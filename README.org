@@ -1,0 +1,9 @@
+#+title: README for JNF Emacs Config
+
+In this repository, I keep personal metadata; not private, just personal.  A remote clone of this repository will be private (e.g., only visible to me).
+
+* Contents
+
+** bookmarks
+
+My emacs bookmarks.  This could move from personal to private.
