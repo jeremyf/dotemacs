@@ -1,0 +1,7 @@
+~/git/org/agenda.org
+~/git/org/todo.org
+~/git/dotzshrc/todo.org
+~/git/takeonrules.github.io/todo.org
+~/git/org/public/todo.org
+~/git/org/personal/todo.org
+~/git/org/hesburgh-libraries/todo.org

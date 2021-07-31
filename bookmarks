@@ -2,7 +2,12 @@
 ;;; This format is meant to be slightly human-readable;
 ;;; nevertheless, you probably don't want to edit it.
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
-(("jnf-blogging.el"
+(("Emacs - Org Roam Configuration"
+ (filename . "~/git/dotzshrc/emacs/jnf-org-roam-v2.el")
+ (front-context-string . "(pretty-hydra-de")
+ (rear-context-string . "Menu\" 1 -0.05))\n")
+ (position . 4039))
+("jnf-blogging.el"
  (filename . "~/git/dotzshrc/emacs/jnf-blogging.el")
  (front-context-string . ";;; -*- lexical-")
  (rear-context-string)
@@ -12,9 +17,6 @@
  (front-context-string . ";; -*- mode: bea")
  (rear-context-string)
  (position . 1))
-("Annotations File"
- (filename . "/Users/jfriesen/git/org/annotations.org")
- (handler . org-bookmark-jump))
 ("Glossary - Take on Rules"
  (filename . "~/git/takeonrules.github.io/data/glossary.yml")
  (front-context-string . "---\n- title: Lim")
@@ -25,9 +27,6 @@
  (filename . "~/git/org/permanent/bibliographic_index.org")
  (handler . org-bookmark-jump)
  (front-context-string . "DAB8F375-7230-46FB-BC5C-02074873888A"))
-("org/index.org"
- (filename . "~/git/org/index.org")
- (handler . org-bookmark-jump))
 ("Straight Repositories"
  (filename . "~/.emacs.d/straight/repos/")
  (front-context-string . "Emacs-wgrep/\n  d")
@@ -37,7 +36,7 @@
  (filename . "~/git/org/permanent/card_index.org")
  (handler . org-bookmark-jump))
 ("org-capture-last-stored"
- (filename . "/Users/jfriesen/git/org/projects/thel-sector/20210718---hidden_research_base_in_new_hull_system.org")
+ (filename . "/Users/jfriesen/git/org/personal/20210727---technical_program_manager_for_shopify.org")
  (handler . org-bookmark-jump))
 ("Thel Sector - Actual Play"
  (filename . "~/git/org/projects/thel-sector/20200813---actual_plays.org")
@@ -59,7 +58,7 @@
  (rear-context-string . "96 Oct 20 13:29 ")
  (position . 132))
 ("elfeed.org"
- (filename . "~/git/org/elfeed.org")
+ (filename . "~/git/org/personal/elfeed.org")
  (front-context-string . "* Blogs         ")
  (rear-context-string)
  (position . 1))
