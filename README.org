@@ -7,3 +7,11 @@ In this repository, I keep personal metadata; not private, just personal.  A rem
 ** bookmarks
 
 My emacs bookmarks.  This could move from personal to private.
+
+** emacs.d
+
+These are files loaded into ~\~/.emacs.d/~
+
+** emacs
+
+The config files for all of my emacs.
