@@ -75,5 +75,11 @@ Version 2016-07-18"
          "e3824ad41f2ec1ed" ))
      @sequence)))
 
+
+;; If the system-name is that of the machine provided by Hesburgh Libraries.
+(if (string-equal system-name "lib-2601")
+    (message "%s" system-name))
+
+
 (provide 'elisp-experiments.el)
 ;;; elisp-experiments.el ends here
