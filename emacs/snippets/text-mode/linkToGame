@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# contributor : Jeremy Friesen <jeremy.n.friesen@gmail.com>
+# name: glossary - linkToGame
+# key: ltg
+# --
+{{< glossary key="${1:$$(yas-choose-value (jnf/tor-game-list))}"${2:${3: abbr="t"}${4: title="$5"}} >}}$0

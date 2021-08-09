@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# contributor: Jeremy Friesen <jeremy.n.friesen@gmail.com>
+# group: takeonrules
+# key: bq
+# name: {{< blockquote >}}
+# --
+{{< blockquote${8: epigraph="t"} ${9: poem="t"} ${6: pre="$7"} cite="$1"${2: cite_url="$3"}${4: post="$5"} >}}
+$0
+{{< /blockquote >}}

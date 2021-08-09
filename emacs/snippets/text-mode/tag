@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# contributor : Jeremy Friesen <jeremy.n.friesen@gmail.com>
+# name: ToR tag list
+# key: tag
+# --
+- ${1:$$(yas-choose-value (jnf/tor-tags-list))}
+${0:tag}

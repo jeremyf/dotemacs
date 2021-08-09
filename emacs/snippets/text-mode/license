@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# contributor: Jeremy Friesen <jeremy.n.friesen@gmail.com>
+# group: takeonrules
+# key: license
+# name: license
+# --
+- ${1:$$(yas-choose-value (jnf/tor-licenses-list))}
+$0

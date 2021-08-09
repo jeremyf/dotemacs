@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: @param
+# key: @p
+# --
+# @param ${1:name} [${2:Types}] $0

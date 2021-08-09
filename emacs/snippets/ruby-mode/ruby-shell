@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: Ruby shell directive
+# key: rb
+# --
+#!/usr/bin/env ruby -w

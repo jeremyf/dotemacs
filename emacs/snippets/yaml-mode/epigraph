@@ -1,0 +1,11 @@
+# -*- mode: snippet -*-
+# contributor: Jeremy Friesen <jeremy.n.friesen@gmail.com>
+# group: takeonrules
+# name: epigraph
+# key: epi
+# expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 'nil))
+# --
+- text: $1
+  key: ${1:$(jnf/epigraph-keyify yas-text)}
+${2:  author_key: ${3:$$(yas-choose-value (jnf/tor-glossary-key-list))}}
+${4:  work_key: ${5:$$(yas-choose-value (jnf/tor-glossary-key-list))}}

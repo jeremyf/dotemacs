@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# contributor: Jeremy Friesen <jeremy.n.friesen@gmail.com>
+# group: takeonrules
+# name: changelog
+# key: ch
+# --
+- date: ${1:`(format-time-string "%Y-%m-%d")`}
+  entries:
+  - "$0"

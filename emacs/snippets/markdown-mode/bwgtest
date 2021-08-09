@@ -1,0 +1,21 @@
+# -*- mode: snippet -*-
+# contributor : Jeremy Friesen <jeremy.n.friesen@gmail.com>
+# group: takeonrules
+# name: BWG Test
+# key: bwgtest
+# --
+
+<dl class="grid">
+<dt>Task</dt>
+<dd>$1</dd>
+<dt>Intent</dt>
+<dd>$2</dd>
+<dt>Consequences</dt>
+<dd>$3</dd>
+<dt>Obstacle</dt>
+<dd>$4</dd>
+<dt>Dice</dt>
+<dd>$5</dd>
+<dt>Result</dt>
+<dd>$6</dd>
+</dl>

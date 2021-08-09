@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# contributor: Jeremy Friesen <jeremy.n.friesen@gmail.com>
+# key: m
+# name: glossary - mention
+# --
+{{< glossary key="${1:$$(yas-choose-value (jnf/tor-glossary-key-list))}"${2:${3: title="$4"}${5: downcase="t"}${6: link="${7:$$(yas-choose-value '("https://" "offer" "sameAs" "itemid"))}"}${8: tag="${9:cite}"}${10: itemprop="mention"}} >}}$0

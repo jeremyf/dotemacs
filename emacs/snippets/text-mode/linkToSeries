@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# contributor : Jeremy Friesen <jeremy.n.friesen@gmail.com>
+# group: takeonrules
+# name: {{< linkToSeries >}}
+# key: lts
+# --
+{{< linkToSeries "${1:$$(yas-choose-value (jnf/tor-series-list))}" >}}$0

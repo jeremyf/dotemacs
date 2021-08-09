@@ -1,0 +1,9 @@
+# -*- mode: snippet -*-
+# contributor: Jeremy Friesen <jeremy.n.friesen@gmail.com>
+# group: hugo
+# key: main
+# name: {{< maincolumn >}}
+# --
+{{% maincolumnWithCaption src="/images/${1:$$(yas-choose-value (jnf/tor-asset-relative-pathname-list))}" alt="$2"${3:${4: title="${5:}"}${6: rotate="${7:270}"}${8: resize="${9:770x}"}} %}}
+$0
+{{% /maincolumnWithCaption %}}

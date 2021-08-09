@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# contributor: Jeremy Friesen <jeremy.n.friesen@gmail.com>
+# key: today
+# name: today
+# --
+<time title="`(format-time-string "%Y-%m-%d")`" datetime="`(format-time-string "%Y-%m-%d")`">today</time>

@@ -1,0 +1,8 @@
+# -*- mode: snippet -*-
+# contributor : Jeremy Friesen <jeremy.n.friesen@gmail.com>
+# name: <dl>...</dl>
+# key: dl
+# --
+<dl${1: class="group"}>
+  $0<dt>$2</dt><dd>$3</dd>
+</dl>

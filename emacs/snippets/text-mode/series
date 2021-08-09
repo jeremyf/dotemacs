@@ -1,0 +1,6 @@
+# -*- mode: snippet -*-
+# contributor : Jeremy Friesen <jeremy.n.friesen@gmail.com>
+# name: ToR series list
+# key: series
+# --
+series: ${1:$$(yas-choose-value (jnf/tor-series-list))}

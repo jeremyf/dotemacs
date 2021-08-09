@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# contributor: Jeremy Friesen
+# group: takeonrules
+# key: update
+# name: {{< update >}}
+# --
+{{< update date="`(format-time-string "%Y-%m-%d")`" mode="${2:$$(yas-choose-value '("inline" "paragraph" "marginnote" "sidenote" "section"))}" >}}$0{{< /update >}}

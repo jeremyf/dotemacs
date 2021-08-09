@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: debugger
+# key: db
+# contributor: Jeremy Friesen
+# --
+require 'byebug'; debugger; true
+:debugger
