@@ -38,9 +38,5 @@
   :bind (:map company-active-map ("C-c h" . 'company-quickhelp-manual-begin))
   :config (company-quickhelp-mode))
 
-;; (use-package company-emoji
-;;   :straight (company-emoji :type git :host github :repo "dunn/company-emoji" :branch "trunk")
-;;   :config (add-to-list 'company-backends 'company-emoji))
-
 (provide 'jnf-company.el)
 ;;; jnf-company.el ends here

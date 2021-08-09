@@ -243,6 +243,7 @@ Useful for pasting code into Reddit's Markdown mode."
   :hook ((prog-mode text-mode) . goggles-mode)
   :config
   (setq-default goggles-pulse t)) ;; set to nil to disable pulsing
+(diminish 'goggles)
 
 ;; https://blog.sumtypeofway.com/posts/emacs-config.html
 (defun jnf/nab-file-name-to-clipboard ()

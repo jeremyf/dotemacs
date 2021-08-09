@@ -49,6 +49,8 @@
 
 ;;Slow down the UI being updated to improve performance
 (setq idle-update-delay 1.1)
+(use-package diminish
+  :straight t)
 
 (require 'jnf-config.el)
 (require 'jnf-display.el)

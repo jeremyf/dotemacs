@@ -13,7 +13,7 @@
   (setq modus-themes-slanted-constructs t
         modus-themes-bold-constructs t
         modus-themes-fringes 'intense ; {nil,'subtle,'intense}
-        modus-themes-mode-line '(accented 3d) ; {nil,'3d,'moody}
+        modus-themes-mode-line '(accented 3d)
         modus-themes-syntax '(alt-syntax yellow-comments green-strings)
         modus-themes-hl-line '(accented intense underline)
         modus-themes-intense-paren-match '(bold intense)
@@ -25,7 +25,7 @@
         modus-themes-tabs-accented t
         modus-themes-completions 'opinionated ; {nil,'moderate,'opinionated}
         modus-themes-diffs nil ; {nil,'desaturated,'fg-only}
-        modus-themes-org-blocks 'rainbow
+        modus-themes-org-blocks 'tinted-background
         modus-themes-variable-pitch-headings nil
         modus-themes-scale-headings t
         modus-themes-scale-1 1.1
