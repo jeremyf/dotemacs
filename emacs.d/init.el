@@ -231,12 +231,10 @@ Tries to preserve the order of window buffers and active window."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (if (eq system-type 'darwin)
-    (progn (add-to-list 'load-path "~/git/jnf-emacs-config/emacs/darwin")
-           (require 'emacs-config.el)))
+    (require 'darwin-emacs-config.el))
 
 (if (eq system-type 'gnu/linux)
-    (progn (add-to-list 'load-path "~/git/jnf-emacs-config/emacs/gnu-linux")
-           (require 'emacs-config.el)))
+    (require 'gnu-linux-emacs-config.el))
 
 ;; This is a common function that I've used in other text editors.
 ;; It's a simple stitch together of sort-lines and
