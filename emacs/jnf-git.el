@@ -121,7 +121,7 @@
                                   (format "L%s-%s" start end)
                                 (format "L%s" start)))))))
   (defun git-link-commit-codeberg (hostname dirname commit)
-    (format "https://%s/%s/src/commit/%s"
+    (format "https://%s/%s/src/%s"
 	    hostname
 	    dirname
 	    commit))
