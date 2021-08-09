@@ -99,5 +99,5 @@ setting (e.g. ns-alternate-modifier)."
   :config
   (global-so-long-mode 1))
 
-(provide 'emacs-config.el)
-;;; emacs-config.el ends here
+(provide 'darwin-emacs-config.el)
+;;; darwin-emacs-config.el ends here

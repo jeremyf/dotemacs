@@ -8,5 +8,5 @@
 ;;; Code:
 (set-frame-font "JetBrains Mono 14" nil t)
 
-(provide 'emacs-config.el)
-;;; emacs-config.el ends here
+(provide 'gnu-linux-emacs-config.el)
+;;; gnu-linux-emacs-config.el ends here
