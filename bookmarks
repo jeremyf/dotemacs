@@ -3,12 +3,12 @@
 ;;; nevertheless, you probably don't want to edit it.
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
 (("Emacs - Org Roam Configuration"
- (filename . "~/git/dotzshrc/emacs/jnf-org-roam-v2.el")
+ (filename . "~/git/jnf-emacs-config/emacs/jnf-org-roam-v2.el")
  (front-context-string . "(pretty-hydra-de")
  (rear-context-string . "Menu\" 1 -0.05))\n")
  (position . 4039))
 ("jnf-blogging.el"
- (filename . "~/git/dotzshrc/emacs/jnf-blogging.el")
+ (filename . "~/git/jnf-emacs-config/emacs/jnf-blogging.el")
  (front-context-string . ";;; -*- lexical-")
  (rear-context-string)
  (position . 1))
@@ -47,13 +47,13 @@
  (rear-context-string . "3K Oct 28 12:43 ")
  (position . 140))
 ("Emacs init.el"
- (filename . "~/git/dotzshrc/emacs.d/init.el")
+ (filename . "~/git/jnf-emacs-config/emacs.d/init.el")
  (front-context-string . ";;; package --- ")
  (rear-context-string)
  (position . 1)
  (annotation . ""))
 ("Emacs jnf packages"
- (filename . "~/git/dotzshrc/emacs/")
+ (filename . "~/git/jnf-emacs-config/emacs/")
  (front-context-string . "darwin/\n  drwxr-")
  (rear-context-string . "96 Oct 20 13:29 ")
  (position . 132))

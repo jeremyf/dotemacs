@@ -12,7 +12,7 @@
 (setq gc-cons-threshold most-positive-fixnum)
 
 ;; I have additional files that I require in the emacs directory
-(add-to-list 'load-path (expand-file-name "~/git/dotzshrc/jnf-emacs-config"))
+(add-to-list 'load-path (expand-file-name "~/git/jnf-emacs-config/emacs"))
 
 ;; https://www.reddit.com/r/emacs/comments/mtb05k/emacs_init_time_decreased_65_after_i_realized_the/
 (setq straight-check-for-modifications '(check-on-save find-when-checking))
@@ -231,11 +231,11 @@ Tries to preserve the order of window buffers and active window."
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (if (eq system-type 'darwin)
-    (progn (add-to-list 'load-path "~/git/dotzshrc/emacs/darwin")
+    (progn (add-to-list 'load-path "~/git/jnf-emacs-config/emacs/darwin")
            (require 'emacs-config.el)))
 
 (if (eq system-type 'gnu/linux)
-    (progn (add-to-list 'load-path "~/git/dotzshrc/emacs/gnu-linux")
+    (progn (add-to-list 'load-path "~/git/jnf-emacs-config/emacs/gnu-linux")
            (require 'emacs-config.el)))
 
 ;; This is a common function that I've used in other text editors.
