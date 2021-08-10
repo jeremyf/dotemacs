@@ -42,7 +42,7 @@
 ;; GCMH does GC when the user is idle.
 (use-package gcmh
   :straight t
-  :diminish gcmh-mode
+  :diminish 'gcmh-mode
   :init
   (setq gcmh-idle-delay 5
 	gcmh-high-cons-threshold (* 16 1024 1024))  ; 16mb
@@ -65,6 +65,7 @@
 ;; Helpful for understanding the likely bounds of directory structure
 (use-package projectile
   :straight t
+  :diminish 'projectile-mode
   :config
   (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
   (projectile-mode +1)
