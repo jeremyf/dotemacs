@@ -260,8 +260,6 @@ echo the method signature of `'delete-duplicate-lines`"
 (require 'jnf-yaml.el)
 (require 'jnf-dired.el)
 
-(diminish 'hungry-delete-mode)
-(diminish 'gcmh-mode)
 (diminish 'eldoc-mode)
 
 ;; Consider for publishing: https://github.com/rnkn/binder
