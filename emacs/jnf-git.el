@@ -97,6 +97,7 @@
 ;; and look to the gutter for guidance.
 (use-package git-gutter-fringe
   :straight (git-gutter-fringe :type git :host github :repo "emacsorphanage/git-gutter-fringe")
+  :diminish 'git-gutter-mode
   :config (global-git-gutter-mode 't)
   (setq git-gutter:modified-sign "Δ"
         git-gutter:added-sign "+"

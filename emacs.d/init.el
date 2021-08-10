@@ -42,6 +42,7 @@
 ;; GCMH does GC when the user is idle.
 (use-package gcmh
   :straight t
+  :diminish gcmh-mode
   :init
   (setq gcmh-idle-delay 5
 	gcmh-high-cons-threshold (* 16 1024 1024))  ; 16mb
@@ -271,6 +272,10 @@ echo the method signature of `'delete-duplicate-lines`"
 ;; (require 'jnf-fennel.el)
 (require 'jnf-yaml.el)
 (require 'jnf-dired.el)
+
+(diminish 'hungry-delete-mode)
+(diminish 'gcmh-mode)
+(diminish 'eldoc-mode)
 
 ;; Consider for publishing: https://github.com/rnkn/binder
 ;; Consider as replacement for org-roam: https://github.com/EFLS/zetteldeft

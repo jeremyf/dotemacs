@@ -26,6 +26,7 @@
 
 (use-package which-key
   :config (which-key-mode)
+  :diminish 'which-key-mode
   :straight t)
 
 (use-package writeroom-mode
@@ -165,6 +166,7 @@ Useful for pasting code into Reddit's Markdown mode."
 ;; Delete multiple spaces in one delete stroke
 (use-package hungry-delete
   :straight t
+  :diminish 'hungry-delete-mode
   :config (global-hungry-delete-mode))
 
 ;; Adding ability to move lines up and down
@@ -241,9 +243,10 @@ Useful for pasting code into Reddit's Markdown mode."
 (use-package goggles
   :straight t
   :hook ((prog-mode text-mode) . goggles-mode)
+  :diminish 'goggles-mode
   :config
   (setq-default goggles-pulse t)) ;; set to nil to disable pulsing
-(diminish 'goggles)
+
 
 ;; https://blog.sumtypeofway.com/posts/emacs-config.html
 (defun jnf/nab-file-name-to-clipboard ()
@@ -257,6 +260,7 @@ Useful for pasting code into Reddit's Markdown mode."
 
 (use-package whole-line-or-region
   :straight t
+  :diminish 'whole-line-or-region-local-mode
   :config (whole-line-or-region-global-mode))
 
 (use-package smartparens
