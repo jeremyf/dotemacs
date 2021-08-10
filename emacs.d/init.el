@@ -37,6 +37,9 @@
 ;; use-package syntax which is often how things are documented.
 (straight-use-package 'use-package)
 
+(use-package diminish
+  :straight t)
+
 ;; GCMH does GC when the user is idle.
 (use-package gcmh
   :straight t
@@ -48,8 +51,6 @@
 
 ;;Slow down the UI being updated to improve performance
 (setq idle-update-delay 1.1)
-(use-package diminish
-  :straight t)
 
 (require 'jnf-config.el)
 (require 'jnf-display.el)
