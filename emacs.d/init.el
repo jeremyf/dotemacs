@@ -9,8 +9,6 @@
 ;;
 ;;; CODE:
 
-(setq gc-cons-threshold most-positive-fixnum)
-
 ;; I have additional files that I require in the emacs directory
 (add-to-list 'load-path (expand-file-name "~/git/jnf-emacs-config/emacs"))
 
@@ -100,12 +98,6 @@
 (use-package ace-window
   :straight t
   :bind (("M-o" . ace-window)))
-
-;; Browse remote git repositories; A prior package I used limited the
-;; behavior to Github. This one is bitbucket, github, sourcehut,
-;; gitlab, etc.
-(use-package browse-at-remote
-  :straight t)
 
 (global-auto-revert-mode)
 ;; https://www.emacswiki.org/emacs/RecentFiles#h5o-1
