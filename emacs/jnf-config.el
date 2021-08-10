@@ -7,6 +7,10 @@
 ;;; Code:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; a modern API for working with files and directories in Emacs.
+;; https://github.com/rejeep/f.el/
+(use-package f :straight t)
+
 (setq jnf/data-directories
       '(
         ;; The themes directory
