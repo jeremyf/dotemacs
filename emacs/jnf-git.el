@@ -139,7 +139,6 @@ Uses `eww-browse-with-external-browser' to determine external browser to use."
   (git-link-homepage remote)
   (eww-browse-with-external-browser (car kill-ring)))
 
-(message "%s" (git-link-homepage))
 (use-package git-messenger
   :config (setq git-messenger:show-detail t)
   :custom (git-messenger:use-magit-popup t)
