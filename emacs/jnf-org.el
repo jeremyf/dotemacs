@@ -48,10 +48,7 @@
          ("C-c l" . org-store-link)
          ("C-c a" . org-agenda)
          ("C-c c" . org-capture)
-         ("C-s-t" . org-toggle-link-display)
-         ("s-9" . jnf-org-insert-immediate-active-timestamp)))
-
-
+         ("C-s-t" . org-toggle-link-display)))
 
 (use-package org-sidebar
   :straight (org-sidebar :type git
@@ -171,7 +168,6 @@ exist after each headings's drawers."
 ;;                                 ))
 
 (require 'jnf-org-roam-v2.el)
-;; (require 'jnf-org-roam.el)
 
 (use-package org-bookmark-heading
   :straight t)
@@ -185,33 +181,6 @@ exist after each headings's drawers."
   :init (setq org-noter-doc-split-fraction '(0.7 . 0.3))
   :bind (
          :map org-noter-notes-mode-map ("C-c o" . 'org-noter-sync-current-note)))
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Begin goto org file
-;; (defmacro go-org-file-fn (file)
-;;   "Define a function to go to Org FILE."
-;;   (let* ((fn-name (intern (concat "go-org-file-" file)))
-;;          (docstring (concat "Go to Org file at: " file)))
-;;     `(defun ,fn-name ()
-;;        ,docstring
-;;        (interactive)
-;;        (gorg ,file))))
-
-(defun gorg(&optional org_file_basename)
-  "Jump to the given ORG_FILE_BASENAME or toggle it's org-sidebar.
-
-If no ORG_FILE_BASENAME is given default to `agenda.org'.  I
-chose `gorg' as the mnemonic Goto Org."
-  (interactive)
-  ;; Need to know the location on disk for the buffer
-  (unless org_file_basename (setq org_file_basename "agenda.org"))
-  (setq org_filename (concat org-directory "/" org_file_basename))
-  (let ((current_filename (if (equal major-mode 'dired-mode) default-directory (buffer-file-name))))
-    (if (equal current_filename (expand-file-name org_filename))
-        (progn (org-sidebar-toggle))
-      (progn (find-file org_filename) (delete-other-windows)))))
-;; End goto org file
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (provide 'jnf-org.el)
 ;;; jnf-org.el ends here
