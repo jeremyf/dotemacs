@@ -11,6 +11,14 @@
 ;; https://github.com/rejeep/f.el/
 (use-package f :straight t)
 
+;; The long lost Emacs string manipulation library.
+;; https://github.com/magnars/s.el/
+(use-package s :straight t)
+
+;; A modern list API for Emacs. No 'cl required.
+;; https://github.com/magnars/dash.el/
+(use-package dash :straight t)
+
 (setq jnf/data-directories
       '(
         ;; The themes directory
