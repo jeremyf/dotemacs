@@ -84,5 +84,20 @@
 
 (setq-default indent-tabs-mode nil) ;; Ensure tabs are expanded, not inserted
 (setq inhibit-startup-screen t) ;; Don't include the  emacs "start" window
+
+(unbind-key "C-x C-d") ;; `list-directory'
+;; `dired' is a better interface than `list-directory'
+(global-set-key (kbd "C-x C-d") 'dired)
+
+;; Far to easy to type this on accident, and I'm not a fan of it's behavior.
+(unbind-key "C-z") ;; `suspend-frame'
+
+;; Given that C-c C-x is common within org-mode, I found myself
+;; accidentally invoking this transposition.  I have "s-q" command for
+;; this.
+(unbind-key "C-x C-c") ;; was `save-buffers-kill-terminal'
+
+
+
 (provide 'jnf-basic-config.el)
 ;;; jnf-basic-config.el ends here

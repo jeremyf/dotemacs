@@ -155,14 +155,6 @@
   (keychain-refresh-environment))
 
 
-;; I never want these.
-(unbind-key "C-x C-d") ;; list-directory
-(global-set-key (kbd "C-x C-d") 'dired)
-;; This addition echoes a previous mapping of neotree to the F8 key.
-(global-set-key (kbd "<f8>") 'dired)
-(unbind-key "C-z") ;; suspend-frame
-
-
 (global-set-key (kbd "C-s-w") 'browse-url-at-point) ;; CTRL+CMD+w
 (setq browse-url-browser-function 'eww-browse-url)
 
