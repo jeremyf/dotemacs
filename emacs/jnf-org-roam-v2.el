@@ -262,7 +262,5 @@ given (or default) TEMPLATE-DEFINITIONS-PLIST."
   :bind (("s-i" . jnf/org-roam--all--node-insert)
          ("C-c i" . jnf/org-subject-menu--all/body)))
 
-(org-roam-setup)
-
 (provide 'jnf-org-roam-v2.el)
 ;;; jnf-org-roam-v2.el ends here
