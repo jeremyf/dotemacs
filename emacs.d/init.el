@@ -154,8 +154,6 @@
   :config
   (keychain-refresh-environment))
 
-;; Open svg files in xml-mode (instead of image rendering mode)
-(add-to-list `auto-mode-alist '("\\.svg\\'" . xml-mode))
 
 ;; I never want these.
 (unbind-key "C-x C-d") ;; list-directory

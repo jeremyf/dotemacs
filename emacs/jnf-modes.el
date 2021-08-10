@@ -48,5 +48,8 @@
 (use-package go-mode
   :straight t)
 
+;; Open svg files in xml-mode (instead of image rendering mode)
+(add-to-list `auto-mode-alist '("\\.svg\\'" . xml-mode))
+
 (provide 'jnf-modes.el)
 ;;; jnf-modes.el ends here
