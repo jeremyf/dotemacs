@@ -131,6 +131,15 @@
   (setq git-link-use-commit t) ;; URL will be SHA instead of branch
   :straight t)
 
+(defun jnf/git-browse-to-repository (remote)
+  "Open in external browser the current repository's given REMOTE.
+
+Uses `eww-browse-with-external-browser' to determine external browser to use."
+  (interactive (list (git-link--select-remote)))
+  (git-link-homepage remote)
+  (eww-browse-with-external-browser (car kill-ring)))
+
+(message "%s" (git-link-homepage))
 (use-package git-messenger
   :config (setq git-messenger:show-detail t)
   :custom (git-messenger:use-magit-popup t)
