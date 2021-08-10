@@ -2,7 +2,8 @@
 ;;
 ;;; Commentary:
 ;;
-;;  Provides some configuration information for Emacs.
+;;  Provides some configuration information for Emacs.  And some
+;;  generally assumed packages that are useful
 ;;
 ;;; Code:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
