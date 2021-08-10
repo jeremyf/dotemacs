@@ -110,24 +110,6 @@
 ;; use this ALL OF THE TIME
 (use-package git-link
   :config
-  (defun git-link-codeberg (hostname dirname filename branch commit start end)
-    (format "https://%s/%s/src/%s/%s"
-	    hostname
-	    dirname
-	    (or branch commit)
-            (concat filename
-                    (when start
-                      (concat "#"
-                              (if end
-                                  (format "L%s-%s" start end)
-                                (format "L%s" start)))))))
-  (defun git-link-commit-codeberg (hostname dirname commit)
-    (format "https://%s/%s/commit/%s"
-	    hostname
-	    dirname
-	    commit))
-  (add-to-list 'git-link-remote-alist '("codeberg.org" git-link-codeberg))
-  (add-to-list 'git-link-commit-remote-alist '("codeberg.org" git-link-commit-codeberg))
   (defun jnf/git-browse-to-repository (remote)
     "Open in external browser the current repository's given REMOTE.
 
