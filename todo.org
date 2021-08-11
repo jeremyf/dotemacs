@@ -1,0 +1,5 @@
+:PROPERTIES:
+:ID:       jnf-emacs-config-todo
+:END:
+#+title: Emacs Config Todo
+#+filetags: :personal:
