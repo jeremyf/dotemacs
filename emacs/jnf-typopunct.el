@@ -103,27 +103,6 @@
      (t ad-do-it))))
 
 
-;; For easy insertion of prime symbols, such as ′ (feet, arcminutes,
-;; derivatives) and ″ (inches, arcseconds, double derivatives), the
-;; following code does the trick:
-(defconst typopunct-prime  (decode-char 'ucs #x2032))
-    (defconst typopunct-dprime (decode-char 'ucs #x2033))
-    (defconst typopunct-tprime (decode-char 'ucs #x2034))
-    (defadvice typopunct-insert-quotation-mark (around primes activate)
-      (cond
-       ((or mark-active
-            (not (eq last-command-char ?')))
-        ad-do-it)
-       ((eq (char-before) ?^)
-        (delete-char -1)
-        (insert typopunct-prime))
-       ((eq (char-before) typopunct-prime)
-        (delete-char -1)
-        (insert typopunct-dprime))
-       ((eq (char-before) typopunct-dprime)
-        (delete-char -1)
-        (insert typopunct-tprime))
-       (t ad-do-it)))
 
 ;; Remember [C-q "] will create a " instead of a “
 ;; And [C-q '] will create a ' instead of a ‘
