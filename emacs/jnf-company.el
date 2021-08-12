@@ -20,7 +20,9 @@
   (company-show-numbers t)
   (company-tooltip-limit 10)
   (company-minimum-prefix-length 3)
-  (company-tooltip-idle-delay 0.2)
+  ;; Slow down the tooltip pop-up.  At 0.2 seconds it's really bad in
+  ;; a large Ruby project.
+  (company-tooltip-idle-delay 0.5)
   (company-async-timeout 20 "Some requests can take a long time. That's fine.")
   :config
 
