@@ -243,24 +243,6 @@ echo the method signature of `'delete-duplicate-lines`"
 
 (diminish 'eldoc-mode)
 
-;; Consider for publishing: https://github.com/rnkn/binder
-;; Consider as replacement for org-roam: https://github.com/EFLS/zetteldeft
-;; And https://github.com/zzamboni/ox-leanpub
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; Begin burly/bufly
-;;
-
-;; (use-package burly :straight (burly :type git :host github :repo "alphapapa/burly.el"))
-;; (use-package bufly :straight (bufly :type git :host github :repo "alphapapa/burly.el"))
-
-;; (use-package bufler
-;;   :straight (bufler :type git :host github :repo "alphapapa/bufler.el"
-;;                     :files (:defaults (:exclude "helm-bufler.el"))))
-
-;; End burly
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 (provide 'init)
 ;;; init.el ends here
 (custom-set-faces
