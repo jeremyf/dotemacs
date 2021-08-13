@@ -85,5 +85,12 @@ The STR identifies the icon and the HEIGHT and V-ADJUST provide
 the configuration."
     (s-concat (all-the-icons-material icon :v-adjust (or v-adjust 0) :height (or height 1)) " " str))
 
+(defun with-octicon (icon str &optional height v-adjust)
+    "Displays an ICON  from Octicon icon.
+
+The STR identifies the icon and the HEIGHT and V-ADJUST provide
+the configuration."
+    (s-concat (all-the-icons-octicon icon :v-adjust (or v-adjust 0) :height (or height 1)) " " str))
+
 (provide 'jnf-display.el)
 ;;; jnf-display.el ends here
