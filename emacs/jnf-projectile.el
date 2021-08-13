@@ -21,7 +21,7 @@
                              ("C-c p" . projectile-command-map)
                              ))
   :bind
-  ("s-t" . projectile-find-file-dwim)
+  ("s-t" . projectile-find-file)
   ("s-." . projectile-toggle-between-implementation-and-test))
 
 (provide 'jnf-projectile.el)
