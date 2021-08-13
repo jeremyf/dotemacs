@@ -227,8 +227,8 @@ Useful for pasting code into Reddit's Markdown mode."
 
 ;; For myself, it's easier to toggle between CTRL+f and CTRL+CMD+f or
 ;; b for moving words.
-(global-set-key (kbd "C-s-f") 'forward-word)
-(global-set-key (kbd "C-s-b") 'backward-word)
+;; (global-set-key (kbd "C-s-f") 'forward-word)
+;; (global-set-key (kbd "C-s-b") 'backward-word)
 
 
 ;; A rather convenient snippet manager.  When you create a snippet, it
