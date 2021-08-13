@@ -25,10 +25,13 @@
 
 (pretty-hydra-define jnf/projectile--menu (:foreign-keys warn :title jnf/projectile--title :quit-key "q" :exit t)
   ("Projectile" (
-                 ("b" projectile-switch-to-buffer "Buffer")
-                 ("f" projectile-find-file-dwim   "Find File DWIM")
-                 ("r" projectile-recentf          "Recent File")
-                 ("t" projectile-find-file        "Find File (aka CMD+t)")
+                 ("b" projectile-switch-to-buffer "Buffer Select…")
+                 ("d" projectile-dired            "Dired to project root…")
+                 ("f" projectile-find-file-dwim   "Find File DWIM…")
+                 ("k" projectile-kill-buffers     "Kill Buffers…")
+                 ("o" projectile-multi-occur      "Occurs in Project…")
+                 ("r" projectile-recentf          "Recent File Select…")
+                 ("t" projectile-find-file        "Find File (aka CMD+t)…")
    )))
 
 (global-set-key (kbd "C-s-p") 'jnf/projectile--menu/body)
