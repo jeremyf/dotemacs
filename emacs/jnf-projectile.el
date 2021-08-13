@@ -12,11 +12,12 @@
   :straight t
   :diminish 'projectile-mode
   :config
-  (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
+  ;; (define-key projectile-mode-map (kbd "C-c p") 'projectile-command-map)
   (projectile-mode +1)
   :custom
   (projectile-project-search-path '("~/git/"))
-  :bind (("s-t" . projectile-find-file)
+  :bind (:map projectile-mode-map ("C-c p" . projectile-command-map)
+         ("s-t" . projectile-find-file)
          ("s-." . projectile-toggle-between-implementation-and-test)))
 
 
