@@ -110,6 +110,11 @@
 ;; use this ALL OF THE TIME
 (use-package git-link
   :config
+  ;; Without the following autoload directive, the call to
+  ;; `eww-browse-with-external-browser' in
+  ;; `jnf/git-browse-to-repository' fails (unless I've previously
+  ;; called `eww').
+  (autoload 'eww-browse-with-external-browser "eww.el")
   (defun jnf/git-browse-to-repository (remote)
     "Open in external browser the current repository's given REMOTE.
 
