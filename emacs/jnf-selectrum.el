@@ -212,7 +212,6 @@ the directory.  `REST' is passed to the `CONSULT-RIPGREP-FUNCTION'."
   )
 
 
-
 ;; Optionally add the `consult-flycheck' command.
 (use-package consult-flycheck
   :straight t

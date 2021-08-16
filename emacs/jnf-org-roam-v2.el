@@ -259,9 +259,9 @@ given (or default) TEMPLATE-DEFINITIONS-PLIST."
                                        (no-delete-other-windows . t)))))
 
   (setq org-roam-v2-ack t)
+  (org-roam-db-autosync-mode)
   :bind (("s-i" . jnf/org-roam--all--node-insert)
          ("C-c i" . jnf/org-subject-menu--all/body)))
 
-(org-roam-db-autosync-mode)
 (provide 'jnf-org-roam-v2.el)
 ;;; jnf-org-roam-v2.el ends here
