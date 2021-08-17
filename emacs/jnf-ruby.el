@@ -24,10 +24,10 @@
 ;; I most often write tests using rspec.
 (use-package rspec-mode
   :straight t
-  :after inf-ruby
   :bind (:map rspec-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
-  :hook (enh-ruby-mode . rspec-mode) ;; should this be `ruby-mode'
-  (enh-ruby-mode . eldoc-mode)) ;; should this be `ruby-mode'
+  :hook (ruby-mode . rspec-mode) ;; should this be `ruby-mode'
+  (ruby-mode . eldoc-mode)) ;; should this be `ruby-mode'
+
 
 (defun rspec-hyrax ()
   "Setup rspec mode docker configuration for Hyrax."
