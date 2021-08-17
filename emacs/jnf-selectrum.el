@@ -142,9 +142,7 @@ the first parameter.  This function handles the `REST' of the
 parameters."
   (interactive)
   (apply consult-line-function
-         (if (use-region-p)
-             (buffer-substring (region-beginning) (region-end))
-           (thing-at-point 'symbol))
+         (if (use-region-p) (buffer-substring (region-beginning) (region-end)))
            rest))
 
   (defun jnf/consult-ripgrep (consult-ripgrep-function &optional dir &rest rest)
@@ -159,7 +157,7 @@ the directory.  `REST' is passed to the `CONSULT-RIPGREP-FUNCTION'."
     (interactive "P")
     (apply consult-ripgrep-function
            dir
-           (if (use-region-p) (buffer-substring (region-beginning) (region-end)) (thing-at-point 'symbol))
+           (if (use-region-p) (buffer-substring (region-beginning) (region-end)))
            rest))
 
   ;; Optionally tweak the register preview window.
