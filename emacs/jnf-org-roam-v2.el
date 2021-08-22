@@ -36,36 +36,44 @@
        ))
 
 ;; A plist that contains the various org-roam subject.  Each subject
-;; has a plist of :templates and :name.  The :templates defines the
-;; named templates available for this subject.  See
+;; has a plist of :templates, :title, :name, and :path-to-todo.
+;;
+;; The :templates defines the ;; named templates available for this subject.  See
 ;; `jnf/org-roam-capture-templates-plist' for list of valid templates.
+;;
+;; The :name is the string version of the subject, suitable for
+;; creating function names.
+;;
+;; The :title is the human readable "title-case" form of the subject.
+;;
+;; The :path-to-todo is the path to the todo file for this subject.
 (setq jnf/org-roam-capture-subjects-plist
       (list
        :all (list
              :templates (list :hesburgh-libraries :personal :personal-encrypted :thel-sector :public)
              :name "all"
              :title "All"
-             :todo "~/git/org/todo.org")
+             :path-to-todo "~/git/org/todo.org")
        :hesburgh-libraries (list
                             :templates (list :hesburgh-libraries)
                             :name "hesburgh-libraries"
                             :title "Hesburgh Libraries"
-                            :todo "~/git/org/hesburgh-libraries/todo.org")
+                            :path-to-todo "~/git/org/hesburgh-libraries/todo.org")
        :personal (list
                   :templates (list :personal :personal-encrypted)
                   :name "personal"
                   :title "Personal"
-                  :todo "~/git/org/personal/todo.org")
+                  :path-to-todo "~/git/org/personal/todo.org")
        :public (list
                 :templates (list :public)
                 :name "public"
                 :title "Public"
-                :todo "~/git/org/public/todo.org")
+                :path-to-todo "~/git/org/public/todo.org")
        :thel-sector (list
                      :templates (list :thel-sector)
                      :name "thel-sector"
                      :title "Thel Sector"
-                     :todo "~/git/org/personal/thel-sector/todo.org")
+                     :path-to-todo "~/git/org/personal/thel-sector/todo.org")
        ))
 
 (cl-defun jnf/org-roam-templates-for-subject (subject
@@ -95,7 +103,7 @@ See `org-roam-capture', `org-roam-node-find', `org-roam-node-insert'."
 
          ;; For todo related antics
          (todo-fn-name (intern (concat "jnf/find-file--" subject-name "--todo")))
-         (path-to-todo (plist-get subject-plist :todo))
+         (path-to-todo (plist-get subject-plist :path-to-todo))
          (todo-docstring (concat "Find the todo file for " subject-name " subject."))
 
          ;; For hydra menu related antics
