@@ -42,12 +42,7 @@
 (setq jnf/org-roam-capture-subjects-plist
       (list
        :all (list
-             :templates (list
-                         :hesburgh-libraries
-                         :personal
-                         :personal-encrypted
-                         :thel-sector
-                         :public)
+             :templates (list :hesburgh-libraries :personal :personal-encrypted :thel-sector :public)
              :name "all"
              :title "All"
              :todo "~/git/org/todo.org")
@@ -57,21 +52,17 @@
                             :title "Hesburgh Libraries"
                             :todo "~/git/org/hesburgh-libraries/todo.org")
        :personal (list
-                  :templates (list
-                              :personal
-                              :personal-encrypted)
+                  :templates (list :personal :personal-encrypted)
                   :name "personal"
                   :title "Personal"
                   :todo "~/git/org/personal/todo.org")
        :public (list
-                :templates (list
-                            :public)
+                :templates (list :public)
                 :name "public"
                 :title "Public"
                 :todo "~/git/org/public/todo.org")
        :thel-sector (list
-                     :templates (list
-                                 :thel-sector)
+                     :templates (list :thel-sector)
                      :name "thel-sector"
                      :title "Thel Sector"
                      :todo "~/git/org/personal/thel-sector/todo.org")
