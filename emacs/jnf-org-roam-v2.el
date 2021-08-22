@@ -49,27 +49,32 @@
                          :thel-sector
                          :public)
              :name "all"
-             :title "All")
+             :title "All"
+             :todo "~/git/org/todo.org")
        :hesburgh-libraries (list
                             :templates (list :hesburgh-libraries)
                             :name "hesburgh-libraries"
-                            :title "Hesburgh Libraries")
+                            :title "Hesburgh Libraries"
+                            :todo "~/git/org/hesburgh-libraries/todo.org")
        :personal (list
                   :templates (list
                               :personal
                               :personal-encrypted)
                   :name "personal"
-                  :title "Personal")
+                  :title "Personal"
+                  :todo "~/git/org/personal/todo.org")
        :public (list
                 :templates (list
                             :public)
                 :name "public"
-                :title "Public")
+                :title "Public"
+                :todo "~/git/org/public/todo.org")
        :thel-sector (list
                      :templates (list
                                  :thel-sector)
                      :name "thel-sector"
-                     :title "Thel Sector")
+                     :title "Thel Sector"
+                     :todo "~/git/org/personal/thel-sector/todo.org")
        ))
 
 (cl-defun jnf/org-roam-templates-for-subject (subject
@@ -84,19 +89,21 @@ given (or default) TEMPLATE-DEFINITIONS-PLIST."
     (-map (lambda (template) (plist-get template-definitions-plist template))
           templates)))
 
-(cl-defmacro create-org-roam-subject-fns-for (plist-key
+(cl-defmacro create-org-roam-subject-fns-for (subject
                                               &key
                                               (subjects-plist jnf/org-roam-capture-subjects-plist))
   "Define a capture, find, and insert org-roam function for SUBJECT.
 
+Fetch the given SUBJECT from the given SUBJECTS-PLIST.
+
 See `org-roam-capture', `org-roam-node-find', `org-roam-node-insert'."
-  (let* ((subject-plist (plist-get subjects-plist plist-key))
-         (subject-as-symbol plist-key)
-         (title (plist-get subject-plist :title))
+  (let* ((subject-plist (plist-get subjects-plist subject))
+         (subject-as-symbol subject)
+         (subject-title (plist-get subject-plist :title))
          (subject-name (plist-get subject-plist :name))
          (hydra-fn-name (intern (concat "jnf/org-subject-menu--" subject-name)))
-         (hydra-menu-title (concat title " Subject Menu"))
-         (hydra-capture-title (concat title ": Capture…"))
+         (hydra-menu-title (concat subject-title " Subject Menu"))
+         (hydra-capture-title (concat subject-title ": Capture…"))
          (capture-fn-name (intern (concat "jnf/org-roam--" subject-name "--capture")))
          (capture-docstring (concat "As `jnf/org-roam-capture' but scoped to " subject-name
                             ".\n\nArguments GOTO and KEYS see `org-capture'."))
