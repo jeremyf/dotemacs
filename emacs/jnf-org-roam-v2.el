@@ -101,9 +101,12 @@ See `org-roam-capture', `org-roam-node-find', `org-roam-node-insert'."
          (subject-as-symbol subject)
          (subject-title (plist-get subject-plist :title))
          (subject-name (plist-get subject-plist :name))
+         (todo-fn-name (intern (concat "jnf/find-file--" subject-name "--todo")))
+         (path-to-todo (plist-get subject-plist :todo))
+         (todo-docstring (concat "Find the todo file for " subject-name " subject."))
          (hydra-fn-name (intern (concat "jnf/org-subject-menu--" subject-name)))
          (hydra-menu-title (concat subject-title " Subject Menu"))
-         (hydra-capture-title (concat subject-title ": Capture…"))
+         (hydra-todo-title (concat subject-title " Todo…"))
          (capture-fn-name (intern (concat "jnf/org-roam--" subject-name "--capture")))
          (capture-docstring (concat "As `jnf/org-roam-capture' but scoped to " subject-name
                             ".\n\nArguments GOTO and KEYS see `org-capture'."))
@@ -115,6 +118,11 @@ See `org-roam-capture', `org-roam-node-find', `org-roam-node-insert'."
                             "\n\nArguments INITIAL-INPUT and OTHER-WINDOW are from `org-roam-find-mode'."))
          )
     `(progn
+       (defun ,todo-fn-name ()
+         ,todo-docstring
+         (interactive)
+         (find-file (file-truename ,path-to-todo)))
+
        (defun ,capture-fn-name (&optional goto keys)
          ,capture-docstring
          (interactive "P")
@@ -138,7 +146,8 @@ See `org-roam-capture', `org-roam-node-find', `org-roam-node-insert'."
          (
           `hydra-menu-title
           (
-           ("c" ,capture-fn-name     ,hydra-capture-title)
+           ("t" ,todo-fn-name        ,hydra-todo-title)
+           ("c" ,capture-fn-name     " ├─ Capture…")
            ("i" ,insert-fn-name      " ├─ Insert…")
            ("f" ,find-fn-name        " └─ Find…")
            ("/" org-roam-buffer-toggle            "Toggle Buffer")
@@ -146,16 +155,7 @@ See `org-roam-capture', `org-roam-node-find', `org-roam-node-insert'."
            )))
        )))
 
-(defmacro create-find-file-fn-for (subject)
-  "Define a `jnf/find-file--subject--todo' function for SUBJECT."
-  (let* ((fn-name (intern (concat "jnf/find-file--" subject "--todo")))
-         (path-to-todo (concat "~/git/org/" subject "/todo.org"))
-         (docstring (concat "Find the todo file for " subject " subject.")))
-    `(defun ,fn-name ()
-       ,docstring
-       (interactive)
-       (find-file (file-truename ,path-to-todo)))
-    ))
+
 
 ;; I tried using a dolist to call each of the macros, but that didn't
 ;; work.  I'd love some additional help refactoring this.  But for
@@ -165,9 +165,6 @@ See `org-roam-capture', `org-roam-node-find', `org-roam-node-insert'."
 (create-org-roam-subject-fns-for :public)
 (create-org-roam-subject-fns-for :personal)
 (create-org-roam-subject-fns-for :hesburgh-libraries)
-
-(create-find-file-fn-for "personal")
-(create-find-file-fn-for "hesburgh-libraries")
 
 ;; A menu of common tasks for `org-roam'.  This menu is for all subjects.
 (defvar jnf/org-subject-menu--title (with-faicon "book" "Org Subject Menu" 1 -0.05))
@@ -179,9 +176,10 @@ See `org-roam-capture', `org-roam-node-find', `org-roam-node-insert'."
     ("p c" jnf/org-roam--personal--capture     " ├─ Capture…")
     ("p i" jnf/org-roam--personal--node-insert " ├─ Insert…")
     ("p f" jnf/org-roam--personal--node-find   " └─ Find…")
-    ("u c" jnf/org-roam--public--capture       "Public: Capture…")
-    ("u i" jnf/org-roam--public--node-insert   " ├─ Insert…")
-    ("u f" jnf/org-roam--public--node-find     " └─ Find…")
+    ("u t" jnf/find-file--public--todo       "Public Todo…")
+    ("u c" jnf/org-roam--public--capture     " ├─ Capture…")
+    ("u i" jnf/org-roam--public--node-insert " ├─ Insert…")
+    ("u f" jnf/org-roam--public--node-find   " └─ Find…")
     )
    "Projects"
    (
@@ -189,7 +187,8 @@ See `org-roam-capture', `org-roam-node-find', `org-roam-node-insert'."
     ("h c" jnf/org-roam--hesburgh-libraries--capture     " ├─ Capture…")
     ("h i" jnf/org-roam--hesburgh-libraries--node-insert " ├─ Insert…")
     ("h f" jnf/org-roam--hesburgh-libraries--node-find   " └─ Find…")
-    ("t c" jnf/org-roam--thel-sector--capture            "Thel Sector: Capture …")
+    ("h t" jnf/find-file--thel-sector--todo              "Thel Sector Todo…")
+    ("h c" jnf/org-roam--thel-sector--capture            " ├─ Capture…")
     ("t i" jnf/org-roam--thel-sector--node-insert        " ├─ Insert…")
     ("t f" jnf/org-roam--thel-sector--node-find          " └─ Find…")
     )
