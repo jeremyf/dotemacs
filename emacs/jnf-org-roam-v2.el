@@ -119,6 +119,17 @@ given (or default) TEMPLATE-DEFINITIONS-PLIST."
                            (lambda (node) (-contains-p (org-roam-node-tags node) ,subject))
                            :templates (jnf/org-roam-templates-for-subject ,subject-as-symbol)))))
 
+(defmacro create-find-file-fn-for (subject)
+  "Define a `jnf/find-file--subject--todo' function for SUBJECT."
+  (let* ((fn-name (intern (concat "jnf/find-file--" subject "--todo")))
+         (path-to-todo (concat "~/git/org/" subject "/todo.org"))
+         (docstring (concat "Find the todo file for " subject " subject.")))
+    `(defun ,fn-name ()
+       ,docstring
+       (interactive)
+       (find-file (file-truename ,path-to-todo)))
+    ))
+
 ;; I tried using a dolist to call each of the macros, but that didn't
 ;; work.  I'd love some additional help refactoring this.  But for
 ;; now, what I have is quite adequate.  It would be nice to
@@ -138,17 +149,8 @@ given (or default) TEMPLATE-DEFINITIONS-PLIST."
 (create-org-roam-capture-fn-for "hesburgh-libraries")
 (create-org-roam-node-insert-fn-for "hesburgh-libraries")
 (create-org-roam-node-find-fn-for "hesburgh-libraries")
-
-(defun jnf/find-file--personal-todo ()
-  "Find personal todo file."
-  (interactive)
-  (find-file (file-truename "~/git/org/personal/todo.org")))
-
-(defun jnf/find-file--hesburgh-libraries-todo ()
-  "Find hesburgh-libraries todo file."
-  (interactive)
-  (find-file (file-truename "~/git/org/hesburgh-libraries/todo.org")))
-
+(create-find-file-fn-for "personal")
+(create-find-file-fn-for "hesburgh-libraries")
 
 ;; A menu of common tasks for `org-roam'.  This menu is for all subjects.
 (defvar jnf/org-subject-menu--title (with-faicon "book" "Org Subject Menu" 1 -0.05))
@@ -156,7 +158,7 @@ given (or default) TEMPLATE-DEFINITIONS-PLIST."
   (
    "Public / Personal"
    (
-    ("p t" jnf/find-file--personal-todo        "Personal Todo…")
+    ("p t" jnf/find-file--personal--todo       "Personal Todo…")
     ("p c" jnf/org-roam--personal--capture     " ├─ Capture…")
     ("p i" jnf/org-roam--personal--node-insert " ├─ Insert…")
     ("p f" jnf/org-roam--personal--node-find   " └─ Find…")
@@ -166,7 +168,7 @@ given (or default) TEMPLATE-DEFINITIONS-PLIST."
     )
    "Projects"
    (
-    ("h t" jnf/find-file--hesburgh-libraries-todo        "Hesburgh Libraries Todo…")
+    ("h t" jnf/find-file--hesburgh-libraries--todo       "Hesburgh Libraries Todo…")
     ("h c" jnf/org-roam--hesburgh-libraries--capture     " ├─ Capture…")
     ("h i" jnf/org-roam--hesburgh-libraries--node-insert " ├─ Insert…")
     ("h f" jnf/org-roam--hesburgh-libraries--node-find   " └─ Find…")
@@ -196,7 +198,7 @@ given (or default) TEMPLATE-DEFINITIONS-PLIST."
   (
    "Personal Subject Menu"
    (
-    ("t" jnf/find-file--personal-todo       "Personal Todo…")
+    ("t" jnf/find-file--personal--todo       "Personal Todo…")
     ("c" jnf/org-roam--personal--capture     " ├─ Capture…")
     ("i" jnf/org-roam--personal--node-insert " ├─ Insert…")
     ("f" jnf/org-roam--personal--node-find   " └─ Find…")
@@ -219,7 +221,7 @@ given (or default) TEMPLATE-DEFINITIONS-PLIST."
   (
    "Hesburgh Libraries Subject Menu"
    (
-    ("t" jnf/find-file--hesburgh-libraries-todo        "Hesburgh Libraries Todo…")
+    ("t" jnf/find-file--hesburgh-libraries--todo       "Hesburgh Libraries Todo…")
     ("c" jnf/org-roam--hesburgh-libraries--capture     " ├─ Capture…")
     ("i" jnf/org-roam--hesburgh-libraries--node-insert " ├─ Insert…")
     ("f" jnf/org-roam--hesburgh-libraries--node-find   " └─ Find Node…")
