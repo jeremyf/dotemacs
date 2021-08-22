@@ -79,45 +79,42 @@ given (or default) TEMPLATE-DEFINITIONS-PLIST."
     (-map (lambda (template) (plist-get template-definitions-plist template))
           templates)))
 
-(defmacro create-org-roam-capture-fn-for (subject)
-  "Define a `jnf/org-roam-capture' function for SUBJECT."
-  (let* ((subject-as-symbol (intern (concat ":" subject)))
-         (fn-name (intern (concat "jnf/org-roam--" subject "--capture")))
-         (docstring (concat "As `jnf/org-roam-capture' but scoped to " subject
-                            ".\n\nArguments GOTO and KEYS see `org-capture'.")))
-    `(defun ,fn-name (&optional goto keys)
-       ,docstring
-       (interactive "P")
-       (org-roam-capture goto
-                         keys
-                         :filter-fn (lambda (node) (-contains-p (org-roam-node-tags node) ,subject))
-                         :templates (jnf/org-roam-templates-for-subject ,subject-as-symbol)))))
+(defmacro create-org-roam-subject-fns-for (subject)
+  "Define a capture, find, and insert org-roam function for SUBJECT.
 
-(defmacro create-org-roam-node-insert-fn-for (subject)
-  "Define a `jnf/org-roam-node-insert' function for SUBJECT."
+See `org-roam-capture', `org-roam-node-find', `org-roam-node-insert'."
   (let* ((subject-as-symbol (intern (concat ":" subject)))
-         (fn-name (intern (concat "jnf/org-roam--" subject "--node-insert")))
-         (docstring (concat "As `jnf/org-roam-insert-node' but scoped to " subject " subject.")))
-    `(defun ,fn-name ()
-       ,docstring
-       (interactive)
-       (org-roam-node-insert (lambda (node) (-contains-p (org-roam-node-tags node) ,subject))
-                             :templates (jnf/org-roam-templates-for-subject ,subject-as-symbol)))))
-
-(defmacro create-org-roam-node-find-fn-for (subject)
-  "Define a `jnf/org-roam-node-find' function for SUBJECT."
-  (let* ((subject-as-symbol (intern (concat ":" subject)))
-         (fn-name (intern (concat "jnf/org-roam--" subject "--node-find")))
-         (docstring (concat "As `jnf/org-roam-find-node' but scoped to "
+         (capture-fn-name (intern (concat "jnf/org-roam--" subject "--capture")))
+         (capture-docstring (concat "As `jnf/org-roam-capture' but scoped to " subject
+                            ".\n\nArguments GOTO and KEYS see `org-capture'."))
+         (insert-fn-name (intern (concat "jnf/org-roam--" subject "--node-insert")))
+         (insert-docstring (concat "As `jnf/org-roam-insert-node' but scoped to " subject " subject."))
+         (find-fn-name (intern (concat "jnf/org-roam--" subject "--node-find")))
+         (find-docstring (concat "As `jnf/org-roam-find-node' but scoped to "
                             subject " subject."
-                            "\n\nArguments INITIAL-INPUT and OTHER-WINDOW are from `org-roam-find-mode'.")))
-    `(defun ,fn-name (&optional other-window initial-input)
-       ,docstring
-       (interactive current-prefix-arg)
-       (org-roam-node-find other-window
-                           initial-input
-                           (lambda (node) (-contains-p (org-roam-node-tags node) ,subject))
-                           :templates (jnf/org-roam-templates-for-subject ,subject-as-symbol)))))
+                            "\n\nArguments INITIAL-INPUT and OTHER-WINDOW are from `org-roam-find-mode'."))
+                )
+    `(progn
+       (defun ,capture-fn-name (&optional goto keys)
+         ,capture-docstring
+         (interactive "P")
+         (org-roam-capture goto
+                           keys
+                           :filter-fn (lambda (node) (-contains-p (org-roam-node-tags node) ,subject))
+                           :templates (jnf/org-roam-templates-for-subject ,subject-as-symbol)))
+       (defun ,insert-fn-name ()
+         ,insert-docstring
+         (interactive)
+         (org-roam-node-insert (lambda (node) (-contains-p (org-roam-node-tags node) ,subject))
+                               :templates (jnf/org-roam-templates-for-subject ,subject-as-symbol)))
+       (defun ,find-fn-name (&optional other-window initial-input)
+         ,find-docstring
+         (interactive current-prefix-arg)
+         (org-roam-node-find other-window
+                             initial-input
+                             (lambda (node) (-contains-p (org-roam-node-tags node) ,subject))
+                             :templates (jnf/org-roam-templates-for-subject ,subject-as-symbol)))
+)))
 
 (defmacro create-find-file-fn-for (subject)
   "Define a `jnf/find-file--subject--todo' function for SUBJECT."
@@ -134,21 +131,11 @@ given (or default) TEMPLATE-DEFINITIONS-PLIST."
 ;; work.  I'd love some additional help refactoring this.  But for
 ;; now, what I have is quite adequate.  It would be nice to
 ;; more programatically generate the hydra menus (see below).
-(create-org-roam-capture-fn-for "thel-sector")
-(create-org-roam-node-insert-fn-for "thel-sector")
-(create-org-roam-node-find-fn-for "thel-sector")
+(create-org-roam-subject-fns-for "thel-sector")
+(create-org-roam-subject-fns-for "public")
+(create-org-roam-subject-fns-for "personal")
+(create-org-roam-subject-fns-for "hesburgh-libraries")
 
-(create-org-roam-capture-fn-for "public")
-(create-org-roam-node-insert-fn-for "public")
-(create-org-roam-node-find-fn-for "public")
-
-(create-org-roam-capture-fn-for "personal")
-(create-org-roam-node-insert-fn-for "personal")
-(create-org-roam-node-find-fn-for "personal")
-
-(create-org-roam-capture-fn-for "hesburgh-libraries")
-(create-org-roam-node-insert-fn-for "hesburgh-libraries")
-(create-org-roam-node-find-fn-for "hesburgh-libraries")
 (create-find-file-fn-for "personal")
 (create-find-file-fn-for "hesburgh-libraries")
 
