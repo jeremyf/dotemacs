@@ -48,23 +48,28 @@
                          :personal-encrypted
                          :thel-sector
                          :public)
-             :name "all")
+             :name "all"
+             :title "All")
        :hesburgh-libraries (list
                             :templates (list :hesburgh-libraries)
-                            :name "hesburgh-libraries")
+                            :name "hesburgh-libraries"
+                            :title "Hesburgh Libraries")
        :personal (list
                   :templates (list
                               :personal
                               :personal-encrypted)
-                  :name "personal")
+                  :name "personal"
+                  :title "Personal")
        :public (list
                 :templates (list
                             :public)
-                :name "public")
+                :name "public"
+                :title "Public")
        :thel-sector (list
                      :templates (list
                                  :thel-sector)
-                     :name "thel-sector")
+                     :name "thel-sector"
+                     :title "Thel Sector")
        ))
 
 (cl-defun jnf/org-roam-templates-for-subject (subject
@@ -79,11 +84,16 @@ given (or default) TEMPLATE-DEFINITIONS-PLIST."
     (-map (lambda (template) (plist-get template-definitions-plist template))
           templates)))
 
-(cl-defmacro create-org-roam-subject-fns-for (subject &key title)
+(cl-defmacro create-org-roam-subject-fns-for (plist-key
+                                              &key
+                                              (subjects-plist jnf/org-roam-capture-subjects-plist))
   "Define a capture, find, and insert org-roam function for SUBJECT.
 
 See `org-roam-capture', `org-roam-node-find', `org-roam-node-insert'."
-  (let* ((subject-as-symbol (intern (concat ":" subject)))
+  (let* ((subject-plist (plist-get subjects-plist plist-key))
+         (subject-as-symbol plist-key)
+         (title (plist-get subject-plist :title))
+         (subject (plist-get subject-plist :name))
          (hydra-fn-name (intern (concat "jnf/org-subject-menu--" subject)))
          (hydra-menu-title (concat title " Subject Menu"))
          (hydra-capture-title (concat title ": Capture…"))
@@ -96,7 +106,7 @@ See `org-roam-capture', `org-roam-node-find', `org-roam-node-insert'."
          (find-docstring (concat "As `jnf/org-roam-find-node' but scoped to "
                             subject " subject."
                             "\n\nArguments INITIAL-INPUT and OTHER-WINDOW are from `org-roam-find-mode'."))
-                )
+         )
     `(progn
        (defun ,capture-fn-name (&optional goto keys)
          ,capture-docstring
@@ -144,10 +154,10 @@ See `org-roam-capture', `org-roam-node-find', `org-roam-node-insert'."
 ;; work.  I'd love some additional help refactoring this.  But for
 ;; now, what I have is quite adequate.  It would be nice to
 ;; more programatically generate the hydra menus (see below).
-(create-org-roam-subject-fns-for "thel-sector" :title "Thel Sector")
-(create-org-roam-subject-fns-for "public" :title "Public")
-(create-org-roam-subject-fns-for "personal" :title "Personal")
-(create-org-roam-subject-fns-for "hesburgh-libraries" :title "Hesburgh Libraries")
+(create-org-roam-subject-fns-for :thel-sector)
+(create-org-roam-subject-fns-for :public)
+(create-org-roam-subject-fns-for :personal)
+(create-org-roam-subject-fns-for :hesburgh-libraries)
 
 (create-find-file-fn-for "personal")
 (create-find-file-fn-for "hesburgh-libraries")
