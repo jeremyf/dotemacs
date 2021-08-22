@@ -147,41 +147,39 @@ given (or default) TEMPLATE-DEFINITIONS-PLIST."
    "Public / Personal"
    (
     ("p t" jnf/find-file--personal-todo        "Personal Todo…")
-    ("p +" jnf/org-roam--personal--capture     " ├─ Capture…")
-    ("p !" jnf/org-roam--personal--node-insert " ├─ Insert…")
-    ("p ?" jnf/org-roam--personal--node-find   " └─ Find…")
-    ("u +" jnf/org-roam--public--capture       "Public: Capture…")
-    ("u !" jnf/org-roam--public--node-insert   " ├─ Insert…")
-    ("u ?" jnf/org-roam--public--node-find     " └─ Find…")
+    ("p c" jnf/org-roam--personal--capture     " ├─ Capture…")
+    ("p i" jnf/org-roam--personal--node-insert " ├─ Insert…")
+    ("p f" jnf/org-roam--personal--node-find   " └─ Find…")
+    ("u c" jnf/org-roam--public--capture       "Public: Capture…")
+    ("u i" jnf/org-roam--public--node-insert   " ├─ Insert…")
+    ("u f" jnf/org-roam--public--node-find     " └─ Find…")
     )
    "Projects"
    (
     ("h t" jnf/find-file--hesburgh-libraries-todo        "Hesburgh Libraries Todo…")
-    ("h +" jnf/org-roam--hesburgh-libraries--capture     " ├─ Capture…")
-    ("h !" jnf/org-roam--hesburgh-libraries--node-insert " ├─ Insert…")
-    ("h ?" jnf/org-roam--hesburgh-libraries--node-find   " └─ Find…")
-    ("t +" jnf/org-roam--thel-sector--capture            "Thel Sector: Capture …")
-    ("t !" jnf/org-roam--thel-sector--node-insert        " ├─ Insert…")
-    ("t ?" jnf/org-roam--thel-sector--node-find          " └─ Find…")
+    ("h c" jnf/org-roam--hesburgh-libraries--capture     " ├─ Capture…")
+    ("h i" jnf/org-roam--hesburgh-libraries--node-insert " ├─ Insert…")
+    ("h f" jnf/org-roam--hesburgh-libraries--node-find   " └─ Find…")
+    ("t c" jnf/org-roam--thel-sector--capture            "Thel Sector: Capture …")
+    ("t i" jnf/org-roam--thel-sector--node-insert        " ├─ Insert…")
+    ("t f" jnf/org-roam--thel-sector--node-find          " └─ Find…")
     )
    "Org Mode"
-   (("+" org-roam-capture               "Capture…")
-    ("!" org-roam-node-insert           " ├─ Insert…")
-    ("?" org-roam-node-find             " └─ Find…")
-    ("@" org-roam-dailies-capture-today "Capture Daily…")
-    ("#" org-roam-buffer-toggle         "Toggle Buffer")
-    ("*" jnf/toggle-roam-project-filter "Toggle Default Filter")
+   (("c" jnf/org-roam--all--capture     "Capture…")
+    ("i" jnf/org-roam--all--node-insert " ├─ Insert…")
+    ("f" jnf/org-roam--all--node-find   " └─ Find…")
+    ("/" org-roam-buffer-toggle         "Toggle Buffer")
+    ("#" jnf/toggle-roam-project-filter "Toggle Default Filter")
     )))
 
 (pretty-hydra-define jnf/org-subject-menu--thel-sector (:foreign-keys warn :title jnf/org-subject-menu--title :quit-key "q" :exit t)
   (
    "Thel Sector Subject Menu"
-   (("+" jnf/org-roam--thel-sector--capture     "Thel Sector: Capture…")
-    ("!" jnf/org-roam--thel-sector--node-insert " ├─ Insert…")
-    ("?" jnf/org-roam--thel-sector--node-find   " └─ Find Node…")
-    ("@" org-roam-dailies-capture-today         "Capture Daily…")
-    ("#" org-roam-buffer-toggle                 "Toggle Buffer")
-    ("*" jnf/toggle-roam-project-filter         "Toggle Filter…")
+   (("c" jnf/org-roam--thel-sector--capture     "Thel Sector: Capture…")
+    ("i" jnf/org-roam--thel-sector--node-insert " ├─ Insert…")
+    ("f" jnf/org-roam--thel-sector--node-find   " └─ Find Node…")
+    ("/" org-roam-buffer-toggle                 "Toggle Buffer")
+    ("#" jnf/toggle-roam-project-filter         "Toggle Filter…")
     )))
 
 (pretty-hydra-define jnf/org-subject-menu--personal (:foreign-keys warn :title jnf/org-subject-menu--title :quit-key "q" :exit t)
@@ -189,24 +187,22 @@ given (or default) TEMPLATE-DEFINITIONS-PLIST."
    "Personal Subject Menu"
    (
     ("t" jnf/find-file--personal-todo       "Personal Todo…")
-    ("+" jnf/org-roam--personal--capture     " ├─ Capture…")
-    ("!" jnf/org-roam--personal--node-insert " ├─ Insert…")
-    ("?" jnf/org-roam--personal--node-find   " └─ Find…")
-    ("@" org-roam-dailies-capture-today      "Capture Daily…")
-    ("#" org-roam-buffer-toggle              "Toggle Buffer")
-    ("*" jnf/toggle-roam-project-filter      "Toggle Filter…")
+    ("c" jnf/org-roam--personal--capture     " ├─ Capture…")
+    ("i" jnf/org-roam--personal--node-insert " ├─ Insert…")
+    ("f" jnf/org-roam--personal--node-find   " └─ Find…")
+    ("/" org-roam-buffer-toggle              "Toggle Buffer")
+    ("#" jnf/toggle-roam-project-filter      "Toggle Filter…")
     )))
 
 (pretty-hydra-define jnf/org-subject-menu--public (:foreign-keys warn :title jnf/org-subject-menu--title :quit-key "q" :exit t)
   (
    "Public Subject Menu"
    (
-    ("+" jnf/org-roam--public--capture     "Public: Capture…")
-    ("!" jnf/org-roam--public--node-insert " ├─ Insert…")
-    ("?" jnf/org-roam--public--node-find   " └─ Find…")
-    ("@" org-roam-dailies-capture-today    "Capture Daily…")
-    ("#" org-roam-buffer-toggle            "Toggle Buffer")
-    ("*" jnf/toggle-roam-project-filter    "Toggle Filter…")
+    ("c" jnf/org-roam--public--capture     "Public: Capture…")
+    ("i" jnf/org-roam--public--node-insert " ├─ Insert…")
+    ("f" jnf/org-roam--public--node-find   " └─ Find…")
+    ("/" org-roam-buffer-toggle            "Toggle Buffer")
+    ("#" jnf/toggle-roam-project-filter    "Toggle Filter…")
     )))
 
 (pretty-hydra-define jnf/org-subject-menu--hesburgh-libraries (:foreign-keys warn :title jnf/org-subject-menu--title :quit-key "q" :exit t)
@@ -214,12 +210,11 @@ given (or default) TEMPLATE-DEFINITIONS-PLIST."
    "Hesburgh Libraries Subject Menu"
    (
     ("t" jnf/find-file--hesburgh-libraries-todo        "Hesburgh Libraries Todo…")
-    ("+" jnf/org-roam--hesburgh-libraries--capture     " ├─ Capture…")
-    ("!" jnf/org-roam--hesburgh-libraries--node-insert " ├─ Insert…")
-    ("?" jnf/org-roam--hesburgh-libraries--node-find   " └─ Find Node…")
-    ("@" org-roam-dailies-capture-today                "Capture Daily…")
-    ("#" org-roam-buffer-toggle                        "Toggle Buffer")
-    ("*" jnf/toggle-roam-project-filter                "Toggle Filter…")
+    ("c" jnf/org-roam--hesburgh-libraries--capture     " ├─ Capture…")
+    ("i" jnf/org-roam--hesburgh-libraries--node-insert " ├─ Insert…")
+    ("f" jnf/org-roam--hesburgh-libraries--node-find   " └─ Find Node…")
+    ("/" org-roam-buffer-toggle                        "Toggle Buffer")
+    ("#" jnf/toggle-roam-project-filter                "Toggle Filter…")
     )))
 
 (defun jnf/toggle-roam-project-filter (project)
@@ -232,11 +227,11 @@ given (or default) TEMPLATE-DEFINITIONS-PLIST."
                                ("personal" 4)
                                ("public" 5)
                                ))))
+  (global-set-key (kbd "s-TAB") (intern (concat "jnf/org-roam--" project "--node-insert"))) ;; Command + Control + i
+  (global-set-key (kbd "C-s-c") (intern (concat "jnf/org-roam--" project "--capture")))
+  (global-set-key (kbd "C-s-f") (intern (concat "jnf/org-roam--" project "--find")))
   (global-set-key (kbd "s-i") (intern (concat "jnf/org-roam--" project "--node-insert")))
   (global-set-key (kbd "C-c i") (intern (concat "jnf/org-subject-menu--" project "/body"))))
-
-;; Including the alias to reduce switching necessary for `jnf/toggle-roam-project-filter'.
-(defalias 'jnf/org-roam--all--node-insert 'org-roam-node-insert)
 
 ;; With the latest update of org-roam, things again behavior
 ;; correctly.  Now I can just load org-roam as part of my day to day
@@ -250,7 +245,7 @@ given (or default) TEMPLATE-DEFINITIONS-PLIST."
   (org-roam-capture-templates (jnf/org-roam-templates-for-context :all))
   :init
   (add-to-list 'display-buffer-alist
-               '("\\*org-roam\\*"
+               '("\\*org-roam\\#"
                  (display-buffer-in-side-window)
                  (side . right)
                  (slot . 0)
@@ -260,8 +255,16 @@ given (or default) TEMPLATE-DEFINITIONS-PLIST."
 
   (setq org-roam-v2-ack t)
   (org-roam-db-autosync-mode)
-  :bind (("s-i" . jnf/org-roam--all--node-insert)
+  :bind (("s-TAB" . jnf/org-roam--all--node-insert) ;; Command + Control + i
+         ("C-s-c" . jnf/org-roam--all--capture)
+         ("C-s-f" . jnf/org-roam--all--node-find)
+         ("s-i" . jnf/org-roam--all--node-insert) ;; Past behavior
          ("C-c i" . jnf/org-subject-menu--all/body)))
+
+;; Including the alias to reduce switching necessary for `jnf/toggle-roam-project-filter'.
+(defalias 'jnf/org-roam--all--node-insert 'org-roam-node-insert)
+(defalias 'jnf/org-roam--all--node-find 'org-roam-node-find)
+(defalias 'jnf/org-roam--all--capture 'org-roam-capture)
 
 (provide 'jnf-org-roam-v2.el)
 ;;; jnf-org-roam-v2.el ends here
