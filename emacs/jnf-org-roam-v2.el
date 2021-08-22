@@ -79,11 +79,14 @@ given (or default) TEMPLATE-DEFINITIONS-PLIST."
     (-map (lambda (template) (plist-get template-definitions-plist template))
           templates)))
 
-(defmacro create-org-roam-subject-fns-for (subject)
+(cl-defmacro create-org-roam-subject-fns-for (subject &key title)
   "Define a capture, find, and insert org-roam function for SUBJECT.
 
 See `org-roam-capture', `org-roam-node-find', `org-roam-node-insert'."
   (let* ((subject-as-symbol (intern (concat ":" subject)))
+         (hydra-fn-name (intern (concat "jnf/org-subject-menu--" subject)))
+         (hydra-menu-title (concat title " Subject Menu"))
+         (hydra-capture-title (concat title ": Capture…"))
          (capture-fn-name (intern (concat "jnf/org-roam--" subject "--capture")))
          (capture-docstring (concat "As `jnf/org-roam-capture' but scoped to " subject
                             ".\n\nArguments GOTO and KEYS see `org-capture'."))
@@ -114,6 +117,16 @@ See `org-roam-capture', `org-roam-node-find', `org-roam-node-insert'."
                              initial-input
                              (lambda (node) (-contains-p (org-roam-node-tags node) ,subject))
                              :templates (jnf/org-roam-templates-for-subject ,subject-as-symbol)))
+       (pretty-hydra-define ,hydra-fn-name (:foreign-keys warn :title jnf/org-subject-menu--title :quit-key "q" :exit t)
+         (
+          `hydra-menu-title
+          (
+           ("c" ,capture-fn-name     ,hydra-capture-title)
+           ("i" ,insert-fn-name      " ├─ Insert…")
+           ("f" ,find-fn-name        " └─ Find…")
+           ("/" org-roam-buffer-toggle            "Toggle Buffer")
+           ("#" jnf/toggle-roam-project-filter    "Toggle Filter…")
+           )))
 )))
 
 (defmacro create-find-file-fn-for (subject)
@@ -131,10 +144,10 @@ See `org-roam-capture', `org-roam-node-find', `org-roam-node-insert'."
 ;; work.  I'd love some additional help refactoring this.  But for
 ;; now, what I have is quite adequate.  It would be nice to
 ;; more programatically generate the hydra menus (see below).
-(create-org-roam-subject-fns-for "thel-sector")
-(create-org-roam-subject-fns-for "public")
-(create-org-roam-subject-fns-for "personal")
-(create-org-roam-subject-fns-for "hesburgh-libraries")
+(create-org-roam-subject-fns-for "thel-sector" :title "Thel Sector")
+(create-org-roam-subject-fns-for "public" :title "Public")
+(create-org-roam-subject-fns-for "personal" :title "Personal")
+(create-org-roam-subject-fns-for "hesburgh-libraries" :title "Hesburgh Libraries")
 
 (create-find-file-fn-for "personal")
 (create-find-file-fn-for "hesburgh-libraries")
@@ -169,51 +182,6 @@ See `org-roam-capture', `org-roam-node-find', `org-roam-node-insert'."
     ("f" jnf/org-roam--all--node-find   " └─ Find…")
     ("/" org-roam-buffer-toggle         "Toggle Buffer")
     ("#" jnf/toggle-roam-project-filter "Toggle Default Filter")
-    )))
-
-(pretty-hydra-define jnf/org-subject-menu--thel-sector (:foreign-keys warn :title jnf/org-subject-menu--title :quit-key "q" :exit t)
-  (
-   "Thel Sector Subject Menu"
-   (("c" jnf/org-roam--thel-sector--capture     "Thel Sector: Capture…")
-    ("i" jnf/org-roam--thel-sector--node-insert " ├─ Insert…")
-    ("f" jnf/org-roam--thel-sector--node-find   " └─ Find Node…")
-    ("/" org-roam-buffer-toggle                 "Toggle Buffer")
-    ("#" jnf/toggle-roam-project-filter         "Toggle Filter…")
-    )))
-
-(pretty-hydra-define jnf/org-subject-menu--personal (:foreign-keys warn :title jnf/org-subject-menu--title :quit-key "q" :exit t)
-  (
-   "Personal Subject Menu"
-   (
-    ("t" jnf/find-file--personal--todo       "Personal Todo…")
-    ("c" jnf/org-roam--personal--capture     " ├─ Capture…")
-    ("i" jnf/org-roam--personal--node-insert " ├─ Insert…")
-    ("f" jnf/org-roam--personal--node-find   " └─ Find…")
-    ("/" org-roam-buffer-toggle              "Toggle Buffer")
-    ("#" jnf/toggle-roam-project-filter      "Toggle Filter…")
-    )))
-
-(pretty-hydra-define jnf/org-subject-menu--public (:foreign-keys warn :title jnf/org-subject-menu--title :quit-key "q" :exit t)
-  (
-   "Public Subject Menu"
-   (
-    ("c" jnf/org-roam--public--capture     "Public: Capture…")
-    ("i" jnf/org-roam--public--node-insert " ├─ Insert…")
-    ("f" jnf/org-roam--public--node-find   " └─ Find…")
-    ("/" org-roam-buffer-toggle            "Toggle Buffer")
-    ("#" jnf/toggle-roam-project-filter    "Toggle Filter…")
-    )))
-
-(pretty-hydra-define jnf/org-subject-menu--hesburgh-libraries (:foreign-keys warn :title jnf/org-subject-menu--title :quit-key "q" :exit t)
-  (
-   "Hesburgh Libraries Subject Menu"
-   (
-    ("t" jnf/find-file--hesburgh-libraries--todo       "Hesburgh Libraries Todo…")
-    ("c" jnf/org-roam--hesburgh-libraries--capture     " ├─ Capture…")
-    ("i" jnf/org-roam--hesburgh-libraries--node-insert " ├─ Insert…")
-    ("f" jnf/org-roam--hesburgh-libraries--node-find   " └─ Find Node…")
-    ("/" org-roam-buffer-toggle                        "Toggle Buffer")
-    ("#" jnf/toggle-roam-project-filter                "Toggle Filter…")
     )))
 
 ;; Including the aliases to reduce switching necessary for re-mapping
