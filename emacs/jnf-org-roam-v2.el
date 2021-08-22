@@ -93,18 +93,18 @@ See `org-roam-capture', `org-roam-node-find', `org-roam-node-insert'."
   (let* ((subject-plist (plist-get subjects-plist plist-key))
          (subject-as-symbol plist-key)
          (title (plist-get subject-plist :title))
-         (subject (plist-get subject-plist :name))
-         (hydra-fn-name (intern (concat "jnf/org-subject-menu--" subject)))
+         (subject-name (plist-get subject-plist :name))
+         (hydra-fn-name (intern (concat "jnf/org-subject-menu--" subject-name)))
          (hydra-menu-title (concat title " Subject Menu"))
          (hydra-capture-title (concat title ": Capture…"))
-         (capture-fn-name (intern (concat "jnf/org-roam--" subject "--capture")))
-         (capture-docstring (concat "As `jnf/org-roam-capture' but scoped to " subject
+         (capture-fn-name (intern (concat "jnf/org-roam--" subject-name "--capture")))
+         (capture-docstring (concat "As `jnf/org-roam-capture' but scoped to " subject-name
                             ".\n\nArguments GOTO and KEYS see `org-capture'."))
-         (insert-fn-name (intern (concat "jnf/org-roam--" subject "--node-insert")))
-         (insert-docstring (concat "As `jnf/org-roam-insert-node' but scoped to " subject " subject."))
-         (find-fn-name (intern (concat "jnf/org-roam--" subject "--node-find")))
+         (insert-fn-name (intern (concat "jnf/org-roam--" subject-name "--node-insert")))
+         (insert-docstring (concat "As `jnf/org-roam-insert-node' but scoped to " subject-name " subject."))
+         (find-fn-name (intern (concat "jnf/org-roam--" subject-name "--node-find")))
          (find-docstring (concat "As `jnf/org-roam-find-node' but scoped to "
-                            subject " subject."
+                            subject-name " subject."
                             "\n\nArguments INITIAL-INPUT and OTHER-WINDOW are from `org-roam-find-mode'."))
          )
     `(progn
@@ -113,19 +113,19 @@ See `org-roam-capture', `org-roam-node-find', `org-roam-node-insert'."
          (interactive "P")
          (org-roam-capture goto
                            keys
-                           :filter-fn (lambda (node) (-contains-p (org-roam-node-tags node) ,subject))
+                           :filter-fn (lambda (node) (-contains-p (org-roam-node-tags node) ,subject-name))
                            :templates (jnf/org-roam-templates-for-subject ,subject-as-symbol)))
        (defun ,insert-fn-name ()
          ,insert-docstring
          (interactive)
-         (org-roam-node-insert (lambda (node) (-contains-p (org-roam-node-tags node) ,subject))
+         (org-roam-node-insert (lambda (node) (-contains-p (org-roam-node-tags node) ,subject-name))
                                :templates (jnf/org-roam-templates-for-subject ,subject-as-symbol)))
        (defun ,find-fn-name (&optional other-window initial-input)
          ,find-docstring
          (interactive current-prefix-arg)
          (org-roam-node-find other-window
                              initial-input
-                             (lambda (node) (-contains-p (org-roam-node-tags node) ,subject))
+                             (lambda (node) (-contains-p (org-roam-node-tags node) ,subject-name))
                              :templates (jnf/org-roam-templates-for-subject ,subject-as-symbol)))
        (pretty-hydra-define ,hydra-fn-name (:foreign-keys warn :title jnf/org-subject-menu--title :quit-key "q" :exit t)
          (
@@ -137,7 +137,7 @@ See `org-roam-capture', `org-roam-node-find', `org-roam-node-insert'."
            ("/" org-roam-buffer-toggle            "Toggle Buffer")
            ("#" jnf/toggle-roam-project-filter    "Toggle Filter…")
            )))
-)))
+       )))
 
 (defmacro create-find-file-fn-for (subject)
   "Define a `jnf/find-file--subject--todo' function for SUBJECT."
