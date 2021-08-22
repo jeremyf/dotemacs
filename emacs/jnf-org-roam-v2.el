@@ -83,7 +83,7 @@ given (or default) TEMPLATE-DEFINITIONS-PLIST."
 (cl-defmacro create-org-roam-subject-fns-for (subject
                                               &key
                                               (subjects-plist jnf/org-roam-capture-subjects-plist))
-  "Define a capture, find, and insert org-roam function for SUBJECT.
+  "Defines a todo, capture, find, and insert org-roam function for SUBJECT.
 
 Fetch the given SUBJECT from the given SUBJECTS-PLIST.
 
@@ -92,19 +92,29 @@ See `org-roam-capture', `org-roam-node-find', `org-roam-node-insert'."
          (subject-as-symbol subject)
          (subject-title (plist-get subject-plist :title))
          (subject-name (plist-get subject-plist :name))
+
+         ;; For todo related antics
          (todo-fn-name (intern (concat "jnf/find-file--" subject-name "--todo")))
          (path-to-todo (plist-get subject-plist :todo))
          (todo-docstring (concat "Find the todo file for " subject-name " subject."))
+
+         ;; For hydra menu related antics
          (hydra-fn-name (intern (concat "jnf/org-subject-menu--" subject-name)))
          (hydra-menu-title (concat subject-title " Subject Menu"))
          (hydra-todo-title (concat subject-title " Todo…"))
+
+         ;; For `org-roam-capture' related antics
          (capture-fn-name (intern (concat "jnf/org-roam--" subject-name "--capture")))
-         (capture-docstring (concat "As `jnf/org-roam-capture' but scoped to " subject-name
+         (capture-docstring (concat "As `org-roam-capture' but scoped to " subject-name
                             ".\n\nArguments GOTO and KEYS see `org-capture'."))
+
+         ;; For `org-roam-insert-node' related antics
          (insert-fn-name (intern (concat "jnf/org-roam--" subject-name "--node-insert")))
-         (insert-docstring (concat "As `jnf/org-roam-insert-node' but scoped to " subject-name " subject."))
+         (insert-docstring (concat "As `org-roam-insert-node' but scoped to " subject-name " subject."))
+
+         ;; For `org-roam-find-node' related antics
          (find-fn-name (intern (concat "jnf/org-roam--" subject-name "--node-find")))
-         (find-docstring (concat "As `jnf/org-roam-find-node' but scoped to "
+         (find-docstring (concat "As `org-roam-find-node' but scoped to "
                             subject-name " subject."
                             "\n\nArguments INITIAL-INPUT and OTHER-WINDOW are from `org-roam-find-mode'."))
          )
