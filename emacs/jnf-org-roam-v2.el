@@ -227,6 +227,12 @@ given (or default) TEMPLATE-DEFINITIONS-PLIST."
     ("#" jnf/toggle-roam-project-filter                "Toggle Filter…")
     )))
 
+;; Including the aliases to reduce switching necessary for re-mapping
+;; keys via `jnf/toggle-roam-project-filter'.
+(defalias 'jnf/org-roam--all--node-insert 'org-roam-node-insert)
+(defalias 'jnf/org-roam--all--node-find 'org-roam-node-find)
+(defalias 'jnf/org-roam--all--capture 'org-roam-capture)
+
 (defun jnf/toggle-roam-project-filter (project)
   "Prompt for a PROJECT, then toggle the `s-i' kbd to filter for that project."
   (interactive (list
@@ -265,17 +271,8 @@ given (or default) TEMPLATE-DEFINITIONS-PLIST."
 
   (setq org-roam-v2-ack t)
   (org-roam-db-autosync-mode)
-  :bind (("s-TAB" . jnf/org-roam--all--node-insert) ;; Command + Control + i
-         ("C-s-c" . jnf/org-roam--all--capture)
-         ("C-s-f" . jnf/org-roam--all--node-find)
-         ("s-i" . jnf/org-roam--all--node-insert) ;; Past behavior
-         ("C-c i" . jnf/org-subject-menu--all/body)))
-
-(jnf/toggle-roam-project-filter "all")
-;; Including the alias to reduce switching necessary for `jnf/toggle-roam-project-filter'.
-(defalias 'jnf/org-roam--all--node-insert 'org-roam-node-insert)
-(defalias 'jnf/org-roam--all--node-find 'org-roam-node-find)
-(defalias 'jnf/org-roam--all--capture 'org-roam-capture)
+  ;; Configure the "all" subject key map
+  (jnf/toggle-roam-project-filter "all"))
 
 (provide 'jnf-org-roam-v2.el)
 ;;; jnf-org-roam-v2.el ends here
