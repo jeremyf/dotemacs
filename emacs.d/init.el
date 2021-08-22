@@ -52,6 +52,10 @@
 ;;Slow down the UI being updated to improve performance
 (setq idle-update-delay 1.1)
 
+;; Most of the times I favor horizontal splits (e.g. two frames
+;; side-by-side)
+(setq split-width-threshold 120)
+
 (require 'jnf-config.el)
 (require 'jnf-display.el)
 (require 'jnf-hydra.el)
