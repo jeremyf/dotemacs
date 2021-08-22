@@ -41,6 +41,8 @@
         ;; An org directory
         "~/git/org/personal"
         ;; An org directory
+        "~/git/org/personal/thel-sector"
+        ;; An org directory
         "~/git/org/hesburgh-libraries"
         ))
 
