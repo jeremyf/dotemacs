@@ -164,8 +164,6 @@ See `org-roam-capture', `org-roam-node-find', `org-roam-node-insert'."
            )))
        )))
 
-
-
 ;; I tried using a dolist to call each of the macros, but that didn't
 ;; work.  I'd love some additional help refactoring this.  But for
 ;; now, what I have is quite adequate.  It would be nice to
@@ -176,6 +174,16 @@ See `org-roam-capture', `org-roam-node-find', `org-roam-node-insert'."
 (create-org-roam-subject-fns-for :hesburgh-libraries)
 
 ;; A menu of common tasks for `org-roam'.  This menu is for all subjects.
+;;
+;; Note the convention:
+;;
+;; * t - for todo
+;; * c - for capture
+;; * i - for insert
+;; * f - for find
+;;
+;; The `create-org-roam-subject-fns-for' presupposes those keys for
+;; narrowed subjects.
 (defvar jnf/org-subject-menu--title (with-faicon "book" "Org Subject Menu" 1 -0.05))
 (pretty-hydra-define jnf/org-subject-menu--all (:foreign-keys warn :title jnf/org-subject-menu--title :quit-key "q" :exit t)
   (
@@ -185,10 +193,10 @@ See `org-roam-capture', `org-roam-node-find', `org-roam-node-insert'."
     ("p c" jnf/org-roam--personal--capture     " ├─ Capture…")
     ("p i" jnf/org-roam--personal--node-insert " ├─ Insert…")
     ("p f" jnf/org-roam--personal--node-find   " └─ Find…")
-    ("u t" jnf/find-file--public--todo       "Public Todo…")
-    ("u c" jnf/org-roam--public--capture     " ├─ Capture…")
-    ("u i" jnf/org-roam--public--node-insert " ├─ Insert…")
-    ("u f" jnf/org-roam--public--node-find   " └─ Find…")
+    ("u t" jnf/find-file--public--todo         "Public Todo…")
+    ("u c" jnf/org-roam--public--capture       " ├─ Capture…")
+    ("u i" jnf/org-roam--public--node-insert   " ├─ Insert…")
+    ("u f" jnf/org-roam--public--node-find     " └─ Find…")
     )
    "Projects"
    (
