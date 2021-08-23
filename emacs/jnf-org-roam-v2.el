@@ -36,7 +36,8 @@
        ))
 
 ;; A plist that contains the various org-roam subject.  Each subject
-;; has a plist of :templates, :title, :name, and :path-to-todo.
+;; has a plist of :templates, :title, :name, :path-to-todo, :prefix,
+;; and :group.
 ;;
 ;; The :templates defines the ;; named templates available for this subject.  See
 ;; `jnf/org-roam-capture-templates-plist' for list of valid templates.
@@ -46,6 +47,10 @@
 ;;
 ;; The :title is the human readable "title-case" form of the subject.
 ;;
+;; The :group is for `pretty-hydra-define+'
+;;
+;; The :prefix helps with menu key build for `pretty-hydra-define+'
+;;
 ;; The :path-to-todo is the path to the todo file for this subject.
 (setq jnf/org-roam-capture-subjects-plist
       (list
@@ -53,26 +58,36 @@
              :templates (list :hesburgh-libraries :personal :personal-encrypted :thel-sector :public)
              :name "all"
              :title "All"
+             :group "All"
+             :prefix "a"
              :path-to-todo "~/git/org/todo.org")
        :hesburgh-libraries (list
                             :templates (list :hesburgh-libraries)
                             :name "hesburgh-libraries"
                             :title "Hesburgh Libraries"
+                            :group "Projects"
+                            :prefix "h"
                             :path-to-todo "~/git/org/hesburgh-libraries/todo.org")
        :personal (list
                   :templates (list :personal :personal-encrypted)
                   :name "personal"
                   :title "Personal"
+                  :group "Personal / Public"
+                  :prefix "p"
                   :path-to-todo "~/git/org/personal/todo.org")
        :public (list
                 :templates (list :public)
                 :name "public"
                 :title "Public"
+                :group "Personal / Public"
+                :prefix "u"
                 :path-to-todo "~/git/org/public/todo.org")
        :thel-sector (list
                      :templates (list :thel-sector)
                      :name "thel-sector"
                      :title "Thel Sector"
+                     :group "Projects"
+                     :prefix "t"
                      :path-to-todo "~/git/org/personal/thel-sector/todo.org")
        ))
 
@@ -87,6 +102,54 @@ given (or default) TEMPLATE-DEFINITIONS-PLIST."
   (let ((templates (plist-get (plist-get subjects-plist subject) :templates)))
     (-map (lambda (template) (plist-get template-definitions-plist template))
           templates)))
+
+;; A menu of common tasks for `org-roam'.  This menu is for all subjects.
+;;
+;; Note the convention:
+;;
+;; * t - for todo
+;; * c - for capture
+;; * i - for insert
+;; * f - for find
+;;
+;; The `create-org-roam-subject-fns-for' presupposes those keys for
+;; narrowed subjects.
+(defvar jnf/org-subject-menu--title (with-faicon "book" "Org Subject Menu" 1 -0.05))
+(pretty-hydra-define jnf/org-subject-menu--all (:foreign-keys warn :title jnf/org-subject-menu--title :quit-key "q" :exit t)
+  (
+   "Public / Personal"
+   (
+    ("p t" jnf/find-file--personal--todo       "Personal Todo…")
+    ("p c" jnf/org-roam--personal--capture     " ├─ Capture…")
+    ("p i" jnf/org-roam--personal--node-insert " ├─ Insert…")
+    ("p f" jnf/org-roam--personal--node-find   " └─ Find…")
+    ("u t" jnf/find-file--public--todo         "Public Todo…")
+    ("u c" jnf/org-roam--public--capture       " ├─ Capture…")
+    ("u i" jnf/org-roam--public--node-insert   " ├─ Insert…")
+    ("u f" jnf/org-roam--public--node-find     " └─ Find…")
+    )
+   "Projects"
+   (
+    ("h t" jnf/find-file--hesburgh-libraries--todo       "Hesburgh Libraries Todo…")
+    ("h c" jnf/org-roam--hesburgh-libraries--capture     " ├─ Capture…")
+    ("h i" jnf/org-roam--hesburgh-libraries--node-insert " ├─ Insert…")
+    ("h f" jnf/org-roam--hesburgh-libraries--node-find   " └─ Find…")
+    ("h t" jnf/find-file--thel-sector--todo              "Thel Sector Todo…")
+    ("h c" jnf/org-roam--thel-sector--capture            " ├─ Capture…")
+    ("t i" jnf/org-roam--thel-sector--node-insert        " ├─ Insert…")
+    ("t f" jnf/org-roam--thel-sector--node-find          " └─ Find…")
+    )
+   "Org Mode"
+   (("t" (lambda ()
+           (interactive)
+           (find-file (file-truename (plist-get (plist-get jnf/org-roam-capture-subjects-plist :all) :path-to-todo))))
+     "Todo…")
+    ("c" jnf/org-roam--all--capture     "Capture…")
+    ("i" jnf/org-roam--all--node-insert " ├─ Insert…")
+    ("f" jnf/org-roam--all--node-find   " └─ Find…")
+    ("/" org-roam-buffer-toggle         "Toggle Buffer")
+    ("#" jnf/toggle-roam-project-filter "Toggle Default Filter")
+    )))
 
 (cl-defmacro create-org-roam-subject-fns-for (subject
                                               &key
@@ -172,54 +235,6 @@ See `org-roam-capture', `org-roam-node-find', `org-roam-node-insert'."
 (create-org-roam-subject-fns-for :public)
 (create-org-roam-subject-fns-for :personal)
 (create-org-roam-subject-fns-for :hesburgh-libraries)
-
-;; A menu of common tasks for `org-roam'.  This menu is for all subjects.
-;;
-;; Note the convention:
-;;
-;; * t - for todo
-;; * c - for capture
-;; * i - for insert
-;; * f - for find
-;;
-;; The `create-org-roam-subject-fns-for' presupposes those keys for
-;; narrowed subjects.
-(defvar jnf/org-subject-menu--title (with-faicon "book" "Org Subject Menu" 1 -0.05))
-(pretty-hydra-define jnf/org-subject-menu--all (:foreign-keys warn :title jnf/org-subject-menu--title :quit-key "q" :exit t)
-  (
-   "Public / Personal"
-   (
-    ("p t" jnf/find-file--personal--todo       "Personal Todo…")
-    ("p c" jnf/org-roam--personal--capture     " ├─ Capture…")
-    ("p i" jnf/org-roam--personal--node-insert " ├─ Insert…")
-    ("p f" jnf/org-roam--personal--node-find   " └─ Find…")
-    ("u t" jnf/find-file--public--todo         "Public Todo…")
-    ("u c" jnf/org-roam--public--capture       " ├─ Capture…")
-    ("u i" jnf/org-roam--public--node-insert   " ├─ Insert…")
-    ("u f" jnf/org-roam--public--node-find     " └─ Find…")
-    )
-   "Projects"
-   (
-    ("h t" jnf/find-file--hesburgh-libraries--todo       "Hesburgh Libraries Todo…")
-    ("h c" jnf/org-roam--hesburgh-libraries--capture     " ├─ Capture…")
-    ("h i" jnf/org-roam--hesburgh-libraries--node-insert " ├─ Insert…")
-    ("h f" jnf/org-roam--hesburgh-libraries--node-find   " └─ Find…")
-    ("h t" jnf/find-file--thel-sector--todo              "Thel Sector Todo…")
-    ("h c" jnf/org-roam--thel-sector--capture            " ├─ Capture…")
-    ("t i" jnf/org-roam--thel-sector--node-insert        " ├─ Insert…")
-    ("t f" jnf/org-roam--thel-sector--node-find          " └─ Find…")
-    )
-   "Org Mode"
-   (("t" (lambda ()
-           (interactive)
-           (find-file (file-truename (plist-get (plist-get jnf/org-roam-capture-subjects-plist :all) :path-to-todo))))
-     "Todo…")
-    ("c" jnf/org-roam--all--capture     "Capture…")
-    ("i" jnf/org-roam--all--node-insert " ├─ Insert…")
-    ("f" jnf/org-roam--all--node-find   " └─ Find…")
-    ("/" org-roam-buffer-toggle         "Toggle Buffer")
-    ("#" jnf/toggle-roam-project-filter "Toggle Default Filter")
-    )))
 
 ;; Including the aliases to reduce switching necessary for re-mapping
 ;; keys via `jnf/toggle-roam-project-filter'.
