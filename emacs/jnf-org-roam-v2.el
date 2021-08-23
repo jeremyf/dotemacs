@@ -81,7 +81,11 @@
       (list
        ;; The :all subject is different from the other items.
        :all (list
-             :templates (list :jf-consulting :hesburgh-libraries :personal :personal-encrypted :thel-sector :public)
+             ;; Iterate through all registered capture templates and
+             ;; generate a list
+             :templates (-non-nil (seq-map-indexed (lambda (template index)
+                     (when (evenp index) template))
+                   jnf/org-roam-capture-templates-plist))
              :name "all"
              :title "All"
              :group "All"
