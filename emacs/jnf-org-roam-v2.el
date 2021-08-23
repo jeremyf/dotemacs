@@ -54,6 +54,7 @@
 ;; The :path-to-todo is the path to the todo file for this subject.
 (setq jnf/org-roam-capture-subjects-plist
       (list
+       ;; The :all subject is different from the other items.
        :all (list
              :templates (list :hesburgh-libraries :personal :personal-encrypted :thel-sector :public)
              :name "all"
@@ -138,11 +139,16 @@ given (or default) TEMPLATE-DEFINITIONS-PLIST."
 (cl-defmacro create-org-roam-subject-fns-for (subject
                                               &key
                                               (subjects-plist jnf/org-roam-capture-subjects-plist))
-  "Defines a todo, capture, find, and insert org-roam function for SUBJECT.
+  "Define the org roam SUBJECT functions and create & update hydra menus.
 
-Fetch the given SUBJECT from the given SUBJECTS-PLIST.
+The functions are wrappers for `org-roam-capture',
+`org-roam-node-find', `org-roam-node-insert', and `find-file'.
 
-See `org-roam-capture', `org-roam-node-find', `org-roam-node-insert'."
+Create a subject specific `pretty-define-hydra' and append to the
+`jnf/org-subject-menu--all' hydra via the `pretty-define-hydra+'
+macro.
+
+Fetch the given SUBJECT from the given SUBJECTS-PLIST."
   (let* ((subject-plist (plist-get subjects-plist subject))
          (subject-as-symbol subject)
          (subject-title (plist-get subject-plist :title))
