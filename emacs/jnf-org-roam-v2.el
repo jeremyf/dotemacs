@@ -323,6 +323,7 @@ Fetch the given SUBJECT from the given SUBJECTS-PLIST."
   (org-roam-node-display-template "${title:*} ${tags:40}")
   (org-roam-capture-templates (jnf/org-roam-templates-for-subject :all))
   :init
+  ;; Help keep the `org-roam-buffer', toggled via `org-roam-buffer-toggle', sticky.
   (add-to-list 'display-buffer-alist
                '("\\*org-roam\\#"
                  (display-buffer-in-side-window)
