@@ -10,6 +10,9 @@
 ;; http://takeonrules.com/2021/08/22/ever-further-refinements-of-org-roam-usage/
 ;; for details on this configuration.
 ;;
+;; See https://takeonrules.com/2021/08/23/diving-into-the-implementation-of-subject-menus-for-org-roam/
+;; for a walk through of the implementation.
+;;
 ;; A Property List of my `org-roam' capture templates.
 (setq jnf/org-roam-capture-templates-plist
       (list
@@ -162,7 +165,7 @@ given (or default) TEMPLATE-DEFINITIONS-PLIST."
     ("i" jnf/org-roam--all--node-insert " ├─ Insert…")
     ("f" jnf/org-roam--all--node-find   " └─ Find…")
     ("/" org-roam-buffer-toggle         "Toggle Buffer")
-    ("#" jnf/toggle-roam-project-filter "Toggle Default Filter")
+    ("#" jnf/toggle-roam-subject-filter "Toggle Default Filter")
     )))
 
 (cl-defmacro create-org-roam-subject-fns-for (subject
@@ -251,7 +254,7 @@ Fetch the given SUBJECT from the given SUBJECTS-PLIST."
            ("i" ,insert-fn-name      " ├─ Insert…")
            ("f" ,find-fn-name        " └─ Find…")
            ("/" org-roam-buffer-toggle            "Toggle Buffer")
-           ("#" jnf/toggle-roam-project-filter    "Toggle Filter…")
+           ("#" jnf/toggle-roam-subject-filter    "Toggle Filter…")
            )))
 
        ;; Append the following menu items to the `jnf/org-subject-menu--all'
@@ -276,7 +279,7 @@ Fetch the given SUBJECT from the given SUBJECTS-PLIST."
 (create-org-roam-subject-fns-for :thel-sector)
 
 ;; Including the aliases to reduce switching necessary for re-mapping
-;; keys via `jnf/toggle-roam-project-filter'.
+;; keys via `jnf/toggle-roam-subject-filter'.
 (defalias 'jnf/org-roam--all--node-insert 'org-roam-node-insert)
 (defalias 'jnf/org-roam--all--node-find 'org-roam-node-find)
 (defalias 'jnf/org-roam--all--capture 'org-roam-capture)
@@ -290,27 +293,27 @@ The form should be '((\"all\" 1) (\"hesburgh-libraries\" 2))."
                      (when (oddp index) (list (plist-get subject :name) index)))
                    subjects-plist)))
 
-(defun jnf/toggle-roam-project-filter (project)
-  "Prompt for a PROJECT, then toggle the 's-i' kbd to filter for that project."
+(defun jnf/toggle-roam-subject-filter (subject)
+  "Prompt for a SUBJECT, then toggle the 's-i' kbd to filter for that subject."
   (interactive (list
                 (completing-read
                  "Project: " (jnf/subject-list-for-completing-read))))
   (global-set-key
    ;; Command + Control + i
    (kbd "s-TAB")
-   (intern (concat "jnf/org-roam--" project "--node-insert")))
+   (intern (concat "jnf/org-roam--" subject "--node-insert")))
   (global-set-key
    (kbd "C-s-c")
-   (intern (concat "jnf/org-roam--" project "--capture")))
+   (intern (concat "jnf/org-roam--" subject "--capture")))
   (global-set-key
    (kbd "C-s-f")
-   (intern (concat "jnf/org-roam--" project "--find")))
+   (intern (concat "jnf/org-roam--" subject "--find")))
   (global-set-key
    (kbd "s-i")
-   (intern (concat "jnf/org-roam--" project "--node-insert")))
+   (intern (concat "jnf/org-roam--" subject "--node-insert")))
   (global-set-key
    (kbd "C-c i")
-   (intern (concat "jnf/org-subject-menu--" project "/body"))))
+   (intern (concat "jnf/org-subject-menu--" subject "/body"))))
 
 ;; With the latest update of org-roam, things again behavior
 ;; correctly.  Now I can just load org-roam as part of my day to day
@@ -336,7 +339,7 @@ The form should be '((\"all\" 1) (\"hesburgh-libraries\" 2))."
   (setq org-roam-v2-ack t)
   (org-roam-db-autosync-mode)
   ;; Configure the "all" subject key map
-  (jnf/toggle-roam-project-filter "all"))
+  (jnf/toggle-roam-subject-filter "all"))
 
 (provide 'jnf-org-roam-v2.el)
 ;;; jnf-org-roam-v2.el ends here
