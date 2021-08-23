@@ -17,6 +17,10 @@
 		             :if-new (file+head "hesburgh-libraries/%<%Y%m%d>---${slug}.org"
 				                "#+title: ${title}\n#+FILETAGS: :hesburgh: %^G\n\n")
 		             :unnarrowed t)
+       :jf-consulting '("j" "JF Consulting" plain "%?"
+		             :if-new (file+head "jeremy-friesen-consulting/%<%Y%m%d>---${slug}.org"
+				                "#+title: ${title}\n#+FILETAGS: :personal:jeremy-friesen-consulting: %^G\n\n")
+		             :unnarrowed t)
        :personal '("p" "Personal" plain "%?"
 		   :if-new (file+head "personal/%<%Y%m%d>---${slug}.org"
 				      "#+title: ${title}\n#+FILETAGS: :personal: %^G\n\n")
@@ -56,12 +60,19 @@
       (list
        ;; The :all subject is different from the other items.
        :all (list
-             :templates (list :hesburgh-libraries :personal :personal-encrypted :thel-sector :public)
+             :templates (list :jf-consulting :hesburgh-libraries :personal :personal-encrypted :thel-sector :public)
              :name "all"
              :title "All"
              :group "All"
              :prefix "a"
              :path-to-todo "~/git/org/todo.org")
+       :jf-consulting (list
+                       :templates (list :jf-consulting)
+                       :name "jf-consulting"
+                       :title "JF Consulting"
+                       :group "Projects"
+                       :prefix "j"
+                       :path-to-todo "~/git/org/jeremy-friesen-consulting/todo.org")
        :hesburgh-libraries (list
                             :templates (list :hesburgh-libraries)
                             :name "hesburgh-libraries"
@@ -243,6 +254,7 @@ Fetch the given SUBJECT from the given SUBJECTS-PLIST."
 (create-org-roam-subject-fns-for :personal)
 (create-org-roam-subject-fns-for :public)
 (create-org-roam-subject-fns-for :hesburgh-libraries)
+(create-org-roam-subject-fns-for :jf-consulting)
 (create-org-roam-subject-fns-for :thel-sector)
 
 ;; Including the aliases to reduce switching necessary for re-mapping
