@@ -281,20 +281,20 @@ Fetch the given SUBJECT from the given SUBJECTS-PLIST."
 (defalias 'jnf/org-roam--all--node-find 'org-roam-node-find)
 (defalias 'jnf/org-roam--all--capture 'org-roam-capture)
 
+(cl-defun jnf/subject-list-for-completing-read (&key (subjects-plist jnf/org-roam-capture-subjects-plist))
+  "Create a list from the SUBJECTS-PLIST for completing read.
+
+The form should be '((\"all\" 1) (\"hesburgh-libraries\" 2))."
+  ;; Skipping the even entries as those are the "keys" for the plist, the odds are the values.
+  (-non-nil (seq-map-indexed (lambda (subject index)
+                     (when (oddp index) (list (plist-get subject :name) index)))
+                   subjects-plist)))
+
 (defun jnf/toggle-roam-project-filter (project)
   "Prompt for a PROJECT, then toggle the 's-i' kbd to filter for that project."
   (interactive (list
                 (completing-read
-                 ;; TODO: Use the
-                 ;; `jnf/org-roam-capture-subjects-plist' to create
-                 ;; this list.
-                 "Project: " '(("all" 1)
-                               ("hesburgh-libraries" 2)
-                               ("jf-consulting" 3)
-                               ("thel-sector" 4)
-                               ("personal" 5)
-                               ("public" 6)
-                               ))))
+                 "Project: " (jnf/subject-list-for-completing-read))))
   (global-set-key
    ;; Command + Control + i
    (kbd "s-TAB")
