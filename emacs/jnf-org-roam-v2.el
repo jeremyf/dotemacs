@@ -153,7 +153,7 @@ See `org-roam-capture', `org-roam-node-find', `org-roam-node-insert'."
                              :templates (jnf/org-roam-templates-for-subject ,subject-as-symbol)))
        (pretty-hydra-define ,hydra-fn-name (:foreign-keys warn :title jnf/org-subject-menu--title :quit-key "q" :exit t)
          (
-          `hydra-menu-title
+          ,hydra-menu-title
           (
            ("t" ,todo-fn-name        ,hydra-todo-title)
            ("c" ,capture-fn-name     " ├─ Capture…")
@@ -210,7 +210,11 @@ See `org-roam-capture', `org-roam-node-find', `org-roam-node-insert'."
     ("t f" jnf/org-roam--thel-sector--node-find          " └─ Find…")
     )
    "Org Mode"
-   (("c" jnf/org-roam--all--capture     "Capture…")
+   (("t" (lambda ()
+           (interactive)
+           (find-file (file-truename (plist-get (plist-get jnf/org-roam-capture-subjects-plist :all) :path-to-todo))))
+     "Todo…")
+    ("c" jnf/org-roam--all--capture     "Capture…")
     ("i" jnf/org-roam--all--node-insert " ├─ Insert…")
     ("f" jnf/org-roam--all--node-find   " └─ Find…")
     ("/" org-roam-buffer-toggle         "Toggle Buffer")
