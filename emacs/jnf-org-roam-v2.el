@@ -302,8 +302,7 @@ The form should be '((\"all\" 1) (\"hesburgh-libraries\" 2))."
                 (completing-read
                  "Project: " (jnf/subject-list-for-completing-read))))
   (global-set-key
-   ;; Command + Control + i
-   (kbd "C-s-!")
+   (kbd "C-s-1")
    (intern (concat "jnf/org-roam--" subject "--node-insert")))
   (global-set-key
    (kbd "C-s-=")
