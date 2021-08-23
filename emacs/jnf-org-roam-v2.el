@@ -105,14 +105,14 @@
                   :templates (list :personal :personal-encrypted)
                   :name "personal"
                   :title "Personal"
-                  :group "Personal / Public"
+                  :group "Life"
                   :prefix "p"
                   :path-to-todo "~/git/org/personal/todo.org")
        :public (list
                 :templates (list :public)
                 :name "public"
                 :title "Public"
-                :group "Personal / Public"
+                :group "Life"
                 :prefix "u"
                 :path-to-todo "~/git/org/public/todo.org")
        :thel-sector (list
@@ -151,7 +151,7 @@ given (or default) TEMPLATE-DEFINITIONS-PLIST."
 (pretty-hydra-define jnf/org-subject-menu--all (:foreign-keys warn :title jnf/org-subject-menu--title :quit-key "q" :exit t)
   (
    ;; Note: This matches at least one of the :groups in `jnf/org-roam-capture-subjects-plist'
-   "Personal / Public"
+   "Life"
    ()
    ;; Note: This matches at least one of the :groups in `jnf/org-roam-capture-subjects-plist'
    "Projects"
@@ -339,6 +339,7 @@ The form should be '((\"all\" 1) (\"hesburgh-libraries\" 2))."
                  (window-parameters . ((no-other-window . t)
                                        (no-delete-other-windows . t)))))
 
+  (setq org-roam-completion-everywhere t)
   (setq org-roam-v2-ack t)
   (org-roam-db-autosync-mode)
   ;; Configure the "all" subject key map
