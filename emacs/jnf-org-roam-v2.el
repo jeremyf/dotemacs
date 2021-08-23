@@ -240,6 +240,7 @@ Fetch the given SUBJECT from the given SUBJECTS-PLIST."
                              (lambda (node) (-contains-p (org-roam-node-tags node) ,subject-name))
                              :templates (jnf/org-roam-templates-for-subject ,subject-as-symbol)))
 
+
        ;; Create a hydra menu for the given subject
        (pretty-hydra-define ,hydra-fn-name (:foreign-keys warn :title jnf/org-subject-menu--title :quit-key "q" :exit t)
          (
