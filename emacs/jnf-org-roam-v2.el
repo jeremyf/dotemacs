@@ -284,11 +284,14 @@ Fetch the given SUBJECT from the given SUBJECTS-PLIST."
 (defalias 'jnf/org-roam--all--node-find 'org-roam-node-find)
 (defalias 'jnf/org-roam--all--capture 'org-roam-capture)
 
-(cl-defun jnf/subject-list-for-completing-read (&key (subjects-plist jnf/org-roam-capture-subjects-plist))
+(cl-defun jnf/subject-list-for-completing-read (&key
+                                                (subjects-plist
+                                                 jnf/org-roam-capture-subjects-plist))
   "Create a list from the SUBJECTS-PLIST for completing read.
 
 The form should be '((\"all\" 1) (\"hesburgh-libraries\" 2))."
-  ;; Skipping the even entries as those are the "keys" for the plist, the odds are the values.
+  ;; Skipping the even entries as those are the "keys" for the plist,
+  ;; the odds are the values.
   (-non-nil (seq-map-indexed (lambda (subject index)
                      (when (oddp index) (list (plist-get subject :name) index)))
                    subjects-plist)))
