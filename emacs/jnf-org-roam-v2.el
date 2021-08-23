@@ -140,10 +140,10 @@ given (or default) TEMPLATE-DEFINITIONS-PLIST."
 ;;
 ;; Note the convention:
 ;;
-;; * t - for todo
-;; * c - for capture
-;; * i - for insert
-;; * f - for find
+;; * @ - for todo
+;; * + - for capture
+;; * ! - for insert
+;; * ? - for find
 ;;
 ;; The `create-org-roam-subject-fns-for' presupposes those keys for
 ;; narrowed subjects.
@@ -157,13 +157,13 @@ given (or default) TEMPLATE-DEFINITIONS-PLIST."
    "Projects"
    ()
    "Org Mode"
-   (("t" (lambda ()
+   (("@" (lambda ()
            (interactive)
            (find-file (file-truename (plist-get (plist-get jnf/org-roam-capture-subjects-plist :all) :path-to-todo))))
      "Todo…")
-    ("c" jnf/org-roam--all--capture     "Capture…")
-    ("i" jnf/org-roam--all--node-insert " ├─ Insert…")
-    ("f" jnf/org-roam--all--node-find   " └─ Find…")
+    ("+" jnf/org-roam--all--capture     "Capture…")
+    ("!" jnf/org-roam--all--node-insert " ├─ Insert…")
+    ("?" jnf/org-roam--all--node-find   " └─ Find…")
     ("/" org-roam-buffer-toggle         "Toggle Buffer")
     ("#" jnf/toggle-roam-subject-filter "Toggle Default Filter")
     )))
@@ -197,10 +197,10 @@ Fetch the given SUBJECT from the given SUBJECTS-PLIST."
          (hydra-todo-title (concat subject-title " Todo…"))
          (hydra-group (plist-get subject-plist :group))
          (hydra-prefix (plist-get subject-plist :prefix))
-         (hydra-kbd-prefix-todo    (concat hydra-prefix " t"))
-         (hydra-kbd-prefix-capture (concat hydra-prefix " c"))
-         (hydra-kbd-prefix-insert  (concat hydra-prefix " i"))
-         (hydra-kbd-prefix-find    (concat hydra-prefix " f"))
+         (hydra-kbd-prefix-todo    (concat hydra-prefix " @"))
+         (hydra-kbd-prefix-capture (concat hydra-prefix " +"))
+         (hydra-kbd-prefix-insert  (concat hydra-prefix " !"))
+         (hydra-kbd-prefix-find    (concat hydra-prefix " ?"))
 
          ;; For `org-roam-capture' related antics
          (capture-fn-name (intern (concat "jnf/org-roam--" subject-name "--capture")))
@@ -249,10 +249,10 @@ Fetch the given SUBJECT from the given SUBJECTS-PLIST."
          (
           ,hydra-menu-title
           (
-           ("t" ,todo-fn-name        ,hydra-todo-title)
-           ("c" ,capture-fn-name     " ├─ Capture…")
-           ("i" ,insert-fn-name      " ├─ Insert…")
-           ("f" ,find-fn-name        " └─ Find…")
+           ("@" ,todo-fn-name        ,hydra-todo-title)
+           ("+" ,capture-fn-name     " ├─ Capture…")
+           ("!" ,insert-fn-name      " ├─ Insert…")
+           ("?" ,find-fn-name        " └─ Find…")
            ("/" org-roam-buffer-toggle            "Toggle Buffer")
            ("#" jnf/toggle-roam-subject-filter    "Toggle Filter…")
            )))
