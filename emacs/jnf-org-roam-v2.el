@@ -13,30 +13,48 @@
 ;; A Property List of my `org-roam' capture templates.
 (setq jnf/org-roam-capture-templates-plist
       (list
-       :hesburgh-libraries '("h" "Hesburgh Libraries" plain "%?"
-		             :if-new (file+head "hesburgh-libraries/%<%Y%m%d>---${slug}.org"
-				                "#+title: ${title}\n#+FILETAGS: :hesburgh: %^G\n\n")
-		             :unnarrowed t)
-       :jf-consulting '("j" "JF Consulting" plain "%?"
-		             :if-new (file+head "jeremy-friesen-consulting/%<%Y%m%d>---${slug}.org"
-				                "#+title: ${title}\n#+FILETAGS: :personal:jeremy-friesen-consulting: %^G\n\n")
-		             :unnarrowed t)
-       :personal '("p" "Personal" plain "%?"
-		   :if-new (file+head "personal/%<%Y%m%d>---${slug}.org"
-				      "#+title: ${title}\n#+FILETAGS: :personal: %^G\n\n")
-		   :unnarrowed t)
-       :personal-encrypted '("P" "Personal (Encrypted)" plain "%?"
-		             :if-new (file+head "personal/%<%Y%m%d>---${slug}.org.gpg"
-				                "#+title: ${title}\n#+FILETAGS: :personal:encrypted: %^G\n\n")
-		             :unnarrowed t)
-       :public '("u" "Public" plain "%?"
-		 :if-new (file+head "public/%<%Y%m%d>---${slug}.org"
-				    "#+title: ${title}\n#+FILETAGS: :public: %^G\n\n")
-		 :unnarrowed t)
-       :thel-sector '("t" "Thel Sector" plain "%?"
-                      :if-new (file+head "personal/thel-sector/%<%Y%m%d>---${slug}.org"
-                                         "#+title: ${title}\n#+FILETAGS: :thel-sector: %^G\n\n")
-                      :unnarrowed t)
+       :hesburgh-libraries
+       '("h" "Hesburgh Libraries" plain "%?"
+	 :if-new
+         (file+head
+          "hesburgh-libraries/%<%Y%m%d>---${slug}.org"
+          "#+title: ${title}\n#+FILETAGS: :hesburgh: %^G\n\n")
+	 :unnarrowed t)
+       :jf-consulting
+       '("j" "JF Consulting" plain "%?"
+	 :if-new
+         (file+head
+          "jeremy-friesen-consulting/%<%Y%m%d>---${slug}.org"
+          "#+title: ${title}\n#+FILETAGS: :personal:jeremy-friesen-consulting: %^G\n\n")
+	 :unnarrowed t)
+       :personal
+       '("p" "Personal" plain "%?"
+	 :if-new
+         (file+head
+          "personal/%<%Y%m%d>---${slug}.org"
+	  "#+title: ${title}\n#+FILETAGS: :personal: %^G\n\n")
+	 :unnarrowed t)
+       :personal-encrypted
+       '("P" "Personal (Encrypted)" plain "%?"
+	 :if-new
+         (file+head
+          "personal/%<%Y%m%d>---${slug}.org.gpg"
+          "#+title: ${title}\n#+FILETAGS: :personal:encrypted: %^G\n\n")
+	 :unnarrowed t)
+       :public
+       '("u" "Public" plain "%?"
+	 :if-new
+         (file+head
+          "public/%<%Y%m%d>---${slug}.org"
+	  "#+title: ${title}\n#+FILETAGS: :public: %^G\n\n")
+	 :unnarrowed t)
+       :thel-sector
+       '("t" "Thel Sector" plain "%?"
+         :if-new
+         (file+head
+          "personal/thel-sector/%<%Y%m%d>---${slug}.org"
+          "#+title: ${title}\n#+FILETAGS: :thel-sector: %^G\n\n")
+         :unnarrowed t)
        ))
 
 ;; A plist that contains the various org-roam subject.  Each subject
@@ -264,20 +282,35 @@ Fetch the given SUBJECT from the given SUBJECTS-PLIST."
 (defalias 'jnf/org-roam--all--capture 'org-roam-capture)
 
 (defun jnf/toggle-roam-project-filter (project)
-  "Prompt for a PROJECT, then toggle the `s-i' kbd to filter for that project."
+  "Prompt for a PROJECT, then toggle the 's-i' kbd to filter for that project."
   (interactive (list
                 (completing-read
+                 ;; TODO: Use the
+                 ;; `jnf/org-roam-capture-subjects-plist' to create
+                 ;; this list.
                  "Project: " '(("all" 1)
                                ("hesburgh-libraries" 2)
-                               ("thel-sector" 3)
-                               ("personal" 4)
-                               ("public" 5)
+                               ("jf-consulting" 3)
+                               ("thel-sector" 4)
+                               ("personal" 5)
+                               ("public" 6)
                                ))))
-  (global-set-key (kbd "s-TAB") (intern (concat "jnf/org-roam--" project "--node-insert"))) ;; Command + Control + i
-  (global-set-key (kbd "C-s-c") (intern (concat "jnf/org-roam--" project "--capture")))
-  (global-set-key (kbd "C-s-f") (intern (concat "jnf/org-roam--" project "--find")))
-  (global-set-key (kbd "s-i") (intern (concat "jnf/org-roam--" project "--node-insert")))
-  (global-set-key (kbd "C-c i") (intern (concat "jnf/org-subject-menu--" project "/body"))))
+  (global-set-key
+   ;; Command + Control + i
+   (kbd "s-TAB")
+   (intern (concat "jnf/org-roam--" project "--node-insert")))
+  (global-set-key
+   (kbd "C-s-c")
+   (intern (concat "jnf/org-roam--" project "--capture")))
+  (global-set-key
+   (kbd "C-s-f")
+   (intern (concat "jnf/org-roam--" project "--find")))
+  (global-set-key
+   (kbd "s-i")
+   (intern (concat "jnf/org-roam--" project "--node-insert")))
+  (global-set-key
+   (kbd "C-c i")
+   (intern (concat "jnf/org-subject-menu--" project "/body"))))
 
 ;; With the latest update of org-roam, things again behavior
 ;; correctly.  Now I can just load org-roam as part of my day to day
