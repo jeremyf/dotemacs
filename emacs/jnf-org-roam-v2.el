@@ -161,16 +161,8 @@ given (or default) TEMPLATE-DEFINITIONS-PLIST."
    "Projects"
    ()
    "All"
-   (("@" (lambda ()
-           (interactive)
-           (find-file (file-truename (plist-get (plist-get jnf/org-roam-capture-subjects-plist :all) :path-to-todo))))
-     "Todo…")
-    ("+" jnf/org-roam--all--capture     "Capture…")
-    ("!" jnf/org-roam--all--node-insert " ├─ Insert…")
-    ("?" jnf/org-roam--all--node-find   " └─ Find…")
-    ("/" org-roam-buffer-toggle         "Toggle Buffer")
-    ("#" jnf/toggle-roam-subject-filter "Toggle Default Filter")
-    )))
+   ()
+   ))
 
 (cl-defmacro create-org-roam-subject-fns-for (subject
                                               &key
@@ -281,6 +273,20 @@ Fetch the given SUBJECT from the given SUBJECTS-PLIST."
 (create-org-roam-subject-fns-for :hesburgh-libraries)
 (create-org-roam-subject-fns-for :jf-consulting)
 (create-org-roam-subject-fns-for :thel-sector)
+
+(pretty-hydra-define+ jnf/org-subject-menu--all()
+  ("All"
+   (
+    ("@" (lambda ()
+           (interactive)
+           (find-file (file-truename (plist-get (plist-get jnf/org-roam-capture-subjects-plist :all) :path-to-todo))))
+     "Todo…")
+    ("+" jnf/org-roam--all--capture     "Capture…")
+    ("!" jnf/org-roam--all--node-insert " ├─ Insert…")
+    ("?" jnf/org-roam--all--node-find   " └─ Find…")
+    ("/" org-roam-buffer-toggle         "Toggle Buffer")
+    ("#" jnf/toggle-roam-subject-filter "Toggle Default Filter")
+    )))
 
 ;; Including the aliases to reduce switching necessary for re-mapping
 ;; keys via `jnf/toggle-roam-subject-filter'.
