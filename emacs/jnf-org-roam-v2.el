@@ -309,7 +309,7 @@ The form should be '((\"all\" 1) (\"hesburgh-libraries\" 2))."
    (intern (concat "jnf/org-roam--" subject "--capture")))
   (global-set-key
    (kbd "C-s-/")
-   (intern (concat "jnf/org-roam--" subject "--find")))
+   (intern (concat "jnf/org-roam--" subject "--node-find")))
   (global-set-key
    (kbd "s-i")
    (intern (concat "jnf/org-roam--" subject "--node-insert")))
