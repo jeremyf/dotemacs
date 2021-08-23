@@ -160,7 +160,7 @@ given (or default) TEMPLATE-DEFINITIONS-PLIST."
    ;; Note: This matches at least one of the :groups in `jnf/org-roam-capture-subjects-plist'
    "Projects"
    ()
-   "Org Mode"
+   "All"
    (("@" (lambda ()
            (interactive)
            (find-file (file-truename (plist-get (plist-get jnf/org-roam-capture-subjects-plist :all) :path-to-todo))))
