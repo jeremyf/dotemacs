@@ -303,13 +303,13 @@ The form should be '((\"all\" 1) (\"hesburgh-libraries\" 2))."
                  "Project: " (jnf/subject-list-for-completing-read))))
   (global-set-key
    ;; Command + Control + i
-   (kbd "s-TAB")
+   (kbd "C-s-!")
    (intern (concat "jnf/org-roam--" subject "--node-insert")))
   (global-set-key
-   (kbd "C-s-c")
+   (kbd "C-s-=")
    (intern (concat "jnf/org-roam--" subject "--capture")))
   (global-set-key
-   (kbd "C-s-f")
+   (kbd "C-s-/")
    (intern (concat "jnf/org-roam--" subject "--find")))
   (global-set-key
    (kbd "s-i")
