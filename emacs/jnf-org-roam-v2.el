@@ -61,8 +61,7 @@
        ))
 
 ;; A plist that contains the various org-roam subject.  Each subject
-;; has a plist of :templates, :title, :name, :path-to-todo, :prefix,
-;; and :group.
+;; has a plist of :templates, :title, :name, and :path-to-todo.
 ;;
 ;; The :templates defines the ;; named templates available for this subject.  See
 ;; `jnf/org-roam-capture-templates-plist' for list of valid templates.
@@ -71,10 +70,6 @@
 ;; creating function names.
 ;;
 ;; The :title is the human readable "title-case" form of the subject.
-;;
-;; The :group is for `pretty-hydra-define+'
-;;
-;; The :prefix helps with menu key build for `pretty-hydra-define+'
 ;;
 ;; The :path-to-todo is the path to the todo file for this subject.
 (setq jnf/org-roam-capture-subjects-plist
@@ -88,43 +83,31 @@
                    jnf/org-roam-capture-templates-plist))
              :name "all"
              :title "All"
-             :group "All"
-             :prefix ""
              :path-to-todo "~/git/org/todo.org")
        :jf-consulting (list
                        :templates (list :jf-consulting)
                        :name "jf-consulting"
                        :title "JF Consulting"
-                       :group "Projects"
-                       :prefix "j"
                        :path-to-todo "~/git/org/jeremy-friesen-consulting/todo.org")
        :hesburgh-libraries (list
                             :templates (list :hesburgh-libraries)
                             :name "hesburgh-libraries"
                             :title "Hesburgh Libraries"
-                            :group "Projects"
-                            :prefix "h"
                             :path-to-todo "~/git/org/hesburgh-libraries/todo.org")
        :personal (list
                   :templates (list :personal :personal-encrypted)
                   :name "personal"
                   :title "Personal"
-                  :group "Life"
-                  :prefix "p"
                   :path-to-todo "~/git/org/personal/todo.org")
        :public (list
                 :templates (list :public)
                 :name "public"
                 :title "Public"
-                :group "Life"
-                :prefix "u"
                 :path-to-todo "~/git/org/public/todo.org")
        :thel-sector (list
                      :templates (list :thel-sector)
                      :name "thel-sector"
                      :title "Thel Sector"
-                     :group "Projects"
-                     :prefix "t"
                      :path-to-todo "~/git/org/personal/thel-sector/todo.org")
        ))
 
@@ -142,32 +125,21 @@ given (or default) TEMPLATE-DEFINITIONS-PLIST."
 
 ;; A menu of common tasks for `org-roam'.  This menu is for all subjects.
 ;;
-;; Note the convention:
-;;
-;; * @ - for todo
-;; * + - for capture
-;; * ! - for insert
-;; * ? - for find
-;;
 ;; The `create-org-roam-subject-fns-for' presupposes those keys for
 ;; narrowed subjects.
 (defvar jnf/org-subject-menu--title (with-faicon "book" "Org Subject Menu" 1 -0.05))
 (pretty-hydra-define jnf/org-subject-menu--all (:foreign-keys warn :title jnf/org-subject-menu--title :quit-key "q" :exit t)
-  (
-   ;; Note: This matches at least one of the :groups in `jnf/org-roam-capture-subjects-plist'
-   "Life"
-   ()
-   ;; Note: This matches at least one of the :groups in `jnf/org-roam-capture-subjects-plist'
-   "Projects"
-   ()
-   "All"
-   ()
-   ))
+  ("All" ()))
 
 (cl-defmacro create-org-roam-subject-fns-for (subject
                                               &key
+                                              menu_group
+                                              menu_prefix
                                               (subjects-plist jnf/org-roam-capture-subjects-plist))
   "Define the org roam SUBJECT functions and create & update hydra menus.
+
+The MENU_GROUP defines the menu column where we place the functions.
+The MENU_PREFIX is the leading key for the menu option.
 
 The functions are wrappers for `org-roam-capture',
 `org-roam-node-find', `org-roam-node-insert', and `find-file'.
@@ -193,12 +165,10 @@ Fetch the given SUBJECT from the given SUBJECTS-PLIST."
          (hydra-fn-name (intern (concat "jnf/org-subject-menu--" (if (eq subject :all) "all--dev--null" subject-name))))
          (hydra-menu-title (concat subject-title " Subject Menu"))
          (hydra-todo-title (concat subject-title " Todo…"))
-         (hydra-group (plist-get subject-plist :group))
-         (hydra-prefix (plist-get subject-plist :prefix))
-         (hydra-kbd-prefix-todo    (s-trim (concat hydra-prefix " @")))
-         (hydra-kbd-prefix-capture (s-trim (concat hydra-prefix " +")))
-         (hydra-kbd-prefix-insert  (s-trim (concat hydra-prefix " !")))
-         (hydra-kbd-prefix-find    (s-trim (concat hydra-prefix " ?")))
+         (hydra-kbd-prefix-todo    (s-trim (concat menu_prefix " @")))
+         (hydra-kbd-prefix-capture (s-trim (concat menu_prefix " +")))
+         (hydra-kbd-prefix-insert  (s-trim (concat menu_prefix " !")))
+         (hydra-kbd-prefix-find    (s-trim (concat menu_prefix " ?")))
 
          ;; For `org-roam-capture' related antics
          (capture-fn-name (intern (concat "jnf/org-roam--" subject-name "--capture")))
@@ -258,7 +228,7 @@ Fetch the given SUBJECT from the given SUBJECTS-PLIST."
 
        ;; Append the following menu items to the `jnf/org-subject-menu--all'
        (pretty-hydra-define+ jnf/org-subject-menu--all()
-         (,hydra-group
+         (,menu_group
           (
            (,hydra-kbd-prefix-todo    ,todo-fn-name    ,hydra-todo-title)
            (,hydra-kbd-prefix-capture ,capture-fn-name " ├─ Capture…")
@@ -271,12 +241,12 @@ Fetch the given SUBJECT from the given SUBJECTS-PLIST."
 ;; work.  I'd love some additional help refactoring this.  But for
 ;; now, what I have is quite adequate.  It would be nice to
 ;; more programatically generate the hydra menus (see below).
-(create-org-roam-subject-fns-for :all)
-(create-org-roam-subject-fns-for :personal)
-(create-org-roam-subject-fns-for :public)
-(create-org-roam-subject-fns-for :hesburgh-libraries)
-(create-org-roam-subject-fns-for :jf-consulting)
-(create-org-roam-subject-fns-for :thel-sector)
+(create-org-roam-subject-fns-for :all :menu_group "All" :menu_prefix "")
+(create-org-roam-subject-fns-for :personal :menu_group "Life" :menu_prefix "p")
+(create-org-roam-subject-fns-for :public :menu_group "Life" :menu_prefix "u")
+(create-org-roam-subject-fns-for :hesburgh-libraries :menu_group "Projects" :menu_prefix "h")
+(create-org-roam-subject-fns-for :jf-consulting :menu_group "Projects" :menu_prefix "j")
+(create-org-roam-subject-fns-for :thel-sector :menu_group "Projects" :menu_prefix "t")
 
 (pretty-hydra-define+ jnf/org-subject-menu--all()
   ("All"
