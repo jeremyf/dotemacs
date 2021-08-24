@@ -34,7 +34,8 @@
     ("n" jnf/tor-create-post "Create new post…")
     ("r" jnf/tor-retitle-post "Re-title post…")
     ("s" jnf/tor-wrap-as-sidenote-dwim "Side-note sentence or region…")
-    ("t" jnf/tor-tag-post "Tag post…")
+    ;; I usually want to tag a post more than once, hence the "non-exit"
+    ("t" jnf/tor-tag-post "Tag post…" :exit nil)
     ("w" jnf/tor-wrap-in-html-tag "Wrap point or region…"))))
 
 (pretty-hydra-define jnf/tor-subject-menu-yaml (:foreign-keys warn :title jnf/tor-menu--title :quit-key "q" :exit t)
