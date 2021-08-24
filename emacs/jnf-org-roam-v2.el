@@ -89,7 +89,7 @@
              :name "all"
              :title "All"
              :group "All"
-             :prefix "a"
+             :prefix ""
              :path-to-todo "~/git/org/todo.org")
        :jf-consulting (list
                        :templates (list :jf-consulting)
@@ -188,15 +188,17 @@ Fetch the given SUBJECT from the given SUBJECTS-PLIST."
          (todo-docstring (concat "Find the todo file for " subject-name " subject."))
 
          ;; For hydra menu related antics
-         (hydra-fn-name (intern (concat "jnf/org-subject-menu--" subject-name)))
+         ;;
+         ;; Note: I'm creating a bogus menu when I have the ":all" subject.
+         (hydra-fn-name (intern (concat "jnf/org-subject-menu--" (if (eq subject :all) "all--dev--null" subject-name))))
          (hydra-menu-title (concat subject-title " Subject Menu"))
          (hydra-todo-title (concat subject-title " Todo…"))
          (hydra-group (plist-get subject-plist :group))
          (hydra-prefix (plist-get subject-plist :prefix))
-         (hydra-kbd-prefix-todo    (concat hydra-prefix " @"))
-         (hydra-kbd-prefix-capture (concat hydra-prefix " +"))
-         (hydra-kbd-prefix-insert  (concat hydra-prefix " !"))
-         (hydra-kbd-prefix-find    (concat hydra-prefix " ?"))
+         (hydra-kbd-prefix-todo    (s-trim (concat hydra-prefix " @")))
+         (hydra-kbd-prefix-capture (s-trim (concat hydra-prefix " +")))
+         (hydra-kbd-prefix-insert  (s-trim (concat hydra-prefix " !")))
+         (hydra-kbd-prefix-find    (s-trim (concat hydra-prefix " ?")))
 
          ;; For `org-roam-capture' related antics
          (capture-fn-name (intern (concat "jnf/org-roam--" subject-name "--capture")))
@@ -250,7 +252,7 @@ Fetch the given SUBJECT from the given SUBJECTS-PLIST."
            ("+" ,capture-fn-name     " ├─ Capture…")
            ("!" ,insert-fn-name      " ├─ Insert…")
            ("?" ,find-fn-name        " └─ Find…")
-           ("/" org-roam-buffer-toggle            "Toggle Buffer")
+           (";" org-roam-buffer-toggle            "Toggle Buffer")
            ("#" jnf/toggle-roam-subject-filter    "Toggle Filter…")
            )))
 
@@ -269,6 +271,7 @@ Fetch the given SUBJECT from the given SUBJECTS-PLIST."
 ;; work.  I'd love some additional help refactoring this.  But for
 ;; now, what I have is quite adequate.  It would be nice to
 ;; more programatically generate the hydra menus (see below).
+(create-org-roam-subject-fns-for :all)
 (create-org-roam-subject-fns-for :personal)
 (create-org-roam-subject-fns-for :public)
 (create-org-roam-subject-fns-for :hesburgh-libraries)
@@ -278,13 +281,6 @@ Fetch the given SUBJECT from the given SUBJECTS-PLIST."
 (pretty-hydra-define+ jnf/org-subject-menu--all()
   ("All"
    (
-    ("@" (lambda ()
-           (interactive)
-           (find-file (file-truename (plist-get (plist-get jnf/org-roam-capture-subjects-plist :all) :path-to-todo))))
-     "Todo…")
-    ("+" jnf/org-roam--all--capture     "Capture…")
-    ("!" jnf/org-roam--all--node-insert " ├─ Insert…")
-    ("?" jnf/org-roam--all--node-find   " └─ Find…")
     ("/" org-roam-buffer-toggle         "Toggle Buffer")
     ("#" jnf/toggle-roam-subject-filter "Toggle Default Filter")
     )))
@@ -313,6 +309,9 @@ The form should be '((\"all\" 1) (\"hesburgh-libraries\" 2))."
                 (completing-read
                  "Project: " (jnf/subject-list-for-completing-read))))
   (global-set-key
+   (kbd "C-s-2")
+   (intern (concat "jnf/org-roam--" subject "--todo")))
+  (global-set-key
    (kbd "C-s-1")
    (intern (concat "jnf/org-roam--" subject "--node-insert")))
   (global-set-key
@@ -338,6 +337,9 @@ The form should be '((\"all\" 1) (\"hesburgh-libraries\" 2))."
   ;; this is the new path forward.
   (org-roam-node-display-template "${title:*} ${tags:40}")
   (org-roam-capture-templates (jnf/org-roam-templates-for-subject :all))
+  :bind
+  (("C-s-;" . org-roam-buffer-toggle)
+   ("C-s-3" . jnf/toggle-roam-subject-filter))
   :init
   ;; Help keep the `org-roam-buffer', toggled via `org-roam-buffer-toggle', sticky.
   (add-to-list 'display-buffer-alist
