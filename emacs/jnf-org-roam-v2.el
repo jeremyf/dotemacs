@@ -241,12 +241,24 @@ Fetch the given SUBJECT from the given SUBJECTS-PLIST."
 ;; work.  I'd love some additional help refactoring this.  But for
 ;; now, what I have is quite adequate.  It would be nice to
 ;; more programatically generate the hydra menus (see below).
-(create-org-roam-subject-fns-for :all :menu_group "All" :menu_prefix "")
-(create-org-roam-subject-fns-for :personal :menu_group "Life" :menu_prefix "p")
-(create-org-roam-subject-fns-for :public :menu_group "Life" :menu_prefix "u")
-(create-org-roam-subject-fns-for :hesburgh-libraries :menu_group "Projects" :menu_prefix "h")
-(create-org-roam-subject-fns-for :jf-consulting :menu_group "Projects" :menu_prefix "j")
-(create-org-roam-subject-fns-for :thel-sector :menu_group "Projects" :menu_prefix "t")
+(create-org-roam-subject-fns-for :all
+                                 :menu_group "All"
+                                 :menu_prefix "")
+(create-org-roam-subject-fns-for :personal
+                                 :menu_group "Life"
+                                 :menu_prefix "p")
+(create-org-roam-subject-fns-for :public
+                                 :menu_group "Life"
+                                 :menu_prefix "u")
+(create-org-roam-subject-fns-for :hesburgh-libraries
+                                 :menu_group "Projects"
+                                 :menu_prefix "h")
+(create-org-roam-subject-fns-for :jf-consulting
+                                 :menu_group "Projects"
+                                 :menu_prefix "j")
+(create-org-roam-subject-fns-for :thel-sector
+                                 :menu_group "Projects"
+                                 :menu_prefix "t")
 
 (pretty-hydra-define+ jnf/org-subject-menu--all()
   ("All"
