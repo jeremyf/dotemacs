@@ -48,6 +48,14 @@
       (tor-post-amplifying-the-blogosphere citeTitle
                                            :citeTitle citeTitle
                                            :citeURL citeURL)))
+  ;; EWW lacks a style for dfn
+  (defun shr-tag-dfn (dom)
+    (shr-fontize-dom dom 'italic))
+
+  ;; EWW lacks a style for cite
+  (defun shr-tag-cite (dom)
+    (shr-fontize-dom dom 'italic))
+
   :bind (:map eww-mode-map
               ("U" . eww-up-url)
               ("<f7>" . jnf/amplify-eww)
