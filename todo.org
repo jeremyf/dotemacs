@@ -3,3 +3,17 @@
 :END:
 #+title: Emacs Config Todo
 #+filetags: :personal:
+
+* Find File Recursively
+
+I like this feature, as it expands the utility of ~find-file~.  The present implementation of ~find-file~ adds some selectrum information.  While not necessary it’s kind of nice.
+
+#+BEGIN_SRC elisp
+  ;; https://www.reddit.com/r/emacs/comments/pb6w2z/weekly_tips_tricks_c_thread/haa7ozm?utm_source=share&utm_medium=web2x&context=3
+  (defun find-file-rec ()
+    "Find a file in the current working directory recursively."
+    (interactive)
+    (find-file
+     (completing-read
+      "Find file: " (process-lines "rg" "--color=never" "--files"))))
+#+END_SRC
