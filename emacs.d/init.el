@@ -83,6 +83,8 @@
      ("k" helpful-key "key")
      ("d" helpful-at-point "thing at point")
      ("v" helpful-variable "variable")
+     ("m" helpful-macro "macro")
+     ("t" describe-text-properties "text properties")
      ("b" embark-bindings "bindings"))))
   :bind ("C-s-h" . helpful-hydra/body))
 
