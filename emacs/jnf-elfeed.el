@@ -172,6 +172,27 @@ preferring the preferred type."
                     return))
         return))))
 
+
+(use-package shrface
+  :straight t
+  :after eww
+  :hook (eww-mode . shrface-mode)
+  :custom (shrface-toggle-bullets nil)
+  :config
+  (shrface-basic)
+  ;; (shrface-trial)
+  (setq shrface-href-versatile t)
+  :bind (:map
+         eww-mode-map (("<tab>" . shr-next-link)
+                       ("<backtab>" . shr-previous-link)))
+  :bind (:map
+         shrface-mode-map (("<C-M-tab>" . shrface-outline-cycle-buffer)
+                           ("C-t" . shrface-toggle-bullets)
+                           ("C-j" . shrface-next-headline)
+                           ("C-k" . shrface-previous-headline)
+                           ("M-l" . shrface-links) ; or 'shrface-links-helm
+                           ("M-h" . shrface-headlines))))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; From https://karthinks.com/blog/lazy-elfeed/
 (defun elfeed-search-show-entry-pre (&optional lines)
