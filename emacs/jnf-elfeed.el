@@ -48,17 +48,51 @@
       (tor-post-amplifying-the-blogosphere citeTitle
                                            :citeTitle citeTitle
                                            :citeURL citeURL)))
-  ;; EWW lacks a style for dfn
+  ;; Inspired from shr-tag-em
   (defun shr-tag-dfn (dom)
     (shr-fontize-dom dom 'italic))
 
-  ;; EWW lacks a style for cite
+  ;; Inspired from shr-tag-em
   (defun shr-tag-cite (dom)
     (shr-fontize-dom dom 'italic))
 
-  ;; EWW lacks a style for small
+  ;; Inspired from shr-tag-a
+  (defun shr-tag-q (dom)
+    (shr-insert "“")
+    (shr-generic dom)
+    (shr-insert "”"))
+
+  ;; Drawing inspiration from shr-tag-h1
   (defun shr-tag-small (dom)
-    (shr-fontize-dom dom (if shr-use-fonts '(variable-pitch (:height 0.8 :weight light))) 'light))
+    (shr-fontize-dom dom (if shr-use-fonts
+                             '(variable-pitch (:height 0.8)))))
+
+  ;; Drawing inspiration from shr-tag-abbr
+  (defun shr-tag-time (dom)
+    (when-let* ((datetime (or
+                           (dom-attr dom 'title)
+                           (dom-attr dom 'datetime)))
+	        (start (point)))
+      (shr-generic dom)
+      (shr-add-font start (point) 'shr-abbreviation)
+      (add-text-properties
+       start (point)
+       (list
+        'help-echo datetime
+        'mouse-face 'highlight))))
+
+
+  ;; EWW lacks a style for article
+  (defun shr-tag-article (dom)
+    (shr-ensure-paragraph)
+    (shr-generic dom)
+    (shr-ensure-paragraph))
+
+  ;; EWW lacks a style for section; This is quite provisional
+  (defun shr-tag-section (dom)
+    (shr-ensure-paragraph)
+    (shr-generic dom)
+    (shr-ensure-paragraph))
 
   :bind (:map eww-mode-map
               ("U" . eww-up-url)
