@@ -56,16 +56,34 @@
   (defun shr-tag-cite (dom)
     (shr-fontize-dom dom 'italic))
 
-  ;; Inspired from shr-tag-a
   (defun shr-tag-q (dom)
-    (shr-insert "“")
-    (shr-generic dom)
-    (shr-insert "”"))
+  (shr-insert shr-before-q-tag)
+  (shr-generic dom)
+  (shr-insert shr-after-q-tag))
+
+  (defcustom shr-before-q-tag "^"
+    "Before quote used for q-tag.
+Alternative suggestions are:
+- \"\\\"\""
+  :type 'string)
+
+  (defcustom shr-after-q-tag "”"
+    "After quote used for q-tag.
+Alternative suggestions are:
+- \"\\\"\""
+    :type 'string)
+
+  (defface shr-small
+    '((t :height 0.8))
+    "Face for <small> elements.")
 
   ;; Drawing inspiration from shr-tag-h1
   (defun shr-tag-small (dom)
-    (shr-fontize-dom dom (if shr-use-fonts
-                             '(variable-pitch (:height 0.8)))))
+    (shr-fontize-dom dom (if shr-use-fonts 'shr-small)))
+
+  (defface shr-time
+  '((t :inherit underline :underline (:style wave)))
+  "Face for <time> elements.")
 
   ;; Drawing inspiration from shr-tag-abbr
   (defun shr-tag-time (dom)
@@ -74,7 +92,7 @@
                            (dom-attr dom 'datetime)))
 	        (start (point)))
       (shr-generic dom)
-      (shr-add-font start (point) 'shr-abbreviation)
+      (shr-add-font start (point) 'shr-time)
       (add-text-properties
        start (point)
        (list
@@ -171,7 +189,6 @@ preferring the preferred type."
                       (s-join " " return)
                     return))
         return))))
-
 
 (use-package shrface
   :straight t
