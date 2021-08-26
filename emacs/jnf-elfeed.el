@@ -56,6 +56,10 @@
   (defun shr-tag-cite (dom)
     (shr-fontize-dom dom 'italic))
 
+  ;; EWW lacks a style for small
+  (defun shr-tag-small (dom)
+    (shr-fontize-dom dom (if shr-use-fonts '(variable-pitch (:height 0.8 :weight light))) 'light))
+
   :bind (:map eww-mode-map
               ("U" . eww-up-url)
               ("<f7>" . jnf/amplify-eww)
