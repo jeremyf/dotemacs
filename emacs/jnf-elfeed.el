@@ -182,6 +182,59 @@ preferring the preferred type."
   (shrface-basic)
   ;; (shrface-trial)
   (setq shrface-href-versatile t)
+
+  ;; I proposed `jnf/shrface-headlines-consult' and
+  ;; `jnf/shrface-links-consult' over at
+  ;; https://github.com/chenyanming/shrface/issues/14.  I added the
+  ;; jnf prefix to highlight that they are my own creation.  If the
+  ;; maintainer adds these functions, then I'll remove them.
+  ;;
+  ;; Working on `consult-headlines' from shrface package.
+  (defun jnf/shrface-headlines-consult ()
+    "Use consult to show all headlines in order founded in the buffer.
+Current headline will be the one of the candidates to initially select."
+    (interactive)
+    (let ((current (point-min)) (start (1+ (point))) point number)
+      ;; Scan from point-min to (1+ (point)) to find the current headline.
+      ;; (1+ (point)) to include under current point headline into the scan range.
+      (unless (> start (point-max))
+        (while (setq point (text-property-not-all
+                            current start shrface-headline-number-property nil))
+          (setq current (1+ point))))
+
+      (cond ((equal (point) 1) (setq number 0))
+            ((equal (point) 2) (setq number 0))
+            ((equal (point) (point-max)) (setq number 0))
+            (t
+             (ignore-errors (setq number (1- (get-text-property (1- current) shrface-headline-number-property))))))
+
+      ;; Start the consult--read
+      (setq start (point)) ; save the starting point
+      (if (fboundp 'consult--read)
+          (consult--read (shrface-headline-selectable-list)
+                         :prompt "shrface headline:"
+                         :category 'shrface-headlines-consult
+                         :sort nil)
+        (message "Please install 'consult' before using 'shrface-headlines-consult'"))))
+
+
+  (defun jnf/shrface-links-consult ()
+    "Use consult to present all urls in order founded in the buffer."
+    (interactive)
+    (let ((start (point)) next url)
+      ;; get the next nearest url
+      (setq next (text-property-not-all
+                  (point) (point-max) shrface-href-follow-link-property nil))
+      ;; only if the next url exists
+      (if next
+          (setq url (get-text-property next shrface-href-property)))
+      (if (fboundp 'consult--read)
+          (consult--read (shrface-links-selectable-list)
+                         :prompt "shrface link:"
+                         :category 'shrface-links-consult
+                         :sort nil)
+        (message "Please install 'consult' before using 'shrface-links-consult'"))))
+
   :bind (:map
          eww-mode-map (("<tab>" . shr-next-link)
                        ("<backtab>" . shr-previous-link)))
@@ -190,8 +243,8 @@ preferring the preferred type."
                            ("C-t" . shrface-toggle-bullets)
                            ("C-j" . shrface-next-headline)
                            ("C-k" . shrface-previous-headline)
-                           ("M-l" . shrface-links) ; or 'shrface-links-helm
-                           ("M-h" . shrface-headlines))))
+                           ("M-l" . jnf/shrface-links-consult)
+                           ("M-h" . jnf/shrface-headlines-consult))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; From https://karthinks.com/blog/lazy-elfeed/
