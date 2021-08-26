@@ -22,27 +22,31 @@
 ;; functions for helping my blogging effort.
 (defvar jnf/tor-menu--title (with-faicon "pencil-square" "Take on Rules" 1 -0.05))
 (pretty-hydra-define jnf/tor-subject-menu-markdown (:foreign-keys warn :title jnf/tor-menu--title :quit-key "q" :exit t)
-  ("Posts"
+  ("Wrapping"
    (("a" jnf/tor-wrap-link-active-region-dwim "A link at point or region…")
     ("c" jnf/tor-wrap-cite-active-region-dwim "Cite point or region…")
     ("d" jnf/tor-wrap-date "Date point or region…")
-    ("e" jnf/tor-insert-epigraph-entry "Create epigraph entry…")
     ("f" jnf/tor-wrap-as-pseudo-dfn "Wrap word or region in pseudo-dfn…")
-    ("F" jnf/tor-find-file-draft "Find Blog in Draft Status…")
-    ("g" jnf/tor-find-glossary-and-insert-entry "Create glossary entry…")
-    ("k" jnf/tor-insert-glossary-key "Insert glossary key at point…")
     ("m" jnf/tor-wrap-as-marginnote-dwim "Margin-note line or region…")
-    ("n" jnf/tor-create-post "Create new post…")
-    ("r" jnf/tor-retitle-post "Re-title post…")
     ("s" jnf/tor-wrap-as-sidenote-dwim "Side-note sentence or region…")
-    ;; I usually want to tag a post more than once, hence the "non-exit"
-    ("t" jnf/tor-tag-post "Tag post…" :exit nil)
-    ("w" jnf/tor-wrap-in-html-tag "Wrap point or region…"))))
+    ("w" jnf/tor-wrap-in-html-tag "Wrap point or region…"))
+   "Entries"
+    (("e" jnf/tor-insert-epigraph-entry "Create epigraph entry…")
+     ("?" jnf/tor-find-file-draft "Find blog in draft status…")
+     ("g" jnf/tor-find-glossary-and-insert-entry "Create glossary entry…")
+     ("k" jnf/tor-insert-glossary-key "Insert glossary key at point…")
+     ("n" jnf/tor-create-post "Create new post…"))
+    "Post"
+     (("r" jnf/tor-retitle-post "Re-title post…")
+      ;; I usually want to tag a post more than once, hence the "non-exit"
+      ("#" jnf/tor-tag-post "Tag post…" :exit nil)
+      ("v" jnf/tor-view-blog-post "View post…")
+    )))
 
 (pretty-hydra-define jnf/tor-subject-menu-yaml (:foreign-keys warn :title jnf/tor-menu--title :quit-key "q" :exit t)
   ("Posts"
    (("e" jnf/tor-insert-epigraph-entry "Create epigraph entry…")
-    ("F" jnf/tor-find-file-draft "Find Blog in Draft Status…")
+    ("?" jnf/tor-find-file-draft "Find Blog in Draft Status…")
     ("g" jnf/tor-find-glossary-and-insert-entry "Create glossary entry…")
     ("k" jnf/tor-insert-glossary-key "Insert key at point…")
     ("n" jnf/tor-create-post "Create new post…"))))
@@ -50,7 +54,7 @@
 (pretty-hydra-define jnf/tor-subject-menu-default (:foreign-keys warn :title jnf/tor-menu--title :quit-key "q" :exit t)
   ("Posts"
    (("e" jnf/tor-insert-epigraph-entry "Create epigraph entry…")
-    ("F" jnf/tor-find-file-draft "Find Blog in Draft Status…")
+    ("?" jnf/tor-find-file-draft "Find Blog in Draft Status…")
     ("g" jnf/tor-find-glossary-and-insert-entry "Create glossary entry…")
     ("n" jnf/tor-create-post "Create new post…"))))
 
@@ -491,6 +495,26 @@ and rename the buffer."
 
       ;; Report filename change
       (message "Renamed %s -> %s" filename new-filename)))
+
+(cl-defun jnf/tor-view-blog-post (&key
+                                  (hostname "http://localhost:1313"))
+  "Open `eww' in a new window to preview the current buffer at the HOSTNAME."
+  (interactive)
+  (let ((slugs))
+    (save-excursion
+      (goto-char 1)
+      (re-search-forward "^slug: \\(.*\\)$" nil t)
+      (push (match-string 1) slugs)
+      (goto-char 1)
+      (re-search-forward "^date: \\([[:digit:]]+\\)-\\([[:digit:]]+\\)-\\([[:digit:]]+\\) " nil t)
+      (push (match-string 3) slugs)
+      (push (match-string 2) slugs)
+      (push (match-string 1) slugs)
+      (push hostname slugs))
+    (delete-other-windows)
+    (split-window-horizontally)
+    (other-window 1)
+    (eww (format "%s" (s-join "/" slugs)))))
 
 (provide 'jnf-blogging.el)
 ;;; jnf-blogging.el ends here
