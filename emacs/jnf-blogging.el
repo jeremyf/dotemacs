@@ -28,6 +28,7 @@
     ("d" jnf/tor-wrap-date "Date point or region…")
     ("e" jnf/tor-insert-epigraph-entry "Create epigraph entry…")
     ("f" jnf/tor-wrap-as-pseudo-dfn "Wrap word or region in pseudo-dfn…")
+    ("F" jnf/tor-find-file-draft "Find Blog in Draft Status…")
     ("g" jnf/tor-find-glossary-and-insert-entry "Create glossary entry…")
     ("k" jnf/tor-insert-glossary-key "Insert glossary key at point…")
     ("m" jnf/tor-wrap-as-marginnote-dwim "Margin-note line or region…")
@@ -41,6 +42,7 @@
 (pretty-hydra-define jnf/tor-subject-menu-yaml (:foreign-keys warn :title jnf/tor-menu--title :quit-key "q" :exit t)
   ("Posts"
    (("e" jnf/tor-insert-epigraph-entry "Create epigraph entry…")
+    ("F" jnf/tor-find-file-draft "Find Blog in Draft Status…")
     ("g" jnf/tor-find-glossary-and-insert-entry "Create glossary entry…")
     ("k" jnf/tor-insert-glossary-key "Insert key at point…")
     ("n" jnf/tor-create-post "Create new post…"))))
@@ -48,6 +50,7 @@
 (pretty-hydra-define jnf/tor-subject-menu-default (:foreign-keys warn :title jnf/tor-menu--title :quit-key "q" :exit t)
   ("Posts"
    (("e" jnf/tor-insert-epigraph-entry "Create epigraph entry…")
+    ("F" jnf/tor-find-file-draft "Find Blog in Draft Status…")
     ("g" jnf/tor-find-glossary-and-insert-entry "Create glossary entry…")
     ("n" jnf/tor-create-post "Create new post…"))))
 
@@ -369,6 +372,22 @@ If there's an active region, select that text and place it."
      "rg \"" key ": .*$\" "
      (f-join "~/git/takeonrules.github.io/" filename)
      " --only-matching --no-filename | cut -d \" \" -f 2- | sort | tr '\n' '~'"))
+   "~"))
+
+(defun jnf/tor-find-file-draft (filename)
+  "Find draft FILENAME."
+  (interactive (list (completing-read "Filename: " (jnf/list-draft-filenames))))
+  (message "Opening draft %s" filename)
+  (find-file filename))
+
+(cl-defun jnf/list-draft-filenames (&key (key "^draft: true"))
+  "Build a list of filenames that have the given `KEY'."
+  (split-string-and-unquote
+   (shell-command-to-string
+    (concat
+     "rg \"" key "\" "
+     (f-join "~/git/takeonrules.github.io/content/")
+     " --only-matching  --files-with-matches | sort | tr '\n' '~'"))
    "~"))
 
 ;; Used in ./emacs/snippets/text-mode/tag
