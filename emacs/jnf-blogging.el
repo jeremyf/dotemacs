@@ -85,7 +85,8 @@ for TakeOnRules.com."
   "Wrap the point or region with the given DATE."
   (interactive (list
                 (read-string
-                 (concat "Date (default \"" (format-time-string "%Y-%m-%d") "\"): ")
+                 (concat "Date (default \""
+                         (format-time-string "%Y-%m-%d") "\"): ")
                  nil nil (format-time-string "%Y-%m-%d"))))
   (jnf/tor-wrap-in-html-tag
    "time"
@@ -109,6 +110,7 @@ Valid STRATEGY options are:
 * `:lineOrRegion'
 * `:pointOrRegion'
 * `:sentenceOrRegion'
+* `:wordOrRegion'
 
 TODO: I would love create a lookup table for the case statement,
 as the behavior's well defined."
@@ -180,10 +182,10 @@ tag."
      :strategy :pointOrRegion)))
 
 (defun jnf/tor-wrap-as-pseudo-dfn ()
-  "Wrap current region (or word) in an `span' tag with a `dfn' class."
+  "Wrap current region (or word) in an SPAN-tag with a DFN dom class."
   (interactive)
   (jnf/tor-wrap-with-text
-     :before (concat "<i class=\"dfn\">")
+     :before "<i class=\"dfn\">"
      :after "</i>"
      :strategy :wordOrRegion))
 
@@ -226,7 +228,7 @@ tag."
   (message "Ready to insert a new epigraph"))
 
 (defun jnf/tor-wrap-cite-active-region-dwim (url)
-  "Wrap current region (or point) in a `CITE' and optional `A' tag with URL.
+  "Wrap current region (or point) in a CITE-tag and optional A-tag with URL.
 
 For the URL:
 
@@ -264,11 +266,11 @@ CITE and A tag."
 (cl-defun jnf/tor-post-amplifying-the-blogosphere (subheading &key citeTitle citeURL citeAuthor)
   "Create and visit draft post for amplifying the blogosphere.
 
-If there's an active region, prompt for the `SUBHEADING'.  The file
+If there's an active region, prompt for the :SUBHEADING.  The file
 for the blog post conforms to the path schema of posts for
 TakeOnRules.com.
 
-We'll pass the `CITETITLE', `CITEAUTHOR', and `CITEURL' to
+We'll pass the :CITETITLE, :CITEAUTHOR, and :CITEURL to
 `jnf/tor-post---create-or-append'"
   (interactive (list (if (use-region-p)
                          (read-string "Sub-Heading: ")
@@ -300,14 +302,14 @@ We'll pass the `CITETITLE', `CITEAUTHOR', and `CITEURL' to
 
 The following keys are optional:
 
-`TAGS' one or more tags, as a list or string, to add to the
+:TAGS one or more tags, as a list or string, to add to the
         frontmatter.
-`SERIES' the series to set in the frontmatter.
-`TOC' whether to include a table of contents in the post.
-`CITETITLE' the title of the URL cited (if any)
-`CITEURL' the URL cited (if any)
-`CITEAUTHOR' the author cited (if any)
-`SUBHEADING' if you have an active region, use this header.
+:SERIES the series to set in the frontmatter.
+:TOC whether to include a table of contents in the post.
+:CITETITLE the title of the URL cited (if any)
+:CITEURL the URL cited (if any)
+:CITEAUTHOR the author cited (if any)
+:SUBHEADING if you have an active region, use this header.
 
 If there's an active region, select that text and place it."
   (let* ((default-directory (concat "~/git/takeonrules.github.io/"
@@ -345,20 +347,20 @@ If there's an active region, select that text and place it."
          (concat
           (if subheading
               (concat "\n## " subheading "\n")
-            (if citeTitle (concat "\n## " citeTitle "\n")))
-          (if citeURL (concat
+            (when citeTitle (concat "\n## " citeTitle "\n")))
+          (when citeURL (concat
                        "\n{{< blockquote"
-                       (if citeAuthor
+                       (when citeAuthor
                            (concat " pre=\"" citeAuthor "\""))
                        " cite=\""
                        citeTitle "\" cite_url=\""
                        citeURL "\" >}}\n"))
           (buffer-substring (region-beginning) (region-end))
-          (if citeURL "\n{{< /blockquote >}}"))
+          (when citeURL "\n{{< /blockquote >}}"))
          nil fpath t)
       ;; Without an active region, if we have a citeURL insert a link
       ;; to it.
-      (if citeURL
+      (when citeURL
           (write-region
            (concat
             "\n<cite><a href=\"" citeURL
@@ -451,7 +453,9 @@ If there's an active region, select that text and place it."
 
 (defun jnf/roll-expression-dwim (expression &optional)
   "Roll the `EXPRESSION', check `thing-at-point' then prompt."
-  (interactive (list (if (string-match "[dD][0-9]" (format "%s" (thing-at-point 'sexp t)))
+  (interactive (list (if (string-match
+                          "[dD][0-9]"
+                          (format "%s" (thing-at-point 'sexp t)))
                          (thing-at-point 'sexp t)
                        (read-string "Dice Expression: "))))
   (-let* (((rolls . result) (org-d20--roll expression)))
@@ -502,14 +506,18 @@ and rename the buffer."
   (interactive)
   (let ((slugs))
     (save-excursion
+      ;; Remember where making a list and pushing to the beginning of
+      ;; the list.  Hence we start with the last slug in mind.
       (goto-char 1)
       (re-search-forward "^slug: \\(.*\\)$" nil t)
       (push (match-string 1) slugs)
       (goto-char 1)
       (re-search-forward "^date: \\([[:digit:]]+\\)-\\([[:digit:]]+\\)-\\([[:digit:]]+\\) " nil t)
+      ;; Then move to day, month, then year.
       (push (match-string 3) slugs)
       (push (match-string 2) slugs)
       (push (match-string 1) slugs)
+      ;; And finally the host name.
       (push hostname slugs))
     (delete-other-windows)
     (split-window-horizontally)
