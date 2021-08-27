@@ -4,8 +4,6 @@
 ;;
 ;;  This package provides configuration for org-roam
 ;;
-;;; Code
-
 ;; See
 ;; http://takeonrules.com/2021/08/22/ever-further-refinements-of-org-roam-usage/
 ;; for details on this configuration.
@@ -13,103 +11,105 @@
 ;; See https://takeonrules.com/2021/08/23/diving-into-the-implementation-of-subject-menus-for-org-roam/
 ;; for a walk through of the implementation.
 ;;
-;; A Property List of my `org-roam' capture templates.
-(setq jnf/org-roam-capture-templates-plist
-      (list
-       :hesburgh-libraries
-       '("h" "Hesburgh Libraries" plain "%?"
-	 :if-new
-         (file+head
-          "hesburgh-libraries/%<%Y%m%d>---${slug}.org"
-          "#+title: ${title}\n#+FILETAGS: :hesburgh: %^G\n\n")
-	 :unnarrowed t)
-       :jf-consulting
-       '("j" "JF Consulting" plain "%?"
-	 :if-new
-         (file+head
-          "jeremy-friesen-consulting/%<%Y%m%d>---${slug}.org"
-          "#+title: ${title}\n#+FILETAGS: :personal:jeremy-friesen-consulting: %^G\n\n")
-	 :unnarrowed t)
-       :personal
-       '("p" "Personal" plain "%?"
-	 :if-new
-         (file+head
-          "personal/%<%Y%m%d>---${slug}.org"
-	  "#+title: ${title}\n#+FILETAGS: :personal: %^G\n\n")
-	 :unnarrowed t)
-       :personal-encrypted
-       '("P" "Personal (Encrypted)" plain "%?"
-	 :if-new
-         (file+head
-          "personal/%<%Y%m%d>---${slug}.org.gpg"
-          "#+title: ${title}\n#+FILETAGS: :personal:encrypted: %^G\n\n")
-	 :unnarrowed t)
-       :public
-       '("u" "Public" plain "%?"
-	 :if-new
-         (file+head
-          "public/%<%Y%m%d>---${slug}.org"
-	  "#+title: ${title}\n#+FILETAGS: :public: %^G\n\n")
-	 :unnarrowed t)
-       :thel-sector
-       '("t" "Thel Sector" plain "%?"
-         :if-new
-         (file+head
-          "personal/thel-sector/%<%Y%m%d>---${slug}.org"
-          "#+title: ${title}\n#+FILETAGS: :thel-sector: %^G\n\n")
-         :unnarrowed t)
-       ))
+;;; Code
+(defconst jnf/org-roam-capture-templates-plist
+  (list
+   :hesburgh-libraries
+   '("h" "Hesburgh Libraries" plain "%?"
+     :if-new
+     (file+head
+      "hesburgh-libraries/%<%Y%m%d>---${slug}.org"
+      "#+title: ${title}\n#+FILETAGS: :hesburgh: %^G\n\n")
+     :unnarrowed t)
+   :jf-consulting
+   '("j" "JF Consulting" plain "%?"
+     :if-new
+     (file+head
+      "jeremy-friesen-consulting/%<%Y%m%d>---${slug}.org"
+      "#+title: ${title}\n#+FILETAGS: :personal:jeremy-friesen-consulting: %^G\n\n")
+     :unnarrowed t)
+   :personal
+   '("p" "Personal" plain "%?"
+     :if-new
+     (file+head
+      "personal/%<%Y%m%d>---${slug}.org"
+      "#+title: ${title}\n#+FILETAGS: :personal: %^G\n\n")
+     :unnarrowed t)
+   :personal-encrypted
+   '("P" "Personal (Encrypted)" plain "%?"
+     :if-new
+     (file+head
+      "personal/%<%Y%m%d>---${slug}.org.gpg"
+      "#+title: ${title}\n#+FILETAGS: :personal:encrypted: %^G\n\n")
+     :unnarrowed t)
+   :public
+   '("u" "Public" plain "%?"
+     :if-new
+     (file+head
+      "public/%<%Y%m%d>---${slug}.org"
+      "#+title: ${title}\n#+FILETAGS: :public: %^G\n\n")
+     :unnarrowed t)
+   :thel-sector
+   '("t" "Thel Sector" plain "%?"
+     :if-new
+     (file+head
+      "personal/thel-sector/%<%Y%m%d>---${slug}.org"
+      "#+title: ${title}\n#+FILETAGS: :thel-sector: %^G\n\n")
+     :unnarrowed t)
+   )
+  "A plist defining my `org-roam' capture templates.")
 
-;; A plist that contains the various org-roam subject.  Each subject
-;; has a plist of :templates, :title, :name, and :path-to-todo.
-;;
-;; The :templates defines the ;; named templates available for this subject.  See
-;; `jnf/org-roam-capture-templates-plist' for list of valid templates.
-;;
-;; The :name is the string version of the subject, suitable for
-;; creating function names.
-;;
-;; The :title is the human readable "title-case" form of the subject.
-;;
-;; The :path-to-todo is the path to the todo file for this subject.
-(setq jnf/org-roam-capture-subjects-plist
-      (list
-       ;; The :all subject is different from the other items.
-       :all (list
-             ;; Iterate through all registered capture templates and
-             ;; generate a list
-             :templates (-non-nil (seq-map-indexed (lambda (template index)
-                     (when (evenp index) template))
-                   jnf/org-roam-capture-templates-plist))
-             :name "all"
-             :title "All"
-             :path-to-todo "~/git/org/todo.org")
-       :jf-consulting (list
-                       :templates (list :jf-consulting)
-                       :name "jf-consulting"
-                       :title "JF Consulting"
-                       :path-to-todo "~/git/org/jeremy-friesen-consulting/todo.org")
-       :hesburgh-libraries (list
-                            :templates (list :hesburgh-libraries)
-                            :name "hesburgh-libraries"
-                            :title "Hesburgh Libraries"
-                            :path-to-todo "~/git/org/hesburgh-libraries/todo.org")
-       :personal (list
-                  :templates (list :personal :personal-encrypted)
-                  :name "personal"
-                  :title "Personal"
-                  :path-to-todo "~/git/org/personal/todo.org")
-       :public (list
-                :templates (list :public)
-                :name "public"
-                :title "Public"
-                :path-to-todo "~/git/org/public/todo.org")
-       :thel-sector (list
-                     :templates (list :thel-sector)
-                     :name "thel-sector"
-                     :title "Thel Sector"
-                     :path-to-todo "~/git/org/personal/thel-sector/todo.org")
-       ))
+(defconst jnf/org-roam-capture-subjects-plist
+  (list
+   ;; The :all subject is different from the other items.
+   :all (list
+         ;; Iterate through all registered capture templates and
+         ;; generate a list
+         :templates (-non-nil (seq-map-indexed (lambda (template index)
+                                                 (when (evenp index) template))
+                                               jnf/org-roam-capture-templates-plist))
+         :name "all"
+         :title "All"
+         :path-to-todo "~/git/org/todo.org")
+   :jf-consulting (list
+                   :templates (list :jf-consulting)
+                   :name "jf-consulting"
+                   :title "JF Consulting"
+                   :path-to-todo "~/git/org/jeremy-friesen-consulting/todo.org")
+   :hesburgh-libraries (list
+                        :templates (list :hesburgh-libraries)
+                        :name "hesburgh-libraries"
+                        :title "Hesburgh Libraries"
+                        :path-to-todo "~/git/org/hesburgh-libraries/todo.org")
+   :personal (list
+              :templates (list :personal :personal-encrypted)
+              :name "personal"
+              :title "Personal"
+              :path-to-todo "~/git/org/personal/todo.org")
+   :public (list
+            :templates (list :public)
+            :name "public"
+            :title "Public"
+            :path-to-todo "~/git/org/public/todo.org")
+   :thel-sector (list
+                 :templates (list :thel-sector)
+                 :name "thel-sector"
+                 :title "Thel Sector"
+                 :path-to-todo "~/git/org/personal/thel-sector/todo.org")
+   )
+"A plist that contains the various `org-roam' subjects.
+
+Each subject has a plist of :templates, :title, :name, and :path-to-todo.
+
+- :templates defines the named templates available for this
+  subject.  See `jnf/org-roam-capture-templates-plist' for list
+  of valid templates.
+- :name is the string version of the subject, suitable for
+  creating function names.
+- :title is the human readable \"title-case\" form of the
+  subject.
+- :path-to-todo is the path to the todo file for this subject."
+)
 
 (cl-defun jnf/org-roam-templates-for-subject (subject
                                               &key
