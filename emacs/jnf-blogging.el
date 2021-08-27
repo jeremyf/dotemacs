@@ -337,7 +337,7 @@ We'll pass the :CITETITLE, :CITEAUTHOR, and :CITEURL to
 
 (defun jnf/tor-find-file-draft (filename)
   "Find draft FILENAME."
-  (interactive (list (completing-read "Filename: " (jnf/list-draft-filenames))))
+  (interactive (list (completing-read "Filename: " (jnf/tor-list-draft-filnames))))
   (message "Opening draft %s" filename)
   (find-file filename))
 ;;******************************************************************************
@@ -407,7 +407,7 @@ We'll pass the :CITETITLE, :CITEAUTHOR, and :CITEURL to
       (concat "rg \"" matching "\" --only-matching --files-with-matches | sort | tr '\n' '~'"))
      "~")))
 
-(defun jnf/list-draft-filnames ()
+(defun jnf/tor-list-draft-filnames ()
   "Return a list of filenames that are in DRAFT status."
   (jnf/list-filenames-with-content :matching "^draft: true" :in "content"))
 
