@@ -57,21 +57,15 @@
     (shr-fontize-dom dom 'italic))
 
   (defun shr-tag-q (dom)
-  (shr-insert shr-before-q-tag)
-  (shr-generic dom)
-  (shr-insert shr-after-q-tag))
+    (shr-insert (car shr-around-q-tag))
+    (shr-generic dom)
+    (shr-insert (car (cdr shr-around-q-tag))))
 
-  (defcustom shr-before-q-tag "^"
-    "Before quote used for q-tag.
+  (defcustom shr-around-q-tag '("“" "”")
+    "The before and after quotes.  `car' is the before and `cdr' the after.
 Alternative suggestions are:
-- \"\\\"\""
-  :type 'string)
-
-  (defcustom shr-after-q-tag "”"
-    "After quote used for q-tag.
-Alternative suggestions are:
-- \"\\\"\""
-    :type 'string)
+- '(\"\\\"\" \"\\\"\")"
+  :type (list 'string 'string))
 
   (defface shr-small
     '((t :height 0.8))
@@ -79,7 +73,7 @@ Alternative suggestions are:
 
   ;; Drawing inspiration from shr-tag-h1
   (defun shr-tag-small (dom)
-    (shr-fontize-dom dom (if shr-use-fonts 'shr-small)))
+    (shr-fontize-dom dom (when shr-use-fonts 'shr-small)))
 
   (defface shr-time
   '((t :inherit underline :underline (:style wave)))
