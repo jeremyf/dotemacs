@@ -178,8 +178,6 @@ exist after each headings's drawers."
 ;;                                 (require 'jnf-org-roam.el)
 ;;                                 ))
 
-(require 'jnf-org-roam-v2.el)
-
 (use-package org-bookmark-heading
   :straight t)
 

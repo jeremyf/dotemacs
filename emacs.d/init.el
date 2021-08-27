@@ -232,6 +232,7 @@ echo the method signature of `'delete-duplicate-lines`"
 ;; (require 'jnf-corfu.el)
 (require 'jnf-in-buffer.el)
 (require 'jnf-org.el)
+(require 'jnf-org-roam-v2.el)
 (require 'jnf-basic-config.el)
 (require 'jnf-git.el)
 (require 'jnf-spelling.el)
