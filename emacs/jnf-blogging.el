@@ -19,6 +19,10 @@
          ("\\.markdown\\'" . markdown-mode))
   :init (setq markdown-command "/usr/local/bin/pandoc"))
 
+(defconst jnf/tor-home-directory
+  (file-truename "~/git/takeonrules.github.io")
+  "The home directory of TakeOnRules.com.")
+
 ;; These menu commands, plus some yasnippets, are some useful
 ;; functions for helping my blogging effort.
 (defvar jnf/tor-menu--title (with-faicon "pencil-square" "Take on Rules" 1 -0.05))
