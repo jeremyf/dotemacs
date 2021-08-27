@@ -12,6 +12,11 @@
 ;; for a walk through of the implementation.
 ;;
 ;;; Code
+;;******************************************************************************
+;;
+;;; BEGIN Template and Subject Definitions
+;;
+;;******************************************************************************
 (defconst jnf/org-roam-capture-templates-plist
   (list
    :hesburgh-libraries
@@ -110,7 +115,6 @@ Each subject has a plist of :templates, :title, :name, and :path-to-todo.
   subject.
 - :path-to-todo is the path to the todo file for this subject."
 )
-
 (cl-defun jnf/org-roam-templates-for-subject (subject
                                               &key
                                               (subjects-plist jnf/org-roam-capture-subjects-plist)
@@ -122,12 +126,21 @@ given (or default) TEMPLATE-DEFINITIONS-PLIST."
   (let ((templates (plist-get (plist-get subjects-plist subject) :templates)))
     (-map (lambda (template) (plist-get template-definitions-plist template))
           templates)))
-
-;; A menu of common tasks for `org-roam'.  This menu is for all subjects.
+;;******************************************************************************
 ;;
-;; The `create-org-roam-subject-fns-for' presupposes those keys for
-;; narrowed subjects.
-(defvar jnf/org-subject-menu--title (with-faicon "book" "Org Subject Menu" 1 -0.05))
+;;; END Template and Subject Definitions
+;;
+;;******************************************************************************
+
+;;******************************************************************************
+;;
+;;; BEGIN Register Subjects
+;;
+;;******************************************************************************
+(defvar jnf/org-subject-menu--title
+  (with-faicon "book" "Org Subject Menu" 1 -0.05)
+  "The menu title for the `org-roam' subject.  See `jnf/toggle-roam-subject-filter'.")
+
 (pretty-hydra-define jnf/org-subject-menu--all (:foreign-keys warn :title jnf/org-subject-menu--title :quit-key "q" :exit t)
   ("All" ()))
 
@@ -244,6 +257,15 @@ Fetch the given SUBJECT from the given SUBJECTS-PLIST."
 (create-org-roam-subject-fns-for :all
                                  :menu_group "All"
                                  :menu_prefix "")
+
+;; Including the aliases to reduce switching necessary for re-mapping
+;; keys via `jnf/toggle-roam-subject-filter'.  And while the
+;; `create-org-roam-subject-fns-for' macro for :all creates the
+;; methods, it has filter functions.
+(defalias 'jnf/org-roam--all--node-insert 'org-roam-node-insert)
+(defalias 'jnf/org-roam--all--node-find 'org-roam-node-find)
+(defalias 'jnf/org-roam--all--capture 'org-roam-capture)
+
 (create-org-roam-subject-fns-for :personal
                                  :menu_group "Life"
                                  :menu_prefix "p")
@@ -260,19 +282,24 @@ Fetch the given SUBJECT from the given SUBJECTS-PLIST."
                                  :menu_group "Projects"
                                  :menu_prefix "t")
 
+
 (pretty-hydra-define+ jnf/org-subject-menu--all()
   ("All"
    (
     ("/" org-roam-buffer-toggle         "Toggle Buffer")
     ("#" jnf/toggle-roam-subject-filter "Toggle Default Filter")
     )))
+;;******************************************************************************
+;;
+;;; END Register Subjects
+;;
+;;******************************************************************************
 
-;; Including the aliases to reduce switching necessary for re-mapping
-;; keys via `jnf/toggle-roam-subject-filter'.
-(defalias 'jnf/org-roam--all--node-insert 'org-roam-node-insert)
-(defalias 'jnf/org-roam--all--node-find 'org-roam-node-find)
-(defalias 'jnf/org-roam--all--capture 'org-roam-capture)
-
+;;******************************************************************************
+;;
+;;; BEGIN Toggle Subject Filter
+;;
+;;******************************************************************************
 (cl-defun jnf/subject-list-for-completing-read (&key
                                                 (subjects-plist
                                                  jnf/org-roam-capture-subjects-plist))
@@ -289,7 +316,7 @@ The form should be '((\"all\" 1) (\"hesburgh-libraries\" 2))."
   "Prompt for a SUBJECT, then toggle the 's-i' kbd to filter for that subject."
   (interactive (list
                 (completing-read
-                 "Project: " (jnf/subject-list-for-completing-read))))
+                 "Subject: " (jnf/subject-list-for-completing-read))))
   (global-set-key
    (kbd "C-s-2")
    (intern (concat "jnf/org-roam--" subject "--todo")))
@@ -308,6 +335,12 @@ The form should be '((\"all\" 1) (\"hesburgh-libraries\" 2))."
   (global-set-key
    (kbd "C-c i")
    (intern (concat "jnf/org-subject-menu--" subject "/body"))))
+
+;;******************************************************************************
+;;
+;;; END Toggle Subject Filter
+;;
+;;******************************************************************************
 
 ;; With the latest update of org-roam, things again behavior
 ;; correctly.  Now I can just load org-roam as part of my day to day
