@@ -248,31 +248,11 @@ If there's an active region, select that text and place it."
     ;; Finally open that file for editing.
     (find-file fpath)))
 
-(cl-defun jnf/tor-list-by-key-from-filename (&key key filename)
-  "Build a list of entries of the `KEY' from the `FILENAME'."
-  (split-string-and-unquote
-   (shell-command-to-string
-    (concat
-     "rg \"" key ": .*$\" "
-     (f-join "~/git/takeonrules.github.io/" filename)
-     " --only-matching --no-filename | cut -d \" \" -f 2- | sort | tr '\n' '~'"))
-   "~"))
-
 (defun jnf/tor-find-file-draft (filename)
   "Find draft FILENAME."
   (interactive (list (completing-read "Filename: " (jnf/list-draft-filenames))))
   (message "Opening draft %s" filename)
   (find-file filename))
-
-(cl-defun jnf/list-draft-filenames (&key (key "^draft: true"))
-  "Build a list of filenames that have the given `KEY'."
-  (split-string-and-unquote
-   (shell-command-to-string
-    (concat
-     "rg \"" key "\" "
-     (f-join "~/git/takeonrules.github.io/content/")
-     " --only-matching  --files-with-matches | sort | tr '\n' '~'"))
-   "~"))
 
 ;; Used in ./emacs/snippets/text-mode/tag
 (defun jnf/tor-tags-list ()
@@ -303,17 +283,49 @@ If there's an active region, select that text and place it."
   "Return a list of available licenses for TakeOnRules.com."
     (jnf/tor-list-by-key-from-filename :key "Key" :filename "data/licenses.yml"))
 
+;;******************************************************************************
+;;
+;; Begin file system querying
+;;
+;;******************************************************************************
+(cl-defun jnf/tor-list-by-key-from-filename (&key key filename)
+  "Build a list of entries of the KEY from the FILENAME."
+  (split-string-and-unquote
+   (shell-command-to-string
+    (concat
+     "rg \"" key ": .*$\" "
+     (f-join "~/git/takeonrules.github.io/" filename)
+     " --only-matching --no-filename | cut -d \" \" -f 2- | sort | tr '\n' '~'"))
+   "~"))
+
+(cl-defun jnf/list-filenames-with-content (&key matching in)
+  "Build a list of filenames MATCHING the pattern IN the given directory."
+  (let ((default-directory (f-join "~/git/takeonrules.github.io" in)))
+    (split-string-and-unquote
+     (shell-command-to-string
+      (concat "rg \"" matching "\" --only-matching --files-with-matches | sort | tr '\n' '~'"))
+     "~")))
+
+(defun jnf/list-draft-filnames ()
+  "Return a list of filenames that are in DRAFT status."
+  (jnf/list-filenames-with-content :matching "^draft: true" :in "content"))
+
 (defun jnf/tor-page-relative-pathname-list ()
   "Return a list of pages for TakeOnRules.com."
-  (split-string-and-unquote
-   (let ((default-directory "~/git/takeonrules.github.io/content"))
-     (shell-command-to-string "rg \"^title: \" --files-with-matches | sort"))))
+  (jnf/list-filenames-with-content :matching "^title: " :in "content"))
 
 (defun jnf/tor-asset-relative-pathname-list ()
   "Return a list of image filenames for TakeOnRules.com."
-  (split-string-and-unquote
-   (let ((default-directory "~/git/takeonrules.github.io/assets/images"))
+  (let ((default-directory "~/git/takeonrules.github.io/assets/images"))
+    (split-string-and-unquote
      (shell-command-to-string "ls"))))
+
+;;******************************************************************************
+;;
+;; End file system querying
+;;
+;;******************************************************************************
+
 
 (defun jnf/tor-retitle-post (title)
   "Replace the given buffer's title with the new TITLE.
