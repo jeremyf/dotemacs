@@ -105,6 +105,11 @@ No effort is made to check if this is a post."
         (substring-no-properties (car kill-ring))
       (read-string "URL (optional): "))))
 
+(defun jnf/tor-insert-glossary-key (key)
+  "Insert the KEY at point."
+  (interactive (list (completing-read "Key: " (jnf/tor-glossary-key-list))))
+  (insert key))
+
 (defun jnf/tor-find-glossary-and-insert-entry (title)
   "Find TakeOnRules glossary and add an entry with TITLE."
   (interactive "sGlossary Entry's Title: ")
