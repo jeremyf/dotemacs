@@ -114,7 +114,10 @@ The LENGTH is how many words to use for the key."
         (read-string "URL (optional): " car-of-kill-ring)
       (read-string "URL (optional): "))))
 
-(cl-defun jnf/tor-post---create-or-append (&key title tags series toc citeTitle citeURL citeAuthor subheading)
+(cl-defun jnf/tor-post---create-or-append (&key
+                                           title
+                                           (tags '("null")) series toc subheading
+                                           citeTitle citeURL citeAuthor)
   "Create or append a post with TITLE.
 
 The following keys are optional:
@@ -123,10 +126,10 @@ The following keys are optional:
         frontmatter.
 :SERIES the series to set in the frontmatter.
 :TOC whether to include a table of contents in the post.
+:SUBHEADING if you have an active region, use this header.
 :CITETITLE the title of the URL cited (if any)
 :CITEURL the URL cited (if any)
 :CITEAUTHOR the author cited (if any)
-:SUBHEADING if you have an active region, use this header.
 
 If there's an active region, select that text and place it."
   (let* ((default-directory (f-join jnf/tor-home-directory
@@ -150,11 +153,12 @@ If there's an active region, select that text and place it."
                  "\ntype: post"
                  (when series (concat "\nseries: " series))
                  (when toc (concat "\ntoc: true"))
-                 "\ntags:\n- null"
-                 (when tags (concat (mapconcat
-                                   (lambda (tag)
-                                     (concat "\n- " tag))
-                                   (flatten-tree tags) "")))
+                 "\ntags:"
+                 (if tags
+                     (concat (mapconcat
+                              (lambda (tag) (concat "\n- " tag))
+                              (flatten-tree tags) ""))
+                   "\n- null")
                  "\n---\n")
          nil fpath))
     ;; If we have an active region, append that region's content to
@@ -220,7 +224,6 @@ and rename the buffer."
       (while (search-forward-regexp "^slug:.*$" nil t)
         (replace-match metadataSlug))
 
-
       ;; Need to save before we rename the buffer
       (save-buffer)
 
@@ -236,8 +239,12 @@ and rename the buffer."
       (message "Renamed %s -> %s" filename new-filename)))
 
 (cl-defun jnf/tor-view-blog-post (&key
-                                  (hostname "http://localhost:1313"))
-  "Open `eww' in a new window to preview the current buffer at the HOSTNAME."
+                                  (hostname jnf/tor-default-local-hostname))
+  "Open `eww' in a new window to preview the current buffer at the HOSTNAME.
+
+The front matter of blog posts contains YAML, with two
+attributes: slug and date.  Based on the site configuration, the
+URLs for one of those posts is: hostname/year/month/day/slug"
   (interactive)
   (let ((slugs))
     (save-excursion
@@ -313,7 +320,11 @@ Assumes you're already in the /data/glossary.yml file."
   (yas-expand)
   (message "Ready to insert a new epigraph"))
 
-(cl-defun jnf/tor-post-amplifying-the-blogosphere (subheading &key citeTitle citeURL citeAuthor)
+(cl-defun jnf/tor-post-amplifying-the-blogosphere (subheading
+                                                   &key
+                                                   citeTitle
+                                                   citeURL
+                                                   citeAuthor)
   "Create and visit draft post for amplifying the blogosphere.
 
 If there's an active region, prompt for the :SUBHEADING.  The file

@@ -24,6 +24,10 @@
   (file-truename "~/git/takeonrules.github.io")
   "The home directory of TakeOnRules.com.")
 
+(defconst jnf/tor-default-local-hostname
+  (file-truename "http://localhost:1313")
+  "The scheme, host name, and port for serving up a local TakeOnRules.com.")
+
 (defvar jnf/data-directories
   (list
     jnf/tor-home-directory
