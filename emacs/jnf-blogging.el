@@ -338,8 +338,9 @@ We'll pass the :CITETITLE, :CITEAUTHOR, and :CITEURL to
 (defun jnf/tor-find-file-draft (filename)
   "Find draft FILENAME."
   (interactive (list (completing-read "Filename: " (jnf/tor-list-draft-filnames))))
-  (message "Opening draft %s" filename)
-  (find-file filename))
+  (let ((file-path (f-join jnf/tor-home-directory "content" filename)))
+    (message "Opening draft %s" file-path)
+    (find-file file-path)))
 ;;******************************************************************************
 ;;
 ;;; END Interactive Non-Wrapping Functions
