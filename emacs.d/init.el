@@ -246,6 +246,7 @@ echo the method signature of `'delete-duplicate-lines`"
 ;; (require 'jnf-fennel.el)
 (require 'jnf-yaml.el)
 (require 'jnf-dired.el)
+(require 'jnf-dice.el)
 
 (diminish 'eldoc-mode)
 

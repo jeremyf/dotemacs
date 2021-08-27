@@ -140,9 +140,6 @@ exist after each headings's drawers."
                          nil
                        'tree)))
 
-(use-package org-d20
-  :straight t)
-
 (use-package org-superstar
   :straight t
   :hook ((org-mode . org-superstar-mode)
