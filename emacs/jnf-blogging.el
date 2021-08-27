@@ -3,7 +3,8 @@
 ;;
 ;;; Commentary:
 ;;
-;;  This package provides some blogging tooling.
+;;  This package includes numerous tools for helping me with my
+;;  blogging efforts.
 ;;
 ;;; Code:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -37,36 +38,44 @@
      ("k" jnf/tor-insert-glossary-key "Insert glossary key at point…")
      ("n" jnf/tor-create-post "Create new post…"))
     "Post"
-     (("r" jnf/tor-retitle-post "Re-title post…")
-      ;; I usually want to tag a post more than once, hence the "non-exit"
-      ("#" jnf/tor-tag-post "Tag post…" :exit nil)
-      ("v" jnf/tor-view-blog-post "View post…")
-    )))
+    (("*" jnf/tor-post-amplifying-the-blogosphere "Amplify the Blogosphere…")
+     ("r" jnf/tor-retitle-post "Re-title post…")
+     ;; I usually want to tag a post more than once, hence the "non-exit"
+     ("#" jnf/tor-tag-post "Tag post…" :exit nil)
+     ("v" jnf/tor-view-blog-post "View post…"))))
 
 (pretty-hydra-define jnf/tor-subject-menu-yaml (:foreign-keys warn :title jnf/tor-menu--title :quit-key "q" :exit t)
   ("Posts"
-   (("e" jnf/tor-insert-epigraph-entry "Create epigraph entry…")
+   (("*" jnf/tor-post-amplifying-the-blogosphere "Amplify the Blogosphere…")
+    ("e" jnf/tor-insert-epigraph-entry "Create epigraph entry…")
     ("?" jnf/tor-find-file-draft "Find Blog in Draft Status…")
     ("g" jnf/tor-find-glossary-and-insert-entry "Create glossary entry…")
     ("k" jnf/tor-insert-glossary-key "Insert key at point…")
     ("n" jnf/tor-create-post "Create new post…"))))
 
+;; The `C-c t' key combo is engrained for my TakeOnRules incantations;
+;; there's a markdown menu but if I'm not in markdown, it likely means
+;; I'm not in Take on Rules pages.
+(global-set-key (kbd "C-c t") 'jnf/tor-subject-menu-default/body)
 (pretty-hydra-define jnf/tor-subject-menu-default (:foreign-keys warn :title jnf/tor-menu--title :quit-key "q" :exit t)
   ("Posts"
-   (("e" jnf/tor-insert-epigraph-entry "Create epigraph entry…")
+   (("*" jnf/tor-post-amplifying-the-blogosphere "Amplify the Blogosphere…")
+    ("e" jnf/tor-insert-epigraph-entry "Create epigraph entry…")
     ("?" jnf/tor-find-file-draft "Find Blog in Draft Status…")
     ("g" jnf/tor-find-glossary-and-insert-entry "Create glossary entry…")
     ("n" jnf/tor-create-post "Create new post…"))))
 
-(defun jnf/epigraph-keyify (text)
-  "Convert the given TEXT to an epigraph key."
+(cl-defun jnf/epigraph-convert-text-to-key (text &key (length 5))
+  "Convert the given TEXT to an epigraph key.
+
+The LENGTH is how many words to use for the key."
   (let ((list-of-words (s-split-words text)))
-    (if (> (length list-of-words) 5)
-        (upcase (s-join "-" (subseq list-of-words 0 5)))
+    (if (> (length list-of-words) length)
+        (upcase (s-join "-" (subseq list-of-words 0 length)))
       "")))
 
 (defun jnf/tor-create-post (title)
-  "Create and visit a new draft post.  Prompt for a `TITLE'.
+  "Create and visit a new draft post.  Prompt for a TITLE.
 
 The file for the blog post conforms to the path schema of posts
 for TakeOnRules.com."
@@ -107,10 +116,10 @@ No effort is made to check if this is a post."
 
 Valid STRATEGY options are:
 
-* `:lineOrRegion'
-* `:pointOrRegion'
-* `:sentenceOrRegion'
-* `:wordOrRegion'
+* :lineOrRegion
+* :pointOrRegion
+* :sentenceOrRegion
+* :wordOrRegion
 
 TODO: I would love create a lookup table for the case statement,
 as the behavior's well defined."
@@ -142,7 +151,7 @@ as the behavior's well defined."
     ))
 
 (defun jnf/tor-wrap-as-marginnote-dwim ()
-  "Wrap the line or current region as a marginnote."
+  "Wrap the line or current region as a marginnote Hugo shortcode."
   (interactive)
   (jnf/tor-wrap-with-text
    :before "{{< marginnote >}}\n"
@@ -150,7 +159,7 @@ as the behavior's well defined."
    :strategy :lineOrRegion))
 
 (defun jnf/tor-wrap-as-sidenote-dwim ()
-  "Wrap the line or current region as a sidenote."
+  "Wrap the line or current region as a sidenote Hugo shortcode."
   (interactive)
   (jnf/tor-wrap-with-text
    :before "{{< sidenote >}}"
@@ -163,7 +172,7 @@ as the behavior's well defined."
   (insert key))
 
 (defun jnf/tor-wrap-link-active-region-dwim (url)
-  "Wrap current region (or point) in an `A' tag with URL.
+  "Wrap current region (or point) in an A-tag with the given URL.
 
 For the URL:
 
@@ -205,7 +214,9 @@ tag."
   (jnf/tor-insert-glossary-entry title))
 
 (defun jnf/tor-insert-glossary-entry (title)
-  "Create an glossary entry with the given TITLE."
+  "Create an glossary entry with the given TITLE.
+
+Assumes you're already in the /data/glossary.yml file."
   (interactive "sGlossary Entry's Title: ")
   (let ((key (upcase (s-dashed-words title))))
     (end-of-buffer)
@@ -223,7 +234,7 @@ tag."
            (if (looking-at-p "^$") "" "\n")
            "epi"))
   (end-of-buffer)
-  "Assumes that the `epi' is the correct expansion"
+  "Assumes that the 'epi' is the correct expansion for the snippet."
   (yas-expand)
   (message "Ready to insert a new epigraph"))
 
@@ -254,14 +265,6 @@ CITE and A tag."
                  "\" class=\"u-url p-name\" rel=\"cite\">")
      :after "</a></cite>"
      :strategy :pointOrRegion)))
-
-(global-set-key (kbd "s-7") 'jnf/tor-post-amplifying-the-blogosphere)
-(global-set-key (kbd "<f7>") 'jnf/tor-post-amplifying-the-blogosphere)
-
-;; The `C-c t' key combo is engrained for my TakeOnRules incantations;
-;; there's a markdown menu but if I'm not in markdown, it likely means
-;; I'm not in Take on Rules pages.
-(global-set-key (kbd "C-c t") 'jnf/tor-subject-menu-default/body)
 
 (cl-defun jnf/tor-post-amplifying-the-blogosphere (subheading &key citeTitle citeURL citeAuthor)
   "Create and visit draft post for amplifying the blogosphere.
@@ -437,22 +440,15 @@ If there's an active region, select that text and place it."
    (let ((default-directory "~/git/takeonrules.github.io/assets/images"))
      (shell-command-to-string "ls"))))
 
-(defun org-files-names-in-project-list ()
-  "Return a list of filenames in the current files directory."
-  (split-string-and-unquote
-   (shell-command-to-string
-    (concat
-     "ls " (file-name-directory buffer-file-name)))))
-
 (defun jnf/roll (sided)
-  "Roll an n `SIDED' die."
+  "Roll an n SIDED die."
   (interactive "sDice Sides: ")
   (let ((result (+ 1 (random (cl-parse-integer sided)))))
     (message "d%s => %s" sided result)))
 
 
 (defun jnf/roll-expression-dwim (expression &optional)
-  "Roll the `EXPRESSION', check `thing-at-point' then prompt."
+  "Roll the EXPRESSION, check `thing-at-point' then prompt."
   (interactive (list (if (string-match
                           "[dD][0-9]"
                           (format "%s" (thing-at-point 'sexp t)))
@@ -463,7 +459,7 @@ If there's an active region, select that text and place it."
 (global-set-key (kbd "C-s-r") 'jnf/roll-expression-dwim)
 
 (defun jnf/tor-retitle-post (title)
-  "Replace the given buffer's title with the new `TITLE'.
+  "Replace the given buffer's title with the new TITLE.
 
 This function will: replace the content's title, update the slug,
 and rename the buffer."

@@ -44,6 +44,14 @@
            "* TODO %?" :empty-lines-before 1)
           ))
   (defun my-org-confirm-babel-evaluate (lang body) t)
+
+  (defun org-files-names-in-project-list ()
+  "Return a list of filenames in the current files directory."
+  (split-string-and-unquote
+   (shell-command-to-string
+    (concat
+     "ls " (file-name-directory buffer-file-name)))))
+
   (setq org-confirm-babel-evaluate #'my-org-confirm-babel-evaluate)
   (org-babel-do-load-languages
    'org-babel-load-languages
