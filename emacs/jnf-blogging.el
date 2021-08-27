@@ -115,7 +115,7 @@ The LENGTH is how many words to use for the key."
       (read-string "URL (optional): "))))
 
 (cl-defun jnf/tor-post---create-or-append (&key title tags series toc citeTitle citeURL citeAuthor subheading)
-  "Create or append a post with `TITLE'.
+  "Create or append a post with TITLE.
 
 The following keys are optional:
 
@@ -148,10 +148,10 @@ If there's an active region, select that text and place it."
                  "\nslug: " (format "%s" slug)
                  "\ntitle: '" (jnf/tor-post-titleize title) "'"
                  "\ntype: post"
-                 (if series (concat "\nseries: " series))
-                 (if toc (concat "\ntoc: true"))
+                 (when series (concat "\nseries: " series))
+                 (when toc (concat "\ntoc: true"))
                  "\ntags:\n- null"
-                 (if tags (concat (mapconcat
+                 (when tags (concat (mapconcat
                                    (lambda (tag)
                                      (concat "\n- " tag))
                                    (flatten-tree tags) "")))
