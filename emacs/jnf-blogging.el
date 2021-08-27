@@ -113,7 +113,7 @@ No effort is made to check if this is a post."
 (defun jnf/tor-find-glossary-and-insert-entry (title)
   "Find TakeOnRules glossary and add an entry with TITLE."
   (interactive "sGlossary Entry's Title: ")
-  (find-file "~/git/takeonrules.github.io/data/glossary.yml")
+  (find-file (f-join jnf/tor-home-directory "data" "glossary.yml"))
   (jnf/tor-insert-glossary-entry title))
 
 (defun jnf/tor-insert-glossary-entry (title)
@@ -131,7 +131,7 @@ Assumes you're already in the /data/glossary.yml file."
 (defun jnf/tor-insert-epigraph-entry ()
   "Prompt for a new a new data/epigraphs.yml entry."
   (interactive)
-  (find-file "~/git/takeonrules.github.io/data/epigraphs.yml")
+  (find-file (f-join jnf/tor-home-directory "data" "epigraphs.yml"))
   (end-of-buffer)
   (insert (concat
            (if (looking-at-p "^$") "" "\n")
@@ -190,8 +190,8 @@ The following keys are optional:
 :SUBHEADING if you have an active region, use this header.
 
 If there's an active region, select that text and place it."
-  (let* ((default-directory (concat "~/git/takeonrules.github.io/"
-                                    "/content/posts/"
+  (let* ((default-directory (f-join jnf/tor-home-directory
+                                    "content" "posts"
                                     (format-time-string "%Y/")))
 
          (slug (jnf/tor-slugify title))
@@ -294,13 +294,13 @@ If there's an active region, select that text and place it."
    (shell-command-to-string
     (concat
      "rg \"" key ": .*$\" "
-     (f-join "~/git/takeonrules.github.io/" filename)
+     (f-join jnf/tor-home-directory filename)
      " --only-matching --no-filename | cut -d \" \" -f 2- | sort | tr '\n' '~'"))
    "~"))
 
 (cl-defun jnf/list-filenames-with-content (&key matching in)
   "Build a list of filenames MATCHING the pattern IN the given directory."
-  (let ((default-directory (f-join "~/git/takeonrules.github.io" in)))
+  (let ((default-directory (f-join jnf/tor-home-directory in)))
     (split-string-and-unquote
      (shell-command-to-string
       (concat "rg \"" matching "\" --only-matching --files-with-matches | sort | tr '\n' '~'"))
@@ -316,7 +316,7 @@ If there's an active region, select that text and place it."
 
 (defun jnf/tor-asset-relative-pathname-list ()
   "Return a list of image filenames for TakeOnRules.com."
-  (let ((default-directory "~/git/takeonrules.github.io/assets/images"))
+  (let ((default-directory (f-join jnf/tor-home-directory "assets" "images")))
     (split-string-and-unquote
      (shell-command-to-string "ls"))))
 
