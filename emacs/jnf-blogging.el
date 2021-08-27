@@ -111,7 +111,7 @@ The LENGTH is how many words to use for the key."
     ;; Need to ensure we're not dealing with something out of bounds
     (if (and (> (length car-of-kill-ring) 3)
              (string= (substring car-of-kill-ring 0 4) "http"))
-        (substring-no-properties (car kill-ring))
+        (read-string "URL (optional): " car-of-kill-ring)
       (read-string "URL (optional): "))))
 
 (cl-defun jnf/tor-post---create-or-append (&key title tags series toc citeTitle citeURL citeAuthor subheading)
@@ -518,7 +518,7 @@ If the URL is an empty string, then send a message.  Else, if we
 have a non-0 length URL, use the URL and wrap the region in an A
 tag."
   (interactive (list (jnf/tor-prompt-or-kill-ring-for-url)))
-  (when (eq (length url) 0)
+  (if (eq (length url) 0)
       (message "No URL to use for A-tag creation")
     (jnf/tor-wrap-with-text
      :before (concat "<a href=\"" url "\">")
