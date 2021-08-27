@@ -427,7 +427,7 @@ as the behavior's well defined."
                       (insert after)
                       (goto-char begin)
                       (insert before)))
-    (:wordOrRegion (let* ((begin (if (use-region-p) (region-beginning) (cdr (bounds-of-thing-at-point 'word))))
+    (:wordOrRegion (let* ((begin (if (use-region-p) (region-beginning) (car (bounds-of-thing-at-point 'word))))
                            (end (if (use-region-p) (region-end) (cdr (bounds-of-thing-at-point 'word)))))
                       (goto-char end)
                       (insert after)
