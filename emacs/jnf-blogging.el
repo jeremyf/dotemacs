@@ -1,5 +1,4 @@
-;;; -*- lexical-binding: t; -*-
-;;; jnf-blogging.el --- Summary
+;;; -*- lexical-binding: t; -*- jnf-blogging.el --- Summary
 ;;
 ;;; Commentary:
 ;;
@@ -13,11 +12,19 @@
 (use-package markdown-mode
   :straight t
   :hook ((markdown-mode . turn-on-visual-line-mode))
+  ;; I use markdown for my blogging platform and very little else.
+  ;; Hence, I have this keybind.
   :bind (:map markdown-mode-map ("C-c t" . jnf/tor-subject-menu-markdown/body))
   :mode (("README\\.md\\'" . gfm-mode)
          ("\\.md\\'" . markdown-mode)
          ("\\.markdown\\'" . markdown-mode))
   :init (setq markdown-command "/usr/local/bin/pandoc"))
+
+;;******************************************************************************
+;;
+;;; BEGIN Menu Declarations
+;;
+;;******************************************************************************
 
 ;; These menu commands, plus some yasnippets, are some useful
 ;; functions for helping my blogging effort.
@@ -44,6 +51,11 @@
      ("#" jnf/tor-tag-post "Tag post…" :exit nil)
      ("v" jnf/tor-view-blog-post "View post…"))))
 
+;; The `C-c t' key combo is engrained for my TakeOnRules incantations;
+;; there's a markdown menu but if I'm not in markdown, it likely means
+;; I'm not in Take on Rules pages.
+(global-set-key (kbd "C-c t") 'jnf/tor-subject-menu-default/body)
+
 (pretty-hydra-define jnf/tor-subject-menu-yaml (:foreign-keys warn :title jnf/tor-menu--title :quit-key "q" :exit t)
   ("Posts"
    (("*" jnf/tor-post-amplifying-the-blogosphere "Amplify the Blogosphere…")
@@ -53,10 +65,6 @@
     ("k" jnf/tor-insert-glossary-key "Insert key at point…")
     ("n" jnf/tor-create-post "Create new post…"))))
 
-;; The `C-c t' key combo is engrained for my TakeOnRules incantations;
-;; there's a markdown menu but if I'm not in markdown, it likely means
-;; I'm not in Take on Rules pages.
-(global-set-key (kbd "C-c t") 'jnf/tor-subject-menu-default/body)
 (pretty-hydra-define jnf/tor-subject-menu-default (:foreign-keys warn :title jnf/tor-menu--title :quit-key "q" :exit t)
   ("Posts"
    (("*" jnf/tor-post-amplifying-the-blogosphere "Amplify the Blogosphere…")
@@ -65,6 +73,17 @@
     ("g" jnf/tor-find-glossary-and-insert-entry "Create glossary entry…")
     ("n" jnf/tor-create-post "Create new post…"))))
 
+;;******************************************************************************
+;;
+;;; END Menu Declarations
+;;
+;;******************************************************************************
+
+;;******************************************************************************
+;;
+;;; BEGIN Non-Interactive Utility Functions
+;;
+;;******************************************************************************
 (cl-defun jnf/epigraph-convert-text-to-key (text &key (length 5))
   "Convert the given TEXT to an epigraph key.
 
@@ -73,91 +92,6 @@ The LENGTH is how many words to use for the key."
     (if (> (length list-of-words) length)
         (upcase (s-join "-" (subseq list-of-words 0 length)))
       "")))
-
-(defun jnf/tor-create-post (title)
-  "Create and visit a new draft post.  Prompt for a TITLE.
-
-The file for the blog post conforms to the path schema of posts
-for TakeOnRules.com."
-  (interactive "sBlog Post Title: ")
-  (jnf/tor-post---create-or-append :title title))
-
-(defun jnf/tor-tag-post (tag)
-  "Apply the TAG to the current TakeOnRules.com post.
-
-No effort is made to check if this is a post."
-  (interactive (list (completing-read "Tag: " (jnf/tor-tags-list))))
-  (let ((saved-point (point))
-        (to-insert (concat "\n- " tag)))
-    (replace-regexp "^tags:$" (concat "tags:" to-insert) nil 0 (point-max))
-    (goto-char (+ saved-point (length to-insert)))))
-
-(defun jnf/tor-prompt-or-kill-ring-for-url ()
-  "Return a URL, either from the kill ring or prompted."
-  (let ((car-of-kill-ring (substring-no-properties (car kill-ring))))
-    ;; Need to ensure we're not dealing with something out of bounds
-    (if (and (> (length car-of-kill-ring) 3)
-             (string= (substring car-of-kill-ring 0 4) "http"))
-        (substring-no-properties (car kill-ring))
-      (read-string "URL (optional): "))))
-
-(defun jnf/tor-insert-glossary-key (key)
-  "Insert the KEY at point."
-  (interactive (list (completing-read "Key: " (jnf/tor-glossary-key-list))))
-  (insert key))
-
-(defun jnf/tor-find-glossary-and-insert-entry (title)
-  "Find TakeOnRules glossary and add an entry with TITLE."
-  (interactive "sGlossary Entry's Title: ")
-  (find-file (f-join jnf/tor-home-directory "data" "glossary.yml"))
-  (jnf/tor-insert-glossary-entry title))
-
-(defun jnf/tor-insert-glossary-entry (title)
-  "Create an glossary entry with the given TITLE.
-
-Assumes you're already in the /data/glossary.yml file."
-  (interactive "sGlossary Entry's Title: ")
-  (let ((key (upcase (s-dashed-words title))))
-    (end-of-buffer)
-    (insert (concat
-             (if (looking-at-p "^$") "" "\n")
-             "- title: " title
-             "\n  key: " key))))
-
-(defun jnf/tor-insert-epigraph-entry ()
-  "Prompt for a new a new data/epigraphs.yml entry."
-  (interactive)
-  (find-file (f-join jnf/tor-home-directory "data" "epigraphs.yml"))
-  (end-of-buffer)
-  (insert (concat
-           (if (looking-at-p "^$") "" "\n")
-           "epi"))
-  (end-of-buffer)
-  "Assumes that the 'epi' is the correct expansion for the snippet."
-  (yas-expand)
-  (message "Ready to insert a new epigraph"))
-
-(cl-defun jnf/tor-post-amplifying-the-blogosphere (subheading &key citeTitle citeURL citeAuthor)
-  "Create and visit draft post for amplifying the blogosphere.
-
-If there's an active region, prompt for the :SUBHEADING.  The file
-for the blog post conforms to the path schema of posts for
-TakeOnRules.com.
-
-We'll pass the :CITETITLE, :CITEAUTHOR, and :CITEURL to
-`jnf/tor-post---create-or-append'"
-  (interactive (list (if (use-region-p)
-                         (read-string "Sub-Heading: ")
-                       nil)))
-  (jnf/tor-post---create-or-append
-   :title (format-time-string "Amplifying the Blogosphere (v%Y-%m-%d)")
-   :toc "true"
-   :subheading subheading
-   :series "amplifying-the-blogosphere"
-   :tags "response to other blogs"
-   :citeTitle citeTitle
-   :citeURL citeURL
-   :citeAuthor citeAuthor))
 
 (defun jnf/tor-post-titleize (title)
   "Convert TITLE to correct format."
@@ -170,6 +104,15 @@ We'll pass the :CITETITLE, :CITEAUTHOR, and :CITEURL to
 (defun jnf/tor-slugify (string)
   "Convert STRING to appropriate slug."
   (s-replace "'" "" (s-dashed-words string)))
+
+(defun jnf/tor-prompt-or-kill-ring-for-url ()
+  "Return a URL, either from the kill ring or prompted."
+  (let ((car-of-kill-ring (substring-no-properties (car kill-ring))))
+    ;; Need to ensure we're not dealing with something out of bounds
+    (if (and (> (length car-of-kill-ring) 3)
+             (string= (substring car-of-kill-ring 0 4) "http"))
+        (substring-no-properties (car kill-ring))
+      (read-string "URL (optional): "))))
 
 (cl-defun jnf/tor-post---create-or-append (&key title tags series toc citeTitle citeURL citeAuthor subheading)
   "Create or append a post with `TITLE'.
@@ -243,86 +186,17 @@ If there's an active region, select that text and place it."
            nil fpath t)))
     ;; Finally open that file for editing.
     (find-file fpath)))
-
-(defun jnf/tor-find-file-draft (filename)
-  "Find draft FILENAME."
-  (interactive (list (completing-read "Filename: " (jnf/list-draft-filenames))))
-  (message "Opening draft %s" filename)
-  (find-file filename))
-
-;; Used in ./emacs/snippets/text-mode/tag
-(defun jnf/tor-tags-list ()
-  "Return a list of tags from TakeOnRules.com."
-  (jnf/tor-list-by-key-from-filename :key "tag" :filename "data/glossary.yml"))
-
-(defun jnf/tor-epigraph-list ()
-  "Return a list of epigraph keys from TakeOnRules.com."
-  (jnf/tor-list-by-key-from-filename :key "key" :filename "data/epigraphs.yml"))
-
-(defun jnf/tor-game-list ()
-  "Return a list of games from TakeOnRules.com."
-  (jnf/tor-list-by-key-from-filename :key "game" :filename "data/glossary.yml"))
-
-(defun jnf/tor-glossary-title-list ()
-  "Return a list of titles from TakeOnRules.com."
-  (jnf/tor-list-by-key-from-filename :key "title" :filename "data/glossary.yml"))
-
-(defun jnf/tor-glossary-key-list ()
-  "Return a list of keys from TakeOnRules.com glossary."
-  (jnf/tor-list-by-key-from-filename :key "key" :filename "data/glossary.yml"))
-
-(defun jnf/tor-series-list ()
-  "Return a list of series from TakeOnRules.com."
-  (jnf/tor-list-by-key-from-filename :key "key" :filename "data/series.yml"))
-
-(defun jnf/tor-licenses-list ()
-  "Return a list of available licenses for TakeOnRules.com."
-    (jnf/tor-list-by-key-from-filename :key "Key" :filename "data/licenses.yml"))
-
 ;;******************************************************************************
 ;;
-;; Begin file system querying
-;;
-;;******************************************************************************
-(cl-defun jnf/tor-list-by-key-from-filename (&key key filename)
-  "Build a list of entries of the KEY from the FILENAME."
-  (split-string-and-unquote
-   (shell-command-to-string
-    (concat
-     "rg \"" key ": .*$\" "
-     (f-join jnf/tor-home-directory filename)
-     " --only-matching --no-filename | cut -d \" \" -f 2- | sort | tr '\n' '~'"))
-   "~"))
-
-(cl-defun jnf/list-filenames-with-content (&key matching in)
-  "Build a list of filenames MATCHING the pattern IN the given directory."
-  (let ((default-directory (f-join jnf/tor-home-directory in)))
-    (split-string-and-unquote
-     (shell-command-to-string
-      (concat "rg \"" matching "\" --only-matching --files-with-matches | sort | tr '\n' '~'"))
-     "~")))
-
-(defun jnf/list-draft-filnames ()
-  "Return a list of filenames that are in DRAFT status."
-  (jnf/list-filenames-with-content :matching "^draft: true" :in "content"))
-
-(defun jnf/tor-page-relative-pathname-list ()
-  "Return a list of pages for TakeOnRules.com."
-  (jnf/list-filenames-with-content :matching "^title: " :in "content"))
-
-(defun jnf/tor-asset-relative-pathname-list ()
-  "Return a list of image filenames for TakeOnRules.com."
-  (let ((default-directory (f-join jnf/tor-home-directory "assets" "images")))
-    (split-string-and-unquote
-     (shell-command-to-string "ls"))))
-
-;;******************************************************************************
-;;
-;; End file system querying
+;;; END Non-Interactive Utility Functions
 ;;
 ;;******************************************************************************
 
-
+;;******************************************************************************
+;;
+;;; BEGIN Interactive Non-Wrapping Functions
+;;
+;;******************************************************************************
 (defun jnf/tor-retitle-post (title)
   "Replace the given buffer's title with the new TITLE.
 
@@ -385,10 +259,177 @@ and rename the buffer."
     (other-window 1)
     (eww (format "%s" (s-join "/" slugs)))))
 
+(defun jnf/tor-create-post (title)
+  "Create and visit a new draft post.  Prompt for a TITLE.
+
+The file for the blog post conforms to the path schema of posts
+for TakeOnRules.com."
+  (interactive "sBlog Post Title: ")
+  (jnf/tor-post---create-or-append :title title))
+
+(defun jnf/tor-tag-post (tag)
+  "Apply the TAG to the current TakeOnRules.com post.
+
+No effort is made to check if this is a post."
+  (interactive (list (completing-read "Tag: " (jnf/tor-tags-list))))
+  (let ((saved-point (point))
+        (to-insert (concat "\n- " tag)))
+    (replace-regexp "^tags:$" (concat "tags:" to-insert) nil 0 (point-max))
+    (goto-char (+ saved-point (length to-insert)))))
+
+(defun jnf/tor-insert-glossary-key (key)
+  "Insert the KEY at point."
+  (interactive (list (completing-read "Key: " (jnf/tor-glossary-key-list))))
+  (insert key))
+
+(defun jnf/tor-find-glossary-and-insert-entry (title)
+  "Find TakeOnRules glossary and add an entry with TITLE."
+  (interactive "sGlossary Entry's Title: ")
+  (find-file (f-join jnf/tor-home-directory "data" "glossary.yml"))
+  (jnf/tor-insert-glossary-entry title))
+
+(defun jnf/tor-insert-glossary-entry (title)
+  "Create an glossary entry with the given TITLE.
+
+Assumes you're already in the /data/glossary.yml file."
+  (interactive "sGlossary Entry's Title: ")
+  (let ((key (upcase (s-dashed-words title))))
+    (end-of-buffer)
+    (insert (concat
+             (if (looking-at-p "^$") "" "\n")
+             "- title: " title
+             "\n  key: " key))))
+
+(defun jnf/tor-insert-epigraph-entry ()
+  "Prompt for a new a new data/epigraphs.yml entry."
+  (interactive)
+  (find-file (f-join jnf/tor-home-directory "data" "epigraphs.yml"))
+  (end-of-buffer)
+  (insert (concat
+           (if (looking-at-p "^$") "" "\n")
+           "epi"))
+  (end-of-buffer)
+  "Assumes that the 'epi' is the correct expansion for the snippet."
+  (yas-expand)
+  (message "Ready to insert a new epigraph"))
+
+(cl-defun jnf/tor-post-amplifying-the-blogosphere (subheading &key citeTitle citeURL citeAuthor)
+  "Create and visit draft post for amplifying the blogosphere.
+
+If there's an active region, prompt for the :SUBHEADING.  The file
+for the blog post conforms to the path schema of posts for
+TakeOnRules.com.
+
+We'll pass the :CITETITLE, :CITEAUTHOR, and :CITEURL to
+`jnf/tor-post---create-or-append'"
+  (interactive (list (if (use-region-p)
+                         (read-string "Sub-Heading: ")
+                       nil)))
+  (jnf/tor-post---create-or-append
+   :title (format-time-string "Amplifying the Blogosphere (v%Y-%m-%d)")
+   :toc "true"
+   :subheading subheading
+   :series "amplifying-the-blogosphere"
+   :tags "response to other blogs"
+   :citeTitle citeTitle
+   :citeURL citeURL
+   :citeAuthor citeAuthor))
+
+(defun jnf/tor-find-file-draft (filename)
+  "Find draft FILENAME."
+  (interactive (list (completing-read "Filename: " (jnf/list-draft-filenames))))
+  (message "Opening draft %s" filename)
+  (find-file filename))
+;;******************************************************************************
+;;
+;;; END Interactive Non-Wrapping Functions
+;;
+;;******************************************************************************
 
 ;;******************************************************************************
 ;;
-;; Beginning Wrapping Functions
+;;; BEGIN Listing functions for TakeOnRules.com data
+;;
+;;******************************************************************************
+(defun jnf/tor-tags-list ()
+  "Return a list of tags from TakeOnRules.com."
+  (jnf/tor-list-by-key-from-filename :key "tag" :filename "data/glossary.yml"))
+
+(defun jnf/tor-epigraph-list ()
+  "Return a list of epigraph keys from TakeOnRules.com."
+  (jnf/tor-list-by-key-from-filename :key "key" :filename "data/epigraphs.yml"))
+
+(defun jnf/tor-game-list ()
+  "Return a list of games from TakeOnRules.com."
+  (jnf/tor-list-by-key-from-filename :key "game" :filename "data/glossary.yml"))
+
+(defun jnf/tor-glossary-title-list ()
+  "Return a list of titles from TakeOnRules.com."
+  (jnf/tor-list-by-key-from-filename :key "title" :filename "data/glossary.yml"))
+
+(defun jnf/tor-glossary-key-list ()
+  "Return a list of keys from TakeOnRules.com glossary."
+  (jnf/tor-list-by-key-from-filename :key "key" :filename "data/glossary.yml"))
+
+(defun jnf/tor-series-list ()
+  "Return a list of series from TakeOnRules.com."
+  (jnf/tor-list-by-key-from-filename :key "key" :filename "data/series.yml"))
+
+(defun jnf/tor-licenses-list ()
+  "Return a list of available licenses for TakeOnRules.com."
+    (jnf/tor-list-by-key-from-filename :key "Key" :filename "data/licenses.yml"))
+;;******************************************************************************
+;;
+;;; END Listing functions for TakeOnRules.com data
+;;
+;;******************************************************************************
+
+;;******************************************************************************
+;;
+;; Begin file system querying
+;;
+;;******************************************************************************
+(cl-defun jnf/tor-list-by-key-from-filename (&key key filename)
+  "Build a list of entries of the KEY from the FILENAME."
+  (split-string-and-unquote
+   (shell-command-to-string
+    (concat
+     "rg \"" key ": .*$\" "
+     (f-join jnf/tor-home-directory filename)
+     " --only-matching --no-filename | cut -d \" \" -f 2- | sort | tr '\n' '~'"))
+   "~"))
+
+(cl-defun jnf/list-filenames-with-content (&key matching in)
+  "Build a list of filenames MATCHING the pattern IN the given directory."
+  (let ((default-directory (f-join jnf/tor-home-directory in)))
+    (split-string-and-unquote
+     (shell-command-to-string
+      (concat "rg \"" matching "\" --only-matching --files-with-matches | sort | tr '\n' '~'"))
+     "~")))
+
+(defun jnf/list-draft-filnames ()
+  "Return a list of filenames that are in DRAFT status."
+  (jnf/list-filenames-with-content :matching "^draft: true" :in "content"))
+
+(defun jnf/tor-page-relative-pathname-list ()
+  "Return a list of pages for TakeOnRules.com."
+  (jnf/list-filenames-with-content :matching "^title: " :in "content"))
+
+(defun jnf/tor-asset-relative-pathname-list ()
+  "Return a list of image filenames for TakeOnRules.com."
+  (let ((default-directory (f-join jnf/tor-home-directory "assets" "images")))
+    (split-string-and-unquote
+     (shell-command-to-string "ls"))))
+
+;;******************************************************************************
+;;
+;; End file system querying
+;;
+;;******************************************************************************
+
+;;******************************************************************************
+;;
+;;; BEGIN Wrapping Functions
 ;;
 ;;******************************************************************************
 (cl-defun jnf/tor-wrap-with-text (&key before after strategy)
@@ -521,7 +562,7 @@ CITE and A tag."
      :strategy :pointOrRegion)))
 ;;******************************************************************************
 ;;
-;; END Wrapping Functions
+;;; END Wrapping Functions
 ;;
 ;;******************************************************************************
 
