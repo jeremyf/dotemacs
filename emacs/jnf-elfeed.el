@@ -59,13 +59,13 @@
   (defun shr-tag-q (dom)
     (shr-insert (car shr-around-q-tag))
     (shr-generic dom)
-    (shr-insert (car (cdr shr-around-q-tag))))
+    (shr-insert (cdr shr-around-q-tag)))
 
-  (defcustom shr-around-q-tag '("“" "”")
+  (defcustom shr-around-q-tag '("“" . "”")
     "The before and after quotes.  `car' is the before and `cdr' the after.
 Alternative suggestions are:
 - '(\"\\\"\" \"\\\"\")"
-  :type (list 'string 'string))
+  :type (cons 'string 'string))
 
   (defface shr-small
     '((t :height 0.8))
