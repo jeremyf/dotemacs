@@ -48,11 +48,9 @@
       (tor-post-amplifying-the-blogosphere citeTitle
                                            :citeTitle citeTitle
                                            :citeURL citeURL)))
-  ;; Inspired from shr-tag-em
   (defun shr-tag-dfn (dom)
     (shr-fontize-dom dom 'italic))
 
-  ;; Inspired from shr-tag-em
   (defun shr-tag-cite (dom)
     (shr-fontize-dom dom 'italic))
 
@@ -62,9 +60,9 @@
     (shr-insert (cdr shr-around-q-tag)))
 
   (defcustom shr-around-q-tag '("“" . "”")
-    "The before and after quotes.  `car' is the before and `cdr' the after.
-Alternative suggestions are:
-- '(\"\\\"\" \"\\\"\")"
+    "The before and after quotes.  `car' is inserted before the Q-tag and `cdr' is inserted after the Q-tag.
+
+Alternative suggestions are: - '(\"\\\"“\" . \"\\\"\")"
   :type (cons 'string 'string))
 
   (defface shr-small
@@ -76,8 +74,8 @@ Alternative suggestions are:
     (shr-fontize-dom dom (when shr-use-fonts 'shr-small)))
 
   (defface shr-time
-  '((t :inherit underline :underline (:style wave)))
-  "Face for <time> elements.")
+    '((t :inherit underline :underline (:style wave)))
+    "Face for <time> elements.")
 
   ;; Drawing inspiration from shr-tag-abbr
   (defun shr-tag-time (dom)
