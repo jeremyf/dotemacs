@@ -20,31 +20,35 @@
 ;; https://github.com/magnars/dash.el/
 (use-package dash :straight t)
 
-(setq jnf/data-directories
-      '(
-        ;; The themes directory
-        "~/git/takeonrules.github.io/themes/hugo-tufte"
-        ;; The content directory
-        "~/git/takeonrules.github.io/"
-        ;; The tooling directory
-        "~/git/dotzshrc/"
-        ;; The personal configuration options
-        "~/git/jnf-emacs-config/"
-        ;; An org directory
-        "~/git/org/"
-        ;; An org directory
-        "~/git/org/archive"
-        ;; An org directory
-        "~/git/org/daily"
-        ;; An org directory
-        "~/git/org/public"
-        ;; An org directory
-        "~/git/org/personal"
-        ;; An org directory
-        "~/git/org/personal/thel-sector"
-        ;; An org directory
-        "~/git/org/hesburgh-libraries"
-        ))
+(defconst jnf/tor-home-directory
+  (file-truename "~/git/takeonrules.github.io")
+  "The home directory of TakeOnRules.com.")
+
+(defvar jnf/data-directories
+  (list
+    jnf/tor-home-directory
+    ;; The themes directory
+    "~/git/takeonrules.github.io/themes/hugo-tufte"
+    ;; The tooling directory
+    "~/git/dotzshrc/"
+    ;; The personal configuration options
+    "~/git/jnf-emacs-config/"
+    ;; An org directory
+    "~/git/org/"
+    ;; An org directory
+    "~/git/org/archive"
+    ;; An org directory
+    "~/git/org/daily"
+    ;; An org directory
+    "~/git/org/public"
+    ;; An org directory
+    "~/git/org/personal"
+    ;; An org directory
+    "~/git/org/personal/thel-sector"
+    ;; An org directory
+    "~/git/org/hesburgh-libraries"
+    )
+  "Relevant data directories for my day to day work.")
 
 (cl-defun jnf/git-data-sync (&optional (directories jnf/data-directories))
   "Synchronize DIRECTORIES with git pull/push.
