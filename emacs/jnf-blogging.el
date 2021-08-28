@@ -34,7 +34,7 @@
     ("s" jnf/tor-wrap-as-sidenote-dwim "Side-note sentence or region…")
     ("w" jnf/tor-wrap-in-html-tag "Wrap point or region…"))
    "Entries"
-   (("*" jnf/tor-post-amplifying-the-blogosphere "Amplify the Blogosphere…")
+   (("*" jnf/tor-post-amplifying-the-blogosphere "Amplify the blogosphere…")
     ("e" jnf/tor-insert-epigraph-entry "Create epigraph entry…")
     ("g" jnf/tor-find-glossary-and-insert-entry "Create glossary entry…")
     ("l" jnf/tor-find-changelog-and-insert-entry "Create change log entry…")
@@ -55,23 +55,23 @@
 
 (pretty-hydra-define jnf/tor-subject-menu-yaml (:foreign-keys warn :title jnf/tor-menu--title :quit-key "q" :exit t)
   ("Posts"
-   (("*" jnf/tor-post-amplifying-the-blogosphere "Amplify the Blogosphere…")
+   (("*" jnf/tor-post-amplifying-the-blogosphere "Amplify the blogosphere…")
     ("e" jnf/tor-insert-epigraph-entry "Create epigraph entry…")
     ("g" jnf/tor-find-glossary-and-insert-entry "Create glossary entry…")
     ("l" jnf/tor-find-changelog-and-insert-entry "Create change log entry…")
     ("n" jnf/tor-create-post "Create new post…")
-    ("?" jnf/tor-find-file-draft "Find Blog in Draft Status…")
+    ("?" jnf/tor-find-file-draft "Find blog in draft Status…")
     (";" jnf/tor-find-hugo-file-by-url "Find blog by url…")
     ("k" jnf/tor-insert-glossary-key "Insert key at point…"))))
 
 (pretty-hydra-define jnf/tor-subject-menu-default (:foreign-keys warn :title jnf/tor-menu--title :quit-key "q" :exit t)
   ("Posts"
-   (("*" jnf/tor-post-amplifying-the-blogosphere "Amplify the Blogosphere…")
+   (("*" jnf/tor-post-amplifying-the-blogosphere "Amplify the blogosphere…")
     ("e" jnf/tor-insert-epigraph-entry "Create epigraph entry…")
     ("g" jnf/tor-find-glossary-and-insert-entry "Create glossary entry…")
     ("n" jnf/tor-create-post "Create new post…")
     ("l" jnf/tor-find-changelog-and-insert-entry "Create change log entry…")
-    ("?" jnf/tor-find-file-draft "Find Blog in Draft Status…")
+    ("?" jnf/tor-find-file-draft "Find blog in draft Status…")
     (";" jnf/tor-find-hugo-file-by-url "Find blog by url…"))))
 
 ;;******************************************************************************
@@ -176,9 +176,8 @@ If there's an active region, select that text and place it."
                          "\n{{< blockquote"
                          (when citeAuthor
                            (concat " pre=\"" citeAuthor "\""))
-                         " cite=\""
-                         citeTitle "\" cite_url=\""
-                         citeURL "\" >}}\n"))
+                         " cite=\"" citeTitle
+                         "\" cite_url=\"" citeURL "\" >}}\n"))
           (buffer-substring (region-beginning) (region-end))
           (when citeURL "\n{{< /blockquote >}}"))
          nil fpath t)
