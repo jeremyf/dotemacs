@@ -106,7 +106,7 @@ The LENGTH is how many words to use for the key."
   "Convert STRING to appropriate slug."
   (s-replace "'" "" (s-dashed-words string)))
 
-(cl-defun jnf/tor-prompt-or-kill-ring-for-url-replace (&key (url-regexp "^https?://"))
+(cl-defun jnf/tor-prompt-or-kill-ring-for-url (&key (url-regexp "^https?://"))
   "Prompt and return a url.
 
 If the `car' `kill-ring' matches the URL-REGEXP, default the
