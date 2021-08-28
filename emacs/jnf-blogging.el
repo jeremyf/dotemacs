@@ -250,7 +250,7 @@ URLs for one of those posts is: hostname/year/month/day/slug"
   (interactive)
   (let ((slugs))
     (save-excursion
-      ;; Remember where making a list and pushing to the beginning of
+      ;; Remember we are making a list and pushing to the beginning of
       ;; the list.  Hence we start with the last slug in mind.
       (goto-char 1)
       (re-search-forward "^slug: \\(.*\\)$" nil t)
@@ -348,10 +348,10 @@ We'll pass the :CITETITLE, :CITEAUTHOR, and :CITEURL to
    :citeURL citeURL
    :citeAuthor citeAuthor))
 
-(defun jnf/tor-find-file-draft (filename)
-  "Find draft FILENAME."
+(cl-defun jnf/tor-find-file-draft (filename &key (directory (f-join jnf/tor-home-directory "content")))
+  "Find draft FILENAME in given DIRECTORY."
   (interactive (list (completing-read "Filename: " (jnf/tor-list-draft-filnames))))
-  (let ((file-path (f-join jnf/tor-home-directory "content" filename)))
+  (let ((file-path (f-join directory filename)))
     (message "Opening draft %s" file-path)
     (find-file file-path)))
 ;;******************************************************************************
@@ -403,13 +403,13 @@ We'll pass the :CITETITLE, :CITEAUTHOR, and :CITEURL to
 ;;; BEGIN file system querying
 ;;
 ;;******************************************************************************
-(cl-defun jnf/tor-list-by-key-from-filename (&key key filename)
-  "Build a list of entries of the KEY from the FILENAME."
+(cl-defun jnf/tor-list-by-key-from-filename (&key key filename (directory jnf/tor-home-directory))
+  "Build a list of entries of the KEY from the FILENAME in DIRECTORY."
   (split-string-and-unquote
    (shell-command-to-string
     (concat
      "rg \"" key ": .*$\" "
-     (f-join jnf/tor-home-directory filename)
+     (f-join directory filename)
      " --only-matching --no-filename | cut -d \" \" -f 2- | sort | tr '\n' '~'"))
    "~"))
 
