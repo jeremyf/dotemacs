@@ -104,10 +104,12 @@ Alternative suggestions are: - '(\"\\\"“\" . \"\\\"\")"
     (shr-generic dom)
     (shr-ensure-paragraph))
 
+  (setq browse-url-browser-function 'eww-browse-url)
   :bind (:map eww-mode-map
               ("U" . eww-up-url)
               ("<f7>" . jnf/amplify-eww)
               ("s-7" . jnf/amplify-eww))
+  :bind (("C-s-w" . browse-url-at-point))
   :hook ((eww-mode . jnf/reader-visual)))
 
 

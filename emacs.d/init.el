@@ -77,15 +77,18 @@
   :pretty-hydra
   ((:title (with-material "help_outline" "Helpful Menus") :quit-key "q" :exit t)
    ("Helpful"
-    (("f" helpful-callable "callable")
+    (
+     ("b" embark-bindings "bindings")
      ("c" helpful-command "command")
-     ("u" helpful-function "function")
+     ("f" helpful-callable "function (interactive)")
+     ("F" helpful-function "function (all)")
      ("k" helpful-key "key")
-     ("d" helpful-at-point "thing at point")
-     ("v" helpful-variable "variable")
+     ("l" find-library "Find library")
      ("m" helpful-macro "macro")
+     ("p" helpful-at-point "thing at point")
+     ("v" helpful-variable "variable")
      ("t" describe-text-properties "text properties")
-     ("b" embark-bindings "bindings"))))
+     )))
   :bind ("C-s-h" . helpful-hydra/body))
 
 ;; A window manager for emacs, allowing fast toggles between windows
