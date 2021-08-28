@@ -15,6 +15,11 @@
 ;;; Code:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;;******************************************************************************
+;;
+;;; BEGIN Use External Packages
+;;
+;;******************************************************************************
 ;; Write "kill" command inputs to disk
 (use-package savekill
   :straight t)
@@ -44,18 +49,21 @@
   :hook (prog-mode . yafolding-mode))
 
 ;; Using Hippie expand, I toggle through words already referenced.
-(setq hippie-expand-try-functions-list '(try-expand-dabbrev-visible
-                                         try-expand-dabbrev
-                                         try-expand-list
-                                         try-expand-all-abbrevs
-                                         try-expand-dabbrev-all-buffers
-                                         try-expand-dabbrev-from-kill
-                                         try-complete-file-name-partially
-                                         try-complete-file-name
-                                         try-complete-lisp-symbol-partially
-                                         try-complete-lisp-symbol
-                                         ))
-(global-set-key (kbd "M-SPC") 'hippie-expand)
+(use-package hippie-exp
+  :straight t
+  :config
+  (setq hippie-expand-try-functions-list '(try-expand-dabbrev-visible
+                                           try-expand-dabbrev
+                                           try-expand-list
+                                           try-expand-all-abbrevs
+                                           try-expand-dabbrev-all-buffers
+                                           try-expand-dabbrev-from-kill
+                                           try-complete-file-name-partially
+                                           try-complete-file-name
+                                           try-complete-lisp-symbol-partially
+                                           try-complete-lisp-symbol
+                                           ))
+  :bind (("M-SPC" . hippie-expand)))
 
 ;; Expand or contract point/region to next logical element.
 ;;
@@ -64,26 +72,6 @@
   :straight t
   :bind (("C-=" . er/expand-region)
          ("C-+" . er/contract-region)))
-
-;; From https://old.reddit.com/r/orgmode/comments/eq76pv/question_about_orgsuperagenda/feok4ro/
-;; And https://www.reddit.com/r/emacs/comments/n9q662/weekly_tipstricketc_thread/
-(defun jnf/copy-indented-4-spaces (beg end)
-  "Copy the region between BEG and END and add an indent of 4 spaces.
-
-Useful for pasting code into Reddit's Markdown mode."
-  (interactive "r")
-  (let* ((mode major-mode)
-         (buffer (current-buffer))
-         (inhibit-read-only t))
-    (kill-new (with-temp-buffer
-                (funcall mode)
-                (insert-buffer-substring buffer beg end)
-                (when (derived-mode-p 'prog-mode)
-                  (delete-trailing-whitespace)
-                  (indent-region (point-min) (point-max) nil))
-                (indent-rigidly (point-min) (point-max) 4)
-                (buffer-string)))))
-(global-set-key (kbd "C-c 4") 'jnf/copy-indented-4-spaces)
 
 ;; This package allows me to toggle between different string cases.
 ;;
@@ -180,56 +168,27 @@ Useful for pasting code into Reddit's Markdown mode."
   :straight t
   :hook ((prog-mode text-mode org-mode) . rainbow-delimiters-mode))
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;; BEGIN EMOJIS
-;;
-;; Add emoji handling
 (use-package emojify
-  :straight t)
+  :straight t
+  :config
+  (defun --set-emoji-font (frame)
+    "Adjust the font settings of FRAME so Emacs can display emoji properly."
+    (if (eq system-type 'darwin)
+        ;; For NS/Cocoa
+        (set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji") frame 'prepend)
+      ;; For Linux
+      (set-fontset-font t 'symbol (font-spec :family "Symbola") frame 'prepend)))
+
+  ;; For when Emacs is started in GUI mode:
+  (--set-emoji-font nil)
+  ;; Hook for when a frame is created with emacsclient
+  ;; see https://www.gnu.org/software/emacs/manual/html_node/elisp/Creating-Frames.html
+  (add-hook 'after-make-frame-functions '--set-emoji-font))
 
 (use-package unicode-fonts
   :straight t
   :ensure t
   :config (unicode-fonts-setup))
-
-(defun --set-emoji-font (frame)
-  "Adjust the font settings of FRAME so Emacs can display emoji properly."
-  (if (eq system-type 'darwin)
-      ;; For NS/Cocoa
-      (set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji") frame 'prepend)
-    ;; For Linux
-    (set-fontset-font t 'symbol (font-spec :family "Symbola") frame 'prepend)))
-
-;; For when Emacs is started in GUI mode:
-(--set-emoji-font nil)
-;; Hook for when a frame is created with emacsclient
-;; see https://www.gnu.org/software/emacs/manual/html_node/elisp/Creating-Frames.html
-(add-hook 'after-make-frame-functions '--set-emoji-font)
-;;
-;; END EMOJIS
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-(defun jnf/kill-region-or-backward-word (&optional arg)
-  "Kill selected region otherwise kill backwards the ARG number of words."
-  (interactive "p")
-  (if (region-active-p)
-      (kill-region (region-beginning) (region-end))
-    (backward-kill-word arg)))
-(global-set-key (kbd "C-w") 'jnf/kill-region-or-backward-word)
-
-(defun jnf/kill-line-or-region (&optional ARG)
-  "Kill the selected region otherwise kill the ARG number of lines."
-  (interactive "P")
-  (if (use-region-p)
-      (kill-region (region-beginning) (region-end))
-    (kill-line ARG)))
-(global-set-key (kbd "C-k") 'jnf/kill-line-or-region)
-
-;; For myself, it's easier to toggle between CTRL+f and CTRL+CMD+f or
-;; b for moving words.
-;; (global-set-key (kbd "C-s-f") 'forward-word)
-;; (global-set-key (kbd "C-s-b") 'backward-word)
-
 
 ;; A rather convenient snippet manager.  When you create a snippet, it
 ;; understands the mode you're in and puts the snippet in the right
@@ -247,17 +206,6 @@ Useful for pasting code into Reddit's Markdown mode."
   :config
   (setq-default goggles-pulse t)) ;; set to nil to disable pulsing
 
-
-;; https://blog.sumtypeofway.com/posts/emacs-config.html
-(defun jnf/nab-file-name-to-clipboard ()
-  "Nab, I mean copy, the current buffer file name to the clipboard."
-  (interactive)
-  (let ((filename (if (equal major-mode 'dired-mode) default-directory (buffer-file-name))))
-    (when filename
-      (kill-new filename)
-      (message "Copied buffer file name '%s' to the clipboard." filename))))
-(global-set-key (kbd "C-c n") 'jnf/nab-file-name-to-clipboard)
-
 (use-package whole-line-or-region
   :straight t
   :diminish 'whole-line-or-region-local-mode
@@ -265,6 +213,77 @@ Useful for pasting code into Reddit's Markdown mode."
 
 (use-package smartparens
   :straight t)
+;;******************************************************************************
+;;
+;;; END Use External Packages
+;;
+;;******************************************************************************
+
+;;******************************************************************************
+;;
+;;; BEGIN Custom "in-buffer" functions
+;;
+;;******************************************************************************
+(global-set-key (kbd "C-w") 'jnf/kill-region-or-backward-word)
+(defun jnf/kill-region-or-backward-word (&optional arg)
+  "Kill selected region otherwise kill backwards the ARG number of words."
+  (interactive "p")
+  (if (region-active-p)
+      (kill-region (region-beginning) (region-end))
+    (backward-kill-word arg)))
+
+(global-set-key (kbd "C-k") 'jnf/kill-line-or-region)
+(defun jnf/kill-line-or-region (&optional ARG)
+  "Kill the selected region otherwise kill the ARG number of lines."
+  (interactive "P")
+  (if (use-region-p)
+      (kill-region (region-beginning) (region-end))
+    (kill-line ARG)))
+
+(global-set-key (kbd "C-c n") 'jnf/nab-file-name-to-clipboard)
+(defun jnf/nab-file-name-to-clipboard ()
+  "Nab, I mean copy, the current buffer file name to the clipboard."
+  ;; https://blog.sumtypeofway.com/posts/emacs-config.html
+  (interactive)
+  (let ((filename (if (equal major-mode 'dired-mode) default-directory (buffer-file-name))))
+    (when filename
+      (kill-new filename)
+      (message "Copied buffer file name '%s' to the clipboard." filename))))
+
+(defun sort-unique-lines (reverse beg end &optional adjacent keep-blanks interactive)
+  "Sort lines and delete duplicates.
+By default the sort is lexigraphically ascending.  To sort as
+descending set REVERSE to non-nil.  Specify BEG and END for the
+bounds of sorting.  By default, this is the selected region.
+
+I've included ADJACENT, KEEP-BLANKS, and INTERACTIVE so I can
+echo the method signature of `'delete-duplicate-lines`"
+;; This is a common function that I've used in other text editors.
+;; It's a simple stitch together of sort-lines and
+;; delete-duplicate-lines.
+  (interactive "P\nr")
+  (sort-lines reverse beg end)
+  (delete-duplicate-lines beg end reverse adjacent keep-blanks interactive))
+
+(global-set-key (kbd "C-c 4") 'jnf/copy-indented-4-spaces)
+(defun jnf/copy-indented-4-spaces (beg end)
+  "Copy the region between BEG and END and add an indent of 4 spaces.
+
+Useful for pasting code into Reddit's Markdown mode."
+;; From https://old.reddit.com/r/orgmode/comments/eq76pv/question_about_orgsuperagenda/feok4ro/
+;; And https://www.reddit.com/r/emacs/comments/n9q662/weekly_tipstricketc_thread/
+  (interactive "r")
+  (let* ((mode major-mode)
+         (buffer (current-buffer))
+         (inhibit-read-only t))
+    (kill-new (with-temp-buffer
+                (funcall mode)
+                (insert-buffer-substring buffer beg end)
+                (when (derived-mode-p 'prog-mode)
+                  (delete-trailing-whitespace)
+                  (indent-region (point-min) (point-max) nil))
+                (indent-rigidly (point-min) (point-max) 4)
+                (buffer-string)))))
 
 (global-set-key (kbd "<f5>") 'eval-region)
 (global-set-key (kbd "M-DEL") 'backward-kill-paragraph)
@@ -273,6 +292,13 @@ Useful for pasting code into Reddit's Markdown mode."
 
 ;; Treat dashes and underscores as part of words for navigation
 ;; (global-superword-mode t)
+
+;;******************************************************************************
+;;
+;;; END Custom "in-buffer" functions
+;;
+;;******************************************************************************
+
 
 (provide 'jnf-in-buffer.el)
 ;;; jnf-in-buffer.el ends here

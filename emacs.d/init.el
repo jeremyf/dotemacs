@@ -213,21 +213,6 @@ Tries to preserve the order of window buffers and active window."
 (if (eq system-type 'gnu/linux)
     (require 'gnu-linux-emacs-config.el))
 
-;; This is a common function that I've used in other text editors.
-;; It's a simple stitch together of sort-lines and
-;; delete-duplicate-lines.
-(defun sort-unique-lines (reverse beg end &optional adjacent keep-blanks interactive)
-  "Sort lines and delete duplicates.
-By default the sort is lexigraphically ascending.  To sort as
-descending set REVERSE to non-nil.  Specify BEG and END for the
-bounds of sorting.  By default, this is the selected region.
-
-I've included ADJACENT, KEEP-BLANKS, and INTERACTIVE so I can
-echo the method signature of `'delete-duplicate-lines`"
-  (interactive "P\nr")
-  (sort-lines reverse beg end)
-  (delete-duplicate-lines beg end reverse adjacent keep-blanks interactive))
-
 (require 'jnf-company.el)
 ;; (require 'jnf-corfu.el)
 (require 'jnf-in-buffer.el)
