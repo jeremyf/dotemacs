@@ -329,6 +329,8 @@ No effort is made to check if this is a post."
   "Find TakeOnRules glossary and begin entering a changelog entry."
   (interactive)
   (find-file (f-join jnf/tor-home-directory "data" "changelog.yml"))
+  ;; The changelog is structured in date descending order.  The first
+  ;; line is the YAML preamble indicating a data object (e.g. "---")
   (beginning-of-buffer)
   (end-of-line)
   (insert (concat "\n- date: " (format-time-string "%Y-%m-%d") "\n  entries:\n    - ")))
@@ -337,13 +339,6 @@ No effort is made to check if this is a post."
   "Find TakeOnRules glossary and add an entry with TITLE."
   (interactive "sGlossary Entry's Title: ")
   (find-file (f-join jnf/tor-home-directory "data" "glossary.yml"))
-  (jnf/tor-insert-glossary-entry title))
-
-(defun jnf/tor-insert-glossary-entry (title)
-  "Create an glossary entry with the given TITLE.
-
-Assumes you're already in the /data/glossary.yml file."
-  (interactive "sGlossary Entry's Title: ")
   (let ((key (upcase (s-dashed-words title))))
     (end-of-buffer)
     (insert (concat
