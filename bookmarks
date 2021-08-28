@@ -2,7 +2,12 @@
 ;;; This format is meant to be slightly human-readable;
 ;;; nevertheless, you probably don't want to edit it.
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
-(("Emacs - Org Roam Configuration"
+(("jnf-elfeed.el"
+ (filename . "~/git/jnf-emacs-config/emacs/jnf-elfeed.el")
+ (front-context-string . ";;; -*- lexical-")
+ (rear-context-string)
+ (position . 1))
+("jnf-org-roam-v2.el"
  (filename . "~/git/jnf-emacs-config/emacs/jnf-org-roam-v2.el")
  (front-context-string . "(pretty-hydra-de")
  (rear-context-string . "Menu\" 1 -0.05))\n")
