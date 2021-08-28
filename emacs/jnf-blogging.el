@@ -84,7 +84,7 @@
 ;;; BEGIN Non-Interactive Utility Functions
 ;;
 ;;******************************************************************************
-(cl-defun jnf/epigraph-convert-text-to-key (text &key (length 5))
+(cl-defun jnf/convert-text-to-key (text &key (length 5))
   "Convert the given TEXT to an epigraph key.
 
 The LENGTH is how many words to use for the key."
@@ -93,40 +93,42 @@ The LENGTH is how many words to use for the key."
         (upcase (s-join "-" (subseq list-of-words 0 length)))
       "")))
 
-(defun jnf/tor-post-titleize (title)
+(defun jnf/tor-convert-text-to-post-title (title)
   "Convert TITLE to correct format."
   (message "Titleizing...")
   (replace-regexp-in-string
+   ;; Replace "Hello World" with “Hello World”
    "\"\\([^\"]+\\)\""
    "“\\1”"
    (s-replace "'" "’" title)))
 
-(defun jnf/tor-slugify (string)
+(defun jnf/tor-convert-text-to-slug (string)
   "Convert STRING to appropriate slug."
   (s-replace "'" "" (s-dashed-words string)))
 
-(defun jnf/tor-prompt-or-kill-ring-for-url ()
-  "Return a URL, either from the kill ring or prompted."
+(cl-defun jnf/tor-prompt-or-kill-ring-for-url-replace (&key (url-regexp "^https?://"))
+  "Prompt and return a url.
+
+If the `car' `kill-ring' matches the URL-REGEXP, default the
+prompt value to the `car' of `kill-ring'."
   (let ((car-of-kill-ring (substring-no-properties (car kill-ring))))
-    ;; Need to ensure we're not dealing with something out of bounds
-    (if (and (> (length car-of-kill-ring) 3)
-             (string= (substring car-of-kill-ring 0 4) "http"))
-        (read-string "URL (optional): " car-of-kill-ring)
-      (read-string "URL (optional): "))))
+    (read-string "URL (optional): "
+                 (when (string-match url-regexp car-of-kill-ring)
+                   car-of-kill-ring))))
 
 (cl-defun jnf/tor-post---create-or-append (&key
-                                           title
-                                           (tags '("null")) series toc subheading
+                                           title subheading
+                                           (tags '("null")) series toc
                                            citeTitle citeURL citeAuthor)
   "Create or append a post with TITLE.
 
 The following keys are optional:
 
+:SUBHEADING if you have an active region, use this header.
 :TAGS one or more tags, as a list or string, to add to the
         frontmatter.
 :SERIES the series to set in the frontmatter.
 :TOC whether to include a table of contents in the post.
-:SUBHEADING if you have an active region, use this header.
 :CITETITLE the title of the URL cited (if any)
 :CITEURL the URL cited (if any)
 :CITEAUTHOR the author cited (if any)
@@ -136,7 +138,7 @@ If there's an active region, select that text and place it."
                                     "content" "posts"
                                     (format-time-string "%Y/")))
 
-         (slug (jnf/tor-slugify title))
+         (slug (jnf/tor-convert-text-to-slug title))
          (fpath (expand-file-name
                  (concat default-directory slug ".md"))))
     ;; If the file does not exist, create the file with the proper
@@ -149,7 +151,7 @@ If there's an active region, select that text and place it."
                  "\nlayout: post"
                  "\nlicenses:\n- all-rights-reserved"
                  "\nslug: " (format "%s" slug)
-                 "\ntitle: '" (jnf/tor-post-titleize title) "'"
+                 "\ntitle: '" (jnf/tor-convert-text-to-post-title title) "'"
                  "\ntype: post"
                  (when series (concat "\nseries: " series))
                  (when toc (concat "\ntoc: true"))
@@ -207,8 +209,8 @@ If there's an active region, select that text and place it."
 This function will: replace the content's title, update the slug,
 and rename the buffer."
     (interactive "sNew Post's Title: ")
-    (let* ((metadataTitle (concat "title: '" (jnf/tor-post-titleize title) "'"))
-           (slug (jnf/tor-slugify title))
+    (let* ((metadataTitle (concat "title: '" (jnf/tor-convert-text-to-post-title title) "'"))
+           (slug (jnf/tor-convert-text-to-slug title))
            (metadataSlug (concat "slug: " slug))
            (filename (buffer-file-name))
            (new-filename (concat (file-name-directory filename)
@@ -398,7 +400,7 @@ We'll pass the :CITETITLE, :CITEAUTHOR, and :CITEURL to
 
 ;;******************************************************************************
 ;;
-;; Begin file system querying
+;;; BEGIN file system querying
 ;;
 ;;******************************************************************************
 (cl-defun jnf/tor-list-by-key-from-filename (&key key filename)
@@ -435,7 +437,7 @@ We'll pass the :CITETITLE, :CITEAUTHOR, and :CITEURL to
 
 ;;******************************************************************************
 ;;
-;; End file system querying
+;;; END file system querying
 ;;
 ;;******************************************************************************
 
@@ -458,7 +460,8 @@ TODO: I would love create a lookup table for the case statement,
 as the behavior's well defined."
   (pcase strategy
     (:lineOrRegion (pcase-let* ((origin (point))
-               (`(,begin . ,end) (crux-get-positions-of-line-or-region)))
+                                (`(,begin . ,end) (crux-get-positions-of-line-or-region)))
+                     (do-it (end after begin before))
                      (goto-char end)
                      (insert after)
                      (goto-char begin)
@@ -476,11 +479,11 @@ as the behavior's well defined."
                       (goto-char begin)
                       (insert before)))
     (:wordOrRegion (let* ((begin (if (use-region-p) (region-beginning) (car (bounds-of-thing-at-point 'word))))
-                           (end (if (use-region-p) (region-end) (cdr (bounds-of-thing-at-point 'word)))))
-                      (goto-char end)
-                      (insert after)
-                      (goto-char begin)
-                      (insert before)))
+                          (end (if (use-region-p) (region-end) (cdr (bounds-of-thing-at-point 'word)))))
+                     (goto-char end)
+                     (insert after)
+                     (goto-char begin)
+                     (insert before)))
     ))
 
 (defun jnf/tor-wrap-in-html-tag (tag &optional attributes)

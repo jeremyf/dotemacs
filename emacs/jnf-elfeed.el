@@ -185,7 +185,9 @@ preferring the preferred type."
 (use-package shrface
   :straight t
   :after eww
-  :hook (eww-mode . shrface-mode)
+  :hook
+  (eww-mode . shrface-mode)
+  (elfeed-mode . shrface-mode)
   :custom (shrface-toggle-bullets nil)
   :config
   (shrface-basic)
