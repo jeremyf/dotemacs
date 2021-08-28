@@ -21,42 +21,42 @@
   (list
    :hesburgh-libraries
    '("h" "Hesburgh Libraries" plain "%?"
-     :if-new
+     :target
      (file+head
       "hesburgh-libraries/%<%Y%m%d>---${slug}.org"
       "#+title: ${title}\n#+FILETAGS: :hesburgh: %^G\n\n")
      :unnarrowed t)
    :jf-consulting
    '("j" "JF Consulting" plain "%?"
-     :if-new
+     :target
      (file+head
       "jeremy-friesen-consulting/%<%Y%m%d>---${slug}.org"
       "#+title: ${title}\n#+FILETAGS: :personal:jeremy-friesen-consulting: %^G\n\n")
      :unnarrowed t)
    :personal
    '("p" "Personal" plain "%?"
-     :if-new
+     :target
      (file+head
       "personal/%<%Y%m%d>---${slug}.org"
       "#+title: ${title}\n#+FILETAGS: :personal: %^G\n\n")
      :unnarrowed t)
    :personal-encrypted
    '("P" "Personal (Encrypted)" plain "%?"
-     :if-new
+     :target
      (file+head
       "personal/%<%Y%m%d>---${slug}.org.gpg"
       "#+title: ${title}\n#+FILETAGS: :personal:encrypted: %^G\n\n")
      :unnarrowed t)
    :public
    '("u" "Public" plain "%?"
-     :if-new
+     :target
      (file+head
       "public/%<%Y%m%d>---${slug}.org"
       "#+title: ${title}\n#+FILETAGS: :public: %^G\n\n")
      :unnarrowed t)
    :thel-sector
    '("t" "Thel Sector" plain "%?"
-     :if-new
+     :target
      (file+head
       "personal/thel-sector/%<%Y%m%d>---${slug}.org"
       "#+title: ${title}\n#+FILETAGS: :thel-sector: %^G\n\n")

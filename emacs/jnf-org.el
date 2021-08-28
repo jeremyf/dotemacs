@@ -36,7 +36,7 @@
            "* TODO %?" :empty-lines-before 1)
           ("h" "Hesburgh Libraries Todo" entry (file "~/git/org/hesburgh-libraries/todo.org")
            "* TODO %?" :empty-lines-before 1)
-          ("t" "Thel Sector Todo" entry (file "~/git/org/personal/thel-sector/todo.org")
+          ("t" "Take on Rules" entry (file "~/git/takeonrules.github.io/todo.org")
            "* TODO %?" :empty-lines-before 1)
           ("p" "Personal Todo" entry (file "~/git/org/personal/todo.org")
            "* TODO %?" :empty-lines-before 1)
