@@ -23,6 +23,7 @@
   :straight t
   :hook
   (org-src-mode . disable-flycheck-for-elisp)
+  (after-init-hook . global-flycheck-mode)
   :custom
   (flycheck-display-errors-delay 0.1)
   (flycheck-emacs-lisp-initialize-packages t)
@@ -33,7 +34,7 @@
     (setq-local flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
 
   (add-to-list 'flycheck-checkers 'proselint))
-(add-hook 'after-init-hook #'global-flycheck-mode)
+;; (add-hook 'after-init-hook #'global-flycheck-mode)
 
 (use-package flyspell-correct
   :straight t

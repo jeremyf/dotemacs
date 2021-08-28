@@ -59,9 +59,8 @@
   (defadvice magit-mode-quit-window (after magit-restore-screen activate)
     (jump-to-register :magit-fullscreen))
   :config
-  (remove-hook 'magit-status-sections-hook 'magit-insert-tags-header))
-
-(defun jnf/magit-list-repositories ()
+  (remove-hook 'magit-status-sections-hook 'magit-insert-tags-header)
+  (defun jnf/magit-list-repositories ()
   "Create a `magit-list-repositories' for my personal repositories."
   (interactive)
   (setq magit-repository-directories
@@ -75,7 +74,7 @@
         ("~/git/org/hesburgh-libraries" . 1)
         ("~/git/jnf-emacs-config/" . 1)
         ("~/git/dotzshrc/" .  1)))
-  (magit-list-repositories))
+  (magit-list-repositories)))
 
 (use-package forge
   :straight t)
