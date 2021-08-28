@@ -15,6 +15,9 @@
   :init (setq ripgrep-arguments "--ignore-case")
   :straight t)
 
+(use-package prescient
+  :straight t)
+
 (use-package selectrum-prescient
   :straight t
   :after prescient
@@ -40,15 +43,7 @@
 
   ;; Must be in the :init section of use-package such that the mode gets
   ;; enabled right away. Note that this forces loading the package.
-  (marginalia-mode)
-
-  ;; Prefer richer, more heavy, annotations over the lighter default variant.
-  ;; E.g. M-x will show the documentation string additional to the keybinding.
-  ;; By default only the keybinding is shown as annotation.
-  ;; Note that there is the command `marginalia-cycle' to
-  ;; switch between the annotators.
-  (setq marginalia-annotators '(marginalia-annotators-heavy marginalia-annotators-light nil))
-  )
+  (marginalia-mode))
 
 ;; Example configuration for Consult
 ;; https://github.com/minad/consult
@@ -106,6 +101,7 @@
          ("M-s e" . consult-isearch)
          ;; ("s-t" . jnf/consult-find-using-fd)
          ("s-3" . consult-imenu)
+         ("s-#" . consult-project-imenu)
          :map isearch-mode-map
          ("M-e" . consult-isearch)                 ;; orig. isearch-edit-string
          ("M-s e" . consult-isearch)               ;; orig. isearch-edit-string

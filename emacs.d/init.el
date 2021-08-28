@@ -60,9 +60,6 @@
 (require 'jnf-display.el)
 (require 'jnf-hydra.el)
 
-(use-package prescient
-  :straight t)
-
 (require 'jnf-projectile.el)
 
 (require 'jnf-selectrum.el)
