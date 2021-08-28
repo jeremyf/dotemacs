@@ -238,23 +238,38 @@ and rename the buffer."
     ;; Report filename change
     (message "Renamed %s -> %s" filename new-filename)))
 
+(defvar jnf/tor-hugo-regexp-for-post-path
+  (rx "/" (= 4 (in "0-9")) "/" (= 2 (in "0-9")) "/" (= 2 (in "0-9")) "/" (group (one-or-more (not "/"))) (? "/") eol)
+  "A regular expression for matching blog posts.")
+
+(defvar jnf/tor-hugo-regexp-for-pages-path
+  (rx "\.com/" (group (* anychar) (not "/")) (? "/"))
+  "A regular expression for matching pages.")
+
 (defun jnf/tor-find-hugo-file-by-url (url)
   "Find the associated TakeOnRules.com file for the given URL."
   (interactive (list
                 (jnf/tor-prompt-or-kill-ring-for-url
                  :url-regexp jnf/tor-hostname-regexp)))
-  (pcase url
-    ;; Blog Post
-    ((rx "/" (= 4 (in "0-9")) "/" (= 2 (in "0-9")) "/" (= 2 (in "0-9")) "/" (group-n 1 (one-or-more (not "/"))) (? "/") eol)
-     (let* ((slug (car (last (split-string-and-unquote url "/"))))
-            (filename (car
-                       (jnf/list-filenames-with-file-text
-                        :matching (concat "^slug: .*" slug "$")
-                        :in "content"))))
-       (find-file (f-join jnf/tor-home-directory "content" filename)))
-     )
-    ;; No match found
-    (_ (message "Unable to find post for \"%s\"" url))))
+  (cond
+   ;; Blog post
+   ((string-match jnf/tor-hugo-regexp-for-post-path url)
+    (let* ((slug (match-string-no-properties 1 url))
+              (filename (car
+                         (jnf/list-filenames-with-file-text
+                          :matching (concat "^slug: " slug "$")
+                          :in "content"))))
+      (find-file (f-join jnf/tor-home-directory "content" filename))))
+   ;; Pages
+   ((string-match jnf/tor-hugo-regexp-for-pages-path url)
+    (let* ((permalink (match-string-no-properties 1 url))
+           (filename (car
+                         (jnf/list-filenames-with-file-text
+                          :matching (concat "^permalink: ['\\\"]?/?" permalink "/?['\\\"]?$")
+                          :in "content"))))
+      (find-file (f-join jnf/tor-home-directory "content" filename))))
+   ;; No match found
+   (t (message "Unable to find post for \"%s\"" url))))
 
 (cl-defun jnf/tor-view-blog-post (&key
                                   (hostname jnf/tor-default-local-hostname))
