@@ -41,7 +41,7 @@
    "Entries"
     (("e" jnf/tor-insert-epigraph-entry "Create epigraph entry…")
      ("?" jnf/tor-find-file-draft "Find blog in draft status…")
-     (";" jnf/find-hugo-file-by-url "Find blog by url…")
+     (";" jnf/tor-find-hugo-file-by-url "Find blog by url…")
      ("g" jnf/tor-find-glossary-and-insert-entry "Create glossary entry…")
      ("k" jnf/tor-insert-glossary-key "Insert glossary key at point…")
      ("n" jnf/tor-create-post "Create new post…"))
@@ -62,7 +62,7 @@
    (("*" jnf/tor-post-amplifying-the-blogosphere "Amplify the Blogosphere…")
     ("e" jnf/tor-insert-epigraph-entry "Create epigraph entry…")
     ("?" jnf/tor-find-file-draft "Find Blog in Draft Status…")
-    (";" jnf/find-hugo-file-by-url "Find blog by url…")
+    (";" jnf/tor-find-hugo-file-by-url "Find blog by url…")
     ("g" jnf/tor-find-glossary-and-insert-entry "Create glossary entry…")
     ("k" jnf/tor-insert-glossary-key "Insert key at point…")
     ("n" jnf/tor-create-post "Create new post…"))))
@@ -72,7 +72,7 @@
    (("*" jnf/tor-post-amplifying-the-blogosphere "Amplify the Blogosphere…")
     ("e" jnf/tor-insert-epigraph-entry "Create epigraph entry…")
     ("?" jnf/tor-find-file-draft "Find Blog in Draft Status…")
-    (";" jnf/find-hugo-file-by-url "Find blog by url…")
+    (";" jnf/tor-find-hugo-file-by-url "Find blog by url…")
     ("g" jnf/tor-find-glossary-and-insert-entry "Create glossary entry…")
     ("n" jnf/tor-create-post "Create new post…"))))
 
@@ -112,7 +112,7 @@ The LENGTH is how many words to use for the key."
 (cl-defun jnf/tor-prompt-or-kill-ring-for-url (&key (url-regexp "^https?://"))
   "Prompt and return a url.
 
-If the `car' `kill-ring' matches the URL-REGEXP, default the
+If the `car' of `kill-ring' matches the URL-REGEXP, default the
 prompt value to the `car' of `kill-ring'."
   (let ((car-of-kill-ring (substring-no-properties (car kill-ring))))
     (read-string "URL (optional): "
@@ -243,12 +243,17 @@ and rename the buffer."
       ;; Report filename change
       (message "Renamed %s -> %s" filename new-filename)))
 
-(cl-defun jnf/find-hugo-file-by-url (url)
+(cl-defun jnf/tor-find-hugo-file-by-url (url)
   "Find the associated TakeOnRules.com file for the given URL."
-  (interactive (list (jnf/tor-prompt-or-kill-ring-for-url :url-regexp jnf/tor-hostname-regexp)))
+  (interactive (list
+                (jnf/tor-prompt-or-kill-ring-for-url
+                 :url-regexp jnf/tor-hostname-regexp)))
   ;; With the given URL extract the slug
   (let* ((slug (car (last (split-string-and-unquote url "/"))))
-         (filename (car (jnf/list-filenames-with-file-text :matching (concat "^slug: .*" slug "$") :in "content"))))
+         (filename (car
+                    (jnf/list-filenames-with-file-text
+                     :matching (concat "^slug: .*" slug "$")
+                     :in "content"))))
     (find-file (f-join jnf/tor-home-directory "content" filename))))
 
 (cl-defun jnf/tor-view-blog-post (&key
@@ -431,7 +436,10 @@ We'll pass the :CITETITLE, :CITEAUTHOR, and :CITEURL to
   (let ((default-directory (f-join jnf/tor-home-directory in)))
     (split-string-and-unquote
      (shell-command-to-string
-      (concat "rg \"" matching "\" --only-matching --files-with-matches | sort | tr '\n' '~'"))
+      (concat
+       "rg \""
+       matching "\" --only-matching --files-with-matches "
+       "| sort | tr '\n' '~'"))
      "~")))
 
 (defun jnf/tor-page-relative-pathname-list ()
@@ -496,12 +504,12 @@ as the behavior's well defined."
     ))
 
 (defun jnf/tor-wrap-in-html-tag (tag &optional attributes)
-  "Wrap the point or region with the given TAG with optional ATTRIBUTES."
+  "Wrap the word or region with the given TAG with optional ATTRIBUTES."
   (interactive "sHTML Tag: \nsAttributes (optional): ")
   (jnf/tor-wrap-with-text
    :before (concat "<" tag (if (s-blank? attributes) "" (concat " " attributes)) ">")
    :after (concat "</" tag ">")
-   :strategy :pointOrRegion))
+   :strategy :wordOrRegion))
 
 (defun jnf/tor-wrap-date (date)
   "Wrap the point or region with the given DATE."
@@ -535,7 +543,7 @@ as the behavior's well defined."
 
 For the URL:
 
-- If `car' in `kill-ring' starts with \"http\", then use that as the URL.
+- If `car' of `kill-ring' starts with \"http\", then use that as the URL.
 - Otherwise prompt for a URL.
 
 If the URL is an empty string, then send a message.  Else, if we
@@ -562,7 +570,7 @@ tag."
 
 For the URL:
 
-- If `car' in `kill-ring' starts with \"http\", then use that as the URL.
+- If `car' of `kill-ring' starts with \"http\", then use that as the URL.
 - Otherwise prompt for a URL.
 
 If the URL an empty string, then wrap the current region or point

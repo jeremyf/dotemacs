@@ -22,7 +22,7 @@
 
 (defconst jnf/tor-home-directory
   (file-truename "~/git/takeonrules.github.io")
-  "The home directory of TakeOnRules.com.")
+  "The home directory of TakeOnRules.com Hugo repository.")
 
 (defconst jnf/tor-default-local-hostname
   (file-truename "http://localhost:1313")
