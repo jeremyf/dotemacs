@@ -11,14 +11,9 @@
 ;; https://github.com/jrblevin/markdown-mode/
 (use-package markdown-mode
   :straight t
-  :hook ((markdown-mode . turn-on-visual-line-mode))
   ;; I use markdown for my blogging platform and very little else.
   ;; Hence, I have this keybind.
-  :bind (:map markdown-mode-map ("C-c t" . jnf/tor-subject-menu-markdown/body))
-  :mode (("README\\.md\\'" . gfm-mode)
-         ("\\.md\\'" . markdown-mode)
-         ("\\.markdown\\'" . markdown-mode))
-  :init (setq markdown-command "/usr/local/bin/pandoc"))
+  :bind (:map markdown-mode-map ("C-c t" . jnf/tor-subject-menu-markdown/body)))
 
 ;;******************************************************************************
 ;;
@@ -39,18 +34,18 @@
     ("s" jnf/tor-wrap-as-sidenote-dwim "Side-note sentence or region…")
     ("w" jnf/tor-wrap-in-html-tag "Wrap point or region…"))
    "Entries"
-    (("e" jnf/tor-insert-epigraph-entry "Create epigraph entry…")
-     ("?" jnf/tor-find-file-draft "Find blog in draft status…")
-     (";" jnf/tor-find-hugo-file-by-url "Find blog by url…")
-     ("g" jnf/tor-find-glossary-and-insert-entry "Create glossary entry…")
-     ("k" jnf/tor-insert-glossary-key "Insert glossary key at point…")
-     ("n" jnf/tor-create-post "Create new post…"))
-    "Post"
-    (("*" jnf/tor-post-amplifying-the-blogosphere "Amplify the Blogosphere…")
-     ("r" jnf/tor-retitle-post "Re-title post…")
-     ;; I usually want to tag a post more than once, hence the "non-exit"
-     ("#" jnf/tor-tag-post "Tag post…" :exit nil)
-     ("v" jnf/tor-view-blog-post "View post…"))))
+   (("*" jnf/tor-post-amplifying-the-blogosphere "Amplify the Blogosphere…")
+    ("e" jnf/tor-insert-epigraph-entry "Create epigraph entry…")
+    ("?" jnf/tor-find-file-draft "Find blog in draft status…")
+    (";" jnf/tor-find-hugo-file-by-url "Find blog by url…")
+    ("g" jnf/tor-find-glossary-and-insert-entry "Create glossary entry…")
+    ("k" jnf/tor-insert-glossary-key "Insert glossary key at point…")
+    ("n" jnf/tor-create-post "Create new post…"))
+   "Manipulate Post"
+   (("r" jnf/tor-retitle-post "Re-title post…")
+    ;; I usually want to tag a post more than once, hence the "non-exit"
+    ("#" jnf/tor-tag-post "Tag post…" :exit nil)
+    ("v" jnf/tor-view-blog-post "View post…"))))
 
 ;; The `C-c t' key combo is engrained for my TakeOnRules incantations;
 ;; there's a markdown menu but if I'm not in markdown, it likely means
@@ -175,24 +170,24 @@ If there's an active region, select that text and place it."
               (concat "\n## " subheading "\n")
             (when citeTitle (concat "\n## " citeTitle "\n")))
           (when citeURL (concat
-                       "\n{{< blockquote"
-                       (when citeAuthor
+                         "\n{{< blockquote"
+                         (when citeAuthor
                            (concat " pre=\"" citeAuthor "\""))
-                       " cite=\""
-                       citeTitle "\" cite_url=\""
-                       citeURL "\" >}}\n"))
+                         " cite=\""
+                         citeTitle "\" cite_url=\""
+                         citeURL "\" >}}\n"))
           (buffer-substring (region-beginning) (region-end))
           (when citeURL "\n{{< /blockquote >}}"))
          nil fpath t)
       ;; Without an active region, if we have a citeURL insert a link
       ;; to it.
       (when citeURL
-          (write-region
-           (concat
-            "\n<cite><a href=\"" citeURL
-            "\" class=\"u-url p-name\" rel=\"cite\">"
-            (or (citeTitle) (citeURL)) "</a></cite>\n")
-           nil fpath t)))
+        (write-region
+         (concat
+          "\n<cite><a href=\"" citeURL
+          "\" class=\"u-url p-name\" rel=\"cite\">"
+          (or (citeTitle) (citeURL)) "</a></cite>\n")
+         nil fpath t)))
     ;; Finally open that file for editing.
     (find-file fpath)))
 ;;******************************************************************************
@@ -211,37 +206,37 @@ If there's an active region, select that text and place it."
 
 This function will: replace the content's title, update the slug,
 and rename the buffer."
-    (interactive "sNew Post's Title: ")
-    (let* ((metadataTitle (concat "title: '" (jnf/tor-convert-text-to-post-title title) "'"))
-           (slug (jnf/tor-convert-text-to-slug title))
-           (metadataSlug (concat "slug: " slug))
-           (filename (buffer-file-name))
-           (new-filename (concat (file-name-directory filename)
-                                 slug ".md")))
+  (interactive "sNew Post's Title: ")
+  (let* ((metadataTitle (concat "title: '" (jnf/tor-convert-text-to-post-title title) "'"))
+         (slug (jnf/tor-convert-text-to-slug title))
+         (metadataSlug (concat "slug: " slug))
+         (filename (buffer-file-name))
+         (new-filename (concat (file-name-directory filename)
+                               slug ".md")))
 
-      ;; Replace the title metadata entry
-      (goto-char (point-min))
-      (while (search-forward-regexp "^title:.*$" nil t)
-        (replace-match metadataTitle))
+    ;; Replace the title metadata entry
+    (goto-char (point-min))
+    (while (search-forward-regexp "^title:.*$" nil t)
+      (replace-match metadataTitle))
 
-      ;; Replace the slug metadata entry
-      (goto-char (point-min))
-      (while (search-forward-regexp "^slug:.*$" nil t)
-        (replace-match metadataSlug))
+    ;; Replace the slug metadata entry
+    (goto-char (point-min))
+    (while (search-forward-regexp "^slug:.*$" nil t)
+      (replace-match metadataSlug))
 
-      ;; Need to save before we rename the buffer
-      (save-buffer)
+    ;; Need to save before we rename the buffer
+    (save-buffer)
 
-      ;; Rename the buffer, accounting for version control
-      (cond
-       ((vc-backend filename)
-        (vc-rename-file filename new-filename))
-         (t
-          (rename-file filename new-filename t)
-          (set-visited-file-name new-filename t t)))
+    ;; Rename the buffer, accounting for version control
+    (cond
+     ((vc-backend filename)
+      (vc-rename-file filename new-filename))
+     (t
+      (rename-file filename new-filename t)
+      (set-visited-file-name new-filename t t)))
 
-      ;; Report filename change
-      (message "Renamed %s -> %s" filename new-filename)))
+    ;; Report filename change
+    (message "Renamed %s -> %s" filename new-filename)))
 
 (cl-defun jnf/tor-find-hugo-file-by-url (url)
   "Find the associated TakeOnRules.com file for the given URL."
@@ -409,7 +404,7 @@ We'll pass the :CITETITLE, :CITEAUTHOR, and :CITEURL to
 
 (defun jnf/tor-licenses-list ()
   "Return a list of available licenses for TakeOnRules.com."
-    (jnf/tor-list-by-key-from-filename :key "Key" :filename "data/licenses.yml"))
+  (jnf/tor-list-by-key-from-filename :key "Key" :filename "data/licenses.yml"))
 ;;******************************************************************************
 ;;
 ;;; END Listing functions for TakeOnRules.com data
@@ -561,9 +556,9 @@ tag."
   "Wrap current region (or word) in an I-tag with a DFN dom class."
   (interactive)
   (jnf/tor-wrap-with-text
-     :before "<i class=\"dfn\">"
-     :after "</i>"
-     :strategy :wordOrRegion))
+   :before "<i class=\"dfn\">"
+   :after "</i>"
+   :strategy :wordOrRegion))
 
 (defun jnf/tor-wrap-cite-active-region-dwim (url)
   "Wrap current region (or point) in a CITE-tag and optional A-tag with URL.
@@ -589,7 +584,7 @@ CITE and A tag."
        :strategy :pointOrRegion)
     (jnf/tor-wrap-with-text
      :before (concat "<cite><a href=\"" url
-                 "\" class=\"u-url p-name\" rel=\"cite\">")
+                     "\" class=\"u-url p-name\" rel=\"cite\">")
      :after "</a></cite>"
      :strategy :pointOrRegion)))
 ;;******************************************************************************
