@@ -51,5 +51,15 @@
 ;; Open svg files in xml-mode (instead of image rendering mode)
 (add-to-list `auto-mode-alist '("\\.svg\\'" . xml-mode))
 
+(use-package markdown-mode
+  :straight t
+  :hook ((markdown-mode . turn-on-visual-line-mode))
+  ;; I use markdown for my blogging platform and very little else.
+  ;; Hence, I have this keybind.
+  :mode (("README\\.md\\'" . gfm-mode)
+         ("\\.md\\'" . markdown-mode)
+         ("\\.markdown\\'" . markdown-mode))
+  :init (setq markdown-command "/usr/local/bin/pandoc"))
+
 (provide 'jnf-modes.el)
 ;;; jnf-modes.el ends here
