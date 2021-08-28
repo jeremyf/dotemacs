@@ -41,6 +41,7 @@
    "Entries"
     (("e" jnf/tor-insert-epigraph-entry "Create epigraph entry…")
      ("?" jnf/tor-find-file-draft "Find blog in draft status…")
+     (";" jnf/find-hugo-file-by-url "Find blog by url…")
      ("g" jnf/tor-find-glossary-and-insert-entry "Create glossary entry…")
      ("k" jnf/tor-insert-glossary-key "Insert glossary key at point…")
      ("n" jnf/tor-create-post "Create new post…"))
@@ -61,6 +62,7 @@
    (("*" jnf/tor-post-amplifying-the-blogosphere "Amplify the Blogosphere…")
     ("e" jnf/tor-insert-epigraph-entry "Create epigraph entry…")
     ("?" jnf/tor-find-file-draft "Find Blog in Draft Status…")
+    (";" jnf/find-hugo-file-by-url "Find blog by url…")
     ("g" jnf/tor-find-glossary-and-insert-entry "Create glossary entry…")
     ("k" jnf/tor-insert-glossary-key "Insert key at point…")
     ("n" jnf/tor-create-post "Create new post…"))))
@@ -70,6 +72,7 @@
    (("*" jnf/tor-post-amplifying-the-blogosphere "Amplify the Blogosphere…")
     ("e" jnf/tor-insert-epigraph-entry "Create epigraph entry…")
     ("?" jnf/tor-find-file-draft "Find Blog in Draft Status…")
+    (";" jnf/find-hugo-file-by-url "Find blog by url…")
     ("g" jnf/tor-find-glossary-and-insert-entry "Create glossary entry…")
     ("n" jnf/tor-create-post "Create new post…"))))
 
@@ -240,6 +243,14 @@ and rename the buffer."
       ;; Report filename change
       (message "Renamed %s -> %s" filename new-filename)))
 
+(cl-defun jnf/find-hugo-file-by-url (url)
+  "Find the associated TakeOnRules.com file for the given URL."
+  (interactive (list (jnf/tor-prompt-or-kill-ring-for-url :url-regexp jnf/tor-hostname-regexp)))
+  ;; With the given URL extract the slug
+  (let* ((slug (car (last (split-string-and-unquote url "/"))))
+         (filename (car (jnf/list-filenames-with-file-text :matching (concat "^slug: .*" slug "$") :in "content"))))
+    (find-file (f-join jnf/tor-home-directory "content" filename))))
+
 (cl-defun jnf/tor-view-blog-post (&key
                                   (hostname jnf/tor-default-local-hostname))
   "Open `eww' in a new window to preview the current buffer at the HOSTNAME.
@@ -350,7 +361,9 @@ We'll pass the :CITETITLE, :CITEAUTHOR, and :CITEURL to
 
 (cl-defun jnf/tor-find-file-draft (filename &key (directory (f-join jnf/tor-home-directory "content")))
   "Find draft FILENAME in given DIRECTORY."
-  (interactive (list (completing-read "Filename: " (jnf/tor-list-draft-filnames))))
+  (interactive (list (completing-read
+                      "Filename: "
+                      (jnf/list-filenames-with-file-text :matching "^draft: true" :in "content"))))
   (let ((file-path (f-join directory filename)))
     (message "Opening draft %s" file-path)
     (find-file file-path)))
@@ -413,7 +426,7 @@ We'll pass the :CITETITLE, :CITEAUTHOR, and :CITEURL to
      " --only-matching --no-filename | cut -d \" \" -f 2- | sort | tr '\n' '~'"))
    "~"))
 
-(cl-defun jnf/list-filenames-with-content (&key matching in)
+(cl-defun jnf/list-filenames-with-file-text (&key matching in)
   "Build a list of filenames MATCHING the pattern IN the given directory."
   (let ((default-directory (f-join jnf/tor-home-directory in)))
     (split-string-and-unquote
@@ -421,13 +434,9 @@ We'll pass the :CITETITLE, :CITEAUTHOR, and :CITEURL to
       (concat "rg \"" matching "\" --only-matching --files-with-matches | sort | tr '\n' '~'"))
      "~")))
 
-(defun jnf/tor-list-draft-filnames ()
-  "Return a list of filenames that are in DRAFT status."
-  (jnf/list-filenames-with-content :matching "^draft: true" :in "content"))
-
 (defun jnf/tor-page-relative-pathname-list ()
   "Return a list of pages for TakeOnRules.com."
-  (jnf/list-filenames-with-content :matching "^title: " :in "content"))
+  (jnf/list-filenames-with-file-text :matching "^title: " :in "content"))
 
 (defun jnf/tor-asset-relative-pathname-list ()
   "Return a list of image filenames for TakeOnRules.com."
