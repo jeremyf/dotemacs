@@ -231,6 +231,7 @@ echo the method signature of `'delete-duplicate-lines`"
 (require 'jnf-company.el)
 ;; (require 'jnf-corfu.el)
 (require 'jnf-in-buffer.el)
+(require 'jnf-macros.el)
 (require 'jnf-org.el)
 (require 'jnf-org-roam-v2.el)
 (require 'jnf-basic-config.el)

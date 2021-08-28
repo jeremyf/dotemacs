@@ -34,7 +34,6 @@
   :bind (("M-x" . counsel-M-x)
          ("C-x C-f" . counsel-find-file)
          ("C-x 8 RET" . counsel-unicode-char)
-         ("<f4>" . counsel-bookmark)
          ("s-4" . counsel-bookmark)
          ("s-r" . counsel-recentf))
   :config (counsel-mode 1)
@@ -131,7 +130,6 @@
   :straight t
   :bind (("C-s" . swiper)))
 
-(global-set-key (kbd "<f3>") 'counsel-imenu)
 (global-set-key (kbd "s-3") 'counsel-imenu)
 
 (use-package lsp-ivy

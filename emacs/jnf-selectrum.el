@@ -98,7 +98,6 @@
          ;; Customizations that map to ivy
          ("s-r" . consult-recent-file)
          ("C-c o" . consult-file-externally)
-         ("<f4>" . consult-bookmark)
          ("s-4" . consult-bookmark)
          ("C-y" . yank)
          ("C-s" . consult-line) ;; I've long favored Swiper mapped to c-s
@@ -106,7 +105,6 @@
          ;; Isearch integration
          ("M-s e" . consult-isearch)
          ;; ("s-t" . jnf/consult-find-using-fd)
-         ("<f3>" . consult-imenu)
          ("s-3" . consult-imenu)
          :map isearch-mode-map
          ("M-e" . consult-isearch)                 ;; orig. isearch-edit-string
