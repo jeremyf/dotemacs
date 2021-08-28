@@ -36,11 +36,12 @@
    "Entries"
    (("*" jnf/tor-post-amplifying-the-blogosphere "Amplify the Blogosphere…")
     ("e" jnf/tor-insert-epigraph-entry "Create epigraph entry…")
+    ("g" jnf/tor-find-glossary-and-insert-entry "Create glossary entry…")
+    ("l" jnf/tor-find-changelog-and-insert-entry "Create change log entry…")
+    ("n" jnf/tor-create-post "Create new post…")
     ("?" jnf/tor-find-file-draft "Find blog in draft status…")
     (";" jnf/tor-find-hugo-file-by-url "Find blog by url…")
-    ("g" jnf/tor-find-glossary-and-insert-entry "Create glossary entry…")
-    ("k" jnf/tor-insert-glossary-key "Insert glossary key at point…")
-    ("n" jnf/tor-create-post "Create new post…"))
+    ("k" jnf/tor-insert-glossary-key "Insert glossary key at point…"))
    "Manipulate Post"
    (("r" jnf/tor-retitle-post "Re-title post…")
     ;; I usually want to tag a post more than once, hence the "non-exit"
@@ -56,20 +57,22 @@
   ("Posts"
    (("*" jnf/tor-post-amplifying-the-blogosphere "Amplify the Blogosphere…")
     ("e" jnf/tor-insert-epigraph-entry "Create epigraph entry…")
+    ("g" jnf/tor-find-glossary-and-insert-entry "Create glossary entry…")
+    ("l" jnf/tor-find-changelog-and-insert-entry "Create change log entry…")
+    ("n" jnf/tor-create-post "Create new post…")
     ("?" jnf/tor-find-file-draft "Find Blog in Draft Status…")
     (";" jnf/tor-find-hugo-file-by-url "Find blog by url…")
-    ("g" jnf/tor-find-glossary-and-insert-entry "Create glossary entry…")
-    ("k" jnf/tor-insert-glossary-key "Insert key at point…")
-    ("n" jnf/tor-create-post "Create new post…"))))
+    ("k" jnf/tor-insert-glossary-key "Insert key at point…"))))
 
 (pretty-hydra-define jnf/tor-subject-menu-default (:foreign-keys warn :title jnf/tor-menu--title :quit-key "q" :exit t)
   ("Posts"
    (("*" jnf/tor-post-amplifying-the-blogosphere "Amplify the Blogosphere…")
     ("e" jnf/tor-insert-epigraph-entry "Create epigraph entry…")
-    ("?" jnf/tor-find-file-draft "Find Blog in Draft Status…")
-    (";" jnf/tor-find-hugo-file-by-url "Find blog by url…")
     ("g" jnf/tor-find-glossary-and-insert-entry "Create glossary entry…")
-    ("n" jnf/tor-create-post "Create new post…"))))
+    ("n" jnf/tor-create-post "Create new post…")
+    ("l" jnf/tor-find-changelog-and-insert-entry "Create change log entry…")
+    ("?" jnf/tor-find-file-draft "Find Blog in Draft Status…")
+    (";" jnf/tor-find-hugo-file-by-url "Find blog by url…"))))
 
 ;;******************************************************************************
 ;;
@@ -321,6 +324,14 @@ No effort is made to check if this is a post."
   "Insert the KEY at point."
   (interactive (list (completing-read "Key: " (jnf/tor-glossary-key-list))))
   (insert key))
+
+(defun jnf/tor-find-changelog-and-insert-entry ()
+  "Find TakeOnRules glossary and begin entering a changelog entry."
+  (interactive)
+  (find-file (f-join jnf/tor-home-directory "data" "changelog.yml"))
+  (beginning-of-buffer)
+  (end-of-line)
+  (insert (concat "\n- date: " (format-time-string "%Y-%m-%d") "\n  entries:\n    - ")))
 
 (defun jnf/tor-find-glossary-and-insert-entry (title)
   "Find TakeOnRules glossary and add an entry with TITLE."
