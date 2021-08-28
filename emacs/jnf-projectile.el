@@ -31,6 +31,7 @@
   (:map projectile-mode-map (("C-c p" . projectile-command-map)))
   :bind
   ("s-t" . projectile-find-file)
+  ("C-c p" . projectile-command-map)
   ("C-s-p". jnf/projectile--menu/body)
   ("s-." . projectile-toggle-between-implementation-and-test))
 
