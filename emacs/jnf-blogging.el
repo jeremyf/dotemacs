@@ -238,18 +238,23 @@ and rename the buffer."
     ;; Report filename change
     (message "Renamed %s -> %s" filename new-filename)))
 
-(cl-defun jnf/tor-find-hugo-file-by-url (url)
+(defun jnf/tor-find-hugo-file-by-url (url)
   "Find the associated TakeOnRules.com file for the given URL."
   (interactive (list
                 (jnf/tor-prompt-or-kill-ring-for-url
                  :url-regexp jnf/tor-hostname-regexp)))
-  ;; With the given URL extract the slug
-  (let* ((slug (car (last (split-string-and-unquote url "/"))))
-         (filename (car
-                    (jnf/list-filenames-with-file-text
-                     :matching (concat "^slug: .*" slug "$")
-                     :in "content"))))
-    (find-file (f-join jnf/tor-home-directory "content" filename))))
+  (pcase url
+    ;; Blog Post
+    ((rx "/" (= 4 (in "0-9")) "/" (= 2 (in "0-9")) "/" (= 2 (in "0-9")) "/" (group-n 1 (one-or-more (not "/"))) (? "/") eol)
+     (let* ((slug (car (last (split-string-and-unquote url "/"))))
+            (filename (car
+                       (jnf/list-filenames-with-file-text
+                        :matching (concat "^slug: .*" slug "$")
+                        :in "content"))))
+       (find-file (f-join jnf/tor-home-directory "content" filename)))
+     )
+    ;; No match found
+    (_ (message "Unable to find post for \"%s\"" url))))
 
 (cl-defun jnf/tor-view-blog-post (&key
                                   (hostname jnf/tor-default-local-hostname))
