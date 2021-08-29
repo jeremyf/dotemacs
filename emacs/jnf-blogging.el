@@ -15,6 +15,9 @@
   ;; Hence, I have this keybind.
   :bind (:map markdown-mode-map ("C-c t" . jnf/tor-subject-menu-markdown/body)))
 
+(use-package decide
+  :straight (decide :host github :type git :repo "jeremyf/decide-mode"))
+
 ;;******************************************************************************
 ;;
 ;;; BEGIN Menu Declarations
@@ -46,7 +49,8 @@
    (("r" jnf/tor-retitle-post "Re-title post…")
     ;; I usually want to tag a post more than once, hence the "non-exit"
     ("#" jnf/tor-tag-post "Tag post…" :exit nil)
-    ("v" jnf/tor-view-blog-post "View post…"))))
+    ("v" jnf/tor-view-blog-post "View post…")
+    ("/" decide-mode "Decide Mode" :toggle t))))
 
 ;; The `C-c t' key combo is engrained for my TakeOnRules incantations;
 ;; there's a markdown menu but if I'm not in markdown, it likely means
@@ -62,7 +66,8 @@
     ("n" jnf/tor-create-post "Create new post…")
     ("?" jnf/tor-find-file-draft "Find blog in draft Status…")
     (";" jnf/tor-find-hugo-file-by-url "Find blog by url…")
-    ("k" jnf/tor-insert-glossary-key "Insert key at point…"))))
+    ("k" jnf/tor-insert-glossary-key "Insert key at point…")
+    ("/" decide-mode "Decide Mode" :toggle t))))
 
 (pretty-hydra-define jnf/tor-subject-menu-default (:foreign-keys warn :title jnf/tor-menu--title :quit-key "q" :exit t)
   ("Posts"
@@ -72,7 +77,8 @@
     ("n" jnf/tor-create-post "Create new post…")
     ("l" jnf/tor-find-changelog-and-insert-entry "Create change log entry…")
     ("?" jnf/tor-find-file-draft "Find blog in draft Status…")
-    (";" jnf/tor-find-hugo-file-by-url "Find blog by url…"))))
+    (";" jnf/tor-find-hugo-file-by-url "Find blog by url…")
+    ("/" decide-mode "Decide Mode" :toggle t))))
 
 ;;******************************************************************************
 ;;
