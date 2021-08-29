@@ -216,7 +216,8 @@ The BUFFER-NAME is where we'll run the Hugo process."
 This function will: replace the content's title, update the slug,
 and rename the buffer."
   (interactive "sNew Post's Title: ")
-  (let* ((metadataTitle (concat "title: '" (jnf/tor-convert-text-to-post-title title) "'"))
+  (let* ((metadataTitle (concat "title: '"
+                                (jnf/tor-convert-text-to-post-title title) "'"))
          (slug (jnf/tor-convert-text-to-slug title))
          (metadataSlug (concat "slug: " slug))
          (filename (buffer-file-name))
@@ -252,7 +253,8 @@ and rename the buffer."
   "A regular expression for checking if it's TakeOnRules.com.")
 
 (defvar jnf/tor-hugo-regexp-for-post-path
-  (concat jnf/tor-hostname-regexp "/[0-9]\\{4\\}/[0-9]\\{2\\}/[0-9]\\{2\\}/\\([^/]+\\)/?$")
+  (concat jnf/tor-hostname-regexp
+          "/[0-9]\\{4\\}/[0-9]\\{2\\}/[0-9]\\{2\\}/\\([^/]+\\)/?$")
   "A regular expression for matching blog posts.")
 
 (defvar jnf/tor-hugo-regexp-for-pages-path
@@ -278,7 +280,8 @@ and rename the buffer."
     (let* ((permalink (match-string-no-properties 1 url))
            (filename (car
                          (jnf/list-filenames-with-file-text
-                          :matching (concat "^permalink: ['\\\"]?/?" permalink "/?['\\\"]?$")
+                          :matching (concat "^permalink: ['\\\"]?/?"
+                                            permalink "/?['\\\"]?$")
                           :in "content"))))
       (find-file (f-join jnf/tor-home-directory "content" filename))))
    ;; No match found
@@ -300,7 +303,9 @@ URLs for one of those posts is: hostname/year/month/day/slug"
       (re-search-forward "^slug: \\(.*\\)$" nil t)
       (push (match-string 1) slugs)
       (goto-char 1)
-      (re-search-forward "^date: \\([[:digit:]]+\\)-\\([[:digit:]]+\\)-\\([[:digit:]]+\\) " nil t)
+      (re-search-forward
+       "^date: \\([[:digit:]]+\\)-\\([[:digit:]]+\\)-\\([[:digit:]]+\\) "
+       nil t)
       ;; Then move to day, month, then year.
       (push (match-string 3) slugs)
       (push (match-string 2) slugs)
@@ -343,7 +348,9 @@ No effort is made to check if this is a post."
   ;; line is the YAML preamble indicating a data object (e.g. "---")
   (beginning-of-buffer)
   (end-of-line)
-  (insert (concat "\n- date: " (format-time-string "%Y-%m-%d") "\n  entries:\n    - ")))
+  (insert (concat "\n- date: "
+                  (format-time-string "%Y-%m-%d")
+                  "\n  entries:\n    - ")))
 
 (defun jnf/tor-find-glossary-and-insert-entry (title)
   "Find TakeOnRules glossary and add an entry with TITLE."
@@ -395,11 +402,15 @@ We'll pass the :CITETITLE, :CITEAUTHOR, and :CITEURL to
    :citeURL citeURL
    :citeAuthor citeAuthor))
 
-(cl-defun jnf/tor-find-file-draft (filename &key (directory (f-join jnf/tor-home-directory "content")))
+(cl-defun jnf/tor-find-file-draft (filename
+                                   &key
+                                   (directory (f-join jnf/tor-home-directory "content")))
   "Find draft FILENAME in given DIRECTORY."
   (interactive (list (completing-read
                       "Filename: "
-                      (jnf/list-filenames-with-file-text :matching "^draft: true" :in "content"))))
+                      (jnf/list-filenames-with-file-text
+                       :matching "^draft: true"
+                       :in "content"))))
   (let ((file-path (f-join directory filename)))
     (message "Opening draft %s" file-path)
     (find-file file-path)))
@@ -452,7 +463,10 @@ We'll pass the :CITETITLE, :CITEAUTHOR, and :CITEURL to
 ;;; BEGIN file system querying
 ;;
 ;;******************************************************************************
-(cl-defun jnf/tor-list-by-key-from-filename (&key key filename (directory jnf/tor-home-directory))
+(cl-defun jnf/tor-list-by-key-from-filename (&key
+                                             key
+                                             filename
+                                             (directory jnf/tor-home-directory))
   "Build a list of entries of the KEY from the FILENAME in DIRECTORY."
   (split-string-and-unquote
    (shell-command-to-string
@@ -508,14 +522,19 @@ TODO: I would love create a lookup table for the case statement,
 as the behavior's well defined."
   (pcase strategy
     (:lineOrRegion (pcase-let* ((origin (point))
-                                (`(,begin . ,end) (crux-get-positions-of-line-or-region)))
+                                (`(,begin . ,end)
+                                 (crux-get-positions-of-line-or-region)))
                      (do-it (end after begin before))
                      (goto-char end)
                      (insert after)
                      (goto-char begin)
                      (insert before)))
-    (:sentenceOrRegion (let* ((begin (if (use-region-p) (region-beginning) (car (bounds-of-thing-at-point 'sentence))))
-                              (end (if (use-region-p) (region-end) (cdr (bounds-of-thing-at-point 'sentence)))))
+    (:sentenceOrRegion (let* ((begin (if (use-region-p)
+                                         (region-beginning)
+                                       (car (bounds-of-thing-at-point 'sentence))))
+                              (end (if (use-region-p)
+                                       (region-end)
+                                     (cdr (bounds-of-thing-at-point 'sentence)))))
                          (goto-char end)
                          (insert after)
                          (goto-char begin)
@@ -526,8 +545,12 @@ as the behavior's well defined."
                       (insert after)
                       (goto-char begin)
                       (insert before)))
-    (:wordOrRegion (let* ((begin (if (use-region-p) (region-beginning) (car (bounds-of-thing-at-point 'word))))
-                          (end (if (use-region-p) (region-end) (cdr (bounds-of-thing-at-point 'word)))))
+    (:wordOrRegion (let* ((begin (if (use-region-p)
+                                     (region-beginning)
+                                   (car (bounds-of-thing-at-point 'word))))
+                          (end (if (use-region-p)
+                                   (region-end)
+                                 (cdr (bounds-of-thing-at-point 'word)))))
                      (goto-char end)
                      (insert after)
                      (goto-char begin)
@@ -538,7 +561,9 @@ as the behavior's well defined."
   "Wrap the word or region with the given TAG with optional ATTRIBUTES."
   (interactive "sHTML Tag: \nsAttributes (optional): ")
   (jnf/tor-wrap-with-text
-   :before (concat "<" tag (if (s-blank? attributes) "" (concat " " attributes)) ">")
+   :before (concat "<" tag (if (s-blank? attributes)
+                               ""
+                             (concat " " attributes)) ">")
    :after (concat "</" tag ">")
    :strategy :wordOrRegion))
 
