@@ -32,7 +32,7 @@
              (sequence "TO-READ" "READING" "|" "READ")))
   (setq org-capture-templates
         '(
-          ("e" "Emacs Config Todo" entry (file "~/git/jnf-emacs-config/todo.org")
+          ("e" "Emacs Config Todo" entry (file "~/git/dotemacs/todo.org")
            "* TODO %?" :empty-lines-before 1)
           ("h" "Hesburgh Libraries Todo" entry (file "~/git/org/hesburgh-libraries/todo.org")
            "* TODO %?" :empty-lines-before 1)

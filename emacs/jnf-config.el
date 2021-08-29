@@ -40,7 +40,7 @@
     ;; The tooling directory
     "~/git/dotzshrc/"
     ;; The personal configuration options
-    "~/git/jnf-emacs-config/"
+    "~/git/dotemacs/"
     ;; An org directory
     "~/git/org/"
     ;; An org directory

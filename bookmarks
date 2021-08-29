@@ -3,17 +3,17 @@
 ;;; nevertheless, you probably don't want to edit it.
 ;;; -*- End Of Bookmark File Format Version Stamp -*-
 (("jnf-elfeed.el"
- (filename . "~/git/jnf-emacs-config/emacs/jnf-elfeed.el")
+ (filename . "~/git/dotemacs/emacs/jnf-elfeed.el")
  (front-context-string . ";;; -*- lexical-")
  (rear-context-string)
  (position . 1))
 ("jnf-org-roam-v2.el"
- (filename . "~/git/jnf-emacs-config/emacs/jnf-org-roam-v2.el")
+ (filename . "~/git/dotemacs/emacs/jnf-org-roam-v2.el")
  (front-context-string . "(pretty-hydra-de")
  (rear-context-string . "Menu\" 1 -0.05))\n")
  (position . 4039))
 ("jnf-blogging.el"
- (filename . "~/git/jnf-emacs-config/emacs/jnf-blogging.el")
+ (filename . "~/git/dotemacs/emacs/jnf-blogging.el")
  (front-context-string . ";;; -*- lexical-")
  (rear-context-string)
  (position . 1))
@@ -52,13 +52,13 @@
  (rear-context-string . "3K Oct 28 12:43 ")
  (position . 140))
 ("Emacs init.el"
- (filename . "~/git/jnf-emacs-config/emacs.d/init.el")
+ (filename . "~/git/dotemacs/emacs.d/init.el")
  (front-context-string . ";;; package --- ")
  (rear-context-string)
  (position . 1)
  (annotation . ""))
 ("Emacs jnf packages"
- (filename . "~/git/jnf-emacs-config/emacs/")
+ (filename . "~/git/dotemacs/emacs/")
  (front-context-string . "darwin/\n  drwxr-")
  (rear-context-string . "96 Oct 20 13:29 ")
  (position . 132))

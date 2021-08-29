@@ -80,7 +80,7 @@
 ;; Given the number of symlinks, visit the "linked to" file.
 (setq vc-follow-symlinks t)
 
-(setq bookmark-default-file "~/git/jnf-emacs-config/bookmarks")
+(setq bookmark-default-file "~/git/dotemacs/bookmarks")
 
 (setq-default indent-tabs-mode nil) ;; Ensure tabs are expanded, not inserted
 (setq inhibit-startup-screen t) ;; Don't include the  emacs "start" window
