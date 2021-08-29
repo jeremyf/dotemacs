@@ -38,6 +38,10 @@
     ("w m" jnf/tor-wrap-as-marginnote-dwim "Margin-note line or region…")
     ("w s" jnf/tor-wrap-as-sidenote-dwim "Side-note sentence or region…")
     ("w w" jnf/tor-wrap-in-html-tag "Wrap point or region…"))
+   "Posts"
+   (("p r" jnf/tor-retitle-post "Re-title post…")
+    ("p t" jnf/tor-tag-post "Tag post…" :exit nil)
+    ("p v" jnf/tor-view-blog-post "View post…"))
    "Utilities"
    (("c a" jnf/tor-post-amplifying-the-blogosphere "Create amplify the blogosphere…")
     ("c e" jnf/tor-insert-epigraph-entry "Create epigraph entry…")
