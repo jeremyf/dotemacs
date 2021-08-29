@@ -28,10 +28,6 @@
   (file-truename "http://localhost:1313")
   "The scheme, host name, and port for serving up a local TakeOnRules.com.")
 
-(defconst jnf/tor-hostname-regexp
-  "https?://takeonrules\.com"
-  "A regular expression for checking if it's TakeOnRules.com.")
-
 (defvar jnf/data-directories
   (list
     jnf/tor-home-directory

@@ -26,7 +26,9 @@
 
 ;; These menu commands, plus some yasnippets, are some useful
 ;; functions for helping my blogging effort.
-(defvar jnf/tor-menu--title (with-faicon "pencil-square" "Take on Rules" 1 -0.05))
+(defvar jnf/tor-menu--title
+  (with-faicon "pencil-square" "Take on Rules" 1 -0.05)
+  "The TakeOnRules.com Subject Menu Title.")
 (pretty-hydra-define jnf/tor-subject-menu-markdown (:foreign-keys warn :title jnf/tor-menu--title :quit-key "q" :exit t)
   ("Wrapping"
    (("a" jnf/tor-wrap-link-active-region-dwim "A link at point or region…")
@@ -246,12 +248,16 @@ and rename the buffer."
     ;; Report filename change
     (message "Renamed %s -> %s" filename new-filename)))
 
+(defvar jnf/tor-hostname-regexp
+  "^https?://takeonrules\.com"
+  "A regular expression for checking if it's TakeOnRules.com.")
+
 (defvar jnf/tor-hugo-regexp-for-post-path
-  (rx "/" (= 4 (in "0-9")) "/" (= 2 (in "0-9")) "/" (= 2 (in "0-9")) "/" (group (one-or-more (not "/"))) (? "/") eol)
+  (concat jnf/tor-hostname-regexp "/[0-9]\\{4\\}/[0-9]\\{2\\}/[0-9]\\{2\\}/\\([^/]+\\)/?$")
   "A regular expression for matching blog posts.")
 
 (defvar jnf/tor-hugo-regexp-for-pages-path
-  (rx "\.com/" (group (* anychar) (not "/")) (? "/"))
+  (concat jnf/tor-hostname-regexp "/\\([^z-a]*[^/]\\)/?$")
   "A regular expression for matching pages.")
 
 (defun jnf/tor-find-hugo-file-by-url (url)
