@@ -1,3 +1,28 @@
 #+title: README for Dotemacs
 
-This is my Emacs repository.  It pairs with my [[https://github.com/jeremyf/dotzshrc/][dotzshrc repository]].  The [[https://github.com/jeremyf/dotzshrc/blob/main/install.rb][install.rb]] script of the dotzshrc repository uses this repository.  For implementation reasons, the ~emacs.d~ the init files that I link into my ~\~/.emacs.d~ directory.  The ~jnf-packages~ are my “packages” that I’ve separated out for organizational purposes.
+This is my Emacs configuration repository.  It pairs with my [[https://github.com/jeremyf/dotzshrc/][dotzshrc repository]].  The [[https://github.com/jeremyf/dotzshrc/blob/main/install.rb][install.rb]] script of the dotzshrc repository uses this repository.  For implementation reasons, the ~emacs.d~ the init files that I link into my ~~/.emacs.d~ directory.  The ~jnf-packages~ are my “packages” that I’ve separated out for organizational purposes.
+
+For those curious, I wrote [[https://takeonrules.com/2020/10/18/why-i-chose-emacs-as-my-new-text-editor/][Why I Chose Emacs as My New Text Editor // Take on Rules]].
+
+Below is the top-level directory:
+
+#+BEGIN_SRC
+.
+├── README.org
+├── bookmarks
+├── emacs.d/
+├── jnf-emacs-packages/
+├── snippets/
+├── todo.org
+└── todo.org_archive
+#+END_SRC
+
+The files and directories:
+
+- README.org :: This file
+- bookmarks :: My personal Emacs bookmarks (likely I’ll remove this file)
+- emacs.d :: A directory that contains files symlinked into ~q~/.emacs.d~ directory
+- jnf-emacs-packages :: A directory of quasi-packages that I’ve made to help organize my emacs configuration.
+- snippets :: A directory of [[https://joaotavora.github.io/yasnippet/][yasnippets]] I’ve created
+- todo.org :: The todo list for updates I’m considering to my dotemacs file
+- todo.org_archive :: The archive of todo items, completed or abandoned.
