@@ -1,17 +1,3 @@
-#+title: README for JNF Emacs Config
+#+title: README for Dotemacs
 
-In this repository, I keep personal metadata; not private, just personal.  A remote clone of this repository will be private (e.g., only visible to me).
-
-* Contents
-
-** bookmarks
-
-My emacs bookmarks.  This could move from personal to private.
-
-** emacs.d
-
-These are files loaded into ~\~/.emacs.d/~
-
-** emacs
-
-The config files for all of my emacs.
+This is my Emacs repository.  It pairs with my [[https://github.com/jeremyf/dotzshrc/][dotzshrc repository]].  The [[https://github.com/jeremyf/dotzshrc/blob/main/install.rb][install.rb]] script of the dotzshrc repository uses this repository.  For implementation reasons, the ~emacs.d~ the init files that I link into my ~\~/.emacs.d~ directory.  The ~jnf-packages~ are my “packages” that I’ve separated out for organizational purposes.
