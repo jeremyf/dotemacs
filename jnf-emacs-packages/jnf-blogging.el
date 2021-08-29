@@ -47,12 +47,13 @@
     ("?" jnf/tor-find-file-draft "Find blog in draft status…")
     (";" jnf/tor-find-hugo-file-by-url "Find blog by url…")
     ("k" jnf/tor-insert-glossary-key "Insert glossary key at point…"))
-   "Manipulate Post"
+   "Utilities"
    (("r" jnf/tor-retitle-post "Re-title post…")
     ;; I usually want to tag a post more than once, hence the "non-exit"
     ("#" jnf/tor-tag-post "Tag post…" :exit nil)
     ("v" jnf/tor-view-blog-post "View post…")
-    ("/" decide-mode "Decide Mode" :toggle t))))
+    ("/" decide-mode "Decide Mode" :toggle t)
+    ("$" (jnf/tor-toggle-hugo-server :buffer-name "*Hugo Server*") "Toggle hugo server" :toggle (get-buffer "*Hugo Server*")))))
 
 ;; The `C-c t' key combo is engrained for my TakeOnRules incantations;
 ;; there's a markdown menu but if I'm not in markdown, it likely means
@@ -60,7 +61,7 @@
 (global-set-key (kbd "C-c t") 'jnf/tor-subject-menu-default/body)
 
 (pretty-hydra-define jnf/tor-subject-menu-yaml (:foreign-keys warn :title jnf/tor-menu--title :quit-key "q" :exit t)
-  ("Posts"
+  ("Utilities"
    (("*" jnf/tor-post-amplifying-the-blogosphere "Amplify the blogosphere…")
     ("e" jnf/tor-insert-epigraph-entry "Create epigraph entry…")
     ("g" jnf/tor-find-glossary-and-insert-entry "Create glossary entry…")
@@ -69,10 +70,11 @@
     ("?" jnf/tor-find-file-draft "Find blog in draft Status…")
     (";" jnf/tor-find-hugo-file-by-url "Find blog by url…")
     ("k" jnf/tor-insert-glossary-key "Insert key at point…")
-    ("/" decide-mode "Decide Mode" :toggle t))))
+    ("/" decide-mode "Decide Mode" :toggle t)
+    ("$" (jnf/tor-toggle-hugo-server :buffer-name "*Hugo Server*") "Toggle hugo server" :toggle (get-buffer "*Hugo Server*")))))
 
 (pretty-hydra-define jnf/tor-subject-menu-default (:foreign-keys warn :title jnf/tor-menu--title :quit-key "q" :exit t)
-  ("Posts"
+  ("Utilities"
    (("*" jnf/tor-post-amplifying-the-blogosphere "Amplify the blogosphere…")
     ("e" jnf/tor-insert-epigraph-entry "Create epigraph entry…")
     ("g" jnf/tor-find-glossary-and-insert-entry "Create glossary entry…")
@@ -80,7 +82,8 @@
     ("l" jnf/tor-find-changelog-and-insert-entry "Create change log entry…")
     ("?" jnf/tor-find-file-draft "Find blog in draft Status…")
     (";" jnf/tor-find-hugo-file-by-url "Find blog by url…")
-    ("/" decide-mode "Decide Mode" :toggle t))))
+    ("/" decide-mode "Decide Mode" :toggle t)
+    ("$" (jnf/tor-toggle-hugo-server :buffer-name "*Hugo Server*") "Toggle hugo server" :toggle (get-buffer "*Hugo Server*")))))
 
 ;;******************************************************************************
 ;;
@@ -211,6 +214,21 @@ If there's an active region, select that text and place it."
 ;;; BEGIN Interactive Non-Wrapping Functions
 ;;
 ;;******************************************************************************
+(cl-defun jnf/tor-toggle-hugo-server (&key
+                                      (directory jnf/tor-home-directory)
+                                      (buffer-name "*Hugo Server*"))
+  "This will start or stop a Hugo server in the given DIRECTORY for TakeOnRules.com.
+
+The BUFFER-NAME is where we'll run the Hugo process."
+  (interactive)
+  (if (get-buffer buffer-name)
+      (progn
+        (kill-buffer buffer-name)
+        (message (concat "Stopping Hugo in \"" buffer-name "\" buffer…")))
+    (let* ((default-directory directory))
+      (start-process "hugo-server" buffer-name "hugo" "server" "-D")
+      (message (concat "Starting Hugo in \"" buffer-name "\" buffer…")))))
+
 (defun jnf/tor-retitle-post (title)
   "Replace the given buffer's title with the new TITLE.
 
