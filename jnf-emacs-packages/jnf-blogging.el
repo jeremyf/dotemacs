@@ -39,11 +39,11 @@
     ("w s" jnf/tor-wrap-as-sidenote-dwim "Side-note sentence or region…")
     ("w w" jnf/tor-wrap-in-html-tag "Wrap point or region…"))
    "Utilities"
-   (("c a" jnf/tor-post-amplifying-the-blogosphere "Amplify the blogosphere…")
+   (("c a" jnf/tor-post-amplifying-the-blogosphere "Create amplify the blogosphere…")
     ("c e" jnf/tor-insert-epigraph-entry "Create epigraph entry…")
     ("c g" jnf/tor-find-glossary-and-insert-entry "Create glossary entry…")
     ("c c" jnf/tor-find-changelog-and-insert-entry "Create change log entry…")
-    ("c n" jnf/tor-create-post "Create new post…")
+    ("c p" jnf/tor-create-post "Create post…")
     ("? d" jnf/tor-find-file-draft "Find blog in draft status…")
     ("? u" jnf/tor-find-hugo-file-by-url "Find blog by url…")
     ("t d" decide-mode "Decide Mode" :toggle t)
@@ -56,11 +56,11 @@
 
 (pretty-hydra-define jnf/tor-subject-menu-default (:foreign-keys warn :title jnf/tor-menu--title :quit-key "q" :exit t)
   ("Utilities"
-   (("c a" jnf/tor-post-amplifying-the-blogosphere "Amplify the blogosphere…")
+   (("c a" jnf/tor-post-amplifying-the-blogosphere "Create amplify the blogosphere…")
     ("c e" jnf/tor-insert-epigraph-entry "Create epigraph entry…")
     ("c g" jnf/tor-find-glossary-and-insert-entry "Create glossary entry…")
     ("c c" jnf/tor-find-changelog-and-insert-entry "Create change log entry…")
-    ("c n" jnf/tor-create-post "Create new post…")
+    ("c p" jnf/tor-create-post "Create post…")
     ("? d" jnf/tor-find-file-draft "Find blog in draft status…")
     ("? u" jnf/tor-find-hugo-file-by-url "Find blog by url…")
     ("t d" decide-mode "Decide Mode" :toggle t)
