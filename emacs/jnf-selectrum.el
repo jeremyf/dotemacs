@@ -258,7 +258,7 @@ the directory.  `REST' is passed to the `CONSULT-RIPGREP-FUNCTION'."
   :after (embark-consult ripgrep)
   :straight t
   :bind (:map wgrep-mode-map
-              ;; Added keybinding to echo Magic behavior
+              ;; Added keybinding to echo Magit behavior
               ("C-c C-c" . save-buffer)
          :map grep-mode-map
          ("e" . wgrep-change-to-wgrep-mode)
