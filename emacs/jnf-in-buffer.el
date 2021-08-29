@@ -285,7 +285,7 @@ Useful for pasting code into Reddit's Markdown mode."
                 (indent-rigidly (point-min) (point-max) 4)
                 (buffer-string)))))
 
-(defvar jnf/typography--title (with-octicon "pencil" "Typography" 1 -0.05))
+(defvar jnf/typography--title (with-octicon "pencil" "Typography (C-x 8 RET for Search)" 1 -0.05))
 (pretty-hydra-define jnf/typography--menu (:foreign-keys warn :title jnf/typography--title :quit-key "q" :exit t)
   ("Characters" (
                  ("d d" (insert "-") "- dash")
