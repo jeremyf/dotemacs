@@ -33,6 +33,11 @@
            ("a d" (insert "÷") "÷ Division Sign")
            ("a m" (insert "−") "− Minus Sign")
            ("a p" (insert "±") "± Plus or Minus Sign")
+           ;; Included as a reminder as I use these for menu structures
+           ("f v"   (insert "│") "│ Forms light vertical")
+           ("f V r" (insert "├") "├ Forms light vertical and right")
+           ("f U r" (insert "└") "└ Forms light up and right")
+           ("f h"   (insert "─") "─ Forms light horizontal")
            )
    "Quotes" (
              ("\" o" (insert "“") "“ double-quote open")
