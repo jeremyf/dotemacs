@@ -1,17 +1,19 @@
 ;;; -*- lexical-binding: t; -*-
-;;; package --- Summary
+;;; jnf-typography.el --- Summary
 ;;
 ;;; Commentary:
 ;;
-;;  This package provides typographical modifications using the typopunct package.
+;;  This package serves the purpose of assisting with adding
+;;  characters that are not readily available on an ANSI keyboard.
 ;;
 ;;; Code:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;;; BEGIN Typography Menu
 ;;
-;;  The purpose of the typography menu is to provide some easier
-;;  access to typographic signs that I use.
+;;  The purpose of the typography menu is to provide easier access to
+;;  typographic characters that I use; It also provides a bit of a
+;;  mnemonic device (e.g. "C-x 8 RET" searches for a character to insert).
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defvar jnf/typography--title
@@ -29,12 +31,14 @@
                  ("t 2" (insert "‡") "‡ double dagger")
                  ("t s" (insert "§") "§ section")
                  ("t p" (insert "¶") "¶ paragraph")
+                 ("? !" (insert "‽") "‽ Interobang")
                  )
    "Math" (
            ("a x" (insert "×") "× Multiplication Sign")
            ("a d" (insert "÷") "÷ Division Sign")
            ("a m" (insert "−") "− Minus Sign")
            ("a p" (insert "±") "± Plus or Minus Sign")
+           ("m n" (insert "¬") "¬ Negation")
            ;; Included as a reminder as I use these for menu structures
            ("f h" (insert "─") "─ Forms light horizontal")
            ("f D l" (insert "┐") "┐ Forms light down and left")
@@ -50,7 +54,10 @@
              ("' o" (insert "‘") "‘ Single quote open")
              ("' c" (insert "’") "’ Single quote close")
              ("' O" (insert "‹") "‹ Single guillemet open")
-             ("' C" (insert "›") "› Single guillemet close"))
+             ("' C" (insert "›") "› Single guillemet close")
+             ("p 1" (insert "′") "′ Single Prime (feet, arcminutes)")
+             ("p 2" (insert "″") "″ Double Prime (inches, arcseconds)")
+             ("p 3" (insert "‴") "‴ Triple Prime"))
    ))
 
 (global-set-key (kbd "C-s-8") 'jnf/typography--menu/body)
@@ -64,13 +71,16 @@
 ;;
 ;;; BEGIN Typopunct
 ;;
+;; This package comes
+;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package typopunct
   :straight t
   :config
-  (require 'typopunct)
   (add-hook 'org-mode-hook 'jnf/typopunct-init)
   (defun jnf/typopunct-init ()
+    (require 'typopunct)
+    (typopunct-change-language 'english)
     (typopunct-mode 1))
   (setq typopunct-buffer-language 'english)
 
@@ -95,6 +105,10 @@
       (self-insert-command arg))))
   (define-key typopunct-map "." 'typopunct-insert-ellipsis-or-middot)
 
+
+  (defconst typopunct-prime  (decode-char 'ucs #x2032)) ; feet, arcminutes, derivatives
+  (defconst typopunct-dprime (decode-char 'ucs #x2033)) ; inches, arcseconds, double derivatives
+  (defconst typopunct-tprime (decode-char 'ucs #x2034))
 
   ;; The minus sign (−) is separate from the hyphen (-), en dash (–) and
   ;; em dash (—). To build upon the clever behavior of the ‘-’ key
@@ -162,5 +176,5 @@
 ;;; END typopunct
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(provide 'jnf-typopunct.el)
-;;; jnf-typopunct.el ends here
+(provide 'jnf-typography.el)
+;;; jnf-typography.el ends here

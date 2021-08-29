@@ -59,11 +59,8 @@
 (require 'jnf-config.el)
 (require 'jnf-display.el)
 (require 'jnf-hydra.el)
-
 (require 'jnf-projectile.el)
-
 (require 'jnf-selectrum.el)
-
 
 ;; I have found this package quite "helpful"; When I want to know the
 ;; name of a function or key or variable, I can use the helpful
@@ -222,7 +219,7 @@ Tries to preserve the order of window buffers and active window."
 (require 'jnf-basic-config.el)
 (require 'jnf-git.el)
 (require 'jnf-spelling.el)
-(require 'jnf-typopunct.el)
+(require 'jnf-typography.el)
 (require 'jnf-ruby.el)
 (require 'jnf-lsp-mode.el)
 (require 'jnf-beancount.el)
