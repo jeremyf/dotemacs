@@ -14,7 +14,9 @@
 ;;  access to typographic signs that I use.
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(defvar jnf/typography--title (with-octicon "pencil" "Typography (C-x 8 RET for Search)" 1 -0.05))
+(defvar jnf/typography--title
+  (with-octicon "pencil" "Typography (C-x 8 RET for Search)" 1 -0.05)
+  "The menu title for typography")
 (pretty-hydra-define jnf/typography--menu (:foreign-keys warn :title jnf/typography--title :quit-key "q" :exit t)
   ("Characters" (
                  ("d d" (insert "-") "- dash")
@@ -34,20 +36,21 @@
            ("a m" (insert "−") "− Minus Sign")
            ("a p" (insert "±") "± Plus or Minus Sign")
            ;; Included as a reminder as I use these for menu structures
-           ("f v"   (insert "│") "│ Forms light vertical")
+           ("f h" (insert "─") "─ Forms light horizontal")
+           ("f D l" (insert "┐") "┐ Forms light down and left")
+           ("f v" (insert "│") "  │ Forms light vertical")
            ("f V r" (insert "├") "├ Forms light vertical and right")
            ("f U r" (insert "└") "└ Forms light up and right")
-           ("f h"   (insert "─") "─ Forms light horizontal")
            )
    "Quotes" (
-             ("\" o" (insert "“") "“ double-quote open")
-             ("\" c" (insert "”") "” double-quote close")
-             ("\" O" (insert "«") "« double-quote open")
-             ("\" C" (insert "»") "» double-quote close")
-             ("' o" (insert "‘") "‘ single-quote open")
-             ("' c" (insert "’") "’ single-quote close")
-             ("' O" (insert "‹") "‹ single-quote open")
-             ("' C" (insert "›") "› single-quote close"))
+             ("\" o" (insert "“") "“ Double quote open")
+             ("\" c" (insert "”") "” Doule quote close")
+             ("\" O" (insert "«") "« Guillemet open")
+             ("\" C" (insert "»") "» Guillemet close")
+             ("' o" (insert "‘") "‘ Single quote open")
+             ("' c" (insert "’") "’ Single quote close")
+             ("' O" (insert "‹") "‹ Single guillemet open")
+             ("' C" (insert "›") "› Single guillemet close"))
    ))
 
 (global-set-key (kbd "C-s-8") 'jnf/typography--menu/body)
@@ -64,12 +67,12 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package typopunct
   :straight t
+  :hook ((org-mode-hook . jnf/typopunct-init))
   :config
   (require 'typopunct)
   (defun jnf/typopunct-init ()
     (typopunct-mode 1))
   (setq typopunct-buffer-language 'english)
-  (add-hook 'org-mode-hook 'jnf/typopunct-init)
 
   ;; To insert a typographical ellipsis sign (…) on three consecutive
   ;; dots, or a middle dot (·) on ‘^.’
@@ -118,8 +121,6 @@
                (insert typopunct-mp))
       (self-insert-command arg)))
   (define-key typopunct-map "+" 'typopunct-insert-mp)
-
-  ;; If you want the cross (×) rather than the middle dot:
   (defconst typopunct-times (decode-char 'ucs #xD7))
   (defun typopunct-insert-times (arg)
     "Insert multiplication sign at ARG."
