@@ -228,7 +228,6 @@ Tries to preserve the order of window buffers and active window."
 (require 'jnf-stars-without-number.el)
 (require 'jnf-elfeed.el)
 ;; (require 'jnf-fennel.el)
-(require 'jnf-yaml.el)
 (require 'jnf-dired.el)
 (require 'jnf-dice.el)
 

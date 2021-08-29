@@ -61,5 +61,8 @@
          ("\\.markdown\\'" . markdown-mode))
   :init (setq markdown-command "/usr/local/bin/pandoc"))
 
+(use-package yaml-mode
+  :straight t)
+
 (provide 'jnf-modes.el)
 ;;; jnf-modes.el ends here
