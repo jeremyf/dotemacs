@@ -10,7 +10,7 @@
 ;;; CODE:
 
 ;; I have additional files that I require in the emacs directory
-(add-to-list 'load-path (expand-file-name "~/git/dotemacs/emacs"))
+(add-to-list 'load-path (expand-file-name "~/git/dotemacs/jnf-emacs-packages"))
 
 ;; https://www.reddit.com/r/emacs/comments/mtb05k/emacs_init_time_decreased_65_after_i_realized_the/
 (setq straight-check-for-modifications '(check-on-save find-when-checking))

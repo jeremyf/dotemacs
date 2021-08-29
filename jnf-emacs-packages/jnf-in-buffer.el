@@ -195,7 +195,7 @@
 ;; place.
 (use-package yasnippet
   :straight t
-  :init (setq yas-snippet-dirs '("~/git/dotemacs/emacs/snippets"))
+  :init (setq yas-snippet-dirs '("~/git/dotemacs/snippets"))
   (yas-global-mode 1))
 
 ;; I kind of like this little bit of visual feedback

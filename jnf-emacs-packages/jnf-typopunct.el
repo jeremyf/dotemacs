@@ -67,9 +67,9 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package typopunct
   :straight t
-  :hook ((org-mode-hook . jnf/typopunct-init))
   :config
   (require 'typopunct)
+  (add-hook 'org-mode-hook 'jnf/typopunct-init)
   (defun jnf/typopunct-init ()
     (typopunct-mode 1))
   (setq typopunct-buffer-language 'english)
