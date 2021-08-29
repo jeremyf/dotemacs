@@ -288,6 +288,7 @@ Fetch the given SUBJECT from the given SUBJECTS-PLIST."
    (
     ("/" org-roam-buffer-toggle         "Toggle Buffer")
     ("#" jnf/toggle-roam-subject-filter "Toggle Default Filter")
+    ("1" (find-file (f-join jnf/tor-home-directory "todo.org")) "Todo for TakeOnRules.com")
     )))
 ;;******************************************************************************
 ;;
