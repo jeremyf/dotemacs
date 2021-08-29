@@ -42,6 +42,8 @@
            "* TODO %?" :empty-lines-before 1)
           ("u" "Public Todo" entry (file "~/git/org/public/todo.org")
            "* TODO %?" :empty-lines-before 1)
+          ("1" "TakeOnRules.com Todo" entry (file "~/git/takeonrules.github.io/todo.org")
+           "* TODO %?" :empty-lines-before 1)
           ))
   (defun my-org-confirm-babel-evaluate (lang body) t)
 
