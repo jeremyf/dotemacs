@@ -44,7 +44,7 @@
 ;; https://blog.sumtypeofway.com/posts/emacs-config.html
 (electric-pair-mode)
 
-(set-frame-font "JetBrains Mono")
+(set-frame-font "Hack Nerd Font Mono")
 
 ;; Don't create lock files.  Emacs drops these files on the file
 ;; system.  I found this most cumbersome when working in hugo.  The

@@ -11,8 +11,8 @@
 ;;
 ;;; Code:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(add-to-list 'default-frame-alist '(font . "JetBrains Mono 14" ))
-(set-face-attribute 'default t :font "JetBrains Mono 14" )
+(add-to-list 'default-frame-alist '(font . "Hack Nerd Font Mono 14" ))
+(set-face-attribute 'default t :font "Hack Nerd Font Mono 14" )
 ;; I'm just going to trust themes
 (setq custom-safe-themes t)
 
@@ -29,11 +29,11 @@
 ;; toggles.
 ;;
 ;; Main typeface, I'm toggling between "JetBrains Mono" and "Hack"
-(set-face-attribute 'default nil :family "JetBrains Mono" :height 140)
+(set-face-attribute 'default nil :family "Hack Nerd Font Mono" :height 140)
 ;; Proportionately spaced typeface
 (set-face-attribute 'variable-pitch nil :family "ETBembo" :height 1.0)
 ;; Monospaced typeface
-(set-face-attribute 'fixed-pitch nil :family "JetBrains Mono" :height 1.0)
+(set-face-attribute 'fixed-pitch nil :family "Hack Nerd Font Mono" :height 1.0)
 ;;
 ;; END BLOCK
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
