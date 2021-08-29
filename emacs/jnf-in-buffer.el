@@ -298,11 +298,13 @@ Useful for pasting code into Reddit's Markdown mode."
                  ("t 2" (insert "‡") "‡ double dagger")
                  ("t s" (insert "§") "§ section")
                  ("t p" (insert "¶") "¶ paragraph")
-                 ("a x" (insert "×") "× Multiplication Sign")
-                 ("a d" (insert "÷") "÷ Division Sign")
-                 ("a m" (insert "−") "− Minus Sign")
-                 ("a p" (insert "±") "± Plus or Minus Sign")
                  )
+   "Math" (
+           ("a x" (insert "×") "× Multiplication Sign")
+           ("a d" (insert "÷") "÷ Division Sign")
+           ("a m" (insert "−") "− Minus Sign")
+           ("a p" (insert "±") "± Plus or Minus Sign")
+           )
    "Quotes" (
              ("\" o" (insert "“") "“ double-quote open")
              ("\" c" (insert "”") "” double-quote close")
