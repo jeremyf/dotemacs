@@ -40,6 +40,7 @@
         `(("~/git/takeonrules.github.io/" . 1) ;; personal
           ("~/git/dotzshrc/" .  1) ;; all
           ("~/git/dotemacs/" . 1) ;; all
+          ("~/git/jnf-emacs-bookmarks/" . 1)
           ("~/git/org" . 1) ;; all
           ("~/git/org/archive" . 1) ;; personal
           ("~/git/org/daily" . 1) ;; ??
@@ -73,6 +74,7 @@
         ("~/git/org/daily" . 1)
         ("~/git/org/hesburgh-libraries" . 1)
         ("~/git/dotemacs/" . 1)
+        ("~/git/jnf-emacs-bookmarks/" . 1)
         ("~/git/dotzshrc/" .  1)))
   (magit-list-repositories)))
 

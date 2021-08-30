@@ -41,6 +41,7 @@ Alternatives:
     jnf/tor-home-directory
     ;; The themes directory
     "~/git/takeonrules.github.io/themes/hugo-tufte"
+    "~/git/jnf-emacs-bookmarks"
     ;; The tooling directory
     "~/git/dotzshrc/"
     ;; The personal configuration options
