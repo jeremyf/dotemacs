@@ -66,10 +66,10 @@
          ("C-c c" . org-capture)
          ("C-s-t" . org-toggle-link-display)))
 
-(use-package org-sidebar
-  :straight (org-sidebar :type git
-                         :host github
-                         :repo "alphapapa/org-sidebar"))
+;; (use-package org-sidebar
+;;   :straight (org-sidebar :type git
+;;                          :host github
+;;                          :repo "alphapapa/org-sidebar"))
 
 ;; Uncomment to always launch org mode with a sidebar tree
 ;; (add-hook 'org-mode-hook #'org-sidebar-tree)
