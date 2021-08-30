@@ -50,6 +50,7 @@
     ("c p" jnf/tor-create-post "Create [p]ost…")
     ("? d" jnf/tor-find-file-draft "Find blog in [d]raft status…")
     ("? u" jnf/tor-find-hugo-file-by-url "Find blog by [u]rl…")
+    ("? f" jnf/tor-find-file "Find blog by [f]ilename…")
     ("t d" decide-mode "[D]ecide Mode" :toggle t)
     ("t h" (jnf/tor-toggle-hugo-server :buffer-name "*Hugo Server*") "Toggle [H]ugo server" :toggle (get-buffer "*Hugo Server*"))
     ("t v" variable-pitch-mode "Toggle [v]ariable pitch mode"))))
@@ -68,6 +69,7 @@
     ("c p" jnf/tor-create-post "Create [p]ost…")
     ("? d" jnf/tor-find-file-draft "Find blog in [d]raft status…")
     ("? u" jnf/tor-find-hugo-file-by-url "Find blog by [u]rl…")
+    ("? f" jnf/tor-find-file "Find blog by [f]ilename…")
     ("t d" decide-mode "[D]ecide Mode" :toggle t)
     ("t h" (jnf/tor-toggle-hugo-server :buffer-name "*Hugo Server*") "Toggle [H]ugo server" :toggle (get-buffer "*Hugo Server*"))
     ("t v" variable-pitch-mode "Toggle [v]ariable pitch mode"))))
@@ -415,10 +417,23 @@ We'll pass the :CITETITLE, :CITEAUTHOR, and :CITEURL to
   (interactive (list (completing-read
                       "Filename: "
                       (jnf/list-filenames-with-file-text
-                       :matching "^draft: true"
+                       :matching "^title: true"
                        :in "content"))))
   (let ((file-path (f-join directory filename)))
     (message "Opening draft %s" file-path)
+    (find-file file-path)))
+
+(cl-defun jnf/tor-find-file (filename
+                             &key
+                             (directory (f-join jnf/tor-home-directory "content")))
+  "Find FILENAME in given DIRECTORY."
+  (interactive (list (completing-read
+                      "Filename: "
+                      (jnf/list-filenames-with-file-text
+                       :matching "^title:"
+                       :in "content"))))
+  (let ((file-path (f-join directory filename)))
+    (message "Opening %s" file-path)
     (find-file file-path)))
 ;;******************************************************************************
 ;;
