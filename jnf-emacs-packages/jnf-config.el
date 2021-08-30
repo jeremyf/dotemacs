@@ -8,6 +8,12 @@
 ;;; Code:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+;; Load keychain environment variables
+(use-package keychain-environment
+  :straight t
+  :config
+  (keychain-refresh-environment))
+
 ;; a modern API for working with files and directories in Emacs.
 ;; https://github.com/rejeep/f.el/
 (use-package f :straight t)

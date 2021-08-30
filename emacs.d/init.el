@@ -138,13 +138,6 @@
 (use-package avy
   :straight t)
 
-(use-package keychain-environment
-  :straight t
-  :config
-  (keychain-refresh-environment))
-
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; BEGIN frame and window quick setup
 (defun gk-layouts-3col ()
