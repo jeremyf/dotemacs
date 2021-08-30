@@ -8,6 +8,18 @@
 ;;; Code:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(use-package diminish
+  :straight t)
+
+;; GCMH does GC when the user is idle.
+(use-package gcmh
+  :straight t
+  :diminish 'gcmh-mode
+  :init
+  (setq gcmh-idle-delay 5
+	gcmh-high-cons-threshold (* 16 1024 1024))  ; 16mb
+	:config (gcmh-mode))
+
 ;; Load keychain environment variables
 (use-package keychain-environment
   :straight t
@@ -86,6 +98,36 @@ By default the DIRECTORIES are `jnf/data-directories'"
             " && git push -u --force-with-lease")))
       (message (concat "Skipping missing directory \"" path "\"...")))
     (message "Finished synchronizing local git repos.")))
+
+;; I use this package to "configure" menus, hence this is in the
+;; config section.
+(use-package pretty-hydra
+  :straight (pretty-hydra
+             :type git :host github :repo "jerrypnz/major-mode-hydra.el"
+             :files (:defaults (:exclude "major-mode-hydra.el"))))
+
+;; I have found this package quite "helpful"; When I want to know the
+;; name of a function or key or variable, I can use the helpful
+;; package.
+(use-package helpful
+  :straight t
+  :after (all-the-icons pretty-hydra)
+  :pretty-hydra
+  ((:title (with-material "help_outline" "Helpful Menus") :quit-key "q" :exit t)
+   ("Helpful"
+    (
+     ("b" embark-bindings "bindings")
+     ("c" helpful-command "command")
+     ("f" helpful-callable "function (interactive)")
+     ("F" helpful-function "function (all)")
+     ("k" helpful-key "key")
+     ("l" find-library "Find library")
+     ("m" helpful-macro "macro")
+     ("p" helpful-at-point "thing at point")
+     ("v" helpful-variable "variable")
+     ("t" describe-text-properties "text properties")
+     )))
+  :bind ("C-s-h" . helpful-hydra/body))
 
 (provide 'jnf-config.el)
 ;;; jnf-config.el ends here

@@ -37,18 +37,6 @@
 ;; use-package syntax which is often how things are documented.
 (straight-use-package 'use-package)
 
-(use-package diminish
-  :straight t)
-
-;; GCMH does GC when the user is idle.
-(use-package gcmh
-  :straight t
-  :diminish 'gcmh-mode
-  :init
-  (setq gcmh-idle-delay 5
-	gcmh-high-cons-threshold (* 16 1024 1024))  ; 16mb
-	:config (gcmh-mode))
-
 ;;Slow down the UI being updated to improve performance
 (setq idle-update-delay 1.1)
 
@@ -58,39 +46,8 @@
 
 (require 'jnf-config.el)
 (require 'jnf-display.el)
-(require 'jnf-hydra.el)
 (require 'jnf-projectile.el)
 (require 'jnf-selectrum.el)
-
-;; I have found this package quite "helpful"; When I want to know the
-;; name of a function or key or variable, I can use the helpful
-;; package.
-(use-package helpful
-  :straight t
-  :after all-the-icons
-  :pretty-hydra
-  ((:title (with-material "help_outline" "Helpful Menus") :quit-key "q" :exit t)
-   ("Helpful"
-    (
-     ("b" embark-bindings "bindings")
-     ("c" helpful-command "command")
-     ("f" helpful-callable "function (interactive)")
-     ("F" helpful-function "function (all)")
-     ("k" helpful-key "key")
-     ("l" find-library "Find library")
-     ("m" helpful-macro "macro")
-     ("p" helpful-at-point "thing at point")
-     ("v" helpful-variable "variable")
-     ("t" describe-text-properties "text properties")
-     )))
-  :bind ("C-s-h" . helpful-hydra/body))
-
-;; A window manager for emacs, allowing fast toggles between windows
-;; as well as opening or moving those windows.
-;; https://github.com/abo-abo/ace-window
-(use-package ace-window
-  :straight t
-  :bind (("M-o" . ace-window)))
 
 (global-auto-revert-mode)
 ;; https://www.emacswiki.org/emacs/RecentFiles#h5o-1

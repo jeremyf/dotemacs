@@ -141,5 +141,13 @@ Tries to preserve the order of window buffers and active window."
 ;; END frame and window quick setup
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+
+;; A window manager for emacs, allowing fast toggles between windows
+;; as well as opening or moving those windows.
+;; https://github.com/abo-abo/ace-window
+(use-package ace-window
+  :straight t
+  :bind (("M-o" . ace-window)))
+
 (provide 'jnf-display.el)
 ;;; jnf-display.el ends here
