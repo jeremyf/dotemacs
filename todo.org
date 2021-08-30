@@ -3,3 +3,34 @@
 :END:
 #+title: Emacs Config Todo
 #+filetags: :personal:
+
+* Work through Separating Packages by Machine
+
+
+- [ ] [[~/git/dotemacs/jnf-emacs-packages/jnf-config.el]]
+- [ ] [[~/git/dotemacs/jnf-emacs-packages/jnf-display.el]]
+- [ ] [[~/git/dotemacs/jnf-emacs-packages/jnf-projectile.el]]
+- [ ] [[~/git/dotemacs/jnf-emacs-packages/jnf-selectrum.el]]
+- [ ] [[~/git/dotemacs/jnf-emacs-packages/jnf-epub.el]]
+- [ ] [[~/git/dotemacs/jnf-emacs-packages/jnf-modes.el]]
+- [ ] [[~/git/dotemacs/jnf-emacs-packages/darwin-emacs-config.el]]
+- [ ] [[~/git/dotemacs/jnf-emacs-packages/gnu-linux-emacs-config.]]el]]
+- [ ] [[~/git/dotemacs/jnf-emacs-packages/jnf-company.el]]
+- [ ] [[~/git/dotemacs/jnf-emacs-packages/jnf-in-buffer.el]]
+- [ ] [[~/git/dotemacs/jnf-emacs-packages/jnf-macros.el]]
+- [ ] [[~/git/dotemacs/jnf-emacs-packages/jnf-org.el]]
+- [ ] [[~/git/dotemacs/jnf-emacs-packages/jnf-org-roam-v2.el]]
+- [ ] [[~/git/dotemacs/jnf-emacs-packages/jnf-basic-config.el]]
+- [ ] [[~/git/dotemacs/jnf-emacs-packages/jnf-git.el]]
+- [ ] [[~/git/dotemacs/jnf-emacs-packages/jnf-spelling.el]]
+- [ ] [[~/git/dotemacs/jnf-emacs-packages/jnf-typography.el]]
+- [ ] [[~/git/dotemacs/jnf-emacs-packages/jnf-ruby.el]]
+- [ ] [[~/git/dotemacs/jnf-emacs-packages/jnf-lsp-mode.el]]
+- [ ] [[~/git/dotemacs/jnf-emacs-packages/jnf-beancount.el]]
+- [ ] [[~/git/dotemacs/jnf-emacs-packages/jnf-blogging.el]]
+- [ ] [[~/git/dotemacs/jnf-emacs-packages/jnf-tabs.el]]
+- [ ] [[~/git/dotemacs/jnf-emacs-packages/jnf-stars-without-numbe]r.el]]
+- [ ] [[~/git/dotemacs/jnf-emacs-packages/jnf-elfeed.el]]
+- [ ] [[~/git/dotemacs/jnf-emacs-packages/jnf-dired.el]]
+- [ ] [[~/git/dotemacs/jnf-emacs-packages/jnf-dice.el]]
+[[]
