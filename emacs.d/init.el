@@ -138,9 +138,6 @@
 (use-package avy
   :straight t)
 
-;; Add a gopher and gemini client
-(use-package elpher
-  :straight t)
 (use-package keychain-environment
   :straight t
   :config

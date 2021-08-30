@@ -8,6 +8,9 @@
 ;;
 ;;; Code:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(use-package elpher
+  :straight t)
+
 (use-package elfeed
   :straight t
   :after org
