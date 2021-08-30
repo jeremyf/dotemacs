@@ -20,6 +20,11 @@
 ;; https://github.com/magnars/dash.el/
 (use-package dash :straight t)
 
+(defconst jnf/fixed-width-font-name
+  "Hack Nerd Font Mono"
+  "The name of the fixed width font.
+I have it sprinkled through too many places")
+
 (defconst jnf/tor-home-directory
   (file-truename "~/git/takeonrules.github.io")
   "The home directory of TakeOnRules.com Hugo repository.")

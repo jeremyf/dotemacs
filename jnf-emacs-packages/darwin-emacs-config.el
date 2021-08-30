@@ -6,12 +6,6 @@
 ;;  "use-package" and "straight-use-package" are loaded.
 ;;
 ;;; Code:
-
-;; I have set this in OS X, however without a fallback, on Linux the
-;; interpretter halts here
-;; (set-frame-font "JetBrains Mono 13" nil t)
-(set-frame-font "Hack Nerd Font Mono 13" nil t)
-
 ;; Adds the ability to grab a link from various OS X applications
 ;; Note, the sibling org-mac-link.  That package works within ORG mode
 ;; with an extended menu option, and assumes ORG styling.  They both
