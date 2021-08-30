@@ -23,7 +23,10 @@
 (defconst jnf/fixed-width-font-name
   "Hack Nerd Font Mono"
   "The name of the fixed width font.
-I have it sprinkled through too many places")
+I have it sprinkled through too many places.
+
+Alternatives:
+- \"JetBrains Mono\"")
 
 (defconst jnf/tor-home-directory
   (file-truename "~/git/takeonrules.github.io")
