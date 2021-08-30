@@ -29,7 +29,7 @@
 ;; Main typeface, I'm toggling between "JetBrains Mono" and "Hack"
 (set-face-attribute 'default nil :family jnf/fixed-width-font-name :height 140)
 ;; Proportionately spaced typeface
-(set-face-attribute 'variable-pitch nil :family "ETBembo" :height 1.0)
+(set-face-attribute 'variable-pitch nil :family "ETBembo" :height 1.1)
 ;; Monospaced typeface
 (set-face-attribute 'fixed-pitch nil :family jnf/fixed-width-font-name :height 1.0)
 ;;
