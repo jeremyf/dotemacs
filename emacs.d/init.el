@@ -147,8 +147,6 @@
   (keychain-refresh-environment))
 
 
-(global-set-key (kbd "C-s-w") 'browse-url-at-point) ;; CTRL+CMD+w
-(setq browse-url-browser-function 'eww-browse-url)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; BEGIN frame and window quick setup
