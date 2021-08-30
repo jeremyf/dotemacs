@@ -24,6 +24,10 @@
 (use-package savekill
   :straight t)
 
+;; That letter is the beginning of a word. Narrow results from there.
+(use-package avy
+  :straight t)
+
 ;; https://github.com/shankar2k/math-at-point
 (use-package math-at-point
   :straight (math-at-point :type git :host github :repo "shankar2k/math-at-point")

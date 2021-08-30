@@ -134,9 +134,6 @@
 (require 'jnf-epub.el)
 (require 'jnf-modes.el)
 
-;; That letter is the beginning of a word. Narrow results from there.
-(use-package avy
-  :straight t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; BEGIN frame and window quick setup
