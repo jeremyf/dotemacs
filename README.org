@@ -26,3 +26,8 @@ The files and directories:
 - snippets :: A directory of [[https://joaotavora.github.io/yasnippet/][yasnippets]] I’ve created
 - todo.org :: The todo list for updates I’m considering to my dotemacs file
 - todo.org_archive :: The archive of todo items, completed or abandoned.
+
+Some highlights:
+
+- [[https://github.com/jeremyf/dotemacs/blob/main/jnf-emacs-packages/jnf-blogging.el][jnf-blogging.el]] :: a quasi-package to assist in writing, building, and extending [[https://takeonrules.com/][TakeOnRules.com]].
+- [[https://github.com/jeremyf/dotemacs/blob/main/jnf-emacs-packages/jnf-org-roam-v2.el][jnf-org-roam-v2.el]] :: a quasi-package I’ve built to extend [[https://www.orgroam.com/][org-roam]] capabilities.  I wrote about this quasi-pacage in [[https://takeonrules.com/2021/08/23/diving-into-the-implementation-of-subject-menus-for-org-roam/][Diving into the Implementation of Subject Menus for Org Roam]].
