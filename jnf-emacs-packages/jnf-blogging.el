@@ -545,7 +545,6 @@ as the behavior's well defined."
     (:lineOrRegion (pcase-let* ((origin (point))
                                 (`(,begin . ,end)
                                  (crux-get-positions-of-line-or-region)))
-                     (do-it (end after begin before))
                      (goto-char end)
                      (insert after)
                      (goto-char begin)
