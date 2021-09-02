@@ -140,7 +140,7 @@ publishing directory."
 (setq org-publish-project-alist
       '(("Thel Sector"
          :base-directory "~/git/org/projects/thel-sector"
-         :publishing-directory "~/git/takeonrules.github.io/content/campaigns/thel-sector/"
+         :publishing-directory "~/git/takeonrules.source/content/campaigns/thel-sector/"
          :publishing-function org-tor-export
          :exclude "\\(actual_play\\|katsina\\|askira\\|faction_turn\\|compline_synthesis\\)"
          :with-toc nil

@@ -47,7 +47,7 @@ Alternatives:
 - \"JetBrains Mono\"")
 
 (defconst jnf/tor-home-directory
-  (file-truename "~/git/takeonrules.github.io")
+  (file-truename "~/git/takeonrules.source")
   "The home directory of TakeOnRules.com Hugo repository.")
 
 (defconst jnf/tor-default-local-hostname
@@ -58,7 +58,7 @@ Alternatives:
   (list
     jnf/tor-home-directory
     ;; The themes directory
-    "~/git/takeonrules.github.io/themes/hugo-tufte"
+    "~/git/takeonrules.source/themes/hugo-tufte"
     "~/git/jnf-emacs-bookmarks"
     ;; The tooling directory
     "~/git/dotzshrc/"

@@ -45,7 +45,7 @@
 (message "%s" (randomElementFrom (list "Hello" "World")))
 
 ;; I want a script that:
-(let* ((dirs (list "~/git/org" "~/git/dotzshrc" "~/git/takeonrules.github.io" "~/git/takeonrules.github.io/themes/hugo-tufte")))
+(let* ((dirs (list "~/git/org" "~/git/dotzshrc" "~/git/takeonrules.source" "~/git/takeonrules.source/themes/hugo-tufte")))
   (dolist (dir dirs)
     (magit-status dir)))
 

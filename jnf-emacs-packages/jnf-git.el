@@ -37,7 +37,7 @@
 
   ;; The default relevant `magit-list-repositories'
   (setq magit-repository-directories
-        `(("~/git/takeonrules.github.io/" . 1) ;; personal
+        `(("~/git/takeonrules.source/" . 1) ;; personal
           ("~/git/dotzshrc/" .  1) ;; all
           ("~/git/dotemacs/" . 1) ;; all
           ("~/git/jnf-emacs-bookmarks/" . 1)
@@ -47,7 +47,7 @@
           ("~/git/org/hesburgh-libraries" . 1) ;; work
           ("~/git/org/personal" . 1) ;; personal
           ("~/git/org/public" . 1) ;; all
-          ("~/git/takeonrules.github.io/themes/hugo-tufte" . 1))) ;; personal
+          ("~/git/takeonrules.source/themes/hugo-tufte" . 1))) ;; personal
 
   ;; Have magit-status go full screen and quit to previous
   ;; configuration.  Taken from
@@ -65,8 +65,8 @@
   "Create a `magit-list-repositories' for my personal repositories."
   (interactive)
   (setq magit-repository-directories
-      `(("~/git/takeonrules.github.io/" . 1)
-        ("~/git/takeonrules.github.io/hugo-tufte" . 1)
+      `(("~/git/takeonrules.source/" . 1)
+        ("~/git/takeonrules.source/hugo-tufte" . 1)
         ("~/git/org" . 1)
         ("~/git/org/personal" . 1)
         ("~/git/org/public" . 1)
