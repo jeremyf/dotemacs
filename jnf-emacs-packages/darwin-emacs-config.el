@@ -94,5 +94,16 @@ setting (e.g. ns-alternate-modifier)."
   :config
   (global-so-long-mode 1))
 
+
+;; (use-package send-to-osx-grammarly
+;;   :straight (send-to-osx-grammarly :type git :host github :repo "emacs-grammarly/send-to-osx-grammarly")
+;;   :config
+;;   (defconst send-to-osx-grammarly-script-dir
+;;     "~/.emacs.d/straight/repos/send-to-osx-grammarly/scripts"
+;;     "Script path for package `send-to-osx-grammarly'.")
+;;   :bind (
+;;          ("C-c C-g p" . send-to-osx-grammarly-push)
+;;          ("C-c C-g f" . send-to-osx-grammarly-pull)
+;;          ))
 (provide 'darwin-emacs-config.el)
 ;;; darwin-emacs-config.el ends here
