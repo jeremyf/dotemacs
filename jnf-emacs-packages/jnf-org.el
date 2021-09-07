@@ -193,5 +193,7 @@ exist after each headings's drawers."
   :bind (
          :map org-noter-notes-mode-map ("C-c o" . 'org-noter-sync-current-note)))
 
+;; https://github.com/zzamboni/ox-leanpub
+
 (provide 'jnf-org.el)
 ;;; jnf-org.el ends here
