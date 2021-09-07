@@ -366,8 +366,8 @@ The form should be '((\"all\" 1) (\"hesburgh-libraries\" 2))."
                  (window-width . 0.33)
                  (window-parameters . ((no-other-window . t)
                                        (no-delete-other-windows . t)))))
-
-  (setq org-roam-completion-everywhere t)
+  ;; When t the autocomplete in org documents would query the org roam database
+  (setq org-roam-completion-everywhere nil)
   (setq org-roam-v2-ack t)
   (org-roam-db-autosync-mode)
   ;; Configure the "all" subject key map
