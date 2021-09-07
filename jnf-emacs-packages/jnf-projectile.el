@@ -20,6 +20,7 @@
                    ("b" projectile-switch-to-buffer "Buffer Select…")
                    ("d" projectile-dired            "Dired to project root…")
                    ("f" projectile-find-file-dwim   "Find File DWIM…")
+                   ("i" projectile-ibuffer          "Ibuffer…")
                    ("k" projectile-kill-buffers     "Kill Buffers…")
                    ("o" projectile-multi-occur      "Occurs in Project…")
                    ("r" projectile-recentf          "Recent File Select…")
