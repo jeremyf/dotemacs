@@ -589,11 +589,7 @@ as the behavior's well defined."
 
 (defun jnf/tor-wrap-date (date)
   "Wrap the point or region with the given DATE."
-  (interactive (list
-                (read-string
-                 (concat "Date (default \""
-                         (format-time-string "%Y-%m-%d") "\"): ")
-                 nil nil (format-time-string "%Y-%m-%d"))))
+  (interactive (list (org-read-date nil nil nil "Date")))
   (jnf/tor-wrap-in-html-tag
    "time"
    (concat "datetime=\"" date "\" title=\"" date "\"")))
