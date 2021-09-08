@@ -26,6 +26,20 @@
       "hesburgh-libraries/%<%Y%m%d>---${slug}.org"
       "#+title: ${title}\n#+FILETAGS: :hesburgh: %^G\n\n")
      :unnarrowed t)
+   :forem
+   '("f" "Forem" plain "%?"
+     :target
+     (file+head
+      "forem/%<%Y%m%d>---${slug}.org"
+      "#+title: ${title}\n#+FILETAGS: :forem: %^G\n\n")
+     :unnarrowed t)
+   :forem-encrypted
+   '("F" "Forem encrypted" plain "%?"
+     :target
+     (file+head
+      "forem/%<%Y%m%d>---${slug}.org.gpg"
+      "#+title: ${title}\n#+FILETAGS: :forem: %^G\n\n")
+     :unnarrowed t)
    :jf-consulting
    '("j" "JF Consulting" plain "%?"
      :target
@@ -76,6 +90,11 @@
          :name "all"
          :title "All"
          :path-to-todo "~/git/org/todo.org")
+   :forem (list
+                   :templates (list :forem :forem-encrypted)
+                   :name "forem"
+                   :title "Forem"
+                   :path-to-todo "~/git/org/forem/todo.org")
    :jf-consulting (list
                    :templates (list :jf-consulting)
                    :name "jf-consulting"
@@ -272,8 +291,11 @@ Fetch the given SUBJECT from the given SUBJECTS-PLIST."
 (create-org-roam-subject-fns-for :public
                                  :menu_group "Life"
                                  :menu_prefix "u")
+(create-org-roam-subject-fns-for :forem
+                                 :menu_group "Work"
+                                 :menu_prefix "f")
 (create-org-roam-subject-fns-for :hesburgh-libraries
-                                 :menu_group "Projects"
+                                 :menu_group "Work"
                                  :menu_prefix "h")
 (create-org-roam-subject-fns-for :jf-consulting
                                  :menu_group "Projects"

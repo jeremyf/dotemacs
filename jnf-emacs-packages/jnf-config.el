@@ -78,6 +78,7 @@ Alternatives:
     "~/git/org/personal/thel-sector"
     ;; An org directory
     "~/git/org/hesburgh-libraries"
+    "~/git/org/forem"
     )
   "Relevant data directories for my day to day work.")
 

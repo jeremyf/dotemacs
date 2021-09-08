@@ -45,6 +45,7 @@
           ("~/git/org/archive" . 1) ;; personal
           ("~/git/org/daily" . 1) ;; ??
           ("~/git/org/hesburgh-libraries" . 1) ;; work
+          ("~/git/org/forem" . 1) ;; work
           ("~/git/org/personal" . 1) ;; personal
           ("~/git/org/public" . 1) ;; all
           ("~/git/takeonrules.source/themes/hugo-tufte" . 1))) ;; personal
@@ -73,6 +74,7 @@
         ("~/git/org/archive" . 1)
         ("~/git/org/daily" . 1)
         ("~/git/org/hesburgh-libraries" . 1)
+        ("~/git/org/forem" . 1)
         ("~/git/dotemacs/" . 1)
         ("~/git/jnf-emacs-bookmarks/" . 1)
         ("~/git/dotzshrc/" .  1)))
