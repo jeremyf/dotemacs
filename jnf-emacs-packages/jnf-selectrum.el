@@ -318,10 +318,13 @@ the directory.  `REST' is passed to the `CONSULT-RIPGREP-FUNCTION'."
      ;; Flex matching
      ((string-prefix-p "~" pattern) `(orderless-flex . ,(substring pattern 1)))
      ((string-suffix-p "~" pattern) `(orderless-flex . ,(substring pattern 0 -1)))))
-  (setq completion-styles '(orderless)
-        completion-category-defaults nil
-        completion-category-overrides '((file (styles . (partial-completion))))
-        orderless-style-dispatchers '(dm/orderless-dispatch)))
+  :custom
+  (completion-styles '(orderless))
+  (completion-category-defaults nil)
+  (read-file-name-completion-ignore-case t)
+  (completion-category-overrides '((file . (styles partial-completion))
+    				   (minibuffer . (initials))))
+  (orderless-style-dispatchers '(dm/orderless-dispatch)))
 
 (provide 'jnf-selectrum.el)
 ;;; jnf-selectrum.el ends here
