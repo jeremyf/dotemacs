@@ -297,6 +297,34 @@ Useful for pasting code into Reddit's Markdown mode."
 ;; Treat dashes and underscores as part of words for navigation
 ;; (global-superword-mode t)
 
+(global-set-key (kbd "C-s-\\") 'jnf/display-buffer-in-side-window)
+(cl-defun jnf/display-buffer-in-side-window (&optional (buffer (current-buffer)))
+  "Display BUFFER in dedicated side window."
+  (interactive)
+  (let ((display-buffer-mark-dedicated t))
+    (display-buffer-in-side-window buffer
+                                   '((side . right)
+                                     (window-parameters
+                                      (no-delete-other-windows . t))))))
+
+(global-set-key (kbd "C-s--") 'jnf/display-buffer-in-bottom-window)
+(cl-defun jnf/display-buffer-in-bottom-window (&optional (buffer (current-buffer)))
+  "Display BUFFER in dedicated side window."
+  (interactive)
+  (let ((display-buffer-mark-dedicated t))
+    (display-buffer-in-side-window buffer
+                                   '((side . bottom)
+                                     (window-parameters
+                                      (no-delete-other-windows . t))))))
+
+;; I'm a little uncertain how to handle this.
+;; https://depp.brause.cc/shackle/
+(use-package shackle
+  :straight t
+  :custom
+  (shackle-rules '((compilation-mode :noselect t))
+                 shackle-default-rule '(:select t)))
+
 ;;******************************************************************************
 ;;
 ;;; END Custom "in-buffer" functions
