@@ -1,6 +1,5 @@
 # -*- mode: snippet -*-
 # contributor: Jeremy Friesen <jeremy.n.friesen@gmail.com>
-# group: takeonrules
 # name: epigraph
 # key: epi
 # expand-env: ((yas-indent-line 'fixed) (yas-wrap-around-region 'nil))
