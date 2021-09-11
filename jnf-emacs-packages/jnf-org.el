@@ -86,6 +86,8 @@
    '((emacs-lisp . t)
      (plantuml . t)
      (ruby . t)))
+  ;; Make TAB act as if it were issued from the buffer of the languages's major mode.
+  :custom (org-src-tab-acts-natively t)
   :bind (
          :map org-mode-map
               ("C-c C-l". jnf/org-insert-link-dwim))

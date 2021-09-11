@@ -92,6 +92,14 @@
 ;; Far to easy to type this on accident, and I'm not a fan of it's behavior.
 (unbind-key "C-z") ;; `suspend-frame'
 
+(prefer-coding-system 'utf-8)
+(set-default-coding-systems 'utf-8)
+(set-terminal-coding-system 'utf-8)
+(set-keyboard-coding-system 'utf-8)
+
+(setq user-full-name "Jeremy Friesen"
+      user-mail-address "jeremy@jeremyfriesen.com")
+
 ;; Given that C-c C-x is common within org-mode, I found myself
 ;; accidentally invoking this transposition.  I have "s-q" command for
 ;; this.
