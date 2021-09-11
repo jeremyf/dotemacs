@@ -36,6 +36,8 @@
 ;; END BLOCK
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+
+(global-hl-line-mode)
 (blink-cursor-mode t)
 ;; Doing a bit of configuration of my cursors
 (setq-default cursor-type 'bar)
