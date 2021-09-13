@@ -39,7 +39,7 @@
 (use-package dash :straight t)
 
 (defconst jnf/fixed-width-font-name
-  "Hack Nerd Font Mono"
+  "Hack Nerd Font"
   "The name of the fixed width font.
 I have it sprinkled through too many places.
 
