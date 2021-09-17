@@ -130,6 +130,7 @@
     "Quickly open a scratch buffer in `org-mode'."
     (interactive)
     (crux-create-scratch-buffer)
+    (rename-buffer (concat "*scratch* at " (format-time-string "%Y-%m-%d %H:%M")))
     (org-mode))
   :bind (("C-a" . crux-move-beginning-of-line)
          ("<C-s-return>" . crux-smart-open-line-above)
