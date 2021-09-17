@@ -125,11 +125,18 @@
 ;; again, and go to the beginning of the line.
 (use-package crux
   :straight t
+  :config
+  (defun jnf/create-org-scratch-buffer ()
+    "Quickly open a scratch buffer in `org-mode'."
+    (interactive)
+    (crux-create-scratch-buffer)
+    (org-mode))
   :bind (("C-a" . crux-move-beginning-of-line)
          ("<C-s-return>" . crux-smart-open-line-above)
          ("C-M-d" . crux-duplicate-current-line-or-region)
          ("C-c d" . crux-duplicate-current-line-or-region)
-         ("<f9>" . crux-kill-other-buffers)))
+         ("<f9>" . crux-kill-other-buffers)
+         ("<f12>" . jnf/create-org-scratch-buffer)))
 
 ;; Whitespace hygene package.  The author's documentation and
 ;; commentary echoes my sentiments
