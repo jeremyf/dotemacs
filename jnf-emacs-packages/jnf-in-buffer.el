@@ -126,12 +126,12 @@
 (use-package crux
   :straight t
   :config
-  (defun jnf/create-org-scratch-buffer ()
-    "Quickly open a scratch buffer in `org-mode'."
+  (cl-defun jnf/create-org-scratch-buffer (&key (mode 'org-mode))
+    "Quickly open a scratch buffer and enable the given MODE."
     (interactive)
     (crux-create-scratch-buffer)
     (rename-buffer (concat "*scratch* at " (format-time-string "%Y-%m-%d %H:%M")))
-    (org-mode))
+    (funcall mode))
   :bind (("C-a" . crux-move-beginning-of-line)
          ("<C-s-return>" . crux-smart-open-line-above)
          ("C-M-d" . crux-duplicate-current-line-or-region)
