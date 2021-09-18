@@ -412,27 +412,27 @@ We'll pass the :CITETITLE, :CITEAUTHOR, and :CITEURL to
 
 (cl-defun jnf/tor-find-file-draft (filename
                                    &key
-                                   (directory (f-join jnf/tor-home-directory "content")))
-  "Find draft FILENAME in given DIRECTORY."
+                                   (in "content"))
+  "Find the draft FILENAME that is IN the directory of TakeOnRules.com."
   (interactive (list (completing-read
                       "Filename: "
                       (jnf/list-filenames-with-file-text
-                       :matching "^title: true"
+                       :matching "^draft: true"
                        :in "content"))))
-  (let ((file-path (f-join directory filename)))
+  (let ((file-path (f-join jnf/tor-home-directory in filename)))
     (message "Opening draft %s" file-path)
     (find-file file-path)))
 
 (cl-defun jnf/tor-find-file (filename
                              &key
-                             (directory (f-join jnf/tor-home-directory "content")))
-  "Find FILENAME in given DIRECTORY."
+                             (in "content"))
+  "Find FILENAME that is IN the directory of TakeOnRules.com."
   (interactive (list (completing-read
                       "Filename: "
                       (jnf/list-filenames-with-file-text
                        :matching "^title:"
                        :in "content"))))
-  (let ((file-path (f-join directory filename)))
+  (let ((file-path (f-join jnf/tor-home-directory in filename)))
     (message "Opening %s" file-path)
     (find-file file-path)))
 ;;******************************************************************************
@@ -504,8 +504,8 @@ We'll pass the :CITETITLE, :CITEAUTHOR, and :CITEURL to
      (shell-command-to-string
       (concat
        "rg \""
-       matching "\" --only-matching --files-with-matches "
-       "| sort | tr '\n' '~'"))
+       matching "\" --only-matching --files-with-matches --sortr modified"
+       "| tr '\n' '~'"))
      "~")))
 
 (defun jnf/tor-page-relative-pathname-list ()
