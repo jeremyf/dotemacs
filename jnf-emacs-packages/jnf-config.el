@@ -44,7 +44,9 @@
 I have it sprinkled through too many places.
 
 Alternatives:
-- \"JetBrains Mono\"")
+- \"Monaco\"
+- \"JetBrains Mono\"
+- \"Hack Nerd Font\"")
 
 (defconst jnf/tor-home-directory
   (file-truename "~/git/takeonrules.source")
@@ -57,26 +59,16 @@ Alternatives:
 (defvar jnf/data-directories
   (list
     jnf/tor-home-directory
-    ;; The themes directory
     "~/git/takeonrules.source/themes/hugo-tufte"
     "~/git/jnf-emacs-bookmarks"
-    ;; The tooling directory
     "~/git/dotzshrc/"
-    ;; The personal configuration options
     "~/git/dotemacs/"
-    ;; An org directory
     "~/git/org/"
-    ;; An org directory
     "~/git/org/archive"
-    ;; An org directory
     "~/git/org/daily"
-    ;; An org directory
     "~/git/org/public"
-    ;; An org directory
     "~/git/org/personal"
-    ;; An org directory
     "~/git/org/personal/thel-sector"
-    ;; An org directory
     "~/git/org/hesburgh-libraries"
     "~/git/org/forem"
     )

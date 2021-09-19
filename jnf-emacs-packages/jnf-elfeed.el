@@ -29,7 +29,7 @@
                    (elfeed-entry-meta elfeed-show-entry)
                    :authors))
              :name)))
-      (tor-post-amplifying-the-blogosphere citeTitle
+      (jnf/tor-post-amplifying-the-blogosphere citeTitle
                                            :citeTitle citeTitle
                                            :citeURL citeURL
                                            :citeAuthor citeAuthor)))
