@@ -19,6 +19,13 @@
 ;;******************************************************************************
 (defconst jnf/org-roam-capture-templates-plist
   (list
+   :eberron
+   '("e" "Eberron" plain "%?"
+     :target
+     (file+head
+      "personal/%<%Y%m%d>---${slug}.org"
+      "#+title: ${title}\n#+FILETAGS: :personal:rpg:eberron:\n\n")
+     :unnarrowed t)
    :hesburgh-libraries
    '("h" "Hesburgh Libraries" plain "%?"
      :target
@@ -90,6 +97,11 @@
          :name "all"
          :title "All"
          :path-to-todo "~/git/org/todo.org")
+   :eberron (list
+              :templates (list :eberron)
+              :name "eberron"
+              :title "Eberron"
+              :path-to-todo "~/git/org/personal/todo.org")
    :forem (list
                    :templates (list :forem :forem-encrypted)
                    :name "forem"
@@ -300,9 +312,9 @@ Fetch the given SUBJECT from the given SUBJECTS-PLIST."
 (create-org-roam-subject-fns-for :jf-consulting
                                  :menu_group "Projects"
                                  :menu_prefix "j")
-(create-org-roam-subject-fns-for :thel-sector
+(create-org-roam-subject-fns-for :eberron
                                  :menu_group "Projects"
-                                 :menu_prefix "t")
+                                 :menu_prefix "e")
 
 
 (pretty-hydra-define+ jnf/org-subject-menu--all()
