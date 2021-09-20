@@ -146,6 +146,14 @@ Each subject has a plist of :templates, :title, :name, and :path-to-todo.
   subject.
 - :path-to-todo is the path to the todo file for this subject."
 )
+
+(cl-defun jnf/org-roam-subject-exists-on-machine? (subject
+                                                   &key
+                                                   (subjects-plist jnf/org-roam-capture-subjects-plist))
+  "Return tif the todo file exists for given SUBJECT in the SUBJECTS-PLIST."
+  (let ((path-to-todo (plist-get (plist-get subjects-plist subject) :path-to-todo)))
+    (f-exists? path-to-todo)))
+
 (cl-defun jnf/org-roam-templates-for-subject (subject
                                               &key
                                               (subjects-plist jnf/org-roam-capture-subjects-plist)
@@ -229,11 +237,13 @@ Fetch the given SUBJECT from the given SUBJECTS-PLIST."
                             subject-name " subject."
                             "\n\nArguments INITIAL-INPUT and OTHER-WINDOW are from `org-roam-find-mode'."))
          )
+    (when (jnf/org-roam-subject-exists-on-machine? subject)
     `(progn
        (defun ,todo-fn-name ()
          ,todo-docstring
          (interactive)
-         (find-file (file-truename ,path-to-todo)))
+         (find-file (file-truename ,path-to-todo))
+         (end-of-buffer))
 
        (defun ,capture-fn-name (&optional goto keys)
          ,capture-docstring
@@ -279,7 +289,7 @@ Fetch the given SUBJECT from the given SUBJECTS-PLIST."
            (,hydra-kbd-prefix-insert  ,insert-fn-name  " ├─ Insert…")
            (,hydra-kbd-prefix-find    ,find-fn-name    " └─ Find…")
            )))
-       )))
+       ))))
 
 ;; I tried using a dolist to call each of the macros, but that didn't
 ;; work.  I'd love some additional help refactoring this.  But for
@@ -344,8 +354,10 @@ The form should be '((\"all\" 1) (\"hesburgh-libraries\" 2))."
   ;; Skipping the even entries as those are the "keys" for the plist,
   ;; the odds are the values.
   (-non-nil (seq-map-indexed (lambda (subject index)
-                     (when (oddp index) (list (plist-get subject :name) index)))
-                   subjects-plist)))
+                               (when (oddp index)
+                                 (when (f-exists? (plist-get subject :path-to-todo))
+                                   (list (plist-get subject :name) index))))
+                             subjects-plist)))
 
 (defun jnf/toggle-roam-subject-filter (subject)
   "Prompt for a SUBJECT, then toggle the 's-i' kbd to filter for that subject."
