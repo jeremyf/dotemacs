@@ -17,7 +17,7 @@
 ;;; BEGIN Template and Subject Definitions
 ;;
 ;;******************************************************************************
-(defconst jnf/org-roam-capture-templates-plist
+(defvar jnf/org-roam-capture-templates-plist
   (list
    :eberron
    '("e" "Eberron" plain "%?"
@@ -85,18 +85,8 @@
    )
   "A plist defining my `org-roam' capture templates.")
 
-(defconst jnf/org-roam-capture-subjects-plist
+(defvar jnf/org-roam-capture-subjects-plist
   (list
-   ;; The :all subject is different from the other items.
-   :all (list
-         ;; Iterate through all registered capture templates and
-         ;; generate a list
-         :templates (-non-nil (seq-map-indexed (lambda (template index)
-                                                 (when (evenp index) template))
-                                               jnf/org-roam-capture-templates-plist))
-         :name "all"
-         :title "All"
-         :path-to-todo "~/git/org/todo.org")
    :eberron (list
               :templates (list :eberron)
               :name "eberron"
@@ -146,6 +136,27 @@ Each subject has a plist of :templates, :title, :name, and :path-to-todo.
   subject.
 - :path-to-todo is the path to the todo file for this subject."
 )
+
+;; Add the special ":all" case to  `jnf/org-roam-capture-subjects-plist'
+(plist-put jnf/org-roam-capture-subjects-plist
+           :all
+           (list
+            ;; Iterate only through the templates that have a
+            ;; corresponding todo file.
+            :templates (-uniq
+                        (-flatten
+                         (-non-nil
+                          (seq-map-indexed
+                           (lambda (subject index)
+                             (when (oddp index)
+                               (if (f-exists? (plist-get subject :path-to-todo))
+                                   (plist-get subject :templates)
+                                 nil)))
+                           jnf/org-roam-capture-subjects-plist))))
+            :name "all"
+            :title "All"
+            :path-to-todo "~/git/org/todo.org"))
+
 
 (cl-defun jnf/org-roam-subject-exists-on-machine? (subject
                                                    &key
