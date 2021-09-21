@@ -336,6 +336,9 @@ Fetch the given SUBJECT from the given SUBJECTS-PLIST."
 (create-org-roam-subject-fns-for :eberron
                                  :menu_group "Projects"
                                  :menu_prefix "e")
+(create-org-roam-subject-fns-for :thel-sector
+                                 :menu_group "Projects"
+                                 :menu_prefix "t")
 
 
 (pretty-hydra-define+ jnf/org-subject-menu--all()
