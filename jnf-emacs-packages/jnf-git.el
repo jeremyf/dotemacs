@@ -38,7 +38,7 @@
   ;; The default relevant `magit-list-repositories'
   (setq magit-repository-directories
         `(("~/git/takeonrules.source/" . 1) ;; personal
-          ("~/git/takeonrules.source/data/burning_wheel" . 1)
+          ("~/git/burning_wheel_lifepaths/" . 1)
           ("~/git/dotzshrc/" .  1) ;; all
           ("~/git/dotemacs/" . 1) ;; all
           ("~/git/jnf-emacs-bookmarks/" . 1)
@@ -69,7 +69,7 @@
   (setq magit-repository-directories
       `(("~/git/takeonrules.source/" . 1)
         ("~/git/takeonrules.source/hugo-tufte" . 1)
-        ("~/git/takeonrules.source/data/burning_wheel" . 1)
+        ("~/git/burning_wheel_lifepaths/" . 1)
         ("~/git/org" . 1)
         ("~/git/org/personal" . 1)
         ("~/git/org/public" . 1)

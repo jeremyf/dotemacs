@@ -60,7 +60,7 @@ Alternatives:
   (list
     jnf/tor-home-directory
     "~/git/takeonrules.source/themes/hugo-tufte"
-    "~/git/takeonrules.source/data/burning_wheel"
+    "~/git/burning_wheel_lifepaths/"
     "~/git/jnf-emacs-bookmarks"
     "~/git/dotzshrc/"
     "~/git/dotemacs/"
