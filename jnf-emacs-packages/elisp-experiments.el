@@ -81,5 +81,8 @@ Version 2016-07-18"
     (message "%s" system-name))
 
 
+(use-package qrencode
+  :straight (qrencode :host github :type git :repo "ruediger/qrencode-el"))
+
 (provide 'elisp-experiments.el)
 ;;; elisp-experiments.el ends here
