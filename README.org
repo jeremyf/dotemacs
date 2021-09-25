@@ -28,4 +28,4 @@ The files and directories:
 Some highlights:
 
 - [[https://github.com/jeremyf/dotemacs/blob/main/jnf-emacs-packages/jnf-blogging.el][jnf-blogging.el]] :: a quasi-package to assist in writing, building, and extending [[https://takeonrules.com/][TakeOnRules.com]].
-- [[https://github.com/jeremyf/dotemacs/blob/main/jnf-emacs-packages/jnf-org-roam-v2.el][jnf-org-roam-v2.el]] :: a quasi-package I’ve built to extend [[https://www.orgroam.com/][org-roam]] capabilities.  I wrote about this quasi-pacage in [[https://takeonrules.com/2021/08/23/diving-into-the-implementation-of-subject-menus-for-org-roam/][Diving into the Implementation of Subject Menus for Org Roam]].
+- [[https://github.com/jeremyf/dotemacs/blob/main/jnf-emacs-packages/jnf-org-roam-v2.el][jnf-org-roam-v2.el]] :: a quasi-package I’ve built to extend [[https://www.orgroam.com/][org-roam]] capabilities.  I wrote about this quasi-package in [[https://takeonrules.com/2021/08/23/diving-into-the-implementation-of-subject-menus-for-org-roam/][Diving into the Implementation of Subject Menus for Org Roam]].
