@@ -191,7 +191,8 @@ If there's an active region, select that text and place it."
           (or (citeTitle) (citeURL)) "</a></cite>\n")
          nil fpath t)))
     ;; Finally open that file for editing.
-    (find-file fpath)))
+    (find-file fpath)
+    (end-of-buffer)))
 ;;******************************************************************************
 ;;
 ;;; END Non-Interactive Utility Functions
