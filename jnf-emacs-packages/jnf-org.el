@@ -18,7 +18,7 @@
   returning-list)
 
 (use-package org
-  :straight t
+  :straight (org :type built-in)
   :config (setq
            org-directory "~/git/org"
            org-agenda-files (jnf/org-agenda-files
