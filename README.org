@@ -1,11 +1,6 @@
 #+title: README for Dotemacs
 
-This is my Emacs configuration repository.  It pairs with my [[https://github.com/jeremyf/dotzshrc/][dotzshrc
-repository]].  The [[https://github.com/jeremyf/dotzshrc/blob/main/install.rb][install.rb]] script of the dotzshrc repository uses
-this repository.  For implementation reasons, the ~emacs.d~ directory
-contains the init files that I link into my ~$HOME/.emacs.d~ directory.
-The ~jnf-packages~ are my “packages” that I’ve separated out for
-organizational purposes.
+This is my Emacs configuration repository.  It pairs with my [[https://github.com/jeremyf/dotzshrc/][dotzshrc repository]].  The [[https://github.com/jeremyf/dotzshrc/blob/main/install.rb][install.rb]] script of the dotzshrc repository uses this repository.  For implementation reasons, the ~emacs.d~ directory contains the init files that I link into my ~$HOME/.emacs.d~ directory.  The ~jnf-packages~ are my “packages” that I’ve separated out for organizational purposes.
 
 For those curious, I wrote [[https://takeonrules.com/2020/10/18/why-i-chose-emacs-as-my-new-text-editor/][Why I Chose Emacs as My New Text Editor // Take on Rules]].
 
@@ -24,18 +19,13 @@ Below is the top-level directory:
 The files and directories:
 
 - README.org :: This file
-- emacs.d :: A directory that contains files symlinked into
-  ~$HOME/.emacs.d~ directory.
-- jnf-emacs-packages :: A directory of quasi-packages that I’ve made
-  to help organize my emacs configuration.
+- emacs.d :: A directory that contains files symlinked into ~$HOME/.emacs.d~ directory.
+- jnf-emacs-packages :: A directory of quasi-packages that I’ve made to help organize my emacs configuration.
 - snippets :: A directory of [[https://joaotavora.github.io/yasnippet/][yasnippets]] I’ve created.
 - todo.org :: The todo list for updates I’m considering to my dotemacs file.
 - todo.org_archive :: The archive of todo items, completed or abandoned.
 
 Some highlights:
 
-- [[https://github.com/jeremyf/dotemacs/blob/main/jnf-emacs-packages/jnf-blogging.el][jnf-blogging.el]] :: a quasi-package to assist in writing, building,
-  and extending [[https://takeonrules.com/][TakeOnRules.com]].
-- [[https://github.com/jeremyf/dotemacs/blob/main/jnf-emacs-packages/jnf-org-roam-v2.el][jnf-org-roam-v2.el]] :: a quasi-package I’ve built to extend [[https://www.orgroam.com/][org-roam]]
-  capabilities.  I wrote about this quasi-pacage in [[https://takeonrules.com/2021/08/23/diving-into-the-implementation-of-subject-menus-for-org-roam/][Diving into the
-  Implementation of Subject Menus for Org Roam]].
+- [[https://github.com/jeremyf/dotemacs/blob/main/jnf-emacs-packages/jnf-blogging.el][jnf-blogging.el]] :: a quasi-package to assist in writing, building, and extending [[https://takeonrules.com/][TakeOnRules.com]].
+- [[https://github.com/jeremyf/dotemacs/blob/main/jnf-emacs-packages/jnf-org-roam-v2.el][jnf-org-roam-v2.el]] :: a quasi-package I’ve built to extend [[https://www.orgroam.com/][org-roam]] capabilities.  I wrote about this quasi-pacage in [[https://takeonrules.com/2021/08/23/diving-into-the-implementation-of-subject-menus-for-org-roam/][Diving into the Implementation of Subject Menus for Org Roam]].
