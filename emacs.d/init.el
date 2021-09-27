@@ -33,6 +33,8 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
+(setq straight-repository-branch "develop")
+
 ;; I saw that straight loaded use-package to take advantage of the
 ;; use-package syntax which is often how things are documented.
 (straight-use-package 'use-package)

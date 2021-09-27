@@ -14,3 +14,7 @@
 ;; don't feel improvements. My value is (setq gc-cons-threshold
 ;; 8000000) ;; ~8MB
 (setq gc-cons-threshold most-positive-fixnum)
+
+;; From straight.el, "Users of Emacs versions >= 27 will want to add
+;; the following:"
+(setq package-enable-at-startup nil)
