@@ -230,21 +230,20 @@ exist after each headings's drawers."
 ;; (setq org-latex-pdf-process
 ;;       '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f"))
 
-;; Disable for now
-;; (eval-after-load 'ox '(require 'ox-koma-letter))
-;;
-;; (eval-after-load 'ox-koma-letter
-;;   '(progn
-;;      (add-to-list 'org-latex-classes
-;;                   '("jnf-letter"
-;;                     "\\documentclass\{scrlttr2\}
-;;      \\usepackage[english]{babel}
-;;      \\setkomavar{frombank}{(1234)\\,567\\,890}
-;;      \[DEFAULT-PACKAGES]
-;;      \[PACKAGES]
-;;      \[EXTRA]"))
+(eval-after-load 'ox '(require 'ox-koma-letter))
 
-;;      (setq org-koma-letter-default-class "jnf-letter")))
+(eval-after-load 'ox-koma-letter
+  '(progn
+     (add-to-list 'org-latex-classes
+                  '("jnf-letter"
+                    "\\documentclass\{scrlttr2\}
+     \\usepackage[english]{babel}
+     \\setkomavar{frombank}{(1234)\\,567\\,890}
+     \[DEFAULT-PACKAGES]
+     \[PACKAGES]
+     \[EXTRA]"))
+
+     (setq org-koma-letter-default-class "jnf-letter")))
 
 
 (provide 'jnf-org.el)
