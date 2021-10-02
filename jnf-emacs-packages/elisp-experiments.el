@@ -84,5 +84,11 @@ Version 2016-07-18"
 (use-package qrencode
   :straight (qrencode :host github :type git :repo "ruediger/qrencode-el"))
 
+(use-package edraw
+  :straight (edraw :host github :type git :repo "misohena/el-easydraw"))
+
+(with-eval-after-load 'org
+  (require 'edraw-org)
+  (edraw-org-setup-default))
 (provide 'elisp-experiments.el)
 ;;; elisp-experiments.el ends here
