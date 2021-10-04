@@ -90,5 +90,13 @@ Version 2016-07-18"
 (with-eval-after-load 'org
   (require 'edraw-org)
   (edraw-org-setup-default))
+
+(use-package tmr
+  :straight (tmr :host gitlab :type git :repo "protesilaos/tmr.el"))
+
+;; Edit in Emacs
+(use-package emacs-everywhere
+  :straight t)
+
 (provide 'elisp-experiments.el)
 ;;; elisp-experiments.el ends here
