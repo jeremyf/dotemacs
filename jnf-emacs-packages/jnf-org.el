@@ -196,9 +196,12 @@ exist after each headings's drawers."
 
 ;; Insert immediate timestamp at point.
 (defun jnf/org-insert-immediate-active-timestamp ()
-  "Insert an active timestamp for the current time."
+  "Insert an active date for today.  If given the universal arg (e.g., C-u) insert a timestamp instead."
   (interactive)
-  (org-insert-time-stamp nil t nil))
+  (if (equal current-prefix-arg nil) ; no C-u
+      (org-insert-time-stamp nil nil nil)
+    (org-insert-time-stamp nil t nil)))
+
 (global-set-key (kbd "<f2>") 'jnf/org-insert-immediate-active-timestamp)
 (global-set-key (kbd "s-2") 'jnf/org-insert-immediate-active-timestamp)
 
