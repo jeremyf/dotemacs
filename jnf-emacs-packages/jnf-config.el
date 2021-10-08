@@ -79,10 +79,11 @@ Alternatives:
   "~/git/org/forem/dashboard.org"
   "The file to the dashboard documentation and links for Forem.")
 
+(global-set-key (kbd "C-M-s-d") 'jnf/open-dashboard)
 (cl-defun jnf/open-dashboard (&key (filename jnf/forem-dashboard-filename))
   "Open the given FILENAME via the bin/dashboard command."
   (interactive)
-  (async-shell-command "dashboard"))
+  (call-process-shell-command "dashboard"))
 
 (cl-defun jnf/git-data-sync (&optional (directories jnf/data-directories))
   "Synchronize DIRECTORIES with git pull/push.
