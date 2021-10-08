@@ -237,6 +237,8 @@
 ;;
 ;;******************************************************************************
 (global-set-key (kbd "C-w") 'jnf/kill-region-or-backward-word)
+(global-set-key (kbd "M-DEL") 'jnf/kill-region-or-backward-word)
+(global-set-key (kbd "<C-M-backspace>") 'backward-kill-paragraph)
 (defun jnf/kill-region-or-backward-word (&optional arg)
   "Kill selected region otherwise kill backwards the ARG number of words."
   (interactive "p")
@@ -298,7 +300,6 @@ Useful for pasting code into Reddit's Markdown mode."
                 (buffer-string)))))
 
 (global-set-key (kbd "<f5>") 'eval-region)
-(global-set-key (kbd "M-DEL") 'backward-kill-paragraph)
 (global-set-key (kbd "s-q") 'save-buffers-kill-terminal)
 (global-set-key (kbd "s-w") 'kill-current-buffer)
 
