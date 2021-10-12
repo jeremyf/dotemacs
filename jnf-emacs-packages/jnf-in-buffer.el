@@ -26,6 +26,7 @@
 
 ;; That letter is the beginning of a word. Narrow results from there.
 (use-package avy
+  :bind* (("C-j" . avy-goto-char-timer))
   :straight t)
 
 ;; https://github.com/shankar2k/math-at-point
