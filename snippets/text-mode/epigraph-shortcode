@@ -1,6 +1,6 @@
 # -*- mode: snippet -*-
 # contributor : Jeremy Friesen <jeremy.n.friesen@gmail.com>
-# name: epigraph
+# name: epigraph-shortcode
 # key: epi
 # --
 {{< epigraph key="${1:$$(yas-choose-value (jnf/tor-epigraph-list))}" >}}$0
