@@ -88,6 +88,7 @@
 (unbind-key "C-x C-d") ;; `list-directory'
 ;; `dired' is a better interface than `list-directory'
 (global-set-key (kbd "C-x C-d") 'dired)
+(global-set-key (kbd "<M-delete>") 'kill-word)
 
 ;; Far to easy to type this on accident, and I'm not a fan of it's behavior.
 (unbind-key "C-z") ;; `suspend-frame'
