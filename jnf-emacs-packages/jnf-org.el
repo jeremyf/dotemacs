@@ -28,9 +28,7 @@
            org-default-notes-file (concat org-directory "/captured-notes.org")
            org-todo-keywords
            '((sequence "TODO" "WAITING" "|" "DONE")
-             (sequence "MEETING" "AGENDA" "|" "MINUTES")
-             (sequence "UNFILED" "|" "FILED")
-             (sequence "TO-READ" "READING" "|" "READ")))
+           (sequence "PENDING" "TODO" "WAITING" "|" "READ")))
   (setq org-capture-templates
         '(
           ("e" "Emacs Config Todo" entry (file "~/git/dotemacs/todo.org")
