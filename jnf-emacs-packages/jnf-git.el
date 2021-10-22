@@ -137,5 +137,12 @@ Uses `eww-browse-with-external-browser' to determine external browser to use."
          ("<f6>" . git-messenger:popup-message))
   :straight t)
 
+(use-package blamer
+  :straight (blamer :host github :repo "Artawower/blamer.el")
+  :custom
+  (blamer-idle-time 0.5)
+  (blamer-min-offset 70)
+  :config (global-blamer-mode 1))
+
 (provide 'jnf-git.el)
 ;;; jnf-git.el ends here
