@@ -120,6 +120,7 @@
 ;; (require 'jnf-fennel.el)
 (require 'jnf-dired.el)
 (require 'jnf-dice.el)
+(require 'jnf-forem.el)
 
 (diminish 'eldoc-mode)
 
