@@ -50,17 +50,16 @@
         "Set theme based on OSX apperance state."
         (if (equal "Dark" (substring (shell-command-to-string "defaults read -g AppleInterfaceStyle") 0 4))
             (modus-themes-load-vivendi)
-            (modus-themes-load-operandi)))
+          (modus-themes-load-operandi)))
       (jnf/emacs-theme-by-osx-appearance))
   (progn
     (defun modus-themes-toggle ()
       "Toggle between `modus-operandi' and `modus-vivendi' themes."
       (interactive)
       (if (eq (car custom-enabled-themes) 'modus-operandi)
-            (modus-themes-load-vivendi)
-            (modus-themes-load-operandi)))
-      (modus-themes-load-operandi)))
+          (modus-themes-load-vivendi)
+        (modus-themes-load-operandi)))
+    (modus-themes-load-operandi)))
 
-  (global-set-key (kbd "<s-clear>") 'modus-themes-toggle)
-  (provide 'jnf-modus-main.el)
+(provide 'jnf-modus-main.el)
 ;;; jnf-modus-main.el ends here
