@@ -257,10 +257,16 @@
 
 (global-set-key (kbd "C-c n") 'jnf/nab-file-name-to-clipboard)
 (defun jnf/nab-file-name-to-clipboard ()
-  "Nab, I mean copy, the current buffer file name to the clipboard."
+  "Nab, I mean copy, the current buffer file name to the clipboard.
+
+If you provide universal prefix (e.g. C-u), return the base
+filename.  Otherwise, use the full filename path."
   ;; https://blog.sumtypeofway.com/posts/emacs-config.html
   (interactive)
-  (let ((filename (if (equal major-mode 'dired-mode) default-directory (buffer-file-name))))
+  (let* ((raw-filename
+          (if (equal major-mode 'dired-mode) default-directory (buffer-file-name)))
+         (filename
+          (if (equal current-prefix-arg nil) (raw-filename) (file-name-nondirectory raw-filename))))
     (when filename
       (kill-new filename)
       (message "Copied buffer file name '%s' to the clipboard." filename))))
