@@ -266,7 +266,7 @@ filename.  Otherwise, use the full filename path."
   (let* ((raw-filename
           (if (equal major-mode 'dired-mode) default-directory (buffer-file-name)))
          (filename
-          (if (equal current-prefix-arg nil) (raw-filename) (file-name-nondirectory raw-filename))))
+          (if (equal current-prefix-arg nil) raw-filename (file-name-nondirectory raw-filename))))
     (when filename
       (kill-new filename)
       (message "Copied buffer file name '%s' to the clipboard." filename))))
