@@ -493,9 +493,9 @@ We'll pass the :CITETITLE, :CITEAUTHOR, and :CITEURL to
   (split-string-and-unquote
    (shell-command-to-string
     (concat
-     "rg \"^  " key ": .*$\" "
+     "rg \"^[- ] " key ": .*$\" "
      (f-join directory filename)
-     " --only-matching --no-filename | sed 's/^  " key ": //' | sort | tr '\n' '~'"))
+     " --only-matching --no-filename | sed 's/^[ -] " key ": //' | sort | tr '\n' '~'"))
    "~"))
 
 (cl-defun jnf/list-filenames-with-file-text (&key matching in)
