@@ -26,7 +26,7 @@ With the universal prefix (e.g. C-u) open the file instead."
                    " --only-matching"
                    " | rg \"[^\\[|\\]]+\" --only-matching"
                    " | xargs open")
-        (find-file filename)))
+        (find-file filename))))
 
     (global-set-key (kbd "C-M-s-f") 'jnf/open-forem-todo)
     (defun jnf/open-forem-todo ()
