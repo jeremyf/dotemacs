@@ -177,6 +177,17 @@ exist after each headings's drawers."
   :hook ((org-mode . org-superstar-mode)
          (org-mode . turn-on-visual-line-mode)))
 
+
+;; https://github.com/xenodium/company-org-block
+(use-package company-org-block
+  :straight t
+  :after (org company)
+  :custom
+  (company-org-block-edit-style 'auto) ;; 'auto, 'prompt, or 'inline
+  :hook ((org-mode . (lambda ()
+                       (setq-local company-backends '(company-org-block))
+                       (company-mode +1)))))
+
 ;; See
 ;; https://www.reddit.com/r/orgmode/comments/i6hl8b/image_preview_size_in_org_mode/
 ;; for further discussion
