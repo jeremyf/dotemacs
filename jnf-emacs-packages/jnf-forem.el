@@ -15,11 +15,12 @@
 
     (global-set-key (kbd "C-M-s-d") 'jnf/open-dashboard)
     (cl-defun jnf/open-dashboard (&key (filename jnf/forem-dashboard-filename))
-      "Open the given FILENAME via the bin/dashboard command."
+      "Open the given FILENAME via the bin/dashboard command.
+
+With the universal prefix (e.g. C-u) open the file instead."
       (interactive)
-      (message "Prefix: %s" current-prefix-arg)
-      (if (equal current-prefix-arg nil) ; no C-u
-          (call-process-shell-command "dashboard")
+          (if (equal current-prefix-arg nil) ; no C-u
+          (call-process-shell-command (concat "dashboard " filename))
         (find-file filename)))
 
     (global-set-key (kbd "C-M-s-f") 'jnf/open-forem-todo)
