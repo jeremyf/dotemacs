@@ -48,6 +48,7 @@
     ("c g" jnf/tor-find-glossary-and-insert-entry "Create [g]lossary entry…")
     ("c c" jnf/tor-find-changelog-and-insert-entry "Create [c]hange log entry…")
     ("c p" jnf/tor-create-post "Create [p]ost…")
+    ("c s" jnf/tor-find-series-and-insert-entry "Create [s]eries…")
     ("? d" jnf/tor-find-file-draft "Find blog in [d]raft status…")
     ("? u" jnf/tor-find-hugo-file-by-url "Find blog by [u]rl…")
     ("? f" jnf/tor-find-file "Find blog by [f]ilename…")
@@ -67,6 +68,7 @@
     ("c g" jnf/tor-find-glossary-and-insert-entry "Create [g]lossary entry…")
     ("c c" jnf/tor-find-changelog-and-insert-entry "Create [c]hange log entry…")
     ("c p" jnf/tor-create-post "Create [p]ost…")
+    ("c s" jnf/tor-find-series-and-insert-entry "Create [s]eries…")
     ("? d" jnf/tor-find-file-draft "Find blog in [d]raft status…")
     ("? u" jnf/tor-find-hugo-file-by-url "Find blog by [u]rl…")
     ("? f" jnf/tor-find-file "Find blog by [f]ilename…")
@@ -360,6 +362,17 @@ No effort is made to check if this is a post."
   (insert (concat "\n- date: "
                   (format-time-string "%Y-%m-%d")
                   "\n  entries:\n    - ")))
+
+(defun jnf/tor-find-series-and-insert-entry (title)
+  "Find TakeOnRules series and add an entry with TITLE."
+  (interactive "sSeries Entry's Title: ")
+  (find-file (f-join jnf/tor-home-directory "data" "series.yml"))
+  (let ((key (downcase (s-dashed-words title))))
+    (end-of-buffer)
+    (insert (concat
+             (if (looking-at-p "^$") "" "\n")
+             "- title: " title
+             "\n  key: " key))))
 
 (defun jnf/tor-find-glossary-and-insert-entry (title)
   "Find TakeOnRules glossary and add an entry with TITLE."
