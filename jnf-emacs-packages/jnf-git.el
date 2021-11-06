@@ -85,7 +85,13 @@
     "In `magit-log-mode' open the associated pull request at point.
 
 Assumes that the commit log title ends in the PR #, which is the
-case when you use the Squash and Merge strategy."
+case when you use the Squash and Merge strategy.
+
+This implementation is dependent on the following packages (besides `magit'):
+- `git-link'
+- `s'
+
+I could perhaps eschew the git-link--exec method."
     (interactive)
     (let* ((remote-url
             (car
@@ -100,9 +106,11 @@ case when you use the Squash and Merge strategy."
         (and (string-match "(\\#\\([0-9]+\\))$" region)
              (browse-url-default-macosx-browser
               (concat
+               ;; I tend to favor HTTPS and the repos end in ".git"
                (s-replace ".git" "" remote-url)
                "/pull/"
                (match-string 1 region)))))))
+  ;; In other situations I bind s-6 to `git-messenger:popup-message'
   :bind (:map magit-log-mode-map ("s-6" . 'jnf/magit-browse-pull-request)))
 
 (use-package forge
