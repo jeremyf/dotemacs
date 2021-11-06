@@ -64,23 +64,43 @@
   :config
   (remove-hook 'magit-status-sections-hook 'magit-insert-tags-header)
   (defun jnf/magit-list-repositories ()
-  "Create a `magit-list-repositories' for my personal repositories."
-  (interactive)
-  (setq magit-repository-directories
-      `(("~/git/takeonrules.source/" . 1)
-        ("~/git/takeonrules.source/hugo-tufte" . 1)
-        ("~/git/burning_wheel_lifepaths/" . 1)
-        ("~/git/org" . 1)
-        ("~/git/org/personal" . 1)
-        ("~/git/org/public" . 1)
-        ("~/git/org/archive" . 1)
-        ("~/git/org/daily" . 1)
-        ("~/git/org/hesburgh-libraries" . 1)
-        ("~/git/org/forem" . 1)
-        ("~/git/dotemacs/" . 1)
-        ("~/git/jnf-emacs-bookmarks/" . 1)
-        ("~/git/dotzshrc/" .  1)))
-  (magit-list-repositories)))
+    "Create a `magit-list-repositories' for my personal repositories."
+    (interactive)
+    (setq magit-repository-directories
+          `(("~/git/takeonrules.source/" . 1)
+            ("~/git/takeonrules.source/hugo-tufte" . 1)
+            ("~/git/burning_wheel_lifepaths/" . 1)
+            ("~/git/org" . 1)
+            ("~/git/org/personal" . 1)
+            ("~/git/org/public" . 1)
+            ("~/git/org/archive" . 1)
+            ("~/git/org/daily" . 1)
+            ("~/git/org/hesburgh-libraries" . 1)
+            ("~/git/org/forem" . 1)
+            ("~/git/dotemacs/" . 1)
+            ("~/git/jnf-emacs-bookmarks/" . 1)
+            ("~/git/dotzshrc/" .  1)))
+    (magit-list-repositories))
+  (defun jnf/magit-browse-pull-request ()
+    "In `magit-log-mode', open the associated pull request at point."
+    (interactive)
+    (let* ((remote-url
+            (car
+             (git-link--exec
+              "remote" "get-url"
+              (format "%s"
+                      (magit-get-current-remote)))))
+           (beg (line-beginning-position))
+           (end (line-end-position))
+           (region (buffer-substring-no-properties beg end)))
+      (save-match-data
+        (and (string-match "(\\#\\([0-9]+\\))$" region)
+             (browse-url-default-macosx-browser
+              (concat
+               (s-replace ".git" "" remote-url)
+               "/pull/"
+               (match-string 1 region)))))))
+  :bind (:map magit-log-mode-map ("s-6" . 'jnf/magit-browse-pull-request)))
 
 (use-package forge
   :straight t)
