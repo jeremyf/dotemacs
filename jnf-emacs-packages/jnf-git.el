@@ -82,7 +82,10 @@
             ("~/git/dotzshrc/" .  1)))
     (magit-list-repositories))
   (defun jnf/magit-browse-pull-request ()
-    "In `magit-log-mode', open the associated pull request at point."
+    "In `magit-log-mode' open the associated pull request at point.
+
+Assumes that the commit log title ends in the PR #, which is the
+case when you use the Squash and Merge strategy."
     (interactive)
     (let* ((remote-url
             (car
