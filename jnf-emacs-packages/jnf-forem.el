@@ -21,12 +21,12 @@ With the universal prefix (e.g. C-u) open the file instead."
       (interactive)
       (if (equal current-prefix-arg nil) ; no C-u
           (call-process-shell-command
-           (concat "rg \"\\[\\[(.*)\\]\\[\""
+           (concat "rg \"\\[\\[(.*)\\]\\[\" "
                    filename
                    " --only-matching"
                    " | rg \"[^\\[|\\]]+\" --only-matching"
-                   " | xargs open")
-        (find-file filename))))
+                   " | xargs open"))
+        (find-file filename)))
 
     (global-set-key (kbd "C-M-s-f") 'jnf/open-forem-todo)
     (defun jnf/open-forem-todo ()
