@@ -93,23 +93,38 @@ This implementation is dependent on the following packages (besides `magit'):
 
 I could perhaps eschew the git-link--exec method."
     (interactive)
-    (let* ((remote-url
-            (car
-             (git-link--exec
-              "remote" "get-url"
-              (format "%s"
-                      (magit-get-current-remote)))))
-           (beg (line-beginning-position))
+    (let* ((beg (line-beginning-position))
            (end (line-end-position))
-           (region (buffer-substring-no-properties beg end)))
-      (save-match-data
-        (and (string-match "(\\#\\([0-9]+\\))$" region)
+           (summary (buffer-substring-no-properties beg end)))
+      (jnf/open-pull-request-for :summary summary)))
+  (defun jnf/git-current-remote-url ()
+    "Get the currente remote url."
+    (car
+     (git-link--exec
+      "remote" "get-url"
+      (format "%s" (magit-get-current-remote)))))
+  (cl-defun jnf/open-pull-request-for (&key summary)
+    "Given the SUMMARY open the related pull request."
+    (let ((message (s-trim summary))
+          (remote-url (jnf/git-current-remote-url)))
+    (save-match-data
+        (and (string-match "(\\#\\([0-9]+\\))$" message)
              (browse-url-default-macosx-browser
               (concat
                ;; I tend to favor HTTPS and the repos end in ".git"
                (s-replace ".git" "" remote-url)
                "/pull/"
-               (match-string 1 region)))))))
+               (match-string 1 message)))))))
+  (defun jnf/open-pull-request-for-current-line ()
+    "For the current line open the applicable pull request."
+    (interactive)
+    (let ((summary (shell-command-to-string
+                    (concat "git --no-pager annotate "
+                            "-w -L " (format "%s" (line-number-at-pos)) ",+1 "
+                            "--porcelain "
+                            buffer-file-name
+                            " | rg \"^summary\""))))
+      (jnf/open-pull-request-for :summary summary)))
   ;; In other situations I bind s-6 to `git-messenger:popup-message'
   :bind (:map magit-log-mode-map ("s-6" . 'jnf/magit-browse-pull-request)))
 
@@ -163,9 +178,21 @@ Uses `eww-browse-with-external-browser' to determine external browser to use."
 
 (use-package git-messenger
   :config (setq git-messenger:show-detail t)
-  :custom (git-messenger:use-magit-popup t)
-  :bind (("s-6" . git-messenger:popup-message)
-         ("<f6>" . git-messenger:popup-message))
+  (defun jnf/git-messenger-popup ()
+    "Open `git-messenger' or github PR.
+
+With universal argument, open the github PR for current line.
+
+Without universal argument, open `git-messenger'."
+    (interactive)
+    (if (equal current-prefix-arg nil) ; no C-u
+        (git-messenger:popup-message)
+      (jnf/open-pull-request-for-current-line)))
+  :custom
+  (git-messenger:use-magit-popup t)
+  :bind (:map git-messenger-map ("p" . 'jnf/open-pull-request-for-current-line))
+  :bind (("s-6" . jnf/git-messenger-popup)
+        ("<f6>" . jnf/git-messenger-popup))
   :straight t)
 
 (use-package blamer
