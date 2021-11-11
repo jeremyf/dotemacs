@@ -82,16 +82,19 @@
             ("~/git/dotzshrc/" .  1)))
     (magit-list-repositories))
   (defun jnf/magit-browse-pull-request ()
-    "In `magit-log-mode' open the associated pull request at point.
+    "In `magit-log-mode' open the associated pull request
+at point.
 
-Assumes that the commit log title ends in the PR #, which is the
-case when you use the Squash and Merge strategy.
+Assumes that the commit log title ends in the PR #, which
+is the case when you use the Squash and Merge strategy.
 
 This implementation is dependent on `magit' and `s'."
     (interactive)
     (let* ((beg (line-beginning-position))
            (end (line-end-position))
-           (summary (buffer-substring-no-properties beg end)))
+           (summary
+            (buffer-substring-no-properties
+             beg end)))
       (jnf/open-pull-request-for :summary summary)))
   (defun jnf/git-current-remote-url ()
     "Get the current remote url."
@@ -114,15 +117,16 @@ This implementation is dependent on `magit' and `s'."
   (defun jnf/open-pull-request-for-current-line ()
     "For the current line open the applicable pull request."
     (interactive)
-    (let ((summary (s-trim
-                    (shell-command-to-string
-                     (concat "git --no-pager annotate "
-                             "-w -L "
-                             (format "%s" (line-number-at-pos))
-                             ",+1 "
-                             "--porcelain "
-                             buffer-file-name
-                             " | rg \"^summary\"")))))
+    (let ((summary
+           (s-trim
+            (shell-command-to-string
+             (concat "git --no-pager annotate "
+                     "-w -L "
+                     (format "%s" (line-number-at-pos))
+                     ",+1 "
+                     "--porcelain "
+                     buffer-file-name
+                     " | rg \"^summary\"")))))
       (jnf/open-pull-request-for :summary summary)))
   ;; In other situations I bind s-6 to `git-messenger:popup-message'
   :bind (:map magit-log-mode-map ("s-6" . 'jnf/magit-browse-pull-request)))
