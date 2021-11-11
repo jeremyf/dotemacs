@@ -87,43 +87,42 @@
 Assumes that the commit log title ends in the PR #, which is the
 case when you use the Squash and Merge strategy.
 
-This implementation is dependent on the following packages (besides `magit'):
-- `git-link'
-- `s'
-
-I could perhaps eschew the git-link--exec method."
+This implementation is dependent on `magit' and `s'."
     (interactive)
     (let* ((beg (line-beginning-position))
            (end (line-end-position))
            (summary (buffer-substring-no-properties beg end)))
       (jnf/open-pull-request-for :summary summary)))
   (defun jnf/git-current-remote-url ()
-    "Get the currente remote url."
-    (car
-     (git-link--exec
-      "remote" "get-url"
-      (format "%s" (magit-get-current-remote)))))
+    "Get the current remote url."
+    (s-trim
+     (shell-command-to-string
+      (concat
+       "git remote get-url "
+       (format "%s" (magit-get-current-remote))))))
   (cl-defun jnf/open-pull-request-for (&key summary)
     "Given the SUMMARY open the related pull request."
-    (let ((message (s-trim summary))
-          (remote-url (jnf/git-current-remote-url)))
-    (save-match-data
-        (and (string-match "(\\#\\([0-9]+\\))$" message)
-             (browse-url-default-macosx-browser
+    (let ((remote-url (jnf/git-current-remote-url)))
+      (save-match-data
+        (and (string-match "(\\#\\([0-9]+\\))$" summary)
+             (eww-browse-with-external-browser
               (concat
                ;; I tend to favor HTTPS and the repos end in ".git"
                (s-replace ".git" "" remote-url)
                "/pull/"
-               (match-string 1 message)))))))
+               (match-string 1 summary)))))))
   (defun jnf/open-pull-request-for-current-line ()
     "For the current line open the applicable pull request."
     (interactive)
-    (let ((summary (shell-command-to-string
-                    (concat "git --no-pager annotate "
-                            "-w -L " (format "%s" (line-number-at-pos)) ",+1 "
-                            "--porcelain "
-                            buffer-file-name
-                            " | rg \"^summary\""))))
+    (let ((summary (s-trim
+                    (shell-command-to-string
+                     (concat "git --no-pager annotate "
+                             "-w -L "
+                             (format "%s" (line-number-at-pos))
+                             ",+1 "
+                             "--porcelain "
+                             buffer-file-name
+                             " | rg \"^summary\"")))))
       (jnf/open-pull-request-for :summary summary)))
   ;; In other situations I bind s-6 to `git-messenger:popup-message'
   :bind (:map magit-log-mode-map ("s-6" . 'jnf/magit-browse-pull-request)))
