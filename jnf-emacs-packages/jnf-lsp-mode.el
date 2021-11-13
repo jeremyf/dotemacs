@@ -8,8 +8,8 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package lsp-mode
   :straight t
-  ;; :hook (
-  ;;        (ruby-mode . lsp)
+  :hook (
+         (ruby-mode . lsp))
   ;;        (js-mode . lsp)
   ;;        (typescript-mode . lsp)
   ;;        (json-mode . lsp)
@@ -30,10 +30,10 @@
 (use-package lsp-ui
   :after lsp-mode
   :commands lsp-ui-mode
-  ;; :hook (
-  ;;        (ruby-mode . lsp-ui-mode)
-  ;;        (ruby-mode . lsp-ui-peek-mode)
-  ;;        (ruby-mode . lsp-ui-sideline-mode)
+  :hook (
+         (ruby-mode . lsp-ui-mode)
+         (ruby-mode . lsp-ui-peek-mode)
+         (ruby-mode . lsp-ui-sideline-mode)
   ;;        (typescript-mode . lsp-ui-mode)
   ;;        (typescript-mode . lsp-ui-peek-mode)
   ;;        (typescript-mode . lsp-ui-sideline-mode)
@@ -52,7 +52,7 @@
   ;;        (bash-mode . lsp-ui-mode)
   ;;        (bash-mode . lsp-ui-peek-mode)
   ;;        (bash-mode . lsp-ui-sideline-mode)
-  ;;        )
+         )
   :straight t)
 
 ;; By default indent levels are often 4; That is against what I've seen.
