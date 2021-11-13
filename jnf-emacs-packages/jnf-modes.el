@@ -64,5 +64,8 @@
 (use-package yaml-mode
   :straight t)
 
+(use-package lua-mode
+  :straight t)
+
 (provide 'jnf-modes.el)
 ;;; jnf-modes.el ends here
