@@ -26,6 +26,7 @@
 (use-package rspec-mode
   :straight t
   :bind (:map rspec-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
+  :bind (:map enh-ruby-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
   :hook (ruby-mode . rspec-mode) ;; should this be `ruby-mode'
   (ruby-mode . eldoc-mode)) ;; should this be `ruby-mode'
 
