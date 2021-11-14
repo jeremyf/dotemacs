@@ -30,12 +30,12 @@
   (ruby-mode . eldoc-mode)) ;; should this be `ruby-mode'
 
 
-(defun rspec-hyrax ()
-  "Setup rspec mode docker configuration for Hyrax."
-  (interactive)
-  (setq rspec-docker-command "docker-compose exec -w /app/samvera/hyrax-engine")
-  (setq rspec-docker-cwd "/app/samvera/hyrax-engine/")
-  (setq rspec-docker-container "app"))
+;; (defun rspec-hyrax ()
+;;   "Setup rspec mode docker configuration for Hyrax."
+;;   (interactive)
+;;   (setq rspec-docker-command "docker-compose exec -w /app/samvera/hyrax-engine")
+;;   (setq rspec-docker-cwd "/app/samvera/hyrax-engine/")
+;;   (setq rspec-docker-container "app"))
 
 ;; I most often write documentation using yard.  See
 ;; https://yardoc.org.
