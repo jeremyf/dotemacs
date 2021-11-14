@@ -179,14 +179,14 @@ exist after each headings's drawers."
 
 
 ;; https://github.com/xenodium/company-org-block
-(use-package company-org-block
-  :straight t
-  :after (org company)
-  :custom
-  (company-org-block-edit-style 'auto) ;; 'auto, 'prompt, or 'inline
-  :hook ((org-mode . (lambda ()
-                       (setq-local company-backends '(company-org-block))
-                       (company-mode +1)))))
+;; (use-package company-org-block
+;;   :straight t
+;;   :after (org company)
+;;   :custom
+;;   (company-org-block-edit-style 'auto) ;; 'auto, 'prompt, or 'inline
+;;   :hook ((org-mode . (lambda ()
+;;                        (setq-local company-backends '(company-org-block))
+;;                        (company-mode +1)))))
 
 ;; See
 ;; https://www.reddit.com/r/orgmode/comments/i6hl8b/image_preview_size_in_org_mode/
@@ -224,20 +224,8 @@ exist after each headings's drawers."
 ;;                                 (require 'jnf-org-roam.el)
 ;;                                 ))
 
-(use-package org-bookmark-heading
-  :straight t)
-
 ;; A package to assist in handling annotations; I wish that DocView
 ;; better rendered the PDF.  It's a little too pixelated.
-(use-package org-noter
-  :straight t
-  ;; Favor two-thirds of the screen for the PDF and one-third for the
-  ;; org notes.
-  :init (setq org-noter-doc-split-fraction '(0.7 . 0.3))
-  :bind (
-         :map org-noter-notes-mode-map ("C-c o" . 'org-noter-sync-current-note)))
-
-;; https://github.com/zzamboni/ox-leanpub
 
 ;; (setq org-latex-pdf-process
 ;;       '("latexmk -pdflatex='pdflatex -interaction nonstopmode' -pdf -bibtex -f %f"))
