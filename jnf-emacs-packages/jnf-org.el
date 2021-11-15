@@ -19,6 +19,11 @@
 
 (use-package org
   :straight t
+  ;; :straight (org
+  ;;            :type git
+  ;;            :url "https://git.savannah.gnu.org/git/emacs/org-mode.git"
+  ;;            :commit "73875939a8b5545ac53a86ec467239f510d14de8" ;; 9.5 stable
+  ;;            )
   ;; :straight (org :type built-in)
   :config (setq
            org-directory "~/git/org"
@@ -179,14 +184,14 @@ exist after each headings's drawers."
 
 
 ;; https://github.com/xenodium/company-org-block
-;; (use-package company-org-block
-;;   :straight t
-;;   :after (org company)
-;;   :custom
-;;   (company-org-block-edit-style 'auto) ;; 'auto, 'prompt, or 'inline
-;;   :hook ((org-mode . (lambda ()
-;;                        (setq-local company-backends '(company-org-block))
-;;                        (company-mode +1)))))
+(use-package company-org-block
+  :straight t
+  :after (org company)
+  :custom
+  (company-org-block-edit-style 'auto) ;; 'auto, 'prompt, or 'inline
+  :hook ((org-mode . (lambda ()
+                       (setq-local company-backends '(company-org-block))
+                       (company-mode +1)))))
 
 ;; See
 ;; https://www.reddit.com/r/orgmode/comments/i6hl8b/image_preview_size_in_org_mode/
