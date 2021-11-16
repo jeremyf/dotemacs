@@ -219,6 +219,21 @@ exist after each headings's drawers."
 (global-set-key (kbd "<f2>") 'jnf/org-insert-immediate-active-timestamp)
 (global-set-key (kbd "s-2") 'jnf/org-insert-immediate-active-timestamp)
 
+;; https://kitchingroup.cheme.cmu.edu/blog/2016/06/16/Copy-formatted-org-mode-text-from-Emacs-to-other-applications/
+(defun jnf/formatted-copy-org-to-html ()
+  "Export region to HTML, and copy it to the clipboard."
+  (interactive)
+  (save-window-excursion
+    (let* ((buf (org-export-to-buffer 'html "*Formatted Copy*" nil nil t t))
+           (html (with-current-buffer buf (buffer-string))))
+      (with-current-buffer buf
+        (shell-command-on-region
+         (point-min)
+         (point-max)
+         "textutil -stdin -format html -convert rtf -stdout | pbcopy"))
+      (kill-buffer buf))))
+(global-set-key (kbd "C-M-s-c") 'jnf/formatted-copy-org-to-html)
+
 ;; For some reason, when I load emacs in daemon mode, the daemon
 ;; process is the process now renders the GET prompts for the
 ;; mini-buffer.  When I load the file interactively, I don't
