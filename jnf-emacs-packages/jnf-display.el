@@ -66,6 +66,13 @@ the configuration."
 The STR identifies the icon and the HEIGHT and V-ADJUST provide
 the configuration."
     (s-concat (all-the-icons-octicon icon :v-adjust (or v-adjust 0) :height (or height 1)) " " str))
+
+  (defun with-alltheicon (icon str &optional height v-adjust)
+    "Displays an ICON  from All the Icons icon.
+
+The STR identifies the icon and the HEIGHT and V-ADJUST provide
+the configuration."
+    (s-concat (all-the-icons-alltheicon icon :v-adjust (or v-adjust 0) :height (or height 1)) " " str))
   :straight t)
 
 ;; Disabled because on 2021-04-11 I got the following error:
