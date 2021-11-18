@@ -106,7 +106,7 @@
 ;; this.
 (unbind-key "C-x C-c") ;; was `save-buffers-kill-terminal'
 
-
+(add-hook 'text-mode-hook #'abbrev-mode)
 
 (provide 'jnf-basic-config.el)
 ;;; jnf-basic-config.el ends here
