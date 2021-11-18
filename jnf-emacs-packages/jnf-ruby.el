@@ -25,10 +25,19 @@
 ;; I most often write tests using rspec.
 (use-package rspec-mode
   :straight t
+  :custom (rspec-use-spring-when-possible nil)
   :bind (:map rspec-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
   :bind (:map enh-ruby-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
   :hook (ruby-mode . rspec-mode) ;; should this be `ruby-mode'
   (ruby-mode . eldoc-mode)) ;; should this be `ruby-mode'
+
+(eval-after-load 'rspec-mode
+  '(rspec-install-snippets))
+
+(use-package rails-routes
+  :straight t)
+  ;; :bind (:map ruby-mode-map (("C-c C-o" . 'rails-routes-insert-no-cache)))
+  ;; :bind (:map web-mode-map (("C-c C-o" . 'rails-routes-insert-no-cache))))
 
 
 ;; (defun rspec-hyrax ()
