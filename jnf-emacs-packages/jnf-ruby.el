@@ -39,6 +39,99 @@
   ;; :bind (:map ruby-mode-map (("C-c C-o" . 'rails-routes-insert-no-cache)))
   ;; :bind (:map web-mode-map (("C-c C-o" . 'rails-routes-insert-no-cache))))
 
+(use-package projectile-rails
+  :after (projectile)
+  :straight t
+  :config
+
+  (defun projectile-rails-find-liquid ()
+    "Find a liquid tag."
+    (interactive)
+    (projectile-rails-find-resource
+     "liquid: "
+     '(("app/liquid_tags/" "\\(.+?\\)\\.rb\\'"))
+     "app/liquid_tags/${filename}.rb"))
+
+  :bind (:map
+         projectile-rails-mode-map (
+                                    ("C-s-." . 'projectile-rails-goto-file-at-point)
+                                    ("C-c r" .  'jnf/projectile-rails--menu)))
+
+  :config (projectile-rails-global-mode))
+
+
+(defvar jnf/projectile-rails--title (with-alltheicon "ruby-alt" "Rails" 1 -0.05))
+(pretty-hydra-define jnf/projectile-rails-find-resource--menu
+  (:foreign-keys warn :title jnf/projectile-rails--title :quit-key "q" :exit t)
+  ("Rails > Find Resources"
+   (("m" projectile-rails-find-model       "model")
+    ("v" projectile-rails-find-view        "view")
+    ("c" projectile-rails-find-controller  "controller")
+    ("h" projectile-rails-find-helper      "helper")
+    ("l" projectile-rails-find-lib         "lib")
+    ("j" projectile-rails-find-javascript  "javascript")
+    ("w" projectile-rails-find-component   "component")
+    ("s" projectile-rails-find-stylesheet  "stylesheet")
+    ("p" projectile-rails-find-spec        "spec")
+    ("u" projectile-rails-find-fixture     "fixture")
+    ("t" projectile-rails-find-test        "test")
+    ("f" projectile-rails-find-feature     "feature")
+    ("i" projectile-rails-find-initializer "initializer")
+    ("o" projectile-rails-find-log         "log")
+    ("t" projectile-rails-find-liquid      "liquid tag")
+    ("@" projectile-rails-find-mailer      "mailer")
+    ("!" projectile-rails-find-validator   "validator")
+    ("y" projectile-rails-find-layout      "layout")
+    ("n" projectile-rails-find-migration   "migration")
+    ("k" projectile-rails-find-rake-task   "rake task")
+    ("b" projectile-rails-find-job         "job")
+    ("z" projectile-rails-find-serializer  "serializer"))))
+
+(pretty-hydra-define jnf/projectile-rails-find-current-resource--menu
+  (:foreign-keys warn :title jnf/projectile-rails--title :quit-key "q" :exit t)
+  ("Rails > Find Current Resources"
+   (("M" projectile-rails-find-current-model      "current model")
+    ("V" projectile-rails-find-current-view       "current view")
+    ("C" projectile-rails-find-current-controller "current controller")
+    ("H" projectile-rails-find-current-helper     "current helper")
+    ("J" projectile-rails-find-current-javascript "current javascript")
+    ("S" projectile-rails-find-current-stylesheet "current stylesheet")
+    ("P" projectile-rails-find-current-spec       "current spec")
+    ("U" projectile-rails-find-current-fixture    "current fixture")
+    ("T" projectile-rails-find-current-test       "current test")
+    ("N" projectile-rails-find-current-migration  "current migration")
+    ("Z" projectile-rails-find-current-serializer "current serializer"))))
+
+(pretty-hydra-define jnf/projectile-rails-goto--menu
+  (:foreign-keys warn :title jnf/projectile-rails--title :quit-key "q" :exit t)
+  ("Rails > Goto"
+   (("f" projectile-rails-goto-file-at-point "file at point")
+    ("g" projectile-rails-goto-gemfile       "Gemfile")
+    ("p" projectile-rails-goto-package       "package")
+    ("r" projectile-rails-goto-routes        "routes")
+    ("d" projectile-rails-goto-schema        "schema")
+    ("s" projectile-rails-goto-seeds         "seeds")
+    ("h" projectile-rails-goto-spec-helper   "spec helper"))))
+
+(pretty-hydra-define jnf/projectile-rails-run--menu
+  (:foreign-keys warn :title jnf/projectile-rails--title :quit-key "q" :exit t)
+  ("Rails > Run"
+   (("r" projectile-rails-rake       "rake")
+    ("c" projectile-rails-console    "console")
+    ("b" projectile-rails-dbconsole  "dbconsole")
+    ("s" projectile-rails-server     "server")
+    ("g" projectile-rails-generate   "generate")
+    ("d" projectile-rails-destroy    "destroy")
+    ("x" projectile-rails-extract-region "extract region"))))
+
+(pretty-hydra-define jnf/projectile-rails--menu
+  (:foreign-keys warn :title jnf/projectile-rails--title :quit-key "q" :exit t)
+  ("Rails"
+   (("c" jnf/projectile-rails-find-current-resource--menu/body "Find current resource")
+    ("f" jnf/projectile-rails-find-resource--menu/body "Find a resource")
+    ("g" jnf/projectile-rails-goto--menu/body "Goto")
+    ("r" jnf/projectile-rails-run--menu/body "Run & interact"))))
+
 
 ;; (defun rspec-hyrax ()
 ;;   "Setup rspec mode docker configuration for Hyrax."
