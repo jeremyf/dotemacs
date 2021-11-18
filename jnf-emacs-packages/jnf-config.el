@@ -123,5 +123,11 @@ By default the DIRECTORIES are `jnf/data-directories'"
      )))
   :bind ("C-s-h" . helpful-hydra/body))
 
+;; See https://editorconfig.org/#overview
+(use-package editorconfig
+  :straight t
+  :config
+  (editorconfig-mode 1))
+
 (provide 'jnf-config.el)
 ;;; jnf-config.el ends here
