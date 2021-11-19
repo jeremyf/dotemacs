@@ -126,6 +126,7 @@ By default the DIRECTORIES are `jnf/data-directories'"
 ;; See https://editorconfig.org/#overview
 (use-package editorconfig
   :straight t
+  :diminish editorconfig-mode
   :config
   (editorconfig-mode 1))
 

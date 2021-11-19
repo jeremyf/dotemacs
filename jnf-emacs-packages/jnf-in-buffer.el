@@ -208,6 +208,7 @@
 ;; place.
 (use-package yasnippet
   :straight t
+  :diminish yas-mode
   :init (setq yas-snippet-dirs '("~/git/dotemacs/snippets"))
   (yas-global-mode 1))
 
