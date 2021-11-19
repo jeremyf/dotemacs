@@ -9,13 +9,14 @@
 (use-package lsp-mode
   :straight t
   :hook (
-         (ruby-mode . lsp))
+         (ruby-mode . lsp)
+         (enh-ruby-mode . lsp)
   ;;        (js-mode . lsp)
   ;;        (typescript-mode . lsp)
   ;;        (json-mode . lsp)
-  ;;        (html-mode . lsp)
+         (html-mode . lsp)
   ;;        (css-mode . lsp)
-  ;;        (bash-mode . lsp))
+         (bash-mode . lsp))
   :config (setq read-process-output-max (* 1024 1024)
                 lsp-completion-provider :capf
                 lsp-idle-delay 0.500)
@@ -34,6 +35,9 @@
          (ruby-mode . lsp-ui-mode)
          (ruby-mode . lsp-ui-peek-mode)
          (ruby-mode . lsp-ui-sideline-mode)
+         (enh-ruby-mode . lsp-ui-mode)
+         (enh-ruby-mode . lsp-ui-peek-mode)
+         (enh-ruby-mode . lsp-ui-sideline-mode)
   ;;        (typescript-mode . lsp-ui-mode)
   ;;        (typescript-mode . lsp-ui-peek-mode)
   ;;        (typescript-mode . lsp-ui-sideline-mode)
@@ -43,16 +47,15 @@
   ;;        (json-mode . lsp-ui-mode)
   ;;        (json-mode . lsp-ui-peek-mode)
   ;;        (json-mode . lsp-ui-sideline-mode)
-  ;;        (html-mode . lsp-ui-mode)
-  ;;        (html-mode . lsp-ui-peek-mode)
-  ;;        (html-mode . lsp-ui-sideline-mode)
+         (html-mode . lsp-ui-mode)
+         (html-mode . lsp-ui-peek-mode)
+         (html-mode . lsp-ui-sideline-mode)
   ;;        (css-mode . lsp-ui-mode)
   ;;        (css-mode . lsp-ui-peek-mode)
   ;;        (css-mode . lsp-ui-sideline-mode)
-  ;;        (bash-mode . lsp-ui-mode)
-  ;;        (bash-mode . lsp-ui-peek-mode)
-  ;;        (bash-mode . lsp-ui-sideline-mode)
-         )
+         (bash-mode . lsp-ui-mode)
+         (bash-mode . lsp-ui-peek-mode)
+         (bash-mode . lsp-ui-sideline-mode))
   :straight t)
 
 ;; By default indent levels are often 4; That is against what I've seen.
@@ -68,9 +71,16 @@
   :config (setq lsp-solargraph-use-bundler 1)
   :bind (:map ruby-mode-map ("M-i" . solargraph:complete)))
 
+(use-package tree-sitter
+  :config (global-tree-sitter-mode)
+  :straight t)
+
+(use-package tree-sitter-langs
+  :straight t)
+
 ;; (use-package tree-sitter
 ;;   :straight t
-;;   :config (global-tree-sitter-mode))
+;;
 ;; (use-package tree-sitter-langs
 ;;   :straight t)
 
