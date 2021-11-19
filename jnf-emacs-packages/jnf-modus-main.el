@@ -16,10 +16,11 @@
         modus-themes-mode-line '(accented 3d)
         modus-themes-syntax '(alt-syntax yellow-comments green-strings)
         modus-themes-hl-line '(accented)
+        modus-themes-intense-markup t
         modus-themes-intense-paren-match '(bold intense)
         modus-themes-links '(faint background)
         modus-themes-subtle-line-numbers t
-        modus-themes-no-mixed-fonts nil
+        modus-themes-mixed-fonts t
         modus-themes-region '(bg-only accented)
         modus-themes-prompts '(intense accented)
         modus-themes-tabs-accented t
