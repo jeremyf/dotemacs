@@ -71,16 +71,9 @@
   :config (setq lsp-solargraph-use-bundler 1)
   :bind (:map ruby-mode-map ("M-i" . solargraph:complete)))
 
-(use-package tree-sitter
-  :config (global-tree-sitter-mode)
-  :straight t)
-
-(use-package tree-sitter-langs
-  :straight t)
-
 ;; (use-package tree-sitter
-;;   :straight t
-;;
+;;   :config (global-tree-sitter-mode)
+;;   :straight t)
 ;; (use-package tree-sitter-langs
 ;;   :straight t)
 
