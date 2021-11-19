@@ -35,13 +35,9 @@
 (eval-after-load 'rspec-mode
   '(rspec-install-snippets))
 
-(use-package rails-routes
-  :straight t)
-  ;; :bind (:map ruby-mode-map (("C-c C-o" . 'rails-routes-insert-no-cache)))
-  ;; :bind (:map web-mode-map (("C-c C-o" . 'rails-routes-insert-no-cache))))
-
 (use-package projectile-rails
   :after (projectile)
+  :diminish 'projectile-rails-mode
   :straight t
   :config
 
@@ -56,10 +52,13 @@
   :bind (:map
          projectile-rails-mode-map (
                                     ("C-s-." . 'projectile-rails-goto-file-at-point)
-                                    ("C-c r" .  'jnf/projectile-rails--menu)))
+                                    ("C-c r" .  'jnf/projectile-rails--menu/body)))
 
   :config (projectile-rails-global-mode))
 
+(use-package rails-routes
+  :after projectile-rails
+  :straight t)
 
 (defvar jnf/projectile-rails--title (with-alltheicon "ruby-alt" "Rails" 1 -0.05))
 (pretty-hydra-define jnf/projectile-rails-find-resource--menu
@@ -128,11 +127,13 @@
 (pretty-hydra-define jnf/projectile-rails--menu
   (:foreign-keys warn :title jnf/projectile-rails--title :quit-key "q" :exit t)
   ("Rails"
-   (("c" jnf/projectile-rails-find-current-resource--menu/body "Find current resource")
-    ("f" jnf/projectile-rails-find-resource--menu/body "Find a resource")
-    ("g" jnf/projectile-rails-goto--menu/body "Goto")
-    ("r" jnf/projectile-rails-run--menu/body "Run & interact"))))
-
+   (("." projectile-rails-goto-file-at-point "Goto file at point")
+    ("c" jnf/projectile-rails-find-current-resource--menu/body "Find current resource…")
+    ("f" jnf/projectile-rails-find-resource--menu/body "Find a resource…")
+    ("g" jnf/projectile-rails-goto--menu/body "Goto…")
+    ("i" rails-routes-insert-no-cache "Insert route…")
+    ("I" rails-routes-insert "Insert route (from cache)…")
+    ("r" jnf/projectile-rails-run--menu/body "Run & interact…"))))
 
 ;; (defun rspec-hyrax ()
 ;;   "Setup rspec mode docker configuration for Hyrax."
