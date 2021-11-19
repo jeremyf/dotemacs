@@ -18,14 +18,15 @@
              ;; '("\\(?:\\.rb\\|ru\\|rake\\|thor\\|jbuilder\\|gemspec\\|podspec\\|/\\(?:Gem\\|Rake\\|Cap\\|Thor\\|Vagrant\\|Guard\\|Pod\\)file\\)\\'" . enh-ruby-mode))
 (add-to-list 'interpreter-mode-alist '("ruby" . enh-ruby-mode))
 
-(use-package robe
-  :straight t
-  :hook (enh-ruby-mode . robe-mode))
+;; (use-package robe
+;;   :straight t
+;;   :hook (enh-ruby-mode . robe-mode))
 
 ;; I most often write tests using rspec.
 (use-package rspec-mode
   :straight t
   :custom (rspec-use-spring-when-possible nil)
+  :diminish 'rspec-mode
   :bind (:map rspec-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
   :bind (:map enh-ruby-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
   :hook (ruby-mode . rspec-mode) ;; should this be `ruby-mode'
