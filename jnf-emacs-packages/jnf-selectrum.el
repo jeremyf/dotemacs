@@ -269,7 +269,10 @@ the directory.  `REST' is passed to the `CONSULT-RIPGREP-FUNCTION'."
 (use-package consult-lsp
   :after (consult lsp-mode)
   :straight (consult-lsp :host github :type git :repo "gagbo/consult-lsp")
+  :config
+  (define-key lsp-mode-map [remap xref-find-apropos] #'consult-lsp-symbols)
   :commands consult-lsp-symbols)
+
 
 ;; https://github.com/minad/vertico
 ;;
