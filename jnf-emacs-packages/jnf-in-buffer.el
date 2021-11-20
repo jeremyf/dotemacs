@@ -124,6 +124,7 @@
 
 ;; C-a goes to the first non-whitepsace character on the line. Type it
 ;; again, and go to the beginning of the line.
+
 (use-package crux
   :straight t
   :config
@@ -135,12 +136,17 @@ there's a region, all lines that region covers will be duplicated.
 For a region in which point is after mark, and point is at the
 beginning of line, duplicate in a more tidy manner."
   (interactive "p")
+  ;; Mentally this is easier to handle
+  (when (and mark-active (< (point) (mark)))
+    (exchange-point-and-mark))
   (let ((end-region-at-bol
          (and (use-region-p) (eq (point) (line-beginning-position)))))
+    ;; Move from the beginning of the line to the end of the previous
+    ;; line then insert a new line.  Here we'll begin inserting the
+    ;; region.
     (when end-region-at-bol
-      (progn
-        (goto-char (- (point) 1))
-        (newline)))
+      (goto-char (- (point) 1))
+      (newline))
     (pcase-let* ((origin (point))
                  (`(,beg . ,end) (crux-get-positions-of-line-or-region))
                  (region (buffer-substring-no-properties beg end)))
@@ -151,6 +157,7 @@ beginning of line, duplicate in a more tidy manner."
         (insert region)
         (setq end (point)))
       (goto-char (+ origin (* (length region) arg) arg)))
+    ;; We did some insertions that we need to undo
     (when end-region-at-bol
       (previous-line)
       (delete-region (point) (- (point) 1))
