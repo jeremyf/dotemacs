@@ -128,40 +128,27 @@
 (use-package crux
   :straight t
   :config
-  (defun jnf/crux-duplicate-current-line-or-region (arg)
-  "Duplicates the current line or region ARG times.
-If there's no region, the current line will be duplicated.  However, if
-there's a region, all lines that region covers will be duplicated.
-
-For a region in which point is after mark, and point is at the
-beginning of line, duplicate in a more tidy manner."
+  (defun jnf/duplicate-current-line-or-lines-of-region (arg)
+  "Duplicate ARG times current line or the lines of the current region."
   (interactive "p")
-  ;; Mentally this is easier to handle
-  (when (and mark-active (< (point) (mark)))
-    (exchange-point-and-mark))
-  (let ((end-region-at-bol
-         (and (use-region-p) (eq (point) (line-beginning-position)))))
-    ;; Move from the beginning of the line to the end of the previous
-    ;; line then insert a new line.  Here we'll begin inserting the
-    ;; region.
-    (when end-region-at-bol
-      (goto-char (- (point) 1))
-      (newline))
-    (pcase-let* ((origin (point))
-                 (`(,beg . ,end) (crux-get-positions-of-line-or-region))
-                 (region (buffer-substring-no-properties beg end)))
-      (dotimes (_i arg)
-        (goto-char end)
-        (unless (use-region-p)
-          (newline))
-        (insert region)
-        (setq end (point)))
-      (goto-char (+ origin (* (length region) arg) arg)))
-    ;; We did some insertions that we need to undo
-    (when end-region-at-bol
-      (previous-line)
-      (delete-region (point) (- (point) 1))
-      (goto-char (+ (point) 1)))))
+  (if (use-region-p)
+      (progn
+        (when (> (point) (mark))
+          (exchange-point-and-mark))
+        (beginning-of-line)
+        (exchange-point-and-mark)
+        (end-of-line)
+        (goto-char (+ (point) 1))
+        (exchange-point-and-mark)
+        (let* ((end (mark))
+               (beg (point))
+               (region
+                (buffer-substring-no-properties beg end)))
+          (dotimes (_i arg)
+            (goto-char end)
+            (insert region)
+            (setq end (point)))))
+    (crux-duplicate-current-line-or-region arg)))
 
   (cl-defun jnf/create-org-scratch-buffer (&key (mode 'org-mode))
     "Quickly open a scratch buffer and enable the given MODE."
@@ -171,8 +158,10 @@ beginning of line, duplicate in a more tidy manner."
     (funcall mode))
   :bind (("C-a" . crux-move-beginning-of-line)
          ("<C-s-return>" . crux-smart-open-line-above)
-         ("C-M-d" . jnf/crux-duplicate-current-line-or-region)
-         ("C-c d" . jnf/crux-duplicate-current-line-or-region)
+         ("C-s-k" . crux-kill-line-backwards)
+         ("<s-backspace>" . crux-kill-line-backwards)
+         ("C-M-d" . jnf/duplicate-current-line-or-lines-of-region)
+         ("C-c d" . jnf/duplicate-current-line-or-lines-of-region)
          ("<f9>" . crux-kill-other-buffers)
          ("<f12>" . jnf/create-org-scratch-buffer)))
 
