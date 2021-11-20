@@ -56,6 +56,20 @@
 
   :config (projectile-rails-global-mode))
 
+;; (use-package rails-i18n
+;;   :straight t)
+
+;; Nice and simple pakcage for string interpolation.
+(use-package ruby-interpolation
+  :straight t
+  :diminish 'ruby-interpolation-mode
+  :hook (enh-ruby-mode . ruby-interpolation-mode))
+
+(use-package ruby-electric
+  :straight t
+  :diminish 'ruby-electric-mode
+  :hook (enh-ruby-mode . ruby-electric-mode))
+
 (use-package rails-routes
   :after projectile-rails
   :straight t)
