@@ -72,10 +72,12 @@
   :bind (:map ruby-mode-map ("M-i" . solargraph:complete)))
 
 ;; (use-package tree-sitter
-;;   :config (global-tree-sitter-mode)
 ;;   :straight t)
+
 ;; (use-package tree-sitter-langs
-;;   :straight t)
+;;   :straight)
+
+;; (add-hook 'enh-ruby-mode-hook #'tree-sitter-mode)
 
 (provide 'jnf-lsp-mode.el)
 ;;; jnf-lsp-mode.el ends here
