@@ -297,7 +297,7 @@ filename.  Otherwise, use the full filename path."
       (kill-new filename)
       (message "Copied buffer file name '%s' to the clipboard." filename))))
 
-(defun sort-unique-lines (reverse beg end &optional adjacent keep-blanks interactive)
+(defun jnf/sort-unique-lines (reverse beg end &optional adjacent keep-blanks interactive)
   "Sort lines and delete duplicates.
 By default the sort is lexigraphically ascending.  To sort as
 descending set REVERSE to non-nil.  Specify BEG and END for the
