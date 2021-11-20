@@ -193,9 +193,10 @@ Without universal argument, open `git-messenger'."
       (jnf/open-pull-request-for-current-line)))
   :custom
   (git-messenger:use-magit-popup t)
-  :bind (:map git-messenger-map ("p" . 'jnf/open-pull-request-for-current-line))
+  :bind (:map git-messenger-map (("p" . 'jnf/open-pull-request-for-current-line)
+                                 ("l" . 'git-link)))
   :bind (("s-6" . jnf/git-messenger-popup)
-        ("<f6>" . jnf/git-messenger-popup))
+         ("<f6>" . jnf/git-messenger-popup))
   :straight t)
 
 (use-package blamer
