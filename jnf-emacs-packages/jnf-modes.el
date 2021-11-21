@@ -67,5 +67,8 @@
 (use-package lua-mode
   :straight t)
 
+(use-package git-modes
+  :straight t)
+
 (provide 'jnf-modes.el)
 ;;; jnf-modes.el ends here
