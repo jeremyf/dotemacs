@@ -29,6 +29,12 @@
   :bind (("C-j" . avy-goto-char-timer))
   :straight t)
 
+(use-package link-hint
+  :straight t
+  :bind
+  ("C-c l o" . link-hint-open-link)
+  ("C-c l c" . link-hint-copy-link))
+
 ;; https://github.com/shankar2k/math-at-point
 (use-package math-at-point
   :straight (math-at-point :type git :host github :repo "shankar2k/math-at-point")
