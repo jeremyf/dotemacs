@@ -21,7 +21,7 @@
                          (read-string "Dice Expression: "))))
     (-let* (((rolls . result) (org-d20--roll expression)))
       (message "%s => %s" expression result)))
-  :straight t)
+  :straight (org-d20 :host github :repo "spwhitton/org-d20"))
 
 (provide 'jnf-dice.el)
 ;;; jnf-dice.el ends here
