@@ -40,7 +40,6 @@
   :diminish 'projectile-rails-mode
   :straight t
   :config
-
   (defun projectile-rails-find-liquid ()
     "Find a liquid tag."
     (interactive)
@@ -49,8 +48,7 @@
      '(("app/liquid_tags/" "\\(.+?\\)\\.rb\\'"))
      "app/liquid_tags/${filename}.rb"))
   :bind (:map
-         projectile-rails-mode-map (
-                                    ("C-s-." . 'projectile-rails-goto-file-at-point)
+         projectile-rails-mode-map (("C-s-." . 'projectile-rails-goto-file-at-point)
                                     ("C-c r" .  'jnf/projectile-rails--menu/body)))
   :config (projectile-rails-global-mode))
 
