@@ -96,7 +96,6 @@
          ("s-4" . consult-bookmark)
          ("C-y" . yank)
          ("C-s" . consult-line) ;; I've long favored Swiper mapped to c-s
-         ("s-l" . consult-goto-line)
          ;; Isearch integration
          ("M-s e" . consult-isearch)
          ;; ("s-t" . jnf/consult-find-using-fd)
