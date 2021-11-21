@@ -129,6 +129,7 @@ This implementation is dependent on `magit' and `s'."
                      " | rg \"^summary\"")))))
       (jnf/open-pull-request-for :summary summary)))
   ;; In other situations I bind s-6 to `git-messenger:popup-message'
+  :bind (("C-c C-g" . magit-file-dispatch))
   :bind (:map magit-log-mode-map ("s-6" . 'jnf/magit-browse-pull-request)))
 
 (use-package forge
