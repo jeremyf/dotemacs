@@ -64,7 +64,11 @@
 (use-package ruby-electric
   :straight t
   :diminish 'ruby-electric-mode
-  :hook (enh-ruby-mode . ruby-electric-mode))
+  ;; Somtimes I want this enabled, other times not; but it's a bit
+  ;;  obnoxious in spec.rb files.
+  ;;
+  ;; :hook (enh-ruby-mode . ruby-electric-mode)
+  )
 
 (use-package rails-routes
   :after projectile-rails
