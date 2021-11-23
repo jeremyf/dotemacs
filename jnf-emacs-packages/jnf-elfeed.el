@@ -107,7 +107,7 @@ Alternative suggestions are: - '(\"\\\"“\" . \"\\\"\")"
     (shr-generic dom)
     (shr-ensure-paragraph))
 
-  (setq browse-url-browser-function 'eww-browse-url)
+  (setq browse-url-browser-function 'browse-url-default-macosx-browser)
   :bind (:map eww-mode-map
               ("U" . eww-up-url)
               ("<f7>" . jnf/amplify-eww)
