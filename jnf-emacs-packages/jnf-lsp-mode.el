@@ -15,7 +15,7 @@
          (bash-mode . lsp))
   :config (setq read-process-output-max (* 1024 1024)
                 lsp-completion-provider :capf
-                lsp-idle-delay 0.500)
+                lsp-idle-delay 0.750)
   :commands (lsp))
 
 (with-eval-after-load 'lsp-mode
@@ -70,7 +70,8 @@
 ;; Solargraph is the language tool for lsp-mode and Ruby
 (use-package solargraph
   :straight (solargraph :host github :repo "guskovd/emacs-solargraph")
-  :config (setq lsp-solargraph-use-bundler 1)
+  :custom
+  (lsp-solargraph-use-bundler t)
   :bind (:map ruby-mode-map ("M-i" . solargraph:complete)))
 
 ;; (use-package tree-sitter
