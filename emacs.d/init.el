@@ -49,7 +49,9 @@
 (require 'jnf-config.el)
 (require 'jnf-display.el)
 (require 'jnf-projectile.el)
-(require 'jnf-selectrum.el)
+(require 'jnf-vertico.el)
+(require 'jnf-consult.el)
+;; (require 'jnf-selectrum.el)
 
 (global-auto-revert-mode)
 ;; https://www.emacswiki.org/emacs/RecentFiles#h5o-1
@@ -80,7 +82,11 @@
  '(safe-local-variable-values '((encoding . utf-8)))
  '(show-paren-mode t)
  '(typopunct-buffer-language 'english)
- '(use-package-always-ensure t))
+ '(use-package-always-ensure t)
+ '(vertico-buffer-display-action
+   '(display-buffer-in-side-window
+     (window-height . 13)
+     (side . bottom))))
 
 (setq backup-directory-alist '((".*" . "~/.emacs.d/backups/"))
       backup-by-copying t    ; Don't delink hardlinks
@@ -100,8 +106,8 @@
 (if (eq system-type 'gnu/linux)
     (require 'gnu-linux-emacs-config.el))
 
-(require 'jnf-company.el)
-;; (require 'jnf-corfu.el)
+;; (require 'jnf-company.el)
+(require 'jnf-corfu.el)
 (require 'jnf-in-buffer.el)
 (require 'jnf-macros.el)
 (require 'jnf-org.el)
