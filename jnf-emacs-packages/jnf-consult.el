@@ -196,7 +196,8 @@ the directory.  `REST' is passed to the `CONSULT-RIPGREP-FUNCTION'."
 (use-package embark
   :straight t
   :bind
-  (("C-s-a" . embark-act)       ;; pick some comfortable binding
+  (("C-." . embark-act)       ;; pick some comfortable binding
+   ("M-." . embark-dwim)
    ("C-s-e" . embark-export)
    ("C-h b" . embark-bindings))
   :hook (embark-pre-action . refresh-selectrum)

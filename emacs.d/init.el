@@ -106,8 +106,8 @@
 (if (eq system-type 'gnu/linux)
     (require 'gnu-linux-emacs-config.el))
 
-;; (require 'jnf-company.el)
-(require 'jnf-corfu.el)
+(require 'jnf-company.el)
+;; (require 'jnf-corfu.el)
 (require 'jnf-in-buffer.el)
 (require 'jnf-macros.el)
 (require 'jnf-org.el)
