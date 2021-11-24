@@ -16,6 +16,7 @@
   :config (setq read-process-output-max (* 1024 1024)
                 lsp-completion-provider :capf
                 lsp-idle-delay 0.750)
+  :custom (lsp-keymap-prefix "C-c C-l")
   :commands (lsp))
 
 (with-eval-after-load 'lsp-mode
