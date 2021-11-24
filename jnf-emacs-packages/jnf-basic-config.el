@@ -90,6 +90,9 @@
 (global-set-key (kbd "C-x C-d") 'dired)
 (global-set-key (kbd "<M-delete>") 'kill-word)
 
+(global-set-key (kbd "<s-down>") 'end-of-buffer)
+(global-set-key (kbd "<s-up>") 'beginning-of-buffer)
+
 ;; Far to easy to type this on accident, and I'm not a fan of it's behavior.
 (unbind-key "C-z") ;; `suspend-frame'
 
