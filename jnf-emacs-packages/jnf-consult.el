@@ -56,19 +56,19 @@
          ("M-g e" . consult-compile-error)
          ("M-g g" . consult-goto-line)             ;; orig. goto-line
          ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
+         ("s-l" . consult-goto-line)           ;; orig. goto-line
          ("M-g o" . consult-outline)
          ("M-g m" . consult-mark)
          ("M-g k" . consult-global-mark)
          ("C-x C-SPC" . consult-mark)
          ("M-g i" . consult-imenu)
-         ("M-g I" . consult-project-imenu)
+         ("M-g I" . consult-imenu-multi)
          ;; M-s bindings (search-map)
          ("M-s f" . consult-find)
          ("M-s L" . consult-locate)
          ("M-s g" . consult-grep)
          ("M-s G" . consult-git-grep)
          ("M-s r" . consult-ripgrep)
-         ("C-c f" . consult-ripgrep)
          ("M-s l" . consult-line)
          ("M-s m" . consult-multi-occur)
          ("M-s k" . consult-keep-lines)
@@ -82,8 +82,7 @@
          ;; Isearch integration
          ("M-s e" . consult-isearch)
          ;; ("s-t" . jnf/consult-find-using-fd)
-         ("s-3" . consult-imenu)
-         ("s-#" . consult-project-imenu)
+         ("s-3" . consult-imenu-multi)
          :map isearch-mode-map
          ("M-e" . consult-isearch)                 ;; orig. isearch-edit-string
          ("M-s e" . consult-isearch)               ;; orig. isearch-edit-string
@@ -256,16 +255,6 @@ the directory.  `REST' is passed to the `CONSULT-RIPGREP-FUNCTION'."
   :config
   (define-key lsp-mode-map [remap xref-find-apropos] #'consult-lsp-symbols)
   :commands consult-lsp-symbols)
-
-
-;; https://github.com/minad/vertico
-;;
-;; See System Crafters - https://www.reddit.com/r/emacs/comments/neh3d7/streamline_your_emacs_completions_with_vertico/
-;; Vertico and Selectrum provide similar functions.  Favor selectrum.
-;; (use-package vertico
-;;   :straight t
-;;   :custom (vertico-cycle t)
-;;   :init (vertico-mode))
 
 ;; https://github.com/minad/orderless
 ;;
