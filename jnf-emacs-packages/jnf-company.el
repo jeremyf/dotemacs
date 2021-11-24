@@ -11,8 +11,7 @@
   :straight t
   :commands (company company-global-mode company-mode)
   :diminish
-  :bind (("C-." . #'company-capf)
-         (:map company-active-map (("<tab>" . 'company-complete-selection ))))
+  :bind ((:map company-active-map (("<tab>" . 'company-complete-selection ))))
   :hook (prog-mode . company-mode)
         (org-mode . company-mode)
   :custom
