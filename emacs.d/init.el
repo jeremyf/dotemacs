@@ -47,6 +47,8 @@
 (setq split-width-threshold 120)
 
 (require 'jnf-config.el)
+(when (file-directory-p "~/git/dotzshrc/symlinks/.hammerspoon/Spoons/editWithEmacs.spoon")
+  (load "~/git/dotzshrc/symlinks/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el"))
 (require 'jnf-display.el)
 (require 'jnf-projectile.el)
 (require 'jnf-vertico.el)
@@ -128,8 +130,6 @@
 (require 'jnf-dice.el)
 (require 'jnf-forem.el)
 
-(when (file-directory-p "~/git/dotzshrc/symlinks/.hammerspoon/Spoons/editWithEmacs.spoon")
-  (load "~/git/dotzshrc/symlinks/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el"))
 
 (diminish 'eldoc-mode)
 

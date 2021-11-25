@@ -7,6 +7,39 @@
 ;;; Code:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+(define-key hammerspoon-edit-minor-map (kbd "C-c t") #'jnf/forem-tidy-pull-request)
+
+(defun jnf/forem-tidy-pull-request ()
+  "Perform some quick tidying of the Forem PR template.
+
+See https://github.com/forem/forem/blob/main/.github/PULL_REQUEST_TEMPLATE.m"
+  (interactive)
+  (beginning-of-buffer)
+  (search-forward "<!--")
+  (kill-region 1 (- (point) 4))
+
+  (replace-string
+   "## Description\n\n"
+   (concat "## Description\n\n" (format "%s" (car kill-ring))))
+
+  (beginning-of-buffer)
+  ;; Remove HTML/Markdown comments
+  (replace-regexp
+   "\\(\n\\)*<!--\\(.\\|\n\\)*-->\\(\n\\)*"
+   "")
+
+  ;; Clean out the comments for QA instructions; I'll write them, but
+  ;; the notes are unnecessary.
+  (replace-regexp
+   "QA Instructions, Screenshots, Recordings\\([^#]\\)*"
+   "QA Instructions, Screenshots, Recordings\n\n")
+
+  ;; Clean out accessibility concerns; I'll write them, but the notes
+  ;; are unnecessary.
+  (replace-regexp
+   "UI accessibility concerns?\\([^#]\\)*"
+   "UI accessibility concerns?\n\n"))
+
 (global-set-key (kbd "C-M-s-f") 'jnf/forem-menu/body)
 (defvar jnf/forem-menu--title
   (with-octicon "code" "Forem" 1 -0.05)
@@ -76,5 +109,6 @@ With the universal prefix (e.g. C-u) open the file instead."
         ("B" jnf/open-forem-brag-book "[B]rag book open…")
         ("D" jnf/open-dashboard "[D]ashboard open…"))))
     ))
+
 (provide 'jnf-forem.el)
 ;;; jnf-forem.el ends here
