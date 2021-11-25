@@ -7,35 +7,48 @@
 ;;; Code:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(define-key hammerspoon-edit-minor-map (kbd "C-c t") #'jnf/forem-tidy-pull-request)
+(define-key
+  hammerspoon-edit-minor-map
+  (kbd "C-c t")
+  #'jnf/forem-tidy-pull-request)
 
 (defun jnf/forem-tidy-pull-request ()
-  "Perform some quick tidying of the Forem PR template.
-
-See https://github.com/forem/forem/blob/main/.github/PULL_REQUEST_TEMPLATE.m"
+  "Perform some quick tidying of the Forem PR template."
   (interactive)
+  ;; Start from the beginning.
   (beginning-of-buffer)
+
+  ;; The text before the first HTML/Markdown
+  ;; comments is the commit message.  Cut that
+  ;; text...
   (search-forward "<!--")
   (kill-region 1 (- (point) 4))
 
+  ;; ...and paste it inside the description
+  ;; section.
   (replace-string
    "## Description\n\n"
-   (concat "## Description\n\n" (format "%s" (car kill-ring))))
+   (concat "## Description\n\n"
+           (format "%s" (car kill-ring))))
 
+  ;; We've moved point (e.g., the cursor) so let's
+  ;; jump back to the beginning of the buffer.
   (beginning-of-buffer)
+
   ;; Remove HTML/Markdown comments
   (replace-regexp
    "\\(\n\\)*<!--\\(.\\|\n\\)*-->\\(\n\\)*"
    "")
 
-  ;; Clean out the comments for QA instructions; I'll write them, but
-  ;; the notes are unnecessary.
+  ;; Clean out the comments for QA instructions;
+  ;; I'll write them, but the notes are
+  ;; unnecessary.
   (replace-regexp
    "QA Instructions, Screenshots, Recordings\\([^#]\\)*"
    "QA Instructions, Screenshots, Recordings\n\n")
 
-  ;; Clean out accessibility concerns; I'll write them, but the notes
-  ;; are unnecessary.
+  ;; Clean out accessibility concerns; I'll write
+  ;; them, but the notes are unnecessary.
   (replace-regexp
    "UI accessibility concerns?\\([^#]\\)*"
    "UI accessibility concerns?\n\n"))
