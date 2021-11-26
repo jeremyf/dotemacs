@@ -36,12 +36,8 @@
   (load "~/.emacs.d/straight/build/vertico/extensions/vertico-indexed.elc")
   (vertico-indexed-mode)
 
-  (load "~/.emacs.d/straight/build/vertico/extensions/vertico-buffer.elc")
-  (vertico-buffer-mode)
-
-  (load "~/.emacs.d/straight/build/vertico/extensions/vertico-quick.elc")
-  (define-key vertico-map "\M-q" #'vertico-quick-insert)
-  (define-key vertico-map "\C-q" #'vertico-quick-exit)
+  ;; (load "~/.emacs.d/straight/build/vertico/extensions/vertico-buffer.elc")
+  ;; (vertico-buffer-mode)
 
   (load "~/.emacs.d/straight/build/vertico/extensions/vertico-repeat.elc")
   (global-set-key (kbd "M-r") #'vertico-repeat)
