@@ -37,7 +37,7 @@
     ("w f" jnf/tor-wrap-as-pseudo-dfn "Wrap word or region in pseudo-d[f]n…")
     ("w m" jnf/tor-wrap-as-marginnote-dwim "[M]argin-note line or region…")
     ("w s" jnf/tor-wrap-as-sidenote-dwim "[S]ide-note sentence or region…")
-    ("w w" jnf/tor-wrap-in-html-tag "[W]rap point or region…"))
+    ("w w" jnf/tor-wrap-in-html-tag "[W]rap point or region in html…"))
    "Posts"
    (("p r" jnf/tor-retitle-post "[R]e-title post…")
     ("p t" jnf/tor-tag-post "[T]ag post…" :exit nil)
