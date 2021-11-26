@@ -108,8 +108,11 @@
 (if (eq system-type 'gnu/linux)
     (require 'gnu-linux-emacs-config.el))
 
+;; I want a completion framework, and the 'company-org-block package
+;; is enough to say "Yes to company" over the simpler corfu.
 (require 'jnf-company.el)
 ;; (require 'jnf-corfu.el)
+
 (require 'jnf-in-buffer.el)
 (require 'jnf-macros.el)
 (require 'jnf-org.el)
@@ -129,6 +132,7 @@
 (require 'jnf-dired.el)
 (require 'jnf-dice.el)
 (require 'jnf-forem.el)
+(require 'jnf-titlecase.el)
 
 
 (diminish 'eldoc-mode)
