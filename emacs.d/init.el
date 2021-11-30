@@ -84,11 +84,7 @@
  '(safe-local-variable-values '((encoding . utf-8)))
  '(show-paren-mode t)
  '(typopunct-buffer-language 'english)
- '(use-package-always-ensure t)
- '(vertico-buffer-display-action
-   '(display-buffer-in-side-window
-     (window-height . 13)
-     (side . bottom))))
+ '(use-package-always-ensure t))
 
 (setq backup-directory-alist '((".*" . "~/.emacs.d/backups/"))
       backup-by-copying t    ; Don't delink hardlinks
