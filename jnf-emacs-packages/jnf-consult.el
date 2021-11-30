@@ -75,7 +75,8 @@
          ("M-s k" . consult-keep-lines)
          ("M-s u" . consult-focus-lines)
          ;; Customizations that map to ivy
-         ("s-r" . consult-recent-file)
+         ("s-r" . consult-recent-file) ;; Deprecate
+         ("C-c r" . consult-recent-file)
          ("C-c o" . consult-file-externally)
          ("s-4" . consult-bookmark)
          ("C-y" . yank)

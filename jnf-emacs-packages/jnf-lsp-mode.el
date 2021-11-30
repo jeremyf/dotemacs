@@ -9,10 +9,11 @@
 (use-package lsp-mode
   :straight t
   :hook (
-         (ruby-mode . lsp)
-         (enh-ruby-mode . lsp)
-         (html-mode . lsp)
-         (bash-mode . lsp))
+         ;; (ruby-mode . lsp)
+         ;; (enh-ruby-mode . lsp)
+         ;; (html-mode . lsp)
+         ;; (bash-mode . lsp)
+         )
   :config (setq read-process-output-max (* 1024 1024)
                 lsp-completion-provider :capf
                 lsp-idle-delay 0.750)
