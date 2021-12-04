@@ -118,7 +118,7 @@
 (require 'jnf-spelling.el)
 (require 'jnf-typography.el)
 (require 'jnf-ruby.el)
-(require 'jnf-lsp-mode.el)
+;; (require 'jnf-lsp-mode.el)
 (require 'jnf-beancount.el)
 (require 'jnf-blogging.el)
 (require 'jnf-tabs.el)
