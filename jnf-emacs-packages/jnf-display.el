@@ -36,8 +36,19 @@
 ;; END BLOCK
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
 (global-hl-line-mode)
+
+;; Recommendation from https://protesilaos.com/emacs/modus-themes
+(setq x-underline-at-descent-line t)
+
+(use-package lin
+  :straight (lin :host gitlab :repo "protesilaos/lin")
+  :config (lin-add-to-many-modes)
+  (set-face-attribute 'lin-hl nil
+                    :background (modus-themes-color 'green-subtle-bg)
+                    :underline (modus-themes-color 'green-intense)))
+
+
 (blink-cursor-mode t)
 ;; Doing a bit of configuration of my cursors
 (setq-default cursor-type 'bar)
@@ -157,6 +168,32 @@ Tries to preserve the order of window buffers and active window."
 (use-package ace-window
   :straight t
   :bind (("M-o" . ace-window)))
+
+
+;; See https://www.reddit.com/r/emacs/comments/r7l3ar/how_do_you_scroll_half_a_page/
+(global-set-key (kbd "C-v") 'jnf/scroll-down-half-page)
+(defun jnf/scroll-down-half-page ()
+  "Scroll down half a page while keeping the cursor centered"
+  (interactive)
+  (let ((ln (line-number-at-pos (point)))
+    (lmax (line-number-at-pos (point-max))))
+    (cond ((= ln 1) (move-to-window-line nil))
+      ((= ln lmax) (recenter (window-end)))
+      (t (progn
+           (move-to-window-line -1)
+           (recenter))))))
+
+(global-set-key (kbd "M-v") 'jnf/scroll-up-half-page)
+(defun jnf/scroll-up-half-page ()
+  "Scroll up half a page while keeping the cursor centered"
+  (interactive)
+  (let ((ln (line-number-at-pos (point)))
+    (lmax (line-number-at-pos (point-max))))
+    (cond ((= ln 1) nil)
+      ((= ln lmax) (move-to-window-line nil))
+      (t (progn
+           (move-to-window-line 0)
+           (recenter))))))
 
 (provide 'jnf-display.el)
 ;;; jnf-display.el ends here
