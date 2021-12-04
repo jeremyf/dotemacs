@@ -3,5 +3,4 @@
 # key: db
 # contributor: Jeremy Friesen
 # --
-require 'byebug'; debugger; true
-:debugger
+require "debug"; binding.break
