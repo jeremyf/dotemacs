@@ -15,7 +15,7 @@
         modus-themes-fringes 'intense ; {nil,'subtle,'intense}
         modus-themes-mode-line '(accented 3d)
         modus-themes-syntax '(alt-syntax yellow-comments green-strings)
-        modus-themes-hl-line '(accented)
+        modus-themes-hl-line '(accented intense)
         modus-themes-intense-markup t
         modus-themes-intense-paren-match '(bold intense)
         modus-themes-links '(faint background)
