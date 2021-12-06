@@ -36,19 +36,6 @@
 ;; END BLOCK
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(global-hl-line-mode)
-
-;; Recommendation from https://protesilaos.com/emacs/modus-themes
-(setq x-underline-at-descent-line t)
-
-(use-package lin
-  :straight (lin :host gitlab :repo "protesilaos/lin")
-  :config (lin-add-to-many-modes)
-  (set-face-attribute 'lin-hl nil
-                    :background (modus-themes-color 'green-subtle-bg)
-                    :underline (modus-themes-color 'green-intense)))
-
-
 (blink-cursor-mode t)
 ;; Doing a bit of configuration of my cursors
 (setq-default cursor-type 'bar)
