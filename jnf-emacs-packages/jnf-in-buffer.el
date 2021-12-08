@@ -27,6 +27,8 @@
 ;; That letter is the beginning of a word. Narrow results from there.
 (use-package avy
   :bind (("C-j" . avy-goto-char-timer))
+  :bind (:map enh-ruby-mode-map ("C-j" . avy-goto-char-timer))
+  :bind (:map org-mode-map ("C-j" . avy-goto-char-timer))
   :straight t)
 
 (use-package link-hint
