@@ -17,7 +17,7 @@
         modus-themes-syntax '(alt-syntax yellow-comments green-strings)
         modus-themes-hl-line '(accented intense)
         modus-themes-intense-markup t
-        modus-themes-intense-paren-match '(bold intense)
+        modus-themes-paren-match '(bold intense)
         modus-themes-links '(faint background)
         modus-themes-subtle-line-numbers t
         modus-themes-mixed-fonts t
@@ -35,6 +35,17 @@
         modus-themes-scale-4 1.27
         modus-themes-scale-5 1.33))
 
+(global-hl-line-mode)
+
+;; Recommendation from https://protesilaos.com/emacs/modus-themes
+(setq x-underline-at-descent-line t)
+
+(use-package lin
+  :straight (lin :host gitlab :repo "protesilaos/lin")
+  :config (lin-add-to-many-modes))
+  ;; (set-face-attribute 'lin-hl nil
+  ;;                   :background (modus-themes-color 'green-subtle-bg)
+  ;;                   :underline (modus-themes-color 'green-intense))
 
 ;; Based on system type, either load the OSX apperance (e.g. dark or
 ;; light) and load accordingly.
