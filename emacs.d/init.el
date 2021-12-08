@@ -111,10 +111,10 @@
 
 (require 'jnf-in-buffer.el)
 (require 'jnf-macros.el)
+(require 'jnf-git.el)
 (require 'jnf-org.el)
 (require 'jnf-org-roam-v2.el)
 (require 'jnf-basic-config.el)
-(require 'jnf-git.el)
 (require 'jnf-spelling.el)
 (require 'jnf-typography.el)
 (require 'jnf-ruby.el)

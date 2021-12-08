@@ -265,6 +265,9 @@ exist after each headings's drawers."
 
      (setq org-koma-letter-default-class "jnf-letter")))
 
+(use-package org-menu
+  :straight (org-menu :host github :repo "sheijk/org-menu")
+  :bind (:map org-mode-map ("C-c m" . 'org-menu)))
 
 (provide 'jnf-org.el)
 ;;; jnf-org.el ends here
