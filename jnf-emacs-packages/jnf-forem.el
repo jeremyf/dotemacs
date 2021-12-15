@@ -51,39 +51,26 @@
   ;; them, but the notes are unnecessary.
   (replace-regexp
    "UI accessibility concerns?\\([^#]\\)*"
-   "UI accessibility concerns?\n\n"))
+   "UI accessibility concerns?\n\n")
+
+  ;; Jump to the beginning of the buffer...again.
+  (beginning-of-buffer))
 
 (global-set-key (kbd "C-M-s-f") 'jnf/forem-menu/body)
 (defvar jnf/forem-menu--title
   (with-octicon "code" "Forem" 1 -0.05)
   "The Forem Subject Menu Title.")
 (pretty-hydra-define jnf/forem-menu (:foreign-keys warn :title jnf/forem-menu--title :quit-key "q" :exit t)
-  ("Forem Github Workflow"
+  ("Forem Workflow"
    (
-    ("i" jnf/form-browse-url-issues "Browse to [i]ssues…")
-    ("j" jnf/form-browse-url-projects "Browse to pro[j]ects…")
-    ("p" jnf/form-browse-url-pull-requests "Browse to [p]ull requests…"))))
-
-(defun jnf/form-browse-url-pull-requests ()
-  "Open forem pull requests."
-  (interactive)
-  (if (equal current-prefix-arg nil)
-      (browse-url "https://github.com/forem/forem/pulls/")
-    (browse-url "https://github.com/forem/forem/pulls/jeremyf")))
-
-(defun jnf/form-browse-url-issues ()
-  "Open forem issues."
-  (interactive)
-  (if (equal current-prefix-arg nil)
-      (browse-url "https://github.com/forem/forem/issues/")
-    (browse-url "https://github.com/forem/forem/issues/assigned/jeremyf")))
-
-(defun jnf/form-browse-url-projects ()
-  "Open forem projects."
-  (interactive)
-  (if (equal current-prefix-arg nil)
-      (browse-url "https://github.com/orgs/forem/projects/")
-    (browse-url "https://github.com/orgs/forem/projects/39")))
+    ("i" (lambda () (interactive) (browse-url "https://github.com/forem/forem/issues/")) "Browse to ssues…")
+    ("j" (lambda () (interactive) (browse-url "https://github.com/forem/forem/issues/")) "Browse to projects…")
+    ("p" (lambda () (interactive) (browse-url "https://github.com/forem/forem/pulls/")) "Browse to pull requests…"))
+   "Jeremy's Workflow"
+   (
+    ("I" (lambda () (interactive) (browse-url "https://github.com/forem/forem/issues/assigned/jeremyf")) "Browse to Jeremy's [I]ssues…")
+    ("J" (lambda () (interactive) (browse-url "https://github.com/forem/forem/issues/assigned/jeremyf")) "Browse to Content Experience pro[J]ects…")
+    ("P" (lambda () (interactive) (browse-url "https://github.com/forem/forem/pulls/jeremyf")) "Browse to Jeremy's [P]ull requests…"))))
 
 (when (file-directory-p "~/git/org/forem")
   (progn
