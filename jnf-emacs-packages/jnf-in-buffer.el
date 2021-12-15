@@ -96,7 +96,7 @@
 ;; - hellow_world
 ;; - HELLO_WORLD
 (use-package string-inflection
-  :bind (("C-M-u" . string-inflection-all-cycle)) ;; CTRL+OPT+u
+  :bind (("C-M-s-i" . string-inflection-all-cycle))
   :straight (string-inflection :type git
                                :host github
                                :repo "akicho8/string-inflection"))
