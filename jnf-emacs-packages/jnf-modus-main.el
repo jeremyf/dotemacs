@@ -10,30 +10,32 @@
 (use-package modus-themes
   :straight (:type git :host gitlab :repo "protesilaos/modus-themes" :branch "main")
   :init
-  (setq modus-themes-slanted-constructs t
-        modus-themes-bold-constructs t
-        modus-themes-fringes 'intense ; {nil,'subtle,'intense}
-        modus-themes-mode-line '(accented 3d)
-        modus-themes-syntax '(alt-syntax yellow-comments green-strings)
-        modus-themes-hl-line '(accented intense)
-        modus-themes-intense-markup t
-        modus-themes-paren-match '(bold intense)
-        modus-themes-links '(faint background)
-        modus-themes-subtle-line-numbers t
-        modus-themes-mixed-fonts t
-        modus-themes-region '(bg-only accented)
-        modus-themes-prompts '(intense accented)
-        modus-themes-tabs-accented t
-        modus-themes-completions 'opinionated ; {nil,'moderate,'opinionated}
-        modus-themes-diffs nil ; {nil,'desaturated,'fg-only}
-        modus-themes-org-blocks 'tinted-background
-        modus-themes-variable-pitch-headings t
-        modus-themes-scale-headings t
-        modus-themes-scale-1 1.1
-        modus-themes-scale-2 1.15
-        modus-themes-scale-3 1.21
-        modus-themes-scale-4 1.27
-        modus-themes-scale-5 1.33))
+  (setq
+   modus-themes-bold-constructs t
+   modus-themes-completions 'opinionated ; {nil,'moderate,'opinionated}
+   modus-themes-diffs nil ; {nil,'desaturated,'fg-only}
+   modus-themes-fringes 'intense ; {nil,'subtle,'intense}
+   modus-themes-hl-line '(accented intense)
+   modus-themes-intense-markup t
+   modus-themes-links '(faint background)
+   modus-themes-mixed-fonts t
+   modus-themes-mode-line '(accented 3d)
+   modus-themes-org-blocks 'tinted-background
+   modus-themes-paren-match '(bold intense)
+   modus-themes-prompts '(intense accented)
+   modus-themes-region '(bg-only accented)
+   modus-themes-scale-1 1.1
+   modus-themes-scale-2 1.15
+   modus-themes-scale-3 1.21
+   modus-themes-scale-4 1.27
+   modus-themes-scale-5 1.33
+   modus-themes-scale-headings t
+   modus-themes-slanted-constructs t
+   modus-themes-subtle-line-numbers t
+   modus-themes-syntax '(alt-syntax yellow-comments green-strings)
+   modus-themes-tabs-accented t
+   modus-themes-variable-pitch-headings t
+   modus-themes-variable-pitch-ui t))
 
 (global-hl-line-mode)
 
