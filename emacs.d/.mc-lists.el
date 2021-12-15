@@ -11,6 +11,7 @@
         electric-pair-delete-pair
         end-of-buffer
         end-of-visual-line
+        enh-ruby-electric-brace
         fill-paragraph
         git-rebase-squash
         hungry-delete-backward
