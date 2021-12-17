@@ -107,7 +107,8 @@ With the universal prefix (e.g. C-u) open the file instead."
        (
         ("@" jnf/open-forem-todo "Open Forem Todo")
         ("B" jnf/open-forem-brag-book "[B]rag book open…")
-        ("D" jnf/open-dashboard "[D]ashboard open…"))))
+        ("D" jnf/open-dashboard "[D]ashboard open…")
+        ("d" (lambda () (interactive) (find-file jnf/forem-dashboard-filename)) "Visit [d]ashboard file…"))))
     ))
 
 (provide 'jnf-forem.el)
