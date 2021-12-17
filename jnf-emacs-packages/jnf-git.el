@@ -137,9 +137,9 @@ This implementation is dependent on `magit' and `s'."
 (use-package forge
   :config
   (setq auth-sources '("~/.authinfo"))
-  (magit-add-section-hook 'magit-status-sections-hook 'forge-insert-authored-pullreqs nil 'append)
-  (magit-add-section-hook 'magit-status-sections-hook 'forge-insert-requested-reviews nil 'append)
-  (magit-add-section-hook 'magit-status-sections-hook 'forge-insert-assigned-issues nil 'append)
+  ;; (magit-add-section-hook 'magit-status-sections-hook 'forge-insert-authored-pullreqs nil 'append)
+  ;; (magit-add-section-hook 'magit-status-sections-hook 'forge-insert-requested-reviews nil 'append)
+  ;; (magit-add-section-hook 'magit-status-sections-hook 'forge-insert-assigned-issues nil 'append)
   :straight t)
 
 (use-package libgit
