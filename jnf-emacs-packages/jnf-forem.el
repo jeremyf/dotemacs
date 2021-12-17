@@ -53,6 +53,17 @@
    "UI accessibility concerns?\\([^#]\\)*"
    "UI accessibility concerns?\n\n")
 
+  ;; Clear out the text I almost always delete.
+  ;;
+  ;; This clears out the two or three line "please"!
+  (replace-regexp "_please.*\\(\n +.+\\)+_" "")
+
+  ;; Clean out the GIF section.  As much as I try
+  ;; I just don't like adding GIFs to PRs
+  (replace-regexp
+   "\n## \\[optional\\] What gif\\(.\\)*\n+\\!.*"
+   "")
+
   ;; Jump to the beginning of the buffer...again.
   (beginning-of-buffer))
 
