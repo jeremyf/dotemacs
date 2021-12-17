@@ -70,7 +70,8 @@
    (
     ("I" (lambda () (interactive) (browse-url "https://github.com/forem/forem/issues/assigned/jeremyf")) "Browse to Jeremy's [I]ssues…")
     ("J" (lambda () (interactive) (browse-url "https://github.com/forem/forem/issues/assigned/jeremyf")) "Browse to Content Experience pro[J]ects…")
-    ("P" (lambda () (interactive) (browse-url "https://github.com/forem/forem/pulls/jeremyf")) "Browse to Jeremy's [P]ull requests…"))))
+    ("P" (lambda () (interactive) (browse-url "https://github.com/forem/forem/pulls/jeremyf")) "Browse to Jeremy's [P]ull requests…")
+    ("N" (lambda () (interactive) (browse-url "https://github.com/notifications")) "Browse Github [N]otifications"))))
 
 (when (file-directory-p "~/git/org/forem")
   (progn
