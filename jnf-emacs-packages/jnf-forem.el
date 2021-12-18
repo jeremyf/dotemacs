@@ -40,23 +40,17 @@
    "\\(\n\\)*<!--\\(.\\|\n\\)*-->\\(\n\\)*"
    "")
 
-  ;; Clean out the comments for QA instructions;
-  ;; I'll write them, but the notes are
-  ;; unnecessary.
-  (replace-regexp
-   "QA Instructions, Screenshots, Recordings\\([^#]\\)*"
-   "QA Instructions, Screenshots, Recordings\n\n")
-
-  ;; Clean out accessibility concerns; I'll write
-  ;; them, but the notes are unnecessary.
-  (replace-regexp
-   "UI accessibility concerns?\\([^#]\\)*"
-   "UI accessibility concerns?\n\n")
+  (beginning-of-buffer)
 
   ;; Clear out the text I almost always delete.
   ;;
   ;; This clears out the two or three line "please"!
-  (replace-regexp "_please.*\\(\n +.+\\)+_" "")
+  (replace-regexp ": _please.*\\(\n +.+\\)+_\n" ":\n")
+
+  (beginning-of-buffer)
+
+  ;; Clear out some comments.
+  (replace-regexp "^\n_\\(If\\|Please\\|Will\\).*\\(\n.+\\)+_\n+" "\n")
 
   ;; Clean out the GIF section.  As much as I try
   ;; I just don't like adding GIFs to PRs
