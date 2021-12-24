@@ -9,6 +9,9 @@
   :init (setq ripgrep-arguments "--ignore-case")
   :straight t)
 
+(use-package fzf
+  :straight t)
+
 (use-package savehist
   :straight t
   :init
@@ -79,6 +82,7 @@
          ("C-c r" . consult-recent-file)
          ("C-c o" . consult-file-externally)
          ("s-4" . consult-bookmark)
+         ("s-1" . ibuffer)
          ("C-y" . yank)
          ("C-s" . consult-line) ;; I've long favored Swiper mapped to c-s
          ;; Isearch integration

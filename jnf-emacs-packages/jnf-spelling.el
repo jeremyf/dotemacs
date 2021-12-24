@@ -40,7 +40,7 @@
   :straight t
   )
 
-(eval-when-compile (require 'cl))
+(eval-when-compile (require 'cl-lib))
 
 (defun append-aspell-word (new-word)
   "Append the given NEW-WORD to the current dictionary, and reload the dictionary."

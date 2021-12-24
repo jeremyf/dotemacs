@@ -49,6 +49,7 @@
 (require 'jnf-config.el)
 (when (file-directory-p "~/git/dotzshrc/symlinks/.hammerspoon/Spoons/editWithEmacs.spoon")
   (load "~/git/dotzshrc/symlinks/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el"))
+
 (require 'jnf-display.el)
 (require 'jnf-projectile.el)
 (require 'jnf-vertico.el)
@@ -119,7 +120,7 @@
 (require 'jnf-typography.el)
 (require 'jnf-ruby.el)
 ;; (require 'jnf-lsp-mode.el)
-(require 'jnf-beancount.el)
+;; (require 'jnf-beancount.el)
 (require 'jnf-blogging.el)
 (require 'jnf-tabs.el)
 ;; (require 'jnf-stars-without-number.el)
