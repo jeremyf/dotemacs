@@ -10,13 +10,13 @@
   :straight t
   :hook (
          ;; (ruby-mode . lsp)
-         ;; (enh-ruby-mode . lsp)
+         (enh-ruby-mode . lsp)
          ;; (html-mode . lsp)
          ;; (bash-mode . lsp)
          )
   :config (setq read-process-output-max (* 1024 1024)
                 lsp-completion-provider :capf
-                lsp-idle-delay 0.750)
+                lsp-idle-delay 1.00)
   :custom (lsp-keymap-prefix "C-c C-l")
   :commands (lsp))
 
@@ -74,7 +74,9 @@
   :straight (solargraph :host github :repo "guskovd/emacs-solargraph")
   :custom
   (lsp-solargraph-use-bundler t)
-  :bind (:map ruby-mode-map ("M-i" . solargraph:complete)))
+  :bind
+  (:map enh-ruby-mode-map ("M-i" . solargraph:complete))
+  (:map ruby-mode-map ("M-i" . solargraph:complete)))
 
 ;; (use-package tree-sitter
 ;;   :straight t)

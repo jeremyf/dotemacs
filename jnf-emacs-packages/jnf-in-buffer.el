@@ -245,6 +245,12 @@
   :init (setq yas-snippet-dirs '("~/git/dotemacs/snippets"))
   (yas-global-mode 1))
 
+(use-package consult-yasnippet
+  :straight t
+  :after (consult yasnippet)
+  :bind ("C-c y" . consult-yasnippet))
+
+
 ;; I kind of like this little bit of visual feedback
 (use-package goggles
   :straight t
