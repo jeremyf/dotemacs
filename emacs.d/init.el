@@ -97,13 +97,7 @@
 
 (require 'jnf-epub.el)
 (require 'jnf-modes.el)
-
-
-(if (eq system-type 'darwin)
-    (require 'darwin-emacs-config.el))
-
-(if (eq system-type 'gnu/linux)
-    (require 'gnu-linux-emacs-config.el))
+(require 'darwin-emacs-config.el)
 
 ;; I want a completion framework, and the 'company-org-block package
 ;; is enough to say "Yes to company" over the simpler corfu.
