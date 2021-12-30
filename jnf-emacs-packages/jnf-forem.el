@@ -69,12 +69,12 @@
   ("Forem Workflow"
    (
     ("i" (lambda () (interactive) (browse-url "https://github.com/forem/forem/issues/")) "Browse to ssues…")
-    ("j" (lambda () (interactive) (browse-url "https://github.com/forem/forem/issues/")) "Browse to projects…")
+    ("j" (lambda () (interactive) (browse-url "https://github.com/orgs/forem/projects/")) "Browse to projects…")
     ("p" (lambda () (interactive) (browse-url "https://github.com/forem/forem/pulls/")) "Browse to pull requests…"))
    "Jeremy's Workflow"
    (
     ("I" (lambda () (interactive) (browse-url "https://github.com/forem/forem/issues/assigned/jeremyf")) "Browse to Jeremy's [I]ssues…")
-    ("J" (lambda () (interactive) (browse-url "https://github.com/forem/forem/issues/assigned/jeremyf")) "Browse to Content Experience pro[J]ects…")
+    ("J" (lambda () (interactive) (browse-url "https://github.com/orgs/forem/projects/39")) "Browse to Content Experience pro[J]ects…")
     ("P" (lambda () (interactive) (browse-url "https://github.com/forem/forem/pulls/jeremyf")) "Browse to Jeremy's [P]ull requests…")
     ("N" (lambda () (interactive) (browse-url "https://github.com/notifications")) "Browse Github [N]otifications"))))
 
