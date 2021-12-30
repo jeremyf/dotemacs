@@ -13,7 +13,8 @@
   :straight t
   ;; I use markdown for my blogging platform and very little else.
   ;; Hence, I have this keybind.
-  :bind (:map markdown-mode-map ("C-M-s-t" . jnf/tor-subject-menu-markdown/body)))
+  :bind (:map markdown-mode-map (("C-c t" . jnf/tor-subject-menu-markdown/body)
+                                 ("C-M-s-t" . jnf/tor-subject-menu-markdown/body))))
 
 (use-package decide
   :straight (decide :host github :type git :repo "jeremyf/decide-mode"))
@@ -60,6 +61,7 @@
 ;; there's a markdown menu but if I'm not in markdown, it likely means
 ;; I'm not in Take on Rules pages.
 (global-set-key (kbd "C-M-s-t") 'jnf/tor-subject-menu-default/body)
+(global-set-key (kbd "C-c t") 'jnf/tor-subject-menu-default/body)
 
 (pretty-hydra-define jnf/tor-subject-menu-default (:foreign-keys warn :title jnf/tor-menu--title :quit-key "q" :exit t)
   ("Utilities"
