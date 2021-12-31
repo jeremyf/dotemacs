@@ -55,7 +55,7 @@
     ("? f" jnf/tor-find-file "Find blog by [f]ilename…")
     ("t d" decide-mode "[D]ecide Mode" :toggle t)
     ("t h" (jnf/tor-toggle-hugo-server :buffer-name "*Hugo Server*") "Toggle [H]ugo server" :toggle (get-buffer "*Hugo Server*"))
-    ("t v" variable-pitch-mode "Toggle [v]ariable pitch mode"))))
+    ("t v" variable-pitch-mode "Toggle [v]ariable pitch mode" :toggle t))))
 
 ;; The `C-c t' key combo is engrained for my TakeOnRules incantations;
 ;; there's a markdown menu but if I'm not in markdown, it likely means
