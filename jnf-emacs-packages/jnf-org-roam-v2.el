@@ -348,6 +348,8 @@ Fetch the given SUBJECT from the given SUBJECTS-PLIST."
     ("#" jnf/toggle-roam-subject-filter "Toggle Default Filter")
     ("~" jnf/magit-list-repositories    "Magit List Repositories")
     ("1" (find-file (f-join jnf/tor-home-directory "todo.org")) "Todo for TakeOnRules.com")
+    ("2" org-transclusion-add "Org Transclusion Add…")
+    ("3" org-transclusion-mode "Org Transclusion Mode" :toggle t)
     )))
 ;;******************************************************************************
 ;;
@@ -433,6 +435,9 @@ The form should be '((\"all\" 1) (\"hesburgh-libraries\" 2))."
   (org-roam-db-autosync-mode)
   ;; Configure the "all" subject key map
   (jnf/toggle-roam-subject-filter "all"))
+
+(use-package org-transclusion
+  :straight t)
 
 (provide 'jnf-org-roam-v2.el)
 ;;; jnf-org-roam-v2.el ends here
