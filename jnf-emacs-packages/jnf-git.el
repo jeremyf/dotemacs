@@ -132,7 +132,8 @@ This implementation is dependent on `magit' and `s'."
   :bind (
          ("C-c C-g" . magit-file-dispatch)
          ("s-7" . magit-status))
-  :bind (:map magit-log-mode-map ("s-6" . 'jnf/magit-browse-pull-request)))
+  :bind (:map magit-log-mode-map ("s-6" . 'jnf/magit-browse-pull-request))
+  :hook ((with-editor-post-finish-hook . magit-status)))
 
 (use-package forge
   :config
