@@ -8,8 +8,8 @@
 ;; I'm just going to trust themes
 
 (use-package modus-themes
-  :straight (modus-themes :type built-in)
-  ;; :straight (:type git :host gitlab :repo "protesilaos/modus-themes" :branch "main")
+  ;; :straight (modus-themes :type built-in)
+  :straight (:type git :host gitlab :repo "protesilaos/modus-themes" :branch "main")
   :init
   (setq
    modus-themes-bold-constructs t
