@@ -24,18 +24,18 @@
    modus-themes-paren-match '(bold intense)
    modus-themes-prompts '(intense accented)
    modus-themes-region '(bg-only accented)
-   modus-themes-scale-1 1.1
-   modus-themes-scale-2 1.15
-   modus-themes-scale-3 1.21
-   modus-themes-scale-4 1.27
-   modus-themes-scale-5 1.33
    modus-themes-scale-headings t
    modus-themes-slanted-constructs t
    modus-themes-subtle-line-numbers t
    modus-themes-syntax '(alt-syntax yellow-comments green-strings)
    modus-themes-tabs-accented t
-   modus-themes-variable-pitch-headings t
-   modus-themes-variable-pitch-ui t))
+   modus-themes-headings
+      '((1 . (variable-pitch light 1.6))
+        (2 . (overline semibold 1.4))
+        (3 . (monochrome overline 1.2))
+        (4 . (overline 1.1))
+        (t . (rainbow 1.05)))
+))
 
 (global-hl-line-mode)
 
