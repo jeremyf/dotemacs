@@ -87,7 +87,7 @@
  '(typopunct-buffer-language 'english)
  '(use-package-always-ensure t)
  '(warning-suppress-log-types '((comp)))
- '(warning-suppress-types '((comp)))
+ '(warning-suppress-types '((comp))))
 
 (setq backup-directory-alist '((".*" . "~/.emacs.d/backups/"))
       backup-by-copying t    ; Don't delink hardlinks
