@@ -8,7 +8,8 @@
 ;; I'm just going to trust themes
 
 (use-package modus-themes
-  :straight (:type git :host gitlab :repo "protesilaos/modus-themes" :branch "main")
+  :straight (modus-themes :type built-in)
+  ;; :straight (:type git :host gitlab :repo "protesilaos/modus-themes" :branch "main")
   :init
   (setq
    modus-themes-bold-constructs t
@@ -34,8 +35,7 @@
         (2 . (overline semibold 1.4))
         (3 . (monochrome overline 1.2))
         (4 . (overline 1.1))
-        (t . (rainbow 1.05)))
-))
+        (t . (rainbow 1.05)))))
 
 (global-hl-line-mode)
 
@@ -63,17 +63,17 @@
       (defun jnf/emacs-theme-by-osx-appearance ()
         "Set theme based on OSX apperance state."
         (if (equal "Dark" (substring (shell-command-to-string "defaults read -g AppleInterfaceStyle") 0 4))
-            (modus-themes-load-vivendi)
-          (modus-themes-load-operandi)))
+            (load-theme 'modus-vivendi)
+          (load-theme 'modus-operandi)))
       (jnf/emacs-theme-by-osx-appearance))
   (progn
     (defun modus-themes-toggle ()
       "Toggle between `modus-operandi' and `modus-vivendi' themes."
       (interactive)
       (if (eq (car custom-enabled-themes) 'modus-operandi)
-          (modus-themes-load-vivendi)
-        (modus-themes-load-operandi)))
-    (modus-themes-load-operandi)))
+          (load-theme 'modus-vivendi)
+        (load-theme 'modus-operandi)))
+    (load-theme 'modus-operandi)))
 
 (provide 'jnf-modus-main.el)
 ;;; jnf-modus-main.el ends here
