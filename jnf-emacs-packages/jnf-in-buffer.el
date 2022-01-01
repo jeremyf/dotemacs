@@ -54,6 +54,10 @@
   :straight t
   :hook ((fundamental-mode) . vi-tilde-fringe-mode))
 
+(use-package fill-sentences-correctly
+  :straight (fill-sentences-correctly :host github :repo "duckwork/fill-sentences-correctly.el")
+  :hook (fundamental-mode . fill-sentences-correctly-mode))
+
 ;; I don't use a lot of folding, this allows me to type C-RET and fold
 ;; the current block.  There's more it can do but for now that's
 ;; enough
