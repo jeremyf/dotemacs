@@ -240,9 +240,18 @@
 
      (setq org-koma-letter-default-class "jnf-letter")))
 
+
+;; Context dependent menu for org-mode.
 (use-package org-menu
   :straight (org-menu :host github :repo "sheijk/org-menu")
   :bind (:map org-mode-map ("C-c m" . 'org-menu)))
+
+;; `org-autolist` makes org-mode lists behave more like lists in
+;; non-programming editors such as Google Docs, MS Word, and OS X
+;; Notes.
+(use-package org-autolist
+  :straight t
+  :hook ((org-mode . org-autolist-mode)))
 
 (provide 'jnf-org.el)
 ;;; jnf-org.el ends here
