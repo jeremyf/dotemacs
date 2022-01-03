@@ -31,7 +31,7 @@
                              :paths jnf/data-directories
                              :basenames '("agenda.org" "todo.org"))
            org-default-notes-file (concat org-directory "/captured-notes.org")
-           org-startup-indented t
+           ;; org-startup-indented t
            org-todo-keywords
            '((sequence "TODO" "WAITING" "|" "DONE")
            (sequence "PENDING" "TODO" "WAITING" "|" "READ")))
