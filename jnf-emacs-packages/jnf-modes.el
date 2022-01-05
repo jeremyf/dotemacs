@@ -14,9 +14,9 @@
          (css-mode . emmet-mode)))
 
 ;; https://github.com/AdamNiederer/vue-mode
-(use-package vue-mode
-  :straight t
-  :mode (("\\.vue\\'" . vue-mode)))
+;; (use-package vue-mode
+;;   :straight t
+;;   :mode (("\\.vue\\'" . vue-mode)))
 
 (use-package web-mode
   :straight t

@@ -9,6 +9,7 @@
   :init (setq ripgrep-arguments "--ignore-case")
   :straight t)
 
+;; A front-end for the fzf bindings.
 (use-package fzf
   :straight t)
 
