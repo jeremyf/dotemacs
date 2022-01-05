@@ -426,31 +426,45 @@ We'll pass the :CITETITLE, :CITEAUTHOR, and :CITEURL to
    :citeURL citeURL
    :citeAuthor citeAuthor))
 
-(cl-defun jnf/tor-find-file-draft (filename
-                                   &key
-                                   (in "content"))
-  "Find the draft FILENAME that is IN the directory of TakeOnRules.com."
-  (interactive (list (completing-read
-                      "Filename: "
-                      (jnf/list-filenames-with-file-text
-                       :matching "^draft: true"
-                       :in "content"))))
-  (let ((file-path (f-join jnf/tor-home-directory in filename)))
-    (message "Opening draft %s" file-path)
-    (find-file file-path)))
+;; Note: I needed to use `fboundp' because if I invoked this functions
+;; before other consult functions I got a method void error.
+(cl-defun jnf/find-file-via-matching (&key prompt matching in)
+  "PROMPT for files IN the directory with MATCHING content.
 
-(cl-defun jnf/tor-find-file (filename
-                             &key
-                             (in "content"))
-  "Find FILENAME that is IN the directory of TakeOnRules.com."
-  (interactive (list (completing-read
-                      "Filename: "
-                      (jnf/list-filenames-with-file-text
-                       :matching "^title:"
-                       :in "content"))))
-  (let ((file-path (f-join jnf/tor-home-directory in filename)))
-    (message "Opening %s" file-path)
-    (find-file file-path)))
+If `consult--read' is defined, use that.  Otherwise fallback to `completing-read'."
+  (if (fboundp 'consult--read)
+      (consult--read
+       (consult--with-increased-gc
+        (jnf/list-full-filenames-with-file-text :matching matching :in in))
+       :prompt prompt
+       :sort nil
+       :require-match t
+       :category 'file
+       :history 'file-name-history
+       :state (consult--file-preview))
+    (list (completing-read
+           prompt
+           (jnf/list-filenames-with-file-text
+            :matching matching
+            :in in)))))
+
+(defun jnf/tor-find-file-draft (filename)
+  "Find a draft FILENAME in the TakeOnRules content directory."
+  (interactive
+   (jnf/find-file-via-matching
+    :prompt "Draft filename: "
+    :matching "^draft: true"
+    :in (f-join jnf/tor-home-directory "content")))
+  (find-file filename))
+
+(defun jnf/tor-find-file (filename)
+  "Find a FILENAME in the TakeOnRules content directory."
+  (interactive
+   (jnf/find-file-via-matching
+    :prompt "Filename: "
+    :matching "^title:"
+    :in (f-join jnf/tor-home-directory "content")))
+  (find-file filename))
 ;;******************************************************************************
 ;;
 ;;; END Interactive Non-Wrapping Functions
@@ -523,6 +537,16 @@ We'll pass the :CITETITLE, :CITEAUTHOR, and :CITEURL to
        matching "\" --only-matching --files-with-matches --sortr modified"
        "| tr '\n' '~'"))
      "~")))
+
+(cl-defun jnf/list-full-filenames-with-file-text (&key matching in)
+  "Build a list of filenames MATCHING the pattern IN the given directory."
+  (split-string-and-unquote
+   (shell-command-to-string
+    (concat
+     "rg \""
+     matching "\" " in " --only-matching --files-with-matches --sortr modified"
+     "| tr '\n' '@'"))
+   "@"))
 
 (defun jnf/tor-page-relative-pathname-list ()
   "Return a list of pages for TakeOnRules.com."

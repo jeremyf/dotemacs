@@ -117,7 +117,6 @@
 (require 'jnf-ruby.el)
 (require 'jnf-lsp-mode.el)
 ;; (require 'jnf-beancount.el)
-(require 'jnf-blogging.el)
 (require 'jnf-tabs.el)
 ;; (require 'jnf-stars-without-number.el)
 (require 'jnf-elfeed.el)
@@ -126,6 +125,7 @@
 (require 'jnf-dice.el)
 (require 'jnf-forem.el)
 (require 'jnf-titlecase.el)
+(require 'jnf-blogging.el)
 
 
 (diminish 'eldoc-mode)

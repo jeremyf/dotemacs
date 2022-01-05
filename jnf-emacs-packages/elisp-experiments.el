@@ -205,8 +205,5 @@ With two prefix args, insert an x'ed checkbox."
                                (?v . ?↕)
                                )))))
 
-
-
-
 (provide 'elisp-experiments.el)
 ;;; elisp-experiments.el ends here
