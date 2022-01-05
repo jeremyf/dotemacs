@@ -18,6 +18,7 @@
   (pretty-hydra-define jnf/projectile--menu (:foreign-keys warn :title jnf/projectile--title :quit-key "q" :exit t)
     ("Projectile" (
                    ("b" projectile-switch-to-buffer "Buffer Select…")
+                   ("c" consult-projectile          "Consult projectile…")
                    ("d" projectile-dired            "Dired to project root…")
                    ("f" projectile-find-file-dwim   "Find File DWIM…")
                    ("i" projectile-ibuffer          "Ibuffer…")
@@ -32,7 +33,6 @@
   :bind
   (:map projectile-mode-map (("C-c p" . jnf/projectile--menu/body)))
   :bind
-  ("s-t" . projectile-find-file)
   ("C-c p" . jnf/projectile--menu/body)
   ("C-s-p". jnf/projectile--menu/body)
   ("s-." . projectile-toggle-between-implementation-and-test))

@@ -309,5 +309,17 @@ the directory.  `REST' is passed to the `CONSULT-RIPGREP-FUNCTION'."
     				   (minibuffer . (initials))))
   (orderless-style-dispatchers '(dm/orderless-dispatch)))
 
+(use-package consult-projectile
+  :after (projectile consult)
+  :straight (consult-projectile :type git :host gitlab :repo "OlMon/consult-projectile" :branch "master")
+  :init
+  (defun jnf/consult-projectile-find-file ()
+    "Find a file in the current project"
+    (interactive)
+    (consult-projectile--file (projectile-project-root)))
+  :bind ("s-t" . jnf/consult-projectile-find-file))
+
+(message "%s" (projectile-project-root))
+
 (provide 'jnf-consult.el)
 ;;; jnf-consult.el ends here
