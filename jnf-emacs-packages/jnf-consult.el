@@ -316,9 +316,9 @@ the directory.  `REST' is passed to the `CONSULT-RIPGREP-FUNCTION'."
   (defun jnf/consult-projectile-find-file ()
     "Find a file in the current project, or select a project."
     (interactive)
-    (let (root (projectile-project-root))
-      (if root (consult-projectile--file root)
-        (consult-projectile))))
+    (if (projectile-project-root)
+        (consult-projectile--file (projectile-project-root))
+      (consult-projectile)))
   :bind ("s-t" . jnf/consult-projectile-find-file))
 
 (provide 'jnf-consult.el)
