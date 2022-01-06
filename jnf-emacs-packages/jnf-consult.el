@@ -310,9 +310,8 @@ the directory.  `REST' is passed to the `CONSULT-RIPGREP-FUNCTION'."
   (orderless-style-dispatchers '(dm/orderless-dispatch)))
 
 (use-package consult-projectile
-  :after (projectile consult)
   :straight (consult-projectile :type git :host gitlab :repo "OlMon/consult-projectile" :branch "master")
-  :init
+  :config
   (defun jnf/consult-projectile-find-file ()
     "Find a file in the current project, or select a project."
     (interactive)
