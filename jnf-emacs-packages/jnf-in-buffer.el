@@ -122,21 +122,8 @@
 (use-package iedit
   :straight t)
 
-;; Not quite sexp navigation, but something alternative.  For vertical
-;; movement, it looks at an empty line and moves there.  For
-;; horizontal movement, moves between two spaces.
-(use-package spatial-navigate
-  :straight (spatial-navigate :type git
-                              :host gitlab
-                              :repo "ideasman42/emacs-spatial-navigate")
-  :bind (("<M-s-up>" . #'spatial-navigate-backward-vertical-bar)
-         ("<M-s-down>" . #'spatial-navigate-forward-vertical-bar)
-         ("<M-s-left>" . #'spatial-navigate-backward-horizontal-bar)
-         ("<M-s-right>" . #'spatial-navigate-forward-horizontal-bar)))
-
 ;; C-a goes to the first non-whitepsace character on the line. Type it
 ;; again, and go to the beginning of the line.
-
 (use-package crux
   :straight t
   :config
