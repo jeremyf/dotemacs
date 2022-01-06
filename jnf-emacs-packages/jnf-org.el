@@ -168,10 +168,10 @@
 ;;                          nil
 ;;                        'tree)))
 
-(use-package org-superstar
-  :straight t
-  :hook ((org-mode . org-superstar-mode)
-         (org-mode . turn-on-visual-line-mode)))
+;; (use-package org-superstar
+;;   :straight t
+;;   :hook ((org-mode . org-superstar-mode)
+;;          (org-mode . turn-on-visual-line-mode)))
 
 
 ;; https://github.com/xenodium/company-org-block
