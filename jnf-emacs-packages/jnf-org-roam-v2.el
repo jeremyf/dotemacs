@@ -93,7 +93,7 @@
               :title "Eberron"
               :path-to-todo "~/git/org/personal/todo.org")
    :forem (list
-                   :templates (list :forem :forem-encrypted)
+                   :templates (list :forem)
                    :name "forem"
                    :title "Forem"
                    :path-to-todo "~/git/org/forem/todo.org")
@@ -108,7 +108,7 @@
                         :title "Hesburgh Libraries"
                         :path-to-todo "~/git/org/hesburgh-libraries/todo.org")
    :personal (list
-              :templates (list :personal :personal-encrypted)
+              :templates (list :personal)
               :name "personal"
               :title "Personal"
               :path-to-todo "~/git/org/personal/todo.org")
