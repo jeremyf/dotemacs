@@ -36,9 +36,9 @@
   (load "~/.emacs.d/straight/build/vertico/extensions/vertico-indexed.elc")
   (vertico-indexed-mode)
 
-  (load "~/.emacs.d/straight/build/vertico/extensions/vertico-buffer.elc")
-  (vertico-buffer-mode)
-  (setq vertico-buffer-display-action '(display-buffer-at-bottom (window-height . 15)))
+  ;; (load "~/.emacs.d/straight/build/vertico/extensions/vertico-buffer.elc")
+  ;; (vertico-buffer-mode)
+  ;; (setq vertico-buffer-display-action '(display-buffer-at-bottom (window-height . 15)))
 
   (load "~/.emacs.d/straight/build/vertico/extensions/vertico-repeat.elc")
   (global-set-key (kbd "M-r") #'vertico-repeat)
