@@ -96,6 +96,35 @@ the configuration."
 ;;   :after spaceline
 ;;   :config (spaceline-all-the-icons-theme))
 
+;; Ensuring that some windows are treated as popups (e.g., something
+;; easier to dismiss, a bit more like the mini-buffer).
+(use-package popper
+  :straight t
+  :bind (("C-`" . jnf/popper))
+  :config
+  (defun jnf/popper (prefix_arg)
+  "Call `popper-cycle', but with PREFIX_ARG invoke a less common popper method.
+
+With one PREFIX_ARG, `popper-toggle-latest'.
+With two (or more) PREFIX_ARG `popper-toggle-type'."
+  (interactive "P")
+  (let ((prefix (car prefix_arg)))
+    (cond
+     ((not prefix)  (popper-cycle))
+     ((= prefix 4)  (popper-toggle-latest))
+     (t (popper-toggle-type)))))
+  :init
+  (setq popper-reference-buffers
+        '("\\*Messages\\*"
+          "Output\\*$"
+          "\\*Async Shell Command\\*"
+          help-mode
+          compilation-mode
+          "^\\*helpful.*\\*$"))
+  (popper-mode +1)
+  (popper-echo-mode +1))
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;; BEGIN frame and window quick setup
 (defun gk-layouts-3col ()
