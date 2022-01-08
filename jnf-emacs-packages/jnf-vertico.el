@@ -73,7 +73,7 @@
   ;; (setq read-extended-command-predicate
   ;;       #'command-completion-default-include-p)
 
-  ;; Enable recursive minibuffers
-  (setq enable-recursive-minibuffers t))
+  ;; recursive minibuffers
+  (setq enable-recursive-minibuffers nil))
 (provide 'jnf-vertico.el)
 ;;; jnf-vertico.el ends here
