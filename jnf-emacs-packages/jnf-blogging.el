@@ -451,19 +451,19 @@ If `consult--read' is defined, use that.  Otherwise fallback to `completing-read
 (defun jnf/tor-find-file-draft (filename)
   "Find a draft FILENAME in the TakeOnRules content directory."
   (interactive
-   (jnf/find-file-via-matching
+   (list (jnf/find-file-via-matching
     :prompt "Draft filename: "
     :matching "^draft: true"
-    :in (f-join jnf/tor-home-directory "content")))
+    :in (f-join jnf/tor-home-directory "content"))))
   (find-file filename))
 
 (defun jnf/tor-find-file (filename)
   "Find a FILENAME in the TakeOnRules content directory."
   (interactive
-   (jnf/find-file-via-matching
+   (list (jnf/find-file-via-matching
     :prompt "Filename: "
     :matching "^title:"
-    :in (f-join jnf/tor-home-directory "content")))
+    :in (f-join jnf/tor-home-directory "content"))))
   (find-file filename))
 ;;******************************************************************************
 ;;
@@ -524,8 +524,8 @@ If `consult--read' is defined, use that.  Otherwise fallback to `completing-read
     (concat
      "rg \"^[- ] " key ": .*$\" "
      (f-join directory filename)
-     " --only-matching --no-filename | sed 's/^[ -] " key ": //' | sort | tr '\n' '~'"))
-   "~"))
+     " --only-matching --no-filename | sed 's/^[ -] " key ": //' | sort | tr '\n' '@'"))
+   "@"))
 
 (cl-defun jnf/list-filenames-with-file-text (&key matching in)
   "Build a list of filenames MATCHING the pattern IN the given directory."
@@ -535,8 +535,8 @@ If `consult--read' is defined, use that.  Otherwise fallback to `completing-read
       (concat
        "rg \""
        matching "\" --only-matching --files-with-matches --sortr modified"
-       "| tr '\n' '~'"))
-     "~")))
+       "| tr '\n' '@'"))
+     "@")))
 
 (cl-defun jnf/list-full-filenames-with-file-text (&key matching in)
   "Build a list of filenames MATCHING the pattern IN the given directory."
