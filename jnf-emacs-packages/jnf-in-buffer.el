@@ -32,11 +32,11 @@
   :bind (:map org-mode-map ("C-j" . avy-goto-char-timer))
   :straight t)
 
-(use-package link-hint
-  :straight t
-  :bind
-  ("C-c l o" . link-hint-open-link)
-  ("C-c l c" . link-hint-copy-link))
+;; (use-package link-hint
+;;   :straight t
+;;   :bind
+;;   ("C-c l o" . link-hint-open-link)
+;;   ("C-c l c" . link-hint-copy-link))
 
 ;; https://github.com/shankar2k/math-at-point
 (use-package math-at-point
