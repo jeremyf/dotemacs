@@ -187,7 +187,7 @@ Tries to preserve the order of window buffers and active window."
 
 
 ;; See https://www.reddit.com/r/emacs/comments/r7l3ar/how_do_you_scroll_half_a_page/
-(global-set-key (kbd "C-v") 'jnf/scroll-down-half-page)
+(global-set-key (kbd "M-n") 'jnf/scroll-down-half-page)
 (defun jnf/scroll-down-half-page ()
   "Scroll down half a page while keeping the cursor centered"
   (interactive)
@@ -199,7 +199,7 @@ Tries to preserve the order of window buffers and active window."
            (move-to-window-line -1)
            (recenter))))))
 
-(global-set-key (kbd "M-v") 'jnf/scroll-up-half-page)
+(global-set-key (kbd "M-p") 'jnf/scroll-up-half-page)
 (defun jnf/scroll-up-half-page ()
   "Scroll up half a page while keeping the cursor centered"
   (interactive)
