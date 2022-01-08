@@ -42,9 +42,8 @@
 ;;Slow down the UI being updated to improve performance
 (setq idle-update-delay 1.1)
 
-;; Most of the times I favor horizontal splits (e.g. two frames
-;; side-by-side)
-(setq split-width-threshold 120)
+;; Most of the times I favor two windows side-by-side within a frame
+(setq split-width-threshold 100)
 
 (require 'jnf-config.el)
 (when (file-directory-p "~/git/dotzshrc/symlinks/.hammerspoon/Spoons/editWithEmacs.spoon")
