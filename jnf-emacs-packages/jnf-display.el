@@ -40,7 +40,7 @@
 ;; Doing a bit of configuration of my cursors
 (setq-default cursor-type 'bar)
 
-;; Nice for neotree
+;; Useful for referential icons.
 (use-package all-the-icons
   :config
   ;; A convenience function to create a nice string
