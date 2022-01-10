@@ -46,18 +46,34 @@
 
 (set-frame-font jnf/fixed-width-font-name)
 
-;; Don't create lock files.  Emacs drops these files on the file
-;; system.  I found this most cumbersome when working in hugo.  The
-;; hugo build would file because it tried to handle a lock file.
-(setq create-lockfiles nil)
-
 ;; Put autosave files (ie #foo#) and backup files (ie foo~) in ~/.emacs.d/.
 ;; See https://snarfed.org/gnu_emacs_backup_files
 ;; create the autosave dir if necessary, since emacs won't.
 (make-directory "~/.emacs.d/autosaves/" t)
 
-;; Stop ringing any bell
-(setq ring-bell-function 'ignore)
+(setq
+ ;; Don't create lock files.  Emacs drops these files on the file
+ ;; system.  I found this most cumbersome when working in hugo.  The
+ ;; hugo build would file because it tried to handle a lock file.
+ create-lockfiles nil
+ ;; Stop ringing any bell
+ ring-bell-function 'ignore
+ fill-column 80
+ ;; The default is 60.  It is rare that I need more than 15 or 20.
+ ;; However in my long use of Jumpcut there have been a few times where
+ ;; I get into the 80s on previous pastes.  Given that the kill ring is
+ ;; searchable, I think a larger value makes a lot of sense.
+ kill-ring-max 120
+ ;; Given the number of symlinks, visit the "linked to" file.
+ vc-follow-symlinks t
+
+ bookmark-default-file "~/git/jnf-emacs-bookmarks/bookmarks"
+ read-process-output-max (* 1024 1024 3)  ; Increase read size per process
+ indent-tabs-mode nil ;; Ensure tabs are expanded, not inserted
+ inhibit-startup-screen t ;; Don't include the  emacs "start" window
+ )
+
+
 
 ;; When you open Emacs, grab all the space on the screen
 (add-to-list 'initial-frame-alist '(fullscreen . maximized))
@@ -70,20 +86,6 @@
 
 ;; Instead of typing "yes" or "no" short-circuit to "y" or "n"
 (defalias 'yes-or-no-p 'y-or-n-p)
-
-;; The default is 60.  It is rare that I need more than 15 or 20.
-;; However in my long use of Jumpcut there have been a few times where
-;; I get into the 80s on previous pastes.  Given that the kill ring is
-;; searchable, I think a larger value makes a lot of sense.
-(setq kill-ring-max 120)
-
-;; Given the number of symlinks, visit the "linked to" file.
-(setq vc-follow-symlinks t)
-
-(setq bookmark-default-file "~/git/jnf-emacs-bookmarks/bookmarks")
-
-(setq-default indent-tabs-mode nil) ;; Ensure tabs are expanded, not inserted
-(setq inhibit-startup-screen t) ;; Don't include the  emacs "start" window
 
 (unbind-key "C-x C-d") ;; `list-directory'
 ;; `dired' is a better interface than `list-directory'
@@ -110,6 +112,12 @@
 (unbind-key "C-x C-c") ;; was `save-buffers-kill-terminal'
 
 (add-hook 'text-mode-hook #'abbrev-mode)
+
+
+(add-function :after after-focus-change-function
+  (defun jnf/garbage-collect-maybe ()
+    (unless (frame-focus-state)
+      (garbage-collect))))
 
 (provide 'jnf-basic-config.el)
 ;;; jnf-basic-config.el ends here
