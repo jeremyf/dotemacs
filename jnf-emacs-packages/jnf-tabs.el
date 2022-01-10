@@ -16,7 +16,7 @@
   :straight t
   :bind
   ;; Cmd+F12 to then choose a buffer to move
-  ("<s-f12>" . buf-move))
+  ("<C-s-f12>" . buf-move))
 
 ;; "The long-awaited Emacs 27 support for native tabs is shaky, both
 ;; visually and in terms of functionality. As such, centaur-tabs is
