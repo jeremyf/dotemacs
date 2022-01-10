@@ -204,7 +204,7 @@
 ;; A quick and useful visual queue for paranthesis
 (use-package rainbow-delimiters
   :straight t
-  :hook ((prog-mode text-mode org-mode) . rainbow-delimiters-mode))
+  :hook ((fundamental-mode) . rainbow-delimiters-mode))
 
 (use-package emojify
   :straight t
