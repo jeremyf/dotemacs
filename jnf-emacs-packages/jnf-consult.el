@@ -206,11 +206,7 @@ the directory.  `REST' is passed to the `CONSULT-RIPGREP-FUNCTION'."
    ("M-." . embark-dwim)
    ("C-s-e" . embark-export)
    ("C-h b" . embark-bindings))
-  :hook (embark-pre-action . refresh-selectrum)
   :init
-  (defun refresh-selectrum ()
-    (setq selectrum--previous-input-string nil))
-
   ;; Optionally replace the key help with a completing-read interface
   (setq prefix-help-command #'embark-prefix-help-command)
   :config
