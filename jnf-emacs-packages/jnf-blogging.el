@@ -37,6 +37,7 @@
     ("w d" jnf/tor-wrap-date "[D]ate point or region…")
     ("w f" jnf/tor-wrap-as-pseudo-dfn "Wrap word or region in pseudo-d[f]n…")
     ("w m" jnf/tor-wrap-as-marginnote-dwim "[M]argin-note line or region…")
+    ("w p" jnf/tor-wrap-in-poem "Wrap point or region as [P]oem…")
     ("w s" jnf/tor-wrap-as-sidenote-dwim "[S]ide-note sentence or region…")
     ("w w" jnf/tor-wrap-in-html-tag "[W]rap point or region in html…"))
    "Posts"
@@ -626,6 +627,14 @@ as the behavior's well defined."
                              (concat " " attributes)) ">")
    :after (concat "</" tag ">")
    :strategy :wordOrRegion))
+
+(defun jnf/tor-wrap-in-poem ()
+  "Wrap the point or region as a poem."
+  (interactive)
+  (jnf/tor-wrap-with-text
+   :before "<pre class=\"poem\">\n"
+   :after "\n</pre>"
+   :strategy :pointOrRegion))
 
 (defun jnf/tor-wrap-date (date)
   "Wrap the point or region with the given DATE."
