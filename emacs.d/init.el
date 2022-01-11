@@ -39,8 +39,6 @@
 ;; use-package syntax which is often how things are documented.
 (straight-use-package 'use-package)
 
-(setq-default use-package-always-defer t)
-
 ;;Slow down the UI being updated to improve performance
 (setq idle-update-delay 1.1)
 
