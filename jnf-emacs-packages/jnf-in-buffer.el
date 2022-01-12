@@ -323,8 +323,6 @@ echo the method signature of `'delete-duplicate-lines`"
   (sort-lines reverse beg end)
   (delete-duplicate-lines beg end reverse adjacent keep-blanks interactive))
 
-(define-key emacs-lisp-mode-map (kbd "C-c C-c") 'eval-region)
-
 (global-set-key (kbd "s-q") 'save-buffers-kill-terminal)
 (global-set-key (kbd "s-w") 'kill-current-buffer)
 

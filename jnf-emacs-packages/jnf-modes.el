@@ -26,6 +26,14 @@
 (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
 (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
 
+;; built-in, consider commenting
+;; (use-package sgml-mode
+;;   :straight nil
+;;   :hook
+;;   (html-mode . sgml-electric-tag-pair-mode)
+;;   (html-mode . sgml-name-8bit-mode)
+;;   :custom
+;;   (sgml-basic-offset 2))
 
 (use-package plantuml-mode
   :config (setq plantuml-executable-path (concat (getenv "HB_PATH") "/bin/plantuml")
@@ -37,6 +45,25 @@
 
 (use-package json-mode
   :straight t)
+
+(use-package emacs-lisp-mode
+  :straight (emacs-lisp-mode :type built-in)
+  :config
+  (defun jnf/eval-region-dwim ()
+    "When region is active, evaluate it and kill the mark. Else,
+evaluate the whole buffer."
+    (interactive)
+    (if (not (region-active-p))
+	(eval-buffer)
+      (eval-region (region-beginning) (region-end))
+      (setq-local deactivate-mark t)))
+  :bind
+  (:map emacs-lisp-mode-map
+	("C-c C-c" . jnf/eval-region-dwim)
+	:map lisp-interaction-mode-map
+	("C-c C-c" . jnf/eval-region-dwim))
+  :hook
+  (emacs-lisp-mode . outline-minor-mode))
 
 ;; Compressed JSON sure is ugly and illegible; This solves that
 ;; problem.
