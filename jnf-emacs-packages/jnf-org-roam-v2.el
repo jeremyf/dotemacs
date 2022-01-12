@@ -410,6 +410,19 @@ The form should be '((\"all\" 1) (\"hesburgh-libraries\" 2))."
 ;; correctly.  Now I can just load org-roam as part of my day to day
 (use-package org-roam
   :straight t
+  :config
+  ;; I encountered the following message when attempting to export data:
+  ;;
+  ;; => "org-export-data: Unable to resolve link: EXISTING-PROPERTY-ID"
+  ;;
+  ;; See https://takeonrules.com/2022/01/11/resolving-an-unable-to-resolve-link-error-for-org-mode-in-emacs/ for details
+  (defun jnf/force-org-rebuild-cache ()
+    "Call some functions to rebuild the `org-mode' and `org-roam' cache."
+    (interactive)
+    (org-id-update-id-locations)
+    ;; Note: you may need `org-roam-db-clear-all' followed by `org-roam-db-sync'
+    (org-roam-db-sync)
+    (org-roam-update-org-id-locations))
   :custom
   (org-roam-directory (file-truename "~/git/org"))
   ;; Set more spaces for tags; As much as I prefer the old format,
