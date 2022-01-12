@@ -223,10 +223,11 @@
   ;; see https://www.gnu.org/software/emacs/manual/html_node/elisp/Creating-Frames.html
   (add-hook 'after-make-frame-functions '--set-emoji-font))
 
-;; Provide sentence highlighting.  Which is nice when thinking about writing.
+;; Provide sentence highlighting.  Which is nice when thinking about
+;; writing.  But don't turn it on by default as it's somewhat
+;; disruptive.
 (use-package hl-sentence
-  :straight t
-  :hook (text-mode . hl-sentence-mode))
+  :straight t)
 
 (use-package unicode-fonts
   :straight t
