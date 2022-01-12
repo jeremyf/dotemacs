@@ -46,24 +46,20 @@
 (use-package json-mode
   :straight t)
 
-(use-package emacs-lisp-mode
-  :straight (emacs-lisp-mode :type built-in)
-  :config
-  (defun jnf/eval-region-dwim ()
-    "When region is active, evaluate it and kill the mark. Else,
+(define-key emacs-lisp-mode-map (kbd "C-c C-c") 'jnf/eval-region-dwim)
+(define-key lisp-interaction-mode-map (kbd "C-c C-c") 'jnf/eval-region-dwim)
+(defun jnf/eval-region-dwim ()
+  "When region is active, evaluate it and kill the mark. Else,
 evaluate the whole buffer."
-    (interactive)
-    (if (not (region-active-p))
+  (interactive)
+  (if (not (region-active-p))
+      (progn
 	(eval-buffer)
+	(message "Evaluated buffer"))
+    (progn
       (eval-region (region-beginning) (region-end))
-      (setq-local deactivate-mark t)))
-  :bind
-  (:map emacs-lisp-mode-map
-	("C-c C-c" . jnf/eval-region-dwim)
-	:map lisp-interaction-mode-map
-	("C-c C-c" . jnf/eval-region-dwim))
-  :hook
-  (emacs-lisp-mode . outline-minor-mode))
+      (message "Evaluated region"))
+    (setq-local deactivate-mark t)))
 
 ;; Compressed JSON sure is ugly and illegible; This solves that
 ;; problem.
