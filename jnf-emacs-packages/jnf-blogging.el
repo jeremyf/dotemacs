@@ -51,6 +51,7 @@
     ("c c" jnf/tor-find-changelog-and-insert-entry "Create [c]hange log entry…")
     ("c p" jnf/tor-create-post "Create [p]ost…")
     ("c s" jnf/tor-find-series-and-insert-entry "Create [s]eries…")
+    ("k h" jnf/kill-new-markdown-heading-as-slug "Kill slug version of given [h]eading…")
     ("? d" jnf/tor-find-file-draft "Find blog in [d]raft status…")
     ("? u" jnf/tor-find-hugo-file-by-url "Find blog by [u]rl…")
     ("? f" jnf/tor-find-file "Find blog by [f]ilename…")
@@ -110,7 +111,7 @@ The LENGTH is how many words to use for the key."
 
 (defun jnf/tor-convert-text-to-slug (string)
   "Convert STRING to appropriate slug."
-  (s-replace "'" "" (s-dashed-words string)))
+  (s-replace "'" "" (s-dashed-words (s-downcase string))))
 
 (cl-defun jnf/tor-prompt-or-kill-ring-for-url (&key (url-regexp "^https?://"))
   "Prompt and return a url.
@@ -512,7 +513,7 @@ If `consult--read' is defined, use that.  Otherwise fallback to `completing-read
 
 ;;******************************************************************************
 ;;
-;;; BEGIN file system querying
+;;; BEGIN querying and list generation functions
 ;;
 ;;******************************************************************************
 (cl-defun jnf/tor-list-by-key-from-filename (&key
@@ -559,9 +560,30 @@ If `consult--read' is defined, use that.  Otherwise fallback to `completing-read
     (split-string-and-unquote
      (shell-command-to-string "ls"))))
 
+(defun jnf/matches-in-buffer (regexp &optional buffer)
+  "Return a list of matches of REGEXP in BUFFER or the current buffer if not given."
+  (let ((matches))
+    (save-match-data
+      (save-excursion
+        (with-current-buffer (or buffer (current-buffer))
+          (save-restriction
+            (widen)
+            (goto-char 1)
+            (while (search-forward-regexp regexp nil t 1)
+              (push (match-string 0) matches)))))
+      matches)))
+
+(defun jnf/kill-new-markdown-heading-as-slug (heading)
+  "Push onto the `kill-ring' a slugified version of HEADING."
+  (interactive
+   (list (completing-read
+	  "Heading: "
+	  (jnf/matches-in-buffer "^#+ +.*$"))))
+  (kill-new (jnf/tor-convert-text-to-slug
+	     (replace-regexp-in-string "^#+ +" "" heading))))
 ;;******************************************************************************
 ;;
-;;; END file system querying
+;;; END querying and list generation functions
 ;;
 ;;******************************************************************************
 
