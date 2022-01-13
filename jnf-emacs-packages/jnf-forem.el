@@ -70,11 +70,13 @@
    (
     ("i" (lambda () (interactive) (browse-url "https://github.com/forem/forem/issues/")) "Browse to ssues…")
     ("j" (lambda () (interactive) (browse-url "https://github.com/orgs/forem/projects/")) "Browse to projects…")
+    ("m" (lambda () (interactive) (browse-url "https://github.com/forem/forem/pulls?q=is%3Apr+is%3Aclosed")) "Browse [m]erged Pull Requests…")
     ("p" (lambda () (interactive) (browse-url "https://github.com/forem/forem/pulls/")) "Browse to pull requests…"))
    "Jeremy's Workflow"
    (
     ("I" (lambda () (interactive) (browse-url "https://github.com/forem/forem/issues/assigned/jeremyf")) "Browse to Jeremy's [I]ssues…")
     ("J" (lambda () (interactive) (browse-url "https://github.com/orgs/forem/projects/39")) "Browse to Content Experience pro[J]ects…")
+    ("M" (lambda () (interactive) (browse-url "https://github.com/forem/forem/pulls/jeremyf?q=is%3Apr+is%3Aclosed")) "Browse Jeremy's [M]erged Pull Requests…")
     ("P" (lambda () (interactive) (browse-url "https://github.com/forem/forem/pulls/jeremyf")) "Browse to Jeremy's [P]ull requests…")
     ("N" (lambda () (interactive) (browse-url "https://github.com/notifications")) "Browse Github [N]otifications"))))
 
