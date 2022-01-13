@@ -51,6 +51,7 @@
 ;; create the autosave dir if necessary, since emacs won't.
 (make-directory "~/.emacs.d/autosaves/" t)
 
+(setq-default fill-column 79)
 (setq
  ;; Don't create lock files.  Emacs drops these files on the file
  ;; system.  I found this most cumbersome when working in hugo.  The
@@ -58,7 +59,6 @@
  create-lockfiles nil
  ;; Stop ringing any bell
  ring-bell-function 'ignore
- fill-column 80
  ;; The default is 60.  It is rare that I need more than 15 or 20.
  ;; However in my long use of Jumpcut there have been a few times where
  ;; I get into the 80s on previous pastes.  Given that the kill ring is
