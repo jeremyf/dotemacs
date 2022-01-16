@@ -94,6 +94,13 @@ setting (e.g. ns-alternate-modifier)."
   :config
   (global-so-long-mode 1))
 
+;; May or may not be useful
+(use-package dtache
+  :straight (dtache :host gitlab :repo "niklaseklund/dtache")
+  :hook (after-init . dtache-setup)
+  :bind (([remap async-shell-command] . dtache-shell-command)
+         :map dtache-shell-mode-map
+         ("C-c C-q" . dtache-detach-dwim)))
 
 ;; (use-package send-to-osx-grammarly
 ;;   :straight (send-to-osx-grammarly :type git :host github :repo "emacs-grammarly/send-to-osx-grammarly")
