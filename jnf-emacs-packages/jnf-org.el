@@ -26,7 +26,7 @@
   ;;            )
   :straight (org :type built-in)
   :config (setq
-           org-directory "~/git/org"
+           org-directory (file-truename "~/git/org")
            org-agenda-files (jnf/org-agenda-files
                              :paths jnf/data-directories
                              :basenames '("agenda.org" "todo.org"))
