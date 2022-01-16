@@ -59,12 +59,14 @@
   :straight (fill-sentences-correctly :host github :repo "duckwork/fill-sentences-correctly.el")
   :hook (fundamental-mode . fill-sentences-correctly-mode))
 
-;; I don't use a lot of folding, this allows me to type C-RET and fold
-;; the current block.  There's more it can do but for now that's
-;; enough
-(use-package yafolding
+(use-package origami
   :straight t
-  :hook (prog-mode . yafolding-mode))
+  :hook (prog-mode . origami-mode))
+
+;; An excellent reference package for creating contextual menus.
+(use-package transient-dwim
+  :straight t
+  :bind ("M-=" . transient-dwim-dispatch))
 
 ;; Using Hippie expand, I toggle through words already referenced.
 (use-package hippie-exp
