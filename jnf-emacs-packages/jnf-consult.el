@@ -210,6 +210,47 @@ the directory.  `REST' is passed to the `CONSULT-RIPGREP-FUNCTION'."
   ;; Optionally replace the key help with a completing-read interface
   (setq prefix-help-command #'embark-prefix-help-command)
   :config
+
+  ;;; BEGIN embark key macro target
+  (defun embark-kmacro-target ()
+    "Target a textual kmacro in braces."
+    (save-excursion
+      (let ((beg (progn (skip-chars-backward "^{}\n") (point)))
+            (end (progn (skip-chars-forward "^{}\n") (point))))
+	(when (and (eq (char-before beg) ?{) (eq (char-after end) ?}))
+          `(kmacro ,(buffer-substring-no-properties beg end)
+                   . (,(1- beg) . ,(1+ end)))))))
+
+  (add-to-list 'embark-target-finders 'embark-kmacro-target)
+
+  (defun embark-kmacro-run (arg kmacro)
+    (interactive "p\nsKmacro: ")
+    (kmacro-call-macro arg t nil (kbd kmacro)))
+
+  (defun embark-kmacro-save (kmacro)
+    (interactive "sKmacro: ")
+    (kmacro-push-ring)
+    (setq last-kbd-macro (kbd kmacro)))
+
+  (defun embark-kmacro-name (kmacro name)
+    (interactive "sKmacro: \nSName: ")
+    (let ((last-kbd-macro (kbd kmacro)))
+      (kmacro-name-last-macro name)))
+
+  (defun embark-kmacro-bind (kmacro)
+    (interactive "sKmacro: \n")
+    (let ((last-kbd-macro (kbd kmacro)))
+      (kmacro-bind-to-key nil)))
+
+  (embark-define-keymap embark-kmacro-map
+    "Actions on kmacros."
+    ("RET" embark-kmacro-run)
+    ("s" embark-kmacro-save)
+    ("n" embark-kmacro-name)
+    ("b" embark-kmacro-bind))
+
+  (add-to-list 'embark-keymap-alist '(kmacro . embark-kmacro-map))
+  ;;; END embark key macro target
   (setq embark-action-indicator
       (lambda (map &optional _target)
         (which-key--show-keymap "Embark" map nil nil 'no-paging)
@@ -262,48 +303,89 @@ the directory.  `REST' is passed to the `CONSULT-RIPGREP-FUNCTION'."
 ;; https://github.com/minad/orderless
 ;;
 ;; Useful for not requiring strict word order
+;;
+;; Configuration from  https://github.com/minad/consult/wiki
 (use-package orderless
   :straight t
-  :demand t
   :config
-  ;; See
-  ;; https://github.com/minad/consult/wiki#orderless-style-dispatchers-ensure-that-the--regexp-works-with-consult-buffer
-  ;; for background of this function.
-  ;;
+  (defvar +orderless-dispatch-alist
+    '((?% . char-fold-to-regexp)
+      (?! . orderless-without-literal)
+      (?`. orderless-initialism)
+      (?= . orderless-literal)
+      (?~ . orderless-flex)))
+
   ;; Recognizes the following patterns:
   ;; * ~flex flex~
   ;; * =literal literal=
+  ;; * %char-fold char-fold%
   ;; * `initialism initialism`
   ;; * !without-literal without-literal!
   ;; * .ext (file extension)
   ;; * regexp$ (regexp matching at end)
-  (defun dm/orderless-dispatch (pattern _index _total)
+  (defun +orderless-dispatch (pattern index _total)
     (cond
      ;; Ensure that $ works with Consult commands, which add disambiguation suffixes
-     ((string-suffix-p "$" pattern) `(orderless-regexp . ,(concat (substring pattern 0 -1) "[\x100000-\x10FFFD]*$")))
+     ((string-suffix-p "$" pattern)
+      `(orderless-regexp . ,(concat (substring pattern 0 -1) "[\x100000-\x10FFFD]*$")))
      ;; File extensions
-     ((string-match-p "\\`\\.." pattern) `(orderless-regexp . ,(concat "\\." (substring pattern 1) "[\x100000-\x10FFFD]*$")))
+     ((and
+       ;; Completing filename or eshell
+       (or minibuffer-completing-file-name
+           (derived-mode-p 'eshell-mode))
+       ;; File extension
+       (string-match-p "\\`\\.." pattern))
+      `(orderless-regexp . ,(concat "\\." (substring pattern 1) "[\x100000-\x10FFFD]*$")))
      ;; Ignore single !
      ((string= "!" pattern) `(orderless-literal . ""))
-     ;; Without literal
-     ((string-prefix-p "!" pattern) `(orderless-without-literal . ,(substring pattern 1)))
-     ((string-suffix-p "!" pattern) `(orderless-without-literal . ,(substring pattern 0 -1)))
-     ;; Initialism matching
-     ((string-prefix-p "`" pattern) `(orderless-initialism . ,(substring pattern 1)))
-     ((string-suffix-p "`" pattern) `(orderless-initialism . ,(substring pattern 0 -1)))
-     ;; Literal matching
-     ((string-prefix-p "=" pattern) `(orderless-literal . ,(substring pattern 1)))
-     ((string-suffix-p "=" pattern) `(orderless-literal . ,(substring pattern 0 -1)))
-     ;; Flex matching
-     ((string-prefix-p "~" pattern) `(orderless-flex . ,(substring pattern 1)))
-     ((string-suffix-p "~" pattern) `(orderless-flex . ,(substring pattern 0 -1)))))
-  :custom
-  (completion-styles '(orderless))
-  (completion-category-defaults nil)
-  (read-file-name-completion-ignore-case t)
-  (completion-category-overrides '((file . (styles partial-completion))
-    				   (minibuffer . (initials))))
-  (orderless-style-dispatchers '(dm/orderless-dispatch)))
+     ;; Prefix and suffix
+     ((if-let (x (assq (aref pattern 0) +orderless-dispatch-alist))
+          (cons (cdr x) (substring pattern 1))
+        (when-let (x (assq (aref pattern (1- (length pattern))) +orderless-dispatch-alist))
+          (cons (cdr x) (substring pattern 0 -1)))))))
+
+  ;; Define orderless style with initialism by default
+  (orderless-define-completion-style +orderless-with-initialism
+    (orderless-matching-styles '(orderless-initialism orderless-literal orderless-regexp)))
+
+  ;; You may want to combine the `orderless` style with `substring` and/or `basic`.
+  ;; There are many details to consider, but the following configurations all work well.
+  ;; Personally I (@minad) use option 3 currently. Also note that you may want to configure
+  ;; special styles for special completion categories, e.g., partial-completion for files.
+  ;;
+  ;; 1. (setq completion-styles '(orderless))
+  ;; This configuration results in a very coherent completion experience,
+  ;; since orderless is used always and exclusively. But it may not work
+  ;; in all scenarios. Prefix expansion with TAB is not possible.
+  ;;
+  ;; 2. (setq completion-styles '(substring orderless))
+  ;; By trying substring before orderless, TAB expansion is possible.
+  ;; The downside is that you can observe the switch from substring to orderless
+  ;; during completion, less coherent.
+  ;;
+  ;; 3. (setq completion-styles '(orderless basic))
+  ;; Certain dynamic completion tables (completion-table-dynamic)
+  ;; do not work properly with orderless. One can add basic as a fallback.
+  ;; Basic will only be used when orderless fails, which happens only for
+  ;; these special tables.
+  ;;
+  ;; 4. (setq completion-styles '(substring orderless basic))
+  ;; Combine substring, orderless and basic.
+  ;;
+  (setq completion-styles '(orderless)
+        completion-category-defaults nil
+        ;;; Enable partial-completion for files.
+        ;;; Either give orderless precedence or partial-completion.
+        ;;; Note that completion-category-overrides is not really an override,
+        ;;; but rather prepended to the default completion-styles.
+        ;; completion-category-overrides '((file (styles orderless partial-completion))) ;; orderless is tried first
+        completion-category-overrides '((file (styles partial-completion)) ;; partial-completion is tried first
+                                        ;; enable initialism by default for symbols
+                                        (command (styles +orderless-with-initialism))
+                                        (variable (styles +orderless-with-initialism))
+                                        (symbol (styles +orderless-with-initialism)))
+        orderless-component-separator #'orderless-escapable-split-on-space ;; allow escaping space with backslash!
+        orderless-style-dispatchers '(+orderless-dispatch)))
 
 (use-package consult-projectile
   :straight (consult-projectile :type git :host gitlab :repo "OlMon/consult-projectile" :branch "master")
