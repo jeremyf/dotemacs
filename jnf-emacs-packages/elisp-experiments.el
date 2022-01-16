@@ -205,5 +205,27 @@ With two prefix args, insert an x'ed checkbox."
                                (?v . ?↕)
                                )))))
 
+;; - Unless point is ~[~ `(isearch-backward "[")'
+;; - Set mark
+;; - `(search-forward "]")'
+;; - `(search-forward ")")'
+;; - `kill-region'
+;; - let string `car-of-kill-ring'
+;; - string replace "^[" ""
+;; - string replace ")$" ""
+;; - let fragments split "]("
+;; - concat "<a href=\"" (car(cdr fragments)) "\">" (car fragments) "</>"
+;; - write to buffer ~<a href="url">text</a>~.
+(defun jnf/convert-markdown-link-to-html-a-tag ()
+  (interactive)
+  (unless (eq ?[ (char-after))
+    (search-backward "[")))
+  (activate-mark)
+  (search-forward "]")
+  (search-forward ")")
+  (kill-region))
+  ;; (kill-region)
+
+
 (provide 'elisp-experiments.el)
 ;;; elisp-experiments.el ends here
