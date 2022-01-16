@@ -102,7 +102,7 @@
 
 ;; I want a completion framework, and the 'company-org-block package
 ;; is enough to say "Yes to company" over the simpler corfu.
-(require 'jnf-company.el)
+;; (require 'jnf-company.el)
 ;; (require 'jnf-corfu.el)
 
 (require 'jnf-in-buffer.el)

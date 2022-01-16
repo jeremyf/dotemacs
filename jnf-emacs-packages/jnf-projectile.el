@@ -31,9 +31,8 @@
   :custom
   (projectile-project-search-path '("~/git/"))
   :bind
-  (:map projectile-mode-map (("C-c p" . jnf/projectile--menu/body)))
+  (:map projectile-mode-map (("C-s-p" . jnf/projectile--menu/body)))
   :bind
-  ("C-c p" . jnf/projectile--menu/body)
   ("C-s-p". jnf/projectile--menu/body)
   ("s-." . projectile-toggle-between-implementation-and-test))
 
