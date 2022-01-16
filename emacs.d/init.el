@@ -39,13 +39,9 @@
 ;; use-package syntax which is often how things are documented.
 (straight-use-package 'use-package)
 
-;;Slow down the UI being updated to improve performance
-(setq idle-update-delay 1.1)
-
-;; Most of the times I favor two windows side-by-side within a frame
-(setq split-width-threshold 100)
-
+(require 'jnf-basic-config.el)
 (require 'jnf-config.el)
+
 (when (file-directory-p "~/git/dotzshrc/symlinks/.hammerspoon/Spoons/editWithEmacs.spoon")
   (load "~/git/dotzshrc/symlinks/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el"))
 
@@ -53,15 +49,7 @@
 (require 'jnf-projectile.el)
 (require 'jnf-vertico.el)
 (require 'jnf-consult.el)
-;; (require 'jnf-selectrum.el)
 
-(global-auto-revert-mode)
-;; https://www.emacswiki.org/emacs/RecentFiles#h5o-1
-;; Save recentf list every five minutes
-(recentf-mode 1)
-(setq recentf-max-menu-items 25)
-(setq recentf-max-saved-items 25)
-(run-at-time nil (* 5 60) 'recentf-save-list)
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.
@@ -88,14 +76,6 @@
  '(warning-suppress-log-types '((comp)))
  '(warning-suppress-types '((comp))))
 
-(setq backup-directory-alist '((".*" . "~/.emacs.d/backups/"))
-      backup-by-copying t    ; Don't delink hardlinks
-      version-control t      ; Use version numbers on backups
-      delete-old-versions t  ; Automatically delete excess backups
-      kept-new-versions 20   ; how many of the newest versions to keep
-      kept-old-versions 5    ; and how many of the old
-      )
-
 (require 'jnf-epub.el)
 (require 'jnf-modes.el)
 (require 'darwin-emacs-config.el)
@@ -110,7 +90,7 @@
 (require 'jnf-git.el)
 (require 'jnf-org.el)
 (require 'jnf-org-roam-v2.el)
-(require 'jnf-basic-config.el)
+
 (require 'jnf-spelling.el)
 (require 'jnf-typography.el)
 (require 'jnf-ruby.el)

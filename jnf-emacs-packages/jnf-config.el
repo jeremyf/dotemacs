@@ -48,6 +48,8 @@ Alternatives:
 - \"JetBrains Mono\"
 - \"Hack Nerd Font\"")
 
+(set-frame-font jnf/fixed-width-font-name)
+
 (defconst jnf/tor-home-directory
   (file-truename "~/git/takeonrules.source")
   "The home directory of TakeOnRules.com Hugo repository.")

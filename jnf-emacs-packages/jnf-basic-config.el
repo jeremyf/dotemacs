@@ -44,12 +44,15 @@
 ;; https://blog.sumtypeofway.com/posts/emacs-config.html
 (electric-pair-mode)
 
-(set-frame-font jnf/fixed-width-font-name)
-
 ;; Put autosave files (ie #foo#) and backup files (ie foo~) in ~/.emacs.d/.
 ;; See https://snarfed.org/gnu_emacs_backup_files
 ;; create the autosave dir if necessary, since emacs won't.
 (make-directory "~/.emacs.d/autosaves/" t)
+
+(recentf-mode 1)
+(run-at-time nil (* 2 60) 'recentf-save-list)
+
+(global-auto-revert-mode)
 
 (setq-default fill-column 79)
 (setq
@@ -71,9 +74,19 @@
  read-process-output-max (* 1024 1024 3)  ; Increase read size per process
  indent-tabs-mode nil ;; Ensure tabs are expanded, not inserted
  inhibit-startup-screen t ;; Don't include the  emacs "start" window
+ idle-update-delay 1.1  ;;Slow down the UI being updated to improve performance
+ split-width-threshold 100 ;; Most of the times I favor two windows side-by-side within a frame
+ recentf-max-menu-items 50
+ recentf-max-saved-items 50
+ backup-directory-alist '((".*" . "~/.emacs.d/backups/"))
+ backup-by-copying t    ; Don't delink hardlinks
+ version-control t      ; Use version numbers on backups
+ delete-old-versions t  ; Automatically delete excess backups
+ kept-new-versions 20   ; how many of the newest versions to keep
+ kept-old-versions 5    ; and how many of the old
+ user-full-name "Jeremy Friesen"
+ user-mail-address "jeremy@jeremyfriesen.com"
  )
-
-
 
 ;; When you open Emacs, grab all the space on the screen
 (add-to-list 'initial-frame-alist '(fullscreen . maximized))
@@ -103,16 +116,12 @@
 (set-terminal-coding-system 'utf-8)
 (set-keyboard-coding-system 'utf-8)
 
-(setq user-full-name "Jeremy Friesen"
-      user-mail-address "jeremy@jeremyfriesen.com")
-
 ;; Given that C-c C-x is common within org-mode, I found myself
 ;; accidentally invoking this transposition.  I have "s-q" command for
 ;; this.
 (unbind-key "C-x C-c") ;; was `save-buffers-kill-terminal'
 
 (add-hook 'text-mode-hook #'abbrev-mode)
-
 
 (add-function :after after-focus-change-function
   (defun jnf/garbage-collect-maybe ()
