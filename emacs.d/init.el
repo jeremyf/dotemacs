@@ -9,6 +9,9 @@
 ;;
 ;;; CODE:
 
+(defconst jnf-silence-loading-log t
+  "When true log to stdout any ")
+
 ;; I have additional files that I require in the emacs directory
 (add-to-list 'load-path (expand-file-name "~/git/dotemacs/jnf-emacs-packages"))
 
@@ -31,7 +34,7 @@
          'silent 'inhibit-cookies)
       (goto-char (point-max))
       (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
+  (load bootstrap-file nil jnf-silence-loading-log))
 
 (setq straight-repository-branch "develop")
 
@@ -39,16 +42,17 @@
 ;; use-package syntax which is often how things are documented.
 (straight-use-package 'use-package)
 
-(require 'jnf-basic-config.el)
-(require 'jnf-config.el)
+(load "jnf-basic-config.el" nil jnf-silence-loading-log)
+(load "jnf-config.el" nil jnf-silence-loading-log)
 
 (when (file-directory-p "~/git/dotzshrc/symlinks/.hammerspoon/Spoons/editWithEmacs.spoon")
-  (load "~/git/dotzshrc/symlinks/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el"))
+  (load "~/git/dotzshrc/symlinks/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el" nil jnf-silence-loading-log))
 
-(require 'jnf-display.el)
-(require 'jnf-projectile.el)
-(require 'jnf-vertico.el)
-(require 'jnf-consult.el)
+(load "jnf-display.el" nil jnf-silence-loading-log)
+
+(load "jnf-projectile.el" nil jnf-silence-loading-log)
+(load "jnf-vertico.el" nil jnf-silence-loading-log)
+(load "jnf-consult.el" nil jnf-silence-loading-log)
 
 (custom-set-variables
  ;; custom-set-variables was added by Custom.
@@ -76,35 +80,35 @@
  '(warning-suppress-log-types '((comp)))
  '(warning-suppress-types '((comp))))
 
-(require 'jnf-epub.el)
-(require 'jnf-modes.el)
-(require 'darwin-emacs-config.el)
+(load "jnf-epub.el" nil jnf-silence-loading-log)
+(load "jnf-modes.el" nil jnf-silence-loading-log)
+(load "darwin-emacs-config.el" nil jnf-silence-loading-log)
 
 ;; I want a completion framework, and the 'company-org-block package
 ;; is enough to say "Yes to company" over the simpler corfu.
-;; (require 'jnf-company.el)
-(require 'jnf-corfu.el)
+;; (load "jnf-company.el" nil jnf-silence-loading-log)
+(load "jnf-corfu.el" nil jnf-silence-loading-log)
 
-(require 'jnf-in-buffer.el)
-(require 'jnf-macros.el)
-(require 'jnf-git.el)
-(require 'jnf-org.el)
-(require 'jnf-org-roam-v2.el)
+(load "jnf-in-buffer.el" nil jnf-silence-loading-log)
+(load "jnf-macros.el" nil jnf-silence-loading-log)
+(load "jnf-git.el" nil jnf-silence-loading-log)
+(load "jnf-org.el" nil jnf-silence-loading-log)
+(load "jnf-org-roam-v2.el" nil jnf-silence-loading-log)
 
-(require 'jnf-spelling.el)
-(require 'jnf-typography.el)
-(require 'jnf-ruby.el)
-(require 'jnf-lsp-mode.el)
-;; (require 'jnf-beancount.el)
-(require 'jnf-tabs.el)
-;; (require 'jnf-stars-without-number.el)
-(require 'jnf-elfeed.el)
-;; (require 'jnf-fennel.el)
-(require 'jnf-dired.el)
-(require 'jnf-dice.el)
-(require 'jnf-forem.el)
-(require 'jnf-titlecase.el)
-(require 'jnf-blogging.el)
+(load "jnf-spelling.el" nil jnf-silence-loading-log)
+(load "jnf-typography.el" nil jnf-silence-loading-log)
+(load "jnf-ruby.el" nil jnf-silence-loading-log)
+(load "jnf-lsp-mode.el" nil jnf-silence-loading-log)
+;; (load "jnf-beancount.el" nil jnf-silence-loading-log)
+(load "jnf-tabs.el" nil jnf-silence-loading-log)
+;; (load "jnf-stars-without-number.el" nil jnf-silence-loading-log)
+(load "jnf-elfeed.el" nil jnf-silence-loading-log)
+;; (load "jnf-fennel.el" nil jnf-silence-loading-log)
+(load "jnf-dired.el" nil jnf-silence-loading-log)
+(load "jnf-dice.el" nil jnf-silence-loading-log)
+(load "jnf-forem.el" nil jnf-silence-loading-log)
+(load "jnf-titlecase.el" nil jnf-silence-loading-log)
+(load "jnf-blogging.el" nil jnf-silence-loading-log)
 
 
 (diminish 'eldoc-mode)

@@ -1,4 +1,4 @@
-;;; jnf-config.el --- Summary -*- lexical-binding: t; -*-
+;; -*- lexical-binding: t; -*-
 ;;
 ;;; Commentary:
 ;;
@@ -131,6 +131,3 @@ By default the DIRECTORIES are `jnf/data-directories'"
   :diminish editorconfig-mode
   :config
   (editorconfig-mode 1))
-
-(provide 'jnf-config.el)
-;;; jnf-config.el ends here

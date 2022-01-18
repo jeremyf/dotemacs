@@ -30,7 +30,7 @@
 
 ;; To use you might put the following in your .emacs:
 ;;
-;; (require 'org-annotate-file)
+;; (load "org-annotate-file)
 ;; (global-set-key (kbd "C-c C-l") 'org-annotate-file) ; for example
 ;;
 ;; To change the location of the annotation file:

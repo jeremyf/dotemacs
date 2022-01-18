@@ -14,7 +14,7 @@
 ;; I'm just going to trust themes
 (setq custom-safe-themes t)
 
-(require 'jnf-modus-main.el)
+(load "jnf-modus-main.el" nil jnf-silence-loading-log)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; BEGIN BLOCK

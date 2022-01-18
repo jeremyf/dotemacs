@@ -33,14 +33,14 @@
   (advice-add #'completing-read-multiple
             :override #'consult-completing-read-multiple)
 
-  (load "~/.emacs.d/straight/build/vertico/extensions/vertico-indexed.elc")
+  (load "~/.emacs.d/straight/build/vertico/extensions/vertico-indexed.elc" nil jnf-silence-loading-log)
   (vertico-indexed-mode)
 
   ;; (load "~/.emacs.d/straight/build/vertico/extensions/vertico-buffer.elc")
   ;; (vertico-buffer-mode)
   ;; (setq vertico-buffer-display-action '(display-buffer-at-bottom (window-height . 15)))
 
-  (load "~/.emacs.d/straight/build/vertico/extensions/vertico-repeat.elc")
+  (load "~/.emacs.d/straight/build/vertico/extensions/vertico-repeat.elc" nil jnf-silence-loading-log)
   (global-set-key (kbd "M-r") #'vertico-repeat)
   (add-hook 'minibuffer-setup-hook #'vertico-repeat-save)
 

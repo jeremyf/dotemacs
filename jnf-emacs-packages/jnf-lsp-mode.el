@@ -11,12 +11,13 @@
   :hook (
          ;; (ruby-mode . lsp)
          (enh-ruby-mode . lsp)
+	 (js-mode . lsp)
          ;; (html-mode . lsp)
          ;; (bash-mode . lsp)
          )
   :config (setq read-process-output-max (* 1024 1024 3)
                 lsp-completion-provider :capf
-                lsp-idle-delay 2.00)
+                lsp-idle-delay 1.00)
   :custom (lsp-keymap-prefix "C-c C-l")
   :commands (lsp))
 

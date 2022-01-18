@@ -1,5 +1,4 @@
 ;;; -*- lexical-binding: t; -*-
-;;; jnf-basic-config.el --- Summary
 ;;
 ;;; Commentary:
 ;;
@@ -127,6 +126,3 @@
   (defun jnf/garbage-collect-maybe ()
     (unless (frame-focus-state)
       (garbage-collect))))
-
-(provide 'jnf-basic-config.el)
-;;; jnf-basic-config.el ends here
