@@ -70,15 +70,6 @@
 
 (add-hook 'emacs-lisp-mode 'eldoc-mode)
 
-;; Solargraph is the language tool for lsp-mode and Ruby
-(use-package solargraph
-  :straight (solargraph :host github :repo "guskovd/emacs-solargraph")
-  :custom
-  (lsp-solargraph-use-bundler t)
-  :bind
-  (:map enh-ruby-mode-map ("s-TAB" . solargraph:complete))
-  (:map ruby-mode-map ("s-TAB" . solargraph:complete)))
-
 ;; (use-package tree-sitter
 ;;   :straight t)
 
