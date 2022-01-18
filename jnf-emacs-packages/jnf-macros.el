@@ -1,5 +1,3 @@
-;;; jnf-macros.el --- Summary
-;;
 ;;; Commentary:
 ;;
 ;;  This "package" provides keyboard macro support.
@@ -25,6 +23,3 @@ If the input is non-empty, it is inserted at point."
     (unless (string= "" input) (insert input))))
 
 (global-set-key (kbd "C-x Q") 'jnf/query-within-macro-definition)
-
-(provide 'jnf-macros.el)
-;;; jnf-macros.el ends here

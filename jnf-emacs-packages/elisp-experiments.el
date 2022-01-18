@@ -1,4 +1,4 @@
-;;; elisp-experiments.el --- Summary -*- lexical-binding: t; -*-
+;;; -*- lexical-binding: t; -*-
 ;;
 ;;; Commentary:
 ;;
@@ -228,7 +228,3 @@ With two prefix args, insert an x'ed checkbox."
 
 ;; Macro to kill a markdown link
 ;; {M-x search-backward RET [ C-d RET C-SPC M-x search-forward RET ] RET M-x search-forward RET ) RET  S-<delete>}
-
-
-(provide 'elisp-experiments.el)
-;;; elisp-experiments.el ends here

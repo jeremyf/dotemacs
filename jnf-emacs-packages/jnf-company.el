@@ -1,5 +1,3 @@
-;;; jnf-company.el --- Summary
-;;
 ;;; Commentary:
 ;;
 ;;  Extracting company usage
@@ -38,6 +36,3 @@
   :straight t
   :bind (:map company-active-map ("C-c h" . 'company-quickhelp-manual-begin))
   :config (company-quickhelp-mode))
-
-(provide 'jnf-company.el)
-;;; jnf-company.el ends here

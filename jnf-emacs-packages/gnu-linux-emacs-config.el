@@ -1,5 +1,3 @@
-;;; package --- Summary
-;;
 ;;; Commentary:
 ;;
 ;;  This package loads gnu-linux specific packages; It assumes that both
@@ -7,6 +5,3 @@
 ;;
 ;;; Code:
 (set-frame-font "JetBrains Mono 14" nil t)
-
-(provide 'gnu-linux-emacs-config.el)
-;;; gnu-linux-emacs-config.el ends here

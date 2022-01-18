@@ -1,4 +1,4 @@
-;;; jnf-tabs.el --- Summary -*- lexical-binding: t; -*-
+;; -*- lexical-binding: t; -*-
 ;;
 ;;; Commentary:
 ;;
@@ -62,7 +62,3 @@
 ;;          ([s-up] . #'centaur-tabs-backward-group)
 ;;          ([s-down] . #'centaur-tabs-forward-group)
 ;;          ("C-s-t" . #'centaur-tabs-counsel-switch-group)))
-
-
-(provide 'jnf-tabs.el)
-;;; jnf-tabs.el ends here

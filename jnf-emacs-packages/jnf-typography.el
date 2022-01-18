@@ -1,6 +1,4 @@
-;;; -*- lexical-binding: t; -*-
-;;; jnf-typography.el --- Summary
-;;
+;; -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;
 ;;  This package serves the purpose of assisting with adding
@@ -176,5 +174,3 @@
 ;;; END typopunct
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(provide 'jnf-typography.el)
-;;; jnf-typography.el ends here

@@ -1,5 +1,3 @@
-;;; jnf-in-buffer.el --- Summary
-;;
 ;;; Commentary:
 ;;
 ;;  Packages that greatly assist with in-buffer editing:
@@ -250,6 +248,33 @@
   :after (consult yasnippet)
   :bind ("C-c y" . consult-yasnippet))
 
+(use-package tempel
+  :straight (tempel :host github :repo "minad/tempel")
+  :bind (("M-+" . tempel-complete) ;; Alternative tempel-expand
+         ("M-*" . tempel-insert))
+
+  :init
+
+  ;; Setup completion at point
+  (defun tempel-setup-capf ()
+    ;; Add the Tempel Capf to `completion-at-point-functions'.
+    ;; The depth is set to -1, such that `tempel-expand' is tried *before* the
+    ;; programming mode Capf. If a template name can be completed it takes
+    ;; precedence over the programming mode completion. `tempel-expand' only
+    ;; triggers on exact matches. Alternatively use `tempel-complete' if you
+    ;; want to see all matches, but then Tempel will probably trigger too
+    ;; often when you don't expect it.
+    (add-hook 'completion-at-point-functions #'tempel-expand -1 'local))
+
+  (add-hook 'prog-mode-hook 'tempel-setup-capf)
+  (add-hook 'text-mode-hook 'tempel-setup-capf)
+
+  ;; Optionally make the Tempel templates available to Abbrev,
+  ;; either locally or globally. `expand-abbrev' is bound to C-x '.
+  ;; (add-hook 'prog-mode-hook #'tempel-abbrev-mode)
+  ;; (tempel-global-abbrev-mode)
+)
+
 
 ;; I kind of like this little bit of visual feedback
 (use-package goggles
@@ -365,7 +390,3 @@ echo the method signature of `'delete-duplicate-lines`"
 ;;; END Custom "in-buffer" functions
 ;;
 ;;******************************************************************************
-
-
-(provide 'jnf-in-buffer.el)
-;;; jnf-in-buffer.el ends here

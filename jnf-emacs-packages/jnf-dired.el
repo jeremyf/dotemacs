@@ -1,5 +1,3 @@
-;;; jnf-dired.el --- Summary
-;;
 ;;; Commentary:
 ;;
 ;;  Functions for the dired mode
@@ -23,6 +21,3 @@
         dired-sidebar-theme 'vscode
         dired-sidebar-use-custom-font t)
   :commands (dired-sidebar-toggle-sidebar))
-
-(provide 'jnf-dired.el)
-;;; jnf-dired.el ends here

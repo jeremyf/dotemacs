@@ -1,6 +1,5 @@
-;;; -*- lexical-binding: t; -*-
-;;; jnf-epub.el --- Summary
-;;;
+;; -*- lexical-binding: t; -*-
+;;
 ;;; Commentary:
 ;;
 ;;  This package includes the various configurations for epub reading.
@@ -64,7 +63,3 @@
              :host github
              :repo "cadadr/elisp"
              :files ("bibliothek.el")))
-
-
-(provide 'jnf-epub.el)
-;;; jnf-epub.el ends here

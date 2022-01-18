@@ -1,6 +1,4 @@
-;;; -*- lexical-binding: t; -*-
-;;; jnf-git.el --- Summary
-;;
+;; -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;
 ;;  This package includes the various configurations for git
@@ -218,6 +216,3 @@ Without universal argument, open `git-messenger'."
   (blamer-commit-formatter "● %s")
   (blamer-min-offset 40)
   (blamer-max-commit-message-length 20))
-
-(provide 'jnf-git.el)
-;;; jnf-git.el ends here

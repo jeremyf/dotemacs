@@ -1,6 +1,4 @@
-;;; -*- lexical-binding: t; -*-
-;;; package --- Summary
-;;
+;; -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;
 ;;  This package provides configuration for spell checking.  It
@@ -91,5 +89,3 @@
   :bind ("C-c w" . writegood-mode)
   :config
   (add-to-list 'writegood-weasel-words "actionable"))
-(provide 'jnf-spelling.el)
-;;; jnf-spelling.el ends here

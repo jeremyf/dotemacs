@@ -1,5 +1,3 @@
-;;; package --- Summary
-;;
 ;;; Commentary:
 ;;
 ;;  This package loads darwin specific packages; It assumes that both
@@ -112,5 +110,3 @@ setting (e.g. ns-alternate-modifier)."
 ;;          ("C-c C-g p" . send-to-osx-grammarly-push)
 ;;          ("C-c C-g f" . send-to-osx-grammarly-pull)
 ;;          ))
-(provide 'darwin-emacs-config.el)
-;;; darwin-emacs-config.el ends here

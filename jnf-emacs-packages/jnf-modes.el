@@ -1,9 +1,9 @@
-;;; jnf-modes.el --- Summary -*- lexical-binding: t; -*-
-;;;
+;; -*- lexical-binding: t; -*-
+;;
 ;;; Commentary:
-;;;
-;;; Intended to be a place for programminig language modes
-;;;
+;;
+;; Intended to be a place for programminig language modes
+;;
 ;;; Code:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (use-package emmet-mode
@@ -92,6 +92,3 @@ evaluate the whole buffer."
 
 (use-package git-modes
   :straight t)
-
-(provide 'jnf-modes.el)
-;;; jnf-modes.el ends here

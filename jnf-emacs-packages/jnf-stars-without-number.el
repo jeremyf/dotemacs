@@ -1,4 +1,3 @@
-;;; jnf-stars-without-number.el --- Summary
 ;;; -*- lexical-binding: t; -*-
 ;;
 ;;; Commentary:
@@ -97,6 +96,3 @@ project in my org-directory."
 ;; combination will prompt to generate a random SWN npc.
 (define-key org-mode-map (kbd "C-c s n") 'swn-npc)
 (defalias 'org-roam-insert-random-thel-sector-npc 'swn-npc)
-
-(provide 'jnf-stars-without-number.el)
-;;; jnf--stars-without-number.el ends here

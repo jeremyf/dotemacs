@@ -1,6 +1,4 @@
-;;; -*- lexical-binding: t; -*-
-;;; package --- Summary
-;;
+;; -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;
 ;;  This package provides a modified latex class
@@ -30,5 +28,3 @@
 
 
 ;; (setq org-latex-default-class "jnfarticle")
-(provide 'jnf-org-latex.el)
-;;; jnf-org-latex.el ends here

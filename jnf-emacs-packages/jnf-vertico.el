@@ -1,5 +1,3 @@
-;;; jnf-vertico.el --- Summary
-;;
 ;;; Commentary:
 ;;
 ;;
@@ -75,5 +73,3 @@
 
   ;; recursive minibuffers
   (setq enable-recursive-minibuffers nil))
-(provide 'jnf-vertico.el)
-;;; jnf-vertico.el ends here

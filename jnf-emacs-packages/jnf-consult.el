@@ -1,7 +1,7 @@
-;;; jnf-consult.el --- Summary -*- lexical-binding: t; -*-
-;;;
+;; -*- lexical-binding: t; -*-
+;;
 ;;; Commentary:
-;;;
+;;
 ;;; Code:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -396,7 +396,4 @@ the directory.  `REST' is passed to the `CONSULT-RIPGREP-FUNCTION'."
     (if (projectile-project-root)
         (consult-projectile--file (projectile-project-root))
       (consult-projectile)))
-  :bind ("s-t" . jnf/consult-projectile-find-file))
-
-(provide 'jnf-consult.el)
-;;; jnf-consult.el ends here
+  :bind ("s-t" . consult-projectile))

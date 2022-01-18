@@ -1,4 +1,4 @@
-;;; jnf-display.el --- Summary -*- lexical-binding: t; -*-
+;; -*- lexical-binding: t; -*-
 ;;
 ;;; Commentary:
 ;;
@@ -210,6 +210,3 @@ Tries to preserve the order of window buffers and active window."
       (t (progn
            (move-to-window-line 0)
            (recenter))))))
-
-(provide 'jnf-display.el)
-;;; jnf-display.el ends here

@@ -1,4 +1,4 @@
-;;; jnf-beancount.el --- Summary -*- lexical-binding: t; -*-
+;; -*- lexical-binding: t; -*-
 ;;
 ;;; Commentary:
 ;;
@@ -18,5 +18,3 @@
 (add-hook 'beancount-mode-hook
           (lambda () (setq-local electric-indent-chars nil)))
 (add-hook 'beancount-mode-hook #'outline-minor-mode)
-(provide 'jnf-beancount.el)
-;;; jnf-beancount.el ends here

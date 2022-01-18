@@ -1,4 +1,4 @@
-;;; jnf-forem.el --- Summary -*- lexical-binding: t; -*-
+;; -*- lexical-binding: t; -*-
 ;;
 ;;; Commentary:
 ;;
@@ -118,6 +118,3 @@ With the universal prefix (e.g. C-u) open the file instead."
         ("D" jnf/open-dashboard "[D]ashboard open…")
         ("d" (lambda () (interactive) (find-file jnf/forem-dashboard-filename)) "Visit [d]ashboard file…"))))
     ))
-
-(provide 'jnf-forem.el)
-;;; jnf-forem.el ends here

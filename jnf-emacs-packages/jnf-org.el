@@ -1,4 +1,3 @@
-;;; jnf-org.el --- Summary
 ;;; -*- lexical-binding: t; -*-
 ;;
 ;;; Commentary:
@@ -301,6 +300,3 @@ language name.")
 (use-package org-autolist
   :straight t
   :hook ((org-mode . org-autolist-mode)))
-
-(provide 'jnf-org.el)
-;;; jnf-org.el ends here

@@ -1,6 +1,4 @@
-;;; -*- lexical-binding: t; -*-
-;;; jnf-elfeed.el --- Summary
-;;
+;; -*- lexical-binding: t; -*-
 ;;; Commentary:
 ;;
 ;;  This package includes the configuration for elfeed, an Emacs RSS
@@ -282,5 +280,3 @@ Current headline will be the one of the candidates to initially select."
   '(define-key elfeed-search-mode-map (kbd "M-RET") (elfeed-search-show-entry-pre)))
 ;; End https://karthinks.com/blog/lazy-elfeed/
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(provide 'jnf-elfeed.el)
-;;; jnf-elfeed.el ends here

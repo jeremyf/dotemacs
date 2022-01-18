@@ -1,4 +1,4 @@
-;;; jnf-modus-main.el --- Summary -*- lexical-binding: t; -*-
+;; -*- lexical-binding: t; -*-
 ;;
 ;;; Commentary:
 ;;
@@ -74,6 +74,3 @@
           (load-theme 'modus-vivendi)
         (load-theme 'modus-operandi)))
     (load-theme 'modus-operandi)))
-
-(provide 'jnf-modus-main.el)
-;;; jnf-modus-main.el ends here

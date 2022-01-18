@@ -1,7 +1,7 @@
-;;; jnf-selectrum.el --- Summary -*- lexical-binding: t; -*-
-;;;
+;; -*- lexical-binding: t; -*-
+;;
 ;;; Commentary:
-;;;
+;;
 ;;; Code:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -22,6 +22,3 @@
            ;; filtering more intelligent to save your command history
            ;; on disk, so the sorting gets more intelligent over time
            (prescient-persist-mode +1))
-
-(provide 'jnf-selectrum.el)
-;;; jnf-selectrum.el ends here

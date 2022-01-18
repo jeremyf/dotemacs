@@ -1,7 +1,7 @@
-;;; jnf-projectile.el --- Summary -*- lexical-binding: t; -*-
-;;;
+;; -*- lexical-binding: t; -*-
+;;
 ;;; Commentary:
-;;;
+;;
 ;;; Code:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -35,6 +35,3 @@
   :bind
   ("C-s-p". jnf/projectile--menu/body)
   ("s-." . projectile-toggle-between-implementation-and-test))
-
-(provide 'jnf-projectile.el)
-;;; jnf-projectile.el ends here

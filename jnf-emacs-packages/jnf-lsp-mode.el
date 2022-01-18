@@ -1,5 +1,3 @@
-;;; jnf-lsp-mode.el --- Summary
-;;
 ;;; Commentary:
 ;;
 ;;  This package provides the lsp-mode behavior.
@@ -20,6 +18,12 @@
                 lsp-idle-delay 1.00)
   :custom (lsp-keymap-prefix "C-c C-l")
   :commands (lsp))
+
+;; See https://www.reddit.com/r/emacs/comments/ql8cyp/corfu_orderless_and_lsp/
+;; (defun corfu-lsp-setup ()
+;;   (setq-local completion-styles '(orderless)
+;;               completion-category-defaults nil))
+;; (add-hook 'lsp-mode-hook #'corfu-lsp-setup)
 
 (with-eval-after-load 'lsp-mode
   (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration))
@@ -77,6 +81,3 @@
 ;;   :straight)
 
 ;; (add-hook 'enh-ruby-mode-hook #'tree-sitter-mode)
-
-(provide 'jnf-lsp-mode.el)
-;;; jnf-lsp-mode.el ends here

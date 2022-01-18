@@ -1,5 +1,3 @@
-;;; jnf-typescript.el --- Summary
-;;
 ;;; Commentary:
 ;;
 ;;  Modes for typescript and lua.
@@ -27,6 +25,3 @@
   :straight t
   :bind (:map typescript-mode-map ("C-l ." . 'tide-references))
   :hook ((typescript-mode . setup-tide-mode)))
-
-(provide 'jnf-typescript.el)
-;;; jnf-typescript.el ends here

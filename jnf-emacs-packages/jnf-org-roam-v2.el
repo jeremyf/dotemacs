@@ -1,4 +1,4 @@
-;;; jnf-org-roam-v2.el --- Summary -*- lexical-binding: t; -*-
+;; -*- lexical-binding: t; -*-
 ;;
 ;;; Commentary:
 ;;
@@ -451,6 +451,3 @@ The form should be '((\"all\" 1) (\"hesburgh-libraries\" 2))."
 
 (use-package org-transclusion
   :straight t)
-
-(provide 'jnf-org-roam-v2.el)
-;;; jnf-org-roam-v2.el ends here

@@ -1,4 +1,4 @@
-;;; -*- lexical-binding: t; -*- jnf-blogging.el --- Summary
+;; -*- lexical-binding: t
 ;;
 ;;; Commentary:
 ;;
@@ -742,6 +742,3 @@ CITE and A tag."
 ;;; END Wrapping Functions
 ;;
 ;;******************************************************************************
-
-(provide 'jnf-blogging.el)
-;;; jnf-blogging.el ends here

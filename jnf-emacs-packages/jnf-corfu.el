@@ -1,5 +1,3 @@
-;;; jnf-corfu.el --- Summary
-;;
 ;;; Commentary:
 ;;
 ;;
@@ -98,6 +96,3 @@
   ;; Enable indentation+completion using the TAB key.
   ;; `completion-at-point' is often bound to M-TAB.
   (setq tab-always-indent 'complete))
-
-(provide 'jnf-corfu.el)
-;;; jnf-corfu.el ends here
