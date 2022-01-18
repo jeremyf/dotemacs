@@ -209,7 +209,6 @@
       (org-insert-time-stamp nil nil nil)
     (org-insert-time-stamp nil t nil)))
 
-(global-set-key (kbd "<f2>") 'jnf/org-insert-immediate-active-timestamp)
 (global-set-key (kbd "s-2") 'jnf/org-insert-immediate-active-timestamp)
 
 ;; ;; https://kitchingroup.cheme.cmu.edu/blog/2016/06/16/Copy-formatted-org-mode-text-from-Emacs-to-other-applications/
@@ -241,6 +240,54 @@
      \[EXTRA]"))
 
      (setq org-koma-letter-default-class "jnf-letter")))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;; BEGIN Hacks for ORG to type a bit more like markdown
+;;
+;; See http://mbork.pl/2022-01-17_Making_code_snippets_in_Org-mode_easier_to_type
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun org-insert-backtick ()
+  "Insert a backtick using `org-self-insert-command'."
+  (interactive)
+  (setq last-command-event ?`)
+  (call-interactively #'org-self-insert-command))
+
+(defun org-insert-tilde ()
+  "Insert a tilde using `org-self-insert-command'."
+  (interactive)
+  (setq last-command-event ?~)
+  (call-interactively #'org-self-insert-command))
+
+(define-key org-mode-map (kbd "`") #'org-insert-tilde)
+(define-key org-mode-map (kbd "~") #'org-insert-backtick)
+(defvar-local org-insert-tilde-language nil
+  "Default language name in the current Org file.
+If nil, `org-insert-tilde' after 2 tildes inserts an \"example\"
+block.  If a string, it inserts a \"src\" block with the given
+language name.")
+
+(defun org-insert-tilde ()
+  "Insert a tilde using `org-self-insert-command'."
+  (interactive)
+  (if (string= (buffer-substring-no-properties (- (point) 3) (point))
+	       "\n~~")
+      (progn (delete-char -2)
+	     (if org-insert-tilde-language
+		 (insert (format "#+begin_src %s\n#+end_src"
+				 org-insert-tilde-language))
+	       (insert "#+begin_example\n#+end_example"))
+	     (forward-line -1)
+	     (if (string= org-insert-tilde-language "")
+		 (move-end-of-line nil)
+	       (org-edit-special)))
+    (setq last-command-event ?~)
+    (call-interactively #'org-self-insert-command)))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;; END Hacks for ORG to type a bit more like markdown
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
 ;; Context dependent menu for org-mode.
