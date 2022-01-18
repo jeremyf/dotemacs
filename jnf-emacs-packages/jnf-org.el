@@ -88,11 +88,11 @@
      "ls " (file-name-directory buffer-file-name)))))
 
   (setq org-confirm-babel-evaluate #'my-org-confirm-babel-evaluate)
-  (org-babel-do-load-languages
-   'org-babel-load-languages
-   '((emacs-lisp . t)
-     (plantuml . t)
-     (ruby . t)))
+  (org-babel-do-load-languages 'org-babel-load-languages
+			       (append org-babel-load-languages
+				       '((emacs-lisp . t)
+					 (plantuml . t)
+					 (ruby . t))))
   ;; Make TAB act as if it were issued from the buffer of the languages's major mode.
   :custom (org-src-tab-acts-natively t)
   :bind (
