@@ -40,13 +40,6 @@
       "forem/%<%Y%m%d>---${slug}.org"
       "#+title: ${title}\n#+FILETAGS: :forem: %^G\n\n")
      :unnarrowed t)
-   :forem-encrypted
-   '("F" "Forem encrypted" plain "%?"
-     :target
-     (file+head
-      "forem/%<%Y%m%d>---${slug}.org.gpg"
-      "#+title: ${title}\n#+FILETAGS: :forem: %^G\n\n")
-     :unnarrowed t)
    :jf-consulting
    '("j" "JF Consulting" plain "%?"
      :target
@@ -60,13 +53,6 @@
      (file+head
       "personal/%<%Y%m%d>---${slug}.org"
       "#+title: ${title}\n#+FILETAGS: :personal: %^G\n\n")
-     :unnarrowed t)
-   :personal-encrypted
-   '("P" "Personal (Encrypted)" plain "%?"
-     :target
-     (file+head
-      "personal/%<%Y%m%d>---${slug}.org.gpg"
-      "#+title: ${title}\n#+FILETAGS: :personal:encrypted: %^G\n\n")
      :unnarrowed t)
    :public
    '("u" "Public" plain "%?"

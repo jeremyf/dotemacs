@@ -40,7 +40,7 @@
            "* TODO %?\n  %i\n  %a" :empty-lines-before 1)
           ("e" "Emacs Config Todo" entry (file "~/git/dotemacs/todo.org")
            "* TODO %?\n  %i\n  %a" :empty-lines-before 1)
-          ("h" "Hesburgh Libraries Todo" entry (file "~/git/org/hesburgh-libraries/todo.org")
+          ("f" "Forem Todo" entry (file "~/git/org/forem/todo.org")
            "* TODO %?\n  %i\n  %a" :empty-lines-before 1)
           ("t" "Take on Rules" entry (file "~/git/takeonrules.source/todo.org")
            "* TODO %?\n  %i\n  %a" :empty-lines-before 1)
