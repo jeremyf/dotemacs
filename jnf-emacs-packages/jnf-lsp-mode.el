@@ -9,7 +9,7 @@
   :hook (
          ;; (ruby-mode . lsp)
          (enh-ruby-mode . lsp)
-	 (js-mode . lsp)
+	 ;; (js-mode . lsp)
          ;; (html-mode . lsp)
          ;; (bash-mode . lsp)
          )

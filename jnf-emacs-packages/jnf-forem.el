@@ -68,8 +68,8 @@
 (pretty-hydra-define jnf/forem-menu (:foreign-keys warn :title jnf/forem-menu--title :quit-key "q" :exit t)
   ("Forem Workflow"
    (
-    ("i" (lambda () (interactive) (browse-url "https://github.com/forem/forem/issues/")) "Browse to ssues…")
-    ("j" (lambda () (interactive) (browse-url "https://github.com/orgs/forem/projects/")) "Browse to projects…")
+    ("i" (lambda () (interactive) (browse-url "https://github.com/forem/forem/issues/")) "Browse to [i]ssues…")
+    ("j" (lambda () (interactive) (browse-url "https://github.com/orgs/forem/projects/")) "Browse to pro[j]ects…")
     ("m" (lambda () (interactive) (browse-url "https://github.com/forem/forem/pulls?q=is%3Apr+is%3Aclosed")) "Browse [m]erged Pull Requests…")
     ("p" (lambda () (interactive) (browse-url "https://github.com/forem/forem/pulls/")) "Browse to pull requests…"))
    "Jeremy's Workflow"
