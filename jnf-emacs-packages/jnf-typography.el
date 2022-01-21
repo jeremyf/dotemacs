@@ -37,10 +37,15 @@
            ("a m" (insert "−") "− Minus Sign")
            ("a p" (insert "±") "± Plus or Minus Sign")
            ("m n" (insert "¬") "¬ Negation")
+	   ;; For declaring regex functions.  See
+	   ;; https://www.johndcook.com/blog/2022/01/08/corner-quotes-in-unicode/
+	   ;; and https://irreal.org/blog/?p=10265
+	   ("c l" (insert "⌜") "⌜ Left Corner Quote")
+	   ("c r" (insert " ⌟") "⌟ Right Corner Quote")
            ;; Included as a reminder as I use these for menu structures
-           ("f h" (insert "─") "─ Forms light horizontal")
+           ("f h"   (insert "─") "─ Forms light horizontal")
            ("f D l" (insert "┐") "┐ Forms light down and left")
-           ("f v" (insert "│") "  │ Forms light vertical")
+           ("f v"   (insert "│") "│ Forms light vertical")
            ("f V r" (insert "├") "├ Forms light vertical and right")
            ("f U r" (insert "└") "└ Forms light up and right")
            )
@@ -49,6 +54,7 @@
              ("\" c" (insert "”") "” Doule quote close")
              ("\" O" (insert "«") "« Guillemet open")
              ("\" C" (insert "»") "» Guillemet close")
+	     ("\" l" (insert "⌈") "⌈ Left ceiling")
              ("' o" (insert "‘") "‘ Single quote open")
              ("' c" (insert "’") "’ Single quote close")
              ("' O" (insert "‹") "‹ Single guillemet open")
