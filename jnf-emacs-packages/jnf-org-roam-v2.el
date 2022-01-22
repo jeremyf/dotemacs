@@ -77,41 +77,41 @@
               :templates (list :eberron)
               :name "eberron"
               :title "Eberron"
-              :path-to-todo "~/git/org/personal/todo.org")
+              :path-to-agenda "~/git/org/personal/agenda.org")
    :forem (list
                    :templates (list :forem)
                    :name "forem"
                    :title "Forem"
-                   :path-to-todo "~/git/org/forem/todo.org")
+                   :path-to-agenda "~/git/org/forem/agenda.org")
    :jf-consulting (list
                    :templates (list :jf-consulting)
                    :name "jf-consulting"
                    :title "JF Consulting"
-                   :path-to-todo "~/git/org/jeremy-friesen-consulting/todo.org")
+                   :path-to-agenda "~/git/org/jeremy-friesen-consulting/agenda.org")
    :hesburgh-libraries (list
                         :templates (list :hesburgh-libraries)
                         :name "hesburgh-libraries"
                         :title "Hesburgh Libraries"
-                        :path-to-todo "~/git/org/hesburgh-libraries/todo.org")
+                        :path-to-agenda "~/git/org/hesburgh-libraries/agenda.org")
    :personal (list
               :templates (list :personal)
               :name "personal"
               :title "Personal"
-              :path-to-todo "~/git/org/personal/todo.org")
+              :path-to-agenda "~/git/org/personal/agenda.org")
    :public (list
             :templates (list :public)
             :name "public"
             :title "Public"
-            :path-to-todo "~/git/org/public/todo.org")
+            :path-to-agenda "~/git/org/public/agenda.org")
    :thel-sector (list
                  :templates (list :thel-sector)
                  :name "thel-sector"
                  :title "Thel Sector"
-                 :path-to-todo "~/git/org/personal/thel-sector/todo.org")
+                 :path-to-agenda "~/git/org/personal/thel-sector/agenda.org")
    )
 "A plist that contains the various `org-roam' subjects.
 
-Each subject has a plist of :templates, :title, :name, and :path-to-todo.
+Each subject has a plist of :templates, :title, :name, and :path-to-agenda.
 
 - :templates defines the named templates available for this
   subject.  See `jnf/org-roam-capture-templates-plist' for list
@@ -120,7 +120,7 @@ Each subject has a plist of :templates, :title, :name, and :path-to-todo.
   creating function names.
 - :title is the human readable \"title-case\" form of the
   subject.
-- :path-to-todo is the path to the todo file for this subject."
+- :path-to-agenda is the path to the agenda file for this subject."
 )
 
 ;; Add the special ":all" case to  `jnf/org-roam-capture-subjects-plist'
@@ -128,28 +128,28 @@ Each subject has a plist of :templates, :title, :name, and :path-to-todo.
            :all
            (list
             ;; Iterate only through the templates that have a
-            ;; corresponding todo file.
+            ;; corresponding agenda file.
             :templates (-uniq
                         (-flatten
                          (-non-nil
                           (seq-map-indexed
                            (lambda (subject index)
                              (when (oddp index)
-                               (if (f-exists? (plist-get subject :path-to-todo))
+                               (if (f-exists? (plist-get subject :path-to-agenda))
                                    (plist-get subject :templates)
                                  nil)))
                            jnf/org-roam-capture-subjects-plist))))
             :name "all"
             :title "All"
-            :path-to-todo "~/git/org/todo.org"))
+            :path-to-agenda "~/git/org/agenda.org"))
 
 
 (cl-defun jnf/org-roam-subject-exists-on-machine? (subject
                                                    &key
                                                    (subjects-plist jnf/org-roam-capture-subjects-plist))
-  "Return tif the todo file exists for given SUBJECT in the SUBJECTS-PLIST."
-  (let ((path-to-todo (plist-get (plist-get subjects-plist subject) :path-to-todo)))
-    (f-exists? path-to-todo)))
+  "Return tif the agenda file exists for given SUBJECT in the SUBJECTS-PLIST."
+  (let ((path-to-agenda (plist-get (plist-get subjects-plist subject) :path-to-agenda)))
+    (f-exists? path-to-agenda)))
 
 (cl-defun jnf/org-roam-templates-for-subject (subject
                                               &key
@@ -203,18 +203,18 @@ Fetch the given SUBJECT from the given SUBJECTS-PLIST."
          (subject-title (plist-get subject-plist :title))
          (subject-name (plist-get subject-plist :name))
 
-         ;; For todo related antics
-         (todo-fn-name (intern (concat "jnf/find-file--" subject-name "--todo")))
-         (path-to-todo (plist-get subject-plist :path-to-todo))
-         (todo-docstring (concat "Find the todo file for " subject-name " subject."))
+         ;; For agenda related antics
+         (agenda-fn-name (intern (concat "jnf/find-file--" subject-name "--agenda")))
+         (path-to-agenda (plist-get subject-plist :path-to-agenda))
+         (agenda-docstring (concat "Find the agenda file for " subject-name " subject."))
 
          ;; For hydra menu related antics
          ;;
          ;; Note: I'm creating a bogus menu when I have the ":all" subject.
          (hydra-fn-name (intern (concat "jnf/org-subject-menu--" (if (eq subject :all) "all--dev--null" subject-name))))
          (hydra-menu-title (concat subject-title " Subject Menu"))
-         (hydra-todo-title (concat subject-title " Todo…"))
-         (hydra-kbd-prefix-todo    (s-trim (concat menu_prefix " @")))
+         (hydra-agenda-title (concat subject-title " Agenda…"))
+         (hydra-kbd-prefix-agenda    (s-trim (concat menu_prefix " @")))
          (hydra-kbd-prefix-capture (s-trim (concat menu_prefix " +")))
          (hydra-kbd-prefix-insert  (s-trim (concat menu_prefix " !")))
          (hydra-kbd-prefix-find    (s-trim (concat menu_prefix " ?")))
@@ -236,10 +236,10 @@ Fetch the given SUBJECT from the given SUBJECTS-PLIST."
          )
     (when (jnf/org-roam-subject-exists-on-machine? subject)
     `(progn
-       (defun ,todo-fn-name ()
-         ,todo-docstring
+       (defun ,agenda-fn-name ()
+         ,agenda-docstring
          (interactive)
-         (find-file (file-truename ,path-to-todo))
+         (find-file (file-truename ,path-to-agenda))
          (end-of-buffer))
 
        (defun ,capture-fn-name (&optional goto keys)
@@ -269,7 +269,7 @@ Fetch the given SUBJECT from the given SUBJECTS-PLIST."
          (
           ,hydra-menu-title
           (
-           ("@" ,todo-fn-name        ,hydra-todo-title)
+           ("@" ,agenda-fn-name        ,hydra-agenda-title)
            ("+" ,capture-fn-name     " ├─ Capture…")
            ("!" ,insert-fn-name      " ├─ Insert…")
            ("?" ,find-fn-name        " └─ Find…")
@@ -281,7 +281,7 @@ Fetch the given SUBJECT from the given SUBJECTS-PLIST."
        (pretty-hydra-define+ jnf/org-subject-menu--all()
          (,menu_group
           (
-           (,hydra-kbd-prefix-todo    ,todo-fn-name    ,hydra-todo-title)
+           (,hydra-kbd-prefix-agenda    ,agenda-fn-name    ,hydra-agenda-title)
            (,hydra-kbd-prefix-capture ,capture-fn-name " ├─ Capture…")
            (,hydra-kbd-prefix-insert  ,insert-fn-name  " ├─ Insert…")
            (,hydra-kbd-prefix-find    ,find-fn-name    " └─ Find…")
@@ -333,7 +333,7 @@ Fetch the given SUBJECT from the given SUBJECTS-PLIST."
     ("/" org-roam-buffer-toggle         "Toggle Buffer")
     ("#" jnf/toggle-roam-subject-filter "Toggle Default Filter")
     ("~" jnf/magit-list-repositories    "Magit List Repositories")
-    ("1" (find-file (f-join jnf/tor-home-directory "todo.org")) "Todo for TakeOnRules.com")
+    ("1" (find-file (f-join jnf/tor-home-directory "agenda.org")) "Agenda for TakeOnRules.com")
     ("2" org-transclusion-add "Org Transclusion Add…")
     ("3" org-transclusion-mode "Org Transclusion Mode" :toggle t)
     )))
@@ -358,7 +358,7 @@ The form should be '((\"all\" 1) (\"hesburgh-libraries\" 2))."
   ;; the odds are the values.
   (-non-nil (seq-map-indexed (lambda (subject index)
                                (when (oddp index)
-                                 (when (f-exists? (plist-get subject :path-to-todo))
+                                 (when (f-exists? (plist-get subject :path-to-agenda))
                                    (list (plist-get subject :name) index))))
                              subjects-plist)))
 
@@ -369,7 +369,7 @@ The form should be '((\"all\" 1) (\"hesburgh-libraries\" 2))."
                  "Subject: " (jnf/subject-list-for-completing-read))))
   (global-set-key
    (kbd "C-s-2")
-   (intern (concat "jnf/org-roam--" subject "--todo")))
+   (intern (concat "jnf/find-file--" subject "--agenda")))
   (global-set-key
    (kbd "C-s-1")
    (intern (concat "jnf/org-roam--" subject "--node-insert")))
@@ -382,6 +382,12 @@ The form should be '((\"all\" 1) (\"hesburgh-libraries\" 2))."
   (global-set-key
    (kbd "s-i")
    (intern (concat "jnf/org-roam--" subject "--node-insert")))
+  (global-set-key
+   (kbd "<f2>")
+   (intern (concat "jnf/org-subject-menu--" subject "/body")))
+  (global-set-key
+   (kbd "s-2")
+   (intern (concat "jnf/org-subject-menu--" subject "/body")))
   (global-set-key
    (kbd "C-c i")
    (intern (concat "jnf/org-subject-menu--" subject "/body"))))

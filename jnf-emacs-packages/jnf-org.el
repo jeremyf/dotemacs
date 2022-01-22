@@ -28,7 +28,7 @@
            org-directory (file-truename "~/git/org")
            org-agenda-files (jnf/org-agenda-files
                              :paths jnf/data-directories
-                             :basenames '("agenda.org" "todo.org"))
+                             :basenames '("agenda.org"))
            org-default-notes-file (concat org-directory "/captured-notes.org")
            ;; org-startup-indented t
            org-todo-keywords
@@ -36,19 +36,19 @@
            (sequence "PENDING" "TODO" "WAITING" "|" "READ")))
   (setq org-capture-templates
         '(
-          ("@" "All Todo" entry (file "~/git/org/todo.org")
+          ("@" "All Todo" entry (file "~/git/org/agenda.org")
            "* TODO %?\n  %i\n  %a" :empty-lines-before 1)
-          ("e" "Emacs Config Todo" entry (file "~/git/dotemacs/todo.org")
+          ("e" "Emacs Config Todo" entry (file "~/git/dotemacs/agenda.org")
            "* TODO %?\n  %i\n  %a" :empty-lines-before 1)
-          ("f" "Forem Todo" entry (file "~/git/org/forem/todo.org")
+          ("f" "Forem Todo" entry (file "~/git/org/forem/agenda.org")
            "* TODO %?\n  %i\n  %a" :empty-lines-before 1)
-          ("t" "Take on Rules" entry (file "~/git/takeonrules.source/todo.org")
+          ("t" "Take on Rules" entry (file "~/git/takeonrules.source/agenda.org")
            "* TODO %?\n  %i\n  %a" :empty-lines-before 1)
-          ("p" "Personal Todo" entry (file "~/git/org/personal/todo.org")
+          ("p" "Personal Todo" entry (file "~/git/org/personal/agenda.org")
            "* TODO %?\n  %i\n  %a" :empty-lines-before 1)
-          ("u" "Public Todo" entry (file "~/git/org/public/todo.org")
+          ("u" "Public Todo" entry (file "~/git/org/public/agenda.org")
            "* TODO %?\n  %i\n  %a" :empty-lines-before 1)
-          ("1" "TakeOnRules.com Todo" entry (file "~/git/takeonrules.source/todo.org")
+          ("1" "TakeOnRules.com Todo" entry (file "~/git/takeonrules.source/agenda.org")
            "* TODO %?\n  %i\n  %a" :empty-lines-before 1)
           ))
   (defun my-org-confirm-babel-evaluate (lang body) t)
@@ -208,7 +208,7 @@
       (org-insert-time-stamp nil nil nil)
     (org-insert-time-stamp nil t nil)))
 
-(global-set-key (kbd "s-2") 'jnf/org-insert-immediate-active-timestamp)
+(global-set-key (kbd "s-5") 'jnf/org-insert-immediate-active-timestamp)
 
 ;; ;; https://kitchingroup.cheme.cmu.edu/blog/2016/06/16/Copy-formatted-org-mode-text-from-Emacs-to-other-applications/
 (defun jnf/formatted-copy-org-to-html ()

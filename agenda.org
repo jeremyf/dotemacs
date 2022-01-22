@@ -1,0 +1,5 @@
+:PROPERTIES:
+:ID:       dotemacs-agenda
+:END:
+#+title: Emacs Config Agenda
+#+filetags: :personal:
