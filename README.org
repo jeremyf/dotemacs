@@ -12,8 +12,8 @@ Below is the top-level directory:
 ├── emacs.d/
 ├── jnf-emacs-packages/
 ├── snippets/
-├── todo.org
-└── todo.org_archive
+├── agenda.org
+└── agenda.org_archive
 #+END_SRC
 
 The files and directories:
@@ -22,8 +22,8 @@ The files and directories:
 - emacs.d :: A directory that contains files symlinked into =$HOME/.emacs.d= directory.
 - jnf-emacs-packages :: A directory of quasi-packages that I’ve made to help organize my emacs configuration.
 - snippets :: A directory of [[https://joaotavora.github.io/yasnippet/][yasnippets]] I’ve created.
-- todo.org :: The todo list for updates I’m considering to my dotemacs file.
-- todo.org_archive :: The archive of todo items, completed or abandoned.
+- agenda.org :: The todo list for updates I’m considering to my dotemacs file.
+- agenda.org_archive :: The archive of todo items, completed or abandoned.
 
 Some highlights:
 
