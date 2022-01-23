@@ -54,11 +54,11 @@ evaluate the whole buffer."
   (interactive)
   (if (not (region-active-p))
       (progn
-	(eval-buffer)
-	(message "Evaluated buffer"))
+	(message "Evaluating buffer...")
+	(eval-buffer))
     (progn
-      (eval-region (region-beginning) (region-end))
-      (message "Evaluated region"))
+      (message "Evaluating region...")
+      (eval-region (region-beginning) (region-end)))
     (setq-local deactivate-mark t)))
 
 ;; Compressed JSON sure is ugly and illegible; This solves that
