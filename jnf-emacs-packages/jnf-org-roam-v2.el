@@ -38,7 +38,7 @@
      :target
      (file+head
       "personal/%<%Y%m%d>---${slug}.org"
-      "#+title: ${title}\n#+FILETAGS: :jeremy-friesen-consulting: %^G\n\n")
+      "#+title: ${title}\n#+FILETAGS: :personal:jeremy-friesen-consulting: %^G\n\n")
      :unnarrowed t)
    :personal
    '("p" "Personal" plain "%?"
@@ -250,7 +250,7 @@ Fetch the given SUBJECT from the given SUBJECTS-PLIST."
            (,hydra-kbd-prefix-agenda    ,agenda-fn-name    ,hydra-agenda-title)
            (,hydra-kbd-prefix-capture ,capture-fn-name " ├─ Capture…")
            (,hydra-kbd-prefix-insert  ,insert-fn-name  " ├─ Insert…")
-o           (,hydra-kbd-prefix-find    ,find-fn-name    " └─ Find…")
+           (,hydra-kbd-prefix-find    ,find-fn-name    " └─ Find…")
            )))
        ))))
 
