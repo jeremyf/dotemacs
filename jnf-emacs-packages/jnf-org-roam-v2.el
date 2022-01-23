@@ -23,15 +23,8 @@
    '("e" "Eberron" plain "%?"
      :target
      (file+head
-      "personal/%<%Y%m%d>---${slug}.org"
-      "#+title: ${title}\n#+FILETAGS: :personal:rpg:eberron:\n\n")
-     :unnarrowed t)
-   :hesburgh-libraries
-   '("h" "Hesburgh Libraries" plain "%?"
-     :target
-     (file+head
-      "hesburgh-libraries/%<%Y%m%d>---${slug}.org"
-      "#+title: ${title}\n#+FILETAGS: :hesburgh: %^G\n\n")
+      "rpgs/%<%Y%m%d>---${slug}.org"
+      "#+title: ${title}\n#+FILETAGS: :rpg:eberron:\n\n")
      :unnarrowed t)
    :forem
    '("f" "Forem" plain "%?"
@@ -44,8 +37,8 @@
    '("j" "JF Consulting" plain "%?"
      :target
      (file+head
-      "jeremy-friesen-consulting/%<%Y%m%d>---${slug}.org"
-      "#+title: ${title}\n#+FILETAGS: :personal:jeremy-friesen-consulting: %^G\n\n")
+      "personal/%<%Y%m%d>---${slug}.org"
+      "#+title: ${title}\n#+FILETAGS: :jeremy-friesen-consulting: %^G\n\n")
      :unnarrowed t)
    :personal
    '("p" "Personal" plain "%?"
@@ -54,60 +47,33 @@
       "personal/%<%Y%m%d>---${slug}.org"
       "#+title: ${title}\n#+FILETAGS: :personal: %^G\n\n")
      :unnarrowed t)
-   :public
-   '("u" "Public" plain "%?"
-     :target
-     (file+head
-      "public/%<%Y%m%d>---${slug}.org"
-      "#+title: ${title}\n#+FILETAGS: :public: %^G\n\n")
-     :unnarrowed t)
    :thel-sector
    '("t" "Thel Sector" plain "%?"
      :target
      (file+head
-      "personal/thel-sector/%<%Y%m%d>---${slug}.org"
-      "#+title: ${title}\n#+FILETAGS: :thel-sector: %^G\n\n")
+      "rpgs/%<%Y%m%d>---${slug}.org"
+      "#+title: ${title}\n#+FILETAGS: :rpg:swn:thel-sector: %^G\n\n")
      :unnarrowed t)
    )
   "A plist defining my `org-roam' capture templates.")
 
 (defvar jnf/org-roam-capture-subjects-plist
   (list
-   :eberron (list
-              :templates (list :eberron)
-              :name "eberron"
-              :title "Eberron"
-              :path-to-agenda "~/git/org/personal/agenda.org")
    :forem (list
-                   :templates (list :forem)
-                   :name "forem"
-                   :title "Forem"
-                   :path-to-agenda "~/git/org/forem/agenda.org")
-   :jf-consulting (list
-                   :templates (list :jf-consulting)
-                   :name "jf-consulting"
-                   :title "JF Consulting"
-                   :path-to-agenda "~/git/org/jeremy-friesen-consulting/agenda.org")
-   :hesburgh-libraries (list
-                        :templates (list :hesburgh-libraries)
-                        :name "hesburgh-libraries"
-                        :title "Hesburgh Libraries"
-                        :path-to-agenda "~/git/org/hesburgh-libraries/agenda.org")
+           :templates (list :forem)
+           :name "forem"
+           :title "Forem"
+           :path-to-agenda "~/git/org/forem/agenda.org")
    :personal (list
-              :templates (list :personal)
+              :templates (list :personal :jf-consulting)
               :name "personal"
               :title "Personal"
               :path-to-agenda "~/git/org/personal/agenda.org")
-   :public (list
-            :templates (list :public)
-            :name "public"
-            :title "Public"
-            :path-to-agenda "~/git/org/public/agenda.org")
-   :thel-sector (list
-                 :templates (list :thel-sector)
-                 :name "thel-sector"
-                 :title "Thel Sector"
-                 :path-to-agenda "~/git/org/personal/thel-sector/agenda.org")
+   :rpg (list
+         :templates (list :thel-sector :eberron)
+         :name "rpg"
+         :title "RPG"
+         :path-to-agenda "~/git/org/rpgs/agenda.org")
    )
 "A plist that contains the various `org-roam' subjects.
 
@@ -284,7 +250,7 @@ Fetch the given SUBJECT from the given SUBJECTS-PLIST."
            (,hydra-kbd-prefix-agenda    ,agenda-fn-name    ,hydra-agenda-title)
            (,hydra-kbd-prefix-capture ,capture-fn-name " ├─ Capture…")
            (,hydra-kbd-prefix-insert  ,insert-fn-name  " ├─ Insert…")
-           (,hydra-kbd-prefix-find    ,find-fn-name    " └─ Find…")
+o           (,hydra-kbd-prefix-find    ,find-fn-name    " └─ Find…")
            )))
        ))))
 
@@ -305,27 +271,14 @@ Fetch the given SUBJECT from the given SUBJECTS-PLIST."
 (defalias 'jnf/org-roam--all--capture 'org-roam-capture)
 
 (create-org-roam-subject-fns-for :personal
-                                 :menu_group "Life"
+                                 :menu_group "Personal"
                                  :menu_prefix "p")
-(create-org-roam-subject-fns-for :public
-                                 :menu_group "Life"
-                                 :menu_prefix "u")
 (create-org-roam-subject-fns-for :forem
-                                 :menu_group "Work"
+                                 :menu_group "Forem"
                                  :menu_prefix "f")
-(create-org-roam-subject-fns-for :hesburgh-libraries
-                                 :menu_group "Work"
-                                 :menu_prefix "h")
-(create-org-roam-subject-fns-for :jf-consulting
-                                 :menu_group "Projects"
-                                 :menu_prefix "j")
-(create-org-roam-subject-fns-for :eberron
-                                 :menu_group "Projects"
-                                 :menu_prefix "e")
-(create-org-roam-subject-fns-for :thel-sector
-                                 :menu_group "Projects"
-                                 :menu_prefix "t")
-
+(create-org-roam-subject-fns-for :rpg
+                                 :menu_group "RPG"
+                                 :menu_prefix "r")
 
 (pretty-hydra-define+ jnf/org-subject-menu--all()
   ("All"
