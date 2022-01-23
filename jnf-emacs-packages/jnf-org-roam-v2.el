@@ -1,4 +1,4 @@
-;; -*- lexical-binding: t; -*-
+;;; -*- lexical-binding: t; -*-
 ;;
 ;;; Commentary:
 ;;
@@ -17,43 +17,64 @@
 ;;; BEGIN Template and Subject Definitions
 ;;
 ;;******************************************************************************
+
 (defvar jnf/org-roam-capture-templates-plist
   (list
    :eberron
-   '("e" "Eberron" plain "%?"
-     :target
-     (file+head
-      "rpgs/%<%Y%m%d>---${slug}.org"
-      "#+title: ${title}\n#+FILETAGS: :rpg:eberron:\n\n")
-     :unnarrowed t)
+   (list
+    :name "Eberron"
+    :tags '("rpg" "eberron")
+    :template
+    '("e" "Eberron" plain "%?"
+      :target
+      (file+head
+       "rpgs/%<%Y%m%d>---${slug}.org"
+       "#+title: ${title}\n#+FILETAGS: :rpg:eberron:\n\n")
+      :unnarrowed t))
    :forem
-   '("f" "Forem" plain "%?"
-     :target
-     (file+head
-      "forem/%<%Y%m%d>---${slug}.org"
-      "#+title: ${title}\n#+FILETAGS: :forem: %^G\n\n")
-     :unnarrowed t)
+   (list
+    :name "Forem"
+    :tags '("forem" "eberron")
+    :template
+    '("f" "Forem" plain "%?"
+      :target
+      (file+head
+       "forem/%<%Y%m%d>---${slug}.org"
+       "#+title: ${title}\n#+FILETAGS: :forem: %^G\n\n")
+      :unnarrowed t))
    :jf-consulting
-   '("j" "JF Consulting" plain "%?"
-     :target
-     (file+head
-      "personal/%<%Y%m%d>---${slug}.org"
-      "#+title: ${title}\n#+FILETAGS: :personal:jeremy-friesen-consulting: %^G\n\n")
-     :unnarrowed t)
+   (list
+    :name "JF Consulting"
+    :tags '("personal" "jeremy-friesen-consulting")
+    :template
+    '("j" "JF Consulting" plain "%?"
+      :target
+      (file+head
+       "personal/%<%Y%m%d>---${slug}.org"
+       "#+title: ${title}\n#+FILETAGS: :personal:jeremy-friesen-consulting: %^G\n\n")
+      :unnarrowed t))
    :personal
-   '("p" "Personal" plain "%?"
-     :target
-     (file+head
-      "personal/%<%Y%m%d>---${slug}.org"
-      "#+title: ${title}\n#+FILETAGS: :personal: %^G\n\n")
-     :unnarrowed t)
+   (list
+    :name "Personal"
+    :tags '("personal")
+    :template
+    '("p" "Personal" plain "%?"
+      :target
+      (file+head
+       "personal/%<%Y%m%d>---${slug}.org"
+       "#+title: ${title}\n#+FILETAGS: :personal: %^G\n\n")
+      :unnarrowed t))
    :thel-sector
-   '("t" "Thel Sector" plain "%?"
-     :target
-     (file+head
-      "rpgs/%<%Y%m%d>---${slug}.org"
-      "#+title: ${title}\n#+FILETAGS: :rpg:swn:thel-sector: %^G\n\n")
-     :unnarrowed t)
+   (list
+    :name "Thel Sector"
+    :tags '("rpg" "swn" "thel-sector")
+    :template
+    '("t" "Thel Sector" plain "%?"
+      :target
+      (file+head
+       "rpgs/%<%Y%m%d>---${slug}.org"
+       "#+title: ${title}\n#+FILETAGS: :rpg:swn:thel-sector: %^G\n\n")
+      :unnarrowed t))
    )
   "A plist defining my `org-roam' capture templates.")
 
@@ -109,7 +130,6 @@ Each subject has a plist of :templates, :title, :name, and :path-to-agenda.
             :title "All"
             :path-to-agenda "~/git/org/agenda.org"))
 
-
 (cl-defun jnf/org-roam-subject-exists-on-machine? (subject
                                                    &key
                                                    (subjects-plist jnf/org-roam-capture-subjects-plist))
@@ -136,7 +156,7 @@ given (or default) TEMPLATE-DEFINITIONS-PLIST."
   (if override
       (list (plist-get template-definitions-plist override))
     (let ((templates (plist-get (plist-get subjects-plist subject) :templates)))
-      (-map (lambda (template) (plist-get template-definitions-plist template))
+      (-map (lambda (template) (plist-get (plist-get template-definitions-plist template) :template))
             templates))))
 ;;******************************************************************************
 ;;
@@ -155,6 +175,11 @@ given (or default) TEMPLATE-DEFINITIONS-PLIST."
 
 (pretty-hydra-define jnf/org-subject-menu--all (:foreign-keys warn :title jnf/org-subject-menu--title :quit-key "q" :exit t)
   ("All" ()))
+
+;; See https://nullprogram.com/blog/2013/12/30/ about creating closures.
+(defun jnf/org-roam-filter-fn (subject-name)
+  "Creates a closure for `org-roam' filtering nodes for SUBJECT_NAME."
+  (lambda (node) (-contains-p (org-roam-node-tags node) subject-name)))
 
 (cl-defmacro create-org-roam-subject-fns-for (subject
                                               &key
@@ -223,12 +248,12 @@ Fetch the given SUBJECT from the given SUBJECTS-PLIST."
          (interactive "P")
          (org-roam-capture goto
                            keys
-                           :filter-fn (lambda (node) (-contains-p (org-roam-node-tags node) ,subject-name))
+                           :filter-fn (jnf/org-roam-filter-fn ,subject-name)
                            :templates (jnf/org-roam-templates-for-subject ,subject-as-symbol)))
        (defun ,insert-fn-name ()
          ,insert-docstring
          (interactive)
-         (org-roam-node-insert (lambda (node) (-contains-p (org-roam-node-tags node) ,subject-name))
+         (org-roam-node-insert (jnf/org-roam-filter-fn ,subject-name)
                                :templates (jnf/org-roam-templates-for-subject ,subject-as-symbol)))
 
        (defun ,find-fn-name (&optional other-window initial-input)
@@ -236,7 +261,7 @@ Fetch the given SUBJECT from the given SUBJECTS-PLIST."
          (interactive current-prefix-arg)
          (org-roam-node-find other-window
                              initial-input
-                             (lambda (node) (-contains-p (org-roam-node-tags node) ,subject-name))
+			     (jnf/org-roam-filter-fn ,subject-name)
                              :templates (jnf/org-roam-templates-for-subject ,subject-as-symbol)))
 
 
