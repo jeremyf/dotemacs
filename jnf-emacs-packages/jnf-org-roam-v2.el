@@ -117,17 +117,27 @@ Each subject has a plist of :templates, :title, :name, and :path-to-agenda.
   (let ((path-to-agenda (plist-get (plist-get subjects-plist subject) :path-to-agenda)))
     (f-exists? path-to-agenda)))
 
+(defvar jnf/override-org-roam-template nil
+  "A singular template to override
+  `jnf/org-roam-templates-for-subject'.  When nil, there is no
+  override.  Otherwise it's a single named :symbol.")
+
 (cl-defun jnf/org-roam-templates-for-subject (subject
                                               &key
+					      (override jnf/override-org-roam-template)
                                               (subjects-plist jnf/org-roam-capture-subjects-plist)
                                               (template-definitions-plist jnf/org-roam-capture-templates-plist))
   "Return a list of `org-roam' templates for the given SUBJECT.
 
+If providing an OVERRIDE, use that regardless of others.
+
 Use the given (or default) SUBJECTS-PLIST to fetch from the
 given (or default) TEMPLATE-DEFINITIONS-PLIST."
-  (let ((templates (plist-get (plist-get subjects-plist subject) :templates)))
-    (-map (lambda (template) (plist-get template-definitions-plist template))
-          templates)))
+  (if override
+      (list (plist-get template-definitions-plist override))
+    (let ((templates (plist-get (plist-get subjects-plist subject) :templates)))
+      (-map (lambda (template) (plist-get template-definitions-plist template))
+            templates))))
 ;;******************************************************************************
 ;;
 ;;; END Template and Subject Definitions
@@ -247,7 +257,7 @@ Fetch the given SUBJECT from the given SUBJECTS-PLIST."
        (pretty-hydra-define+ jnf/org-subject-menu--all()
          (,menu_group
           (
-           (,hydra-kbd-prefix-agenda    ,agenda-fn-name    ,hydra-agenda-title)
+           (,hydra-kbd-prefix-agenda  ,agenda-fn-name    ,hydra-agenda-title)
            (,hydra-kbd-prefix-capture ,capture-fn-name " ├─ Capture…")
            (,hydra-kbd-prefix-insert  ,insert-fn-name  " ├─ Insert…")
            (,hydra-kbd-prefix-find    ,find-fn-name    " └─ Find…")
