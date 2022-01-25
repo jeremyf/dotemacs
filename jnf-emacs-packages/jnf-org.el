@@ -24,6 +24,7 @@
   ;;            :commit "73875939a8b5545ac53a86ec467239f510d14de8" ;; 9.5 stable
   ;;            )
   :straight (org :type built-in)
+  :hook (org-mode . turn-on-visual-line-mode)
   :config (setq
            org-directory (file-truename "~/git/org")
            org-agenda-files (jnf/org-agenda-files
