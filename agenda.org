@@ -4,11 +4,37 @@
 #+title: Emacs Config Agenda
 #+filetags: :personal:
 
-* TODO  Create setter for jnf/override-org-roam-template
+* DONE Create setter for jnf/override-org-roam-template
 
 Earlier <2022-01-22 Sat> I added the ~jnf/override-org-roam-template~ variable.
 Now I need a way to set and unset that.  I’m imaginging the =$= key with a
 completing read.  When the value is ~:all~ set ~jnf/override-org-roam-template~
 to ~nil~.
 
-The reason for this is that I have subjects and templates.  A subject has many templates.  Each template applies one or more tags.
+The reason for this is that I have subjects and templates.  A subject has many
+templates.  Each template applies one or more tags.
+
+* TODO Create a more dynamic filter function
+
+As of <2022-01-23 Sun> I’m relying on a subject based filter.  This naive
+approach can work by convention.
+
+What I would like is a filter function that uses the subject’s templates’s tags
+as the list.  If the candidate matches one or more of the tags, keep the
+candidate.  Otherwise discard.
+
+* TODO Create Burning Wheel Helper Functions
+
+Thinking through the various “modes” of work:
+
+- Writing blog posts.
+- Running/playing a session of Burning Wheel or other RPGs.
+- Writing session notes.
+
+This means I need to think about how I take notes for a session.
+
+I want to explore transient menus, to see about adjusting the menus on a per-mode basis.
+
+- [ ] Create a minor mode for Burning Wheel.
+- [ ] Bind ~C-c m~ to the menu for the minor mode; note global-key for ~C-c m~ is ~consult-mode-command~
+- [ ] Create a menu for the quick help of Burning Wheel; generalize to RPGs?
