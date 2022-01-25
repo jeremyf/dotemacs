@@ -109,6 +109,7 @@
 (load "jnf-forem.el" nil jnf-silence-loading-log)
 (load "jnf-titlecase.el" nil jnf-silence-loading-log)
 (load "jnf-blogging.el" nil jnf-silence-loading-log)
+(load "jnf-help.el" nil jnf-silence-loading-log)
 
 
 (diminish 'eldoc-mode)

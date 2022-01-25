@@ -99,35 +99,6 @@ Version 2016-07-18"
   :straight t)
 
 
-(defmacro quick-help (name buffer text)
-  "Macro for creating callable functions that display help.
-Where NAME is name of function, BUFFER is name of buffer, and TEXT is displayed."
-  (declare (indent defun))
-  `(progn
-     (defun ,name nil
-       ,buffer
-       (interactive)
-       (let ((qh-buff (concat "*Quick Help: " ,buffer "*"))
-             (qh-text ,text))
-         (get-buffer-create qh-buff)
-         (with-current-buffer qh-buff
-           (insert qh-text)
-           (goto-char (point-min))
-           (not-modified)
-           (read-only-mode)
-           (special-mode)
-           (local-set-key (kbd "C-g") (lambda () (interactive) (other-window -1)))
-           (local-set-key (kbd "q") 'kill-buffer-and-window))
-         (pop-to-buffer qh-buff '((display-buffer-below-selected)
-                                  (window-parameters . ((no-other-window . nil)))
-                                  (window-height . fit-window-to-buffer)))
-         (message "C-g - Previous Window, q - Remove Window")))))
-
-(quick-help qh--it-hotline
-  "IT Hotline"
-  "IT HOTLINE: 855-555-5555")
-
-
 (defun kf-display-command-output (command)
   "Display output of COMMAND."
   (interactive "sCommand: ")
