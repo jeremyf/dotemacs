@@ -20,9 +20,10 @@
 
 (defvar jnf/org-roam-capture-templates-plist
   (list
+   :clear (list :name "clear")
    :eberron
    (list
-    :name "Eberron"
+    :name "eberron"
     :tags '("rpg" "eberron")
     :template
     '("e" "Eberron" plain "%?"
@@ -31,9 +32,20 @@
        "rpgs/%<%Y%m%d>---${slug}.org"
        "#+title: ${title}\n#+FILETAGS: :rpg:eberron:\n\n")
       :unnarrowed t))
+   :mistimed-scroll
+   (list
+    :name "mistimed-scroll"
+    :tags '("rpg" "eberron" "burning-wheel" "mistimed-scroll")
+    :template
+    '("m" "Mistimed Scroll" plain "%?"
+      :target
+      (file+head
+       "rpgs/%<%Y%m%d>---${slug}.org"
+       "#+title: ${title}\n#+FILETAGS: :rpg:eberron:burning-wheel:mistimed-scroll:\n\n")
+      :unnarrowed t))
    :forem
    (list
-    :name "Forem"
+    :name "forem"
     :tags '("forem" "eberron")
     :template
     '("f" "Forem" plain "%?"
@@ -44,7 +56,7 @@
       :unnarrowed t))
    :jf-consulting
    (list
-    :name "JF Consulting"
+    :name "jf-consulting"
     :tags '("personal" "jeremy-friesen-consulting")
     :template
     '("j" "JF Consulting" plain "%?"
@@ -55,7 +67,7 @@
       :unnarrowed t))
    :personal
    (list
-    :name "Personal"
+    :name "personal"
     :tags '("personal")
     :template
     '("p" "Personal" plain "%?"
@@ -66,7 +78,7 @@
       :unnarrowed t))
    :thel-sector
    (list
-    :name "Thel Sector"
+    :name "thel-sector"
     :tags '("rpg" "swn" "thel-sector")
     :template
     '("t" "Thel Sector" plain "%?"
@@ -76,7 +88,14 @@
        "#+title: ${title}\n#+FILETAGS: :rpg:swn:thel-sector: %^G\n\n")
       :unnarrowed t))
    )
-  "A plist defining my `org-roam' capture templates.")
+  "A plist defining my `org-roam' capture templates.
+
+Each template has a plist of :name, :tags, and :template.
+
+- :template defines the `org-roam' capture template.
+- :tags a list of tags for this template.
+- :name is the string version of the containing plist
+    keyword.  (e.g. :eberron is the keyword and \"eberron\" is the name).")
 
 (defvar jnf/org-roam-capture-subjects-plist
   (list
@@ -91,7 +110,7 @@
               :title "Personal"
               :path-to-agenda "~/git/org/personal/agenda.org")
    :rpg (list
-         :templates (list :thel-sector :eberron)
+         :templates (list :thel-sector :eberron :mistimed-scroll)
          :name "rpg"
          :title "RPG"
          :path-to-agenda "~/git/org/rpgs/agenda.org")
@@ -137,14 +156,22 @@ Each subject has a plist of :templates, :title, :name, and :path-to-agenda.
   (let ((path-to-agenda (plist-get (plist-get subjects-plist subject) :path-to-agenda)))
     (f-exists? path-to-agenda)))
 
-(defvar jnf/override-org-roam-template nil
+(defvar jnf/override-org-roam-template-name nil
   "A singular template to override
   `jnf/org-roam-templates-for-subject'.  When nil, there is no
   override.  Otherwise it's a single named :symbol.")
 
+(defun jnf/override-org-roam-template (template)
+  (interactive (list
+                (completing-read
+                 "Template: " (jnf/template-list-for-completing-read))))
+  (setq jnf/override-org-roam-template-name (if (string-equal template "clear")
+						nil
+					      (intern (concat ":" template)))))
+
 (cl-defun jnf/org-roam-templates-for-subject (subject
                                               &key
-					      (override jnf/override-org-roam-template)
+					      (override jnf/override-org-roam-template-name)
                                               (subjects-plist jnf/org-roam-capture-subjects-plist)
                                               (template-definitions-plist jnf/org-roam-capture-templates-plist))
   "Return a list of `org-roam' templates for the given SUBJECT.
@@ -154,7 +181,7 @@ If providing an OVERRIDE, use that regardless of others.
 Use the given (or default) SUBJECTS-PLIST to fetch from the
 given (or default) TEMPLATE-DEFINITIONS-PLIST."
   (if override
-      (list (plist-get template-definitions-plist override))
+      (list (plist-get (plist-get template-definitions-plist override) :template))
     (let ((templates (plist-get (plist-get subjects-plist subject) :templates)))
       (-map (lambda (template) (plist-get (plist-get template-definitions-plist template) :template))
             templates))))
@@ -274,8 +301,11 @@ Fetch the given SUBJECT from the given SUBJECTS-PLIST."
            ("+" ,capture-fn-name     " ├─ Capture…")
            ("!" ,insert-fn-name      " ├─ Insert…")
            ("?" ,find-fn-name        " └─ Find…")
-           (";" org-roam-buffer-toggle            "Toggle Buffer")
+           ("/" org-roam-buffer-toggle            "Toggle Buffer")
+	   ("$" jnf/override-org-roam-template "Override Template Name…")
            ("#" jnf/toggle-roam-subject-filter    "Toggle Filter…")
+	   ("1" org-transclusion-add "Org Transclusion Add…")
+	   ("2" org-transclusion-mode "Org Transclusion Mode" :toggle t)
            )))
 
        ;; Append the following menu items to the `jnf/org-subject-menu--all'
@@ -319,11 +349,12 @@ Fetch the given SUBJECT from the given SUBJECTS-PLIST."
   ("All"
    (
     ("/" org-roam-buffer-toggle         "Toggle Buffer")
-    ("#" jnf/toggle-roam-subject-filter "Toggle Default Filter")
+    ("#" jnf/toggle-roam-subject-filter "Toggle Default Filter…")
+    ("$" jnf/override-org-roam-template "Override Template Name…")
     ("~" jnf/magit-list-repositories    "Magit List Repositories")
-    ("1" (find-file (f-join jnf/tor-home-directory "agenda.org")) "Agenda for TakeOnRules.com")
-    ("2" org-transclusion-add "Org Transclusion Add…")
-    ("3" org-transclusion-mode "Org Transclusion Mode" :toggle t)
+    ("1" org-transclusion-add "Org Transclusion Add…")
+    ("2" org-transclusion-mode "Org Transclusion Mode" :toggle t)
+    ("`" (find-file (f-join jnf/tor-home-directory "agenda.org")) "Agenda for TakeOnRules.com")
     )))
 ;;******************************************************************************
 ;;
@@ -350,11 +381,25 @@ The form should be '((\"all\" 1) (\"hesburgh-libraries\" 2))."
                                    (list (plist-get subject :name) index))))
                              subjects-plist)))
 
+(cl-defun jnf/template-list-for-completing-read (&key
+                                                 (templates-plist
+						  jnf/org-roam-capture-templates-plist))
+  "Create a list from the TEMPLATES-PLIST for completing read.
+
+The form should be '((\"all\" 1) (\"hesburgh-libraries\" 2))."
+  ;; Skipping the even entries as those are the "keys" for the plist,
+  ;; the odds are the values.
+  (-non-nil (seq-map-indexed (lambda (template index)
+                               (when (oddp index)
+                                 (list (plist-get template :name) index)))
+                             templates-plist)))
+
 (defun jnf/toggle-roam-subject-filter (subject)
   "Prompt for a SUBJECT, then toggle the 's-i' kbd to filter for that subject."
   (interactive (list
                 (completing-read
                  "Subject: " (jnf/subject-list-for-completing-read))))
+  (jnf/override-org-roam-template "clear")
   (global-set-key
    (kbd "C-s-2")
    (intern (concat "jnf/find-file--" subject "--agenda")))
