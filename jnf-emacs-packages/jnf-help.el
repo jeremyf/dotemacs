@@ -22,12 +22,12 @@ Where NAME is name of function, BUFFER is name of buffer, and TEXT is displayed.
            (not-modified)
            (read-only-mode)
            (special-mode)
-           (local-set-key (kbd "C-g") (lambda () (interactive) (other-window -1)))
+           ;; (local-set-key (kbd "C-g") (lambda () (interactive) (other-window -1)))
            (local-set-key (kbd "q") 'kill-buffer-and-window))
          (pop-to-buffer qh-buff '((display-buffer-below-selected)
                                   (window-parameters . ((no-other-window . nil)))
                                   (window-height . fit-window-to-buffer)))
-         (message "C-g - Previous Window, q - Remove Window")))))
+         (message "q - Remove Window")))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
