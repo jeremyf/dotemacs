@@ -1,6 +1,6 @@
 ;;; Commentary:
 ;;
-;; This file provides a macro for generating quick-help.
+;; This file provides both a macro for generating quick-help and help buffers.
 ;;
 ;;; Code:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -28,6 +28,12 @@ Where NAME is name of function, BUFFER is name of buffer, and TEXT is displayed.
                                   (window-parameters . ((no-other-window . nil)))
                                   (window-height . fit-window-to-buffer)))
          (message "C-g - Previous Window, q - Remove Window")))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;; BEGIN Burning Wheel Gold Tables
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (quick-help jnf/qh--bwg-wises
   "BWG Wises Obstacles (page 309)"
@@ -112,3 +118,9 @@ Where NAME is name of function, BUFFER is name of buffer, and TEXT is displayed.
    "  Volcanic eruptions, cataclysm .............. +4 Ob\n"
    "  Seeing horrible magic at work .............. +4 Ob\n"
    "  Being in the presence of the supernatural .. +5 Ob\n"))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;; END Burning Wheel Gold Tables
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
