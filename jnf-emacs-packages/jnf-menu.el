@@ -104,5 +104,4 @@ Add hook to each HOOKS provided."
   `[,@(minor-modes-menu-items)
     ,@(burning-wheel-gold-menu-items)])
 
-
 (global-set-key (kbd "C-c m") 'jnf/menu-dwim)

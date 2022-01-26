@@ -34,7 +34,6 @@ Where NAME is name of function, BUFFER is name of buffer, and TEXT is displayed.
 ;;; BEGIN Burning Wheel Gold Tables
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 (quick-help jnf/qh--bwg-wises
   "BWG Wises Obstacles (page 309)"
   (concat

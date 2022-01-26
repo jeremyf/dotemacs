@@ -197,5 +197,19 @@ With two prefix args, insert an x'ed checkbox."
   (kill-region))
 ;; (kill-region)
 
+
+(defun in-range (n min max)
+  (memq n (number-sequence min max)))
+
+(defun d20-ability-modifier (n)
+  (cond
+   ((in-range n 2 3) -4)
+   ((in-range n 4 5) -3)
+   ((in-range n 6 7) -2)
+   ((in-range n 8 9) -1)))
+
+(message "%s" (jnf/lookup 3 table/swn/ability-modifier))
+
+
 ;; Macro to kill a markdown link
 ;; {M-x search-backward RET [ C-d RET C-SPC M-x search-forward RET ] RET M-x search-forward RET ) RET  S-<delete>}
