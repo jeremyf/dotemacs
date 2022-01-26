@@ -12,24 +12,24 @@
 ;;  option is for other "files" to know about the menu structure.
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(cl-defmacro rpg-minor-mode (&key title abbr)
+(cl-defmacro rpg-minor-mode (&key title abbr hooks)
   "A macro to declare an RPG minor mode.
 
 Use TITLE to derive the mode-name and docstring.
-Use ABBR to derive the lighter."
+Use ABBR to derive the lighter.
+Add hook to each HOOKS provided."
   (let ((mode-name (intern (s-dashed-words (s-downcase (concat "rpg-" title "-minor-mode")))))
 	(lighter (concat "_" abbr "_"))
 	(docstring (concat "Minor mode for " title " RPG.")))
-    `(define-minor-mode ,mode-name
+    `(progn
+       (define-minor-mode ,mode-name
 	 ,docstring
 	 :global nil
-	 :lighter ,lighter)))
+	 :lighter ,lighter)
+       (when ,hooks
+	 (-each ,hooks (lambda(hook) (add-hook hook (lambda () (,mode-name)))))))))
 
-(rpg-minor-mode :title "Burning Wheel Gold" :abbr "bwg")
-(add-hook 'markdown-mode-hook
-          (lambda () (rpg-burning-wheel-gold-minor-mode)))
-(add-hook 'org-mode-hook
-          (lambda () (rpg-burning-wheel-gold-minor-mode)))
+(rpg-minor-mode :title "Burning Wheel Gold" :abbr "bwg" :hooks (list 'org-mode-hook 'markdown-mode-hook))
 (rpg-minor-mode :title "Stars without Number" :abbr "swn")
 (rpg-minor-mode :title "Worlds without Number" :abbr "wwn")
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
