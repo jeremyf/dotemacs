@@ -61,11 +61,6 @@
   :straight t
   :hook (prog-mode . origami-mode))
 
-;; An excellent reference package for creating contextual menus.
-(use-package transient-dwim
-  :straight t
-  :bind ("M-=" . transient-dwim-dispatch))
-
 ;; Using Hippie expand, I toggle through words already referenced.
 (use-package hippie-exp
   :straight t

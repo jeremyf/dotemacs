@@ -10,83 +10,10 @@
 
 ;; https://github.com/jrblevin/markdown-mode/
 (use-package markdown-mode
-  :straight t
-  ;; I use markdown for my blogging platform and very little else.
-  ;; Hence, I have this keybind.
-  :bind (:map markdown-mode-map (("C-c t" . jnf/tor-subject-menu-markdown/body)
-                                 ("C-M-s-t" . jnf/tor-subject-menu-markdown/body))))
+  :straight t)
 
 (use-package decide
   :straight (decide :host github :type git :repo "jeremyf/decide-mode"))
-
-;;******************************************************************************
-;;
-;;; BEGIN Menu Declarations
-;;
-;;******************************************************************************
-
-;; These menu commands, plus some yasnippets, are some useful
-;; functions for helping my blogging effort.
-(defvar jnf/tor-menu--title
-  (with-faicon "pencil-square" "Take on Rules" 1 -0.05)
-  "The TakeOnRules.com Subject Menu Title.")
-(pretty-hydra-define jnf/tor-subject-menu-markdown (:foreign-keys warn :title jnf/tor-menu--title :quit-key "q" :exit t)
-  ("Wrapping"
-   (("w a" jnf/tor-wrap-link-active-region-dwim "[A] link at point or region…")
-    ("w c" jnf/tor-wrap-cite-active-region-dwim "[C]ite point or region…")
-    ("w d" jnf/tor-wrap-date "[D]ate point or region…")
-    ("w f" jnf/tor-wrap-as-pseudo-dfn "Wrap word or region in pseudo-d[f]n…")
-    ("w m" jnf/tor-wrap-as-marginnote-dwim "[M]argin-note line or region…")
-    ("w p" jnf/tor-wrap-in-poem "Wrap point or region as [P]oem…")
-    ("w s" jnf/tor-wrap-as-sidenote-dwim "[S]ide-note sentence or region…")
-    ("w w" jnf/tor-wrap-in-html-tag "[W]rap point or region in html…"))
-   "Posts"
-   (("p r" jnf/tor-retitle-post "[R]e-title post…")
-    ("p t" jnf/tor-tag-post "[T]ag post…" :exit nil)
-    ("p v" jnf/tor-view-blog-post "[V]iew post…")
-    ("k h" jnf/kill-new-markdown-heading-as-slug "Kill slug version of given [h]eading…"))
-   "Utilities"
-   (("c a" jnf/tor-post-amplifying-the-blogosphere "Create [a]mplify the blogosphere…")
-    ("c e" jnf/tor-insert-epigraph-entry "Create [e]pigraph entry…")
-    ("c g" jnf/tor-find-glossary-and-insert-entry "Create [g]lossary entry…")
-    ("c c" jnf/tor-find-changelog-and-insert-entry "Create [c]hange log entry…")
-    ("c p" jnf/tor-create-post "Create [p]ost…")
-    ("c s" jnf/tor-find-series-and-insert-entry "Create [s]eries…")
-    ("? d" jnf/tor-find-file-draft "Find blog in [d]raft status…")
-    ("? u" jnf/tor-find-hugo-file-by-url "Find blog by [u]rl…")
-    ("? f" jnf/tor-find-file "Find blog by [f]ilename…")
-    ("t d" decide-mode "Toggle [d]ecide Mode" :toggle t)
-    ("t h" (jnf/tor-toggle-hugo-server :buffer-name "*Hugo Server*") "Toggle [h]ugo server" :toggle (get-buffer "*Hugo Server*"))
-    ("t t" typopunct-mode "Toggle [t]ypopunct mode" :toggle t)
-    ("t v" variable-pitch-mode "Toggle [v]ariable pitch mode"))))
-
-;; The `C-c t' key combo is engrained for my TakeOnRules incantations;
-;; there's a markdown menu but if I'm not in markdown, it likely means
-;; I'm not in Take on Rules pages.
-(global-set-key (kbd "C-M-s-t") 'jnf/tor-subject-menu-default/body)
-(global-set-key (kbd "C-c t") 'jnf/tor-subject-menu-default/body)
-
-(pretty-hydra-define jnf/tor-subject-menu-default (:foreign-keys warn :title jnf/tor-menu--title :quit-key "q" :exit t)
-  ("Utilities"
-   (("c a" jnf/tor-post-amplifying-the-blogosphere "Create [a]mplify the blogosphere…")
-    ("c e" jnf/tor-insert-epigraph-entry "Create [e]pigraph entry…")
-    ("c g" jnf/tor-find-glossary-and-insert-entry "Create [g]lossary entry…")
-    ("c c" jnf/tor-find-changelog-and-insert-entry "Create [c]hange log entry…")
-    ("c p" jnf/tor-create-post "Create [p]ost…")
-    ("c s" jnf/tor-find-series-and-insert-entry "Create [s]eries…")
-    ("? d" jnf/tor-find-file-draft "Find blog in [d]raft status…")
-    ("? u" jnf/tor-find-hugo-file-by-url "Find blog by [u]rl…")
-    ("? f" jnf/tor-find-file "Find blog by [f]ilename…")
-    ("t d" decide-mode "Toggle [d]ecide Mode" :toggle t)
-    ("t h" (jnf/tor-toggle-hugo-server :buffer-name "*Hugo Server*") "Toggle [h]ugo server" :toggle (get-buffer "*Hugo Server*"))
-    ("t t" typopunct-mode "Toggle [t]ypopunct mode" :toggle t)
-    ("t v" variable-pitch-mode "Toggle [v]ariable pitch mode"))))
-
-;;******************************************************************************
-;;
-;;; END Menu Declarations
-;;
-;;******************************************************************************
 
 ;;******************************************************************************
 ;;
