@@ -23,7 +23,7 @@ What I would like is a filter function that uses the subject’s templates’s t
 as the list.  If the candidate matches one or more of the tags, keep the
 candidate.  Otherwise discard.
 
-* TODO Create Burning Wheel Helper Functions
+* DONE Create Burning Wheel Helper Functions
 
 Thinking through the various “modes” of work:
 
