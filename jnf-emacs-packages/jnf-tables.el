@@ -8,15 +8,14 @@ The inner list has 3 elements:
 - result")
 
 (defun jnf/table-print--format-row (row)
-  (let ((first (car row))
+  (let* ((first (car row))
 	(second (cadr row))
-	(third (caddr row)))
-    (if (equal first second)
-	(format "| %s | %s |" first third)
-      (format "| %s–%s | %s |" first second third))))
+	(row-value (caddr row))
+	(row-header (if (equal first second) (format "%s" first) (format  "%s–%s" first second))))
+    (format "| %-7s | %28s |" row-header row-value)))
 
-(cl-defun jnf/table-print (&key name (registry jnf/table-registry))
-  "Print
+(cl-defun jnf/table-to-string (&key name (registry jnf/table-registry))
+  "Convert the table with NAME to a string.
 
 The goal is to inject this into the `quick-help' text "
   (let* ((container (plist-get registry name))
@@ -24,9 +23,10 @@ The goal is to inject this into the `quick-help' text "
 	 (label (plist-get container :label))
 	 (dice (plist-get container :dice))
 	 (table (plist-get container :table)))
-    (message "%s"
-	     (concat caption "\n\n" "| " dice " | " label " |\n|---+---|\n"
-		     (mapconcat 'jnf/table-print--format-row table "\n")))))
+    (concat caption "\n\n"
+	    (format "| %-7s | %28s |" dice label )
+	    "\n|---------+------------------------------|\n"
+	    (mapconcat 'jnf/table-print--format-row table "\n"))))
 
 (cl-defun jnf/table-register (&key name table label dice caption)
   "Add the TABLE with NAME to registry with CAPTION, DICE and LABEL."
@@ -34,15 +34,15 @@ The goal is to inject this into the `quick-help' text "
 	(plist-put jnf/table-registry name
 		   (list :caption caption :dice dice :label label :table table))))
 
-(cl-defun jnf/table-lookup (integer &key table (registry jnf/table-registry))
-  "Lookup INTEGER in TABLE.
+(cl-defun jnf/table-lookup (integer &key name (registry jnf/table-registry))
+  "Lookup INTEGER in table with NAME.
 
 Return the result of the first match."
   (caddr
    (seq-find
     (lambda (x)
       (memq integer (number-sequence (car x) (cadr x))))
-    (if (listp table) table (plist-get (plist-get registry table) :table)))))
+    (if (listp name) name (plist-get (plist-get registry name) :table)))))
 
 (jnf/table-register :name 'swn-ability-modifier
 		    :caption "SWN Ability Modifier"
@@ -72,6 +72,7 @@ Return the result of the first match."
 			     (5 5 "Inviting")
 			     (6 6 "Defiant")))
 
-(message "%s" (jnf/table-lookup 3 :table 'swn-ability-modifier))
-(message "%s" (jnf/table-lookup 3 :table 'wartime-village-physical-condition))
-(jnf/table-print :name 'swn-ability-modifier)
+(message "%s" (jnf/table-lookup 3 :name 'swn-ability-modifier))
+(message "%s" (jnf/table-lookup 3 :name 'wartime-village-physical-condition))
+(message "%s" (jnf/table-to-string :name 'wartime-village-physical-condition))
+(message "%s" (jnf/table-to-string :name 'swn-ability-modifier))

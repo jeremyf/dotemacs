@@ -16,10 +16,10 @@
 (cl-defmacro minor-mode-maker (&key title abbr hooks)
   "A macro to declare a minor mode.
 
-Use TITLE to derive the mode-name and docstring.
-Use ABBR to derive the lighter.
+Use TITLE to derive the docstring.
+Use ABBR to derive the mode-name lighter.
 Add hook to each HOOKS provided."
-  (let ((mode-name (intern (s-dashed-words (s-downcase (concat title "-minor-mode")))))
+  (let ((mode-name (intern (s-dashed-words (s-downcase (concat "jnf-" abbr "-minor-mode")))))
 	(lighter (concat " " abbr))
 	(docstring (concat "Minor mode for " title " .")))
     `(progn
@@ -36,7 +36,7 @@ Add hook to each HOOKS provided."
   "Return a `transient' compliant list for BWG items."
   (list
    ["BWG References"
-    :if-non-nil burning-wheel-gold-minor-mode
+    :if-non-nil jnf-bwg-minor-mode
     ("b c" "Circles" jnf/qh--bwg-circles-obstacles)
     ("b d" "Difficulty (Absolute)" jnf/qh--bwg-absolute-difficulty)
     ("b e" "Exponent" jnf/qh--bwg-expertise-exponent)
@@ -51,11 +51,12 @@ Add hook to each HOOKS provided."
   "Return a `transient' compliant list for minor modes."
   (list
   ["Modes"
-    ("-b" "Burning Wheel mode" burning-wheel-gold-minor-mode)
-    ("-s" "Stars without Number mode" stars-without-number-minor-mode)
-    ("-t" "Take on Rules mode" take-on-rules-minor-mode)
+    ("-b" "Burning Wheel mode" jnf-bwg-minor-mode)
+    ;; ("-s" "Stars without Number mode" jnf-swn-minor-mode)
+    ("-t" "Take on Rules mode" jnf-tor-minor-mode)
     ("-T" "Typopunct mode" typopunct-mode)
-    ("-w" "Worlds without Number mode" worlds-without-number-minor-mode)]))
+    ;; ("-w" "Worlds without Number mode" jnf-wwn-minor-mode)
+    ]))
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;;; END minor mode definitions
@@ -79,7 +80,7 @@ Add hook to each HOOKS provided."
     ("w w" "[W]rap point or region in html…" jnf/tor-wrap-in-html-tag)
     ]
    ["Posts"
-    :if-non-nil take-on-rules-minor-mode
+    :if-non-nil jnf-bwg-minor-mode
     ("p r" "[R]e-title post…" jnf/tor-retitle-post)
     ("p t" "[T]ag post…" jnf/tor-tag-post :transient t)
     ("p v" "[V]iew post…" jnf/tor-view-blog-post)
