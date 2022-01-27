@@ -18,12 +18,12 @@
         eglot-autoshutdown t)
   (add-to-list 'eglot-server-programs '(enh-ruby-mode . ("solargraph" "socket" "--port" :autoport))))
 
-(use-package solargraph
-  :straight (solargraph :host github :repo "guskovd/emacs-solargraph")
-  :config (setq lsp-solargraph-use-bundler 1)
-  :bind
-  (:map enh-ruby-mode-map ("M-i" . solargraph:complete))
-  (:map ruby-mode-map ("M-i" . solargraph:complete)))
+;; (use-package solargraph
+;;   :straight (solargraph :host github :repo "guskovd/emacs-solargraph")
+;;   :config (setq lsp-solargraph-use-bundler 1)
+;;   :bind
+;;   (:map enh-ruby-mode-map ("M-i" . solargraph:complete))
+;;   (:map ruby-mode-map ("M-i" . solargraph:complete)))
 
 (provide 'jnf-eglot.el)
 ;;; jnf-eglot.el ends here
