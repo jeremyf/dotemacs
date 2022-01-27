@@ -7,10 +7,6 @@
 ;;; Code:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(define-key
-  hammerspoon-edit-minor-map
-  (kbd "C-c t")
-  #'jnf/forem-tidy-pull-request)
 
 (defun jnf/forem-tidy-pull-request ()
   "Perform some quick tidying of the Forem PR template."

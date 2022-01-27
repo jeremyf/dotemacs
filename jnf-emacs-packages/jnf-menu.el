@@ -52,6 +52,7 @@ Add hook to each HOOKS provided."
   (list
   ["Modes"
     ("-b" "Burning Wheel mode" jnf-bwg-minor-mode)
+    ("-h" "Hammerspoon mode" hammerspoon-edit-minor-mode)
     ;; ("-s" "Stars without Number mode" jnf-swn-minor-mode)
     ("-t" "Take on Rules mode" jnf-tor-minor-mode)
     ("-T" "Typopunct mode" typopunct-mode)
@@ -95,6 +96,8 @@ Add hook to each HOOKS provided."
     ("? d" "Find blog in [d]raft status…" jnf/tor-find-file-draft)
     ("? u" "Find blog by [u]rl…" jnf/tor-find-hugo-file-by-url)
     ("? f" "Find blog by [f]ilename…" jnf/tor-find-file)
+    ("t h m" "Toggle hammerspoon editor mode" hammerspoon-toggle-mode :if-non-nil hammerspoon-edit-minor-mode)
+    ("t p" "Tidy pull request" jnf/forem-tidy-pull-request :if-non-nil hammerspoon-edit-minor-mode)
     ]])
 
 (transient-append-suffix 'jnf/menu-dwim (list 0)
