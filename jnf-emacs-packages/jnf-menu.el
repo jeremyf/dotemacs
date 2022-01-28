@@ -31,8 +31,8 @@ Add hook to each HOOKS provided."
 	 (-each ,hooks (lambda(hook) (add-hook hook (lambda () (,mode-name)))))))))
 
 (minor-mode-maker :title "Burning Wheel Gold" :abbr "bwg" :hooks (list 'org-mode-hook 'markdown-mode-hook))
-(minor-mode-maker :title "Stars without Number" :abbr "swn")
-(minor-mode-maker :title "Worlds without Number" :abbr "wwn")
+;; (minor-mode-maker :title "Stars without Number" :abbr "swn")
+;; (minor-mode-maker :title "Worlds without Number" :abbr "wwn")
 (minor-mode-maker :title "Take on Rules" :abbr "tor")
 
 (transient-define-prefix jnf/menu-dwim--bwg-help ()
@@ -89,24 +89,23 @@ Add hook to each HOOKS provided."
     ("w s" "Side-note sentence or region…" jnf/tor-wrap-as-sidenote-dwim  :if-derived (or markdown-mode html-mode))
     ("w w" "Wrap point or region in html…" jnf/tor-wrap-in-html-tag  :if-derived (or markdown-mode html-mode))
     ]
-   ["Posts"
+   ["Take on Rules > Posts"
     :if-non-nil jnf-tor-minor-mode
     ("p r" "Re-title post…" jnf/tor-retitle-post)
     ("p t" "Tag post…" jnf/tor-tag-post :transient t)
     ("p v" "View post…" jnf/tor-view-blog-post)
     ]
-
-   ["Sub-Menus"
+   ["Contexts"
     ("? b" "Burning Wheel…"  jnf/menu-dwim--bwg-help)
     ("? t" "TakeOnRules Find…" jnf/menu-dwim--tor-find-files)
     ("c t" "TakeOnRules Create…" jnf/menu-dwim--tor-create)
-    ("? h" "Hammerspoon…" jnf/menu-dwim--hammerspoon :if-non-nil hammerspoon-edit-minor-mode)
-    ""
-    "Modes"
-    ("-m" "Markdown ( )" markdown-mode :if-not-derived markdown-mode)
-    ("-m" "Markdown (*)" markdown-mode :if-derived markdown-mode)
+    ("? h" "Hammerspoon…" jnf/menu-dwim--hammerspoon :if-non-nil hammerspoon-edit-minor-mode)]
+   ["Modes"
+    ;; I could write functions for these, but this is concise enough
     ("-t" "Typopunct ( )" typopunct-mode :if-nil typopunct-mode)
     ("-t" "Typopunct (*)" typopunct-mode :if-non-nil typopunct-mode)
+    ("-o" "MacOS Native Option ( )" jnf/toggle-osx-alternate-modifier :if-non-nil ns-alternate-modifier)
+    ("-o" "MacOS Native Option (*)" jnf/toggle-osx-alternate-modifier :if-nil ns-alternate-modifier)
     ]])
 
 ;; (transient-insert-suffix 'org-menu (list 0)
