@@ -32,15 +32,16 @@ Add hook to each HOOKS provided."
 
 (minor-mode-maker :title "Burning Wheel Gold" :abbr "bwg" :hooks (list 'org-mode-hook 'markdown-mode-hook))
 
-(defun rpg-menu-items ()
+(defun bwg-menu-items ()
   "Return a `transient' compliant list for BWG items."
   (list
-   ["Game References"
-    ("b c" "Circles" jnf/qh--bwg-circles-obstacles :if-non-nil jnf-bwg-minor-mode)
-    ("b d" "Difficulty (Absolute)" jnf/qh--bwg-absolute-difficulty :if-non-nil jnf-bwg-minor-mode)
-    ("b e" "Exponent" jnf/qh--bwg-expertise-exponent :if-non-nil jnf-bwg-minor-mode)
-    ("b s" "Steel" jnf/qh--bwg-steel-test-adjustments :if-non-nil jnf-bwg-minor-mode)
-    ("b w" "Wises" jnf/qh--bwg-wises :if-non-nil jnf-bwg-minor-mode)]))
+   ["Burning Wheel"
+     :if-non-nil jnf-bwg-minor-mode
+    ("b c" "Circles" jnf/qh--bwg-circles-obstacles)
+    ("b d" "Difficulty (Absolute)" jnf/qh--bwg-absolute-difficulty)
+    ("b e" "Exponent" jnf/qh--bwg-expertise-exponent)
+    ("b s" "Steel" jnf/qh--bwg-steel-test-adjustments)
+    ("b w" "Wises" jnf/qh--bwg-wises)]))
 
 (minor-mode-maker :title "Stars without Number" :abbr "swn")
 (minor-mode-maker :title "Worlds without Number" :abbr "wwn")
@@ -100,10 +101,10 @@ Add hook to each HOOKS provided."
 
 (transient-append-suffix 'jnf/menu-dwim (list 0)
   `[,@(minor-modes-menu-items)
-    ,@(rpg-menu-items)])
+    ,@(bwg-menu-items)])
 
 (transient-insert-suffix 'org-menu (list 0)
   `[,@(minor-modes-menu-items)
-    ,@(rpg-menu-items)])
+    ,@(bwg-menu-items)])
 
 (global-set-key (kbd "C-c m") 'jnf/menu-dwim)

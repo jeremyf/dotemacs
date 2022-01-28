@@ -7,7 +7,7 @@ The inner list has 3 elements:
 - ending of range
 - result")
 
-(defun jnf/table-print--format-row (row)
+(defun jnf/table-to-string--format-row (row)
   (let* ((first (car row))
 	(second (cadr row))
 	(row-value (caddr row))
@@ -26,7 +26,7 @@ The goal is to inject this into the `quick-help' text "
     (concat caption "\n\n"
 	    (format "| %-7s | %28s |" dice label )
 	    "\n|---------+------------------------------|\n"
-	    (mapconcat 'jnf/table-print--format-row table "\n"))))
+	    (mapconcat 'jnf/table-to-string--format-row table "\n"))))
 
 (cl-defun jnf/table-register (&key name table label dice caption)
   "Add the TABLE with NAME to registry with CAPTION, DICE and LABEL."
