@@ -37,7 +37,7 @@ Where NAME is name of function, BUFFER is name of buffer, and TEXT is displayed.
   `(progn
      (transient-define-suffix ,name nil
        ,buffer
-       :if-non-nil ,mode
+       ;; :if-non-nil ,mode
        :description ,label
        (interactive)
        (let ((qh-buff (concat "*Quick Help: " ,buffer "*"))
