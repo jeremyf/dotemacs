@@ -29,13 +29,43 @@ Where NAME is name of function, BUFFER is name of buffer, and TEXT is displayed.
                                   (window-height . fit-window-to-buffer)))
          (message "q - Remove Window")))))
 
+
+(cl-defmacro transient-quick-help (name buffer &key label body mode)
+  "Macro for creating callable functions that display help.
+Where NAME is name of function, BUFFER is name of buffer, and TEXT is displayed."
+  (declare (indent defun))
+  `(progn
+     (transient-define-suffix ,name nil
+       ,buffer
+       :if-non-nil ,mode
+       :description ,label
+       (interactive)
+       (let ((qh-buff (concat "*Quick Help: " ,buffer "*"))
+             (qh-text ,body))
+         (get-buffer-create qh-buff)
+         (with-current-buffer qh-buff
+           (insert qh-text)
+           (goto-char (point-min))
+           (not-modified)
+           (read-only-mode)
+           (special-mode)
+           ;; (local-set-key (kbd "C-g") (lambda () (interactive) (other-window -1)))
+           (local-set-key (kbd "q") 'kill-buffer-and-window))
+         (pop-to-buffer qh-buff '((display-buffer-below-selected)
+                                  (window-parameters . ((no-other-window . nil)))
+                                  (window-height . fit-window-to-buffer)))
+         (message "q - Remove Window")))))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;;; BEGIN Burning Wheel Gold Tables
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(quick-help jnf/qh--bwg-wises
+(transient-quick-help jnf/qh--bwg-wises
   "BWG Wises Obstacles (page 309)"
+  :label "Wises"
+  :mode 'jnf-bwg-minor-mode
+  :body
   (concat
    "Common knowledge ............. Ob 1\n"
    "An interesting fact .......... Ob 2\n"
@@ -45,8 +75,11 @@ Where NAME is name of function, BUFFER is name of buffer, and TEXT is displayed.
    "Bizarre or obscure ........... Ob 7\n"
    "Freaky details or specifics .. Ob 8"))
 
-(quick-help jnf/qh--bwg-expertise-exponent
+(transient-quick-help jnf/qh--bwg-expertise-exponent
   "BWG Expertise Exponent (page 12)"
+  :label "Exponents"
+  :mode 'jnf-bwg-minor-mode
+  :body
   (concat
    "Exp 1  is naturally disinclined, crippled, or utterly incompetent.\n"
    "Exp 2  is untrained, raw, weak, or unpracticed.\n"
@@ -59,8 +92,11 @@ Where NAME is name of function, BUFFER is name of buffer, and TEXT is displayed.
    "Exp 9  is uncanny; incomprehensibly good.\n"
    "Exp 10 is as near perfection as the system allows."))
 
-(quick-help jnf/qh--bwg-absolute-difficulty
+(transient-quick-help jnf/qh--bwg-absolute-difficulty
   "BWG Absolute Difficulty (page 15)"
+  :label "Difficulty"
+  :mode 'jnf-bwg-minor-mode
+  :body
   (concat
    "Ob 1  A simple act done with little thought.\n"
    "Ob 2  An act performed routinely at your job.\n"
@@ -73,8 +109,11 @@ Where NAME is name of function, BUFFER is name of buffer, and TEXT is displayed.
    "Ob 9  An act deemed nearly impossible.\n"
    "Ob 10 A miracle."))
 
-(quick-help jnf/qh--bwg-circles-obstacles
+(transient-quick-help jnf/qh--bwg-circles-obstacles
   "BWG Circles Obstacles (page 380-381)"
+  :label "Circles"
+  :mode 'jnf-bwg-minor-mode
+  :body
   (concat
    "Occupation\n"
    "  Broad occupation/profession, same life path ... +0 Ob\n"
@@ -97,8 +136,11 @@ Where NAME is name of function, BUFFER is name of buffer, and TEXT is displayed.
    "  Unusual for this character .................... +1-2 Ob\n"
    "  Right here and now in the middle of trouble ... +3 Ob"))
 
-(quick-help jnf/qh--bwg-steel-test-adjustments
+(transient-quick-help jnf/qh--bwg-steel-test-adjustments
   "BWG Steel Test Adjustments (page 363)"
+  :label "Steel"
+  :mode 'jnf-bwg-minor-mode
+  :body
   (concat
    "Conditions for Steel Advantags\n"
    "  Being startled by something mundane ........ +2D\n"
