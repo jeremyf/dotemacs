@@ -68,34 +68,32 @@ Add hook to each HOOKS provided."
 (define-transient-command jnf/menu-dwim ()
   "A \"super\" menu of context specific functions."
   ["Take on Rules"
-   ["Wrapping"
-    :if-derived markdown-mode
-    ("k h" "Kill slug version of given [h]eading…" jnf/kill-new-markdown-heading-as-slug)
-    ("w a" "[A] link at point or region…" jnf/tor-wrap-link-active-region-dwim)
-    ("w c" "[C]ite point or region…" jnf/tor-wrap-cite-active-region-dwim)
-    ("w d" "[D]ate point or region…" jnf/tor-wrap-date)
-    ("w f" "Wrap word or region in pseudo-d[f]n…" jnf/tor-wrap-as-pseudo-dfn)
-    ("w m" "[M]argin-note line or region…" jnf/tor-wrap-as-marginnote-dwim)
-    ("w p" "Wrap point or region as [P]oem…" jnf/tor-wrap-in-poem)
-    ("w s" "[S]ide-note sentence or region…" jnf/tor-wrap-as-sidenote-dwim)
-    ("w w" "[W]rap point or region in html…" jnf/tor-wrap-in-html-tag)
+   ["Wrapping"    ("w a" "[A] link at point or region…" jnf/tor-wrap-link-active-region-dwim  :if-derived html-mode)
+    ("w c" "[C]ite point or region…" jnf/tor-wrap-cite-active-region-dwim  :if-derived html-mode)
+    ("w d" "[D]ate point or region…" jnf/tor-wrap-date  :if-derived html-mode)
+    ("w f" "Wrap word or region in pseudo-d[f]n…" jnf/tor-wrap-as-pseudo-dfn  :if-derived html-mode)
+    ("w m" "[M]argin-note line or region…" jnf/tor-wrap-as-marginnote-dwim  :if-derived html-mode)
+    ("w p" "Wrap point or region as [P]oem…" jnf/tor-wrap-in-poem  :if-derived html-mode)
+    ("w s" "[S]ide-note sentence or region…" jnf/tor-wrap-as-sidenote-dwim  :if-derived html-mode)
+    ("w w" "[W]rap point or region in html…" jnf/tor-wrap-in-html-tag  :if-derived html-mode)
     ]
    ["Posts"
-    :if-non-nil jnf-bwg-minor-mode
+    :if-non-nil jnf-tor-minor-mode
     ("p r" "[R]e-title post…" jnf/tor-retitle-post)
     ("p t" "[T]ag post…" jnf/tor-tag-post :transient t)
     ("p v" "[V]iew post…" jnf/tor-view-blog-post)
     ]
    ["Utilities"
+    ("? d" "Find blog in [d]raft status…" jnf/tor-find-file-draft)
+    ("? u" "Find blog by [u]rl…" jnf/tor-find-hugo-file-by-url)
+    ("? f" "Find blog by [f]ilename…" jnf/tor-find-file)
     ("c a" "Create [a]mplify the blogosphere…" jnf/tor-post-amplifying-the-blogosphere)
     ("c e" "Create [e]pigraph entry…" jnf/tor-insert-epigraph-entry)
     ("c g" "Create [g]lossary entry…" jnf/tor-find-glossary-and-insert-entry)
     ("c c" "Create [c]hange log entry…" jnf/tor-find-changelog-and-insert-entry)
     ("c p" "Create [p]ost…" jnf/tor-create-post)
     ("c s" "Create [s]eries…" jnf/tor-find-series-and-insert-entry)
-    ("? d" "Find blog in [d]raft status…" jnf/tor-find-file-draft)
-    ("? u" "Find blog by [u]rl…" jnf/tor-find-hugo-file-by-url)
-    ("? f" "Find blog by [f]ilename…" jnf/tor-find-file)
+    ("k h" "Kill slug version of given [h]eading…" jnf/kill-new-markdown-heading-as-slug :if-derived markdown-mode)
     ("t h m" "Toggle hammerspoon editor mode" hammerspoon-toggle-mode :if-non-nil hammerspoon-edit-minor-mode)
     ("t p" "Tidy pull request" jnf/forem-tidy-pull-request :if-non-nil hammerspoon-edit-minor-mode)
     ]])
