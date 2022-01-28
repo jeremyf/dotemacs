@@ -31,44 +31,55 @@ Add hook to each HOOKS provided."
 	 (-each ,hooks (lambda(hook) (add-hook hook (lambda () (,mode-name)))))))))
 
 (minor-mode-maker :title "Burning Wheel Gold" :abbr "bwg" :hooks (list 'org-mode-hook 'markdown-mode-hook))
-
-(defun bwg-menu-items ()
-  "Return a `transient' compliant list for BWG items."
-  (list
-   ["Burning Wheel"
-     :if-non-nil jnf-bwg-minor-mode
-    ("b c" "Circles" jnf/qh--bwg-circles-obstacles)
-    ("b d" "Difficulty (Absolute)" jnf/qh--bwg-absolute-difficulty)
-    ("b e" "Exponent" jnf/qh--bwg-expertise-exponent)
-    ("b s" "Steel" jnf/qh--bwg-steel-test-adjustments)
-    ("b w" "Wises" jnf/qh--bwg-wises)]))
-
 (minor-mode-maker :title "Stars without Number" :abbr "swn")
 (minor-mode-maker :title "Worlds without Number" :abbr "wwn")
 (minor-mode-maker :title "Take on Rules" :abbr "tor")
 
-(defun minor-modes-menu-items ()
-  "Return a `transient' compliant list for minor modes."
-  (list
-  ["Modes"
-    ("-b" "Burning Wheel mode" jnf-bwg-minor-mode)
-    ("-h" "Hammerspoon mode" hammerspoon-edit-minor-mode)
-    ;; ("-s" "Stars without Number mode" jnf-swn-minor-mode)
-    ("-t" "Take on Rules mode" jnf-tor-minor-mode)
-    ("-T" "Typopunct mode" typopunct-mode)
-    ;; ("-w" "Worlds without Number mode" jnf-wwn-minor-mode)
-    ]))
+(transient-define-prefix jnf/menu-dwim--bwg-help ()
+  "Define the BWG help prefix."
+  ["Burning Wheel"
+   ("c" jnf/qh--bwg-circles-obstacles)
+   ("d" jnf/qh--bwg-absolute-difficulty)
+   ("e" jnf/qh--bwg-expertise-exponent)
+   ("s" jnf/qh--bwg-steel-test-adjustments)
+   ("w" jnf/qh--bwg-wises)
+   ])
+
+(transient-define-prefix jnf/menu-dwim--tor-find-files ()
+  "Define the Take on Rules find files prefix."
+  ["Take on Rules > Find Blog"
+   ("d" "in draft status…" jnf/tor-find-file-draft)
+   ("u" "by url…" jnf/tor-find-hugo-file-by-url)
+   ("f" "by filename…" jnf/tor-find-file)])
+
+(transient-define-prefix jnf/menu-dwim--tor-create ()
+  "Define the Take on Rules create prefix."
+  ["Take on Rules > Create"
+   ("a" "Amplify the Blogosphere…" jnf/tor-post-amplifying-the-blogosphere)
+   ("c" "Changelog entry…" jnf/tor-find-changelog-and-insert-entry)
+   ("e" "Epigraph entry…" jnf/tor-insert-epigraph-entry)
+   ("g" "Glossary entry…" jnf/tor-find-glossary-and-insert-entry)
+   ("p" "Post…" jnf/tor-create-post)
+   ("s" "Series…" jnf/tor-find-series-and-insert-entry)])
+
+(transient-define-prefix jnf/menu-dwim--hammerspoon ()
+  "Define the Take on Rules find files prefix."
+  ["Hammerspoon"
+   :if-non-nil hammerspoon-edit-minor-mode
+   ("m" "Toggle hammerspoon editor mode" hammerspoon-toggle-mode)
+   ("p" "Tidy pull request" jnf/forem-tidy-pull-request)])
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
 ;;; END minor mode definitions
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
-(define-transient-command jnf/menu-dwim ()
+(transient-define-prefix jnf/menu-dwim ()
   "A \"super\" menu of context specific functions."
-  ["Take on Rules"
-   ["Wrapping"
+  ["General Menu"
+   ["Utilities"
+    ("k h" "Kill slug version of given heading…" jnf/kill-new-markdown-heading-as-slug :if-derived (or markdown-mode html-mode))
     ("w a" "A-tag at point or region…" jnf/tor-wrap-link-active-region-dwim  :if-derived (or markdown-mode html-mode))
     ("w c" "CITE-tag point or region…" jnf/tor-wrap-cite-active-region-dwim  :if-derived (or markdown-mode html-mode))
     ("w d" "DATETIME-tag point or region…" jnf/tor-wrap-date  :if-derived (or markdown-mode html-mode))
@@ -84,27 +95,23 @@ Add hook to each HOOKS provided."
     ("p t" "Tag post…" jnf/tor-tag-post :transient t)
     ("p v" "View post…" jnf/tor-view-blog-post)
     ]
-   ["Utilities"
-    ("? d" "Find blog in draft status…" jnf/tor-find-file-draft)
-    ("? u" "Find blog by url…" jnf/tor-find-hugo-file-by-url)
-    ("? f" "Find blog by filename…" jnf/tor-find-file)
-    ("c a" "Create amplify the blogosphere…" jnf/tor-post-amplifying-the-blogosphere)
-    ("c e" "Create epigraph entry…" jnf/tor-insert-epigraph-entry)
-    ("c g" "Create glossary entry…" jnf/tor-find-glossary-and-insert-entry)
-    ("c c" "Create change log entry…" jnf/tor-find-changelog-and-insert-entry)
-    ("c p" "Create post…" jnf/tor-create-post)
-    ("c s" "Create series…" jnf/tor-find-series-and-insert-entry)
-    ("k h" "Kill slug version of given heading…" jnf/kill-new-markdown-heading-as-slug :if-derived (or markdown-mode html-mode))
-    ("t h m" "Toggle hammerspoon editor mode" hammerspoon-toggle-mode :if-non-nil hammerspoon-edit-minor-mode)
-    ("t p" "Tidy pull request" jnf/forem-tidy-pull-request :if-non-nil hammerspoon-edit-minor-mode)
+
+   ["Sub-Menus"
+    ("? b" "Burning Wheel…"  jnf/menu-dwim--bwg-help)
+    ("? t" "TakeOnRules Find…" jnf/menu-dwim--tor-find-files)
+    ("c t" "TakeOnRules Create…" jnf/menu-dwim--tor-create)
+    ("? h" "Hammerspoon…" jnf/menu-dwim--hammerspoon :if-non-nil hammerspoon-edit-minor-mode)
+    ""
+    "Modes"
+    ("-m" "Markdown ( )" markdown-mode :if-not-derived markdown-mode)
+    ("-m" "Markdown (*)" markdown-mode :if-derived markdown-mode)
+    ("-t" "Typopunct ( )" typopunct-mode :if-nil typopunct-mode)
+    ("-t" "Typopunct (*)" typopunct-mode :if-non-nil typopunct-mode)
     ]])
 
-(transient-append-suffix 'jnf/menu-dwim (list 0)
-  `[,@(minor-modes-menu-items)
-    ,@(bwg-menu-items)])
-
-(transient-insert-suffix 'org-menu (list 0)
-  `[,@(minor-modes-menu-items)
-    ,@(bwg-menu-items)])
+;; (transient-insert-suffix 'org-menu (list 0)
+;;   ["Lookup"
+;;    ("? b" "Burning Wheel…"  jnf/menu-dwim--bwg-help)
+;;    ("? t" "TakeOnRules Find…" jnf/menu-dwim--tor-find-files)])
 
 (global-set-key (kbd "C-c m") 'jnf/menu-dwim)
