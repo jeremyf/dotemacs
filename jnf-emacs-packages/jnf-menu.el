@@ -35,6 +35,13 @@ Add hook to each HOOKS provided."
 ;; (minor-mode-maker :title "Worlds without Number" :abbr "wwn")
 (minor-mode-maker :title "Take on Rules" :abbr "tor")
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;; END minor mode definitions
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
 (transient-define-prefix jnf/menu-dwim--bwg-help ()
   "Define the BWG help prefix."
   ["Burning Wheel"
@@ -69,16 +76,10 @@ Add hook to each HOOKS provided."
    ("m" "Toggle hammerspoon editor mode" hammerspoon-toggle-mode)
    ("p" "Tidy pull request" jnf/forem-tidy-pull-request)])
 
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;
-;;; END minor mode definitions
-;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
 (transient-define-prefix jnf/menu-dwim ()
   "A \"super\" menu of context specific functions."
-  ["General Menu"
-   ["Utilities"
+  [
+   ["Markdown Utilities"
     ("k h" "Kill slug version of given heading…" jnf/kill-new-markdown-heading-as-slug :if-derived (or markdown-mode html-mode))
     ("w a" "A-tag at point or region…" jnf/tor-wrap-link-active-region-dwim  :if-derived (or markdown-mode html-mode))
     ("w c" "CITE-tag point or region…" jnf/tor-wrap-cite-active-region-dwim  :if-derived (or markdown-mode html-mode))
@@ -95,22 +96,30 @@ Add hook to each HOOKS provided."
     ("p t" "Tag post…" jnf/tor-tag-post :transient t)
     ("p v" "View post…" jnf/tor-view-blog-post)
     ]
-   ["Contexts"
-    ("? b" "Burning Wheel…"  jnf/menu-dwim--bwg-help)
-    ("? t" "TakeOnRules Find…" jnf/menu-dwim--tor-find-files)
-    ("c t" "TakeOnRules Create…" jnf/menu-dwim--tor-create)
-    ("? h" "Hammerspoon…" jnf/menu-dwim--hammerspoon :if-non-nil hammerspoon-edit-minor-mode)]
-   ["Modes"
-    ;; I could write functions for these, but this is concise enough
-    ("-t" "Typopunct ( )" typopunct-mode :if-nil typopunct-mode)
-    ("-t" "Typopunct (*)" typopunct-mode :if-non-nil typopunct-mode)
-    ("-o" "MacOS Native Option ( )" jnf/toggle-osx-alternate-modifier :if-non-nil ns-alternate-modifier)
-    ("-o" "MacOS Native Option (*)" jnf/toggle-osx-alternate-modifier :if-nil ns-alternate-modifier)
-    ]])
+   ])
 
-;; (transient-insert-suffix 'org-menu (list 0)
-;;   ["Lookup"
-;;    ("? b" "Burning Wheel…"  jnf/menu-dwim--bwg-help)
-;;    ("? t" "TakeOnRules Find…" jnf/menu-dwim--tor-find-files)])
+(defun jnf/menu-dwim--global-suffixes ()
+  "Return a `transient' compliant list to apply to different transients."
+  (list
+   ["Contexts"
+     ("? b" "Burning Wheel…"  jnf/menu-dwim--bwg-help)
+     ("? t" "TakeOnRules Find…" jnf/menu-dwim--tor-find-files)
+     ("c t" "TakeOnRules Create…" jnf/menu-dwim--tor-create)
+     ("? h" "Hammerspoon…" jnf/menu-dwim--hammerspoon :if-non-nil hammerspoon-edit-minor-mode)]
+    ["Modes"
+     ;; I could write functions for these, but this is concise enough
+     ("-t" "Typopunct ( )" typopunct-mode :if-nil typopunct-mode)
+     ("-t" "Typopunct (*)" typopunct-mode :if-non-nil typopunct-mode)
+     ("-o" "MacOS Native Option ( )" jnf/toggle-osx-alternate-modifier :if-non-nil ns-alternate-modifier)
+     ("-o" "MacOS Native Option (*)" jnf/toggle-osx-alternate-modifier :if-nil ns-alternate-modifier)
+     ]))
+
+(transient-insert-suffix 'jnf/menu-dwim (list 0)
+  `["Global"
+    ,@(jnf/menu-dwim--global-suffixes)])
+
+(transient-insert-suffix 'org-menu (list 1)
+  `["Global"
+    ,@(jnf/menu-dwim--global-suffixes)])
 
 (global-set-key (kbd "C-c m") 'jnf/menu-dwim)
