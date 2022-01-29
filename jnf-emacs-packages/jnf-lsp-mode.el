@@ -1,4 +1,4 @@
-;;; Commentary:
+;; Commentary:
 ;;
 ;;  This package provides the lsp-mode behavior.
 ;;
@@ -7,8 +7,8 @@
 (use-package lsp-mode
   :straight t
   :hook (
-         ;; (ruby-mode . lsp)
-         (enh-ruby-mode . lsp)
+         (ruby-mode . lsp)
+         ;; (enh-ruby-mode . lsp)
 	 ;; (js-mode . lsp)
          ;; (html-mode . lsp)
          ;; (bash-mode . lsp)
@@ -77,8 +77,11 @@
 
 ;; See https://github.com/emacs-tree-sitter/elisp-tree-sitter
 ;; Waiting on https://github.com/emacs-tree-sitter/elisp-tree-sitter/issues/197 to resolve.
-;; (use-package tree-sitter
-;;   :straight t)
-;; (use-package tree-sitter-langs
-;;   :straight)
-;; (add-hook 'enh-ruby-mode-hook #'tree-sitter-mode)
+(use-package tree-sitter
+  :straight (tree-sitter :host github :repo "emacs-tree-sitter/elisp-tree-sitter"))
+
+(global-tree-sitter-mode)
+(add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
+
+(use-package tree-sitter-langs
+  :straight t)
