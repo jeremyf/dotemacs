@@ -113,6 +113,11 @@ Add hook to each HOOKS provided."
     ("-t" "Typopunct (*)" typopunct-mode :if-non-nil typopunct-mode)
     ("-o" "MacOS Native Option ( )" jnf/toggle-osx-alternate-modifier :if-non-nil ns-alternate-modifier)
     ("-o" "MacOS Native Option (*)" jnf/toggle-osx-alternate-modifier :if-nil ns-alternate-modifier)
+    ]
+   ["Jump To…"
+    ("j b" "Buffer" ibuffer)
+    ("j g" "Global Mark" consult-global-mark)
+    ("j m" "Mark" consult-mark)
     ]))
 
 (transient-insert-suffix 'jnf/menu-dwim (list 0)

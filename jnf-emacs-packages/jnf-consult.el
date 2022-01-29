@@ -82,14 +82,12 @@
          ("s-r" . consult-recent-file) ;; Deprecate
          ("C-c r" . consult-recent-file)
          ("C-c o" . consult-file-externally)
-         ("s-4" . consult-bookmark)
-         ("s-1" . ibuffer)
          ("C-y" . yank)
          ("C-s" . consult-line) ;; I've long favored Swiper mapped to c-s
          ;; Isearch integration
          ("M-s e" . consult-isearch)
          ;; ("s-t" . jnf/consult-find-using-fd)
-         ("s-3" . consult-imenu-multi)
+         ;; ("s-3" . consult-imenu-multi)
          :map isearch-mode-map
          ("M-e" . consult-isearch)                 ;; orig. isearch-edit-string
          ("M-s e" . consult-isearch)               ;; orig. isearch-edit-string

@@ -75,10 +75,10 @@
 
 (add-hook 'emacs-lisp-mode 'eldoc-mode)
 
+;; See https://github.com/emacs-tree-sitter/elisp-tree-sitter
+;; Waiting on https://github.com/emacs-tree-sitter/elisp-tree-sitter/issues/197 to resolve.
 ;; (use-package tree-sitter
 ;;   :straight t)
-
 ;; (use-package tree-sitter-langs
 ;;   :straight)
-
 ;; (add-hook 'enh-ruby-mode-hook #'tree-sitter-mode)
