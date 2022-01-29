@@ -102,17 +102,18 @@ Add hook to each HOOKS provided."
   "Return a `transient' compliant list to apply to different transients."
   (list
    ["Contexts"
-     ("? b" "Burning Wheel…"  jnf/menu-dwim--bwg-help)
-     ("? t" "TakeOnRules Find…" jnf/menu-dwim--tor-find-files)
-     ("c t" "TakeOnRules Create…" jnf/menu-dwim--tor-create)
-     ("? h" "Hammerspoon…" jnf/menu-dwim--hammerspoon :if-non-nil hammerspoon-edit-minor-mode)]
-    ["Modes"
-     ;; I could write functions for these, but this is concise enough
-     ("-t" "Typopunct ( )" typopunct-mode :if-nil typopunct-mode)
-     ("-t" "Typopunct (*)" typopunct-mode :if-non-nil typopunct-mode)
-     ("-o" "MacOS Native Option ( )" jnf/toggle-osx-alternate-modifier :if-non-nil ns-alternate-modifier)
-     ("-o" "MacOS Native Option (*)" jnf/toggle-osx-alternate-modifier :if-nil ns-alternate-modifier)
-     ]))
+    ("? b" "Burning Wheel…"  jnf/menu-dwim--bwg-help)
+    ("? f" "Forem…" jnf/forem-menu/body)
+    ("? t" "TakeOnRules Find…" jnf/menu-dwim--tor-find-files)
+    ("c t" "TakeOnRules Create…" jnf/menu-dwim--tor-create)
+    ("? h" "Hammerspoon…" jnf/menu-dwim--hammerspoon :if-non-nil hammerspoon-edit-minor-mode)]
+   ["Modes"
+    ;; I could write functions for these, but this is concise enough
+    ("-t" "Typopunct ( )" typopunct-mode :if-nil typopunct-mode)
+    ("-t" "Typopunct (*)" typopunct-mode :if-non-nil typopunct-mode)
+    ("-o" "MacOS Native Option ( )" jnf/toggle-osx-alternate-modifier :if-non-nil ns-alternate-modifier)
+    ("-o" "MacOS Native Option (*)" jnf/toggle-osx-alternate-modifier :if-nil ns-alternate-modifier)
+    ]))
 
 (transient-insert-suffix 'jnf/menu-dwim (list 0)
   `["Global"

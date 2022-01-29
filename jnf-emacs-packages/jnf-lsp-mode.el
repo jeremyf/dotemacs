@@ -14,7 +14,7 @@
          ;; (bash-mode . lsp)
          )
   :config (setq read-process-output-max (* 1024 1024 3)
-                lsp-completion-provider :capf
+                lsp-completion-provider nil
 		lsp-completion-mode nil
                 lsp-idle-delay 1.00)
   :custom (lsp-keymap-prefix "C-c C-l")
