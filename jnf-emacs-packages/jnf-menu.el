@@ -108,6 +108,11 @@ Add hook to each HOOKS provided."
     ("c t" "TakeOnRules Create…" jnf/menu-dwim--tor-create)
     ("? h" "Hammerspoon…" jnf/menu-dwim--hammerspoon :if-non-nil hammerspoon-edit-minor-mode)
     ("? r" "Rails…" jnf/projectile-rails--menu/body :if-non-nil projectile-rails-mode)]
+   ["Jump To…"
+    ("j b" "Buffer" ibuffer)
+    ("j g" "Global Mark" consult-global-mark)
+    ("j m" "Mark" consult-mark)
+    ]
    ["Modes"
     ;; I could write functions for these, but this is concise enough
     ("-t" "Typopunct ( )" typopunct-mode :if-nil typopunct-mode)
@@ -115,17 +120,20 @@ Add hook to each HOOKS provided."
     ("-o" "MacOS Native Option ( )" jnf/toggle-osx-alternate-modifier :if-non-nil ns-alternate-modifier)
     ("-o" "MacOS Native Option (*)" jnf/toggle-osx-alternate-modifier :if-nil ns-alternate-modifier)
     ]
-   ["Jump To…"
-    ("j b" "Buffer" ibuffer)
-    ("j g" "Global Mark" consult-global-mark)
-    ("j m" "Mark" consult-mark)
-    ]))
+   ["Org Add-Ons"
+    :if-derived org-mode
+    ("# +" "Add Org Tag…" org-roam-tag-add)
+    ("# -" "Remove Org Tag…" org-roam-tag-remove)
+    ("r +" "Add Org Ref…" org-roam-ref-add)
+    ("r -" "Remote Org Ref…" org-roam-ref-remove)
+    ]
+   ))
 
 (transient-insert-suffix 'jnf/menu-dwim (list 0)
   `["Global"
     ,@(jnf/menu-dwim--global-suffixes)])
 
-(transient-insert-suffix 'org-menu (list 1)
+(transient-insert-suffix 'org-menu (list 0)
   `["Global"
     ,@(jnf/menu-dwim--global-suffixes)])
 
