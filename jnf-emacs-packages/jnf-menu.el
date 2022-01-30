@@ -106,7 +106,8 @@ Add hook to each HOOKS provided."
     ("? f" "Forem…" jnf/forem-menu/body)
     ("? t" "TakeOnRules Find…" jnf/menu-dwim--tor-find-files)
     ("c t" "TakeOnRules Create…" jnf/menu-dwim--tor-create)
-    ("? h" "Hammerspoon…" jnf/menu-dwim--hammerspoon :if-non-nil hammerspoon-edit-minor-mode)]
+    ("? h" "Hammerspoon…" jnf/menu-dwim--hammerspoon :if-non-nil hammerspoon-edit-minor-mode)
+    ("? r" "Rails…" jnf/projectile-rails--menu/body :if-non-nil projectile-rails-mode)]
    ["Modes"
     ;; I could write functions for these, but this is concise enough
     ("-t" "Typopunct ( )" typopunct-mode :if-nil typopunct-mode)
