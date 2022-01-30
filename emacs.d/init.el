@@ -100,7 +100,7 @@
 
 (load "jnf-spelling.el" nil jnf-silence-loading-log)
 (load "jnf-typography.el" nil jnf-silence-loading-log)
-(load "jnf-ruby.el" nil jnf-silence-loading-log)
+(load "jnf-enh-ruby.el" nil jnf-silence-loading-log)
 (load "jnf-lsp-mode.el" nil jnf-silence-loading-log)
 ;; (load "jnf-beancount.el" nil jnf-silence-loading-log)
 (load "jnf-tabs.el" nil jnf-silence-loading-log)

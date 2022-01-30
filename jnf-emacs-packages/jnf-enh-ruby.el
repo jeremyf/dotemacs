@@ -18,8 +18,6 @@
   :config (add-hook 'enh-ruby-mode-hook #'jnf/enh-ruby-mode-hook-hook)
   :bind (:map enh-ruby-mode-map ("C-j" . avy-goto-char-timer))
   :mode (("\\(?:\\.rb\\|ru\\|rake\\|thor\\|jbuilder\\|gemspec\\|podspec\\|/\\(?:Gem\\|Rake\\|Cap\\|Thor\\|Vagrant\\|Guard\\|Pod\\)file\\)\\'" . enh-ruby-mode)))
-;; (add-to-list 'auto-mode-alist
-             ;; '("\\(?:\\.rb\\|ru\\|rake\\|thor\\|jbuilder\\|gemspec\\|podspec\\|/\\(?:Gem\\|Rake\\|Cap\\|Thor\\|Vagrant\\|Guard\\|Pod\\)file\\)\\'" . enh-ruby-mode))
 (add-to-list 'interpreter-mode-alist '("ruby" . enh-ruby-mode))
 
 ;; (use-package robe
@@ -33,8 +31,8 @@
   :diminish 'rspec-mode
   :bind (:map rspec-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
   :bind (:map enh-ruby-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
-  :hook (ruby-mode . rspec-mode) ;; should this be `ruby-mode'
-  (ruby-mode . eldoc-mode)) ;; should this be `ruby-mode'
+  :hook (ruby-mode . rspec-mode) ;; should this be `enh-ruby-mode'
+  (ruby-mode . eldoc-mode)) ;; should this be `enh-ruby-mode'
 
 (eval-after-load 'rspec-mode
   '(rspec-install-snippets))
@@ -52,8 +50,7 @@
      '(("app/liquid_tags/" "\\(.+?\\)\\.rb\\'"))
      "app/liquid_tags/${filename}.rb"))
   :bind (:map
-         projectile-rails-mode-map (("C-s-." . 'projectile-rails-goto-file-at-point)
-                                    ("C-c r" .  'jnf/projectile-rails--menu/body)))
+         projectile-rails-mode-map (("C-s-." . 'projectile-rails-goto-file-at-point)))
   :config (projectile-rails-global-mode))
 
 ;; (use-package rails-i18n

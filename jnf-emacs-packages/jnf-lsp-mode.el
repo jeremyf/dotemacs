@@ -8,7 +8,7 @@
   :straight t
   :hook (
          (ruby-mode . lsp)
-         ;; (enh-ruby-mode . lsp)
+         (enh-ruby-mode . lsp)
 	 ;; (js-mode . lsp)
          ;; (html-mode . lsp)
          ;; (bash-mode . lsp)
@@ -78,7 +78,9 @@
 ;; See https://github.com/emacs-tree-sitter/elisp-tree-sitter
 ;; Waiting on https://github.com/emacs-tree-sitter/elisp-tree-sitter/issues/197 to resolve.
 (use-package tree-sitter
-  :straight (tree-sitter :host github :repo "emacs-tree-sitter/elisp-tree-sitter"))
+  :straight (tree-sitter :host github :repo "emacs-tree-sitter/elisp-tree-sitter")
+  :config
+  (add-to-list 'tree-sitter-major-mode-language-alist '(enh-ruby-mode . ruby)))
 
 (global-tree-sitter-mode)
 (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
