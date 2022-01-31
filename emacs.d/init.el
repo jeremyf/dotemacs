@@ -96,7 +96,7 @@
 (load "jnf-macros.el" nil jnf-silence-loading-log)
 (load "jnf-git.el" nil jnf-silence-loading-log)
 (load "jnf-org.el" nil jnf-silence-loading-log)
-(load "jnf-org-roam-v2.el" nil jnf-silence-loading-log)
+(load "jnf-org-roam-v3.el" nil jnf-silence-loading-log)
 
 (load "jnf-spelling.el" nil jnf-silence-loading-log)
 (load "jnf-typography.el" nil jnf-silence-loading-log)

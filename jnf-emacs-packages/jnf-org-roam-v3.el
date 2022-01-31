@@ -140,16 +140,6 @@ The form should be '((\"forem\" 1) (\"burning-loscusts\" 2))."
   "Determine TAG-LIST is subset of NODE's tags."
   (cl-subsetp tag-list (org-roam-node-tags node)))
 
-(cl-defmethod org-roam-node-type ((node org-roam-node))
-  "Return the TYPE of NODE."
-  (condition-case nil
-      (file-name-nondirectory
-       (directory-file-name
-        (file-name-directory
-         (file-relative-name (org-roam-node-file node) org-roam-directory))))
-    (error "")))
-
-
 ;;; BEGIN org-roam declaration
 (use-package org-roam
   :straight t
@@ -213,3 +203,12 @@ The form should be '((\"forem\" 1) (\"burning-loscusts\" 2))."
   (setq org-roam-completion-everywhere nil)
   (setq org-roam-v2-ack t)
   (org-roam-db-autosync-mode))
+
+(cl-defmethod org-roam-node-type ((node org-roam-node))
+  "Return the TYPE of NODE."
+  (condition-case nil
+      (file-name-nondirectory
+       (directory-file-name
+        (file-name-directory
+         (file-relative-name (org-roam-node-file node) org-roam-directory))))
+    (error "")))
