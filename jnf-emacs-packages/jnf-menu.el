@@ -122,10 +122,8 @@ Add hook to each HOOKS provided."
     ]
    ["Org Add-Ons"
     :if-derived org-mode
-    ("# +" "Add Org Tag…" org-roam-tag-add)
-    ("# -" "Remove Org Tag…" org-roam-tag-remove)
-    ("r +" "Add Org Ref…" org-roam-ref-add)
-    ("r -" "Remote Org Ref…" org-roam-ref-remove)
+    ("#" "Add Org Tag…" org-roam-tag-add)
+    ("r a" "Add Org Ref…" org-roam-ref-add)
     ]
    ))
 
