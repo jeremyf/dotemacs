@@ -141,7 +141,7 @@ Alternative suggestions are: - '(\"\\\"“\" . \"\\\"\")"
   :straight t
   :after elfeed
   :config (elfeed-org)
-  (setq rmh-elfeed-org-files (list "~/git/org/personal/elfeed.org")))
+  (setq rmh-elfeed-org-files (list "~/git/org/elfeed.org")))
 
 
 ;; https://github.com/alphapapa/unpackaged.el#feed-for-url
