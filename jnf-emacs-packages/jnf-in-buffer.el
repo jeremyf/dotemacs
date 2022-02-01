@@ -380,6 +380,15 @@ echo the method signature of `'delete-duplicate-lines`"
   (shackle-rules '((compilation-mode :noselect t))
                  shackle-default-rule '(:select t)))
 
+(bind-key "C-x m" #'jnf/move-file)
+(defun jnf/move-file (target-directory)
+  "Write this file to TARGET-DIRECTORY, and delete old one."
+  (interactive "DTarget Directory: ")
+  (let* ((source (expand-file-name (file-name-nondirectory (buffer-name)) default-directory))
+	 (target (f-join target-directory (file-name-nondirectory (buffer-name)))))
+    (save-buffer)
+    (rename-file source target)
+    (kill-current-buffer)))
 ;;******************************************************************************
 ;;
 ;;; END Custom "in-buffer" functions
