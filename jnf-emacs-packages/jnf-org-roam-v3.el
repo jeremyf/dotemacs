@@ -162,7 +162,7 @@ The form should be '((\"forem\" 1) (\"burning-loscusts\" 2))."
     (org-roam-capture goto
                       keys
                       :filter-fn 'jnf/org-roam-filter-context-fn
-                      :templates 'jnf/org-roam-templates-context-fn))
+                      :templates (jnf/org-roam-templates-context-fn)))
 
   (defun jnf/org-roam-node-insert ()
     "Call `org-roam-node-insert' based on set tags."
@@ -182,7 +182,7 @@ The form should be '((\"forem\" 1) (\"burning-loscusts\" 2))."
   ;; Set more spaces for tags; As much as I prefer the old format,
   ;; this is the new path forward.
   (org-roam-node-display-template
-   (concat "${type:15} ${title:*} " (propertize "${tags:40}" 'face 'org-tag)))
+   (concat "${type:4}   ${title:*} " (propertize "${tags:40}" 'face 'org-tag)))
   (org-roam-capture-templates (jnf/org-roam-templates-list :all))
   :bind (("C-s-f" . jnf/org-roam-find-node)
 	 ("C-s-c" . jnf/org-roam-capture))
