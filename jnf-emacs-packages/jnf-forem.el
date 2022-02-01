@@ -79,7 +79,7 @@
 (when (file-directory-p "~/git/org/forem")
   (progn
     (defconst jnf/forem-dashboard-filename
-      "~/git/org/forem/dashboard.org"
+      "~/git/org/forem-dashboard.org"
       "The file to the dashboard documentation and links for Forem.")
 
     (cl-defun jnf/open-dashboard (&key (filename jnf/forem-dashboard-filename))
