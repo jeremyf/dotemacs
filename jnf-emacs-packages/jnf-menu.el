@@ -107,7 +107,8 @@ Add hook to each HOOKS provided."
     ("? t" "TakeOnRules Find…" jnf/menu-dwim--tor-find-files)
     ("c t" "TakeOnRules Create…" jnf/menu-dwim--tor-create)
     ("? h" "Hammerspoon…" jnf/menu-dwim--hammerspoon :if-non-nil hammerspoon-edit-minor-mode)
-    ("? r" "Rails…" jnf/projectile-rails--menu/body :if-non-nil projectile-rails-mode)]
+    ;; ("? r" "Rails…" jnf/projectile-rails--menu/body :if-non-nil projectile-rails-mode)
+    ]
    ["Jump To…"
     ("j b" "Buffer" ibuffer)
     ("j g" "Global Mark" consult-global-mark)
