@@ -52,22 +52,27 @@ Add hook to each HOOKS provided."
    ("w" jnf/qh--bwg-wises)
    ])
 
-(transient-define-prefix jnf/menu-dwim--tor-find-files ()
-  "Define the Take on Rules find files prefix."
-  ["Take on Rules > Find Blog"
-   ("d" "in draft status…" jnf/tor-find-file-draft)
-   ("u" "by url…" jnf/tor-find-hugo-file-by-url)
-   ("f" "by filename…" jnf/tor-find-file)])
-
-(transient-define-prefix jnf/menu-dwim--tor-create ()
-  "Define the Take on Rules create prefix."
-  ["Take on Rules > Create"
-   ("a" "Amplify the Blogosphere…" jnf/tor-post-amplifying-the-blogosphere)
-   ("c" "Changelog entry…" jnf/tor-find-changelog-and-insert-entry)
-   ("e" "Epigraph entry…" jnf/tor-insert-epigraph-entry)
-   ("g" "Glossary entry…" jnf/tor-find-glossary-and-insert-entry)
-   ("p" "Post…" jnf/tor-create-post)
-   ("s" "Series…" jnf/tor-find-series-and-insert-entry)])
+(transient-define-prefix jnf/menu-dwim--tor ()
+  "Define the Take on Rules menu."
+  ["Take on Rules"
+   ["Posts"
+    :if-non-nil jnf-tor-minor-mode
+    ("p r" "Re-title post…" jnf/tor-retitle-post)
+    ("p t" "Tag post…" jnf/tor-tag-post :transient t)
+    ("p v" "View post…" jnf/tor-view-blog-post)
+    ]
+   ["Find"
+    ("f d" "in draft status…" jnf/tor-find-file-draft)
+    ("f u" "by url…" jnf/tor-find-hugo-file-by-url)
+    ("f f" "by filename…" jnf/tor-find-file)]
+   ["Create"
+    ("c a" "Amplify the Blogosphere…" jnf/tor-post-amplifying-the-blogosphere)
+    ("c c" "Changelog entry…" jnf/tor-find-changelog-and-insert-entry)
+    ("c e" "Epigraph entry…" jnf/tor-insert-epigraph-entry)
+    ("c g" "Glossary entry…" jnf/tor-find-glossary-and-insert-entry)
+    ("c p" "Post…" jnf/tor-create-post)
+    ("c s" "Series…" jnf/tor-find-series-and-insert-entry)]
+   ])
 
 (transient-define-prefix jnf/menu-dwim--hammerspoon ()
   "Define the Take on Rules find files prefix."
@@ -90,52 +95,63 @@ Add hook to each HOOKS provided."
     ("w s" "Side-note sentence or region…" jnf/tor-wrap-as-sidenote-dwim  :if-derived (or markdown-mode html-mode))
     ("w w" "Wrap point or region in html…" jnf/tor-wrap-in-html-tag  :if-derived (or markdown-mode html-mode))
     ]
-   ["Take on Rules > Posts"
-    :if-non-nil jnf-tor-minor-mode
-    ("p r" "Re-title post…" jnf/tor-retitle-post)
-    ("p t" "Tag post…" jnf/tor-tag-post :transient t)
-    ("p v" "View post…" jnf/tor-view-blog-post)
-    ]
    ])
 
-(defun jnf/menu-dwim--global-suffixes ()
+(cl-defun jnf/menu-dwim--org-capture-elfeed-show (&key (entry elfeed-show-entry))
+  "Create a `org-roam-node' from elfeed ENTRY."
+  (interactive)
+  (let ((ref (elfeed-entry-link entry))
+	(title (elfeed-entry-title entry)))
+    (org-roam-capture-
+     :keys "r"
+     ;; TODO: I would love to get tags working but I'm missing something
+     :node (org-roam-node-create :title title)
+     :info (list :ref ref)
+     :templates (jnf/org-roam-templates-list :refs))))
+
+(transient-define-suffix jnf/org-auto-tags--transient (tags)
+  "Set the tags from minibuffer read"
+  :description '(lambda ()
+                  (concat
+                   "Org Tags: "
+                   (propertize
+                    (format "%s" jnf/org-auto-tags--current-list)
+                    'face 'transient-argument)))
+  (interactive
+   (list (completing-read-multiple "Tag(s): " (org-roam-tag-completions))))
+  (setq jnf/org-auto-tags--current-list tags))
+
+(transient-define-prefix jnf/menu-dwim ()
   "Return a `transient' compliant list to apply to different transients."
-  (list
+  [
    ["Contexts"
-    ("? b" "Burning Wheel…"  jnf/menu-dwim--bwg-help)
-    ("? f" "Forem…" jnf/forem-menu/body)
-    ("? t" "TakeOnRules Find…" jnf/menu-dwim--tor-find-files)
-    ("c t" "TakeOnRules Create…" jnf/menu-dwim--tor-create)
-    ("? h" "Hammerspoon…" jnf/menu-dwim--hammerspoon :if-non-nil hammerspoon-edit-minor-mode)
-    ;; ("? r" "Rails…" jnf/projectile-rails--menu/body :if-non-nil projectile-rails-mode)
+    ("c b" "Burning Wheel…"  jnf/menu-dwim--bwg-help)
+    ("c f" "Forem…" jnf/forem-menu/body)
+    ("c t" "TakeOnRules…" jnf/menu-dwim--tor)
+    ("c h" "Hammerspoon…" jnf/menu-dwim--hammerspoon :if-non-nil hammerspoon-edit-minor-mode)
     ]
-   ["Jump To…"
+   ["Grab"
+    ("g e" "Elfeed" jnf/menu-dwim--org-capture-elfeed-show :if-derived elfeed-show-mode)
+    ;; ("g u" "URL")
+    ]
+   ["Jump to"
     ("j b" "Buffer" ibuffer)
     ("j g" "Global Mark" consult-global-mark)
     ("j m" "Mark" consult-mark)
     ]
    ["Modes"
     ;; I could write functions for these, but this is concise enough
-    (". t t" "Typopunct ( )" typopunct-mode :if-nil typopunct-mode)
-    (". t t" "Typopunct (*)" typopunct-mode :if-non-nil typopunct-mode)
-    (". t o" "MacOS Native Option ( )" jnf/toggle-osx-alternate-modifier :if-non-nil ns-alternate-modifier)
-    (". t o" "MacOS Native Option (*)" jnf/toggle-osx-alternate-modifier :if-nil ns-alternate-modifier)
-    ]
-   ["Org Add-Ons"
-    :if-derived org-mode
-    ("#" "Add Org Tag…" org-roam-tag-add)
-    (". r a" "Add Org Ref…" org-roam-ref-add)
-    (". s c" "Roam Set Context" jnf/org-auto-tags--set-by-context)
-    (". s t" "Roam Set Tags" jnf/org-auto-tags--set)
-    ]
-   ))
+    ("m t" "Typopunct ( )" typopunct-mode :if-nil typopunct-mode)
+    ("m t" "Typopunct (*)" typopunct-mode :if-non-nil typopunct-mode)
+    ("m o" "MacOS Native Option ( )" jnf/toggle-osx-alternate-modifier :if-non-nil ns-alternate-modifier)
+    ("m o" "MacOS Native Option (*)" jnf/toggle-osx-alternate-modifier :if-nil ns-alternate-modifier)
+    ]]
+  ["Org Add-Ons"
+   ("o t" "Add Org Tag…" org-roam-tag-add :if-derived org-mode)
+   ("o r" "Add Org Ref…" org-roam-ref-add :if-derived org-mode)
+   ("o c" "Roam Set Context…" jnf/org-auto-tags--set-by-context :transient t)
+   ("o s" jnf/org-auto-tags--transient :transient t)
+   ])
 
-(transient-insert-suffix 'jnf/menu-dwim (list 0)
-  `["Global"
-    ,@(jnf/menu-dwim--global-suffixes)])
-
-(transient-insert-suffix 'org-menu (list 0)
-  `["Global"
-    ,@(jnf/menu-dwim--global-suffixes)])
-
+(global-set-key (kbd "s-1") 'jnf/menu-dwim)
 (global-set-key (kbd "C-c m") 'jnf/menu-dwim)
