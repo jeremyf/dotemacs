@@ -138,7 +138,7 @@ The form should be '((\"forem\" 1) (\"burning-loscusts\" 2))."
 
 (cl-defun jnf/org-roam-filter-context-fn (node &key (tag-list jnf/org-auto-tags--current-list))
   "Determine TAG-LIST is subset of NODE's tags."
-  (cl-subsetp tag-list (org-roam-node-tags node)))
+  (gnus-subsetp tag-list (org-roam-node-tags node)))
 
 ;;; BEGIN org-roam declaration
 (use-package org-roam
