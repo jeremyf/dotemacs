@@ -38,8 +38,7 @@
   (list
    ;; These are references to "other people's thoughts."
    :refs '("r" "refs" plain "%?"
-           :if-new (file+head "refs/%<%Y%m%d>---${title}.org" "#+title: ${title}\n")
-           :immediate-finish t
+           :if-new (file+head "refs/%<%Y%m%d>---${slug}.org" "#+title: ${title}\n#+FILETAGS:\n")
            :unnarrowed t)
    ;; These are "my thoughts" with references to "other people's thoughts."
    :main '("m" "main" plain "%?"
@@ -49,7 +48,7 @@
            :unnarrowed t)
    ;; These are publications of "my thoughts" referencing "other people's thoughts".
    :pubs '("p" "pubs" plain "%?"
-           :if-new (file+head "pubs/%<%Y%m%d>---${title}.org" "#+title: ${title}\n")q
+           :if-new (file+head "pubs/%<%Y%m%d>---${slug}.org" "#+title: ${title}\n#+FILETAGS:\n")
            :immediate-finish t
            :unnarrowed t))
   "Templates to use for `org-roam' capture.")
