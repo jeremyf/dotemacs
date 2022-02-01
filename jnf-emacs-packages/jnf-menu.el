@@ -115,15 +115,17 @@ Add hook to each HOOKS provided."
     ]
    ["Modes"
     ;; I could write functions for these, but this is concise enough
-    ("-t" "Typopunct ( )" typopunct-mode :if-nil typopunct-mode)
-    ("-t" "Typopunct (*)" typopunct-mode :if-non-nil typopunct-mode)
-    ("-o" "MacOS Native Option ( )" jnf/toggle-osx-alternate-modifier :if-non-nil ns-alternate-modifier)
-    ("-o" "MacOS Native Option (*)" jnf/toggle-osx-alternate-modifier :if-nil ns-alternate-modifier)
+    (". t t" "Typopunct ( )" typopunct-mode :if-nil typopunct-mode)
+    (". t t" "Typopunct (*)" typopunct-mode :if-non-nil typopunct-mode)
+    (". t o" "MacOS Native Option ( )" jnf/toggle-osx-alternate-modifier :if-non-nil ns-alternate-modifier)
+    (". t o" "MacOS Native Option (*)" jnf/toggle-osx-alternate-modifier :if-nil ns-alternate-modifier)
     ]
    ["Org Add-Ons"
     :if-derived org-mode
     ("#" "Add Org Tag…" org-roam-tag-add)
-    ("r a" "Add Org Ref…" org-roam-ref-add)
+    (". r a" "Add Org Ref…" org-roam-ref-add)
+    (". s c" "Roam Set Context" jnf/org-auto-tags--set-by-context)
+    (". s t" "Roam Set Tags" jnf/org-auto-tags--set)
     ]
    ))
 
