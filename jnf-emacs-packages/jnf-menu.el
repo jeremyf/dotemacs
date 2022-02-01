@@ -98,16 +98,31 @@ Add hook to each HOOKS provided."
    ])
 
 (cl-defun jnf/menu-dwim--org-capture-elfeed-show (&key (entry elfeed-show-entry))
-  "Create a `org-roam-node' from elfeed ENTRY."
+  "Create an `org-roam-node' from elfeed ENTRY."
   (interactive)
   (let ((ref (elfeed-entry-link entry))
 	(title (elfeed-entry-title entry)))
-    (org-roam-capture-
-     :keys "r"
-     ;; TODO: I would love to get tags working but I'm missing something
-     :node (org-roam-node-create :title title)
-     :info (list :ref ref)
-     :templates (jnf/org-roam-templates-list :refs))))
+    (jnf/org-roam-capture-ref :ref ref :title title)))
+
+(defun jnf/menu-dwim--org-capture-safari ()
+  "Create an `org-roam-node' from Safari page.
+
+Depends on the `grab-mac-link' package."
+  (interactive)
+  (let* ((link-title-pair (grab-mac-link-safari-1))
+	 (ref (car link-title-pair))
+	 (title (cadr link-title-pair)))
+    (jnf/org-roam-capture-ref :ref ref :title title)))
+
+(defun jnf/menu-dwim--org-capture-firefox ()
+  "Create an `org-roam-node' from Firefox page.
+
+Depends on the `grab-mac-link' package."
+  (interactive)
+  (let* ((link-title-pair (grab-mac-link-firefox-1))
+	 (ref (car link-title-pair))
+	 (title (cadr link-title-pair)))
+    (jnf/org-roam-capture-ref :ref ref :title title)))
 
 (transient-define-suffix jnf/org-auto-tags--transient (tags)
   "Set the tags from minibuffer read"
@@ -132,6 +147,8 @@ Add hook to each HOOKS provided."
     ]
    ["Grab"
     ("g e" "Elfeed" jnf/menu-dwim--org-capture-elfeed-show :if-derived elfeed-show-mode)
+    ("g f" "Firefox" jnf/menu-dwim--org-capture-firefox)
+    ("g s" "Safari" jnf/menu-dwim--org-capture-safari)
     ;; ("g u" "URL")
     ]
    ["Jump to"

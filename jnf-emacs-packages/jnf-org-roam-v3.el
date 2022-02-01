@@ -135,6 +135,15 @@ The form should be '((\"forem\" 1) (\"burning-loscusts\" 2))."
                                  (list (plist-get context :name) index)))
                              context-plist)))
 
+(cl-defun jnf/org-roam-capture-ref (&key title ref)
+  "Capture the TITLE and REF in the :refs template"
+  (org-roam-capture-
+     :keys "r"
+     ;; TODO: I would love to get tags working but I'm missing something
+     :node (org-roam-node-create :title title)
+     :info (list :ref ref)
+     :templates (jnf/org-roam-templates-list :refs)))
+
 (cl-defun jnf/org-roam-filter-context-fn (node &key (tag-list jnf/org-auto-tags--current-list))
   "Determine TAG-LIST is subset of NODE's tags."
   (gnus-subsetp tag-list (org-roam-node-tags node)))
@@ -199,7 +208,7 @@ The form should be '((\"forem\" 1) (\"burning-loscusts\" 2))."
                  (window-parameters . ((no-other-window . t)
                                        (no-delete-other-windows . t)))))
   ;; When t the autocomplete in org documents would query the org roam database
-  (setq org-roam-completion-everywhere nil)
+  (setq org-roam-completion-everywhere t)
   (setq org-roam-v2-ack t)
   (org-roam-db-autosync-mode))
 
