@@ -846,6 +846,244 @@ Projectile provides convenient organization and commands to run over projects.
 /Note:/ The =CMD= + =.= is a carryover from my [[https://macromates.com][Textmate]] and [[https://www.sublimetext.com/][Sublime Text]] days.
 That’s one of those hot-keys almost burned into soul.
 
+** TODO  magit.el
+#+begin_src emacs-lisp
+;;; Commentary:
+;;
+;;  This package includes the various configurations for git
+;;  interactions.
+;;
+;;; Code:
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;; The OMG awesome git client for emacs.
+(use-package magit
+  :straight t
+  :init (use-package with-editor :straight t)
+
+  ;; Adding format to git-commit-fill-column of 72 as best practice.
+  (setq git-commit-fill-column 72)
+
+  ;; Keeping the summary terse helps with legibility when you run a
+  ;; report with only summary.
+  (setq git-commit-summary-max-length 50)
+
+  ;; Set the tabular display columns for the `magit-list-repositories'
+  (setq magit-repolist-columns
+      '(("Name"    25 magit-repolist-column-ident ())
+        ("Version" 25 magit-repolist-column-version ())
+        ("δ"        1 magit-repolist-column-dirty ())
+        ("⇣"        3 magit-repolist-column-unpulled-from-upstream
+         ((:right-align t)
+          (:help-echo "Upstream changes not in branch")))
+        ("⇡"        3 magit-repolist-column-unpushed-to-upstream
+         ((:right-align t)
+          (:help-echo "Local changes not in upstream")))
+        ("Branch"  25 magit-repolist-column-branch ())
+        ("Path"    99 magit-repolist-column-path ())))
+
+  ;; The default relevant `magit-list-repositories'
+  (setq magit-repository-directories
+        `(("~/git/takeonrules.source/" . 1) ;; personal
+          ("~/git/burning_wheel_lifepaths/" . 1)
+          ("~/git/dotzshrc/" .  1) ;; all
+          ("~/git/dotemacs/" . 1) ;; all
+          ("~/git/jnf-emacs-bookmarks/" . 1)
+          ("~/git/org" . 1) ;; all
+          ("~/git/org/archive" . 1) ;; personal
+          ("~/git/org/daily" . 1) ;; ??
+          ("~/git/org/hesburgh-libraries" . 1) ;; work
+          ("~/git/org/forem" . 1) ;; work
+          ("~/git/org/forem-docs" . 1) ;; work
+          ("~/git/org/personal" . 1) ;; personal
+          ("~/git/org/public" . 1) ;; all
+          ("~/git/takeonrules.source/themes/hugo-tufte" . 1))) ;; personal
+
+  ;; Have magit-status go full screen and quit to previous
+  ;; configuration.  Taken from
+  ;; http://whattheemacsd.com/setup-magit.el-01.html#comment-748135498
+  ;; and http://irreal.org/blog/?p=2253
+  (defadvice magit-status (around magit-fullscreen activate)
+    (window-configuration-to-register :magit-fullscreen)
+    ad-do-it
+    (delete-other-windows))
+  (defadvice magit-mode-quit-window (after magit-restore-screen activate)
+    (jump-to-register :magit-fullscreen))
+  :config
+  (remove-hook 'magit-status-sections-hook 'magit-insert-tags-header)
+  (defun jnf/magit-list-repositories ()
+    "Create a `magit-list-repositories' for my personal repositories."
+    (interactive)
+    (setq magit-repository-directories
+          `(("~/git/takeonrules.source/" . 1)
+            ("~/git/takeonrules.source/hugo-tufte" . 1)
+            ("~/git/burning_wheel_lifepaths/" . 1)
+            ("~/git/org" . 1)
+            ("~/git/org/personal" . 1)
+            ("~/git/org/public" . 1)
+            ("~/git/org/archive" . 1)
+            ("~/git/org/daily" . 1)
+            ("~/git/org/hesburgh-libraries" . 1)
+            ("~/git/org/forem-docs" . 1)
+            ("~/git/dotemacs/" . 1)
+            ("~/git/jnf-emacs-bookmarks/" . 1)
+            ("~/git/dotzshrc/" .  1)))
+    (magit-list-repositories))
+  (defun jnf/magit-browse-pull-request ()
+    "In `magit-log-mode' open the associated pull request
+at point.
+
+Assumes that the commit log title ends in the PR #, which
+is the case when you use the Squash and Merge strategy.
+
+This implementation is dependent on `magit' and `s'."
+    (interactive)
+    (let* ((beg (line-beginning-position))
+           (end (line-end-position))
+           (summary
+            (buffer-substring-no-properties
+             beg end)))
+      (jnf/open-pull-request-for :summary summary)))
+  (defun jnf/git-current-remote-url ()
+    "Get the current remote url."
+    (s-trim
+     (shell-command-to-string
+      (concat
+       "git remote get-url "
+       (format "%s" (magit-get-current-remote))))))
+  (cl-defun jnf/open-pull-request-for (&key summary)
+    "Given the SUMMARY open the related pull request."
+    (let ((remote-url (jnf/git-current-remote-url)))
+      (save-match-data
+        (and (string-match "(\\#\\([0-9]+\\))$" summary)
+             (eww-browse-with-external-browser
+              (concat
+               ;; I tend to favor HTTPS and the repos end in ".git"
+               (s-replace ".git" "" remote-url)
+               "/pull/"
+               (match-string 1 summary)))))))
+  (defun jnf/open-pull-request-for-current-line ()
+    "For the current line open the applicable pull request."
+    (interactive)
+    (let ((summary
+           (s-trim
+            (shell-command-to-string
+             (concat "git --no-pager annotate "
+                     "-w -L "
+                     (format "%s" (line-number-at-pos))
+                     ",+1 "
+                     "--porcelain "
+                     buffer-file-name
+                     " | rg \"^summary\"")))))
+      (jnf/open-pull-request-for :summary summary)))
+  ;; In other situations I bind s-6 to `git-messenger:popup-message'
+  :bind (
+         ("C-c C-g" . magit-file-dispatch)
+         ("s-7" . magit-status))
+  :bind (:map magit-log-mode-map ("s-6" . 'jnf/magit-browse-pull-request))
+  :hook ((with-editor-post-finish-hook . magit-status)))
+#+end_src
+** TODO  forge.el
+#+begin_src emacs-lisp
+(use-package forge
+  :config
+  (setq auth-sources '("~/.authinfo"))
+  ;; (magit-add-section-hook 'magit-status-sections-hook 'forge-insert-authored-pullreqs nil 'append)
+  ;; (magit-add-section-hook 'magit-status-sections-hook 'forge-insert-requested-reviews nil 'append)
+  ;; (magit-add-section-hook 'magit-status-sections-hook 'forge-insert-assigned-issues nil 'append)
+  :straight t)
+
+#+end_src
+** TODO  libgit.el
+#+begin_src emacs-lisp
+(use-package libgit
+  :straight t)
+#+end_src
+** TODO  magit-libgit.el
+#+begin_src emacs-lisp
+(use-package magit-libgit
+  :after (libgit magit)
+  :straight t)
+#+end_src
+** TODO  git-timemachine.el
+#+begin_src emacs-lisp
+;; With the time machine, travel back and forth through a files history.
+;;
+;; While visiting a point in time, you can open
+(use-package git-timemachine
+  :straight t)
+#+end_src
+** TODO  git-gutter-fringe.el
+#+begin_src emacs-lisp
+;; Show the current git state in the gutter Go ahead and edit a line
+;; and look to the gutter for guidance.
+(use-package git-gutter-fringe
+  :straight (git-gutter-fringe :type git :host github :repo "emacsorphanage/git-gutter-fringe")
+  :diminish 'git-gutter-mode
+  :config (global-git-gutter-mode 't)
+  (setq git-gutter:modified-sign "Δ"
+        git-gutter:added-sign "+"
+        git-gutter:deleted-sign "-"))
+#+end_src
+** TODO  git-link.el
+#+begin_src emacs-lisp
+;; https://github.com/sshaw/git-link
+;;
+;; `M-x git-link` to add the current URL to the kill ring.  This is
+;; particularly helpful for sharing links with other developers.  I
+;; use this ALL OF THE TIME
+(use-package git-link
+  :config
+  ;; Without the following autoload directive, the call to
+  ;; `eww-browse-with-external-browser' in
+  ;; `jnf/git-browse-to-repository' fails (unless I've previously
+  ;; called `eww').
+  (autoload 'eww-browse-with-external-browser "eww.el")
+  (defun jnf/git-browse-to-repository (remote)
+    "Open in external browser the current repository's given REMOTE.
+
+Uses `eww-browse-with-external-browser' to determine external browser to use."
+    (interactive (list (git-link--select-remote)))
+    (git-link-homepage remote)
+    (eww-browse-with-external-browser (car kill-ring)))
+  (setq git-link-use-commit t) ;; URL will be SHA instead of branch
+  :straight t)
+#+end_src
+** TODO  git-messenger.el
+#+begin_src emacs-lisp
+(use-package git-messenger
+  :config (setq git-messenger:show-detail t)
+  (defun jnf/git-messenger-popup ()
+    "Open `git-messenger' or github PR.
+
+With universal argument, open the github PR for current line.
+
+Without universal argument, open `git-messenger'."
+    (interactive)
+    (if (equal current-prefix-arg nil) ; no C-u
+        (git-messenger:popup-message)
+      (jnf/open-pull-request-for-current-line)))
+  :custom
+  (git-messenger:use-magit-popup t)
+  :bind (:map git-messenger-map (("p" . 'jnf/open-pull-request-for-current-line)
+                                 ("l" . 'git-link)))
+  :bind (("s-6" . jnf/git-messenger-popup)
+         ("<f6>" . jnf/git-messenger-popup))
+  :straight t)
+#+end_src
+** TODO  blamer.el
+#+begin_src emacs-lisp
+(use-package blamer
+  :straight (blamer :host github :repo "Artawower/blamer.el")
+  :custom
+  (blamer-idle-time 0.5)
+  (blamer-author-formatter "✎ %s ")
+  (blamer-datetime-formatter "[%s]")
+  (blamer-commit-formatter "● %s")
+  (blamer-min-offset 40)
+  (blamer-max-commit-message-length 20))
+#+end_src
+
 * Completion
 ** DONE vertico.el
 #+begin_src emacs-lisp
@@ -1922,6 +2160,229 @@ quasi-opinionated compromise.
       (kill-current-buffer)))
 #+end_src
 
+* Org Mode
+** TODO org-mode.el
+#+begin_src emacs-lisp
+  ;; Consider https://github.com/jkitchin/org-ref as well
+
+  (cl-defun jnf/org-agenda-files (&key paths basenames)
+    "Return the list of filenames where BASENAMES exists in PATHS."
+    (setq returning-list '())
+    (dolist (path paths)
+      (dolist (basename basenames)
+	(if (f-exists-p (f-join path basename))
+	    (add-to-list 'returning-list (f-join path basename)))))
+    returning-list)
+
+  (use-package org
+    ;; :straight t
+    ;; :straight (org
+    ;;            :type git
+    ;;            :url "https://git.savannah.gnu.org/git/emacs/org-mode.git"
+    ;;            :commit "73875939a8b5545ac53a86ec467239f510d14de8" ;; 9.5 stable
+    ;;            )
+    :straight (org :type built-in)
+    :hook (org-mode . turn-on-visual-line-mode)
+    :config (setq
+	     org-directory (file-truename "~/git/org")
+	     org-agenda-files (jnf/org-agenda-files
+			       :paths jnf/data-directories
+			       :basenames '("agenda.org"))
+	     org-default-notes-file (concat org-directory "/captured-notes.org")
+	     ;; org-startup-indented t
+	     org-todo-keywords
+	     '((sequence "TODO" "WAITING" "|" "DONE")
+	     (sequence "PENDING" "TODO" "WAITING" "|" "READ")))
+    (setq org-capture-templates
+	  '(
+	    ("@" "All Todo" entry (file "~/git/org/agenda.org")
+	     "* TODO %?\n  %i\n  %a" :empty-lines-before 1)))
+
+    ;; https://xenodium.com/emacs-dwim-do-what-i-mean/
+    (defun jnf/org-insert-link-dwim ()
+      "Like `org-insert-link' but with personal dwim preferences."
+      (interactive)
+      (let* ((point-in-link (org-in-regexp org-link-any-re 1))
+	     (clipboard-url (when (string-match-p "^http" (current-kill 0))
+			      (current-kill 0)))
+	     (region-content (when (region-active-p)
+			       (buffer-substring-no-properties (region-beginning)
+							       (region-end)))))
+	(cond ((and region-content clipboard-url (not point-in-link))
+	       (delete-region (region-beginning) (region-end))
+	       (insert (org-make-link-string clipboard-url region-content)))
+	      ((and clipboard-url (not point-in-link))
+	       (insert (org-make-link-string
+			clipboard-url
+			(read-string "title: "
+				     (with-current-buffer (url-retrieve-synchronously clipboard-url)
+				       (dom-text (car
+						  (dom-by-tag (libxml-parse-html-region
+							       (point-min)
+							       (point-max))
+							      'title))))))))
+	      (t
+	       (call-interactively 'org-insert-link)))))
+
+    (defun org-files-names-in-project-list ()
+    "Return a list of filenames in the current files directory."
+    (split-string-and-unquote
+     (shell-command-to-string
+      (concat
+       "ls " (file-name-directory buffer-file-name)))))
+
+
+    (org-babel-do-load-languages 'org-babel-load-languages
+				 (append org-babel-load-languages
+					 '((emacs-lisp . t)
+					   (plantuml . t)
+					   (ruby . t))))
+    ;; Make TAB act as if it were issued from the buffer of the languages's major mode.
+    :custom (org-src-tab-acts-natively t)
+    :bind (
+	   :map org-mode-map
+		("C-c l i". jnf/org-insert-link-dwim))
+    :bind (
+	   ("C-c l s" . org-store-link)
+	   ("C-c a" . org-agenda)
+	   ("C-c c" . org-capture)
+	   ("C-s-t" . org-toggle-link-display)))
+
+  (defun my-org-confirm-babel-evaluate (lang body) nil)
+  (setq org-confirm-babel-evaluate #'my-org-confirm-babel-evaluate)
+
+  ;; To make Org mode take care of versioning of attachments for you,
+  ;; add the following to your Emacs config:
+  (require 'org-attach-git)
+
+  ;; See
+  ;; https://www.reddit.com/r/orgmode/comments/i6hl8b/image_preview_size_in_org_mode/
+  ;; for further discussion
+  ;;
+  ;; One consideration is that the below setq should be called as part
+  ;; of the `org-toggle-inline-images`.  <2020-11-14 Sat 12:09>: I
+  ;; commented out the lines below as it created a very small image
+  ;; (about the size of one character).  (setq org-image-actual-width
+  ;; (truncate (* (window-pixel-width) 0.8)))
+
+
+  ;; I'd prefer to use the executable, but that doe not appear to be the
+  ;; implementation of org-babel.
+  (setq org-plantuml-jar-path (concat (string-trim (shell-command-to-string "brew-path plantuml")) "/libexec/plantuml.jar"))
+#+end_src
+
+** TODO company-org-block
+#+begin_src emacs-lisp
+;; https://github.com/xenodium/company-org-block
+;; (use-package company-org-block
+;;   :straight t
+;;   :after (org company)
+;;   :custom
+;;   (company-org-block-edit-style 'auto) ;; 'auto, 'prompt, or 'inline
+;;   :hook ((org-mode . (lambda ()
+;;                        (setq-local company-backends '(company-org-block))
+;;                        (company-mode +1)))))
+#+end_src
+
+#+begin_src emacs-lisp
+;; ;; Insert immediate timestamp at point.
+(defun jnf/org-insert-immediate-active-timestamp ()
+  "Insert an active date for today.  If given the universal arg (e.g., C-u) insert a timestamp instead."
+  (interactive)
+  (if (equal current-prefix-arg nil) ; no C-u
+      (org-insert-time-stamp nil nil nil)
+    (org-insert-time-stamp nil t nil)))
+
+(global-set-key (kbd "s-5") 'jnf/org-insert-immediate-active-timestamp)
+
+;; ;; https://kitchingroup.cheme.cmu.edu/blog/2016/06/16/Copy-formatted-org-mode-text-from-Emacs-to-other-applications/
+(defun jnf/formatted-copy-org-to-html ()
+  "Export region to HTML, and copy it to the clipboard."
+  (interactive)
+  (save-window-excursion
+    (let* ((buf (org-export-to-buffer 'html "*Formatted Copy*" nil nil t t))
+           (html (with-current-buffer buf (buffer-string))))
+      (with-current-buffer buf
+        (shell-command-on-region
+         (point-min)
+         (point-max)
+         "textutil -stdin -format html -convert rtf -stdout | pbcopy"))
+      (kill-buffer buf))))
+(global-set-key (kbd "C-M-s-c") 'jnf/formatted-copy-org-to-html)
+
+(eval-after-load 'ox '(require 'ox-koma-letter))
+
+(eval-after-load 'ox-koma-letter
+  '(progn
+     (add-to-list 'org-latex-classes
+                  '("jnf-letter"
+                    "\\documentclass\{scrlttr2\}
+     \\usepackage[english]{babel}
+     \\setkomavar{frombank}{(1234)\\,567\\,890}
+     \[DEFAULT-PACKAGES]
+     \[PACKAGES]
+     \[EXTRA]"))
+
+     (setq org-koma-letter-default-class "jnf-letter")))
+#+end_src
+
+#+begin_src emacs-lisp
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;; BEGIN Hacks for ORG to type a bit more like markdown
+;;
+;; See http://mbork.pl/2022-01-17_Making_code_snippets_in_Org-mode_easier_to_type
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun org-insert-backtick ()
+  "Insert a backtick using `org-self-insert-command'."
+  (interactive)
+  (setq last-command-event ?`)
+  (call-interactively #'org-self-insert-command))
+
+(defun org-insert-tilde ()
+  "Insert a tilde using `org-self-insert-command'."
+  (interactive)
+  (setq last-command-event ?~)
+  (call-interactively #'org-self-insert-command))
+
+(define-key org-mode-map (kbd "`") #'org-insert-tilde)
+(define-key org-mode-map (kbd "~") #'org-insert-backtick)
+(defvar-local org-insert-tilde-language nil
+  "Default language name in the current Org file.
+If nil, `org-insert-tilde' after 2 tildes inserts an \"example\"
+block.  If a string, it inserts a \"src\" block with the given
+language name.")
+
+(defun org-insert-tilde ()
+  "Insert a tilde using `org-self-insert-command'."
+  (interactive)
+  (if (string= (buffer-substring-no-properties (- (point) 3) (point))
+	       "\n~~")
+      (progn (delete-char -2)
+	     (if org-insert-tilde-language
+		 (insert (format "#+begin_src %s\n#+end_src"
+				 org-insert-tilde-language))
+	       (insert "#+begin_example\n#+end_example"))
+	     (forward-line -1)
+	     (if (string= org-insert-tilde-language "")
+		 (move-end-of-line nil)
+	       (org-edit-special)))
+    (setq last-command-event ?~)
+    (call-interactively #'org-self-insert-command)))
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;
+;;; END Hacks for ORG to type a bit more like markdown
+;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+#+end_src
+
+#+begin_src emacs-lisp
+;; Context dependent menu for org-mode.
+(use-package org-menu
+  :straight (org-menu :host github :repo "sheijk/org-menu")
+  :bind (:map org-mode-map ("C-c m" . 'org-menu)))
+#+end_src
+
 * Utilities
 
 ** TODO jnf/eval-region-dwim()
@@ -1998,6 +2459,25 @@ By default the DIRECTORIES are `jnf/data-directories'"
      jnf-silence-loading-log))
 #+end_src
 
+** TODO jnf/query-within-macro-definition()
+#+begin_src emacs-lisp
+(defun jnf/query-within-macro-definition (arg)
+  "Prompt for input using minibuffer during kbd macro execution.
+
+With prefix ARG, allows you to select what prompt string to use.
+If the input is non-empty, it is inserted at point."
+  (interactive "P")
+  (let* ((query (lambda () (kbd-macro-query t)))
+         (prompt (if arg (read-from-minibuffer "PROMPT: ") "Input: "))
+         (input (unwind-protect
+                    (progn
+                      (add-hook 'minibuffer-setup-hook query)
+                      (read-from-minibuffer prompt))
+                  (remove-hook 'minibuffer-setup-hook query))))
+    (unless (string= "" input) (insert input))))
+
+(global-set-key (kbd "C-x Q") 'jnf/query-within-macro-definition)
+#+end_src
 * Footnotes
 
 [fn:1] “Ag” is the chemical symbol for the Silver element.
