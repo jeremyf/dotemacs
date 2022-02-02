@@ -269,13 +269,13 @@ for TakeOnRules.com."
   (interactive "sBlog Post Title: ")
   (jnf/tor-post---create-or-append :title title))
 
-(defun jnf/tor-tag-post (tag)
-  "Apply the TAG to the current TakeOnRules.com post.
+(defun jnf/tor-tag-post (tags)
+  "Apply the TAGS to the current TakeOnRules.com post.
 
 No effort is made to check if this is a post."
-  (interactive (list (completing-read "Tag: " (jnf/tor-tags-list))))
+  (interactive (list (completing-read-multiple "Tags: " (jnf/tor-tags-list))))
   (let ((saved-point (point))
-        (to-insert (concat "\n- " tag)))
+        (to-insert (concat "\n- " (s-join "\n -" tags))))
     (replace-regexp "^tags:$" (concat "tags:" to-insert) nil 0 (point-max))
     (goto-char (+ saved-point (length to-insert)))))
 
