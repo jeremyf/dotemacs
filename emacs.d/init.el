@@ -56,10 +56,10 @@
 ;; (load "jnf-elfeed.el" nil jnf-silence-loading-log)
 ;; (load "jnf-fennel.el" nil jnf-silence-loading-log)
 ;; (load "jnf-dired.el" nil jnf-silence-loading-log)
-(load "jnf-dice.el" nil jnf-silence-loading-log)
-(load "jnf-forem.el" nil jnf-silence-loading-log)
+;; (load "jnf-dice.el" nil jnf-silence-loading-log)
+;; (load "jnf-forem.el" nil jnf-silence-loading-log)
 ;; (load "jnf-titlecase.el" nil jnf-silence-loading-log)
-(load "jnf-blogging.el" nil jnf-silence-loading-log)
+;; (load "jnf-blogging.el" nil jnf-silence-loading-log)
 (load "jnf-help.el" nil jnf-silence-loading-log)
 (load "jnf-menu.el" nil jnf-silence-loading-log)
 
