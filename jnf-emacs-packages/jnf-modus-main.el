@@ -21,7 +21,7 @@
    modus-themes-links '(faint background)
    modus-themes-mixed-fonts t
    modus-themes-mode-line '(accented 3d)
-   modus-themes-org-blocks 'tinted-background
+   modus-themes-org-blocks 'gray-background
    modus-themes-paren-match '(bold intense)
    modus-themes-prompts '(intense accented)
    modus-themes-region '(bg-only accented)
