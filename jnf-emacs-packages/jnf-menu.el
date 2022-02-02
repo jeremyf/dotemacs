@@ -81,22 +81,6 @@ Add hook to each HOOKS provided."
    ("m" "Toggle hammerspoon editor mode" hammerspoon-toggle-mode)
    ("p" "Tidy pull request" jnf/forem-tidy-pull-request)])
 
-(transient-define-prefix jnf/menu-dwim ()
-  "A \"super\" menu of context specific functions."
-  [
-   ["Markdown Utilities"
-    ("k h" "Kill slug version of given heading…" jnf/kill-new-markdown-heading-as-slug :if-derived (or markdown-mode html-mode))
-    ("w a" "A-tag at point or region…" jnf/tor-wrap-link-active-region-dwim  :if-derived (or markdown-mode html-mode))
-    ("w c" "CITE-tag point or region…" jnf/tor-wrap-cite-active-region-dwim  :if-derived (or markdown-mode html-mode))
-    ("w d" "DATETIME-tag point or region…" jnf/tor-wrap-date  :if-derived (or markdown-mode html-mode))
-    ("w f" "Wrap word or region in pseudo-DFN…" jnf/tor-wrap-as-pseudo-dfn  :if-derived (or markdown-mode html-mode))
-    ("w m" "Margin-note line or region…" jnf/tor-wrap-as-marginnote-dwim  :if-derived (or markdown-mode html-mode))
-    ("w p" "Wrap point or region as Poem…" jnf/tor-wrap-in-poem  :if-derived (or markdown-mode html-mode))
-    ("w s" "Side-note sentence or region…" jnf/tor-wrap-as-sidenote-dwim  :if-derived (or markdown-mode html-mode))
-    ("w w" "Wrap point or region in html…" jnf/tor-wrap-in-html-tag  :if-derived (or markdown-mode html-mode))
-    ]
-   ])
-
 (cl-defun jnf/menu-dwim--org-capture-elfeed-show (&key (entry elfeed-show-entry))
   "Create an `org-roam-node' from elfeed ENTRY."
   (interactive)
@@ -139,6 +123,17 @@ Depends on the `grab-mac-link' package."
 (transient-define-prefix jnf/menu-dwim ()
   "Return a `transient' compliant list to apply to different transients."
   [
+   ["Markdown Utilities"
+    ("k h" "Kill slug version of given heading…" jnf/kill-new-markdown-heading-as-slug :if-derived (or markdown-mode html-mode))
+    ("w a" "A-tag at point or region…" jnf/tor-wrap-link-active-region-dwim  :if-derived (or markdown-mode html-mode))
+    ("w c" "CITE-tag point or region…" jnf/tor-wrap-cite-active-region-dwim  :if-derived (or markdown-mode html-mode))
+    ("w d" "DATETIME-tag point or region…" jnf/tor-wrap-date  :if-derived (or markdown-mode html-mode))
+    ("w f" "Wrap word or region in pseudo-DFN…" jnf/tor-wrap-as-pseudo-dfn  :if-derived (or markdown-mode html-mode))
+    ("w m" "Margin-note line or region…" jnf/tor-wrap-as-marginnote-dwim  :if-derived (or markdown-mode html-mode))
+    ("w p" "Wrap point or region as Poem…" jnf/tor-wrap-in-poem  :if-derived (or markdown-mode html-mode))
+    ("w s" "Side-note sentence or region…" jnf/tor-wrap-as-sidenote-dwim  :if-derived (or markdown-mode html-mode))
+    ("w w" "Wrap point or region in html…" jnf/tor-wrap-in-html-tag  :if-derived (or markdown-mode html-mode))
+    ]
    ["Contexts"
     ("c b" "Burning Wheel…"  jnf/menu-dwim--bwg-help)
     ("c f" "Forem…" jnf/forem-menu/body)
@@ -152,6 +147,7 @@ Depends on the `grab-mac-link' package."
     ;; ("g u" "URL")
     ]
    ["Jump to"
+    ;; ("j a" "Agenda" ibuffer)
     ("j b" "Buffer" ibuffer)
     ("j g" "Global Mark" consult-global-mark)
     ("j m" "Mark" consult-mark)
@@ -164,9 +160,9 @@ Depends on the `grab-mac-link' package."
     ("m o" "MacOS Native Option (*)" jnf/toggle-osx-alternate-modifier :if-nil ns-alternate-modifier)
     ]]
   ["Org Add-Ons"
+   ("o c" "Context…" jnf/org-auto-tags--set-by-context :transient t)
    ("o t" "Add Org Tag…" org-roam-tag-add :if-derived org-mode)
    ("o r" "Add Org Ref…" org-roam-ref-add :if-derived org-mode)
-   ("o c" "Roam Set Context…" jnf/org-auto-tags--set-by-context :transient t)
    ("o s" jnf/org-auto-tags--transient :transient t)
    ])
 
