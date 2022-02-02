@@ -3,7 +3,7 @@
 #+EMAIL: jeremy@jeremyfriesen.com
 #+STARTUP: overview
 
-** General Emacs Configuration
+* General Emacs Configuration
 
 I tried enabling this, and found myself sometimes lost in a labyrinth of
 minibuffers.  This change ensures that there’s only one.
@@ -12,9 +12,208 @@ minibuffers.  This change ensures that there’s only one.
   (setq enable-recursive-minibuffers nil)
 #+end_src
 
-** DONE Support
+** MacOS Specific
 
-*** DONE ripgrep.el
+*** TODO grab-mac-link.el
+
+#+begin_src emacs-lisp
+;;; Commentary:
+;;
+;;  This package loads darwin specific packages; It assumes that both
+;;  "use-package" and "straight-use-package" are loaded.
+;;
+;;; Code:
+;; Adds the ability to grab a link from various OS X applications
+;; Note, the sibling org-mac-link.  That package works within ORG mode
+;; with an extended menu option, and assumes ORG styling.  They both
+;; have the same keybinding as org-mode favors org-mac-link.
+(use-package grab-mac-link
+  :straight t
+  :config
+  ;; A replacement function for existing grab-mac-link-make-html-link
+  (defun jnf/grab-mac-link-make-html-link (url name)
+    "Using HTML syntax, link to and cite the URL with the NAME."
+    (format "<cite><a href=\"%s\" class=\"u-url p-name\" rel=\"cite\">%s</a></cite>" url name))
+  ;; The function advice to override the default behavior
+  (advice-add
+   'grab-mac-link-make-html-link
+   :override
+   'jnf/grab-mac-link-make-html-link
+   '((name . "jnf")))
+  :bind (("C-c g" . grab-mac-link)))
+
+(eval-after-load "flyspell"
+  '(progn
+     (define-key flyspell-mouse-map [down-mouse-3] #'flyspell-correct-word)
+     (define-key flyspell-mouse-map [mouse-3] #'undefined)))
+#+end_src
+
+*** TODO org-mac-link.el
+#+begin_src emacs-lisp
+(use-package org-mac-link
+  :ensure t
+  :straight (org-mac-link :type git :host github :repo "jeremyf/org-mac-link")
+  :defer t)
+(add-hook 'org-mode-hook (lambda ()
+                           (define-key org-mode-map (kbd "C-c g") 'org-mac-grab-link)))
+
+(if (version< "27.0" emacs-version)
+           (set-fontset-font
+            "fontset-default" 'unicode "Apple Color Emoji" nil 'prepend)
+         (set-fontset-font
+          t 'symbol (font-spec :family "Apple Color Emoji") nil 'prepend))
+#+end_src
+
+*** TODO pdf-tools.el
+#+begin_src emacs-lisp
+;; Emacs comes with DocView built in.  pdf-tools is a replacement for
+;; DocView.  I've found the rendered images a bit more crisp and the
+;; interactions a bit more responsive.  However, I have not been able
+;; to get `org-noter' working with `pdf-tools'.  `org-noter' provides
+;; annotation services for PDFs.
+(use-package pdf-tools
+  :pin manual ;; manually update
+  :straight t
+  :defer t
+  :ensure t
+  :config (pdf-tools-install) ;; initialise
+  (setq-default pdf-view-display-size 'fit-page) ;; open pdfs scaled to fit page
+  (setq pdf-annot-activate-created-annotations t) ;; automatically annotate highlights
+  (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward);; use normal isearch
+  )
+#+end_src
+
+*** TODO so-long.el
+#+begin_src emacs-lisp
+
+;; When we get to a REALLY long file or long line, emacs develops problems.
+;; This mode helps overcome that.
+;;
+(use-package so-long
+  :ensure t
+  :defer t
+  :straight t
+  :bind
+  (:map so-long-mode-map
+        ("C-s" . isearch-forward)
+        ("C-r" . isearch-backward))
+  :config
+  (global-so-long-mode 1))
+#+end_src
+
+*** TODO dtache.el
+#+begin_src emacs-lisp
+;; May or may not be useful
+(use-package dtache
+  :straight (dtache :host gitlab :repo "niklaseklund/dtache")
+  :hook (after-init . dtache-setup)
+  :bind (([remap async-shell-command] . dtache-shell-command)
+         :map dtache-shell-mode-map
+         ("C-c C-q" . dtache-detach-dwim)))
+#+end_src
+
+* Modes
+Sometimes I want to edit svg files.  Often times if I open them directly in
+Emacs, I want to edit them.  This setting helps with that default.  /Note:/
+without this setting, Emacs will happily render the SVG as an image,
+
+#+begin_src emacs-lisp
+  (add-to-list `auto-mode-alist '("\\.svg\\'" . xml-mode))
+#+end_src
+
+** TODO emmet-mode.el
+#+begin_src emacs-lisp
+  (use-package emmet-mode
+    :straight t
+    :bind (("C-c C-e" . emmet-expand-yas ))
+    :hook ((sgml-mode . emmet-mode)
+	   (html-mode . emmet-mode)
+	   (css-mode . emmet-mode)))
+#+end_src
+
+** TODO web-mode.el
+#+begin_src emacs-lisp
+  (use-package web-mode
+    :straight t
+    :config (setq web-mode-markup-indent-offset 2
+		  web-mode-css-indent-offset 2
+		  web-mode-code-indent-offset 2))
+  (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+
+  ;; built-in, consider commenting
+  ;; (use-package sgml-mode
+  ;;   :straight nil
+  ;;   :hook
+  ;;   (html-mode . sgml-electric-tag-pair-mode)
+  ;;   (html-mode . sgml-name-8bit-mode)
+  ;;   :custom
+  ;;   (sgml-basic-offset 2))
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package plantuml-mode
+    :config (setq plantuml-executable-path (concat (getenv "HB_PATH") "/bin/plantuml")
+		  plantuml-default-exec-mode 'executable
+		  org-plantuml-executable-path (concat (getenv "HB_PATH") "/bin/plantuml")
+		  org-plantuml-exec-mode 'executable)
+    :mode (("\\.plantuml\\'" . plantuml-mode))
+    :straight t)
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package json-mode :straight t)
+#+end_src
+
+Because JSON can be quite ugly, I want something to help tidy it up.
+#+begin_src emacs-lisp
+  (use-package json-reformat
+    :straight t
+    :after json-mode
+    :init (setq json-reformat:indent-width 2))
+
+#+end_src
+
+** go-mode.el
+
+Every so often I stumble upon a Go package.  The ~go-mode~ package gives me the
+syntax highlighting that makes reading ~Go-lang~ tolerable.
+
+#+begin_src emacs-lisp
+  (use-package go-mode :straight t)
+#+end_src
+
+** TODO markdown-mode.el
+#+begin_src emacs-lisp
+  (use-package markdown-mode
+    :straight t
+    :hook ((markdown-mode . turn-on-visual-line-mode))
+    ;; I use markdown for my blogging platform and very little else.
+    ;; Hence, I have this keybind.
+    :mode (("README\\.md\\'" . gfm-mode)
+	   ("\\.md\\'" . markdown-mode)
+	   ("\\.markdown\\'" . markdown-mode))
+    :init (setq markdown-command "/usr/local/bin/pandoc"))
+#+end_src
+
+** TODO yaml-mode.el
+#+begin_src emacs-lisp
+  (use-package yaml-mode :straight t)
+#+end_src
+
+** TODO lua-mode.el
+#+begin_src emacs-lisp
+  (use-package lua-mode :straight t)
+#+end_src
+
+** TODO lua-mode.el
+#+begin_src emacs-lisp
+  (use-package git-modes :straight t)
+#+end_src
+
+* Support
+
+** DONE ripgrep.el
 For many years, I’ve used “The Silver Searcher”, or ~ag~ on the command
 line.[fn:1].  However, [[https://github.com/BurntSushi/ripgrep][ripgrep]] provides even faster searching, with an almost
 identical parameter list.
@@ -25,8 +224,8 @@ identical parameter list.
     :straight t)
 #+end_src
 
-** Projects
-*** TODO projectile.el
+* Projects
+** TODO projectile.el
 
 Projectile provides convenient organization and commands to run over projects.
 
@@ -42,8 +241,8 @@ Projectile provides convenient organization and commands to run over projects.
 /Note:/ The =CMD= + =.= is a carryover from my [[https://macromates.com][Textmate]] and [[https://www.sublimetext.com/][Sublime Text]] days.
 That’s one of those hot-keys almost burned into soul.
 
-** Completion
-*** DONE vertico.el
+* Completion
+** DONE vertico.el
 #+begin_src emacs-lisp
   (use-package vertico
     :straight t
@@ -62,7 +261,7 @@ That’s one of those hot-keys almost burned into soul.
     (setq vertico-cycle t))
 #+end_src
 
-**** Vertico Extensions
+*** Vertico Extensions
 
 The ~vertico-indexed.elc~ extension adds a visual indicator of each candidate’s
 index.  Further, I can type ~C-<num> ENT~ and select that candidate.  Often
@@ -111,7 +310,7 @@ minibuffer commands I issued.  These are, by default, in ~\~/.emacs.d/history~.
   (savehist-mode 1)
 #+end_src
 
-*** Emacs Adjustments for Completion
+** Emacs Adjustments for Completion
 
 What follows is adjustments to emacs settings as they relate to completion.
 
@@ -137,7 +336,7 @@ What follows is adjustments to emacs settings as they relate to completion.
     (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode))
 #+end_src
 
-*** DONE marginalia.el
+** DONE marginalia.el
 
 The ~marginalia~ package provides annotations to minibuffer completions; I
 shudder to think how hard it would be to navigate Emacs’s ~M-x~ command without
@@ -153,7 +352,7 @@ annotations.
 This ensures that it is enabled right away.  It also forces the loading of the
 package.
 
-*** TODO consult.el
+** TODO consult.el
 
 #+begin_src emacs-lisp
   ;; Example configuration for Consult
@@ -315,7 +514,7 @@ package.
 
 #+end_src
 
-*** TODO consult-flycheck.el
+** TODO consult-flycheck.el
 #+begin_src emacs-lisp
   ;; Optionally add the `consult-flycheck' command.
   (use-package consult-flycheck
@@ -324,7 +523,7 @@ package.
 		("!" . consult-flycheck)))
 #+end_src
 
-*** TODO embark.el
+** TODO embark.el
 #+begin_src emacs-lisp
 
   ;; https://github.com/oantolin/embark
@@ -372,11 +571,11 @@ package.
 	(kmacro-bind-to-key nil)))
 
     (embark-define-keymap embark-kmacro-map
-      "Actions on kmacros."
-      ("RET" embark-kmacro-run)
-      ("s" embark-kmacro-save)
-      ("n" embark-kmacro-name)
-      ("b" embark-kmacro-bind))
+			  "Actions on kmacros."
+			  ("RET" embark-kmacro-run)
+			  ("s" embark-kmacro-save)
+			  ("n" embark-kmacro-name)
+			  ("b" embark-kmacro-bind))
 
     (add-to-list 'embark-keymap-alist '(kmacro . embark-kmacro-map))
     ;;; END embark key macro target
@@ -393,7 +592,7 @@ package.
 
 #+end_src
 
-*** TODO embark-consult.el
+** TODO embark-consult.el
 
 #+begin_src emacs-lisp
 
@@ -408,7 +607,7 @@ package.
     (embark-collect-mode . embark-consult-preview-minor-mode))
 #+end_src
 
-*** TODO wgrep.el
+** TODO wgrep.el
 
 #+begin_src emacs-lisp
 
@@ -432,7 +631,7 @@ package.
 		("e" . wgrep-change-to-wgrep-mode)))
 #+end_src
 
-*** TODO consult-lsp.el
+** TODO consult-lsp.el
 
 
 #+begin_src emacs-lisp
@@ -446,7 +645,7 @@ package.
     :commands consult-lsp-symbols)
 #+end_src
 
-*** DONE orderless.el
+** DONE orderless.el
 
 The [[https://github.com/minad/orderless][orderless]] package provides completion tooling for non-strict word order.  I
 spent considerable time reading through the [[https://github.com/minad/consult/wiki][Orderless section of Consult’s
@@ -527,7 +726,7 @@ More on these component matchings styles is available at [[https://github.com/mi
 	  orderless-style-dispatchers '(+orderless-dispatch)))
 #+end_src
 
-*** DONE consult-projectile.el
+** DONE consult-projectile.el
 
 The ~consult-projectile.el~ package provides a function I use everyday: ~M-x
 consult-projectile~.  When I invoke ~consult-projectile~, I have the file
@@ -550,8 +749,8 @@ other projects; and then select a file within that project.
 and [[https://www.sublimetext.com/][Sublime Text]] days.  More than any other key combination, that one is
 entirely muscle memory.
 
-** Window Manipulation
-*** DONE Tab Line
+* Window Manipulation
+** DONE Tab Line
 
 Show tabs in the current window.  The tab system is something I wrestle with,
 but I appreciate it’s existence.  These configurations make it easier to use.
@@ -562,7 +761,7 @@ but I appreciate it’s existence.  These configurations make it easier to use.
   (global-set-key (kbd "s-}") 'next-buffer)
 #+end_src
 
-*** TODO buffer-move.el
+** TODO buffer-move.el
 
 From [[https://github.com/lukhas/buffer-move][lukhas/buffer-move]], this package helps me quickly move a window elsewhere.
 As of <2022-02-01 Tue>, I don’t often use this command.  Consider it “on
@@ -574,9 +773,9 @@ notice” for removal.
     :bind ("<C-s-f12>" . buf-move))
 #+end_src
 
-** Text Manipulation
+* Text Manipulation
 
-*** DONE titlecase.el
+** DONE titlecase.el
 
 The rules of “titlecase” are confounding.  The ~titlecase.el~ package provides
 numerous ways to cast a string to “titlecase.”  I chose wikipedia style as a
@@ -586,6 +785,51 @@ quasi-opinionated compromise.
   (use-package titlecase
     :straight (titlecase :host github :repo "duckwork/titlecase.el")
     :custom (titlecase-style 'wikipedia))
+#+end_src
+
+* Utilities
+
+** jnf/eval-region-dwim()
+#+begin_src emacs-lisp
+  (define-key emacs-lisp-mode-map (kbd "C-c C-c") 'jnf/eval-region-dwim)
+  (define-key lisp-interaction-mode-map (kbd "C-c C-c") 'jnf/eval-region-dwim)
+  (defun jnf/eval-region-dwim ()
+    "When region is active, evaluate it and kill the mark. Else,
+    evaluate the whole buffer."
+    (interactive)
+    (if (not (region-active-p))
+	(progn
+	  (message "Evaluating buffer...")
+	  (eval-buffer))
+      (progn
+	(message "Evaluating region...")
+	(eval-region (region-beginning) (region-end)))
+      (setq-local deactivate-mark t)))
+#+end_src
+
+** jnf/toggle-osx-alternate-modifier()
+#+begin_src emacs-lisp
+
+;; On  I use ⌘ as meta and prefer ⌥ to do nothing so I can still insert special characters easily.
+;;
+;; (setq mac-command-modifier 'meta
+;;       mac-option-modifier 'none)
+
+;; (setq mac-right-option-modifier nil) ;; Disable Emacs capturing meta-key and fall back to OS X (useful for diacritics)
+;;
+;; (setq mac-right-option-modifier 'meta) ;; Enable Emacs capturing meta-key, so right M-x will execute extended command
+
+
+(defun jnf/toggle-osx-alternate-modifier ()
+  "Toggle native OS-X Option modifier
+setting (e.g. ns-alternate-modifier)."
+  (interactive)
+  (if ns-alternate-modifier
+      (progn (setq ns-alternate-modifier nil)
+             (message "Enabling OS X native Option modifier"))
+    (progn (setq ns-alternate-modifier 'meta)
+           (message "Disabling OX X native Option modifier (e.g. Option as Meta)"))))
+(global-set-key (kbd "C-x /") 'jnf/toggle-osx-alternate-modifier)
 #+end_src
 
 * Footnotes

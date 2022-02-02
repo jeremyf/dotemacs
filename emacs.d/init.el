@@ -63,9 +63,9 @@
 ;; (load "jnf-vertico.el" nil jnf-silence-loading-log)
 ;; (load "jnf-consult.el" nil jnf-silence-loading-log)
 
-(load "jnf-epub.el" nil jnf-silence-loading-log)
-(load "jnf-modes.el" nil jnf-silence-loading-log)
-(load "darwin-emacs-config.el" nil jnf-silence-loading-log)
+;; (load "jnf-epub.el" nil jnf-silence-loading-log)
+;; (load "jnf-modes.el" nil jnf-silence-loading-log)
+;; (load "darwin-emacs-config.el" nil jnf-silence-loading-log)
 
 ;; I want a completion framework, and the 'company-org-block package
 ;; is enough to say "Yes to company" over the simpler corfu.
