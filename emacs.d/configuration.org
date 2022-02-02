@@ -4,7 +4,6 @@
 #+STARTUP: overview
 
 ** Projects
-
 *** projectile.el
 
 Projectile provides convenient organization and commands to run over projects.
@@ -18,10 +17,10 @@ Projectile provides convenient organization and commands to run over projects.
   :bind ("s-." . projectile-toggle-between-implementation-and-test))
 #+end_src
 
-/Note:/  The =CMD= + =.= is a carryover from my [[https://macromates.com][Textmate]] and [[https://www.sublimetext.com/][Sublime Text]] days.  That’s one of those hot-keys almost burned into soul.
+/Note:/ The =CMD= + =.= is a carryover from my [[https://macromates.com][Textmate]] and [[https://www.sublimetext.com/][Sublime Text]] days.
+That’s one of those hot-keys almost burned into soul.
 
 ** Window Manipulation
-
 *** Tab Line
 
 Show tabs in the current window.  The tab system is something I wrestle with,
@@ -44,7 +43,6 @@ notice” for removal.
   :straight t
   :bind ("<C-s-f12>" . buf-move))
 #+end_src
-
 
 ** Text Manipulation
 

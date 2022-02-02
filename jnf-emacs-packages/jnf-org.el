@@ -50,7 +50,6 @@
           ("r" "Public Todo" entry (file "~/git/org/rpgs/agenda.org")
            "* TODO %?\n  %i\n  %a" :empty-lines-before 1)
           ))
-  (defun my-org-confirm-babel-evaluate (lang body) t)
 
   ;; https://xenodium.com/emacs-dwim-do-what-i-mean/
   (defun jnf/org-insert-link-dwim ()
@@ -85,7 +84,7 @@
     (concat
      "ls " (file-name-directory buffer-file-name)))))
 
-  (setq org-confirm-babel-evaluate #'my-org-confirm-babel-evaluate)
+
   (org-babel-do-load-languages 'org-babel-load-languages
 			       (append org-babel-load-languages
 				       '((emacs-lisp . t)
@@ -101,6 +100,9 @@
          ("C-c a" . org-agenda)
          ("C-c c" . org-capture)
          ("C-s-t" . org-toggle-link-display)))
+
+(defun my-org-confirm-babel-evaluate (lang body) nil)
+(setq org-confirm-babel-evaluate #'my-org-confirm-babel-evaluate)
 
 ;; To make Org mode take care of versioning of attachments for you,
 ;; add the following to your Emacs config:
