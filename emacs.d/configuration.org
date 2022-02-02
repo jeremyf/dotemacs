@@ -439,28 +439,44 @@ configuration for these two sibling themes.
 
    The STR identifies the icon and the HEIGHT and V-ADJUST provide
    the configuration."
-      (s-concat (all-the-icons-faicon icon :v-adjust (or v-adjust 0) :height (or height 1)) " " str))
+      (s-concat (all-the-icons-faicon
+		 icon
+		 :v-adjust (or v-adjust 0)
+		 :height (or height 1))
+		" " str))
 
     (defun with-material (icon str &optional height v-adjust)
       "Displays an ICON  from Font Material icon.
 
    The STR identifies the icon and the HEIGHT and V-ADJUST provide
    the configuration."
-      (s-concat (all-the-icons-material icon :v-adjust (or v-adjust 0) :height (or height 1)) " " str))
+      (s-concat (all-the-icons-material
+		 icon
+		 :v-adjust (or v-adjust 0)
+		 :height (or height 1))
+		" " str))
 
     (defun with-octicon (icon str &optional height v-adjust)
       "Displays an ICON  from Octicon icon.
 
    The STR identifies the icon and the HEIGHT and V-ADJUST provide
    the configuration."
-      (s-concat (all-the-icons-octicon icon :v-adjust (or v-adjust 0) :height (or height 1)) " " str))
+      (s-concat (all-the-icons-octicon
+		 icon
+		 :v-adjust (or v-adjust 0)
+		 :height (or height 1))
+		" " str))
 
     (defun with-alltheicon (icon str &optional height v-adjust)
       "Displays an ICON  from All the Icons icon.
 
    The STR identifies the icon and the HEIGHT and V-ADJUST provide
    the configuration."
-      (s-concat (all-the-icons-alltheicon icon :v-adjust (or v-adjust 0) :height (or height 1)) " " str)))
+      (s-concat (all-the-icons-alltheicon
+		 icon
+		 :v-adjust (or v-adjust 0)
+		 :height (or height 1))
+		" " str)))
 #+end_src
 
 ** TODO all-the-icons-dired.el
