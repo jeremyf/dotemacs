@@ -2,13 +2,45 @@
 #+AUTHOR: Jeremy Friesen
 #+EMAIL: jeremy@jeremyfriesen.com
 #+STARTUP: overview
+* Introduction
+
+On <2022-02-01 Tue> I chose to begin extracting my the various ~*.el~ into a
+[[https://en.wikipedia.org/wiki/Literate_programming][Literate programming]] format.  As with all Emacs configurations, what follows is
+a work in progress.
+
+** Tips on Troubleshooting
+
+As I migrated from my ~*.el~ configurations, I moved one ~.el~ file at a time.
+With each move, I would restart my Emacs daemon[fn:daemon].  I went so far as
+to write a ~e-reboot~ alias[fn:e-reboot].  So if I “messed up”, I could easily
+recover and fix the files I broke.
+
+In other words, when I’m working on extending my Emacs configuration, I tend to
+favor a bisset approach.  Make a change, verify it, and commit.  This helps
+insulate me from “getting to far ahead of myself.”
+
+** About the Current Structure
+
+The current structure is carried over from my past structure.  As I was first
+adopting Emacs, I spent time organizing the packages.  This organization is a
+bit muddy, as I never quite established the nomenclature.
+
+What I can say is the order may be important.  But I’ll be working to untangle
+that.
+
+Where feasible, I have tried to bind keys “close” to their utilization.  That
+is to say, I often leverage ~use-package~’s ~:bind~, ~:hook~, and ~:map~
+keyword.  But I’m not always consistent.
 
 * Basic Configuration
-** TODO straight.el
+
+** DONE straight.el
+
+I have chosen to adopt ~straight.el~ for my package management.  The fact that
+it rather seamlessly works with ~use-package~ has help me keep my code more
+organized.
 
 #+begin_src emacs-lisp
-  (defconst jnf-silence-loading-log t
-    "When true log to stdout any ")
   ;; https://www.reddit.com/r/emacs/comments/mtb05k/emacs_init_time_decreased_65_after_i_realized_the/
   (setq straight-check-for-modifications '(check-on-save find-when-checking))
 
@@ -28,117 +60,83 @@
 	   'silent 'inhibit-cookies)
 	(goto-char (point-max))
 	(eval-print-last-sexp)))
-    (load bootstrap-file nil jnf-silence-loading-log))
+    (load bootstrap-file))
 
   (setq straight-repository-branch "develop")
-
-  ;; I saw that straight loaded use-package to take advantage of the
-  ;; use-package syntax which is often how things are documented.
   (straight-use-package 'use-package)
 #+end_src
 
-** TODO Early Configuration
+** DONE Early Configuration
+
+These are some general configurations that I’ve slowly accumulated.  There’s
+inline documentation in most cases.
 
 #+begin_src emacs-lisp
-  ;;; Commentary:
-  ;;
-  ;;  Some basic configurations that should be applicable for all emacs
-  ;;  settings.
-  ;;
-  ;;; Code:
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  (setq  user-full-name "Jeremy Friesen"
+	 user-mail-address "jeremy@jeremyfriesen.com")
 
-  ;; A chunk of code that allows me to pass multiple filenames to
-  ;; emacsclient AND open those files in different frames within the
-  ;; same window.(defvar server-visit-files-custom-find:buffer-count)
-  (defvar server-visit-files-custom-find:buffer-count)
-  (defadvice server-visit-files
-      (around server-visit-files-custom-find
-	      activate compile)
-    "Maintain a counter of visited files from a single client call."
-    (let ((server-visit-files-custom-find:buffer-count 0))
-      ad-do-it))
-  (defun server-visit-hook-custom-find ()
-    "Arrange to visit the files from a client call in separate windows."
-    (if (zerop server-visit-files-custom-find:buffer-count)
-	(progn
-	  (delete-other-windows)
-	  (switch-to-buffer (current-buffer)))
-      (let ((buffer (current-buffer))
-	    (window (split-window-sensibly)))
-	(switch-to-buffer buffer)
-	(balance-windows)))
-    (setq server-visit-files-custom-find:buffer-count
-	  (1+ server-visit-files-custom-find:buffer-count)))
-  (add-hook 'server-visit-hook 'server-visit-hook-custom-find)
+  (defconst jnf-silence-loading-log t
+    "When t log to stdout load messages from this configuration.
 
-  (global-so-long-mode)
+  In a previous iteration, I loaded lots of separate '*.el' files.
+  This flag allowed me to more easily troubleshoot those load
+  attempts.")
 
-  ;; Parenthesis matching is one of the flaws in my Emacs setup as of
-  ;; this writing. I know that there are a lot of options out
-  ;; there—paredit, smartparens, etc.—but I haven’t sat down and really
-  ;; capital-L Learned a better solution than the TextMate-style bracket
-  ;; completion (which Emacs calls, somewhat fancifully, ‘electric’).
-  ;;
-  ;; https://blog.sumtypeofway.com/posts/emacs-config.html
-  (electric-pair-mode)
-
-  ;; Put autosave files (ie #foo#) and backup files (ie foo~) in ~/.emacs.d/.
-  ;; See https://snarfed.org/gnu_emacs_backup_files
-  ;; create the autosave dir if necessary, since emacs won't.
-  (make-directory "~/.emacs.d/autosaves/" t)
-
-  (recentf-mode 1)
-  (run-at-time nil (* 2 60) 'recentf-save-list)
-
+  (global-so-long-mode) ;; Handle long files.
+  (electric-pair-mode)  ;; https://blog.sumtypeofway.com/posts/emacs-config.html
+  (make-directory "~/.emacs.d/autosaves/" t) ;; Ensuring I have an autosave
+  ;; directory.
+  (recentf-mode 1) ;; Track recent
+  (run-at-time nil (* 2 60) 'recentf-save-list) ;; Save files every 2 minutes
   (global-auto-revert-mode)
 
-  (setq-default fill-column 79)
+  (setq-default fill-column 79) ;; Feeling a bit old school with 80 characters.
   (setq
-   ;; Don't create lock files.  Emacs drops these files on the file
-   ;; system.  I found this most cumbersome when working in hugo.  The
-   ;; hugo build would file because it tried to handle a lock file.
-   create-lockfiles nil
-   ;; Stop ringing any bell
-   ring-bell-function 'ignore
-   ;; The default is 60.  It is rare that I need more than 15 or 20.
-   ;; However in my long use of Jumpcut there have been a few times where
-   ;; I get into the 80s on previous pastes.  Given that the kill ring is
-   ;; searchable, I think a larger value makes a lot of sense.
-   kill-ring-max 120
-   ;; Given the number of symlinks, visit the "linked to" file.
-   vc-follow-symlinks t
-
    bookmark-default-file "~/git/jnf-emacs-bookmarks/bookmarks"
+   backup-directory-alist '((".*" . "~/.emacs.d/backups/"))
+   create-lockfiles nil        ;; Don't create lock files.
+   ring-bell-function 'ignore  ;; Stop ringing any bell
+   kill-ring-max 120           ;; Set a generous kill ring size.
+   vc-follow-symlinks t        ;; Follow symlinks instead of prompting.
    read-process-output-max (* 1024 1024 3)  ; Increase read size per process
-   indent-tabs-mode nil ;; Ensure tabs are expanded, not inserted
-   inhibit-startup-screen t ;; Don't include the  emacs "start" window
-   idle-update-delay 1.1  ;;Slow down the UI being updated to improve performance
-   split-width-threshold 100 ;; Most of the times I favor two windows side-by-side within a frame
+   indent-tabs-mode nil        ;; Ensure tabs are expanded, not inserted
+   inhibit-startup-screen t    ;; Don't include the  emacs "start" window
+   idle-update-delay 1.1       ;; Slow down the UI being updated to improve
+			       ;; performance
+   split-width-threshold 100   ;; Most of the times I favor two windows
+			       ;; side-by-side within a frame
+   backup-by-copying t         ;; Don't delink hardlinks
+   version-control t           ;; Use version numbers on backups
+   delete-old-versions t       ;; Automatically delete excess backups
+   kept-new-versions 20        ;; how many of the newest versions to keep
+   kept-old-versions 5         ;; and how many of the old
    recentf-max-menu-items 50
    recentf-max-saved-items 50
-   backup-directory-alist '((".*" . "~/.emacs.d/backups/"))
-   backup-by-copying t    ; Don't delink hardlinks
-   version-control t      ; Use version numbers on backups
-   delete-old-versions t  ; Automatically delete excess backups
-   kept-new-versions 20   ; how many of the newest versions to keep
-   kept-old-versions 5    ; and how many of the old
-   user-full-name "Jeremy Friesen"
-   user-mail-address "jeremy@jeremyfriesen.com"
    )
 
   ;; When you open Emacs, grab all the space on the screen
   (add-to-list 'initial-frame-alist '(fullscreen . maximized))
 
-  ;; Hide the icons of the Emacs toolbar
-  (tool-bar-mode -1)
+  (tool-bar-mode -1) ;; Hide the icons of the Emacs toolbar
+  (scroll-bar-mode -1) ;; Hide the scroll bar. Let's be clear, I don't use it.
+  (defalias 'yes-or-no-p 'y-or-n-p) ;; Always "y" or "n" for yes/no
 
-  ;; Hide the scroll bar. Let's be clear, I don't use it.
-  (scroll-bar-mode -1)
+  (prefer-coding-system 'utf-8)
+  (set-default-coding-systems 'utf-8)
+  (set-terminal-coding-system 'utf-8)
+  (set-keyboard-coding-system 'utf-8)
 
-  ;; Instead of typing "yes" or "no" short-circuit to "y" or "n"
-  (defalias 'yes-or-no-p 'y-or-n-p)
+  (add-hook 'text-mode-hook #'abbrev-mode)
 
+  (add-function :after after-focus-change-function
+		(defun jnf/garbage-collect-maybe ()
+		  (unless (frame-focus-state)
+		    (garbage-collect))))
+#+end_src
+
+** TODO Keymappings
+
+#+begin_src emacs-lisp
   (unbind-key "C-x C-d") ;; `list-directory'
   ;; `dired' is a better interface than `list-directory'
   (global-set-key (kbd "C-x C-d") 'dired)
@@ -150,35 +148,27 @@
   ;; Far to easy to type this on accident, and I'm not a fan of it's behavior.
   (unbind-key "C-z") ;; `suspend-frame'
 
-  (prefer-coding-system 'utf-8)
-  (set-default-coding-systems 'utf-8)
-  (set-terminal-coding-system 'utf-8)
-  (set-keyboard-coding-system 'utf-8)
-
   ;; Given that C-c C-x is common within org-mode, I found myself
   ;; accidentally invoking this transposition.  I have "s-q" command for
   ;; this.
   (unbind-key "C-x C-c") ;; was `save-buffers-kill-terminal'
-
-  (add-hook 'text-mode-hook #'abbrev-mode)
-
-  (add-function :after after-focus-change-function
-		(defun jnf/garbage-collect-maybe ()
-		  (unless (frame-focus-state)
-		    (garbage-collect))))
 #+end_src
 
-** TODO diminish.el
+
+** DONE Utility Packages
+
+These are some “invisible” packages that do some behind the scenes work.
+
+- ~diminish~ :: Provides a means of not displaying the :lighter of a minor mode in the modeline.
 
 #+begin_src emacs-lisp
   (use-package diminish :straight t)
+  (diminish 'eldoc-mode)
 #+end_src
 
-** TODO gchm.el
+- ~gcmh.el~ :: Do garbage collection (GC) when the user is idle.
 
 #+begin_src emacs-lisp
-
-  ;; GCMH does GC when the user is idle.
   (use-package gcmh
     :straight t
     :diminish 'gcmh-mode
@@ -188,42 +178,39 @@
     :config (gcmh-mode))
 #+end_src
 
-** TODO keychain-environment.el
+- ~keychain-environment.el~ :: Load keychain environment variables
 
 #+begin_src emacs-lisp
-
-  ;; Load keychain environment variables
   (use-package keychain-environment
     :straight t
-    :config
-    (keychain-refresh-environment))
+    :config (keychain-refresh-environment))
 #+end_src
 
-** TODO f.el
+- ~dash.el~ :: A modern list API for Emacs. No 'cl required.  (See https://github.com/magnars/dash.el/)
 
 #+begin_src emacs-lisp
+  (use-package dash :straight t)
+#+end_src
 
-  ;; a modern API for working with files and directories in Emacs.
-  ;; https://github.com/rejeep/f.el/
+
+- ~f.el~ :: A modern API for working with files and directories in Emacs. (See https://github.com/rejeep/f.el/)
+
+#+begin_src emacs-lisp
   (use-package f :straight t)
 #+end_src
 
-** TODO s.el
+- ~s.el~ :: The long lost Emacs string manipulation library.  (See https://github.com/magnars/s.el/)
 
 #+begin_src emacs-lisp
-
-  ;; The long lost Emacs string manipulation library.
-  ;; https://github.com/magnars/s.el/
   (use-package s :straight t)
 #+end_src
 
-** TODO dash.el
+- ~transient.el~ :: A package for building “menus” to prompt for additional
+  input before executing a command. See [[https://github.com/tecosaur/screenshot/blob/master/screenshot.el][screenshot.el]] for some examples or the
+  ubiquitous [[https://magit.vc][magit.el]].
 
 #+begin_src emacs-lisp
-
-  ;; A modern list API for Emacs. No 'cl required.
-  ;; https://github.com/magnars/dash.el/
-  (use-package dash :straight t)
+(use-package transient :straight t)
 #+end_src
 
 ** TODO Variable/const definitions
@@ -303,6 +290,7 @@
        ("l" find-library "Find library")
        ("m" helpful-macro "Macro")
        ("p" helpful-at-point "Thing at point")
+       ("." helpful-at-point "Thing at point")
        ("v" helpful-variable "Variable")
        ("t" describe-text-properties "Text properties")
        )))
@@ -1101,7 +1089,7 @@ syntax highlighting that makes reading ~Go-lang~ tolerable.
 ** TODO el-doc
 
 #+begin_src emacs-lisp
-  (diminish 'eldoc-mode)
+
 #+end_src
 
 * Support
@@ -1109,7 +1097,7 @@ syntax highlighting that makes reading ~Go-lang~ tolerable.
 ** DONE ripgrep.el
 
 For many years, I’ve used “The Silver Searcher”, or ~ag~ on the command
-line.[fn:1].  However, [[https://github.com/BurntSushi/ripgrep][ripgrep]] provides even faster searching, with an almost
+line.[fn:ag].  However, [[https://github.com/BurntSushi/ripgrep][ripgrep]] provides even faster searching, with an almost
 identical parameter list.
 
 #+begin_src emacs-lisp
@@ -3598,6 +3586,38 @@ This package includes the configuration for elfeed, an Emacs RSS reader.
 
 * Utilities
 
+** DONE Opening multiple file names from command line
+
+The following chunk of allows me to take multiple filenames passed via the
+emacsclient and open those files in windows within the same frame.
+
+You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/main/bin/git-edit][git-edit]] command line tool.
+
+#+begin_src emacs-lisp
+  (defvar server-visit-files-custom-find:buffer-count
+    "A counter for assisting with opening multiple files via a single
+  client call.")
+  (defadvice server-visit-files
+      (around server-visit-files-custom-find
+	      activate compile)
+    "Maintain a counter of visited files from a single client call."
+    (let ((server-visit-files-custom-find:buffer-count 0))
+      ad-do-it))
+  (defun server-visit-hook-custom-find ()
+    "Arrange to visit the files from a client call in separate windows."
+    (if (zerop server-visit-files-custom-find:buffer-count)
+	(progn
+	  (delete-other-windows)
+	  (switch-to-buffer (current-buffer)))
+      (let ((buffer (current-buffer))
+	    (window (split-window-sensibly)))
+	(switch-to-buffer buffer)
+	(balance-windows)))
+    (setq server-visit-files-custom-find:buffer-count
+	  (1+ server-visit-files-custom-find:buffer-count)))
+  (add-hook 'server-visit-hook 'server-visit-hook-custom-find)
+#+end_src
+
 ** TODO blogging specific
 
 #+begin_src emacs-lisp
@@ -4661,9 +4681,6 @@ Where NAME is name of function, BUFFER is name of buffer, and TEXT is displayed.
 ** TODO transient.el
 
 #+begin_src emacs-lisp
-;; See https://github.com/tecosaur/screenshot/blob/master/screenshot.el for some examples
-(use-package transient
-  :straight t)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -4835,4 +4852,8 @@ Depends on the `grab-mac-link' package."
 
 * Footnotes
 
-[fn:1] “Ag” is the chemical symbol for the Silver element.
+[fn:e-reboot] My alias is as follows: ~alias e-reboot='cd ~/git/dotemacs; git stash ; edaemon ; git stash pop ; git edit'~.
+
+[fn:daemon] My [[https://codeberg.org/takeonrules/dotzshrc/src/ab8b781cbdddd2fdbe674e031436b7e9a8e8a024/README.org#L1][dotzshrc]] config has my ~$EDITOR~
+
+[fn:ag] “Ag” is the chemical symbol for the Silver element.
