@@ -77,7 +77,7 @@ These are some general configurations that I’ve slowly accumulated.  There’s
 inline documentation in most cases.
 
 #+begin_src emacs-lisp
-  (setq  user-full-name "Jeremy Friesen"
+  (setq user-full-name "Jeremy Friesen"
 	 user-mail-address "jeremy@jeremyfriesen.com")
 
   (defconst jnf-silence-loading-log t
@@ -90,7 +90,7 @@ inline documentation in most cases.
   (global-so-long-mode) ;; Handle long files.
   (electric-pair-mode)  ;; https://blog.sumtypeofway.com/posts/emacs-config.html
   (make-directory "~/.emacs.d/autosaves/" t) ;; Ensuring I have an autosave
-					     ;; directory.
+                                             ;; directory.
   (recentf-mode 1) ;; Track recent
   (run-at-time nil (* 2 60) 'recentf-save-list) ;; Save files every 2 minutes
   (global-auto-revert-mode)
@@ -114,11 +114,15 @@ inline documentation in most cases.
    recentf-max-menu-items 50
    recentf-max-saved-items 50
    ring-bell-function 'ignore  ;; Stop ringing any bell
-   vc-follow-symlinks t        ;; Follow symlinks instead of prompting.
    split-width-threshold 100   ;; Most of the times I favor two windows
-			       ;; side-by-side within a frame
+   ;; side-by-side within a frame
+   vc-follow-symlinks t        ;; Follow symlinks instead of prompting.
    version-control t           ;; Use version numbers on backups
+   x-underline-at-descent-line t ;; Recommendation from https://protesilaos.com/emacs/modus-themes
    )
+
+
+  (global-hl-line-mode)
 
   ;; When you open Emacs, grab all the space on the screen
   (add-to-list 'initial-frame-alist '(fullscreen . maximized))
@@ -317,7 +321,13 @@ These are some “invisible” packages that do some behind the scenes work.
 
 * Display
 
-** TODO modus-themes.el
+** DONE modus-themes.el
+
+The modus themes (e.g. ~modus-vivendi~ and ~modus-operandi~) provide a light
+and dark theme with a focus on visual accessibility.
+
+I love [[http://protesilaos.com][Prot]]’s attention to detail with the modus themes).  Here’s my
+configuration for these two sibling themes.
 
 #+begin_src emacs-lisp
   (use-package modus-themes
@@ -349,14 +359,11 @@ These are some “invisible” packages that do some behind the scenes work.
        (3 . (monochrome overline 1.2))
        (4 . (overline 1.1))
        (t . (rainbow 1.05)))))
-
-  (global-hl-line-mode)
-
-  ;; Recommendation from https://protesilaos.com/emacs/modus-themes
-  (setq x-underline-at-descent-line t)
 #+end_src
 
 ** TODO lin.el
+
+- ~lin.el~ :: “LIN locally remaps the hl-line face to a style that is optimal for major modes where line selection is the primary mode of interaction.”  In otherwords, ~lin.el~ improves the highlighted line behavior for the competing contexts.
 
 #+begin_src emacs-lisp
   (use-package lin
@@ -588,33 +595,6 @@ These are some “invisible” packages that do some behind the scenes work.
 #+end_src
 
 ** TODO Scrolling functions
-
-#+begin_src emacs-lisp
-  ;; See https://www.reddit.com/r/emacs/comments/r7l3ar/how_do_you_scroll_half_a_page/
-  (global-set-key (kbd "M-n") 'jnf/scroll-down-half-page)
-  (defun jnf/scroll-down-half-page ()
-    "Scroll down half a page while keeping the cursor centered"
-    (interactive)
-    (let ((ln (line-number-at-pos (point)))
-	  (lmax (line-number-at-pos (point-max))))
-      (cond ((= ln 1) (move-to-window-line nil))
-	    ((= ln lmax) (recenter (window-end)))
-	    (t (progn
-		 (move-to-window-line -1)
-		 (recenter))))))
-
-  (global-set-key (kbd "M-p") 'jnf/scroll-up-half-page)
-  (defun jnf/scroll-up-half-page ()
-    "Scroll up half a page while keeping the cursor centered"
-    (interactive)
-    (let ((ln (line-number-at-pos (point)))
-	  (lmax (line-number-at-pos (point-max))))
-      (cond ((= ln 1) nil)
-	    ((= ln lmax) (move-to-window-line nil))
-	    (t (progn
-		 (move-to-window-line 0)
-		 (recenter))))))
-#+end_src
 
 * General Emacs Configuration
 
@@ -4675,6 +4655,42 @@ Where NAME is name of function, BUFFER is name of buffer, and TEXT is displayed.
 ;;; END Burning Wheel Gold Tables
 ;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+#+end_src
+
+
+** TODO Functions
+
+- ~jnf/scroll-down-half-page~ :: See https://www.reddit.com/r/emacs/comments/r7l3ar/how_do_you_scroll_half_a_page/
+
+#+begin_src emacs-lisp
+  (global-set-key (kbd "M-n") 'jnf/scroll-down-half-page)
+  (defun jnf/scroll-down-half-page ()
+    "Scroll down half a page while keeping the cursor centered"
+    (interactive)
+    (let ((ln (line-number-at-pos (point)))
+	  (lmax (line-number-at-pos (point-max))))
+      (cond ((= ln 1) (move-to-window-line nil))
+	    ((= ln lmax) (recenter (window-end)))
+	    (t (progn
+		 (move-to-window-line -1)
+		 (recenter))))))
+#+end_src
+
+- ~jnf/scroll-up-half-page~ :: See https://www.reddit.com/r/emacs/comments/r7l3ar/how_do_you_scroll_half_a_page/
+
+#+begin_src emacs-lisp
+
+  (global-set-key (kbd "M-p") 'jnf/scroll-up-half-page)
+  (defun jnf/scroll-up-half-page ()
+    "Scroll up half a page while keeping the cursor centered"
+    (interactive)
+    (let ((ln (line-number-at-pos (point)))
+	  (lmax (line-number-at-pos (point-max))))
+      (cond ((= ln 1) nil)
+	    ((= ln lmax) (move-to-window-line nil))
+	    (t (progn
+		 (move-to-window-line 0)
+		 (recenter))))))
 #+end_src
 
 * Menus
