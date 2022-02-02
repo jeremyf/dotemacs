@@ -60,7 +60,7 @@
   ;; Load the remainder of the configuration from the Org configuration file.
   (org-babel-load-file (concat user-emacs-directory "configuration.org")))
 
-(load "jnf-vertico.el" nil jnf-silence-loading-log)
+;; (load "jnf-vertico.el" nil jnf-silence-loading-log)
 (load "jnf-consult.el" nil jnf-silence-loading-log)
 
 (load "jnf-epub.el" nil jnf-silence-loading-log)
