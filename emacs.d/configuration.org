@@ -12,9 +12,12 @@ minibuffers.  This change ensures that there’s only one.
   (setq enable-recursive-minibuffers nil)
 #+end_src
 
-** Support
+** DONE Support
 
-For many years, I’ve used “The Silver Searcher”, or ~ag~ on the command line.[fn:1].  However, [[https://github.com/BurntSushi/ripgrep][ripgrep]] provides even faster searching, with an almost identical parameter list.
+*** DONE ripgrep.el
+For many years, I’ve used “The Silver Searcher”, or ~ag~ on the command
+line.[fn:1].  However, [[https://github.com/BurntSushi/ripgrep][ripgrep]] provides even faster searching, with an almost
+identical parameter list.
 
 #+begin_src emacs-lisp
   (use-package ripgrep
@@ -23,7 +26,7 @@ For many years, I’ve used “The Silver Searcher”, or ~ag~ on the command li
 #+end_src
 
 ** Projects
-*** projectile.el
+*** TODO projectile.el
 
 Projectile provides convenient organization and commands to run over projects.
 
@@ -40,8 +43,7 @@ Projectile provides convenient organization and commands to run over projects.
 That’s one of those hot-keys almost burned into soul.
 
 ** Completion
-
-*** vertico.el
+*** DONE vertico.el
 #+begin_src emacs-lisp
   (use-package vertico
     :straight t
@@ -59,6 +61,8 @@ That’s one of those hot-keys almost burned into soul.
 		:override #'consult-completing-read-multiple)
     (setq vertico-cycle t))
 #+end_src
+
+**** Vertico Extensions
 
 The ~vertico-indexed.elc~ extension adds a visual indicator of each candidate’s
 index.  Further, I can type ~C-<num> ENT~ and select that candidate.  Often
@@ -79,9 +83,12 @@ different experience from what I’m accustomed to in Emacs.  Then again, at
 least I’m not trapped in the recursive mini-buffer challenges.
 
 #+begin_src emacs-lisp
-  ;; (load "~/.emacs.d/straight/build/vertico/extensions/vertico-buffer.elc")
-  ;; (vertico-buffer-mode)
-  ;; (setq vertico-buffer-display-action '(display-buffer-at-bottom (window-height . 15)))
+  (load "~/.emacs.d/straight/build/vertico/extensions/vertico-buffer.elc"
+	nil
+	jnf-silence-loading-log)
+  (vertico-buffer-mode)
+  (setq vertico-buffer-display-action
+	'(display-buffer-at-bottom (window-height . 15)))
 #+end_src
 
 The ~vertico-repeat.elc~ extension does one simple thing: it remembers and
@@ -103,6 +110,8 @@ minibuffer commands I issued.  These are, by default, in ~\~/.emacs.d/history~.
 #+begin_src emacs-lisp
   (savehist-mode 1)
 #+end_src
+
+*** Emacs Adjustments for Completion
 
 What follows is adjustments to emacs settings as they relate to completion.
 
@@ -128,7 +137,7 @@ What follows is adjustments to emacs settings as they relate to completion.
     (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode))
 #+end_src
 
-*** marginalia.el
+*** DONE marginalia.el
 
 The ~marginalia~ package provides annotations to minibuffer completions; I
 shudder to think how hard it would be to navigate Emacs’s ~M-x~ command without
@@ -144,8 +153,405 @@ annotations.
 This ensures that it is enabled right away.  It also forces the loading of the
 package.
 
+*** TODO consult.el
+
+#+begin_src emacs-lisp
+  ;; Example configuration for Consult
+  ;; https://github.com/minad/consult
+  (use-package consult
+    :straight t
+    ;; Replace bindings. Lazily loaded due by `use-package'.
+    :bind (;; C-c bindings (mode-specific-map)
+	   ("C-c h" . consult-history)
+	   ;; ("C-c m" . consult-mode-command)
+	   ("C-c b" . consult-bookmark)
+	   ("C-c k" . consult-kmacro)
+	   ;; C-x bindings (ctl-x-map)
+	   ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complet-command
+	   ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
+	   ("s-b" . consult-buffer)                ;; orig. switch-to-buffer
+	   ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
+	   ("C-s-b" . consult-buffer-other-window)
+	   ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
+	   ;; Custom M-# bindings for fast register access
+	   ("M-#" . consult-register-load)
+	   ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
+	   ("C-M-#" . consult-register)
+	   ;; Other custom bindings
+	   ("M-y" . consult-yank-from-kill-ring)                ;; orig. yank-pop
+	   ("<help> a" . consult-apropos)            ;; orig. apropos-command
+	   ;; M-g bindings (goto-map)
+	   ("M-g e" . consult-compile-error)
+	   ("M-g g" . consult-goto-line)             ;; orig. goto-line
+	   ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
+	   ("s-l" . consult-goto-line)           ;; orig. goto-line
+	   ("M-g o" . consult-outline)
+	   ("M-g m" . consult-mark)
+	   ("M-g k" . consult-global-mark)
+	   ("C-x C-SPC" . consult-mark)
+	   ("M-g i" . consult-imenu)
+	   ("M-g I" . consult-imenu-multi)
+	   ;; M-s bindings (search-map)
+	   ("M-s f" . consult-find)
+	   ("M-s L" . consult-locate)
+	   ("M-s g" . consult-grep)
+	   ("M-s G" . consult-git-grep)
+	   ("M-s r" . consult-ripgrep)
+	   ("C-c f" . consult-ripgrep)
+	   ("M-s l" . consult-line)
+	   ("M-s m" . consult-multi-occur)
+	   ("M-s k" . consult-keep-lines)
+	   ("M-s u" . consult-focus-lines)
+	   ;; Customizations that map to ivy
+	   ("s-r" . consult-recent-file) ;; Deprecate
+	   ("C-c r" . consult-recent-file)
+	   ("C-c o" . consult-file-externally)
+	   ("C-y" . yank)
+	   ("C-s" . consult-line) ;; I've long favored Swiper mapped to c-s
+	   ;; Isearch integration
+	   ("M-s e" . consult-isearch)
+	   ;; ("s-t" . jnf/consult-find-using-fd)
+	   ;; ("s-3" . consult-imenu-multi)
+	   :map isearch-mode-map
+	   ("M-e" . consult-isearch)                 ;; orig. isearch-edit-string
+	   ("M-s e" . consult-isearch)               ;; orig. isearch-edit-string
+	   ("M-s l" . consult-line))                 ;; required by consult-line to detect isearch
+
+    ;; The :init configuration is always executed (Not lazy)
+    :init
+
+    ;; Optionally configure the register formatting. This improves the register
+    ;; preview for `consult-register', `consult-register-load',
+    ;; `consult-register-store' and the Emacs built-ins.
+    (setq register-preview-delay 0
+	  register-preview-function #'consult-register-format)
+
+
+    ;; From https://github.com/minad/consult/wiki#find-files-using-fd
+    ;; Note: this requires lexical binding
+    (defun jnf/consult-find-using-fd (&optional dir initial)
+      "Find project files.
+
+  A replacement for `projectile-find-file'."
+      (interactive "P")
+      (let ((consult-find-command "fd --color=never --hidden --exclude .git/ --full-path ARG OPTS"))
+	(consult-find dir initial)))
+
+    (defun jnf/consult-line (consult-line-function &rest rest)
+      "Advising function around `CONSULT-LINE-FUNCTION'.
+
+  When there's an active region, use that as the first parameter
+  for `CONSULT-LINE-FUNCTION'.  Otherwise, use the current word as
+  the first parameter.  This function handles the `REST' of the
+  parameters."
+      (interactive)
+      (apply consult-line-function
+	     (if (use-region-p) (buffer-substring (region-beginning) (region-end)))
+	     rest))
+
+    (defun jnf/consult-ripgrep (consult-ripgrep-function &optional dir &rest rest)
+      "Use region or thing at point to populate initial parameter for `CONSULT-RIPGREP-FUNCTION'.
+
+  When there's an active region, use that as the initial parameter
+  for the `CONSULT-RIPGREP-FUNCTION'.  Otherwise, use the thing at
+  point.
+
+  `DIR' use the universal argument (e.g. C-u prefix) to first set
+  the directory.  `REST' is passed to the `CONSULT-RIPGREP-FUNCTION'."
+      (interactive "P")
+      (apply consult-ripgrep-function
+	     dir
+	     (if (use-region-p) (buffer-substring (region-beginning) (region-end)))
+	     rest))
+
+    ;; Optionally tweak the register preview window.
+    ;; This adds thin lines, sorting and hides the mode line of the window.
+    (advice-add #'register-preview :override #'consult-register-window)
+    (advice-add #'consult-line :around #'jnf/consult-line '((name . "wrapper")))
+    (advice-add #'consult-ripgrep :around #'jnf/consult-ripgrep '((name . "wrapper")))
+
+    ;; Use Consult to select xref locations with preview
+    (setq xref-show-xrefs-function #'consult-xref
+	  xref-show-definitions-function #'consult-xref)
+
+    ;; Updating the default to include "--ignore-case"
+    (setq consult-ripgrep-command "rg --null --line-buffered --color=ansi --max-columns=1000 --ignore-case --no-heading --line-number . -e ARG OPTS")
+
+    ;; Configure other variables and modes in the :config section,
+    ;; after lazily loading the package.
+    :config
+
+    ;; Optionally configure preview. Note that the preview-key can also be
+    ;; configured on a per-command basis via `consult-config'. The default value
+    ;; is 'any, such that any key triggers the preview.
+    ;; (setq consult-preview-key 'any)
+    ;; (setq consult-preview-key (kbd "M-p"))
+    ;; (setq consult-preview-key (list (kbd "<S-down>") (kbd "<S-up>")))
+
+    ;; Optionally configure the narrowing key.
+    ;; Both < and C-+ work reasonably well.
+    (setq consult-narrow-key "<") ;; (kbd "C-+")
+
+    ;; Optionally make narrowing help available in the minibuffer.
+    ;; Probably not needed if you are using which-key.
+    ;; (define-key consult-narrow-map (vconcat consult-narrow-key "?") #'consult-narrow-help)
+
+    ;; Optionally configure a function which returns the project root directory.
+    ;; There are multiple reasonable alternatives to chose from:
+    ;; * projectile-project-root
+    ;; * vc-root-dir
+    ;; * project-roots
+    ;; * locate-dominating-file
+    (autoload 'projectile-project-root "projectile")
+    (setq consult-project-root-function #'projectile-project-root)
+    ;; (setq consult-project-root-function
+    ;;       (lambda ()
+    ;;         (when-let (project (project-current))
+    ;;           (car (project-roots project)))))
+    ;; (setq consult-project-root-function #'vc-root-dir)
+    ;; (setq consult-project-root-function
+    ;;       (lambda () (locate-dominating-file "." ".git")))
+    )
+
+#+end_src
+
+*** TODO consult-flycheck.el
+#+begin_src emacs-lisp
+  ;; Optionally add the `consult-flycheck' command.
+  (use-package consult-flycheck
+    :straight t
+    :bind (:map flycheck-command-map
+		("!" . consult-flycheck)))
+#+end_src
+
+*** TODO embark.el
+#+begin_src emacs-lisp
+
+  ;; https://github.com/oantolin/embark
+  (use-package embark
+    :straight t
+    :bind
+    (("C-." . embark-act)       ;; pick some comfortable binding
+     ("M-." . embark-dwim)
+     ("C-s-e" . embark-export)
+     ("C-h b" . embark-bindings))
+    :init
+    ;; Optionally replace the key help with a completing-read interface
+    (setq prefix-help-command #'embark-prefix-help-command)
+    :config
+
+    ;;; BEGIN embark key macro target
+    (defun embark-kmacro-target ()
+      "Target a textual kmacro in braces."
+      (save-excursion
+	(let ((beg (progn (skip-chars-backward "^{}\n") (point)))
+	      (end (progn (skip-chars-forward "^{}\n") (point))))
+	  (when (and (eq (char-before beg) ?{) (eq (char-after end) ?}))
+	    `(kmacro ,(buffer-substring-no-properties beg end)
+		     . (,(1- beg) . ,(1+ end)))))))
+
+    (add-to-list 'embark-target-finders 'embark-kmacro-target)
+
+    (defun embark-kmacro-run (arg kmacro)
+      (interactive "p\nsKmacro: ")
+      (kmacro-call-macro arg t nil (kbd kmacro)))
+
+    (defun embark-kmacro-save (kmacro)
+      (interactive "sKmacro: ")
+      (kmacro-push-ring)
+      (setq last-kbd-macro (kbd kmacro)))
+
+    (defun embark-kmacro-name (kmacro name)
+      (interactive "sKmacro: \nSName: ")
+      (let ((last-kbd-macro (kbd kmacro)))
+	(kmacro-name-last-macro name)))
+
+    (defun embark-kmacro-bind (kmacro)
+      (interactive "sKmacro: \n")
+      (let ((last-kbd-macro (kbd kmacro)))
+	(kmacro-bind-to-key nil)))
+
+    (embark-define-keymap embark-kmacro-map
+      "Actions on kmacros."
+      ("RET" embark-kmacro-run)
+      ("s" embark-kmacro-save)
+      ("n" embark-kmacro-name)
+      ("b" embark-kmacro-bind))
+
+    (add-to-list 'embark-keymap-alist '(kmacro . embark-kmacro-map))
+    ;;; END embark key macro target
+    (setq embark-action-indicator
+	  (lambda (map &optional _target)
+	    (which-key--show-keymap "Embark" map nil nil 'no-paging)
+	    #'which-key--hide-popup-ignore-command)
+	  embark-become-indicator embark-action-indicator)
+    ;; Hide the mode line of the Embark live/completions buffers
+    (add-to-list 'display-buffer-alist
+		 '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+		   nil
+		   (window-parameters (mode-line-format . none)))))
+
+#+end_src
+
+*** TODO embark-consult.el
+
+#+begin_src emacs-lisp
+
+  ;; Consult users will also want the embark-consult package.
+  (use-package embark-consult
+    :straight t
+    :after (embark consult)
+    :demand t ; only necessary if you have the hook below
+    ;; if you want to have consult previews as you move around an
+    ;; auto-updating embark collect buffer
+    :hook
+    (embark-collect-mode . embark-consult-preview-minor-mode))
+#+end_src
+
+*** TODO wgrep.el
+
+#+begin_src emacs-lisp
+
+  ;; Useful for editing grep results:
+  ;;
+  ;; 1) "C-c f" invoke `consult-ripgrep'
+  ;; 2) "C-s-e" invoke `embark-export' (On OS X map that's Ctrl+Cmd+e)
+  ;; 3) "e" or "C-c C-p" invoke `wgrep-change-to-wgrep-mode'
+  ;; 4) Save or cancel
+  ;;    a) Save: "C-x C-s" invoke `save-buffer' (or "C-c C-c")
+  ;;    b) Cancel: "C-c C-k"
+  (use-package wgrep
+    :after (embark-consult ripgrep)
+    :straight t
+    :bind (:map wgrep-mode-map
+		;; Added keybinding to echo Magit behavior
+		("C-c C-c" . save-buffer)
+		:map grep-mode-map
+		("e" . wgrep-change-to-wgrep-mode)
+		:map ripgrep-search-mode-map
+		("e" . wgrep-change-to-wgrep-mode)))
+#+end_src
+
+*** TODO consult-lsp.el
+
+
+#+begin_src emacs-lisp
+  ;; https://github.com/gagbo/consult-lsp
+  (use-package consult-lsp
+    :after (consult lsp-mode)
+    :straight (consult-lsp :host github :type git :repo "gagbo/consult-lsp")
+    :config
+    (define-key lsp-mode-map [remap xref-find-apropos] #'consult-lsp-symbols)
+    (consult-lsp-marginalia-mode)
+    :commands consult-lsp-symbols)
+#+end_src
+
+*** DONE orderless.el
+
+The [[https://github.com/minad/orderless][orderless]] package provides completion tooling for non-strict word order.  I
+spent considerable time reading through the [[https://github.com/minad/consult/wiki][Orderless section of Consult’s
+wiki]].
+
+As configured the orderless completion recognizes the following “switches”:
+
+- Flex (~\~~) :: Just start typing characters and you’ll get matches that have
+  those characters
+- File Extension (~\.ext~) :: Match files with this extension.
+- Regexp ~^.$~ :: Use some regular expression syntax
+  - ~^~ matching beginning
+  - ~.~ any ol’ character
+  - ~$~ matching ending
+- Initialism (~`~) :: In ~M-x~ when I typed ~`pl~ the ~previous-line~ function
+  was a top match.  The initialism switch “explodes” the characters and says
+  match methods who’s words start with those characters.
+- Not Literal ~!~ :: Exclude candidates that match the literal
+  (e.g. ~!previous~ won’t show ~previous-line~ in the ~M-x~ completion).
+- Literal ~=~ :: No “fuzzy buziness”, just match exactly what I typed.
+
+There is another case (e.g. ~%~ character fold) that I don’t yet understand.
+
+More on these component matchings styles is available at [[https://github.com/minad/orderless#component-matching-styles][github.com/minad/orderless]].
+
+#+begin_src emacs-lisp
+  (use-package orderless
+    :straight t
+    :config
+    (defvar +orderless-dispatch-alist
+      '((?% . char-fold-to-regexp)
+	(?! . orderless-without-literal)
+	(?`. orderless-initialism)
+	(?= . orderless-literal)
+	(?~ . orderless-flex)))
+    (defun +orderless-dispatch (pattern index _total)
+      (cond
+       ;; Ensure that $ works with Consult commands, which add disambiguation suffixes
+       ((string-suffix-p "$" pattern)
+	`(orderless-regexp . ,(concat (substring pattern 0 -1) "[\x100000-\x10FFFD]*$")))
+       ;; File extensions
+       ((and
+	 ;; Completing filename or eshell
+	 (or minibuffer-completing-file-name
+	     (derived-mode-p 'eshell-mode))
+	 ;; File extension
+	 (string-match-p "\\`\\.." pattern))
+	`(orderless-regexp . ,(concat "\\." (substring pattern 1) "[\x100000-\x10FFFD]*$")))
+       ;; Ignore single !
+       ((string= "!" pattern) `(orderless-literal . ""))
+       ;; Prefix and suffix
+       ((if-let (x (assq (aref pattern 0) +orderless-dispatch-alist))
+	    (cons (cdr x) (substring pattern 1))
+	  (when-let (x (assq (aref pattern (1- (length pattern))) +orderless-dispatch-alist))
+	    (cons (cdr x) (substring pattern 0 -1)))))))
+
+    ;; Define orderless style with initialism by default
+    (orderless-define-completion-style +orderless-with-initialism
+      (orderless-matching-styles '(orderless-initialism orderless-literal orderless-regexp)))
+
+    ;; Certain dynamic completion tables (completion-table-dynamic)
+    ;; do not work properly with orderless. One can add basic as a fallback.
+    ;; Basic will only be used when orderless fails, which happens only for
+    ;; these special tables.
+    (setq completion-styles '(orderless basic)
+	  completion-category-defaults nil
+	    ;;; Enable partial-completion for files.
+	    ;;; Either give orderless precedence or partial-completion.
+	    ;;; Note that completion-category-overrides is not really an override,
+	    ;;; but rather prepended to the default completion-styles.
+	  ;; completion-category-overrides '((file (styles orderless partial-completion))) ;; orderless is tried first
+	  completion-category-overrides '((file (styles partial-completion)) ;; partial-completion is tried first
+					  ;; enable initialism by default for symbols
+					  (command (styles +orderless-with-initialism))
+					  (variable (styles +orderless-with-initialism))
+					  (symbol (styles +orderless-with-initialism)))
+	  orderless-component-separator #'orderless-escapable-split-on-space ;; allow escaping space with backslash!
+	  orderless-style-dispatchers '(+orderless-dispatch)))
+#+end_src
+
+*** DONE consult-projectile.el
+
+The ~consult-projectile.el~ package provides a function I use everyday: ~M-x
+consult-projectile~.  When I invoke ~consult-projectile~, I have the file
+completion for the current project.  I can also type =b= + =SPACE= to narrow my
+initial search to open buffers in the project.  Or =p= + =space= to narrow to
+other projects; and then select a file within that project.
+
+
+#+begin_src emacs-lisp
+  (use-package consult-projectile
+    :straight (consult-projectile
+	       :type git
+	       :host gitlab
+	       :repo "OlMon/consult-projectile"
+	       :branch "master")
+    :bind ("s-t" . consult-projectile))
+#+end_src
+
+/Note:/ The =CMD= + =t= (e.g. ~s-t~ in Emacs) is a carryover from my [[https://macromates.com][Textmate]]
+and [[https://www.sublimetext.com/][Sublime Text]] days.  More than any other key combination, that one is
+entirely muscle memory.
+
 ** Window Manipulation
-*** Tab Line
+*** DONE Tab Line
 
 Show tabs in the current window.  The tab system is something I wrestle with,
 but I appreciate it’s existence.  These configurations make it easier to use.
@@ -170,7 +576,7 @@ notice” for removal.
 
 ** Text Manipulation
 
-*** titlecase.el
+*** DONE titlecase.el
 
 The rules of “titlecase” are confounding.  The ~titlecase.el~ package provides
 numerous ways to cast a string to “titlecase.”  I chose wikipedia style as a
