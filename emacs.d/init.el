@@ -9,10 +9,6 @@
 ;;
 ;;; CODE:
 
-
-;; I have additional files that I require in the emacs directory
-(add-to-list 'load-path (expand-file-name "~/git/dotemacs/jnf-emacs-packages"))
-
 (setq custom-file (concat user-emacs-directory "custom.el"))
 (load custom-file :noerror)
 
@@ -60,10 +56,8 @@
 ;; (load "jnf-forem.el" nil jnf-silence-loading-log)
 ;; (load "jnf-titlecase.el" nil jnf-silence-loading-log)
 ;; (load "jnf-blogging.el" nil jnf-silence-loading-log)
-(load "jnf-help.el" nil jnf-silence-loading-log)
-(load "jnf-menu.el" nil jnf-silence-loading-log)
-
-(diminish 'eldoc-mode)
+;; (load "jnf-help.el" nil jnf-silence-loading-log)
+;; (load "jnf-menu.el" nil jnf-silence-loading-log)
 
 (provide 'init)
 ;;; init.el ends here
