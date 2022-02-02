@@ -1,0 +1,61 @@
+#+TITLE: Emacs Configuration
+#+AUTHOR: Jeremy Friesen
+#+EMAIL: jeremy@jeremyfriesen.com
+#+STARTUP: overview
+
+** Projects
+
+*** projectile.el
+
+Projectile provides convenient organization and commands to run over projects.
+
+#+begin_src emacs-lisp
+(use-package projectile
+  :straight t
+  :diminish 'projectile-mode
+  :config (projectile-mode 1)
+  :custom (projectile-project-search-path '("~/git/"))
+  :bind ("s-." . projectile-toggle-between-implementation-and-test))
+#+end_src
+
+/Note:/  The =CMD= + =.= is a carryover from my [[https://macromates.com][Textmate]] and [[https://www.sublimetext.com/][Sublime Text]] days.  That’s one of those hot-keys almost burned into soul.
+
+** Window Manipulation
+
+*** Tab Line
+
+Show tabs in the current window.  The tab system is something I wrestle with,
+but I appreciate it’s existence.  These configurations make it easier to use.
+
+#+begin_src emacs-lisp
+(global-tab-line-mode t)
+(global-set-key (kbd "s-{") 'previous-buffer)
+(global-set-key (kbd "s-}") 'next-buffer)
+#+end_src
+
+*** TODO buffer-move.el
+
+From [[https://github.com/lukhas/buffer-move][lukhas/buffer-move]], this package helps me quickly move a window elsewhere.
+As of <2022-02-01 Tue>, I don’t often use this command.  Consider it “on
+notice” for removal.
+
+#+begin_src emacs-lisp
+(use-package buffer-move
+  :straight t
+  :bind ("<C-s-f12>" . buf-move))
+#+end_src
+
+
+** Text Manipulation
+
+*** titlecase.el
+
+The rules of “titlecase” are confounding.  The ~titlecase.el~ package provides
+numerous ways to cast a string to “titlecase.”  I chose wikipedia style as a
+quasi-opinionated compromise.
+
+#+begin_src emacs-lisp
+(use-package titlecase
+  :straight (titlecase :host github :repo "duckwork/titlecase.el")
+  :custom (titlecase-style 'wikipedia))
+#+end_src
