@@ -9,47 +9,15 @@
 ;;
 ;;; CODE:
 
-(defconst jnf-silence-loading-log t
-  "When true log to stdout any ")
 
 ;; I have additional files that I require in the emacs directory
 (add-to-list 'load-path (expand-file-name "~/git/dotemacs/jnf-emacs-packages"))
-
-;; https://www.reddit.com/r/emacs/comments/mtb05k/emacs_init_time_decreased_65_after_i_realized_the/
-(setq straight-check-for-modifications '(check-on-save find-when-checking))
-
-;; This preamble is part of straight-use-package My understanding, in
-;; reading straight documentation is that it has better load
-;; times. However, the configuration options I often see leverage
-;; "use-package" which is why most of my package declarations look as
-;; they do.
-(defvar bootstrap-version)
-(let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-      (bootstrap-version 5))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil jnf-silence-loading-log))
-
-(setq straight-repository-branch "develop")
-
-;; I saw that straight loaded use-package to take advantage of the
-;; use-package syntax which is often how things are documented.
-(straight-use-package 'use-package)
 
 (setq custom-file (concat user-emacs-directory "custom.el"))
 (load custom-file :noerror)
 
 ;; (load "jnf-basic-config.el" nil jnf-silence-loading-log)
 ;; (load "jnf-config.el" nil jnf-silence-loading-log)
-
-(when (file-directory-p "~/git/dotzshrc/symlinks/.hammerspoon/Spoons/editWithEmacs.spoon")
-  (load "~/git/dotzshrc/symlinks/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el" nil jnf-silence-loading-log))
 
 ;; (load "jnf-display.el" nil jnf-silence-loading-log)
 
