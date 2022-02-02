@@ -53,7 +53,7 @@
 ;; (load "jnf-beancount.el" nil jnf-silence-loading-log)
 ;; (load "jnf-tabs.el" nil jnf-silence-loading-log)
 ;; (load "jnf-stars-without-number.el" nil jnf-silence-loading-log)
-(load "jnf-elfeed.el" nil jnf-silence-loading-log)
+;; (load "jnf-elfeed.el" nil jnf-silence-loading-log)
 ;; (load "jnf-fennel.el" nil jnf-silence-loading-log)
 (load "jnf-dired.el" nil jnf-silence-loading-log)
 (load "jnf-dice.el" nil jnf-silence-loading-log)
