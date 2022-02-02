@@ -23,34 +23,26 @@ What I would like is a filter function that uses the subject’s templates’s t
 as the list.  If the candidate matches one or more of the tags, keep the
 candidate.  Otherwise discard.
 
-* DONE Create Burning Wheel Helper Functions
-
-Thinking through the various “modes” of work:
-
-- Writing blog posts.
-- Running/playing a session of Burning Wheel or other RPGs.
-- Writing session notes.
-
-This means I need to think about how I take notes for a session.
-
-I want to explore transient menus, to see about adjusting the menus on a per-mode basis.
-
-- [ ] Create a minor mode for Burning Wheel.
-- [ ] Bind ~C-c m~ to the menu for the minor mode; note global-key for ~C-c m~ is ~consult-mode-command~
-- [ ] Create a menu for the quick help of Burning Wheel; generalize to RPGs?
-
 * TODO Work on Restructuring Roam
 
-The goal is related to [[id:39F360C9-FDDE-4C7E-9FBB-4CF537655F3C][Note Taking with Org Roam]].  I’m finding that there’s too many “up front” decision points when capturing notes.
+The goal is related to [[id:39F360C9-FDDE-4C7E-9FBB-4CF537655F3C][Note Taking with Org Roam]].  I’m finding that there’s too
+many “up front” decision points when capturing notes.
 
 What I want is the ability to make two decisions:
 
 - First, is this a reference or a new idea of my own?
 - Second, am I working in an assumptive context?
 
-What do I mean “assumptive context?”  When I’m taking notes for a game, there’s an assumption that anything I generate or link will be “scoped” to that context.  In other words, I want my templates to auto-tag themselves.  I want my “keys” to assume one template.  And I want a way to circumvent the assumption.
+What do I mean “assumptive context?”  When I’m taking notes for a game, there’s
+an assumption that anything I generate or link will be “scoped” to that
+context.  In other words, I want my templates to auto-tag themselves.  I want
+my “keys” to assume one template.  And I want a way to circumvent the
+assumption.
 
-I think to how I was specifically using ~org-roam~ to take notes for my Thel Sector campaign.  I would just type ~s-i~ and start finding a node to link.  That was super fast and helped build a great “relationship graph”.  But that’s note the case in what I have now.  And so I don’t use it.
+I think to how I was specifically using ~org-roam~ to take notes for my Thel
+Sector campaign.  I would just type ~s-i~ and start finding a node to link.
+That was super fast and helped build a great “relationship graph”.  But that’s
+note the case in what I have now.  And so I don’t use it.
 
 I want to get back to those fast decisions.  Why?  Because when taking notes
 for a given “assumptive context”, I want DWIM behavior.
@@ -58,13 +50,3 @@ for a given “assumptive context”, I want DWIM behavior.
 ** TODO Research how to auto-tag posts by variable
 
 Explored this.
-
-** DONE Research how to prompt for all ToR tags on capture
-
-Initially, I tried to use ~%(EXP)~ in capture template, but that didn’t work.  So I’m going to fallback on ~%^G~ as the capture.
-
-To use ~%^G~ I’ll need to have an agenda file with all of the tags.  This will rely on my Take on Rules glossary.  I believe I’ll want to add an attribute (like “skip”) so as to not overly pollute the tag space.
-
-Alternatively, do I need to auto-tag?  There’s ~org-roam-tag-add~ which builds from the database.  So, perhaps creating a hot key for that.
-
-*SOLUTION:*  For org-mode, add a hot-key for ~org-roam-tag-add~

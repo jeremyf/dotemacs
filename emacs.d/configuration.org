@@ -3,6 +3,304 @@
 #+EMAIL: jeremy@jeremyfriesen.com
 #+STARTUP: overview
 
+* Display
+
+I'm just going to trust themes.
+#+begin_src emacs-lisp
+(setq custom-safe-themes t)
+#+end_src
+
+** TODO modus-themes.el
+#+begin_src emacs-lisp
+  (use-package modus-themes
+    ;; :straight (modus-themes :type built-in)
+    :straight (:type git :host gitlab :repo "protesilaos/modus-themes" :branch "main")
+    :init
+    (setq
+     modus-themes-bold-constructs t
+     modus-themes-completions 'opinionated ; {nil,'moderate,'opinionated}
+     modus-themes-diffs nil ; {nil,'desaturated,'fg-only}
+     modus-themes-fringes 'intense ; {nil,'subtle,'intense}
+     modus-themes-hl-line '(accented intense)
+     modus-themes-intense-markup t
+     modus-themes-links '(faint background)
+     modus-themes-mixed-fonts t
+     modus-themes-mode-line '(accented 3d)
+     modus-themes-org-blocks 'gray-background
+     modus-themes-paren-match '(bold intense)
+     modus-themes-prompts '(intense accented)
+     modus-themes-region '(bg-only accented)
+     modus-themes-scale-headings t
+     modus-themes-slanted-constructs t
+     modus-themes-subtle-line-numbers t
+     modus-themes-syntax '(alt-syntax yellow-comments green-strings)
+     modus-themes-tabs-accented t
+     modus-themes-headings
+     '((1 . (variable-pitch light 1.6))
+       (2 . (overline semibold 1.4))
+       (3 . (monochrome overline 1.2))
+       (4 . (overline 1.1))
+       (t . (rainbow 1.05)))))
+
+  (global-hl-line-mode)
+
+  ;; Recommendation from https://protesilaos.com/emacs/modus-themes
+  (setq x-underline-at-descent-line t)
+#+end_src
+
+** TODO lin.el
+#+begin_src emacs-lisp
+  (use-package lin
+      :straight (lin :host gitlab :repo "protesilaos/lin")
+      :config (lin-add-to-many-modes))
+#+end_src
+
+#+begin_src emacs-lisp
+  ;; Based on system type, either load the OSX apperance (e.g. dark or
+  ;; light) and load accordingly.
+  (if (eq system-type 'darwin)
+      (progn
+	(defun jnf/dark ()
+	  "Toggle system-wide Dark or Light setting."
+	  (interactive)
+	  (shell-command "osascript -e 'tell application \"System Events\" to tell appearance preferences to set dark mode to not dark mode'")
+	  (jnf/emacs-theme-by-osx-appearance))
+
+	(defalias 'modus-themes-toggle 'jnf/dark)
+	(defun jnf/emacs-theme-by-osx-appearance ()
+	  "Set theme based on OSX apperance state."
+	  (if (equal "Dark" (substring (shell-command-to-string "defaults read -g AppleInterfaceStyle") 0 4))
+	      (load-theme 'modus-vivendi)
+	    (load-theme 'modus-operandi)))
+	(jnf/emacs-theme-by-osx-appearance))
+    (progn
+      (defun modus-themes-toggle ()
+	"Toggle between `modus-operandi' and `modus-vivendi' themes."
+	(interactive)
+	(if (eq (car custom-enabled-themes) 'modus-operandi)
+	    (load-theme 'modus-vivendi)
+	  (load-theme 'modus-operandi)))
+      (load-theme 'modus-operandi)))
+#+end_src
+
+#+begin_src emacs-lisp
+
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;; BEGIN BLOCK
+  ;;
+  ;; With a quick bit of testing, it appears that the following
+  ;; set-face-attribute declarations should be made after the theme
+  ;; declarations.  When the following statements were declared before
+  ;; the themes, and I toggled my theme, the font changed to something
+  ;; unexpected.  With them declared after, I keep the fonts between
+  ;; toggles.
+  ;;
+  ;; Main typeface, I'm toggling between "JetBrains Mono" and "Hack"
+  (set-face-attribute 'default nil :family jnf/fixed-width-font-name :height 140)
+  ;; Proportionately spaced typeface
+  (set-face-attribute 'variable-pitch nil :family "ETBembo" :height 1.1)
+  ;; Monospaced typeface
+  (set-face-attribute 'fixed-pitch nil :family jnf/fixed-width-font-name :height 1.0)
+  ;;
+  ;; END BLOCK
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+  (blink-cursor-mode t)
+  ;; Doing a bit of configuration of my cursors
+  (setq-default cursor-type 'bar)
+#+end_src
+
+** TODO all-the-icons.el
+
+#+begin_src emacs-lisp
+  ;; Useful for referential icons.
+  (use-package all-the-icons
+    :straight t
+    :config
+    ;; A convenience function to create a nice string
+    (defun with-faicon (icon str &optional height v-adjust)
+      "Displays an ICON  from Font Awesome icon.
+
+   The STR identifies the icon and the HEIGHT and V-ADJUST provide
+   the configuration."
+      (s-concat (all-the-icons-faicon icon :v-adjust (or v-adjust 0) :height (or height 1)) " " str))
+
+    (defun with-material (icon str &optional height v-adjust)
+      "Displays an ICON  from Font Material icon.
+
+   The STR identifies the icon and the HEIGHT and V-ADJUST provide
+   the configuration."
+      (s-concat (all-the-icons-material icon :v-adjust (or v-adjust 0) :height (or height 1)) " " str))
+
+    (defun with-octicon (icon str &optional height v-adjust)
+      "Displays an ICON  from Octicon icon.
+
+   The STR identifies the icon and the HEIGHT and V-ADJUST provide
+   the configuration."
+      (s-concat (all-the-icons-octicon icon :v-adjust (or v-adjust 0) :height (or height 1)) " " str))
+
+    (defun with-alltheicon (icon str &optional height v-adjust)
+      "Displays an ICON  from All the Icons icon.
+
+   The STR identifies the icon and the HEIGHT and V-ADJUST provide
+   the configuration."
+      (s-concat (all-the-icons-alltheicon icon :v-adjust (or v-adjust 0) :height (or height 1)) " " str)))
+#+end_src
+
+** TODO all-the-icons-dired.el
+#+begin_src emacs-lisp
+  ;; Disabled because on 2021-04-11 I got the following error:
+  ;; *ERROR*: Symbol’s value as variable is void: file
+  ;;
+  ;; Incorporates file icons with file listings of dired
+  (use-package all-the-icons-dired
+    :straight t
+    :after all-the-icons
+    :hook (dired-mode . all-the-icons-dired-mode))
+#+end_src
+
+** TODO spaceline.el
+#+begin_src emacs-lisp
+  ;; A nice looking modeline enhancement
+  (use-package spaceline
+    :straight t)
+#+end_src
+
+** TODO spaceline-all-the-icons.el
+#+begin_src emacs-lisp
+  ;; Add some visual flair to the modeline enhancements
+  (use-package spaceline-all-the-icons
+    :straight t
+    :after spaceline
+    :config (spaceline-all-the-icons-theme))
+#+end_src
+
+** TODO popper.el
+
+#+begin_src emacs-lisp
+  ;; Ensuring that some windows are treated as popups (e.g., something
+  ;; easier to dismiss, a bit more like the mini-buffer).
+  (use-package popper
+    :straight t
+    :bind (("C-`" . jnf/popper))
+    :config
+    (defun jnf/popper (prefix_arg)
+      "Call `popper-cycle', but with PREFIX_ARG invoke a less common popper method.
+
+  With one PREFIX_ARG, `popper-toggle-latest'.
+  With two (or more) PREFIX_ARG `popper-toggle-type'."
+      (interactive "P")
+      (let ((prefix (car prefix_arg)))
+	(cond
+	 ((not prefix)  (popper-cycle))
+	 ((= prefix 4)  (popper-toggle-latest))
+	 (t (popper-toggle-type)))))
+    :init
+    (setq popper-reference-buffers
+	  '("\\*Messages\\*"
+	    "Output\\*$"
+	    "\\*Async Shell Command\\*"
+	    help-mode
+	    compilation-mode
+	    "^\\*helpful.*\\*$"))
+    (popper-mode +1)
+    (popper-echo-mode +1))
+
+#+end_src
+
+** TODO ace-window.el
+#+begin_src emacs-lisp
+  ;; A window manager for emacs, allowing fast toggles between windows
+  ;; as well as opening or moving those windows.
+  ;; https://github.com/abo-abo/ace-window
+  (use-package ace-window
+    :straight t
+    :bind (("M-o" . ace-window)))
+#+end_src
+
+** TODO Window Layout Functions
+#+begin_src emacs-lisp
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;;; BEGIN frame and window quick setup
+  (defun gk-layouts-3col ()
+    "Three column layout.
+
+  Tries to preserve the order of window buffers and active window."
+    (interactive)
+    ;; Record active window buffer.
+    (let ((cbuf (current-buffer)))
+      ;; Switch to leftmost window.
+      (ignore-errors (cl-loop do (windmove-left)))
+      (let ((buffers
+	     (mapcar #'window-buffer (-take 3 (window-list))))
+	    (width (/ (frame-width) 3)))
+	(delete-other-windows)
+	(split-window-horizontally width)
+	(other-window 1)
+	(split-window-horizontally)
+	(other-window -1)
+	(dolist (b buffers)
+	  (switch-to-buffer b)
+	  (other-window 1)))
+      ;; Switch to previously visible buffer’s window.
+      (select-window (get-buffer-window cbuf))))
+
+
+  (defun gk-layouts-main-and-sidekicks ()
+    "One horizontal split, the right window split in two.
+
+  Tries to preserve the order of window buffers and active window."
+    (interactive)
+    ;; Record active window buffer.
+    (let ((cbuf (current-buffer)))
+      ;; Switch to leftmost window.
+      (ignore-errors (cl-loop do (windmove-left)))
+      (let ((buffers
+	     (mapcar #'window-buffer (-take 3 (window-list)))))
+	(delete-other-windows)
+	(split-window-horizontally)
+	(other-window 1)
+	(split-window-vertically)
+	(other-window -1)
+	(dolist (b buffers)
+	  (switch-to-buffer b)
+	  (other-window 1)))
+      ;; Switch to previously visible buffer’s window.
+      (select-window (get-buffer-window cbuf))))
+
+  (bind-key "C-x \\" #'gk-layouts-main-and-sidekicks)
+  ;; END frame and window quick setup
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+#+end_src
+
+** TODO Scrolling functions
+#+begin_src emacs-lisp
+  ;; See https://www.reddit.com/r/emacs/comments/r7l3ar/how_do_you_scroll_half_a_page/
+  (global-set-key (kbd "M-n") 'jnf/scroll-down-half-page)
+  (defun jnf/scroll-down-half-page ()
+    "Scroll down half a page while keeping the cursor centered"
+    (interactive)
+    (let ((ln (line-number-at-pos (point)))
+	  (lmax (line-number-at-pos (point-max))))
+      (cond ((= ln 1) (move-to-window-line nil))
+	    ((= ln lmax) (recenter (window-end)))
+	    (t (progn
+		 (move-to-window-line -1)
+		 (recenter))))))
+
+  (global-set-key (kbd "M-p") 'jnf/scroll-up-half-page)
+  (defun jnf/scroll-up-half-page ()
+    "Scroll up half a page while keeping the cursor centered"
+    (interactive)
+    (let ((ln (line-number-at-pos (point)))
+	  (lmax (line-number-at-pos (point-max))))
+      (cond ((= ln 1) nil)
+	    ((= ln lmax) (move-to-window-line nil))
+	    (t (progn
+		 (move-to-window-line 0)
+		 (recenter))))))
+#+end_src
+
 * General Emacs Configuration
 
 I tried enabling this, and found myself sometimes lost in a labyrinth of
@@ -17,99 +315,99 @@ minibuffers.  This change ensures that there’s only one.
 *** TODO grab-mac-link.el
 
 #+begin_src emacs-lisp
-;;; Commentary:
-;;
-;;  This package loads darwin specific packages; It assumes that both
-;;  "use-package" and "straight-use-package" are loaded.
-;;
-;;; Code:
-;; Adds the ability to grab a link from various OS X applications
-;; Note, the sibling org-mac-link.  That package works within ORG mode
-;; with an extended menu option, and assumes ORG styling.  They both
-;; have the same keybinding as org-mode favors org-mac-link.
-(use-package grab-mac-link
-  :straight t
-  :config
-  ;; A replacement function for existing grab-mac-link-make-html-link
-  (defun jnf/grab-mac-link-make-html-link (url name)
-    "Using HTML syntax, link to and cite the URL with the NAME."
-    (format "<cite><a href=\"%s\" class=\"u-url p-name\" rel=\"cite\">%s</a></cite>" url name))
-  ;; The function advice to override the default behavior
-  (advice-add
-   'grab-mac-link-make-html-link
-   :override
-   'jnf/grab-mac-link-make-html-link
-   '((name . "jnf")))
-  :bind (("C-c g" . grab-mac-link)))
+  ;;; Commentary:
+  ;;
+  ;;  This package loads darwin specific packages; It assumes that both
+  ;;  "use-package" and "straight-use-package" are loaded.
+  ;;
+  ;;; Code:
+  ;; Adds the ability to grab a link from various OS X applications
+  ;; Note, the sibling org-mac-link.  That package works within ORG mode
+  ;; with an extended menu option, and assumes ORG styling.  They both
+  ;; have the same keybinding as org-mode favors org-mac-link.
+  (use-package grab-mac-link
+    :straight t
+    :config
+    ;; A replacement function for existing grab-mac-link-make-html-link
+    (defun jnf/grab-mac-link-make-html-link (url name)
+      "Using HTML syntax, link to and cite the URL with the NAME."
+      (format "<cite><a href=\"%s\" class=\"u-url p-name\" rel=\"cite\">%s</a></cite>" url name))
+    ;; The function advice to override the default behavior
+    (advice-add
+     'grab-mac-link-make-html-link
+     :override
+     'jnf/grab-mac-link-make-html-link
+     '((name . "jnf")))
+    :bind (("C-c g" . grab-mac-link)))
 
-(eval-after-load "flyspell"
-  '(progn
-     (define-key flyspell-mouse-map [down-mouse-3] #'flyspell-correct-word)
-     (define-key flyspell-mouse-map [mouse-3] #'undefined)))
+  (eval-after-load "flyspell"
+    '(progn
+       (define-key flyspell-mouse-map [down-mouse-3] #'flyspell-correct-word)
+       (define-key flyspell-mouse-map [mouse-3] #'undefined)))
 #+end_src
 
 *** TODO org-mac-link.el
 #+begin_src emacs-lisp
-(use-package org-mac-link
-  :ensure t
-  :straight (org-mac-link :type git :host github :repo "jeremyf/org-mac-link")
-  :defer t)
-(add-hook 'org-mode-hook (lambda ()
-                           (define-key org-mode-map (kbd "C-c g") 'org-mac-grab-link)))
+  (use-package org-mac-link
+    :ensure t
+    :straight (org-mac-link :type git :host github :repo "jeremyf/org-mac-link")
+    :defer t)
+  (add-hook 'org-mode-hook (lambda ()
+			     (define-key org-mode-map (kbd "C-c g") 'org-mac-grab-link)))
 
-(if (version< "27.0" emacs-version)
-           (set-fontset-font
-            "fontset-default" 'unicode "Apple Color Emoji" nil 'prepend)
-         (set-fontset-font
-          t 'symbol (font-spec :family "Apple Color Emoji") nil 'prepend))
+  (if (version< "27.0" emacs-version)
+      (set-fontset-font
+       "fontset-default" 'unicode "Apple Color Emoji" nil 'prepend)
+    (set-fontset-font
+     t 'symbol (font-spec :family "Apple Color Emoji") nil 'prepend))
 #+end_src
 
 *** TODO pdf-tools.el
 #+begin_src emacs-lisp
-;; Emacs comes with DocView built in.  pdf-tools is a replacement for
-;; DocView.  I've found the rendered images a bit more crisp and the
-;; interactions a bit more responsive.  However, I have not been able
-;; to get `org-noter' working with `pdf-tools'.  `org-noter' provides
-;; annotation services for PDFs.
-(use-package pdf-tools
-  :pin manual ;; manually update
-  :straight t
-  :defer t
-  :ensure t
-  :config (pdf-tools-install) ;; initialise
-  (setq-default pdf-view-display-size 'fit-page) ;; open pdfs scaled to fit page
-  (setq pdf-annot-activate-created-annotations t) ;; automatically annotate highlights
-  (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward);; use normal isearch
-  )
+  ;; Emacs comes with DocView built in.  pdf-tools is a replacement for
+  ;; DocView.  I've found the rendered images a bit more crisp and the
+  ;; interactions a bit more responsive.  However, I have not been able
+  ;; to get `org-noter' working with `pdf-tools'.  `org-noter' provides
+  ;; annotation services for PDFs.
+  (use-package pdf-tools
+    :pin manual ;; manually update
+    :straight t
+    :defer t
+    :ensure t
+    :config (pdf-tools-install) ;; initialise
+    (setq-default pdf-view-display-size 'fit-page) ;; open pdfs scaled to fit page
+    (setq pdf-annot-activate-created-annotations t) ;; automatically annotate highlights
+    (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward);; use normal isearch
+    )
 #+end_src
 
 *** TODO so-long.el
 #+begin_src emacs-lisp
 
-;; When we get to a REALLY long file or long line, emacs develops problems.
-;; This mode helps overcome that.
-;;
-(use-package so-long
-  :ensure t
-  :defer t
-  :straight t
-  :bind
-  (:map so-long-mode-map
-        ("C-s" . isearch-forward)
-        ("C-r" . isearch-backward))
-  :config
-  (global-so-long-mode 1))
+  ;; When we get to a REALLY long file or long line, emacs develops problems.
+  ;; This mode helps overcome that.
+  ;;
+  (use-package so-long
+    :ensure t
+    :defer t
+    :straight t
+    :bind
+    (:map so-long-mode-map
+	  ("C-s" . isearch-forward)
+	  ("C-r" . isearch-backward))
+    :config
+    (global-so-long-mode 1))
 #+end_src
 
 *** TODO dtache.el
 #+begin_src emacs-lisp
-;; May or may not be useful
-(use-package dtache
-  :straight (dtache :host gitlab :repo "niklaseklund/dtache")
-  :hook (after-init . dtache-setup)
-  :bind (([remap async-shell-command] . dtache-shell-command)
-         :map dtache-shell-mode-map
-         ("C-c C-q" . dtache-detach-dwim)))
+  ;; May or may not be useful
+  (use-package dtache
+    :straight (dtache :host gitlab :repo "niklaseklund/dtache")
+    :hook (after-init . dtache-setup)
+    :bind (([remap async-shell-command] . dtache-shell-command)
+	   :map dtache-shell-mode-map
+	   ("C-c C-q" . dtache-detach-dwim)))
 #+end_src
 
 * Modes
@@ -810,26 +1108,26 @@ quasi-opinionated compromise.
 ** jnf/toggle-osx-alternate-modifier()
 #+begin_src emacs-lisp
 
-;; On  I use ⌘ as meta and prefer ⌥ to do nothing so I can still insert special characters easily.
-;;
-;; (setq mac-command-modifier 'meta
-;;       mac-option-modifier 'none)
+  ;; On  I use ⌘ as meta and prefer ⌥ to do nothing so I can still insert special characters easily.
+  ;;
+  ;; (setq mac-command-modifier 'meta
+  ;;       mac-option-modifier 'none)
 
-;; (setq mac-right-option-modifier nil) ;; Disable Emacs capturing meta-key and fall back to OS X (useful for diacritics)
-;;
-;; (setq mac-right-option-modifier 'meta) ;; Enable Emacs capturing meta-key, so right M-x will execute extended command
+  ;; (setq mac-right-option-modifier nil) ;; Disable Emacs capturing meta-key and fall back to OS X (useful for diacritics)
+  ;;
+  ;; (setq mac-right-option-modifier 'meta) ;; Enable Emacs capturing meta-key, so right M-x will execute extended command
 
 
-(defun jnf/toggle-osx-alternate-modifier ()
-  "Toggle native OS-X Option modifier
-setting (e.g. ns-alternate-modifier)."
-  (interactive)
-  (if ns-alternate-modifier
-      (progn (setq ns-alternate-modifier nil)
-             (message "Enabling OS X native Option modifier"))
-    (progn (setq ns-alternate-modifier 'meta)
-           (message "Disabling OX X native Option modifier (e.g. Option as Meta)"))))
-(global-set-key (kbd "C-x /") 'jnf/toggle-osx-alternate-modifier)
+  (defun jnf/toggle-osx-alternate-modifier ()
+    "Toggle native OS-X Option modifier
+  setting (e.g. ns-alternate-modifier)."
+    (interactive)
+    (if ns-alternate-modifier
+	(progn (setq ns-alternate-modifier nil)
+	       (message "Enabling OS X native Option modifier"))
+      (progn (setq ns-alternate-modifier 'meta)
+	     (message "Disabling OX X native Option modifier (e.g. Option as Meta)"))))
+  (global-set-key (kbd "C-x /") 'jnf/toggle-osx-alternate-modifier)
 #+end_src
 
 * Footnotes
