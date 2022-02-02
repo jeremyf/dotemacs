@@ -40,7 +40,7 @@
 ;; (load "jnf-company.el" nil jnf-silence-loading-log)
 ;; (load "jnf-corfu.el" nil jnf-silence-loading-log)
 
-(load "jnf-in-buffer.el" nil jnf-silence-loading-log)
+;; (load "jnf-in-buffer.el" nil jnf-silence-loading-log)
 (load "jnf-macros.el" nil jnf-silence-loading-log)
 (load "jnf-git.el" nil jnf-silence-loading-log)
 (load "jnf-org.el" nil jnf-silence-loading-log)
