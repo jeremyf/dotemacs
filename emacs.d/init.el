@@ -45,8 +45,8 @@
 (setq custom-file (concat user-emacs-directory "custom.el"))
 (load custom-file :noerror)
 
-(load "jnf-basic-config.el" nil jnf-silence-loading-log)
-(load "jnf-config.el" nil jnf-silence-loading-log)
+;; (load "jnf-basic-config.el" nil jnf-silence-loading-log)
+;; (load "jnf-config.el" nil jnf-silence-loading-log)
 
 (when (file-directory-p "~/git/dotzshrc/symlinks/.hammerspoon/Spoons/editWithEmacs.spoon")
   (load "~/git/dotzshrc/symlinks/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el" nil jnf-silence-loading-log))
