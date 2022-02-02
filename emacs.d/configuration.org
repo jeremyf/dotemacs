@@ -29,8 +29,8 @@ What I can say is the order may be important.  But I’ll be working to untangle
 that.
 
 Where feasible, I have tried to bind keys “close” to their utilization.  That
-is to say, I often leverage ~use-package~’s ~:bind~, ~:hook~, and ~:map~
-keyword.  But I’m not always consistent.
+is to say, I often leverage the ~:bind~, ~:hook~, and ~:map~ keywords for
+~use-package~.  But I’m not always consistent.
 
 In the ~org-mode~ version, I’m making use of “TODO” indicators to help me track
 what else I may need to do.  A node marked as “DONE” should be viewed as “I
