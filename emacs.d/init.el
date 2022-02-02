@@ -38,7 +38,7 @@
 ;; I want a completion framework, and the 'company-org-block package
 ;; is enough to say "Yes to company" over the simpler corfu.
 ;; (load "jnf-company.el" nil jnf-silence-loading-log)
-(load "jnf-corfu.el" nil jnf-silence-loading-log)
+;; (load "jnf-corfu.el" nil jnf-silence-loading-log)
 
 (load "jnf-in-buffer.el" nil jnf-silence-loading-log)
 (load "jnf-macros.el" nil jnf-silence-loading-log)
