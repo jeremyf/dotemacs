@@ -47,9 +47,9 @@
 ;; (load "jnf-org-roam-v3.el" nil jnf-silence-loading-log)
 
 ;; (load "jnf-spelling.el" nil jnf-silence-loading-log)
-(load "jnf-typography.el" nil jnf-silence-loading-log)
-(load "jnf-enh-ruby.el" nil jnf-silence-loading-log)
-(load "jnf-lsp-mode.el" nil jnf-silence-loading-log)
+;; (load "jnf-typography.el" nil jnf-silence-loading-log)
+;; (load "jnf-enh-ruby.el" nil jnf-silence-loading-log)
+;; (load "jnf-lsp-mode.el" nil jnf-silence-loading-log)
 ;; (load "jnf-beancount.el" nil jnf-silence-loading-log)
 ;; (load "jnf-tabs.el" nil jnf-silence-loading-log)
 ;; (load "jnf-stars-without-number.el" nil jnf-silence-loading-log)
@@ -62,7 +62,6 @@
 (load "jnf-blogging.el" nil jnf-silence-loading-log)
 (load "jnf-help.el" nil jnf-silence-loading-log)
 (load "jnf-menu.el" nil jnf-silence-loading-log)
-
 
 (diminish 'eldoc-mode)
 
