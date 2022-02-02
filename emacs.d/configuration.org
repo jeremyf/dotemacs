@@ -32,6 +32,11 @@ Where feasible, I have tried to bind keys “close” to their utilization.  Tha
 is to say, I often leverage ~use-package~’s ~:bind~, ~:hook~, and ~:map~
 keyword.  But I’m not always consistent.
 
+In the ~org-mode~ version, I’m making use of “TODO” indicators to help me track
+what else I may need to do.  A node marked as “DONE” should be viewed as “I
+don’t need to go back and amend any documentation in that part.  However, it
+doesn’t mean I won’t put more things in that section.”
+
 * Basic Configuration
 
 ** DONE straight.el
@@ -85,33 +90,34 @@ inline documentation in most cases.
   (global-so-long-mode) ;; Handle long files.
   (electric-pair-mode)  ;; https://blog.sumtypeofway.com/posts/emacs-config.html
   (make-directory "~/.emacs.d/autosaves/" t) ;; Ensuring I have an autosave
-  ;; directory.
+					     ;; directory.
   (recentf-mode 1) ;; Track recent
   (run-at-time nil (* 2 60) 'recentf-save-list) ;; Save files every 2 minutes
   (global-auto-revert-mode)
 
   (setq-default fill-column 79) ;; Feeling a bit old school with 80 characters.
   (setq
-   bookmark-default-file "~/git/jnf-emacs-bookmarks/bookmarks"
+   backup-by-copying t         ;; Don't delink hardlinks
    backup-directory-alist '((".*" . "~/.emacs.d/backups/"))
+   bookmark-default-file "~/git/jnf-emacs-bookmarks/bookmarks"
+   custom-safe-themes t        ;; I may as well trust themes.
    create-lockfiles nil        ;; Don't create lock files.
-   ring-bell-function 'ignore  ;; Stop ringing any bell
-   kill-ring-max 120           ;; Set a generous kill ring size.
-   vc-follow-symlinks t        ;; Follow symlinks instead of prompting.
-   read-process-output-max (* 1024 1024 3)  ; Increase read size per process
-   indent-tabs-mode nil        ;; Ensure tabs are expanded, not inserted
-   inhibit-startup-screen t    ;; Don't include the  emacs "start" window
+   delete-old-versions t       ;; Automatically delete excess backups
    idle-update-delay 1.1       ;; Slow down the UI being updated to improve
 			       ;; performance
-   split-width-threshold 100   ;; Most of the times I favor two windows
-			       ;; side-by-side within a frame
-   backup-by-copying t         ;; Don't delink hardlinks
-   version-control t           ;; Use version numbers on backups
-   delete-old-versions t       ;; Automatically delete excess backups
+   indent-tabs-mode nil        ;; Ensure tabs are expanded, not inserted
+   inhibit-startup-screen t    ;; Don't include the  emacs "start" window
    kept-new-versions 20        ;; how many of the newest versions to keep
    kept-old-versions 5         ;; and how many of the old
+   kill-ring-max 120           ;; Set a generous kill ring size.
+   read-process-output-max (* 1024 1024 3)  ;; Increase read size per process
    recentf-max-menu-items 50
    recentf-max-saved-items 50
+   ring-bell-function 'ignore  ;; Stop ringing any bell
+   vc-follow-symlinks t        ;; Follow symlinks instead of prompting.
+   split-width-threshold 100   ;; Most of the times I favor two windows
+			       ;; side-by-side within a frame
+   version-control t           ;; Use version numbers on backups
    )
 
   ;; When you open Emacs, grab all the space on the screen
@@ -192,6 +198,17 @@ These are some “invisible” packages that do some behind the scenes work.
   (use-package dash :straight t)
 #+end_src
 
+- ~editorconfig.el~ :: “EditorConfig helps maintain consistent coding styles
+  for multiple developers working on the same project across various editors
+  and IDEs.”  See https://editorconfig.org/#overview for more details.
+
+#+begin_src emacs-lisp
+  (use-package editorconfig
+    :straight t
+    :diminish editorconfig-mode
+    :config
+    (editorconfig-mode 1))
+#+end_src
 
 - ~f.el~ :: A modern API for working with files and directories in Emacs. (See https://github.com/rejeep/f.el/)
 
@@ -297,23 +314,12 @@ These are some “invisible” packages that do some behind the scenes work.
     :bind ("C-s-h" . helpful-hydra/body))
 #+end_src
 
-** TODO editorconfig.el
-
-#+begin_src emacs-lisp
-
-  ;; See https://editorconfig.org/#overview
-  (use-package editorconfig
-    :straight t
-    :diminish editorconfig-mode
-    :config
-    (editorconfig-mode 1))
-#+end_src
 
 * Display
 
 I'm just going to trust themes.
 #+begin_src emacs-lisp
-  (setq custom-safe-themes t)
+
 #+end_src
 
 ** TODO modus-themes.el
