@@ -4702,7 +4702,7 @@ Use ABBR to derive the mode-name lighter.
 Add hook to each HOOKS provided."
   (let ((mode-name (intern (s-dashed-words (s-downcase (concat "jnf-" abbr "-minor-mode")))))
 	(lighter (concat " " abbr))
-	(docstring (concat "Minor mode for " title " .")))
+	(docstring (concat "Minor mode for " title ".")))
     `(progn
        (define-minor-mode ,mode-name
 	 ,docstring
@@ -4715,6 +4715,7 @@ Add hook to each HOOKS provided."
 ;; (minor-mode-maker :title "Stars without Number" :abbr "swn")
 ;; (minor-mode-maker :title "Worlds without Number" :abbr "wwn")
 (minor-mode-maker :title "Take on Rules" :abbr "tor")
+(minor-mode-maker :title "Forem" :abbr "forem")
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;
@@ -4816,10 +4817,10 @@ Depends on the `grab-mac-link' package."
     ("w w" "Wrap point or region in html…" jnf/tor-wrap-in-html-tag  :if-derived (or markdown-mode html-mode))
     ]
    ["Contexts"
-    ("c b" "Burning Wheel…"  jnf/menu-dwim--bwg-help)
-    ("c f" "Forem…" jnf/forem-menu/body)
-    ("c t" "TakeOnRules…" jnf/menu-dwim--tor)
-    ("c h" "Hammerspoon…" jnf/menu-dwim--hammerspoon :if-non-nil hammerspoon-edit-minor-mode)
+    ("-b" "Burning Wheel…"  jnf/menu-dwim--bwg-help)
+    ("-f" "Forem…" jnf/forem-menu/body)
+    ("-t" "TakeOnRules…" jnf/menu-dwim--tor)
+    ("-h" "Hammerspoon…" jnf/menu-dwim--hammerspoon :if-non-nil hammerspoon-edit-minor-mode)
     ]
    ["Grab"
     ("g e" "Elfeed" jnf/menu-dwim--org-capture-elfeed-show :if-derived elfeed-show-mode)
