@@ -760,20 +760,21 @@ syntax highlighting that makes reading ~Go-lang~ tolerable.
     :straight t)
 #+end_src
 
-** TODO yard-mode.el
+** DONE yard-mode.el
+
+- ~yard-mode.el~ :: When writing Ruby documentation, I favor YARD syntax.  See https://yardoc.org fore more details.
 
 #+begin_src emacs-lisp
-  ;; I most often write documentation using yard.  See
-  ;; https://yardoc.org.
   (use-package yard-mode
     :straight t
     :hook (enh-ruby-mode . yard-mode))
 #+end_src
 
-** TODO bundler.el
+** DONE bundler.el
+
+- ~bundler.el~ :: Adds the useful ~bundle-open~ command.
 
 #+begin_src emacs-lisp
-  ;; Adds the helpful `bundle-open'
   (use-package bundler
     :straight (bundler :type git :host github :repo "endofunky/bundler.el"))
 #+end_src
