@@ -1890,6 +1890,9 @@ entirely muscle memory.
     :straight t
     :bind (("C-c p" . completion-at-point)))
 
+  (setq-local completion-at-point-functions
+	      (mapcar #'cape-company-to-capf
+		      (list #'company-files #'company-ispell #'company-dabbrev)))
   (use-package emacs
     :straight nil
     :init
