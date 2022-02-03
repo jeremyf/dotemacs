@@ -553,7 +553,7 @@ between toggles.
 
 ** TODO Scrolling functions
 
-* General Emacs Configuration
+* TODO General Emacs Configuration
 
 I tried enabling this, and found myself sometimes lost in a labyrinth of
 minibuffers.  This change ensures that there’s only one.
@@ -666,7 +666,7 @@ minibuffers.  This change ensures that there’s only one.
 	   ("C-c C-q" . dtache-detach-dwim)))
 #+end_src
 
-* Modes
+* TODO Modes
 
 Sometimes I want to edit svg files.  Often times if I open them directly in
 Emacs, I want to edit them.  This setting helps with that default.  /Note:/
@@ -1030,7 +1030,7 @@ syntax highlighting that makes reading ~Go-lang~ tolerable.
 
 #+end_src
 
-* Support
+* DONE Support
 
 ** DONE ripgrep.el
 
@@ -1044,7 +1044,7 @@ identical parameter list.
     :straight t)
 #+end_src
 
-* Projects
+* TODO Projects
 
 ** TODO projectile.el
 
@@ -1340,7 +1340,7 @@ That’s one of those hot-keys almost burned into soul.
   :commands (dired-sidebar-toggle-sidebar))
 #+end_src
 
-* Completion
+* TODO Completion
 
 ** DONE vertico.el
 
@@ -1905,7 +1905,7 @@ entirely muscle memory.
 
 #+RESULTS:
 
-* Window Manipulation
+* TODO Window Manipulation
 
 ** DONE Tab Line
 
@@ -1930,7 +1930,7 @@ notice” for removal.
     :bind ("<C-s-f12>" . buf-move))
 #+end_src
 
-* Text Manipulation
+* DONE Text Manipulation
 
 ** DONE titlecase.el
 
@@ -1944,7 +1944,7 @@ quasi-opinionated compromise.
     :custom (titlecase-style 'wikipedia))
 #+end_src
 
-* In Buffer
+* TODO In Buffer
 
 ** TODO savekill.el
 
@@ -2456,7 +2456,7 @@ quasi-opinionated compromise.
       (kill-current-buffer)))
 #+end_src
 
-* Org Mode
+* TODO Org Mode
 
 ** TODO org-mode.el
 
@@ -2930,7 +2930,7 @@ establish the current context (or clear it).
       (message "%s => %s" expression result)))
   :straight (org-d20 :host github :repo "spwhitton/org-d20"))
 #+end_src
-* Spelling
+* TODO Spelling
 
 This package provides configuration for spell checking.  It
 assumes the use of ivy; See the flyspell-correct-ivy package.
@@ -3516,7 +3516,7 @@ This package includes the configuration for elfeed, an Emacs RSS reader.
 
 #+RESULTS:
 
-* Utilities
+* TODO Utilities
 
 ** DONE Opening multiple file names from command line
 
@@ -4341,7 +4341,6 @@ Provides some Forem specific shortcut tooling.
 
 #+begin_src emacs-lisp
   (define-key emacs-lisp-mode-map (kbd "C-c C-c") 'jnf/eval-region-dwim)
-  (define-key lisp-interaction-mode-map (kbd "C-c C-c") 'jnf/eval-region-dwim)
   (defun jnf/eval-region-dwim ()
     "When region is active, evaluate it and kill the mark. Else,
     evaluate the whole buffer."
@@ -4370,6 +4369,7 @@ Provides some Forem specific shortcut tooling.
   ;; (setq mac-right-option-modifier 'meta) ;; Enable Emacs capturing meta-key, so right M-x will execute extended command
 
 
+  (global-set-key (kbd "C-x /") 'jnf/toggle-osx-alternate-modifier)
   (defun jnf/toggle-osx-alternate-modifier ()
     "Toggle native OS-X Option modifier
   setting (e.g. ns-alternate-modifier)."
@@ -4379,29 +4379,6 @@ Provides some Forem specific shortcut tooling.
 	       (message "Enabling OS X native Option modifier"))
       (progn (setq ns-alternate-modifier 'meta)
 	     (message "Disabling OX X native Option modifier (e.g. Option as Meta)"))))
-  (global-set-key (kbd "C-x /") 'jnf/toggle-osx-alternate-modifier)
-#+end_src
-
-** TODO jnf/git-data-sync()
-
-#+begin_src emacs-lisp
-  (cl-defun jnf/git-data-sync (&optional (directories jnf/data-directories))
-    "Synchronize DIRECTORIES with git pull/push.
-
-  By default the DIRECTORIES are `jnf/data-directories'"
-    (interactive)
-    (message "Synchronizing local git repos...")
-    (dolist (path directories)
-      (if (f-dir-p (file-truename path))
-	  (progn
-	    (message (concat "Syncing \"" path "\"..."))
-	    (shell-command-to-string
-	     (concat
-	      "cd " path
-	      " && git pull --rebase"
-	      " && git push -u --force-with-lease")))
-	(message (concat "Skipping missing directory \"" path "\"...")))
-      (message "Finished synchronizing local git repos.")))
 #+end_src
 
 ** TODO hammerspoon
@@ -4413,27 +4390,6 @@ Provides some Forem specific shortcut tooling.
      "~/git/dotzshrc/symlinks/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el"
      nil
      jnf-silence-loading-log))
-#+end_src
-
-** TODO jnf/query-within-macro-definition()
-
-#+begin_src emacs-lisp
-  (defun jnf/query-within-macro-definition (arg)
-    "Prompt for input using minibuffer during kbd macro execution.
-
-  With prefix ARG, allows you to select what prompt string to use.
-  If the input is non-empty, it is inserted at point."
-    (interactive "P")
-    (let* ((query (lambda () (kbd-macro-query t)))
-	   (prompt (if arg (read-from-minibuffer "PROMPT: ") "Input: "))
-	   (input (unwind-protect
-		      (progn
-			(add-hook 'minibuffer-setup-hook query)
-			(read-from-minibuffer prompt))
-		    (remove-hook 'minibuffer-setup-hook query))))
-      (unless (string= "" input) (insert input))))
-
-  (global-set-key (kbd "C-x Q") 'jnf/query-within-macro-definition)
 #+end_src
 
 ** TODO help functions
@@ -4675,7 +4631,6 @@ Where NAME is name of function, BUFFER is name of buffer, and TEXT is displayed.
 * Menus
 
 ** TODO jnf/menu-dwim
-
 *** Minor Modes
 
 In work and in play, there are several “me” specific contexts.  The
@@ -4758,9 +4713,7 @@ I’ve opted to take a different path; write some Emacs functions instead.
       (jnf/org-roam-capture-ref :url url :title title)))
 #+end_src
 
-*** A Consistent Transient Menu
-
-
+*** TODO A Consistent Transient Menu
 
 #+begin_src emacs-lisp
   (transient-define-prefix jnf/menu-dwim--bwg ()
