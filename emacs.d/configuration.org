@@ -392,78 +392,52 @@ between toggles.
     :config (lin-add-to-many-modes))
 #+end_src
 
-** TODO all-the-icons.el
+** DONE all-the-icons.el
+
+- ~all-the-icons.el~ :: Provides a nice set of reference icons.  The various
+  ~jnf/all-with--with-~ functions give access to the icons of the named set.
 
 #+begin_src emacs-lisp
   ;; Useful for referential icons.
   (use-package all-the-icons
     :straight t
     :config
-    ;; A convenience function to create a nice string
-    (defun with-faicon (icon str &optional height v-adjust)
-      "Displays an ICON  from Font Awesome icon.
-
-   The STR identifies the icon and the HEIGHT and V-ADJUST provide
-   the configuration."
-      (s-concat (all-the-icons-faicon
-		 icon
-		 :v-adjust (or v-adjust 0)
-		 :height (or height 1))
-		" " str))
-
-    (defun with-material (icon str &optional height v-adjust)
-      "Displays an ICON  from Font Material icon.
-
-   The STR identifies the icon and the HEIGHT and V-ADJUST provide
-   the configuration."
-      (s-concat (all-the-icons-material
-		 icon
-		 :v-adjust (or v-adjust 0)
-		 :height (or height 1))
-		" " str))
-
-    (defun with-octicon (icon str &optional height v-adjust)
-      "Displays an ICON  from Octicon icon.
-
-   The STR identifies the icon and the HEIGHT and V-ADJUST provide
-   the configuration."
-      (s-concat (all-the-icons-octicon
-		 icon
-		 :v-adjust (or v-adjust 0)
-		 :height (or height 1))
-		" " str))
-
-    (defun with-alltheicon (icon str &optional height v-adjust)
-      "Displays an ICON  from All the Icons icon.
-
-   The STR identifies the icon and the HEIGHT and V-ADJUST provide
-   the configuration."
-      (s-concat (all-the-icons-alltheicon
-		 icon
-		 :v-adjust (or v-adjust 0)
-		 :height (or height 1))
-		" " str)))
+    (cl-defmacro jnf/all-the-icons--with(&key name)
+      (let ((defun-fn (intern (concat "jnf/all-the-icons--with-" name)))
+	    (icon-fn (intern (concat "all-the-icons-" name)))
+	    (docstring (concat "Displays an ICON from `all-the-icons-" name "'.")))
+	`(defun ,defun-fn (icon str &optional height v-adjust)
+	   ,docstring
+	   (s-concat (,icon-fn
+		      icon
+		      :v-adjust (or v-adjust 0)
+		      :height (or height 1))
+		     " " str))))
+    (jnf/all-the-icons--with :name "faicon")
+    (jnf/all-the-icons--with :name "material")
+    (jnf/all-the-icons--with :name "octicon")
+    (jnf/all-the-icons--with :name "alltheicon"))
 #+end_src
 
-** TODO all-the-icons-dired.el
+** DONE all-the-icons-dired.el
+
+- ~all-the-icons-dired.el~ :: Incorporates file icons with file listings of
+  dired.  /Note/: On 2021-04-11 I was getting the following error with this
+  package: "*ERROR*: Symbol's value as variable is void: file"
 
 #+begin_src emacs-lisp
-  ;; Disabled because on 2021-04-11 I got the following error:
-  ;; *ERROR*: Symbol’s value as variable is void: file
-  ;;
-  ;; Incorporates file icons with file listings of dired
   (use-package all-the-icons-dired
     :straight t
     :after all-the-icons
     :hook (dired-mode . all-the-icons-dired-mode))
 #+end_src
 
-** TODO spaceline.el
+** DONE spaceline.el
+
+- ~spaceline.el~ :: A nice looking modeline enhancement
 
 #+begin_src emacs-lisp
-  ;; A nice looking modeline enhancement
-  (use-package spaceline
-    :straight t)
+  (use-package spaceline :straight t)
 #+end_src
 
 ** TODO spaceline-all-the-icons.el
@@ -886,7 +860,7 @@ syntax highlighting that makes reading ~Go-lang~ tolerable.
 ** TODO ruby menus
 
 #+begin_src emacs-lisp
-  (defvar jnf/projectile-rails--title (with-alltheicon "ruby-alt" "Rails" 1 -0.05))
+  (defvar jnf/projectile-rails--title (jnf/all-the-icons--with-alltheicon "ruby-alt" "Rails" 1 -0.05))
   (pretty-hydra-define jnf/projectile-rails-find-resource--menu
     (:foreign-keys warn :title jnf/projectile-rails--title :quit-key "q" :exit t)
     ("Rails > Find Resources"
@@ -3083,7 +3057,7 @@ kbd "C-").
   ;;
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   (defvar jnf/typography--title
-    (with-octicon "pencil" "Typography (C-x 8 RET for Search)" 1 -0.05)
+    (jnf/all-the-icons--with-octicon "pencil" "Typography (C-x 8 RET for Search)" 1 -0.05)
     "The menu title for typography")
   (pretty-hydra-define jnf/typography--menu (:foreign-keys warn :title jnf/typography--title :quit-key "q" :exit t)
     ("Characters" (
@@ -4310,7 +4284,7 @@ Provides some Forem specific shortcut tooling.
 
   (global-set-key (kbd "C-M-s-f") 'jnf/forem-menu/body)
   (defvar jnf/forem-menu--title
-    (with-octicon "code" "Forem" 1 -0.05)
+    (jnf/all-the-icons--with-octicon "code" "Forem" 1 -0.05)
     "The Forem Subject Menu Title.")
   (pretty-hydra-define jnf/forem-menu (:foreign-keys warn :title jnf/forem-menu--title :quit-key "q" :exit t)
     ("Forem Workflow"
