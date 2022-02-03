@@ -1,3 +1,4 @@
+-*- org-insert-tilde-language: emacs-lisp; -*-
 #+TITLE: Emacs Configuration
 #+AUTHOR: Jeremy Friesen
 #+EMAIL: jeremy@jeremyfriesen.com
@@ -443,11 +444,11 @@ between toggles.
 ** TODO spaceline-all-the-icons.el
 
 #+begin_src emacs-lisp
-  ;; Add some visual flair to the modeline enhancements
-  (use-package spaceline-all-the-icons
-    :straight t
-    :after spaceline
-    :config (spaceline-all-the-icons-theme))
+  ;; ;; Add some visual flair to the modeline enhancements
+  ;; (use-package spaceline-all-the-icons
+  ;;   :straight t
+  ;;   :after spaceline
+  ;;   :config (spaceline-all-the-icons-theme))
 #+end_src
 
 ** TODO popper.el
@@ -2829,15 +2830,6 @@ establish the current context (or clear it).
 				   (list (plist-get context :name) index)))
 			       context-plist)))
 
-  (cl-defun jnf/org-roam-capture-ref (&key title ref)
-    "Capture the TITLE and REF in the :refs template"
-    (org-roam-capture-
-     :keys "r"
-     ;; TODO: I would love to get tags working but I'm missing something
-     :node (org-roam-node-create :title title)
-     :info (list :ref ref)
-     :templates (jnf/org-roam-templates-list :refs)))
-
   (cl-defun jnf/org-roam-filter-context-fn (node &key (tag-list jnf/org-auto-tags--current-list))
     "Determine TAG-LIST is subset of NODE's tags."
     (gnus-subsetp tag-list (org-roam-node-tags node)))
@@ -4682,22 +4674,17 @@ Where NAME is name of function, BUFFER is name of buffer, and TEXT is displayed.
 
 * Menus
 
-** TODO transient.el
+** TODO jnf/menu-dwim
+
+*** Minor Modes
+
+In work and in play, there are several “me” specific contexts.  The
+~jnf/minor-mode-maker~ macro helps me quickly and consistently make those
+contexual minor modes.  My intention is to build out even more functions on
+those modes.
 
 #+begin_src emacs-lisp
-
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  ;;
-  ;;; BEGIN minor mode definitions
-  ;;
-  ;;; Commentary:
-  ;;
-  ;;  I like the idea of a "C-c m" invoking a general menu of utility.  This
-  ;;  file, by it's very nature, has knowledge of other functions.  The other
-  ;;  option is for other "files" to know about the menu structure.
-  ;;
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  (cl-defmacro minor-mode-maker (&key title abbr hooks)
+  (cl-defmacro jnf/minor-mode-maker (&key title abbr hooks)
     "A macro to declare a minor mode.
 
   Use TITLE to derive the docstring.
@@ -4714,20 +4701,69 @@ Where NAME is name of function, BUFFER is name of buffer, and TEXT is displayed.
 	 (when ,hooks
 	   (-each ,hooks (lambda(hook) (add-hook hook (lambda () (,mode-name)))))))))
 
-  (minor-mode-maker :title "Burning Wheel Gold" :abbr "bwg" :hooks (list 'org-mode-hook 'markdown-mode-hook))
-  ;; (minor-mode-maker :title "Stars without Number" :abbr "swn")
-  ;; (minor-mode-maker :title "Worlds without Number" :abbr "wwn")
-  (minor-mode-maker :title "Take on Rules" :abbr "tor")
-  (minor-mode-maker :title "Forem" :abbr "forem")
+  (jnf/minor-mode-maker :title "Burning Wheel Gold"
+			:abbr "bwg"
+			:hooks (list 'org-mode-hook 'markdown-mode-hook))
+  (jnf/minor-mode-maker :title "Take on Rules"
+			:abbr "tor")
+  (jnf/minor-mode-maker :title "Forem"
+			:abbr "forem")
+#+end_src
 
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  ;;
-  ;;; END minor mode definitions
-  ;;
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+*** Org Capture Commands
+
+Try as I may, based on my configuration, I can’t get [[https://orgmode.org/manual/Protocols.html#Protocols][org-protocol]] to work.  So
+I’ve opted to take a different path; write some Emacs functions instead.
+
+- ~jnf/org-roam-capture-ref~ :: Capture a “refs” context ~org-roam-node~ for the given title and url.
+- ~jnf/menu-dwim--org-capture-elfeed-show~ :: Capture an RSS entry.
+- ~jnf/menu-dwim--org-capture-firefox~ :: Capture the active tab of Firefox.
+- ~jnf/menu-dwim--org-capture-safari~ :: Capture the active tab of Safari.
+
+#+begin_src emacs-lisp
+  (cl-defun jnf/org-roam-capture-ref (&key title url)
+    "Capture the TITLE and URL in the `org-roam' :refs template"
+    (org-roam-capture-
+     :keys "r"
+     ;; TODO: I would love to get tags working but I'm missing something
+     :node (org-roam-node-create :title title)
+     :info (list :ref url)
+     :templates (jnf/org-roam-templates-list :refs)))
+
+  (cl-defun jnf/menu-dwim--org-capture-elfeed-show (&key (entry elfeed-show-entry))
+    "Create an `org-roam-node' from elfeed ENTRY."
+    (interactive)
+    (let ((url (elfeed-entry-link entry))
+	  (title (elfeed-entry-title entry)))
+      (jnf/org-roam-capture-ref :ref ref :title title)))
+
+  (defun jnf/menu-dwim--org-capture-firefox ()
+    "Create an `org-roam-node' from Firefox page.
+
+    Depends on the `grab-mac-link' package."
+    (interactive)
+    (let* ((link-title-pair (grab-mac-link-firefox-1))
+	   (url (car link-title-pair))
+	   (title (cadr link-title-pair)))
+      (jnf/org-roam-capture-ref :url url :title title)))
+
+  (defun jnf/menu-dwim--org-capture-safari ()
+    "Create an `org-roam-node' from Safari page.
+
+    Depends on the `grab-mac-link' package."
+    (interactive)
+    (let* ((link-title-pair (grab-mac-link-safari-1))
+	   (url (car link-title-pair))
+	   (title (cadr link-title-pair)))
+      (jnf/org-roam-capture-ref :url url :title title)))
+#+end_src
+
+*** A Consistent Transient Menu
 
 
-  (transient-define-prefix jnf/menu-dwim--bwg-help ()
+
+#+begin_src emacs-lisp
+  (transient-define-prefix jnf/menu-dwim--bwg ()
     "Define the BWG help prefix."
     ["Burning Wheel"
      ("c" jnf/qh--bwg-circles-obstacles)
@@ -4766,33 +4802,6 @@ Where NAME is name of function, BUFFER is name of buffer, and TEXT is displayed.
      ("m" "Toggle hammerspoon editor mode" hammerspoon-toggle-mode)
      ("p" "Tidy pull request" jnf/forem-tidy-pull-request)])
 
-  (cl-defun jnf/menu-dwim--org-capture-elfeed-show (&key (entry elfeed-show-entry))
-    "Create an `org-roam-node' from elfeed ENTRY."
-    (interactive)
-    (let ((ref (elfeed-entry-link entry))
-	  (title (elfeed-entry-title entry)))
-      (jnf/org-roam-capture-ref :ref ref :title title)))
-
-  (defun jnf/menu-dwim--org-capture-safari ()
-    "Create an `org-roam-node' from Safari page.
-
-  Depends on the `grab-mac-link' package."
-    (interactive)
-    (let* ((link-title-pair (grab-mac-link-safari-1))
-	   (ref (car link-title-pair))
-	   (title (cadr link-title-pair)))
-      (jnf/org-roam-capture-ref :ref ref :title title)))
-
-  (defun jnf/menu-dwim--org-capture-firefox ()
-    "Create an `org-roam-node' from Firefox page.
-
-  Depends on the `grab-mac-link' package."
-    (interactive)
-    (let* ((link-title-pair (grab-mac-link-firefox-1))
-	   (ref (car link-title-pair))
-	   (title (cadr link-title-pair)))
-      (jnf/org-roam-capture-ref :ref ref :title title)))
-
   (transient-define-suffix jnf/org-auto-tags--transient (tags)
     "Set the tags from minibuffer read"
     :description '(lambda ()
@@ -4820,9 +4829,9 @@ Where NAME is name of function, BUFFER is name of buffer, and TEXT is displayed.
       ("w p" "Wrap point or region as Poem…" jnf/tor-wrap-in-poem  :if-derived (or markdown-mode html-mode))
       ("w s" "Side-note sentence or region…" jnf/tor-wrap-as-sidenote-dwim  :if-derived (or markdown-mode html-mode))
       ("w w" "Wrap point or region in html…" jnf/tor-wrap-in-html-tag  :if-derived (or markdown-mode html-mode))
-     ]]
+      ]]
     [["Contexts"
-      ("-b" "Burning Wheel…"  jnf/menu-dwim--bwg-help)
+      ("-b" "Burning Wheel…"  jnf/menu-dwim--bwg)
       ("-f" "Forem…" jnf/forem-menu/body)
       ("-t" "TakeOnRules…" jnf/menu-dwim--tor)
       ("-h" "Hammerspoon…" jnf/menu-dwim--hammerspoon :if-non-nil hammerspoon-edit-minor-mode)
@@ -4847,11 +4856,11 @@ Where NAME is name of function, BUFFER is name of buffer, and TEXT is displayed.
       ("m o" "MacOS Native Option (*)" jnf/toggle-osx-alternate-modifier :if-nil ns-alternate-modifier)
       ]]
     [["Org Add-Ons"
-     ("o c" "Context…" jnf/org-auto-tags--set-by-context :transient t)
-     ("o t" "Add Org Tag…" org-roam-tag-add :if-derived org-mode)
-     ("o r" "Add Org Ref…" org-roam-ref-add :if-derived org-mode)
-     ("o s" jnf/org-auto-tags--transient :transient t)
-     ]])
+      ("o c" "Context…" jnf/org-auto-tags--set-by-context :transient t)
+      ("o t" "Add Org Tag…" org-roam-tag-add :if-derived org-mode)
+      ("o r" "Add Org Ref…" org-roam-ref-add :if-derived org-mode)
+      ("o s" jnf/org-auto-tags--transient :transient t)
+      ]])
 
   (global-set-key (kbd "s-1") 'jnf/menu-dwim)
   (global-set-key (kbd "C-c m") 'jnf/menu-dwim)
