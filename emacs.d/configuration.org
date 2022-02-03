@@ -2760,7 +2760,7 @@ establish the current context (or clear it).
      ;; These are "my thoughts" with references to "other people's thoughts."
      :main '("m" "main" plain "%?"
 	     :if-new (file+head "main/%<%Y%m%d>---${slug}.org"
-				"#+title: ${title}\n#+FILETAGS: ${auto-tags}%^G\n")
+				"#+title: ${title}\n#+FILETAGS: ${auto-tags}\n")
 	     :immediate-finish t
 	     :unnarrowed t)
      ;; These are publications of "my thoughts" referencing "other people's thoughts".
@@ -2893,7 +2893,7 @@ establish the current context (or clear it).
       "Call `org-roam-node-insert' based on set tags."
       (interactive)
       (org-roam-node-insert 'jnf/org-roam-filter-context-fn
-			    :templates 'jnf/org-roam-templates-context-fn))
+			    :templates (jnf/org-roam-templates-context-fn)))
 
     (defun jnf/org-roam-find-node (&optional other-window initial-input)
       "Call `org-roam-node-find' based on set tags."
