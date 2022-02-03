@@ -521,7 +521,7 @@ minibuffers.  This change ensures that there’s only one.
   (setq enable-recursive-minibuffers nil)
 #+end_src
 
-** MacOS Specific
+** DONE MacOS Specific
 
 *** DONE grab-mac-link.el
 
@@ -555,26 +555,6 @@ minibuffers.  This change ensures that there’s only one.
     :bind (:map org-mode-map (("C-c g" . org-mac-grab-link))))
 #+end_src
 
-*** TODO pdf-tools.el
-
-#+begin_src emacs-lisp
-  ;; Emacs comes with DocView built in.  pdf-tools is a replacement for
-  ;; DocView.  I've found the rendered images a bit more crisp and the
-  ;; interactions a bit more responsive.  However, I have not been able
-  ;; to get `org-noter' working with `pdf-tools'.  `org-noter' provides
-  ;; annotation services for PDFs.
-  (use-package pdf-tools
-    :pin manual ;; manually update
-    :straight t
-    :defer t
-    :ensure t
-    :config (pdf-tools-install) ;; initialise
-    (setq-default pdf-view-display-size 'fit-page) ;; open pdfs scaled to fit page
-    (setq pdf-annot-activate-created-annotations t) ;; automatically annotate highlights
-    (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward);; use normal isearch
-    )
-#+end_src
-
 *** DONE so-long.el
 
 - ~so-long.el~ :: Really long files or long lines can cause problems for Emacs.  This mode helps with that.
@@ -601,7 +581,12 @@ without this setting, Emacs will happily render the SVG as an image,
   (add-to-list `auto-mode-alist '("\\.svg\\'" . xml-mode))
 #+end_src
 
-** TODO emmet-mode.el
+** DONE emmet-mode.el
+
+- ~emmet-mode.el~ :: I’ve only scratched the surface of this.  Namely when I
+  write a haiku, in my editor it type =pre.poem= followed by ~C-c C-e~ and that
+  expands to a ~pre~ tag with the ~class="poem"~.  There's a lot more, but I
+  write comparatively little HTML.
 
 #+begin_src emacs-lisp
   (use-package emmet-mode
@@ -633,6 +618,8 @@ without this setting, Emacs will happily render the SVG as an image,
   ;;   (sgml-basic-offset 2))
 #+end_src
 
+** TODO plantuml-mode.el
+
 #+begin_src emacs-lisp
   (use-package plantuml-mode
     :config (setq plantuml-executable-path (concat (getenv "HB_PATH") "/bin/plantuml")
@@ -643,11 +630,14 @@ without this setting, Emacs will happily render the SVG as an image,
     :straight t)
 #+end_src
 
+** TODO json-mode.el
+
 #+begin_src emacs-lisp
   (use-package json-mode :straight t)
 #+end_src
 
 Because JSON can be quite ugly, I want something to help tidy it up.
+
 #+begin_src emacs-lisp
   (use-package json-reformat
     :straight t
@@ -722,8 +712,8 @@ syntax highlighting that makes reading ~Go-lang~ tolerable.
     :diminish 'rspec-mode
     :bind (:map rspec-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
     :bind (:map enh-ruby-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
-    :hook (ruby-mode . rspec-mode) ;; should this be `enh-ruby-mode'
-    (ruby-mode . eldoc-mode)) ;; should this be `enh-ruby-mode'
+    :hook ((ruby-mode . rspec-mode) ;; should this be `enh-ruby-mode'
+	   (ruby-mode . eldoc-mode))) ;; should this be `enh-ruby-mode'
 
   (eval-after-load 'rspec-mode
     '(rspec-install-snippets))
@@ -755,24 +745,11 @@ syntax highlighting that makes reading ~Go-lang~ tolerable.
 ** TODO ruby-interpolation.el
 
 #+begin_src emacs-lisp
-  ;; Nice and simple pakcage for string interpolation.
+  ;; Nice and simple package for string interpolation.
   (use-package ruby-interpolation
     :straight t
     :diminish 'ruby-interpolation-mode
     :hook (enh-ruby-mode . ruby-interpolation-mode))
-#+end_src
-
-** TODO ruby-electric.el
-
-#+begin_src emacs-lisp
-  (use-package ruby-electric
-    :straight t
-    :diminish 'ruby-electric-mode
-    ;; Somtimes I want this enabled, other times not; but it's a bit
-    ;;  obnoxious in spec.rb files.
-    ;;
-    ;; :hook (enh-ruby-mode . ruby-electric-mode)
-    )
 #+end_src
 
 ** TODO rails-routes.el
@@ -781,85 +758,6 @@ syntax highlighting that makes reading ~Go-lang~ tolerable.
   (use-package rails-routes
     :after projectile-rails
     :straight t)
-#+end_src
-
-** TODO ruby menus
-
-#+begin_src emacs-lisp
-  (defvar jnf/projectile-rails--title (jnf/all-the-icons--with-alltheicon "ruby-alt" "Rails" 1 -0.05))
-  (pretty-hydra-define jnf/projectile-rails-find-resource--menu
-    (:foreign-keys warn :title jnf/projectile-rails--title :quit-key "q" :exit t)
-    ("Rails > Find Resources"
-     (("m" projectile-rails-find-model       "model")
-      ("v" projectile-rails-find-view        "view")
-      ("c" projectile-rails-find-controller  "controller")
-      ("h" projectile-rails-find-helper      "helper")
-      ("l" projectile-rails-find-lib         "lib")
-      ("j" projectile-rails-find-javascript  "javascript")
-      ("w" projectile-rails-find-component   "component")
-      ("s" projectile-rails-find-stylesheet  "stylesheet")
-      ("p" projectile-rails-find-spec        "spec")
-      ("u" projectile-rails-find-fixture     "fixture")
-      ("t" projectile-rails-find-test        "test")
-      ("f" projectile-rails-find-feature     "feature")
-      ("i" projectile-rails-find-initializer "initializer")
-      ("o" projectile-rails-find-log         "log")
-      ("t" projectile-rails-find-liquid      "liquid tag")
-      ("@" projectile-rails-find-mailer      "mailer")
-      ("!" projectile-rails-find-validator   "validator")
-      ("y" projectile-rails-find-layout      "layout")
-      ("n" projectile-rails-find-migration   "migration")
-      ("k" projectile-rails-find-rake-task   "rake task")
-      ("b" projectile-rails-find-job         "job")
-      ("z" projectile-rails-find-serializer  "serializer"))))
-
-  (pretty-hydra-define jnf/projectile-rails-find-current-resource--menu
-    (:foreign-keys warn :title jnf/projectile-rails--title :quit-key "q" :exit t)
-    ("Rails > Find Current Resources"
-     (("M" projectile-rails-find-current-model      "current model")
-      ("V" projectile-rails-find-current-view       "current view")
-      ("C" projectile-rails-find-current-controller "current controller")
-      ("H" projectile-rails-find-current-helper     "current helper")
-      ("J" projectile-rails-find-current-javascript "current javascript")
-      ("S" projectile-rails-find-current-stylesheet "current stylesheet")
-      ("P" projectile-rails-find-current-spec       "current spec")
-      ("U" projectile-rails-find-current-fixture    "current fixture")
-      ("T" projectile-rails-find-current-test       "current test")
-      ("N" projectile-rails-find-current-migration  "current migration")
-      ("Z" projectile-rails-find-current-serializer "current serializer"))))
-
-  (pretty-hydra-define jnf/projectile-rails-goto--menu
-    (:foreign-keys warn :title jnf/projectile-rails--title :quit-key "q" :exit t)
-    ("Rails > Goto"
-     (("f" projectile-rails-goto-file-at-point "file at point")
-      ("g" projectile-rails-goto-gemfile       "Gemfile")
-      ("p" projectile-rails-goto-package       "package")
-      ("r" projectile-rails-goto-routes        "routes")
-      ("d" projectile-rails-goto-schema        "schema")
-      ("s" projectile-rails-goto-seeds         "seeds")
-      ("h" projectile-rails-goto-spec-helper   "spec helper"))))
-
-  (pretty-hydra-define jnf/projectile-rails-run--menu
-    (:foreign-keys warn :title jnf/projectile-rails--title :quit-key "q" :exit t)
-    ("Rails > Run"
-     (("r" projectile-rails-rake       "rake")
-      ("c" projectile-rails-console    "console")
-      ("b" projectile-rails-dbconsole  "dbconsole")
-      ("s" projectile-rails-server     "server")
-      ("g" projectile-rails-generate   "generate")
-      ("d" projectile-rails-destroy    "destroy")
-      ("x" projectile-rails-extract-region "extract region"))))
-
-  (pretty-hydra-define jnf/projectile-rails--menu
-    (:foreign-keys warn :title jnf/projectile-rails--title :quit-key "q" :exit t)
-    ("Rails"
-     (("." projectile-rails-goto-file-at-point "Goto file at point")
-      ("c" jnf/projectile-rails-find-current-resource--menu/body "Find current resource…")
-      ("f" jnf/projectile-rails-find-resource--menu/body "Find a resource…")
-      ("g" jnf/projectile-rails-goto--menu/body "Goto…")
-      ("i" rails-routes-insert-no-cache "Insert route…")
-      ("I" rails-routes-insert "Insert route (from cache)…")
-      ("r" jnf/projectile-rails-run--menu/body "Run & interact…"))))
 #+end_src
 
 ** TODO yard-mode.el
@@ -987,7 +885,7 @@ Projectile provides convenient organization and commands to run over projects.
 /Note:/ The =CMD= + =.= is a carryover from my [[https://macromates.com][Textmate]] and [[https://www.sublimetext.com/][Sublime Text]] days.
 That’s one of those hot-keys almost burned into soul.
 
-** TODO  magit.el
+** TODO magit.el
 
 #+begin_src emacs-lisp
   ;;; Commentary:
@@ -1126,7 +1024,7 @@ That’s one of those hot-keys almost burned into soul.
     :hook ((with-editor-post-finish-hook . magit-status)))
 #+end_src
 
-** TODO  forge.el
+** TODO forge.el
 
 #+begin_src emacs-lisp
   (use-package forge
@@ -1139,14 +1037,14 @@ That’s one of those hot-keys almost burned into soul.
 
 #+end_src
 
-** TODO  libgit.el
+** TODO libgit.el
 
 #+begin_src emacs-lisp
   (use-package libgit
     :straight t)
 #+end_src
 
-** TODO  magit-libgit.el
+** TODO magit-libgit.el
 
 #+begin_src emacs-lisp
   (use-package magit-libgit
@@ -1154,7 +1052,7 @@ That’s one of those hot-keys almost burned into soul.
     :straight t)
 #+end_src
 
-** TODO  git-timemachine.el
+** TODO git-timemachine.el
 
 #+begin_src emacs-lisp
   ;; With the time machine, travel back and forth through a files history.
@@ -1164,7 +1062,7 @@ That’s one of those hot-keys almost burned into soul.
     :straight t)
 #+end_src
 
-** TODO  git-gutter-fringe.el
+** TODO git-gutter-fringe.el
 
 #+begin_src emacs-lisp
   ;; Show the current git state in the gutter Go ahead and edit a line
@@ -1178,7 +1076,7 @@ That’s one of those hot-keys almost burned into soul.
 	  git-gutter:deleted-sign "-"))
 #+end_src
 
-** TODO  git-link.el
+** TODO git-link.el
 
 #+begin_src emacs-lisp
   ;; https://github.com/sshaw/git-link
@@ -1204,8 +1102,9 @@ That’s one of those hot-keys almost burned into soul.
     :straight t)
 #+end_src
 
-** TODO  git-messenger.el
+** TODO git-messenger.el
 
+- ~git-messenger.el~ ::
 #+begin_src emacs-lisp
   (use-package git-messenger
     :config (setq git-messenger:show-detail t)
@@ -1228,21 +1127,25 @@ That’s one of those hot-keys almost burned into soul.
     :straight t)
 #+end_src
 
-** TODO  blamer.el
+** WAITING blamer.el
+
+- ~blamer.el~ :: When working in code, I want different ways to view the
+  metadata around the code.  ~blammer.el~ adds a quick annotation to the
+  current line; When did the last person touch this and what was the message.
 
 #+begin_src emacs-lisp
   (use-package blamer
     :straight (blamer :host github :repo "Artawower/blamer.el")
     :custom
-    (blamer-idle-time 0.5)
+    ;; Set to 0 because I don’t enable by default.  So I’m in a mindset of show
+    ;; me who and when.
+    (blamer-idle-time 0.0)
     (blamer-author-formatter "✎ %s ")
-    (blamer-datetime-formatter "[%s]")
+    (blamer-datetime-formatter "[%s] ")
     (blamer-commit-formatter "● %s")
     (blamer-min-offset 40)
     (blamer-max-commit-message-length 20))
 #+end_src
-
-
 ** TODO dired.el
 
 #+begin_src emacs-lisp
@@ -2373,7 +2276,7 @@ quasi-opinionated compromise.
 
   (cl-defun jnf/org-agenda-files (&key paths basenames)
     "Return the list of filenames where BASENAMES exists in PATHS."
-    (setq returning-list '())
+    (setq returning-list '("~/git/dotemacs/emacs.d/configuration.org"))
     (dolist (path paths)
       (dolist (basename basenames)
 	(if (f-exists-p (f-join path basename))
