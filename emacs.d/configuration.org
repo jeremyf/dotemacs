@@ -1382,12 +1382,12 @@ different experience from what I’m accustomed to in Emacs.  Then again, at
 least I’m not trapped in the recursive mini-buffer challenges.
 
 #+begin_src emacs-lisp
-  (load "~/.emacs.d/straight/build/vertico/extensions/vertico-buffer.elc"
-	nil
-	jnf-silence-loading-log)
-  (vertico-buffer-mode)
-  (setq vertico-buffer-display-action
-	'(display-buffer-at-bottom (window-height . 15)))
+  ;; (load "~/.emacs.d/straight/build/vertico/extensions/vertico-buffer.elc"
+  ;;       nil
+  ;;       jnf-silence-loading-log)
+  ;; (vertico-buffer-mode)
+  ;; (setq vertico-buffer-display-action
+  ;;       '(display-buffer-at-bottom (window-height . 15)))
 #+end_src
 
 The ~vertico-repeat.elc~ extension does one simple thing: it remembers and
