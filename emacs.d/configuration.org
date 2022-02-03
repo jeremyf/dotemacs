@@ -323,7 +323,7 @@ These are some “invisible” packages that do some behind the scenes work.
 #+end_src
 
 
-* Display
+* TODO Display
 
 ** DONE modus-themes.el
 
@@ -441,21 +441,24 @@ between toggles.
   (use-package spaceline :straight t)
 #+end_src
 
-** TODO spaceline-all-the-icons.el
+** DONE spaceline-all-the-icons.el
+
+- ~spaceline-all-the-icons.el~ ::  Add some visual flair to the modeline enhancements.  Disabled as of <2022-02-03 Thu>.
 
 #+begin_src emacs-lisp
-  ;; ;; Add some visual flair to the modeline enhancements
   ;; (use-package spaceline-all-the-icons
-  ;;   :straight t
-  ;;   :after spaceline
-  ;;   :config (spaceline-all-the-icons-theme))
+  ;;  :straight t
+  ;;  :after spaceline
+  ;;  :config (spaceline-all-the-icons-theme))
 #+end_src
 
-** TODO popper.el
+** DONE popper.el
+
+- ~popper.el~ :: Treat some types of windows as popups (e.g., something easier
+  to dismiss, a bit more like the mini-buffer).  Further ~jnf/popper~ can
+  toggle the popup buffer.  See that method for further implementation details.
 
 #+begin_src emacs-lisp
-  ;; Ensuring that some windows are treated as popups (e.g., something
-  ;; easier to dismiss, a bit more like the mini-buffer).
   (use-package popper
     :straight t
     :bind (("C-`" . jnf/popper))
@@ -484,74 +487,18 @@ between toggles.
 
 #+end_src
 
-** TODO ace-window.el
+** DONE ace-window.el
+
+- ~ace-window.el~ :: A window manager for emacs, allowing fast toggles between
+  windows as well as opening or moving those windows.  See
+  https://github.com/abo-abo/ace-window for more details.
 
 #+begin_src emacs-lisp
-  ;; A window manager for emacs, allowing fast toggles between windows
-  ;; as well as opening or moving those windows.
-  ;; https://github.com/abo-abo/ace-window
   (use-package ace-window
     :straight t
     :bind (("M-o" . ace-window)))
 #+end_src
 
-** TODO Window Layout Functions
-
-#+begin_src emacs-lisp
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  ;;; BEGIN frame and window quick setup
-  (defun gk-layouts-3col ()
-    "Three column layout.
-
-  Tries to preserve the order of window buffers and active window."
-    (interactive)
-    ;; Record active window buffer.
-    (let ((cbuf (current-buffer)))
-      ;; Switch to leftmost window.
-      (ignore-errors (cl-loop do (windmove-left)))
-      (let ((buffers
-	     (mapcar #'window-buffer (-take 3 (window-list))))
-	    (width (/ (frame-width) 3)))
-	(delete-other-windows)
-	(split-window-horizontally width)
-	(other-window 1)
-	(split-window-horizontally)
-	(other-window -1)
-	(dolist (b buffers)
-	  (switch-to-buffer b)
-	  (other-window 1)))
-      ;; Switch to previously visible buffer’s window.
-      (select-window (get-buffer-window cbuf))))
-
-
-  (defun gk-layouts-main-and-sidekicks ()
-    "One horizontal split, the right window split in two.
-
-  Tries to preserve the order of window buffers and active window."
-    (interactive)
-    ;; Record active window buffer.
-    (let ((cbuf (current-buffer)))
-      ;; Switch to leftmost window.
-      (ignore-errors (cl-loop do (windmove-left)))
-      (let ((buffers
-	     (mapcar #'window-buffer (-take 3 (window-list)))))
-	(delete-other-windows)
-	(split-window-horizontally)
-	(other-window 1)
-	(split-window-vertically)
-	(other-window -1)
-	(dolist (b buffers)
-	  (switch-to-buffer b)
-	  (other-window 1)))
-      ;; Switch to previously visible buffer’s window.
-      (select-window (get-buffer-window cbuf))))
-
-  (bind-key "C-x \\" #'gk-layouts-main-and-sidekicks)
-  ;; END frame and window quick setup
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-#+end_src
-
-** TODO Scrolling functions
 
 * TODO General Emacs Configuration
 
@@ -564,19 +511,11 @@ minibuffers.  This change ensures that there’s only one.
 
 ** MacOS Specific
 
-*** TODO grab-mac-link.el
+*** DONE grab-mac-link.el
+
+- ~grab-mac-link.el~ :: Grab a link from a variety of MacOS applications.
 
 #+begin_src emacs-lisp
-  ;;; Commentary:
-  ;;
-  ;;  This package loads darwin specific packages; It assumes that both
-  ;;  "use-package" and "straight-use-package" are loaded.
-  ;;
-  ;;; Code:
-  ;; Adds the ability to grab a link from various OS X applications
-  ;; Note, the sibling org-mac-link.  That package works within ORG mode
-  ;; with an extended menu option, and assumes ORG styling.  They both
-  ;; have the same keybinding as org-mode favors org-mac-link.
   (use-package grab-mac-link
     :straight t
     :config
@@ -591,28 +530,17 @@ minibuffers.  This change ensures that there’s only one.
      'jnf/grab-mac-link-make-html-link
      '((name . "jnf")))
     :bind (("C-c g" . grab-mac-link)))
-
-  (eval-after-load "flyspell"
-    '(progn
-       (define-key flyspell-mouse-map [down-mouse-3] #'flyspell-correct-word)
-       (define-key flyspell-mouse-map [mouse-3] #'undefined)))
 #+end_src
 
-*** TODO org-mac-link.el
+*** WAITING org-mac-link.el
+
+- ~org-mac-link.el~ :: Similar to ~grab-mac-link.el~ this specifically grabs a link and insersts in ~org-mode~ format.
 
 #+begin_src emacs-lisp
   (use-package org-mac-link
     :ensure t
     :straight (org-mac-link :type git :host github :repo "jeremyf/org-mac-link")
-    :defer t)
-  (add-hook 'org-mode-hook (lambda ()
-			     (define-key org-mode-map (kbd "C-c g") 'org-mac-grab-link)))
-
-  (if (version< "27.0" emacs-version)
-      (set-fontset-font
-       "fontset-default" 'unicode "Apple Color Emoji" nil 'prepend)
-    (set-fontset-font
-     t 'symbol (font-spec :family "Apple Color Emoji") nil 'prepend))
+    :bind ( :map org-mode-map (("C-c g" . org-mac-grab-link))))
 #+end_src
 
 *** TODO pdf-tools.el
@@ -4627,6 +4555,64 @@ Where NAME is name of function, BUFFER is name of buffer, and TEXT is displayed.
 	(load-theme 'modus-operandi)))
     (load-theme 'modus-operandi)))
 #+end_src
+
+*** TODO Window Layout Functions
+
+#+begin_src emacs-lisp
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;;; BEGIN frame and window quick setup
+  (defun gk-layouts-3col ()
+    "Three column layout.
+
+  Tries to preserve the order of window buffers and active window."
+    (interactive)
+    ;; Record active window buffer.
+    (let ((cbuf (current-buffer)))
+      ;; Switch to leftmost window.
+      (ignore-errors (cl-loop do (windmove-left)))
+      (let ((buffers
+	     (mapcar #'window-buffer (-take 3 (window-list))))
+	    (width (/ (frame-width) 3)))
+	(delete-other-windows)
+	(split-window-horizontally width)
+	(other-window 1)
+	(split-window-horizontally)
+	(other-window -1)
+	(dolist (b buffers)
+	  (switch-to-buffer b)
+	  (other-window 1)))
+      ;; Switch to previously visible buffer’s window.
+      (select-window (get-buffer-window cbuf))))
+
+
+  (defun gk-layouts-main-and-sidekicks ()
+    "One horizontal split, the right window split in two.
+
+  Tries to preserve the order of window buffers and active window."
+    (interactive)
+    ;; Record active window buffer.
+    (let ((cbuf (current-buffer)))
+      ;; Switch to leftmost window.
+      (ignore-errors (cl-loop do (windmove-left)))
+      (let ((buffers
+	     (mapcar #'window-buffer (-take 3 (window-list)))))
+	(delete-other-windows)
+	(split-window-horizontally)
+	(other-window 1)
+	(split-window-vertically)
+	(other-window -1)
+	(dolist (b buffers)
+	  (switch-to-buffer b)
+	  (other-window 1)))
+      ;; Switch to previously visible buffer’s window.
+      (select-window (get-buffer-window cbuf))))
+
+  (bind-key "C-x \\" #'gk-layouts-main-and-sidekicks)
+  ;; END frame and window quick setup
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+#+end_src
+
+
 
 * Menus
 
