@@ -90,12 +90,15 @@ inline documentation in most cases.
   (global-so-long-mode) ;; Handle long files.
   (electric-pair-mode)  ;; https://blog.sumtypeofway.com/posts/emacs-config.html
   (make-directory "~/.emacs.d/autosaves/" t) ;; Ensuring I have an autosave
-                                             ;; directory.
+					     ;; directory.
   (recentf-mode 1) ;; Track recent
   (run-at-time nil (* 2 60) 'recentf-save-list) ;; Save files every 2 minutes
   (global-auto-revert-mode)
+  (blink-cursor-mode t)
 
-  (setq-default fill-column 79) ;; Feeling a bit old school with 80 characters.
+  (setq-default fill-column 79)   ;; Feeling a bit old school with 80 characters.
+  (setq-default cursor-type 'bar) ;; Doing a bit of configuration of my cursors
+
   (setq
    backup-by-copying t         ;; Don't delink hardlinks
    backup-directory-alist '((".*" . "~/.emacs.d/backups/"))
@@ -361,7 +364,25 @@ configuration for these two sibling themes.
        (t . (rainbow 1.05)))))
 #+end_src
 
-** TODO lin.el
+With a quick bit of testing, it appears that the following ~set-face-attribute~
+declarations should be made after the theme declarations.  When the following
+statements were declared before the themes, and I toggled my theme, the font
+changed to something unexpected.  With them declared after, I keep the fonts
+between toggles.
+
+#+begin_src emacs-lisp
+  (set-face-attribute 'default nil
+		      :family jnf/fixed-width-font-name
+		      :height 140)
+  (set-face-attribute 'variable-pitch nil
+		      :family "ETBembo"
+		      :height 1.1)
+  (set-face-attribute 'fixed-pitch nil
+		      :family jnf/fixed-width-font-name
+		      :height 1.0)
+#+end_src
+
+** DONE lin.el
 
 - ~lin.el~ :: “LIN locally remaps the hl-line face to a style that is optimal for major modes where line selection is the primary mode of interaction.”  In otherwords, ~lin.el~ improves the highlighted line behavior for the competing contexts.
 
@@ -369,61 +390,6 @@ configuration for these two sibling themes.
   (use-package lin
     :straight (lin :host gitlab :repo "protesilaos/lin")
     :config (lin-add-to-many-modes))
-#+end_src
-
-#+begin_src emacs-lisp
-  ;; Based on system type, either load the OSX apperance (e.g. dark or
-  ;; light) and load accordingly.
-  (if (eq system-type 'darwin)
-      (progn
-	(defun jnf/dark ()
-	  "Toggle system-wide Dark or Light setting."
-	  (interactive)
-	  (shell-command "osascript -e 'tell application \"System Events\" to tell appearance preferences to set dark mode to not dark mode'")
-	  (jnf/emacs-theme-by-osx-appearance))
-
-	(defalias 'modus-themes-toggle 'jnf/dark)
-	(defun jnf/emacs-theme-by-osx-appearance ()
-	  "Set theme based on OSX apperance state."
-	  (if (equal "Dark" (substring (shell-command-to-string "defaults read -g AppleInterfaceStyle") 0 4))
-	      (load-theme 'modus-vivendi)
-	    (load-theme 'modus-operandi)))
-	(jnf/emacs-theme-by-osx-appearance))
-    (progn
-      (defun modus-themes-toggle ()
-	"Toggle between `modus-operandi' and `modus-vivendi' themes."
-	(interactive)
-	(if (eq (car custom-enabled-themes) 'modus-operandi)
-	    (load-theme 'modus-vivendi)
-	  (load-theme 'modus-operandi)))
-      (load-theme 'modus-operandi)))
-#+end_src
-
-#+begin_src emacs-lisp
-
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  ;; BEGIN BLOCK
-  ;;
-  ;; With a quick bit of testing, it appears that the following
-  ;; set-face-attribute declarations should be made after the theme
-  ;; declarations.  When the following statements were declared before
-  ;; the themes, and I toggled my theme, the font changed to something
-  ;; unexpected.  With them declared after, I keep the fonts between
-  ;; toggles.
-  ;;
-  ;; Main typeface, I'm toggling between "JetBrains Mono" and "Hack"
-  (set-face-attribute 'default nil :family jnf/fixed-width-font-name :height 140)
-  ;; Proportionately spaced typeface
-  (set-face-attribute 'variable-pitch nil :family "ETBembo" :height 1.1)
-  ;; Monospaced typeface
-  (set-face-attribute 'fixed-pitch nil :family jnf/fixed-width-font-name :height 1.0)
-  ;;
-  ;; END BLOCK
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-  (blink-cursor-mode t)
-  ;; Doing a bit of configuration of my cursors
-  (setq-default cursor-type 'bar)
 #+end_src
 
 ** TODO all-the-icons.el
@@ -4707,6 +4673,34 @@ Where NAME is name of function, BUFFER is name of buffer, and TEXT is displayed.
 	    (t (progn
 		 (move-to-window-line 0)
 		 (recenter))))))
+#+end_src
+
+- ~jnf/dark~ :: Toggle from Dark to Light setting based on system preferences.
+
+#+begin_src emacs-lisp
+(if (eq system-type 'darwin)
+    (progn
+      (defun jnf/dark ()
+	"Toggle system-wide Dark or Light setting."
+	(interactive)
+	(shell-command "osascript -e 'tell application \"System Events\" to tell appearance preferences to set dark mode to not dark mode'")
+	(jnf/emacs-theme-by-osx-appearance))
+
+      (defalias 'modus-themes-toggle 'jnf/dark)
+      (defun jnf/emacs-theme-by-osx-appearance ()
+	"Set theme based on OSX apperance state."
+	(if (equal "Dark" (substring (shell-command-to-string "defaults read -g AppleInterfaceStyle") 0 4))
+	    (load-theme 'modus-vivendi)
+	  (load-theme 'modus-operandi)))
+      (jnf/emacs-theme-by-osx-appearance))
+  (progn
+    (defun modus-themes-toggle ()
+      "Toggle between `modus-operandi' and `modus-vivendi' themes."
+      (interactive)
+      (if (eq (car custom-enabled-themes) 'modus-operandi)
+	  (load-theme 'modus-vivendi)
+	(load-theme 'modus-operandi)))
+    (load-theme 'modus-operandi)))
 #+end_src
 
 * Menus
