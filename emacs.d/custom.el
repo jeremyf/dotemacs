@@ -18,8 +18,8 @@
  '(global-display-line-numbers-mode t)
  '(org-export-backends '(ascii html icalendar latex md odt))
  '(safe-local-variable-values
-   '((jnf-tor-minor-mode . 1)
-     (take-on-rules-minor-mode . 1)
+   '((jnf-forem-minor-mode . 1)
+     (jnf-tor-minor-mode . 1)
      (encoding . utf-8)))
  '(show-paren-mode t)
  '(typopunct-buffer-language 'english)
