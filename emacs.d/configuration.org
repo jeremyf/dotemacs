@@ -3831,7 +3831,7 @@ for TakeOnRules.com."
 No effort is made to check if this is a post."
   (interactive (list (completing-read-multiple "Tags: " (jnf/tor-tags-list))))
   (let ((saved-point (point))
-        (to-insert (concat "\n- " (s-join "\n -" tags))))
+        (to-insert (concat "\n- " (s-join "\n- " tags))))
     (replace-regexp "^tags:$" (concat "tags:" to-insert) nil 0 (point-max))
     (goto-char (+ saved-point (length to-insert)))))
 
