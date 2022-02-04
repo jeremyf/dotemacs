@@ -2326,21 +2326,6 @@ quasi-opinionated compromise.
   ;; implementation of org-babel.
   (setq org-plantuml-jar-path (concat (string-trim (shell-command-to-string "brew-path plantuml")) "/libexec/plantuml.jar"))
 #+end_src
-
-** TODO company-org-block.el
-
-#+begin_src emacs-lisp
-  ;; https://github.com/xenodium/company-org-block
-  ;; (use-package company-org-block
-  ;;   :straight t
-  ;;   :after (org company)
-  ;;   :custom
-  ;;   (company-org-block-edit-style 'auto) ;; 'auto, 'prompt, or 'inline
-  ;;   :hook ((org-mode . (lambda ()
-  ;;                        (setq-local company-backends '(company-org-block))
-  ;;                        (company-mode +1)))))
-#+end_src
-
 ** TODO functions
 
 #+begin_src emacs-lisp
