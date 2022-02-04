@@ -1999,7 +1999,7 @@ quasi-opinionated compromise.
     :hook ((fundamental-mode) . rainbow-delimiters-mode))
 #+end_src
 
-** TODO emojify.el
+** DONE emojify.el
 
 - ~emojify.el~ :: Ensure rendering of correct emoji’s.
 
