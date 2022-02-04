@@ -571,7 +571,7 @@ minibuffers.  This change ensures that there’s only one.
     :config (global-so-long-mode 1))
 #+end_src
 
-* TO\DO Modes
+* TODO Modes
 
 Sometimes I want to edit svg files.  Often times if I open them directly in
 Emacs, I want to edit them.  This setting helps with that default.  /Note:/
@@ -668,7 +668,7 @@ syntax highlighting that makes reading ~Go-lang~ tolerable.
     :init (setq markdown-command "/usr/local/bin/pandoc"))
 #+end_src
 
-** TODO yaml-mode.el
+** DONE yaml-mode.el
 
 - ~yaml-mode.el~ :: Visual parsing for yaml.
 
@@ -1042,26 +1042,21 @@ That’s one of those hot-keys almost burned into soul.
 ** TODO libgit.el
 
 #+begin_src emacs-lisp
-  (use-package libgit
-    :straight t)
+  (use-package libgit :straight t)
 #+end_src
 
 ** TODO magit-libgit.el
 
 #+begin_src emacs-lisp
-  (use-package magit-libgit
-    :after (libgit magit)
-    :straight t)
+  (use-package magit-libgit :straight t)
 #+end_src
 
-** TODO git-timemachine.el
+** DONE git-timemachine.el
+
+- ~git-timemachine.el~ :: With the time machine, travel back and forth through a files history.
 
 #+begin_src emacs-lisp
-  ;; With the time machine, travel back and forth through a files history.
-  ;;
-  ;; While visiting a point in time, you can open
-  (use-package git-timemachine
-    :straight t)
+  (use-package git-timemachine :straight t)
 #+end_src
 
 ** TODO git-gutter-fringe.el
@@ -1353,7 +1348,7 @@ package.
     ;; Optionally configure the register formatting. This improves the register
     ;; preview for `consult-register', `consult-register-load',
     ;; `consult-register-store' and the Emacs built-ins.
-    (setq register-preview-delay 0
+    (setq register-preview-delay 0.1
 	  register-preview-function #'consult-register-format)
 
 
