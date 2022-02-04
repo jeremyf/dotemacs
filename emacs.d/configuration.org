@@ -625,11 +625,15 @@ without this setting, Emacs will happily render the SVG as an image,
     :straight t)
 #+end_src
 
-** TODO json-mode.el
+** DONE json-mode.el
+
+- ~json.el~ :: In modern web-development, JSON is nigh unavoidable.
 
 #+begin_src emacs-lisp
   (use-package json-mode :straight t)
 #+end_src
+
+** DONE json-reformat.el
 
 - ~json-reformat.el~ :: Because JSON can be quite ugly, I want something to help tidy it up.
 
@@ -650,14 +654,14 @@ syntax highlighting that makes reading ~Go-lang~ tolerable.
   (use-package go-mode :straight t)
 #+end_src
 
-** TODO markdown-mode.el
+** DONE markdown-mode.el
+
+- ~markdown-mode.el~ :: Oh ubiquitous Markdown.
 
 #+begin_src emacs-lisp
   (use-package markdown-mode
     :straight t
     :hook ((markdown-mode . turn-on-visual-line-mode))
-    ;; I use markdown for my blogging platform and very little else.
-    ;; Hence, I have this keybind.
     :mode (("README\\.md\\'" . gfm-mode)
 	   ("\\.md\\'" . markdown-mode)
 	   ("\\.markdown\\'" . markdown-mode))
@@ -666,17 +670,23 @@ syntax highlighting that makes reading ~Go-lang~ tolerable.
 
 ** TODO yaml-mode.el
 
+- ~yaml-mode.el~ :: Visual parsing for yaml.
+
 #+begin_src emacs-lisp
   (use-package yaml-mode :straight t)
 #+end_src
 
-** TODO lua-mode.el
+** WAITING lua-mode.el
+
+- ~lua-mode.el~ :: For working with Hammerspoon.
 
 #+begin_src emacs-lisp
   (use-package lua-mode :straight t)
 #+end_src
 
-** TODO git-modes.el
+** DONE git-modes.el
+
+- ~git-modes.el~ :: For editing various Git configuration files.
 
 #+begin_src emacs-lisp
   (use-package git-modes :straight t)
@@ -737,7 +747,9 @@ syntax highlighting that makes reading ~Go-lang~ tolerable.
   ;;   :straight t)
 #+end_src
 
-** TODO ruby-interpolation.el
+** DONE ruby-interpolation.el
+
+- ~ruby-interpolation.el~ :: A simple package to expand ~#~ to ~#{<cursor>}~.
 
 #+begin_src emacs-lisp
   ;; Nice and simple package for string interpolation.
@@ -745,14 +757,6 @@ syntax highlighting that makes reading ~Go-lang~ tolerable.
     :straight t
     :diminish 'ruby-interpolation-mode
     :hook (enh-ruby-mode . ruby-interpolation-mode))
-#+end_src
-
-** TODO rails-routes.el
-
-#+begin_src emacs-lisp
-  (use-package rails-routes
-    :after projectile-rails
-    :straight t)
 #+end_src
 
 ** DONE yard-mode.el
@@ -774,14 +778,9 @@ syntax highlighting that makes reading ~Go-lang~ tolerable.
     :straight (bundler :type git :host github :repo "endofunky/bundler.el"))
 #+end_src
 
-** TODO lsp-mode.el
+** DONE lsp-mode.el
 
-- ~lsp-mode.el~ :: Language Server Protocol; provides some nice inline
-  documentation regarding code.  In the case of Ruby this relies on
-  documentation.
-
-What I’m finding is that I occasionally use it, and it also has some flake-outs
-as it relates to the minibuffer.
+- ~lsp-mode.el~ :: Language Server Protocol; provides some nice interactions with code.
 
 #+begin_src emacs-lisp
   (use-package lsp-mode
@@ -800,9 +799,12 @@ as it relates to the minibuffer.
     (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration))
 #+end_src
 
-** TODO lsp-ui.el
+** DONE lsp-ui.el
 
-- ~lsp-ui.el~ :: Some nice UI for LSP mode.  For now, I’m disabling it.
+- ~lsp-ui.el~ :: Some nice UI for LSP mode.
+
+What I’m finding is that I occasionally use it, and it also has some flake-outs
+as it relates to the minibuffer.
 
 But a bit flakey.  For example, as I’m using ~consult-recent-file~, when I move
 the minibuffer selection (via ~C-n~) to a Ruby file, ~consult-recent-file~
@@ -834,7 +836,9 @@ packages don’t warrant including this.
   ;; (add-hook 'emacs-lisp-mode 'eldoc-mode)
 #+end_src
 
-** TODO tree-sitter.el
+** DONE tree-sitter.el
+
+- ~tree-sitter.el~ :: An incremental parsing library for languages.  See https://tree-sitter.github.io/tree-sitter/.
 
 #+begin_src emacs-lisp
   ;; See https://github.com/emacs-tree-sitter/elisp-tree-sitter
@@ -849,12 +853,6 @@ packages don’t warrant including this.
 
   (use-package tree-sitter-langs
     :straight t)
-#+end_src
-
-** TODO el-doc
-
-#+begin_src emacs-lisp
-
 #+end_src
 
 * DONE Support
