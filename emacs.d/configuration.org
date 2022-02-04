@@ -550,7 +550,6 @@ minibuffers.  This change ensures that there’s only one.
 
 #+begin_src emacs-lisp
   (use-package org-mac-link
-    :ensure t
     :straight (org-mac-link :type git :host github :repo "jeremyf/org-mac-link")
     :bind (:map org-mode-map (("C-c g" . org-mac-grab-link))))
 #+end_src
@@ -561,7 +560,6 @@ minibuffers.  This change ensures that there’s only one.
 
 #+begin_src emacs-lisp
   (use-package so-long
-    :ensure t
     :defer t
     :straight t
     :bind
@@ -1143,28 +1141,6 @@ That’s one of those hot-keys almost burned into soul.
     (blamer-min-offset 40)
     (blamer-max-commit-message-length 20))
 #+end_src
-** TODO dired.el
-
-#+begin_src emacs-lisp
-  (use-package dired-subtree
-    :bind (:map dired-mode-map ("C-, t" . 'dired-subtree-toggle))
-    :straight t)
-
-  (use-package dired-sidebar
-    :straight t
-    :bind (("C-x C-n" . dired-sidebar-toggle-sidebar))
-    :init
-    (add-hook 'dired-sidebar-mode-hook
-	      (lambda ()
-		(unless (file-remote-p default-directory)
-		  (auto-revert-mode))))
-    :config
-    (setq dired-sidebar-use-term-integration t
-	  dired-sidebar-theme 'vscode
-	  dired-sidebar-use-custom-font t)
-    :commands (dired-sidebar-toggle-sidebar))
-#+end_src
-
 * TODO Completion
 
 ** DONE vertico.el
@@ -1730,8 +1706,7 @@ entirely muscle memory.
 
 #+RESULTS:
 
-* TODO Window Manipulation
-
+* DONE Window Manipulation
 ** DONE Tab Line
 
 Show tabs in the current window.  The tab system is something I wrestle with,
@@ -1743,11 +1718,11 @@ but I appreciate it’s existence.  These configurations make it easier to use.
   (global-set-key (kbd "s-}") 'next-buffer)
 #+end_src
 
-** TODO buffer-move.el
+** DONE buffer-move.el
 
-From [[https://github.com/lukhas/buffer-move][lukhas/buffer-move]], this package helps me quickly move a window elsewhere.
-As of <2022-02-01 Tue>, I don’t often use this command.  Consider it “on
-notice” for removal.
+- ~buffer-move.el~ :: From [[https://github.com/lukhas/buffer-move][lukhas/buffer-move]], this package helps me quickly
+  move a window elsewhre.  As of <2022-02-01 Tue>, I don’t often use this
+  command.  Consider it “on notice” for removal.
 
 #+begin_src emacs-lisp
   (use-package buffer-move
@@ -1780,22 +1755,24 @@ quasi-opinionated compromise.
 
 #+end_src
 
+** DONE avy.el
+
+- ~avy.el~ :: That letter is the beginning of a word. Narrow results from there.
+
+#+begin_src emacs-lisp
+  (use-package avy
+    :bind (("C-j" . avy-goto-char-timer))
+    :bind (:map org-mode-map ("C-j" . avy-goto-char-timer))
+    :straight t)
+#+end_src
+
 ** TODO link-hint.el
 
 #+begin_src emacs-lisp
-  ;; That letter is the beginning of a word. Narrow results from there.
-  (use-package avy
-    :bind (("C-j" . avy-goto-char-timer))
-    ;; moved bind to enh-ruby-mode declaration
-    ;; :bind (:map enh-ruby-mode-map ("C-j" . avy-goto-char-timer))
-    :bind (:map org-mode-map ("C-j" . avy-goto-char-timer))
-    :straight t)
-
-  ;; (use-package link-hint
-  ;;   :straight t
-  ;;   :bind
-  ;;   ("C-c l o" . link-hint-open-link)
-  ;;   ("C-c l c" . link-hint-copy-link))
+  (use-package link-hint
+    :straight t
+    :bind (("C-c l o" . link-hint-open-link)
+	   ("C-c l c" . link-hint-copy-link)))
 #+end_src
 
 ** TODO math-at-point.el
@@ -1820,9 +1797,7 @@ quasi-opinionated compromise.
 ** TODO writeroom-mode.el
 
 #+begin_src emacs-lisp
-
-  (use-package writeroom-mode
-    :straight t)
+  (use-package writeroom-mode :straight t)
 #+end_src
 
 ** TODO vi-tilde-fringe.el
@@ -1841,15 +1816,6 @@ quasi-opinionated compromise.
   (use-package fill-sentences-correctly
     :straight (fill-sentences-correctly :host github :repo "duckwork/fill-sentences-correctly.el")
     :hook (fundamental-mode . fill-sentences-correctly-mode))
-#+end_src
-
-** TODO origami.el
-
-#+begin_src emacs-lisp
-
-  (use-package origami
-    :straight t
-    :hook (prog-mode . origami-mode))
 #+end_src
 
 ** TODO hippie-exp.el
@@ -1925,13 +1891,13 @@ quasi-opinionated compromise.
     :straight t)
 #+end_src
 
-** TODO iedit.el
+** DONE iedit.el
+
+- ~iedit.el~ :: ~C-;~ to select current symbol and all matches; Then edit at
+  multiple points.
 
 #+begin_src emacs-lisp
-
-  ;; C-; to select current symbol and all matches; Then edit at multiple points.
-  (use-package iedit
-    :straight t)
+  (use-package iedit :straight t)
 #+end_src
 
 ** TODO crux.el
@@ -2076,7 +2042,6 @@ quasi-opinionated compromise.
 #+begin_src emacs-lisp
   (use-package unicode-fonts
     :straight t
-    :ensure t
     :config (unicode-fonts-setup))
 #+end_src
 
