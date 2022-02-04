@@ -1471,11 +1471,12 @@ Do I even use this?
 		   (window-parameters (mode-line-format . none)))))
 #+end_src
 
-** TODO embark-consult.el
+** DONE embark-consult.el
+
+- ~embark-consult.el~ :: I use ~embark.el~ and ~consult.el~, let’s add a little
+  bit more connective tissue.
 
 #+begin_src emacs-lisp
-
-  ;; Consult users will also want the embark-consult package.
   (use-package embark-consult
     :straight t
     :after (embark consult)
@@ -1623,6 +1624,8 @@ entirely muscle memory.
 
 ** TODO corfu.el et al
 
+- ~cape.el~ ::
+
 #+begin_src emacs-lisp
   ;; Configure corfu
   (use-package corfu
@@ -1648,23 +1651,26 @@ entirely muscle memory.
       (let (completion-cycle-threshold completion-cycling)
 	(apply #'consult-completion-in-region completion-in-region--data)))
     (define-key corfu-map "\M-m" #'corfu-move-to-minibuffer))
+#+end_src
 
-  ;; Dabbrev works with Corfu
-  (use-package dabbrev
-    :straight t
-    ;; Swap M-/ and C-M-/
-    :bind (("M-/" . dabbrev-completion)
-	   ("C-M-/" . dabbrev-expand)))
+** TODO cape.el
 
+- ~cape.el~ ::
 
-  (use-package cape
+#+begin_src
+(use-package cape
     :straight t
     :bind (("C-c p" . completion-at-point)))
 
   (setq-local completion-at-point-functions
 	      (mapcar #'cape-company-to-capf
 		      (list #'company-files #'company-ispell #'company-dabbrev)))
-  (use-package emacs
+#+end_src
+
+** TODO Emacs configuration
+
+#+begin_src
+(use-package emacs
     :straight nil
     :init
     ;; Emacs 28: Hide commands in M-x which do not apply to the current mode.
@@ -1673,7 +1679,6 @@ entirely muscle memory.
 	  #'command-completion-default-include-p))
 #+end_src
 
-#+RESULTS:
 
 * DONE Window Manipulation
 ** DONE Tab Line
