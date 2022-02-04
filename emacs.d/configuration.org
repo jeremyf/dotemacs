@@ -3952,65 +3952,6 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
 
     ;; Jump to the beginning of the buffer...again.
     (beginning-of-buffer))
-
-  (global-set-key (kbd "C-M-s-f") 'jnf/forem-menu/body)
-  (defvar jnf/forem-menu--title
-    (jnf/all-the-icons--with-octicon "code" "Forem" 1 -0.05)
-    "The Forem Subject Menu Title.")
-  (pretty-hydra-define jnf/forem-menu (:foreign-keys warn :title jnf/forem-menu--title :quit-key "q" :exit t)
-    ("Forem Workflow"
-     (
-      ("i" (lambda () (interactive) (browse-url "https://github.com/forem/forem/issues/")) "Browse to [i]ssues…")
-      ("j" (lambda () (interactive) (browse-url "https://github.com/orgs/forem/projects/")) "Browse to pro[j]ects…")
-      ("m" (lambda () (interactive) (browse-url "https://github.com/forem/forem/pulls?q=is%3Apr+is%3Aclosed")) "Browse [m]erged Pull Requests…")
-      ("p" (lambda () (interactive) (browse-url "https://github.com/forem/forem/pulls/")) "Browse to pull requests…"))
-     "Jeremy's Workflow"
-     (
-      ("I" (lambda () (interactive) (browse-url "https://github.com/forem/forem/issues/assigned/jeremyf")) "Browse to Jeremy's [I]ssues…")
-      ("J" (lambda () (interactive) (browse-url "https://github.com/orgs/forem/projects/39")) "Browse to Content Experience pro[J]ects…")
-      ("M" (lambda () (interactive) (browse-url "https://github.com/forem/forem/pulls/jeremyf?q=is%3Apr+is%3Aclosed")) "Browse Jeremy's [M]erged Pull Requests…")
-      ("P" (lambda () (interactive) (browse-url "https://github.com/forem/forem/pulls/jeremyf")) "Browse to Jeremy's [P]ull requests…")
-      ("N" (lambda () (interactive) (browse-url "https://github.com/notifications")) "Browse Github [N]otifications"))))
-
-  (when (file-directory-p "~/git/org/forem")
-    (progn
-      (defconst jnf/forem-dashboard-filename
-	"~/git/org/forem-dashboard.org"
-	"The file to the dashboard documentation and links for Forem.")
-
-      (cl-defun jnf/open-dashboard (&key (filename jnf/forem-dashboard-filename))
-	"For the given FILENAME open the links in the default browser.
-
-  With the universal prefix (e.g. C-u) open the file instead."
-	(interactive)
-	(if (equal current-prefix-arg nil) ; no C-u
-	    (call-process-shell-command
-	     (concat "rg \"\\[\\[(.*)\\]\\[\" "
-		     filename
-		     " --only-matching"
-		     " | rg \"[^\\[|\\]]+\" --only-matching"
-		     " | xargs open"))
-	  (find-file filename)))
-
-      (defun jnf/open-forem-todo ()
-	"Open ~/git/org/forem/todo.org"
-	(interactive)
-	(find-file "~/git/org/forem/todo.org"))
-
-      (defun jnf/open-forem-brag-book ()
-	"Open forem brag book."
-	(interactive)
-	(find-file "~/git/org/forem/20211005---brag_book_for_jeremy_friesen.org"))
-
-      (pretty-hydra-define+ jnf/forem-menu()
-	("Org-Mode"
-	 (
-	  ("@" jnf/open-forem-todo "Open Forem Todo")
-	  ("B" jnf/open-forem-brag-book "[B]rag book open…")
-	  ("D" jnf/open-dashboard "[D]ashboard open…")
-	  ("d" (lambda () (interactive) (find-file jnf/forem-dashboard-filename)) "Visit [d]ashboard file…"))))
-      ))
-
 #+end_src
 
 ** TODO jnf/eval-region-dwim()
@@ -4449,6 +4390,58 @@ I’ve opted to take a different path; write some Emacs functions instead.
 *** TODO A Consistent Transient Menu
 
 #+begin_src emacs-lisp
+  (defconst jnf/forem-dashboard-filename
+    "~/git/org/forem-dashboard.org"
+    "The file to the dashboard documentation and links for Forem.")
+
+  (cl-defun jnf/open-dashboard (&key (filename jnf/forem-dashboard-filename))
+    "For the given FILENAME open the links in the default browser.
+
+      With the universal prefix (e.g. C-u) open the file instead."
+    (interactive)
+    (if (equal current-prefix-arg nil) ; no C-u
+	(call-process-shell-command
+	 (concat "rg \"\\[\\[(.*)\\]\\[\" "
+		 filename
+		 " --only-matching"
+		 " | rg \"[^\\[|\\]]+\" --only-matching"
+		 " | xargs open"))
+      (find-file filename)))
+
+  (transient-define-suffix jnf/org-auto-tags--transient (tags)
+    "Set the tags from minibuffer read"
+    :description '(lambda ()
+		    (concat
+		     "Org Tags: "
+		     (propertize
+		      (format "%s" jnf/org-auto-tags--current-list)
+		      'face 'transient-argument)))
+    (interactive (list
+		  (completing-read-multiple
+		   "Tag(s): " (org-roam-tag-completions))))
+    (setq jnf/org-auto-tags--current-list tags))
+
+  (global-set-key (kbd "C-M-s-f") 'jnf/menu-dwim--forem)
+  (transient-define-prefix jnf/menu-dwim--forem ()
+    [["Forem's Workflow"
+      ("i" "Browse to [i]ssues…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/issues/")))
+      ("j" "Browse to pro[j]ects…" (lambda () (interactive) (browse-url "https://github.com/orgs/forem/projects/")))
+      ("m" "Browse [m]erged Pull Requests…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/pulls?q=is%3Apr+is%3Aclosed")))
+      ("p" "Browse to pull requests…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/pulls/")))
+      ]
+     ["Jeremy's Workflow"
+
+      ("I" "Browse to Jeremy's [I]ssues…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/issues/assigned/jeremyf")))
+      ("J" "Browse to Content Experience pro[J]ects…" (lambda () (interactive) (browse-url "https://github.com/orgs/forem/projects/39")))
+      ("M" "Browse Jeremy's [M]erged Pull Requests…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/pulls/jeremyf?q=is%3Apr+is%3Aclosed")))
+      ("P" "Browse to Jeremy's [P]ull requests…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/pulls/jeremyf")))
+      ("N" "Browse Github [N]otifications" (lambda () (interactive) (browse-url "https://github.com/notifications")))
+      ]
+     ["Org-Mode"
+      ("D" "[D]ashboard open…" jnf/open-dashboard)
+      ("d" "Visit [d]ashboard file…" (lambda () (interactive) (find-file jnf/forem-dashboard-filename)))
+      ]])
+
   (transient-define-prefix jnf/menu-dwim--bwg ()
     "Define the BWG help prefix."
     ["Burning Wheel"
@@ -4500,6 +4493,7 @@ I’ve opted to take a different path; write some Emacs functions instead.
      (list (completing-read-multiple "Tag(s): " (org-roam-tag-completions))))
     (setq jnf/org-auto-tags--current-list tags))
 
+  (global-set-key (kbd "s-1") 'jnf/menu-dwim)
   (transient-define-prefix jnf/menu-dwim ()
     "Return a `transient' compliant list to apply to different transients."
     [["Markdown Utilities"
@@ -4518,9 +4512,9 @@ I’ve opted to take a different path; write some Emacs functions instead.
       ]]
     [["Contexts"
       ("-b" "Burning Wheel…"  jnf/menu-dwim--bwg)
-      ("-f" "Forem…" jnf/forem-menu/body)
-      ("-t" "TakeOnRules…" jnf/menu-dwim--tor)
+      ("-f" "Forem…" jnf/menu-dwim--forem)
       ("-h" "Hammerspoon…" jnf/menu-dwim--hammerspoon :if-non-nil hammerspoon-edit-minor-mode)
+      ("-t" "TakeOnRules…" jnf/menu-dwim--tor)
       ]
      ["Grab"
       ("g e" "Elfeed" jnf/menu-dwim--org-capture-elfeed-show :if-derived elfeed-show-mode)
@@ -4547,9 +4541,6 @@ I’ve opted to take a different path; write some Emacs functions instead.
       ("o r" "Add Org Ref…" org-roam-ref-add :if-derived org-mode)
       ("o s" jnf/org-auto-tags--transient :transient t)
       ]])
-
-  (global-set-key (kbd "s-1") 'jnf/menu-dwim)
-  (global-set-key (kbd "C-c m") 'jnf/menu-dwim)
 #+end_src
 
 * Footnotes
