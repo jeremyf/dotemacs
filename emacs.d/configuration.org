@@ -1259,7 +1259,8 @@ package.
 ** TODO consult.el
 
 - ~consult.el~ :: “Consult provides practical commands based on the Emacs
-  completion function [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Minibuffer-Completion.html][completing-read]].”  See https://github.com/minad/consult
+  completion function [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Minibuffer-Completion.html][completing-read]].”  I had previously used Ivy, mostly for Swiper.  What I’ve found is a very
+  See https://github.com/minad/consult
 
 #+begin_src emacs-lisp
   (use-package consult
@@ -1376,6 +1377,11 @@ package.
     (autoload 'projectile-project-root "projectile")
     (setq consult-project-root-function #'projectile-project-root))
 #+end_src
+
+*** TODO consult-org.el
+
+- [ ] In org-mode map ~s-2~ to ~consult-org-menu~ instead of ~consult-imenu~.
+- [ ] Consider leveraging ~consult-org-agenda~
 
 ** TODO consult-flycheck.el
 
