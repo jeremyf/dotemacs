@@ -1435,11 +1435,19 @@ Do I even use this?
 		("!" . consult-flycheck)))
 #+end_src
 
-** TODO embark.ell
+** DONE embark.el
+
+- ~embark.el~ :: The missing context menu (e.g. “right click”) for Emacs, but conceptually so much more.  See https://github.com/oantolin/embark.
+
+  Let’s think in terms of “pairs”.  A targe and an action.
+
+  When I call ~embark-act~ (via ~C-.~) Embark gives me buffer listing the actions I can take on the target.  A contextual menu if you will.
+
+  I can also gather up a group of targets (via ~embark-export~) and then take actions on them.  I write more about this in ~wgrep.el~.
+
+  There’s also the ~embark-dwim~ (I map that to ~M-.~).  Given a target, say the place at point, when I call ~embark-dwim~ it takes an applicable action.  For a URL, it will open that URL in the configured browser.
 
 #+begin_src emacs-lisp
-
-  ;; https://github.com/oantolin/embark
   (use-package embark
     :straight t
     :bind
@@ -1451,47 +1459,6 @@ Do I even use this?
     ;; Optionally replace the key help with a completing-read interface
     (setq prefix-help-command #'embark-prefix-help-command)
     :config
-
-    ;;; BEGIN embark key macro target
-    (defun embark-kmacro-target ()
-      "Target a textual kmacro in braces."
-      (save-excursion
-	(let ((beg (progn (skip-chars-backward "^{}\n") (point)))
-	      (end (progn (skip-chars-forward "^{}\n") (point))))
-	  (when (and (eq (char-before beg) ?{) (eq (char-after end) ?}))
-	    `(kmacro ,(buffer-substring-no-properties beg end)
-		     . (,(1- beg) . ,(1+ end)))))))
-
-    (add-to-list 'embark-target-finders 'embark-kmacro-target)
-
-    (defun embark-kmacro-run (arg kmacro)
-      (interactive "p\nsKmacro: ")
-      (kmacro-call-macro arg t nil (kbd kmacro)))
-
-    (defun embark-kmacro-save (kmacro)
-      (interactive "sKmacro: ")
-      (kmacro-push-ring)
-      (setq last-kbd-macro (kbd kmacro)))
-
-    (defun embark-kmacro-name (kmacro name)
-      (interactive "sKmacro: \nSName: ")
-      (let ((last-kbd-macro (kbd kmacro)))
-	(kmacro-name-last-macro name)))
-
-    (defun embark-kmacro-bind (kmacro)
-      (interactive "sKmacro: \n")
-      (let ((last-kbd-macro (kbd kmacro)))
-	(kmacro-bind-to-key nil)))
-
-    (embark-define-keymap embark-kmacro-map
-      "Actions on kmacros."
-      ("RET" embark-kmacro-run)
-      ("s" embark-kmacro-save)
-      ("n" embark-kmacro-name)
-      ("b" embark-kmacro-bind))
-
-    (add-to-list 'embark-keymap-alist '(kmacro . embark-kmacro-map))
-    ;;; END embark key macro target
     (setq embark-action-indicator
 	  (lambda (map &optional _target)
 	    (which-key--show-keymap "Embark" map nil nil 'no-paging)
@@ -1502,7 +1469,6 @@ Do I even use this?
 		 '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
 		   nil
 		   (window-parameters (mode-line-format . none)))))
-
 #+end_src
 
 ** TODO embark-consult.el
