@@ -1,4 +1,4 @@
--*- org-insert-tilde-language: emacs-lisp; -*-
+g-*- org-insert-tilde-language: emacs-lisp; -*-
 #+TITLE: Emacs Configuration
 #+AUTHOR: Jeremy Friesen
 #+EMAIL: jeremy@jeremyfriesen.com
@@ -690,17 +690,25 @@ syntax highlighting that makes reading ~Go-lang~ tolerable.
   (use-package git-modes :straight t)
 #+end_src
 
-** TODO enh-ruby-mode.el
+** DONE enh-ruby-mode.el
+
+- ~enh-ruby-mode.el~ :: Emacs ships with ~ruby-mode.el~, but I’ve found that
+  ~enh-ruby-mode.el~ has more convenient navigation functions:
+
+  - ~enh-ruby-mark-defun~ :: Put mark at end of this Ruby definition, point at
+    beginning.
+  - ~enh-ruby-up-sexp~ :: Move up one balanced expression (sexp).
+  - ~enh-ruby-toggle-block~ :: Toggle block type from do-end to braces or back.
+  - ~enh-ruby-backward-sexp~ :: Move backward across one balanced expression
+    (sexp).
+  - ~enh-ruby-forward-sexp~ :: Move backward across one balanced expression
+    (sexp).
 
 #+begin_src emacs-lisp
-  (defun jnf/enh-ruby-mode-hook-hook ()
-    (setq fill-column 100))
-  ;; I'm provisionally addinig enh-ruby-mode and robe.  I've found that
-  ;; LSP can work, but has it's own problems; namely you need solargraph
-  ;; installed for all versions.
   (use-package enh-ruby-mode
     :straight t
-    :config (add-hook 'enh-ruby-mode-hook #'jnf/enh-ruby-mode-hook-hook)
+    :hook (enh-ruby-mode . (lambda () (setq fill-column 100)))
+    :hook (enh-ruby-mode . eldoc-mode)
     :bind (:map enh-ruby-mode-map ("C-j" . avy-goto-char-timer))
     :mode (("\\(?:\\.rb\\|ru\\|rake\\|thor\\|jbuilder\\|gemspec\\|podspec\\|/\\(?:Gem\\|Rake\\|Cap\\|Thor\\|Vagrant\\|Guard\\|Pod\\)file\\)\\'" . enh-ruby-mode)))
   (add-to-list 'interpreter-mode-alist '("ruby" . enh-ruby-mode))
@@ -708,19 +716,30 @@ syntax highlighting that makes reading ~Go-lang~ tolerable.
 
 ** TODO rspec-mode.el
 
+- ~rspec-mode.el~ :: [[http://rspec.info][RSpec]] is my Ruby testing framework of choice.  As I’ve
+  been doing much more extensive Ruby coding, I’ve been using a lot of:
+
+  - ~rspec-toggle-spec-and-target~ :: Jump between spec and target;
+    ~spec/models/user_spec.rb~ and ~app/models/user.rb~ respectively.
+  - ~rspec-verify~ :: Run ~rspec~ for the current file; either the spec or the
+    spec associated with the target.
+  - ~rspec-verify-single~ :: Run ~rspec~ for the current line.
+
 #+begin_src emacs-lisp
   (use-package rspec-mode
     :straight t
+    ;; Ensure that we’re loading enh-ruby-mode before we do any rspec loading.
+    :after enh-ruby-mode
     :custom (rspec-use-spring-when-possible nil)
-    :diminish 'rspec-mode
     :bind (:map rspec-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
     :bind (:map enh-ruby-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
-    :hook ((ruby-mode . rspec-mode) ;; should this be `enh-ruby-mode'
-	   (ruby-mode . eldoc-mode))) ;; should this be `enh-ruby-mode'
+    :diminish 'rspec-mode)
 
-  (eval-after-load 'rspec-mode
-    '(rspec-install-snippets))
+  (eval-after-load 'rspec-mode '(rspec-install-snippets))
 #+end_src
+
+/Note:/ The =CMD= + =.= is a carryover from my [[https://macromates.com][Textmate]] and [[https://www.sublimetext.com/][Sublime Text]] days.
+That’s one of those hot-keys almost burned into soul.
 
 ** TODO projectile-rails.el
 
