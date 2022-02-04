@@ -95,10 +95,10 @@ inline documentation in most cases.
   (recentf-mode 1) ;; Track recent
   (run-at-time nil (* 2 60) 'recentf-save-list) ;; Save files every 2 minutes
   (global-auto-revert-mode)
-  (blink-cursor-mode t)
 
   (setq-default fill-column 79)   ;; Feeling a bit old school with 80 characters.
   (setq-default cursor-type 'bar) ;; Doing a bit of configuration of my cursors
+  (blink-cursor-mode t)
 
   (setq
    backup-by-copying t         ;; Don't delink hardlinks
@@ -512,7 +512,7 @@ between toggles.
     :bind (("M-o" . ace-window)))
 #+end_src
 
-* TODO General Emacs Configuration
+* WAITING General Emacs Configuration
 
 I tried enabling this, and found myself sometimes lost in a labyrinth of
 minibuffers.  This change ensures that there’s only one.
@@ -571,7 +571,7 @@ minibuffers.  This change ensures that there’s only one.
     :config (global-so-long-mode 1))
 #+end_src
 
-* TODO Modes
+* TO\DO Modes
 
 Sometimes I want to edit svg files.  Often times if I open them directly in
 Emacs, I want to edit them.  This setting helps with that default.  /Note:/
@@ -597,7 +597,9 @@ without this setting, Emacs will happily render the SVG as an image,
 	   (css-mode . emmet-mode)))
 #+end_src
 
-** TODO web-mode.el
+** DONE web-mode.el
+
+- ~web-mode.el~ :: Some configurations for web development.
 
 #+begin_src emacs-lisp
   (use-package web-mode
@@ -607,18 +609,11 @@ without this setting, Emacs will happily render the SVG as an image,
 		  web-mode-code-indent-offset 2))
   (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
-
-  ;; built-in, consider commenting
-  ;; (use-package sgml-mode
-  ;;   :straight nil
-  ;;   :hook
-  ;;   (html-mode . sgml-electric-tag-pair-mode)
-  ;;   (html-mode . sgml-name-8bit-mode)
-  ;;   :custom
-  ;;   (sgml-basic-offset 2))
 #+end_src
 
-** TODO plantuml-mode.el
+** DONE plantuml-mode.el
+
+- ~plantuml-mode.el~ :: A mode for working with PlantUML.  See https://plantuml.com.
 
 #+begin_src emacs-lisp
   (use-package plantuml-mode
@@ -636,7 +631,7 @@ without this setting, Emacs will happily render the SVG as an image,
   (use-package json-mode :straight t)
 #+end_src
 
-Because JSON can be quite ugly, I want something to help tidy it up.
+- ~json-reformat.el~ :: Because JSON can be quite ugly, I want something to help tidy it up.
 
 #+begin_src emacs-lisp
   (use-package json-reformat
@@ -781,35 +776,46 @@ syntax highlighting that makes reading ~Go-lang~ tolerable.
 
 ** TODO lsp-mode.el
 
+- ~lsp-mode.el~ :: Language Server Protocol; provides some nice inline
+  documentation regarding code.  In the case of Ruby this relies on
+  documentation.
+
+What I’m finding is that I occasionally use it, and it also has some flake-outs
+as it relates to the minibuffer.
+
 #+begin_src emacs-lisp
   (use-package lsp-mode
     :straight t
-    :hook (
-	   (ruby-mode . lsp)
-	   (enh-ruby-mode . lsp)
-	   ;; (js-mode . lsp)
-	   ;; (html-mode . lsp)
-	   ;; (bash-mode . lsp)
-	   )
+    :hook ((ruby-mode . lsp)
+	   (enh-ruby-mode . lsp))
     :config (setq read-process-output-max (* 1024 1024 3)
 		  lsp-completion-provider nil
 		  lsp-completion-mode nil
+		  lsp--show-message nil
 		  lsp-idle-delay 1.00)
     :custom (lsp-keymap-prefix "C-c C-l")
     :commands (lsp))
 
-  ;; See https://www.reddit.com/r/emacs/comments/ql8cyp/corfu_orderless_and_lsp/
-  ;; (defun corfu-lsp-setup ()
-  ;;   (setq-local completion-styles '(orderless)
-  ;;               completion-category-defaults nil))
-  ;; (add-hook 'lsp-mode-hook #'corfu-lsp-setup)
-
   (with-eval-after-load 'lsp-mode
     (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration))
-
 #+end_src
 
 ** TODO lsp-ui.el
+
+- ~lsp-ui.el~ :: Some nice UI for LSP mode.  For now, I’m disabling it.
+
+But a bit flakey.  For example, as I’m using ~consult-recent-file~, when I move
+the minibuffer selection (via ~C-n~) to a Ruby file, ~consult-recent-file~
+renders a preview of that file.  It appears that the ~lsp-mode~’s hooks loses
+or pulls the focus away from the minibuffer to the previewed buffer.
+
+This makes it hard to navigate for search candidates.  I find the preview very
+helpful, so favor that over ~lsp-mode~.  With some “bisect” debugging, I’ve
+found that this is related to the ~lsp-ui.el~ package.  In particular the
+~lsp-ui-peek-mode~.
+
+In other words, the functions are nice, but the interactions with other useful
+packages don’t warrant including this.
 
 #+begin_src emacs-lisp
   ;; This package provides some nice UI behavior for documentation and linting
@@ -817,18 +823,15 @@ syntax highlighting that makes reading ~Go-lang~ tolerable.
   ;; In particular, I like 'lsp-ui-peek-find-reference
   (use-package lsp-ui
     :straight t
-    :after lsp-mode
-    :commands lsp-ui-mode
-    :hook ((enh-ruby-mode . lsp-ui-mode)
-	   (enh-ruby-mode . lsp-ui-peek-mode)
-	   (enh-ruby-mode . lsp-ui-sideline-mode)))
+    :hook ((enh-ruby-mode . lsp-ui-mode))
+    :after lsp-mode)
 
   ;; By default indent levels are often 4; That is against what I've seen.
   (setq ruby-indent-level 2
 	typescript-indent-level 2
 	js-indent-level 2)
 
-  (add-hook 'emacs-lisp-mode 'eldoc-mode)
+  ;; (add-hook 'emacs-lisp-mode 'eldoc-mode)
 #+end_src
 
 ** TODO tree-sitter.el
@@ -1566,14 +1569,14 @@ package.
 ** TODO consult-lsp.el
 
 #+begin_src emacs-lisp
-  ;; https://github.com/gagbo/consult-lsp
-  (use-package consult-lsp
-    :after (consult lsp-mode)
-    :straight (consult-lsp :host github :type git :repo "gagbo/consult-lsp")
-    :config
-    (define-key lsp-mode-map [remap xref-find-apropos] #'consult-lsp-symbols)
-    (consult-lsp-marginalia-mode)
-    :commands consult-lsp-symbols)
+  ;; ;; https://github.com/gagbo/consult-lsp
+  ;; (use-package consult-lsp
+  ;;   :after (consult lsp-mode)
+  ;;   :straight (consult-lsp :host github :type git :repo "gagbo/consult-lsp")
+  ;;   :config
+  ;;   (define-key lsp-mode-map [remap xref-find-apropos] #'consult-lsp-symbols)
+  ;;   (consult-lsp-marginalia-mode)
+  ;;   :commands consult-lsp-symbols)
 #+end_src
 
 ** DONE orderless.el
