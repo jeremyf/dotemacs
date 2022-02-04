@@ -152,8 +152,10 @@ inline documentation in most cases.
 
 #+begin_src emacs-lisp
   (unbind-key "C-x C-d") ;; `list-directory'
-  ;; `dired' is a better interface than `list-directory'
-  (global-set-key (kbd "C-x C-d") 'dired)
+  (global-set-key (kbd "C-x C-d") 'dired) ;; We’ll override this later with
+					  ;; `consult-dir' but this is a good
+					  ;; stand-in.
+
   (global-set-key (kbd "<M-delete>") 'kill-word)
 
   (global-set-key (kbd "<s-down>") 'end-of-buffer)
