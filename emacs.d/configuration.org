@@ -3895,7 +3895,13 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
 
 ** TODO forem specific
 
-Provides some Forem specific shortcut tooling.
+*** jnf/forem-tidy-pull-request
+
+- ~jnf/forem-tidy-pull-request~ :: At [[https://forem.com][Forem]] we use a [[https://github.com/forem/forem/blob/main/.github/PULL_REQUEST_TEMPLATE.md][pull request template]] that
+  has lots of instructions for contributors to complete.  The
+  ~jnf/forem-tidy-pull-request~ function takes the initial contents (which
+  include the commit message of the first commit of the pull request) and
+  tidies it up so I can fill out the primary fields.
 
 #+begin_src emacs-lisp
   (defun jnf/forem-tidy-pull-request ()
