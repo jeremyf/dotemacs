@@ -1534,19 +1534,6 @@ package.
 		("e" . wgrep-change-to-wgrep-mode)))
 #+end_src
 
-** TODO consult-lsp.el
-
-#+begin_src emacs-lisp
-  ;; ;; https://github.com/gagbo/consult-lsp
-  ;; (use-package consult-lsp
-  ;;   :after (consult lsp-mode)
-  ;;   :straight (consult-lsp :host github :type git :repo "gagbo/consult-lsp")
-  ;;   :config
-  ;;   (define-key lsp-mode-map [remap xref-find-apropos] #'consult-lsp-symbols)
-  ;;   (consult-lsp-marginalia-mode)
-  ;;   :commands consult-lsp-symbols)
-#+end_src
-
 ** DONE orderless.el
 
 The [[https://github.com/minad/orderless][orderless]] package provides completion tooling for non-strict word order.  I
