@@ -1400,11 +1400,27 @@ There’s a macro in here somewhere.
 	      '((name . "wrapper")))
 #+end_src
 
+*** TODO Narrowing Functions
 *** TODO consult-org.el
 
 - [ ] In org-mode map ~s-2~ to ~consult-org-menu~ instead of ~consult-imenu~.
 - [ ] Consider leveraging ~consult-org-agenda~
 
+*** DONE consult-dir.el
+
+- ~consult-dir.el~ :: This package helps ease traveling across directories by
+  providing directory candidates related to current buffers, bookmarks, and
+  projects.  Further, like other ~consult.el~ functions, you can use narrowing
+  keys.  See https://github.com/karthink/consult-dir.
+
+#+begin_src emacs-lisp
+  (use-package consult-dir
+    :straight t
+    :bind (("C-x C-d" . consult-dir)
+	   :map minibuffer-local-completion-map
+	   ("C-x C-d" . consult-dir)
+	   ("C-x C-j" . consult-dir-jump-file)))
+#+end_src
 ** WAITING consult-flycheck.el
 
 Do I even use this?
