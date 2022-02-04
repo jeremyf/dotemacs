@@ -1258,9 +1258,10 @@ package.
 
 ** TODO consult.el
 
+- ~consult.el~ :: “Consult provides practical commands based on the Emacs
+  completion function [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Minibuffer-Completion.html][completing-read]].”  See https://github.com/minad/consult
+
 #+begin_src emacs-lisp
-  ;; Example configuration for Consult
-  ;; https://github.com/minad/consult
   (use-package consult
     :straight t
     ;; Replace bindings. Lazily loaded due by `use-package'.
@@ -1293,6 +1294,7 @@ package.
 	   ("M-g k" . consult-global-mark)
 	   ("C-x C-SPC" . consult-mark)
 	   ("M-g i" . consult-imenu)
+	   ("s-2" . consult-imenu)
 	   ("M-g I" . consult-imenu-multi)
 	   ;; M-s bindings (search-map)
 	   ("M-s f" . consult-find)
@@ -1313,8 +1315,6 @@ package.
 	   ("C-s" . consult-line) ;; I've long favored Swiper mapped to c-s
 	   ;; Isearch integration
 	   ("M-s e" . consult-isearch)
-	   ;; ("s-t" . jnf/consult-find-using-fd)
-	   ;; ("s-3" . consult-imenu-multi)
 	   :map isearch-mode-map
 	   ("M-e" . consult-isearch)                 ;; orig. isearch-edit-string
 	   ("M-s e" . consult-isearch)               ;; orig. isearch-edit-string
@@ -1328,17 +1328,6 @@ package.
     ;; `consult-register-store' and the Emacs built-ins.
     (setq register-preview-delay 0.1
 	  register-preview-function #'consult-register-format)
-
-
-    ;; From https://github.com/minad/consult/wiki#find-files-using-fd
-    ;; Note: this requires lexical binding
-    (defun jnf/consult-find-using-fd (&optional dir initial)
-      "Find project files.
-
-  A replacement for `projectile-find-file'."
-      (interactive "P")
-      (let ((consult-find-command "fd --color=never --hidden --exclude .git/ --full-path ARG OPTS"))
-	(consult-find dir initial)))
 
     (defun jnf/consult-line (consult-line-function &rest rest)
       "Advising function around `CONSULT-LINE-FUNCTION'.
@@ -1384,38 +1373,8 @@ package.
     ;; after lazily loading the package.
     :config
 
-    ;; Optionally configure preview. Note that the preview-key can also be
-    ;; configured on a per-command basis via `consult-config'. The default value
-    ;; is 'any, such that any key triggers the preview.
-    ;; (setq consult-preview-key 'any)
-    ;; (setq consult-preview-key (kbd "M-p"))
-    ;; (setq consult-preview-key (list (kbd "<S-down>") (kbd "<S-up>")))
-
-    ;; Optionally configure the narrowing key.
-    ;; Both < and C-+ work reasonably well.
-    (setq consult-narrow-key "<") ;; (kbd "C-+")
-
-    ;; Optionally make narrowing help available in the minibuffer.
-    ;; Probably not needed if you are using which-key.
-    ;; (define-key consult-narrow-map (vconcat consult-narrow-key "?") #'consult-narrow-help)
-
-    ;; Optionally configure a function which returns the project root directory.
-    ;; There are multiple reasonable alternatives to chose from:
-    ;; * projectile-project-root
-    ;; * vc-root-dir
-    ;; * project-roots
-    ;; * locate-dominating-file
     (autoload 'projectile-project-root "projectile")
-    (setq consult-project-root-function #'projectile-project-root)
-    ;; (setq consult-project-root-function
-    ;;       (lambda ()
-    ;;         (when-let (project (project-current))
-    ;;           (car (project-roots project)))))
-    ;; (setq consult-project-root-function #'vc-root-dir)
-    ;; (setq consult-project-root-function
-    ;;       (lambda () (locate-dominating-file "." ".git")))
-    )
-
+    (setq consult-project-root-function #'projectile-project-root))
 #+end_src
 
 ** TODO consult-flycheck.el
