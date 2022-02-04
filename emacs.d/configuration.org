@@ -3224,7 +3224,6 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
 ** TODO blogging specific
 
 #+begin_src emacs-lisp
-  ;; -*- lexical-binding: t
   ;;
   ;;; Commentary:
   ;;
