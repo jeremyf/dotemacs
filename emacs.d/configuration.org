@@ -2642,7 +2642,6 @@ establish the current context (or clear it).
       (error "")))
 #+end_src
 
-
 ** TODO org-d20.el
 
 #+begin_src emacs-lisp
@@ -2945,7 +2944,9 @@ kbd "C-").
 
 * TODO Applications
 
-** TODO elpher.el
+** DONE elpher.el
+
+- ~elpher.el~ :: A Gopher and Gemini client.
 
 #+begin_src emacs-lisp
   (use-package elpher :straight t)
