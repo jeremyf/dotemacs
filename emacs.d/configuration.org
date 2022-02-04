@@ -1,4 +1,4 @@
-g-*- org-insert-tilde-language: emacs-lisp; -*-
+-*- org-insert-tilde-language: emacs-lisp; -*-
 #+TITLE: Emacs Configuration
 #+AUTHOR: Jeremy Friesen
 #+EMAIL: jeremy@jeremyfriesen.com
@@ -1259,8 +1259,13 @@ package.
 ** TODO consult.el
 
 - ~consult.el~ :: “Consult provides practical commands based on the Emacs
-  completion function [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Minibuffer-Completion.html][completing-read]].”  I had previously used Ivy, mostly for Swiper.  What I’ve found is a very
-  See https://github.com/minad/consult
+  completion function [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Minibuffer-Completion.html][completing-read]].”  I had previously used [[https://github.com/abo-abo/swiper][Ivy, Counsel,
+  and Swiper]], but appreciate the design principles of Consult, namely “Consult
+  fits well into existing setups and it helps you to create a full completion
+  environment out of small and independent components.”[fn:consult]
+
+  With ~consult.el~ I’m able to bring in other components that focus on doing
+  their “one thing” really well.
 
 #+begin_src emacs-lisp
   (use-package consult
@@ -1330,39 +1335,6 @@ package.
     (setq register-preview-delay 0.1
 	  register-preview-function #'consult-register-format)
 
-    (defun jnf/consult-line (consult-line-function &rest rest)
-      "Advising function around `CONSULT-LINE-FUNCTION'.
-
-  When there's an active region, use that as the first parameter
-  for `CONSULT-LINE-FUNCTION'.  Otherwise, use the current word as
-  the first parameter.  This function handles the `REST' of the
-  parameters."
-      (interactive)
-      (apply consult-line-function
-	     (if (use-region-p) (buffer-substring (region-beginning) (region-end)))
-	     rest))
-
-    (defun jnf/consult-ripgrep (consult-ripgrep-function &optional dir &rest rest)
-      "Use region or thing at point to populate initial parameter for `CONSULT-RIPGREP-FUNCTION'.
-
-  When there's an active region, use that as the initial parameter
-  for the `CONSULT-RIPGREP-FUNCTION'.  Otherwise, use the thing at
-  point.
-
-  `DIR' use the universal argument (e.g. C-u prefix) to first set
-  the directory.  `REST' is passed to the `CONSULT-RIPGREP-FUNCTION'."
-      (interactive "P")
-      (apply consult-ripgrep-function
-	     dir
-	     (if (use-region-p) (buffer-substring (region-beginning) (region-end)))
-	     rest))
-
-    ;; Optionally tweak the register preview window.
-    ;; This adds thin lines, sorting and hides the mode line of the window.
-    (advice-add #'register-preview :override #'consult-register-window)
-    (advice-add #'consult-line :around #'jnf/consult-line '((name . "wrapper")))
-    (advice-add #'consult-ripgrep :around #'jnf/consult-ripgrep '((name . "wrapper")))
-
     ;; Use Consult to select xref locations with preview
     (setq xref-show-xrefs-function #'consult-xref
 	  xref-show-definitions-function #'consult-xref)
@@ -1378,12 +1350,64 @@ package.
     (setq consult-project-root-function #'projectile-project-root))
 #+end_src
 
+*** DONE Advising Functions
+
+I wrote some advising functions to wrap around ~consult-line~ and
+~consult-ripgrep~.  These wrapping functions use the active region as the
+initial text or an empty string if there’s no active region.
+
+There’s a macro in here somewhere.
+
+#+begin_src emacs-lisp
+  (defun jnf/consult-first-param-is-initial-text (consult-fn &rest rest)
+    "Advising function around CONSULT-FN.
+
+  The CONSULT-FN's first parameter should be the initial text.
+
+  When there's an active region, use that as the first parameter
+  for CONSULT-FN.  Otherwise, use an empty string the first
+  parameter.  This function handles the REST of the parameters."
+    (interactive)
+    (apply consult-fn
+	   (when (use-region-p)
+	     (buffer-substring
+	      (region-beginning) (region-end)))
+	   rest))
+
+  (defun jnf/consult-second-param-is-initial-text (consult-fn &optional first &rest rest)
+    "Advising function around CONSULT-FN.
+
+  We'll pass the FIRST parameter through.  The CONSULT-FN's second
+  parameter should be the initial text.
+
+  When there's an active region, use that as the first parameter
+  for CONSULT-FN.  Otherwise, use an empty string the second
+  parameter.  This function handles the REST of the parameters."
+    (interactive)
+    (apply consult-fn
+	   first
+	   (when (use-region-p)
+	     (buffer-substring
+	      (region-beginning) (region-end)))
+	   rest))
+
+
+  (advice-add #'consult-line
+	      :around #'jnf/consult-first-param-is-initial-text
+	      '((name . "wrapper")))
+  (advice-add #'consult-ripgrep
+	      :around #'jnf/consult-second-param-is-initial-text
+	      '((name . "wrapper")))
+#+end_src
+
 *** TODO consult-org.el
 
 - [ ] In org-mode map ~s-2~ to ~consult-org-menu~ instead of ~consult-imenu~.
 - [ ] Consider leveraging ~consult-org-agenda~
 
-** TODO consult-flycheck.el
+** WAITING consult-flycheck.el
+
+Do I even use this?
 
 #+begin_src emacs-lisp
   ;; Optionally add the `consult-flycheck' command.
@@ -1393,7 +1417,7 @@ package.
 		("!" . consult-flycheck)))
 #+end_src
 
-** TODO embark.el
+** TODO embark.ell
 
 #+begin_src emacs-lisp
 
@@ -1475,22 +1499,29 @@ package.
     ;; if you want to have consult previews as you move around an
     ;; auto-updating embark collect buffer
     :hook
+
+    (embark-collect-mode . consult-preview-at-point-mode)
     (embark-collect-mode . embark-consult-preview-minor-mode))
 #+end_src
 
-** TODO wgrep.el
+** DONE wgrep.el
+
+- ~wgrep.el~ :: “Edit a grep buffer and apply those changes to the file
+  buffer.”  In other words, after “searching” for something, sending the
+  results to a buffer (via ~embark-export~ or such thing), you can edit that
+  search results buffer and propogate the changes to the locations of the
+  elements that matched the search.
+
+1. Call ~consult-ripgrep~ (via ~C-c f~) to search for something.
+2. Call ~embark-export~ (via ~C-s-e~) to export to a grep buffer.
+3. Call ~wgrep-change-to-wgrep-mode~ (via ~e~ or ~C-c C-p~)
+4. Edit the grep buffer as you would anywhere else.
+5. Save (via ~C-x C-s~) or Cancel (via ~C-c C-k~).
+
+   I use this sequence at least once a day.
 
 #+begin_src emacs-lisp
-
-  ;; Useful for editing grep results:
-  ;;
-  ;; 1) "C-c f" invoke `consult-ripgrep'
-  ;; 2) "C-s-e" invoke `embark-export' (On OS X map that's Ctrl+Cmd+e)
-  ;; 3) "e" or "C-c C-p" invoke `wgrep-change-to-wgrep-mode'
-  ;; 4) Save or cancel
-  ;;    a) Save: "C-x C-s" invoke `save-buffer' (or "C-c C-c")
-  ;;    b) Cancel: "C-c C-k"
-  (use-package wgrep
+(use-package wgrep
     :after (embark-consult ripgrep)
     :straight t
     :bind (:map wgrep-mode-map
@@ -4512,6 +4543,8 @@ I’ve opted to take a different path; write some Emacs functions instead.
 #+end_src
 
 * Footnotes
+
+[fn:consult]  https://github.com/minad/consult#introduction
 [fn:squash-and-merge]  These functions assume that the repository is using a [[https://rietta.com/blog/github-merge-types/#squash-and-merge][Squash and Merge strategy]].
 
 [fn:e-reboot] My alias is as follows: ~alias e-reboot='cd ~/git/dotemacs; git stash ; edaemon ; git stash pop ; git edit'~.
