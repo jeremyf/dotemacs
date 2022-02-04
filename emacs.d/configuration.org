@@ -1732,13 +1732,12 @@ quasi-opinionated compromise.
 
 * TODO In Buffer
 
-** TODO savekill.el
+** DONE savekill.el
+
+- ~savekill.el~ :: Write "kill" command inputs to disk.
 
 #+begin_src emacs-lisp
-  ;; Write "kill" command inputs to disk
-  (use-package savekill
-    :straight t)
-
+  (use-package savekill :straight t)
 #+end_src
 
 ** DONE avy.el
