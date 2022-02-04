@@ -2327,18 +2327,6 @@ quasi-opinionated compromise.
   (setq org-plantuml-jar-path (concat (string-trim (shell-command-to-string "brew-path plantuml")) "/libexec/plantuml.jar"))
 #+end_src
 
-** TODO org-contrib.el
-
-I like the ~org-toc~ package.  I can toggle on the table of contents for
-navigation.  Particularly useful for a large configuration.org file like this
-one.
-
-#+begin_src emacs-lisp
-  (use-package org-contrib
-    :straight (org-contrib :url "git.sr.ht/~bzg/org-contrib"))
-  (require 'org-toc)
-#+end_src
-
 ** TODO company-org-block.el
 
 #+begin_src emacs-lisp
