@@ -865,7 +865,7 @@ identical parameter list.
     :straight t)
 #+end_src
 
-* TODO Projects
+* WAITING Projects
 ** WAITING projectile.el
 
 - ~projectile.el~ :: this package provides convenient organization and commands to run over projects.
@@ -1765,7 +1765,7 @@ quasi-opinionated compromise.
     :bind ("C-c =" . math-at-point))
 #+end_src
 
-** TODO which-key.el
+** DONE which-key.el
 
 - ~which-key.el~ :: renders a menu of commands for an incomplete command
   prefix.  For example if I type ~C-x~ and wait a moment, ~which-key.el~ will
@@ -1781,35 +1781,33 @@ quasi-opinionated compromise.
     :straight t)
 #+end_src
 
-** TODO writeroom-mode.el
+** DONE vi-tilde-fringe.el
+- ~vi-tilde-fringt.el~ :: Show tilde (e.g. ~\~~) on empty trailing lines.  This is a feature ported from [[https://en.wikipedia.org/wiki/Vi][vi]].
 
 #+begin_src emacs-lisp
-  (use-package writeroom-mode :straight t)
-#+end_src
-
-** TODO vi-tilde-fringe.el
-
-#+begin_src emacs-lisp
-
   (use-package vi-tilde-fringe
     :straight t
-    :hook ((fundamental-mode) . vi-tilde-fringe-mode))
+    :config (global-vi-tilde-fringe-mode))
 #+end_src
 
-** TODO fill-sentences-correctly.el
+** DONE fill-sentences-correctly.el
 
-#+begin_src emacs-lisp
+- ~fill-sentences-correctly.el~ :: After using Emacs for awhile, with it’s
+  sentence navigation, I’ve come to strongly favor two spaces after a period.
+  The ~fill-sentences-correctly-mode~ ensures that ~fill-paragraph~
+  (e.g. ~M-q~) preserves two spaces.
 
+#+BEGIN_src emacs-lisp
   (use-package fill-sentences-correctly
     :straight (fill-sentences-correctly :host github :repo "duckwork/fill-sentences-correctly.el")
     :hook (fundamental-mode . fill-sentences-correctly-mode))
 #+end_src
 
-** TODO hippie-exp.el
+** DONE hippie-exp.el
+
+- ~hippie-exp.el~ :: Using Hippie expand, I toggle through words already referenced.
 
 #+begin_src emacs-lisp
-
-  ;; Using Hippie expand, I toggle through words already referenced.
   (use-package hippie-exp
     :straight t
     :config
@@ -1827,47 +1825,28 @@ quasi-opinionated compromise.
     :bind (("M-SPC" . hippie-expand)))
 #+end_src
 
-** TODO expand-region.el
+** DONE expand-region.el
+
+- ~expand-region.el~ :: a simple package that does two related things really
+  well; expands and contracts the current region.  I use this all of the time.
+
+  In writing, with the cursor at point, when I expand it selects the word.  The
+  next expand the sentence, then paragraph, then page.  In programming it
+  leverages sexp.
 
 #+begin_src emacs-lisp
-
-  ;; Expand or contract point/region to next logical element.
-  ;;
-  ;; NOTE: I use this all the time.
   (use-package expand-region
     :straight t
     :bind (("C-=" . er/expand-region)
 	   ("C-+" . er/contract-region)))
 #+end_src
 
-** TODO string-inflection.el
+** DONE multiple-cursors.el
+
+- ~multiple-cursors.el~ :: Allow Emacs to work with multiple cursors.  See
+  https://melpa.org/#/multiple-cursors.
 
 #+begin_src emacs-lisp
-
-  ;; This package allows me to toggle between different string cases.
-  ;;
-  ;; - HELLO WORLD
-  ;; - HelloWorld
-  ;; - helloWorld
-  ;; - hello-world
-  ;; - Hello_World
-  ;; - hellow_world
-  ;; - HELLO_WORLD
-  (use-package string-inflection
-    :bind (("C-M-s-i" . string-inflection-all-cycle))
-    :straight (string-inflection :type git
-				 :host github
-				 :repo "akicho8/string-inflection"))
-#+end_src
-
-** TODO multiple-cursors.el
-
-#+begin_src emacs-lisp
-
-  ;; Allow to work with multipe cursors
-  ;; https://melpa.org/#/multiple-cursors Aside from the
-  ;; set-rectangular-region-anchor, there are several additional
-  ;; features to practice
   (use-package multiple-cursors
     :bind (("C-M-SPC" . set-rectangular-region-anchor)
 	   ("C->" . mc/mark-next-like-this)
@@ -1889,50 +1868,22 @@ quasi-opinionated compromise.
 
 ** TODO crux.el
 
+- ~crux.el~ :: A mix of a few odd methods.
+
 #+begin_src emacs-lisp
 
   ;; C-a goes to the first non-whitepsace character on the line. Type it
   ;; again, and go to the beginning of the line.
   (use-package crux
     :straight t
-    :config
-    (defun jnf/duplicate-current-line-or-lines-of-region (arg)
-      "Duplicate ARG times current line or the lines of the current region."
-      (interactive "p")
-      (if (use-region-p)
-	  (progn
-	    (when (> (point) (mark))
-	      (exchange-point-and-mark))
-	    (beginning-of-line)
-	    (exchange-point-and-mark)
-	    (end-of-line)
-	    (goto-char (+ (point) 1))
-	    (exchange-point-and-mark)
-	    (let* ((end (mark))
-		   (beg (point))
-		   (region
-		    (buffer-substring-no-properties beg end)))
-	      (dotimes (_i arg)
-		(goto-char end)
-		(insert region)
-		(setq end (point)))))
-	(crux-duplicate-current-line-or-region arg)))
-
-    (cl-defun jnf/create-org-scratch-buffer (&key (mode 'org-mode))
-      "Quickly open a scratch buffer and enable the given MODE."
-      (interactive)
-      (crux-create-scratch-buffer)
-      (rename-buffer (concat "*scratch* at " (format-time-string "%Y-%m-%d %H:%M")))
-      (funcall mode))
     :bind (("C-a" . crux-move-beginning-of-line)
 	   ("<C-s-return>" . crux-smart-open-line-above)
 	   ("C-s-k" . crux-kill-line-backwards)
 	   ("<s-backspace>" . crux-kill-line-backwards)
-	   ("C-M-d" . jnf/duplicate-current-line-or-lines-of-region)
-	   ("C-c d" . jnf/duplicate-current-line-or-lines-of-region)
-	   ("<f9>" . crux-kill-other-buffers)
-	   ("<f12>" . jnf/create-org-scratch-buffer)))
+	   ("<f9>" . crux-kill-other-buffers)))
 #+end_src
+
+
 
 ** TODO ethan-wspace.el
 
@@ -2124,12 +2075,6 @@ quasi-opinionated compromise.
 ** TODO Functions
 
 #+begin_src emacs-lisp
-
-  ;;******************************************************************************
-  ;;
-    ;;; BEGIN Custom "in-buffer" functions
-  ;;
-  ;;******************************************************************************
   (global-set-key (kbd "C-w") 'jnf/kill-region-or-backward-word)
   (global-set-key (kbd "M-DEL") 'jnf/kill-region-or-backward-word)
   (global-set-key (kbd "<C-M-backspace>") 'backward-kill-paragraph)
@@ -2205,7 +2150,7 @@ quasi-opinionated compromise.
 				       (window-parameters
 					(no-delete-other-windows . t))))))
 
-  (bind-key "C-x m" #'jnf/move-file)
+  (global-set-key (kbd "C-x m") 'jnf/move-file)
   (defun jnf/move-file (target-directory)
     "Write this file to TARGET-DIRECTORY, and delete old one."
     (interactive "DTarget Directory: ")
@@ -2214,6 +2159,37 @@ quasi-opinionated compromise.
       (save-buffer)
       (rename-file source target)
       (kill-current-buffer)))
+  (global-set-key (kbd "C-M-d") 'jnf/duplicate-current-line-or-lines-of-region)
+  (global-set-key (kbd "C-c d") 'jnf/duplicate-current-line-or-lines-of-region)
+  (defun jnf/duplicate-current-line-or-lines-of-region (arg)
+    "Duplicate ARG times current line or the lines of the current region."
+    (interactive "p")
+    (if (use-region-p)
+	(progn
+	  (when (> (point) (mark))
+	    (exchange-point-and-mark))
+	  (beginning-of-line)
+	  (exchange-point-and-mark)
+	  (end-of-line)
+	  (goto-char (+ (point) 1))
+	  (exchange-point-and-mark)
+	  (let* ((end (mark))
+		 (beg (point))
+		 (region
+		  (buffer-substring-no-propertis beg end)))
+	    (dotimes (_i arg)
+	      (goto-char end)
+	      (insert region)
+	      (setq end (point)))))
+      (crux-duplicate-current-line-or-region arg)))
+
+  (global-set-key (kbd "<f12>") 'jnf/create-org-scratch-buffer)
+  (cl-defun jnf/create-org-scratch-buffer (&key (mode 'org-mode))
+    "Quickly open a scratch buffer and enable the given MODE."
+    (interactive)
+    (crux-create-scratch-buffer)
+    (rename-buffer (concat "*scratch* at " (format-time-string "%Y-%m-%d %H:%M")))
+    (funcall mode))
 #+end_src
 
 * TODO Org Mode
@@ -3261,7 +3237,7 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
      "“\\1”"
      (s-replace "'" "’" title)))
 
-  (defun jnf/tor-convert-text-to-slug (string)
+  (defun jnf/tor-convert-text-to-slug (&optional string)
     "Convert STRING to appropriate slug."
     (s-replace "'" "" (s-dashed-words (s-downcase string))))
 
@@ -3274,6 +3250,17 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
       (read-string "URL (optional): "
 		   (when (string-match url-regexp car-of-kill-ring)
 		     car-of-kill-ring))))
+
+  (defun jnf/slugify ()
+    (interactive)
+    (let* ((range (if (region-active-p)
+		      (list (region-beginning) (region-end))
+		    (list (point-at-bol) (point-at-eol))))
+	   (text (buffer-substring-no-properties (car range) (cadr range))))
+      (save-excursion
+	(delete-region (car range) (cadr range))
+	(goto-char (car range))
+	(insert (jnf/tor-convert-text-to-slug text)))))
 
   (cl-defun jnf/tor-post---create-or-append (&key
 					     title subheading
@@ -3892,7 +3879,6 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
   ;;; END Wrapping Functions
   ;;
   ;;******************************************************************************
-
 #+end_src
 
 ** TODO forem specific
