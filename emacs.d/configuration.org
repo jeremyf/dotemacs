@@ -1448,7 +1448,7 @@ Write about the narrowing functions, as these help create both broad and narrow 
 
 #+begin_src emacs-lisp
   (use-package consult-projectile
-    :after consult
+    :commands (consult-projectile)
     :straight (consult-projectile
 	       :type git
 	       :host gitlab
