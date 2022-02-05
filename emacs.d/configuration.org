@@ -872,8 +872,8 @@ identical parameter list.
     :straight t)
 #+end_src
 
-* WAITING Projects
-** WAITING projectile.el
+* DONE Projects
+** DONE projectile.el
 
 - ~projectile.el~ :: this package provides convenient organization and commands to run over projects.
 
@@ -889,27 +889,6 @@ identical parameter list.
 /Note:/ The =CMD= + =.= is a carryover from my [[https://macromates.com][Textmate]] and [[https://www.sublimetext.com/][Sublime Text]] days.
 That’s one of those hot-keys almost burned into soul.
 
-*** WAITING projectile-rails.el
-
-I’m thinking on this one.
-
-#+begin_src emacs-lisp
-  (use-package projectile-rails
-    :after (projectile)
-    :diminish 'projectile-rails-mode
-    :straight t
-    :config
-    (defun projectile-rails-find-liquid ()
-      "Find a liquid tag."
-      (interactive)
-      (projectile-rails-find-resource
-       "liquid: "
-       '(("app/liquid_tags/" "\\(.+?\\)\\.rb\\'"))
-       "app/liquid_tags/${filename}.rb"))
-    :bind (:map
-	   projectile-rails-mode-map (("C-s-." . 'projectile-rails-goto-file-at-point)))
-    :config (projectile-rails-global-mode))
-#+end_src
 ** DONE magit.el
 
 - ~magit.el~ :: The awesome [[http://git-scm.com][git]] client for Emacs.  I’ve written a few functions
