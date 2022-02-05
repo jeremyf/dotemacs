@@ -38,6 +38,12 @@ what else I may need to do.  A node marked as “DONE” should be viewed as “
 don’t need to go back and amend any documentation in that part.  However, it
 doesn’t mean I won’t put more things in that section.”
 
+** Conventions
+
+I’ve written quite a few functions to further extend the utility of Emacs.  I
+try to prefix them with ~jf/~.  And if I cribbed those functions from
+elsewhere, I attempt to give credit to the source.
+
 * Basic Configuration
 
 ** DONE straight.el
@@ -143,7 +149,7 @@ inline documentation in most cases.
   (add-hook 'text-mode-hook #'abbrev-mode)
 
   (add-function :after after-focus-change-function
-		(defun jnf/garbage-collect-maybe ()
+		(defun jf/garbage-collect-maybe ()
 		  (unless (frame-focus-state)
 		    (garbage-collect))))
 #+end_src
@@ -247,7 +253,7 @@ These are some “invisible” packages that do some behind the scenes work.
   (use-package helpful
     :straight t
     :config
-    (transient-define-prefix jnf/helpful-menu ()
+    (transient-define-prefix jf/helpful-menu ()
       "Return a `transient' compliant list to apply to different transients."
       ["Help"
        ""
@@ -262,14 +268,14 @@ These are some “invisible” packages that do some behind the scenes work.
        ("." "Thing at point" helpful-at-point)
        ("t" "Text properties" describe-text-properties)
        ("v" "Variable" helpful-variable)])
-    :bind ("C-s-h" . jnf/helpful-menu))
+    :bind ("C-s-h" . jf/helpful-menu))
 #+end_src
 
 ** TODO Variable/const definitions
 
 #+begin_src emacs-lisp
 
-  (defconst jnf/fixed-width-font-name
+  (defconst jf/fixed-width-font-name
     "Hack Nerd Font"
     "The name of the fixed width font.
   I have it sprinkled through too many places.
@@ -279,19 +285,19 @@ These are some “invisible” packages that do some behind the scenes work.
   - \"JetBrains Mono\"
   - \"Hack Nerd Font\"")
 
-  (set-frame-font jnf/fixed-width-font-name)
+  (set-frame-font jf/fixed-width-font-name)
 
-  (defconst jnf/tor-home-directory
+  (defconst jf/tor-home-directory
     (file-truename "~/git/takeonrules.source")
     "The home directory of TakeOnRules.com Hugo repository.")
 
-  (defconst jnf/tor-default-local-hostname
+  (defconst jf/tor-default-local-hostname
     "http://localhost:1313"
     "The scheme, host name, and port for serving up a local TakeOnRules.com.")
 
-  (defvar jnf/data-directories
+  (defvar jf/data-directories
     (list
-     jnf/tor-home-directory
+     jf/tor-home-directory
      "~/git/takeonrules.source/themes/hugo-tufte"
      "~/git/burning_wheel_lifepaths/"
      "~/git/jnf-emacs-bookmarks"
@@ -371,13 +377,13 @@ between toggles.
 
 #+begin_src emacs-lisp
   (set-face-attribute 'default nil
-		      :family jnf/fixed-width-font-name
+		      :family jf/fixed-width-font-name
 		      :height 140)
   (set-face-attribute 'variable-pitch nil
 		      :family "ETBembo"
 		      :height 1.1)
   (set-face-attribute 'fixed-pitch nil
-		      :family jnf/fixed-width-font-name
+		      :family jf/fixed-width-font-name
 		      :height 1.0)
 #+end_src
 
@@ -394,15 +400,15 @@ between toggles.
 ** DONE all-the-icons.el
 
 - ~all-the-icons.el~ :: Provides a nice set of reference icons.  The various
-  ~jnf/all-with--with-~ functions give access to the icons of the named set.
+  ~jf/all-with--with-~ functions give access to the icons of the named set.
 
 #+begin_src emacs-lisp
   ;; Useful for referential icons.
   (use-package all-the-icons
     :straight t
     :config
-    (cl-defmacro jnf/all-the-icons--with(&key name)
-      (let ((defun-fn (intern (concat "jnf/all-the-icons--with-" name)))
+    (cl-defmacro jf/all-the-icons--with(&key name)
+      (let ((defun-fn (intern (concat "jf/all-the-icons--with-" name)))
 	    (icon-fn (intern (concat "all-the-icons-" name)))
 	    (docstring (concat "Displays an ICON from `all-the-icons-" name "'.")))
 	`(defun ,defun-fn (icon str &optional height v-adjust)
@@ -412,10 +418,10 @@ between toggles.
 		      :v-adjust (or v-adjust 0)
 		      :height (or height 1))
 		     " " str))))
-    (jnf/all-the-icons--with :name "faicon")
-    (jnf/all-the-icons--with :name "material")
-    (jnf/all-the-icons--with :name "octicon")
-    (jnf/all-the-icons--with :name "alltheicon"))
+    (jf/all-the-icons--with :name "faicon")
+    (jf/all-the-icons--with :name "material")
+    (jf/all-the-icons--with :name "octicon")
+    (jf/all-the-icons--with :name "alltheicon"))
 #+end_src
 
 ** DONE all-the-icons-dired.el
@@ -453,15 +459,15 @@ between toggles.
 ** DONE popper.el
 
 - ~popper.el~ :: Treat some types of windows as popups (e.g., something easier
-  to dismiss, a bit more like the mini-buffer).  Further ~jnf/popper~ can
+  to dismiss, a bit more like the mini-buffer).  Further ~jf/popper~ can
   toggle the popup buffer.  See that method for further implementation details.
 
 #+begin_src emacs-lisp
   (use-package popper
     :straight t
-    :bind (("C-`" . jnf/popper))
+    :bind (("C-`" . jf/popper))
     :config
-    (defun jnf/popper (prefix_arg)
+    (defun jf/popper (prefix_arg)
       "Call `popper-cycle', but with PREFIX_ARG invoke a less common popper method.
 
   With one PREFIX_ARG, `popper-toggle-latest'.
@@ -531,14 +537,14 @@ minibuffers.  This change ensures that there’s only one.
     :straight t
     :config
     ;; A replacement function for existing grab-mac-link-make-html-link
-    (defun jnf/grab-mac-link-make-html-link (url name)
+    (defun jf/grab-mac-link-make-html-link (url name)
       "Using HTML syntax, link to and cite the URL with the NAME."
       (format "<cite><a href=\"%s\" class=\"u-url p-name\" rel=\"cite\">%s</a></cite>" url name))
     ;; The function advice to override the default behavior
     (advice-add
      'grab-mac-link-make-html-link
      :override
-     'jnf/grab-mac-link-make-html-link
+     'jf/grab-mac-link-make-html-link
      '((name . "jnf")))
     :bind (("C-c g" . grab-mac-link)))
 #+end_src
@@ -905,12 +911,12 @@ I’m thinking on this one.
 - ~magit.el~ :: The awesome [[http://git-scm.com][git]] client for Emacs.  I’ve written a few functions
   to help me jump to the Github page for the pull request.[fn:squash-and-merge]
 
-  - ~jnf/magit-browse-pull-request~ :: In ‘magit-log-mode’ open the associated
+  - ~jf/magit-browse-pull-request~ :: In ‘magit-log-mode’ open the associated
     pull request.
-  - ~jnf/git-current-remote-url~ :: Get the current remote url.
-  - ~jnf/open-pull-request-for~ :: Given the SUMMARY open the related pull
+  - ~jf/git-current-remote-url~ :: Get the current remote url.
+  - ~jf/open-pull-request-for~ :: Given the SUMMARY open the related pull
     request.
-  - ~jnf/open-pull-request-for-current-line~ :: For the current line open the
+  - ~jf/open-pull-request-for-current-line~ :: For the current line open the
     applicable pull request.
 
 #+begin_src emacs-lisp
@@ -962,7 +968,7 @@ I’m thinking on this one.
       (jump-to-register :magit-fullscreen))
     :config
     (remove-hook 'magit-status-sections-hook 'magit-insert-tags-header)
-    (defun jnf/magit-browse-pull-request ()
+    (defun jf/magit-browse-pull-request ()
       "In `magit-log-mode' open the associated pull request
   at point.
 
@@ -976,19 +982,19 @@ I’m thinking on this one.
 	     (summary
 	      (buffer-substring-no-properties
 	       beg end)))
-	(jnf/open-pull-request-for :summary summary)))
-    (defun jnf/git-current-remote-url ()
+	(jf/open-pull-request-for :summary summary)))
+    (defun jf/git-current-remote-url ()
       "Get the current remote url."
       (s-trim
        (shell-command-to-string
 	(concat
 	 "git remote get-url "
 	 (format "%s" (magit-get-current-remote))))))
-    (cl-defun jnf/open-pull-request-for (&key summary)
+    (cl-defun jf/open-pull-request-for (&key summary)
       "Given the SUMMARY open the related pull request.
 
   This method assumes you're using Github's Squash and Strategy."
-      (let ((remote-url (jnf/git-current-remote-url)))
+      (let ((remote-url (jf/git-current-remote-url)))
 	(save-match-data
 	  (and (string-match "(\\#\\([0-9]+\\))$" summary)
 	       (browse-url
@@ -997,7 +1003,7 @@ I’m thinking on this one.
 		 (s-replace ".git" "" remote-url)
 		 "/pull/"
 		 (match-string 1 summary)))))))
-    (defun jnf/open-pull-request-for-current-line ()
+    (defun jf/open-pull-request-for-current-line ()
       "For the current line open the applicable pull request."
       (interactive)
       (let ((summary
@@ -1010,10 +1016,10 @@ I’m thinking on this one.
 		       "--porcelain "
 		       buffer-file-name
 		       " | rg \"^summary\"")))))
-	(jnf/open-pull-request-for :summary summary)))
+	(jf/open-pull-request-for :summary summary)))
     :bind (("s-7" . magit-status))
     ;; In other situations I bind s-6 to `git-messenger:popup-message'
-    :bind (:map magit-log-mode-map ("s-6" . 'jnf/magit-browse-pull-request))
+    :bind (:map magit-log-mode-map ("s-6" . 'jf/magit-browse-pull-request))
     :hook ((with-editor-post-finish-hook . magit-status)))
 #+end_src
 
@@ -1085,7 +1091,7 @@ I’m thinking on this one.
 #+begin_src emacs-lisp
   (use-package git-link
     :config
-    (defun jnf/git-browse-to-repository (remote)
+    (defun jf/git-browse-to-repository (remote)
       "Open in external browser the current repository's given REMOTE."
       (interactive (list (git-link--select-remote)))
       (git-link-homepage remote)
@@ -1103,7 +1109,7 @@ I’m thinking on this one.
 #+begin_src emacs-lisp
   (use-package git-messenger
     :config (setq git-messenger:show-detail t)
-    (defun jnf/git-messenger-popup ()
+    (defun jf/git-messenger-popup ()
       "Open `git-messenger' or github PR.
 
   With universal argument, open the github PR for current line.
@@ -1112,13 +1118,13 @@ I’m thinking on this one.
       (interactive)
       (if (equal current-prefix-arg nil) ; no C-u
 	  (git-messenger:popup-message)
-	(jnf/open-pull-request-for-current-line)))
+	(jf/open-pull-request-for-current-line)))
     :custom
     (git-messenger:use-magit-popup t)
-    :bind (:map git-messenger-map (("p" . 'jnf/open-pull-request-for-current-line)
+    :bind (:map git-messenger-map (("p" . 'jf/open-pull-request-for-current-line)
 				   ("l" . 'git-link)))
-    :bind (("s-6" . jnf/git-messenger-popup)
-	   ("<f6>" . jnf/git-messenger-popup))
+    :bind (("s-6" . jf/git-messenger-popup)
+	   ("<f6>" . jf/git-messenger-popup))
     :straight t)
 #+end_src
 
@@ -1363,7 +1369,7 @@ initial text or an empty string if there’s no active region.
 There’s a macro in here somewhere.
 
 #+begin_src emacs-lisp
-  (defun jnf/consult-first-param-is-initial-text (consult-fn &rest rest)
+  (defun jf/consult-first-param-is-initial-text (consult-fn &rest rest)
     "Advising function around CONSULT-FN.
 
   The CONSULT-FN's first parameter should be the initial text.
@@ -1378,7 +1384,7 @@ There’s a macro in here somewhere.
 	      (region-beginning) (region-end)))
 	   rest))
 
-  (defun jnf/consult-second-param-is-initial-text (consult-fn &optional first &rest rest)
+  (defun jf/consult-second-param-is-initial-text (consult-fn &optional first &rest rest)
     "Advising function around CONSULT-FN.
 
   We'll pass the FIRST parameter through.  The CONSULT-FN's second
@@ -1397,10 +1403,10 @@ There’s a macro in here somewhere.
 
 
   (advice-add #'consult-line
-	      :around #'jnf/consult-first-param-is-initial-text
+	      :around #'jf/consult-first-param-is-initial-text
 	      '((name . "wrapper")))
   (advice-add #'consult-ripgrep
-	      :around #'jnf/consult-second-param-is-initial-text
+	      :around #'jf/consult-second-param-is-initial-text
 	      '((name . "wrapper")))
 #+end_src
 
@@ -2066,26 +2072,26 @@ quasi-opinionated compromise.
 ** TODO Functions
 
 #+begin_src emacs-lisp
-  (global-set-key (kbd "C-w") 'jnf/kill-region-or-backward-word)
-  (global-set-key (kbd "M-DEL") 'jnf/kill-region-or-backward-word)
+  (global-set-key (kbd "C-w") 'jf/kill-region-or-backward-word)
+  (global-set-key (kbd "M-DEL") 'jf/kill-region-or-backward-word)
   (global-set-key (kbd "<C-M-backspace>") 'backward-kill-paragraph)
-  (defun jnf/kill-region-or-backward-word (&optional arg)
+  (defun jf/kill-region-or-backward-word (&optional arg)
     "Kill selected region otherwise kill backwards the ARG number of words."
     (interactive "p")
     (if (region-active-p)
 	(kill-region (region-beginning) (region-end))
       (backward-kill-word arg)))
 
-  (global-set-key (kbd "C-k") 'jnf/kill-line-or-region)
-  (defun jnf/kill-line-or-region (&optional ARG)
+  (global-set-key (kbd "C-k") 'jf/kill-line-or-region)
+  (defun jf/kill-line-or-region (&optional ARG)
     "Kill the selected region otherwise kill the ARG number of lines."
     (interactive "P")
     (if (use-region-p)
 	(kill-region (region-beginning) (region-end))
       (kill-line ARG)))
 
-  (global-set-key (kbd "C-c n") 'jnf/nab-file-name-to-clipboard)
-  (defun jnf/nab-file-name-to-clipboard ()
+  (global-set-key (kbd "C-c n") 'jf/nab-file-name-to-clipboard)
+  (defun jf/nab-file-name-to-clipboard ()
     "Nab, I mean copy, the current buffer file name to the clipboard.
 
     If you provide universal prefix (e.g. C-u), return the base
@@ -2100,7 +2106,7 @@ quasi-opinionated compromise.
 	(kill-new filename)
 	(message "Copied buffer file name '%s' to the clipboard." filename))))
 
-  (defun jnf/sort-unique-lines (reverse beg end &optional adjacent keep-blanks interactive)
+  (defun jf/sort-unique-lines (reverse beg end &optional adjacent keep-blanks interactive)
     "Sort lines and delete duplicates.
     By default the sort is lexigraphically ascending.  To sort as
     descending set REVERSE to non-nil.  Specify BEG and END for the
@@ -2121,8 +2127,8 @@ quasi-opinionated compromise.
   ;; Treat dashes and underscores as part of words for navigation
   ;; (global-superword-mode t)
 
-  (global-set-key (kbd "C-s-\\") 'jnf/display-buffer-in-side-window)
-  (cl-defun jnf/display-buffer-in-side-window (&optional (buffer (current-buffer)))
+  (global-set-key (kbd "C-s-\\") 'jf/display-buffer-in-side-window)
+  (cl-defun jf/display-buffer-in-side-window (&optional (buffer (current-buffer)))
     "Display BUFFER in dedicated side window."
     (interactive)
     (let ((display-buffer-mark-dedicated t))
@@ -2131,8 +2137,8 @@ quasi-opinionated compromise.
 				       (window-parameters
 					(no-delete-other-windows . t))))))
 
-  (global-set-key (kbd "C-s--") 'jnf/display-buffer-in-bottom-window)
-  (cl-defun jnf/display-buffer-in-bottom-window (&optional (buffer (current-buffer)))
+  (global-set-key (kbd "C-s--") 'jf/display-buffer-in-bottom-window)
+  (cl-defun jf/display-buffer-in-bottom-window (&optional (buffer (current-buffer)))
     "Display BUFFER in dedicated side window."
     (interactive)
     (let ((display-buffer-mark-dedicated t))
@@ -2141,8 +2147,8 @@ quasi-opinionated compromise.
 				       (window-parameters
 					(no-delete-other-windows . t))))))
 
-  (global-set-key (kbd "C-x m") 'jnf/move-file)
-  (defun jnf/move-file (target-directory)
+  (global-set-key (kbd "C-x m") 'jf/move-file)
+  (defun jf/move-file (target-directory)
     "Write this file to TARGET-DIRECTORY, and delete old one."
     (interactive "DTarget Directory: ")
     (let* ((source (expand-file-name (file-name-nondirectory (buffer-name)) default-directory))
@@ -2150,9 +2156,9 @@ quasi-opinionated compromise.
       (save-buffer)
       (rename-file source target)
       (kill-current-buffer)))
-  (global-set-key (kbd "C-M-d") 'jnf/duplicate-current-line-or-lines-of-region)
-  (global-set-key (kbd "C-c d") 'jnf/duplicate-current-line-or-lines-of-region)
-  (defun jnf/duplicate-current-line-or-lines-of-region (arg)
+  (global-set-key (kbd "C-M-d") 'jf/duplicate-current-line-or-lines-of-region)
+  (global-set-key (kbd "C-c d") 'jf/duplicate-current-line-or-lines-of-region)
+  (defun jf/duplicate-current-line-or-lines-of-region (arg)
     "Duplicate ARG times current line or the lines of the current region."
     (interactive "p")
     (if (use-region-p)
@@ -2174,8 +2180,8 @@ quasi-opinionated compromise.
 	      (setq end (point)))))
       (crux-duplicate-current-line-or-region arg)))
 
-  (global-set-key (kbd "<f12>") 'jnf/create-org-scratch-buffer)
-  (cl-defun jnf/create-org-scratch-buffer (&key (mode 'org-mode))
+  (global-set-key (kbd "<f12>") 'jf/create-org-scratch-buffer)
+  (cl-defun jf/create-org-scratch-buffer (&key (mode 'org-mode))
     "Quickly open a scratch buffer and enable the given MODE."
     (interactive)
     (crux-create-scratch-buffer)
@@ -2192,12 +2198,12 @@ writing in ~org-mode~ syntax and leave it at that.  From there you can delve
 further into the ~org-mode~ ecosystem.
 
 A bit of pre-amble.  I maintain a list of data directories, each might have
-“relevant to org-mode” files.  The ~jnf/org-agenda-files~ reads the file
+“relevant to org-mode” files.  The ~jf/org-agenda-files~ reads the file
 system to gather sources for ~org-mode~ agenda.
 
 #+begin_src emacs-lisp
-  (cl-defun jnf/org-agenda-files (&key
-				  (paths jnf/data-directories)
+  (cl-defun jf/org-agenda-files (&key
+				  (paths jf/data-directories)
 				  (basenames '("agenda.org")))
     "Return the list of filenames where BASENAMES exists in PATHS."
     ;; I want to include my configuration file in my agenda querying.
@@ -2215,8 +2221,8 @@ system to gather sources for ~org-mode~ agenda.
     :hook (org-mode . turn-on-visual-line-mode)
     :config (setq
 	     org-directory (file-truename "~/git/org")
-	     org-agenda-files (jnf/org-agenda-files
-			       :paths jnf/data-directories
+	     org-agenda-files (jf/org-agenda-files
+			       :paths jf/data-directories
 			       :basenames '("agenda.org"))
 	     org-default-notes-file (concat org-directory "/captured-notes.org")
 	     org-todo-keywords
@@ -2236,7 +2242,7 @@ system to gather sources for ~org-mode~ agenda.
     ;; mode.
     :custom (org-src-tab-acts-natively t)
     :bind (:map org-mode-map
-	   ("C-c l i". jnf/org-insert-link-dwim))
+	   ("C-c l i". jf/org-insert-link-dwim))
     :bind (("C-c l s" . org-store-link)
 	   ("C-c a" . org-agenda)
 	   ("C-c c" . org-capture)
@@ -2268,7 +2274,7 @@ system to gather sources for ~org-mode~ agenda.
 I cribbed the following function from [[https://xenodium.com/emacs-dwim-do-what-i-mean/][Emacs DWIM: do what ✨I✨ mean]].
 
 #+begin_src emacs-lisp
-  (defun jnf/org-insert-link-dwim ()
+  (defun jf/org-insert-link-dwim ()
 	"Like `org-insert-link' but with personal dwim preferences."
 	(interactive)
 	(let* ((point-in-link (org-in-regexp org-link-any-re 1))
@@ -2306,8 +2312,8 @@ HTML (e.g., I can more readily paste into an Email and it pastes as expected).
 See [[https://kitchingroup.cheme.cmu.edu/blog/2016/06/16/Copy-formatted-org-mode-text-from-Emacs-to-other-applications/][Copy formatted org-mode text from Emacs to other applications]] for more details.
 
 #+begin_src emacs-lisp
-  (global-set-key (kbd "C-M-s-c") 'jnf/formatted-copy-org-to-html)
-  (defun jnf/formatted-copy-org-to-html ()
+  (global-set-key (kbd "C-M-s-c") 'jf/formatted-copy-org-to-html)
+  (defun jf/formatted-copy-org-to-html ()
     "Export region to HTML, and copy it to the clipboard."
     (interactive)
     (save-window-excursion
@@ -2402,16 +2408,16 @@ Jethro Kuan's post helped me see how I could do this.
 
 *** Org Roam Supporting Functions
 
-The ~jnf/org-context-plist~ defines and names some of the contexts in which I
+The ~jf/org-context-plist~ defines and names some of the contexts in which I
 might be writing.  Each named context defines the tags.  These are the tags
 that all nodes will have when they were written in the defined context.
 
-I can use ~jnf/org-auto-tags--set~ to create a "yet to be named" context (e.g.,
-an ad hoc context).  Or I can use ~jnf/org-auto-tags--set-by-context~ to
+I can use ~jf/org-auto-tags--set~ to create a "yet to be named" context (e.g.,
+an ad hoc context).  Or I can use ~jf/org-auto-tags--set-by-context~ to
 establish the current context (or clear it).
 
 #+begin_src emacs-lisp
-  (defvar jnf/org-roam-capture-templates-plist
+  (defvar jf/org-roam-capture-templates-plist
     (list
      ;; These are references to "other people's thoughts."
      :refs '("r" "refs" plain "%?"
@@ -2430,7 +2436,7 @@ establish the current context (or clear it).
 	     :unnarrowed t))
     "Templates to use for `org-roam' capture.")
 
-  (defvar jnf/org-context-plist
+  (defvar jf/org-context-plist
     (list
      :none (list
 	    :name "none"
@@ -2449,27 +2455,27 @@ establish the current context (or clear it).
 		   :tags '("thel-sector" "rpg" "swn")))
     "A list of contexts that I regularly write about.")
 
-  (defvar jnf/org-auto-tags--current-list
+  (defvar jf/org-auto-tags--current-list
     (list)
     "The list of tags to automatically apply to an `org-roam' capture.")
 
-  (defun jnf/org-auto-tags--set (tags)
+  (defun jf/org-auto-tags--set (tags)
     "Prompt user or more TAGS."
     (interactive
      (list (completing-read-multiple "Tag(s): " (org-roam-tag-completions))))
-    (setq jnf/org-auto-tags--current-list tags))
+    (setq jf/org-auto-tags--current-list tags))
 
-  (cl-defun jnf/org-auto-tags--set-by-context (context &key (context-plist jnf/org-context-plist))
+  (cl-defun jf/org-auto-tags--set-by-context (context &key (context-plist jf/org-context-plist))
     "Set auto-tags by CONTEXT.
 
      Prompt for CONTEXT from CONTEXT-PLIST."
     (interactive (list
 		  (completing-read
-		   "Context: " (jnf/org-context-list-completing-read))))
-    (setq jnf/org-auto-tags--current-list
+		   "Context: " (jf/org-context-list-completing-read))))
+    (setq jf/org-auto-tags--current-list
 	  (plist-get (plist-get context-plist (intern (concat ":" context))) :tags)))
 
-  (cl-defun org-roam-node-auto-tags (node &key (tag-list jnf/org-auto-tags--current-list))
+  (cl-defun org-roam-node-auto-tags (node &key (tag-list jf/org-auto-tags--current-list))
     "Inject the TAG-LIST into the {auto-tags} region of captured NODE.
 
      See https://www.orgroam.com/manual.html#Template-Walkthrough"
@@ -2477,7 +2483,7 @@ establish the current context (or clear it).
 	(concat ":" (s-join ":" tag-list) ":")
       ""))
 
-  (cl-defun jnf/org-roam-templates-list (template &key (template-plist jnf/org-roam-capture-templates-plist))
+  (cl-defun jf/org-roam-templates-list (template &key (template-plist jf/org-roam-capture-templates-plist))
     "List of `org-roam' capture templates based on given TEMPLATE.
 
      Searches the TEMPLATE-PLIST for the templates.
@@ -2490,18 +2496,18 @@ establish the current context (or clear it).
 				   template-plist))
       (list (plist-get template-plist template))))
 
-  (cl-defun jnf/org-roam-templates-context-fn (&key (tag-list jnf/org-auto-tags--current-list))
+  (cl-defun jf/org-roam-templates-context-fn (&key (tag-list jf/org-auto-tags--current-list))
     "Returns a set of templates based on TAG-LIST.
 
      A key assumption is that if there's a default tag list, use the
      :main template."
     (if (and tag-list (> (length tag-list) 0))
-	(jnf/org-roam-templates-list :main)
-      (jnf/org-roam-templates-list :all)))
+	(jf/org-roam-templates-list :main)
+      (jf/org-roam-templates-list :all)))
 
-  (cl-defun jnf/org-context-list-completing-read (&key
+  (cl-defun jf/org-context-list-completing-read (&key
 						  (context-plist
-						   jnf/org-context-plist))
+						   jf/org-context-plist))
     "Create a list from the CONTEXT-PLIST for completing read.
 
      The form should be '((\"forem\" 1) (\"burning-loscusts\" 2))."
@@ -2512,7 +2518,7 @@ establish the current context (or clear it).
 				   (list (plist-get context :name) index)))
 			       context-plist)))
 
-  (cl-defun jnf/org-roam-filter-context-fn (node &key (tag-list jnf/org-auto-tags--current-list))
+  (cl-defun jf/org-roam-filter-context-fn (node &key (tag-list jf/org-auto-tags--current-list))
     "Determine TAG-LIST is subset of NODE's tags."
     (gnus-subsetp tag-list (org-roam-node-tags node)))
 #+end_src
@@ -2529,44 +2535,44 @@ establish the current context (or clear it).
     ;; => "org-export-data: Unable to resolve link: EXISTING-PROPERTY-ID"
     ;;
     ;; See https://takeonrules.com/2022/01/11/resolving-an-unable-to-resolve-link-error-for-org-mode-in-emacs/ for details
-    (defun jnf/force-org-rebuild-cache ()
+    (defun jf/force-org-rebuild-cache ()
       "Call some functions to rebuild the `org-mode' and `org-roam' cache."
       (interactive)
       (org-id-update-id-locations)
       ;; Note: you may need `org-roam-db-clear-all' followed by `org-roam-db-sync'
       (org-roam-db-sync)
       (org-roam-update-org-id-locations))
-    (defun jnf/org-roam-capture (&optional goto keys)
+    (defun jf/org-roam-capture (&optional goto keys)
       "Call `org-roam-capture' based on set tags."
       (interactive "P")
       (org-roam-capture goto
 			keys
-			:filter-fn 'jnf/org-roam-filter-context-fn
-			:templates (jnf/org-roam-templates-context-fn)))
+			:filter-fn 'jf/org-roam-filter-context-fn
+			:templates (jf/org-roam-templates-context-fn)))
 
-    (defun jnf/org-roam-node-insert ()
+    (defun jf/org-roam-node-insert ()
       "Call `org-roam-node-insert' based on set tags."
       (interactive)
-      (org-roam-node-insert 'jnf/org-roam-filter-context-fn
-			    :templates (jnf/org-roam-templates-context-fn)))
+      (org-roam-node-insert 'jf/org-roam-filter-context-fn
+			    :templates (jf/org-roam-templates-context-fn)))
 
-    (defun jnf/org-roam-find-node (&optional other-window initial-input)
+    (defun jf/org-roam-find-node (&optional other-window initial-input)
       "Call `org-roam-node-find' based on set tags."
       (interactive current-prefix-arg)
       (org-roam-node-find other-window
 			  initial-input
-			  'jnf/org-roam-filter-context-fn
-			  :templates 'jnf/org-roam-templates-context-fn))
+			  'jf/org-roam-filter-context-fn
+			  :templates 'jf/org-roam-templates-context-fn))
     :custom
     (org-roam-directory (file-truename "~/git/org"))
     (org-roam-node-display-template
      (concat "${type:4}   ${title:*} " (propertize "${tags:40}" 'face 'org-tag)))
-    (org-roam-capture-templates (jnf/org-roam-templates-list :all))
-    :bind (("C-s-f" . jnf/org-roam-find-node)
-	   ("C-s-c" . jnf/org-roam-capture))
+    (org-roam-capture-templates (jf/org-roam-templates-list :all))
+    :bind (("C-s-f" . jf/org-roam-find-node)
+	   ("C-s-c" . jf/org-roam-capture))
     :bind (:map org-mode-map (
 			      ("C-s-;" . org-roam-buffer-toggle)
-			      ("s-i" . jnf/org-roam-node-insert)))
+			      ("s-i" . jf/org-roam-node-insert)))
     :init
     ;; Help keep the `org-roam-buffer', toggled via `org-roam-buffer-toggle', sticky.
     (add-to-list 'display-buffer-alist
@@ -2601,9 +2607,9 @@ establish the current context (or clear it).
 #+begin_src emacs-lisp
   (use-package org-d20
     :after org
-    :bind  (("C-s-r" . jnf/roll-expression-dwim))
+    :bind  (("C-s-r" . jf/roll-expression-dwim))
     :config
-    (defun jnf/roll-expression-dwim (expression &optional)
+    (defun jf/roll-expression-dwim (expression &optional)
       "Roll the EXPRESSION, check `thing-at-point' then prompt."
       (interactive (list (if (string-match
 			      "[dD][0-9]"
@@ -2669,10 +2675,10 @@ establish the current context (or clear it).
   ;;  mnemonic device (e.g. "C-x 8 RET" searches for a character to insert).
   ;;
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  (defvar jnf/typography--title
-    (jnf/all-the-icons--with-octicon "pencil" "Typography (C-x 8 RET for Search)" 1 -0.05)
+  (defvar jf/typography--title
+    (jf/all-the-icons--with-octicon "pencil" "Typography (C-x 8 RET for Search)" 1 -0.05)
     "The menu title for typography")
-  (pretty-hydra-define jnf/typography--menu (:foreign-keys warn :title jnf/typography--title :quit-key "q" :exit t)
+  (pretty-hydra-define jf/typography--menu (:foreign-keys warn :title jf/typography--title :quit-key "q" :exit t)
     ("Characters" (
 		   ("d d" (insert "-") "- dash")
 		   ("d m" (insert "—") "— em dash")
@@ -2719,7 +2725,7 @@ establish the current context (or clear it).
 	       ("p 3" (insert "‴") "‴ Triple Prime"))
      ))
 
-  (global-set-key (kbd "C-s-8") 'jnf/typography--menu/body)
+  (global-set-key (kbd "C-s-8") 'jf/typography--menu/body)
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;;
   ;;; END Typography Menu
@@ -2734,8 +2740,8 @@ establish the current context (or clear it).
   (use-package typopunct
     :straight t
     :config
-    (add-hook 'org-mode-hook 'jnf/typopunct-init)
-    (defun jnf/typopunct-init ()
+    (add-hook 'org-mode-hook 'jf/typopunct-init)
+    (defun jf/typopunct-init ()
       (require 'typopunct)
       (typopunct-change-language 'english)
       (typopunct-mode 1))
@@ -2850,28 +2856,28 @@ establish the current context (or clear it).
   (use-package elfeed
     :straight t
     :after org
-    :hook ((elfeed-show-mode . jnf/reader-visual))
+    :hook ((elfeed-show-mode . jf/reader-visual))
     :config
     (setq-default elfeed-search-filter "@2-days-ago +unread ")
     :bind (
 	   (:map elfeed-search-mode-map
-		 ("q" . jnf/elfeed-save-db-and-bury))))
+		 ("q" . jf/elfeed-save-db-and-bury))))
 
   ;;write to disk when quiting
-  (defun jnf/elfeed-save-db-and-bury ()
+  (defun jf/elfeed-save-db-and-bury ()
     "Wrapper to save the elfeed db to disk before burying buffer"
     (interactive)
     (elfeed-db-save)
     (quit-window))
 
-  (defun jnf/elfeed-load-db-and-open ()
+  (defun jf/elfeed-load-db-and-open ()
     "Load the elfeed db from disk before opening"
     (interactive)
     (elfeed)
     (elfeed-update)
     (elfeed-db-load)
     (elfeed-search-update--force))
-  (defalias 'rss 'jnf/elfeed-load-db-and-open)
+  (defalias 'rss 'jf/elfeed-load-db-and-open)
 
     ;; From https://karthinks.com/blog/lazy-elfeed/
   (defun elfeed-search-show-entry-pre (&optional lines)
@@ -2959,10 +2965,10 @@ establish the current context (or clear it).
     (setq browse-url-browser-function 'browse-url-default-macosx-browser)
     :bind (:map eww-mode-map
 		("U" . eww-up-url)
-		("<f7>" . jnf/amplify-eww)
-		("s-7" . jnf/amplify-eww))
+		("<f7>" . jf/amplify-eww)
+		("s-7" . jf/amplify-eww))
     :bind (("C-s-w" . browse-url-at-point))
-    :hook ((eww-mode . jnf/reader-visual)))
+    :hook ((eww-mode . jf/reader-visual)))
 #+end_src
 
 
@@ -3057,7 +3063,7 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
   ;;; BEGIN Non-Interactive Utility Functions
   ;;
   ;;******************************************************************************
-  (cl-defun jnf/convert-text-to-key (text &key (length 5))
+  (cl-defun jf/convert-text-to-key (text &key (length 5))
     "Convert the given TEXT to an epigraph key.
 
   The LENGTH is how many words to use for the key."
@@ -3066,7 +3072,7 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
 	  (upcase (s-join "-" (subseq list-of-words 0 length)))
 	"")))
 
-  (defun jnf/tor-convert-text-to-post-title (title)
+  (defun jf/tor-convert-text-to-post-title (title)
     "Convert TITLE to correct format."
     (message "Titleizing...")
     (replace-regexp-in-string
@@ -3075,11 +3081,11 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
      "“\\1”"
      (s-replace "'" "’" title)))
 
-  (defun jnf/tor-convert-text-to-slug (&optional string)
+  (defun jf/tor-convert-text-to-slug (&optional string)
     "Convert STRING to appropriate slug."
     (s-replace "'" "" (s-dashed-words (s-downcase string))))
 
-  (cl-defun jnf/tor-prompt-or-kill-ring-for-url (&key (url-regexp "^https?://"))
+  (cl-defun jf/tor-prompt-or-kill-ring-for-url (&key (url-regexp "^https?://"))
     "Prompt and return a url.
 
   If the `car' of `kill-ring' matches the URL-REGEXP, default the
@@ -3089,7 +3095,7 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
 		   (when (string-match url-regexp car-of-kill-ring)
 		     car-of-kill-ring))))
 
-  (defun jnf/slugify ()
+  (defun jf/slugify ()
     (interactive)
     (let* ((range (if (region-active-p)
 		      (list (region-beginning) (region-end))
@@ -3098,9 +3104,9 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
       (save-excursion
 	(delete-region (car range) (cadr range))
 	(goto-char (car range))
-	(insert (jnf/tor-convert-text-to-slug text)))))
+	(insert (jf/tor-convert-text-to-slug text)))))
 
-  (cl-defun jnf/tor-post---create-or-append (&key
+  (cl-defun jf/tor-post---create-or-append (&key
 					     title subheading
 					     (tags '("null")) series toc
 					     citeTitle citeURL citeAuthor)
@@ -3118,11 +3124,11 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
   :CITEAUTHOR the author cited (if any)
 
   If there's an active region, select that text and place it."
-    (let* ((default-directory (f-join jnf/tor-home-directory
+    (let* ((default-directory (f-join jf/tor-home-directory
 				      "content" "posts"
 				      (format-time-string "%Y/")))
 
-	   (slug (jnf/tor-convert-text-to-slug title))
+	   (slug (jf/tor-convert-text-to-slug title))
 	   (fpath (expand-file-name
 		   (concat default-directory slug ".md"))))
       ;; If the file does not exist, create the file with the proper
@@ -3135,7 +3141,7 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
 		   "\nlayout: post"
 		   "\nlicenses:\n- all-rights-reserved"
 		   "\nslug: " (format "%s" slug)
-		   "\ntitle: '" (jnf/tor-convert-text-to-post-title title) "'"
+		   "\ntitle: '" (jf/tor-convert-text-to-post-title title) "'"
 		   "\ntype: post"
 		   (when series (concat "\nseries: " series))
 		   (when toc (concat "\ntoc: true"))
@@ -3187,8 +3193,8 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
   ;;; BEGIN Interactive Non-Wrapping Functions
   ;;
   ;;******************************************************************************
-  (cl-defun jnf/tor-toggle-hugo-server (&key
-					(directory jnf/tor-home-directory)
+  (cl-defun jf/tor-toggle-hugo-server (&key
+					(directory jf/tor-home-directory)
 					(buffer-name "*Hugo Server*"))
     "This will start or stop a Hugo server in the given DIRECTORY for TakeOnRules.com.
 
@@ -3202,15 +3208,15 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
 	(start-process "hugo-server" buffer-name "hugo" "server" "-D")
 	(message (concat "Starting Hugo in \"" buffer-name "\" buffer…")))))
 
-  (defun jnf/tor-retitle-post (title)
+  (defun jf/tor-retitle-post (title)
     "Replace the given buffer's title with the new TITLE.
 
   This function will: replace the content's title, update the slug,
   and rename the buffer."
     (interactive "sNew Post's Title: ")
     (let* ((metadataTitle (concat "title: '"
-				  (jnf/tor-convert-text-to-post-title title) "'"))
-	   (slug (jnf/tor-convert-text-to-slug title))
+				  (jf/tor-convert-text-to-post-title title) "'"))
+	   (slug (jf/tor-convert-text-to-slug title))
 	   (metadataSlug (concat "slug: " slug))
 	   (filename (buffer-file-name))
 	   (new-filename (concat (file-name-directory filename)
@@ -3240,47 +3246,47 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
       ;; Report filename change
       (message "Renamed %s -> %s" filename new-filename)))
 
-  (defvar jnf/tor-hostname-regexp
+  (defvar jf/tor-hostname-regexp
     "^https?://takeonrules\.com"
     "A regular expression for checking if it's TakeOnRules.com.")
 
-  (defvar jnf/tor-hugo-regexp-for-post-path
-    (concat jnf/tor-hostname-regexp
+  (defvar jf/tor-hugo-regexp-for-post-path
+    (concat jf/tor-hostname-regexp
 	    "/[0-9]\\{4\\}/[0-9]\\{2\\}/[0-9]\\{2\\}/\\([^/]+\\)/?$")
     "A regular expression for matching blog posts.")
 
-  (defvar jnf/tor-hugo-regexp-for-pages-path
-    (concat jnf/tor-hostname-regexp "/\\([^z-a]*[^/]\\)/?$")
+  (defvar jf/tor-hugo-regexp-for-pages-path
+    (concat jf/tor-hostname-regexp "/\\([^z-a]*[^/]\\)/?$")
     "A regular expression for matching pages.")
 
-  (defun jnf/tor-find-hugo-file-by-url (url)
+  (defun jf/tor-find-hugo-file-by-url (url)
     "Find the associated TakeOnRules.com file for the given URL."
     (interactive (list
-		  (jnf/tor-prompt-or-kill-ring-for-url
-		   :url-regexp jnf/tor-hostname-regexp)))
+		  (jf/tor-prompt-or-kill-ring-for-url
+		   :url-regexp jf/tor-hostname-regexp)))
     (cond
      ;; Blog post
-     ((string-match jnf/tor-hugo-regexp-for-post-path url)
+     ((string-match jf/tor-hugo-regexp-for-post-path url)
       (let* ((slug (match-string-no-properties 1 url))
 	     (filename (car
-			(jnf/list-filenames-with-file-text
+			(jf/list-filenames-with-file-text
 			 :matching (concat "^slug: " slug "$")
 			 :in "content"))))
-	(find-file (f-join jnf/tor-home-directory "content" filename))))
+	(find-file (f-join jf/tor-home-directory "content" filename))))
      ;; Pages
-     ((string-match jnf/tor-hugo-regexp-for-pages-path url)
+     ((string-match jf/tor-hugo-regexp-for-pages-path url)
       (let* ((permalink (match-string-no-properties 1 url))
 	     (filename (car
-			(jnf/list-filenames-with-file-text
+			(jf/list-filenames-with-file-text
 			 :matching (concat "^permalink: ['\\\"]?/?"
 					   permalink "/?['\\\"]?$")
 			 :in "content"))))
-	(find-file (f-join jnf/tor-home-directory "content" filename))))
+	(find-file (f-join jf/tor-home-directory "content" filename))))
      ;; No match found
      (t (message "Unable to find post for \"%s\"" url))))
 
-  (cl-defun jnf/tor-view-blog-post (&key
-				    (hostname jnf/tor-default-local-hostname))
+  (cl-defun jf/tor-view-blog-post (&key
+				    (hostname jf/tor-default-local-hostname))
     "Open `eww' in a new window to preview the current buffer at the HOSTNAME.
 
   The front matter of blog posts contains YAML, with two
@@ -3309,33 +3315,33 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
       (other-window 1)
       (eww (format "%s" (s-join "/" slugs)))))
 
-  (defun jnf/tor-create-post (title)
+  (defun jf/tor-create-post (title)
     "Create and visit a new draft post.  Prompt for a TITLE.
 
   The file for the blog post conforms to the path schema of posts
   for TakeOnRules.com."
     (interactive "sBlog Post Title: ")
-    (jnf/tor-post---create-or-append :title title))
+    (jf/tor-post---create-or-append :title title))
 
-  (defun jnf/tor-tag-post (tags)
+  (defun jf/tor-tag-post (tags)
     "Apply the TAGS to the current TakeOnRules.com post.
 
   No effort is made to check if this is a post."
-    (interactive (list (completing-read-multiple "Tags: " (jnf/tor-tags-list))))
+    (interactive (list (completing-read-multiple "Tags: " (jf/tor-tags-list))))
     (let ((saved-point (point))
 	  (to-insert (concat "\n- " (s-join "\n- " tags))))
       (replace-regexp "^tags:$" (concat "tags:" to-insert) nil 0 (point-max))
       (goto-char (+ saved-point (length to-insert)))))
 
-  (defun jnf/tor-insert-glossary-key (key)
+  (defun jf/tor-insert-glossary-key (key)
     "Insert the KEY at point."
-    (interactive (list (completing-read "Key: " (jnf/tor-glossary-key-list))))
+    (interactive (list (completing-read "Key: " (jf/tor-glossary-key-list))))
     (insert key))
 
-  (defun jnf/tor-find-changelog-and-insert-entry ()
+  (defun jf/tor-find-changelog-and-insert-entry ()
     "Find TakeOnRules glossary and begin entering a changelog entry."
     (interactive)
-    (find-file (f-join jnf/tor-home-directory "data" "changelog.yml"))
+    (find-file (f-join jf/tor-home-directory "data" "changelog.yml"))
     ;; The changelog is structured in date descending order.  The first
     ;; line is the YAML preamble indicating a data object (e.g. "---")
     (beginning-of-buffer)
@@ -3344,10 +3350,10 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
 		    (format-time-string "%Y-%m-%d")
 		    "\n  entries:\n    - ")))
 
-  (defun jnf/tor-find-series-and-insert-entry (title)
+  (defun jf/tor-find-series-and-insert-entry (title)
     "Find TakeOnRules series and add an entry with TITLE."
     (interactive "sSeries Entry's Title: ")
-    (find-file (f-join jnf/tor-home-directory "data" "series.yml"))
+    (find-file (f-join jf/tor-home-directory "data" "series.yml"))
     (let ((key (downcase (s-dashed-words title))))
       (end-of-buffer)
       (insert (concat
@@ -3355,10 +3361,10 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
 	       "- title: " title
 	       "\n  key: " key))))
 
-  (defun jnf/tor-find-glossary-and-insert-entry (title)
+  (defun jf/tor-find-glossary-and-insert-entry (title)
     "Find TakeOnRules glossary and add an entry with TITLE."
     (interactive "sGlossary Entry's Title: ")
-    (find-file (f-join jnf/tor-home-directory "data" "glossary.yml"))
+    (find-file (f-join jf/tor-home-directory "data" "glossary.yml"))
     (let ((key (upcase (s-dashed-words title))))
       (end-of-buffer)
       (insert (concat
@@ -3366,10 +3372,10 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
 	       "- title: " title
 	       "\n  key: " key))))
 
-  (defun jnf/tor-insert-epigraph-entry ()
+  (defun jf/tor-insert-epigraph-entry ()
     "Prompt for a new a new data/epigraphs.yml entry."
     (interactive)
-    (find-file (f-join jnf/tor-home-directory "data" "epigraphs.yml"))
+    (find-file (f-join jf/tor-home-directory "data" "epigraphs.yml"))
     (end-of-buffer)
     (insert (concat
 	     (if (looking-at-p "^$") "" "\n")
@@ -3379,7 +3385,7 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
     (yas-expand)
     (message "Ready to insert a new epigraph"))
 
-  (cl-defun jnf/tor-post-amplifying-the-blogosphere (subheading
+  (cl-defun jf/tor-post-amplifying-the-blogosphere (subheading
 						     &key
 						     citeTitle
 						     citeURL
@@ -3391,11 +3397,11 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
   TakeOnRules.com.
 
   We'll pass the :CITETITLE, :CITEAUTHOR, and :CITEURL to
-  `jnf/tor-post---create-or-append'"
+  `jf/tor-post---create-or-append'"
     (interactive (list (if (use-region-p)
 			   (read-string "Sub-Heading: ")
 			 nil)))
-    (jnf/tor-post---create-or-append
+    (jf/tor-post---create-or-append
      :title (format-time-string "Amplifying the Blogosphere (v%Y-%m-%d)")
      :toc "true"
      :subheading subheading
@@ -3407,14 +3413,14 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
 
   ;; Note: I needed to use `fboundp' because if I invoked this functions
   ;; before other consult functions I got a method void error.
-  (cl-defun jnf/find-file-via-matching (&key prompt matching in)
+  (cl-defun jf/find-file-via-matching (&key prompt matching in)
     "PROMPT for files IN the directory with MATCHING content.
 
   If `consult--read' is defined, use that.  Otherwise fallback to `completing-read'."
     (if (fboundp 'consult--read)
 	(consult--read
 	 (consult--with-increased-gc
-	  (jnf/list-full-filenames-with-file-text :matching matching :in in))
+	  (jf/list-full-filenames-with-file-text :matching matching :in in))
 	 :prompt prompt
 	 :sort nil
 	 :require-match t
@@ -3423,26 +3429,26 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
 	 :state (consult--file-preview))
       (list (completing-read
 	     prompt
-	     (jnf/list-filenames-with-file-text
+	     (jf/list-filenames-with-file-text
 	      :matching matching
 	      :in in)))))
 
-  (defun jnf/tor-find-file-draft (filename)
+  (defun jf/tor-find-file-draft (filename)
     "Find a draft FILENAME in the TakeOnRules content directory."
     (interactive
-     (list (jnf/find-file-via-matching
+     (list (jf/find-file-via-matching
 	    :prompt "Draft filename: "
 	    :matching "^draft: true"
-	    :in (f-join jnf/tor-home-directory "content"))))
+	    :in (f-join jf/tor-home-directory "content"))))
     (find-file filename))
 
-  (defun jnf/tor-find-file (filename)
+  (defun jf/tor-find-file (filename)
     "Find a FILENAME in the TakeOnRules content directory."
     (interactive
-     (list (jnf/find-file-via-matching
+     (list (jf/find-file-via-matching
 	    :prompt "Filename: "
 	    :matching "^title:"
-	    :in (f-join jnf/tor-home-directory "content"))))
+	    :in (f-join jf/tor-home-directory "content"))))
     (find-file filename))
   ;;******************************************************************************
   ;;
@@ -3455,33 +3461,33 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
   ;;; BEGIN Listing functions for TakeOnRules.com data
   ;;
   ;;******************************************************************************
-  (defun jnf/tor-tags-list ()
+  (defun jf/tor-tags-list ()
     "Return a list of tags from TakeOnRules.com."
-    (jnf/tor-list-by-key-from-filename :key "tag" :filename "data/glossary.yml"))
+    (jf/tor-list-by-key-from-filename :key "tag" :filename "data/glossary.yml"))
 
-  (defun jnf/tor-epigraph-list ()
+  (defun jf/tor-epigraph-list ()
     "Return a list of epigraph keys from TakeOnRules.com."
-    (jnf/tor-list-by-key-from-filename :key "key" :filename "data/epigraphs.yml"))
+    (jf/tor-list-by-key-from-filename :key "key" :filename "data/epigraphs.yml"))
 
-  (defun jnf/tor-game-list ()
+  (defun jf/tor-game-list ()
     "Return a list of games from TakeOnRules.com."
-    (jnf/tor-list-by-key-from-filename :key "game" :filename "data/glossary.yml"))
+    (jf/tor-list-by-key-from-filename :key "game" :filename "data/glossary.yml"))
 
-  (defun jnf/tor-glossary-title-list ()
+  (defun jf/tor-glossary-title-list ()
     "Return a list of titles from TakeOnRules.com."
-    (jnf/tor-list-by-key-from-filename :key "title" :filename "data/glossary.yml"))
+    (jf/tor-list-by-key-from-filename :key "title" :filename "data/glossary.yml"))
 
-  (defun jnf/tor-glossary-key-list ()
+  (defun jf/tor-glossary-key-list ()
     "Return a list of keys from TakeOnRules.com glossary."
-    (jnf/tor-list-by-key-from-filename :key "key" :filename "data/glossary.yml"))
+    (jf/tor-list-by-key-from-filename :key "key" :filename "data/glossary.yml"))
 
-  (defun jnf/tor-series-list ()
+  (defun jf/tor-series-list ()
     "Return a list of series from TakeOnRules.com."
-    (jnf/tor-list-by-key-from-filename :key "key" :filename "data/series.yml"))
+    (jf/tor-list-by-key-from-filename :key "key" :filename "data/series.yml"))
 
-  (defun jnf/tor-licenses-list ()
+  (defun jf/tor-licenses-list ()
     "Return a list of available licenses for TakeOnRules.com."
-    (jnf/tor-list-by-key-from-filename :key "Key" :filename "data/licenses.yml"))
+    (jf/tor-list-by-key-from-filename :key "Key" :filename "data/licenses.yml"))
   ;;******************************************************************************
   ;;
   ;;; END Listing functions for TakeOnRules.com data
@@ -3493,10 +3499,10 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
   ;;; BEGIN querying and list generation functions
   ;;
   ;;******************************************************************************
-  (cl-defun jnf/tor-list-by-key-from-filename (&key
+  (cl-defun jf/tor-list-by-key-from-filename (&key
 					       key
 					       filename
-					       (directory jnf/tor-home-directory))
+					       (directory jf/tor-home-directory))
     "Build a list of entries of the KEY from the FILENAME in DIRECTORY."
     (split-string-and-unquote
      (shell-command-to-string
@@ -3506,9 +3512,9 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
        " --only-matching --no-filename | sed 's/^[ -] " key ": //' | sort | tr '\n' '@'"))
      "@"))
 
-  (cl-defun jnf/list-filenames-with-file-text (&key matching in)
+  (cl-defun jf/list-filenames-with-file-text (&key matching in)
     "Build a list of filenames MATCHING the pattern IN the given directory."
-    (let ((default-directory (f-join jnf/tor-home-directory in)))
+    (let ((default-directory (f-join jf/tor-home-directory in)))
       (split-string-and-unquote
        (shell-command-to-string
 	(concat
@@ -3517,7 +3523,7 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
 	 "| tr '\n' '@'"))
        "@")))
 
-  (cl-defun jnf/list-full-filenames-with-file-text (&key matching in)
+  (cl-defun jf/list-full-filenames-with-file-text (&key matching in)
     "Build a list of filenames MATCHING the pattern IN the given directory."
     (split-string-and-unquote
      (shell-command-to-string
@@ -3527,17 +3533,17 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
        "| tr '\n' '@'"))
      "@"))
 
-  (defun jnf/tor-page-relative-pathname-list ()
+  (defun jf/tor-page-relative-pathname-list ()
     "Return a list of pages for TakeOnRules.com."
-    (jnf/list-filenames-with-file-text :matching "^title: " :in "content"))
+    (jf/list-filenames-with-file-text :matching "^title: " :in "content"))
 
-  (defun jnf/tor-asset-relative-pathname-list ()
+  (defun jf/tor-asset-relative-pathname-list ()
     "Return a list of image filenames for TakeOnRules.com."
-    (let ((default-directory (f-join jnf/tor-home-directory "assets" "images")))
+    (let ((default-directory (f-join jf/tor-home-directory "assets" "images")))
       (split-string-and-unquote
        (shell-command-to-string "ls"))))
 
-  (defun jnf/matches-in-buffer (regexp &optional buffer)
+  (defun jf/matches-in-buffer (regexp &optional buffer)
     "Return a list of matches of REGEXP in BUFFER or the current buffer if not given."
     (let ((matches))
       (save-match-data
@@ -3550,13 +3556,13 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
 		(push (match-string 0) matches)))))
 	matches)))
 
-  (defun jnf/kill-new-markdown-heading-as-slug (heading)
+  (defun jf/kill-new-markdown-heading-as-slug (heading)
     "Push onto the `kill-ring' a slugified version of HEADING."
     (interactive
      (list (completing-read
 	    "Heading: "
-	    (jnf/matches-in-buffer "^#+ +.*$"))))
-    (kill-new (jnf/tor-convert-text-to-slug
+	    (jf/matches-in-buffer "^#+ +.*$"))))
+    (kill-new (jf/tor-convert-text-to-slug
 	       (replace-regexp-in-string "^#+ +" "" heading))))
   ;;******************************************************************************
   ;;
@@ -3569,7 +3575,7 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
   ;;; BEGIN Wrapping Functions
   ;;
   ;;******************************************************************************
-  (cl-defun jnf/tor-wrap-with-text (&key before after strategy)
+  (cl-defun jf/tor-wrap-with-text (&key before after strategy)
     "Wrap the STRATEGY determined region with the BEFORE and AFTER text.
 
   Valid STRATEGY options are:
@@ -3617,48 +3623,48 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
 		       (insert before)))
       ))
 
-  (defun jnf/tor-wrap-in-html-tag (tag &optional attributes)
+  (defun jf/tor-wrap-in-html-tag (tag &optional attributes)
     "Wrap the word or region with the given TAG with optional ATTRIBUTES."
     (interactive "sHTML Tag: \nsAttributes (optional): ")
-    (jnf/tor-wrap-with-text
+    (jf/tor-wrap-with-text
      :before (concat "<" tag (if (s-blank? attributes)
 				 ""
 			       (concat " " attributes)) ">")
      :after (concat "</" tag ">")
      :strategy :wordOrRegion))
 
-  (defun jnf/tor-wrap-in-poem ()
+  (defun jf/tor-wrap-in-poem ()
     "Wrap the point or region as a poem."
     (interactive)
-    (jnf/tor-wrap-with-text
+    (jf/tor-wrap-with-text
      :before "<pre class=\"poem\">\n"
      :after "\n</pre>"
      :strategy :pointOrRegion))
 
-  (defun jnf/tor-wrap-date (date)
+  (defun jf/tor-wrap-date (date)
     "Wrap the point or region with the given DATE."
     (interactive (list (org-read-date nil nil nil "Date")))
-    (jnf/tor-wrap-in-html-tag
+    (jf/tor-wrap-in-html-tag
      "time"
      (concat "datetime=\"" date "\" title=\"" date "\"")))
 
-  (defun jnf/tor-wrap-as-marginnote-dwim ()
+  (defun jf/tor-wrap-as-marginnote-dwim ()
     "Wrap the line or current region as a marginnote Hugo shortcode."
     (interactive)
-    (jnf/tor-wrap-with-text
+    (jf/tor-wrap-with-text
      :before "{{< marginnote >}}\n"
      :after "\n{{< /marginnote >}}"
      :strategy :lineOrRegion))
 
-  (defun jnf/tor-wrap-as-sidenote-dwim ()
+  (defun jf/tor-wrap-as-sidenote-dwim ()
     "Wrap the line or current region as a sidenote Hugo shortcode."
     (interactive)
-    (jnf/tor-wrap-with-text
+    (jf/tor-wrap-with-text
      :before "{{< sidenote >}}"
      :after "{{< /sidenote >}}"
      :strategy :sentenceOrRegion))
 
-  (defun jnf/tor-wrap-link-active-region-dwim (url)
+  (defun jf/tor-wrap-link-active-region-dwim (url)
     "Wrap current region (or point) in an A-tag with the given URL.
 
   For the URL:
@@ -3669,23 +3675,23 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
   If the URL is an empty string, then send a message.  Else, if we
   have a non-0 length URL, use the URL and wrap the region in an A
   tag."
-    (interactive (list (jnf/tor-prompt-or-kill-ring-for-url)))
+    (interactive (list (jf/tor-prompt-or-kill-ring-for-url)))
     (if (eq (length url) 0)
 	(message "No URL to use for A-tag creation")
-      (jnf/tor-wrap-with-text
+      (jf/tor-wrap-with-text
        :before (concat "<a href=\"" url "\">")
        :after "</a>"
        :strategy :pointOrRegion)))
 
-  (defun jnf/tor-wrap-as-pseudo-dfn ()
+  (defun jf/tor-wrap-as-pseudo-dfn ()
     "Wrap current region (or word) in an I-tag with a DFN dom class."
     (interactive)
-    (jnf/tor-wrap-with-text
+    (jf/tor-wrap-with-text
      :before "<i class=\"dfn\">"
      :after "</i>"
      :strategy :wordOrRegion))
 
-  (defun jnf/tor-wrap-cite-active-region-dwim (url)
+  (defun jf/tor-wrap-cite-active-region-dwim (url)
     "Wrap current region (or point) in a CITE-tag and optional A-tag with URL.
 
   For the URL:
@@ -3696,18 +3702,18 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
   If the URL an empty string, then wrap the current region or point
   in a CITE tag.  Else, if we have a non-0 length URL, wrap it in
   CITE and A tag."
-    (interactive (list (jnf/tor-prompt-or-kill-ring-for-url)))
+    (interactive (list (jf/tor-prompt-or-kill-ring-for-url)))
 
     ;; Were we to start writing at the START position, we'd invariably
     ;; change the contents such that the END position was no longer
     ;; accurate.  So instead, we append at the END position, hop back to
     ;; the START position and append to the START position.
     (if (eq (length url) 0)
-	(jnf/tor-wrap-with-text
+	(jf/tor-wrap-with-text
 	 :before "<cite>"
 	 :after "</cite >"
 	 :strategy :pointOrRegion)
-      (jnf/tor-wrap-with-text
+      (jf/tor-wrap-with-text
        :before (concat "<cite><a href=\"" url
 		       "\" class=\"u-url p-name\" rel=\"cite\">")
        :after "</a></cite>"
@@ -3721,16 +3727,16 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
 
 ** TODO forem specific
 
-*** jnf/forem-tidy-pull-request
+*** jf/forem-tidy-pull-request
 
-- ~jnf/forem-tidy-pull-request~ :: At [[https://forem.com][Forem]] we use a [[https://github.com/forem/forem/blob/main/.github/PULL_REQUEST_TEMPLATE.md][pull request template]] that
+- ~jf/forem-tidy-pull-request~ :: At [[https://forem.com][Forem]] we use a [[https://github.com/forem/forem/blob/main/.github/PULL_REQUEST_TEMPLATE.md][pull request template]] that
   has lots of instructions for contributors to complete.  The
-  ~jnf/forem-tidy-pull-request~ function takes the initial contents (which
+  ~jf/forem-tidy-pull-request~ function takes the initial contents (which
   include the commit message of the first commit of the pull request) and
   tidies it up so I can fill out the primary fields.
 
 #+begin_src emacs-lisp
-  (defun jnf/forem-tidy-pull-request ()
+  (defun jf/forem-tidy-pull-request ()
     "Perform some quick tidying of the Forem PR template."
     (interactive)
     ;; Start from the beginning.
@@ -3780,11 +3786,11 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
     (beginning-of-buffer))
 #+end_src
 
-** TODO jnf/eval-region-dwim()
+** TODO jf/eval-region-dwim()
 
 #+begin_src emacs-lisp
-  (define-key emacs-lisp-mode-map (kbd "C-c C-c") 'jnf/eval-region-dwim)
-  (defun jnf/eval-region-dwim ()
+  (define-key emacs-lisp-mode-map (kbd "C-c C-c") 'jf/eval-region-dwim)
+  (defun jf/eval-region-dwim ()
     "When region is active, evaluate it and kill the mark. Else,
     evaluate the whole buffer."
     (interactive)
@@ -3798,7 +3804,7 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
       (setq-local deactivate-mark t)))
 #+end_src
 
-** TODO jnf/toggle-osx-alternate-modifier()
+** TODO jf/toggle-osx-alternate-modifier()
 
 #+begin_src emacs-lisp
 
@@ -3812,8 +3818,8 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
   ;; (setq mac-right-option-modifier 'meta) ;; Enable Emacs capturing meta-key, so right M-x will execute extended command
 
 
-  (global-set-key (kbd "C-x /") 'jnf/toggle-osx-alternate-modifier)
-  (defun jnf/toggle-osx-alternate-modifier ()
+  (global-set-key (kbd "C-x /") 'jf/toggle-osx-alternate-modifier)
+  (defun jf/toggle-osx-alternate-modifier ()
     "Toggle native OS-X Option modifier
   setting (e.g. ns-alternate-modifier)."
     (interactive)
@@ -3901,7 +3907,7 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
   ;;; BEGIN Burning Wheel Gold Tables
   ;;
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  (transient-quick-help jnf/qh--bwg-wises
+  (transient-quick-help jf/qh--bwg-wises
     "BWG Wises Obstacles (page 309)"
     :label "Wises"
     :mode 'jnf-bwg-minor-mode
@@ -3915,7 +3921,7 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
      "Bizarre or obscure ........... Ob 7\n"
      "Freaky details or specifics .. Ob 8"))
 
-  (transient-quick-help jnf/qh--bwg-expertise-exponent
+  (transient-quick-help jf/qh--bwg-expertise-exponent
     "BWG Expertise Exponent (page 12)"
     :label "Exponents"
     :mode 'jnf-bwg-minor-mode
@@ -3932,7 +3938,7 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
      "Exp 9  is uncanny; incomprehensibly good.\n"
      "Exp 10 is as near perfection as the system allows."))
 
-  (transient-quick-help jnf/qh--bwg-absolute-difficulty
+  (transient-quick-help jf/qh--bwg-absolute-difficulty
     "BWG Absolute Difficulty (page 15)"
     :label "Difficulty"
     :mode 'jnf-bwg-minor-mode
@@ -3949,7 +3955,7 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
      "Ob 9  An act deemed nearly impossible.\n"
      "Ob 10 A miracle."))
 
-  (transient-quick-help jnf/qh--bwg-circles-obstacles
+  (transient-quick-help jf/qh--bwg-circles-obstacles
     "BWG Circles Obstacles (page 380-381)"
     :label "Circles"
     :mode 'jnf-bwg-minor-mode
@@ -3976,7 +3982,7 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
      "  Unusual for this character .................... +1-2 Ob\n"
      "  Right here and now in the middle of trouble ... +3 Ob"))
 
-  (transient-quick-help jnf/qh--bwg-steel-test-adjustments
+  (transient-quick-help jf/qh--bwg-steel-test-adjustments
     "BWG Steel Test Adjustments (page 363)"
     :label "Steel"
     :mode 'jnf-bwg-minor-mode
@@ -4010,20 +4016,20 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
 
 ** TODO Functions
 
-- ~jnf/reader-visual~ :: A little bit of RSS beautification.
+- ~jf/reader-visual~ :: A little bit of RSS beautification.
 
 #+begin_src emacs-lisp
-  (defun jnf/reader-visual ()
+  (defun jf/reader-visual ()
     "A method to turn on visual line mode and adjust text scale."
     (text-scale-set 2)
     (turn-on-visual-line-mode))
 #+end_src
 
-- ~jnf/scroll-down-half-page~ :: See https://www.reddit.com/r/emacs/comments/r7l3ar/how_do_you_scroll_half_a_page/
+- ~jf/scroll-down-half-page~ :: See https://www.reddit.com/r/emacs/comments/r7l3ar/how_do_you_scroll_half_a_page/
 
 #+begin_src emacs-lisp
-  (global-set-key (kbd "M-n") 'jnf/scroll-down-half-page)
-  (defun jnf/scroll-down-half-page ()
+  (global-set-key (kbd "M-n") 'jf/scroll-down-half-page)
+  (defun jf/scroll-down-half-page ()
     "Scroll down half a page while keeping the cursor centered"
     (interactive)
     (let ((ln (line-number-at-pos (point)))
@@ -4035,12 +4041,12 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
 		 (recenter))))))
 #+end_src
 
-- ~jnf/scroll-up-half-page~ :: See https://www.reddit.com/r/emacs/comments/r7l3ar/how_do_you_scroll_half_a_page/
+- ~jf/scroll-up-half-page~ :: See https://www.reddit.com/r/emacs/comments/r7l3ar/how_do_you_scroll_half_a_page/
 
 #+begin_src emacs-lisp
 
-  (global-set-key (kbd "M-p") 'jnf/scroll-up-half-page)
-  (defun jnf/scroll-up-half-page ()
+  (global-set-key (kbd "M-p") 'jf/scroll-up-half-page)
+  (defun jf/scroll-up-half-page ()
     "Scroll up half a page while keeping the cursor centered"
     (interactive)
     (let ((ln (line-number-at-pos (point)))
@@ -4052,24 +4058,24 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
 		 (recenter))))))
 #+end_src
 
-- ~jnf/dark~ :: Toggle from Dark to Light setting based on system preferences.
+- ~jf/dark~ :: Toggle from Dark to Light setting based on system preferences.
 
 #+begin_src emacs-lisp
   (if (eq system-type 'darwin)
       (progn
-	(defun jnf/dark ()
+	(defun jf/dark ()
 	  "Toggle system-wide Dark or Light setting."
 	  (interactive)
 	  (shell-command "osascript -e 'tell application \"System Events\" to tell appearance preferences to set dark mode to not dark mode'")
-	  (jnf/emacs-theme-by-osx-appearance))
+	  (jf/emacs-theme-by-osx-appearance))
 
-	(defalias 'modus-themes-toggle 'jnf/dark)
-	(defun jnf/emacs-theme-by-osx-appearance ()
+	(defalias 'modus-themes-toggle 'jf/dark)
+	(defun jf/emacs-theme-by-osx-appearance ()
 	  "Set theme based on OSX apperance state."
 	  (if (equal "Dark" (substring (shell-command-to-string "defaults read -g AppleInterfaceStyle") 0 4))
 	      (load-theme 'modus-vivendi)
 	    (load-theme 'modus-operandi)))
-	(jnf/emacs-theme-by-osx-appearance))
+	(jf/emacs-theme-by-osx-appearance))
     (progn
       (defun modus-themes-toggle ()
 	"Toggle between `modus-operandi' and `modus-vivendi' themes."
@@ -4080,11 +4086,11 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
       (load-theme 'modus-operandi)))
 #+end_src
 
-- ~jnf/org-insert-immediate-active-timestamp~ :: Insert an active timestamp, with a few options.
+- ~jf/org-insert-immediate-active-timestamp~ :: Insert an active timestamp, with a few options.
 
 #+begin_src emacs-lisp
-  (global-set-key (kbd "s-5") 'jnf/org-insert-immediate-active-timestamp)
-  (defun jnf/org-insert-immediate-active-timestamp (parg)
+  (global-set-key (kbd "s-5") 'jf/org-insert-immediate-active-timestamp)
+  (defun jf/org-insert-immediate-active-timestamp (parg)
     "Insert an active date for today.
 
   One universal arg (e.g., prefix call with C-u) inserts timestamp.
@@ -4156,16 +4162,16 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
 
 * TODO Menus
 
-** TODO jnf/menu-dwim
+** TODO jf/menu-dwim
 *** Minor Modes
 
 In work and in play, there are several “me” specific contexts.  The
-~jnf/minor-mode-maker~ macro helps me quickly and consistently make those
+~jf/minor-mode-maker~ macro helps me quickly and consistently make those
 contexual minor modes.  My intention is to build out even more functions on
 those modes.
 
 #+begin_src emacs-lisp
-  (cl-defmacro jnf/minor-mode-maker (&key title abbr hooks)
+  (cl-defmacro jf/minor-mode-maker (&key title abbr hooks)
     "A macro to declare a minor mode.
 
   Use TITLE to derive the docstring.
@@ -4182,12 +4188,12 @@ those modes.
 	 (when ,hooks
 	   (-each ,hooks (lambda(hook) (add-hook hook (lambda () (,mode-name)))))))))
 
-  (jnf/minor-mode-maker :title "Burning Wheel Gold"
+  (jf/minor-mode-maker :title "Burning Wheel Gold"
 			:abbr "bwg"
 			:hooks (list 'org-mode-hook 'markdown-mode-hook))
-  (jnf/minor-mode-maker :title "Take on Rules"
+  (jf/minor-mode-maker :title "Take on Rules"
 			:abbr "tor")
-  (jnf/minor-mode-maker :title "Forem"
+  (jf/minor-mode-maker :title "Forem"
 			:abbr "forem")
 #+end_src
 
@@ -4196,29 +4202,29 @@ those modes.
 Try as I may, based on my configuration, I can’t get [[https://orgmode.org/manual/Protocols.html#Protocols][org-protocol]] to work.  So
 I’ve opted to take a different path; write some Emacs functions instead.
 
-- ~jnf/org-roam-capture-ref~ :: Capture a “refs” context ~org-roam-node~ for the given title and url.
-- ~jnf/menu-dwim--org-capture-elfeed-show~ :: Capture an RSS entry.
-- ~jnf/menu-dwim--org-capture-firefox~ :: Capture the active tab of Firefox.
-- ~jnf/menu-dwim--org-capture-safari~ :: Capture the active tab of Safari.
+- ~jf/org-roam-capture-ref~ :: Capture a “refs” context ~org-roam-node~ for the given title and url.
+- ~jf/menu-dwim--org-capture-elfeed-show~ :: Capture an RSS entry.
+- ~jf/menu-dwim--org-capture-firefox~ :: Capture the active tab of Firefox.
+- ~jf/menu-dwim--org-capture-safari~ :: Capture the active tab of Safari.
 
 #+begin_src emacs-lisp
-  (cl-defun jnf/org-roam-capture-ref (&key title url)
+  (cl-defun jf/org-roam-capture-ref (&key title url)
     "Capture the TITLE and URL in the `org-roam' :refs template"
     (org-roam-capture-
      :keys "r"
      ;; TODO: I would love to get tags working but I'm missing something
      :node (org-roam-node-create :title title)
      :info (list :ref url)
-     :templates (jnf/org-roam-templates-list :refs)))
+     :templates (jf/org-roam-templates-list :refs)))
 
-  (cl-defun jnf/menu-dwim--org-capture-elfeed-show (&key (entry elfeed-show-entry))
+  (cl-defun jf/menu-dwim--org-capture-elfeed-show (&key (entry elfeed-show-entry))
     "Create an `org-roam-node' from elfeed ENTRY."
     (interactive)
     (let ((url (elfeed-entry-link entry))
 	  (title (elfeed-entry-title entry)))
-      (jnf/org-roam-capture-ref :url url :title title)))
+      (jf/org-roam-capture-ref :url url :title title)))
 
-  (defun jnf/menu-dwim--org-capture-firefox ()
+  (defun jf/menu-dwim--org-capture-firefox ()
     "Create an `org-roam-node' from Firefox page.
 
     Depends on the `grab-mac-link' package."
@@ -4226,9 +4232,9 @@ I’ve opted to take a different path; write some Emacs functions instead.
     (let* ((link-title-pair (grab-mac-link-firefox-1))
 	   (url (car link-title-pair))
 	   (title (cadr link-title-pair)))
-      (jnf/org-roam-capture-ref :url url :title title)))
+      (jf/org-roam-capture-ref :url url :title title)))
 
-  (defun jnf/menu-dwim--org-capture-safari ()
+  (defun jf/menu-dwim--org-capture-safari ()
     "Create an `org-roam-node' from Safari page.
 
     Depends on the `grab-mac-link' package."
@@ -4236,24 +4242,24 @@ I’ve opted to take a different path; write some Emacs functions instead.
     (let* ((link-title-pair (grab-mac-link-safari-1))
 	   (url (car link-title-pair))
 	   (title (cadr link-title-pair)))
-      (jnf/org-roam-capture-ref :url url :title title)))
+      (jf/org-roam-capture-ref :url url :title title)))
 
-  (defun jnf/menu-dwim--org-capture-eww ()
+  (defun jf/menu-dwim--org-capture-eww ()
     "Create an `org-roam-node' from `eww' data"
     (interactive)
     (let* ((url (plist-get eww-data :url))
 	   (title (plist-get eww-data :title)))
-      (jnf/org-roam-capture-ref :url url :title title)))
+      (jf/org-roam-capture-ref :url url :title title)))
 #+end_src
 
 *** TODO A Consistent Transient Menu
 
 #+begin_src emacs-lisp
-  (defconst jnf/forem-dashboard-filename
+  (defconst jf/forem-dashboard-filename
     "~/git/org/forem-dashboard.org"
     "The file to the dashboard documentation and links for Forem.")
 
-  (cl-defun jnf/open-dashboard (&key (filename jnf/forem-dashboard-filename))
+  (cl-defun jf/open-dashboard (&key (filename jf/forem-dashboard-filename))
     "For the given FILENAME open the links in the default browser.
 
       With the universal prefix (e.g. C-u) open the file instead."
@@ -4267,21 +4273,21 @@ I’ve opted to take a different path; write some Emacs functions instead.
 		 " | xargs open"))
       (find-file filename)))
 
-  (transient-define-suffix jnf/org-auto-tags--transient (tags)
+  (transient-define-suffix jf/org-auto-tags--transient (tags)
     "Set the tags from minibuffer read"
     :description '(lambda ()
 		    (concat
 		     "Org Tags: "
 		     (propertize
-		      (format "%s" jnf/org-auto-tags--current-list)
+		      (format "%s" jf/org-auto-tags--current-list)
 		      'face 'transient-argument)))
     (interactive (list
 		  (completing-read-multiple
 		   "Tag(s): " (org-roam-tag-completions))))
-    (setq jnf/org-auto-tags--current-list tags))
+    (setq jf/org-auto-tags--current-list tags))
 
-  (global-set-key (kbd "C-M-s-f") 'jnf/menu-dwim--forem)
-  (transient-define-prefix jnf/menu-dwim--forem ()
+  (global-set-key (kbd "C-M-s-f") 'jf/menu-dwim--forem)
+  (transient-define-prefix jf/menu-dwim--forem ()
     [["Forem's Workflow"
       ("i" "Browse to [i]ssues…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/issues/")))
       ("j" "Browse to pro[j]ects…" (lambda () (interactive) (browse-url "https://github.com/orgs/forem/projects/")))
@@ -4297,89 +4303,89 @@ I’ve opted to take a different path; write some Emacs functions instead.
       ("N" "Browse Github [N]otifications" (lambda () (interactive) (browse-url "https://github.com/notifications")))
       ]
      ["Org-Mode"
-      ("D" "[D]ashboard open…" jnf/open-dashboard)
-      ("d" "Visit [d]ashboard file…" (lambda () (interactive) (find-file jnf/forem-dashboard-filename)))
+      ("D" "[D]ashboard open…" jf/open-dashboard)
+      ("d" "Visit [d]ashboard file…" (lambda () (interactive) (find-file jf/forem-dashboard-filename)))
       ]])
 
-  (transient-define-prefix jnf/menu-dwim--bwg ()
+  (transient-define-prefix jf/menu-dwim--bwg ()
     "Define the BWG help prefix."
     ["Burning Wheel"
-     ("c" jnf/qh--bwg-circles-obstacles)
-     ("d" jnf/qh--bwg-absolute-difficulty)
-     ("e" jnf/qh--bwg-expertise-exponent)
-     ("s" jnf/qh--bwg-steel-test-adjustments)
-     ("w" jnf/qh--bwg-wises)
+     ("c" jf/qh--bwg-circles-obstacles)
+     ("d" jf/qh--bwg-absolute-difficulty)
+     ("e" jf/qh--bwg-expertise-exponent)
+     ("s" jf/qh--bwg-steel-test-adjustments)
+     ("w" jf/qh--bwg-wises)
      ])
 
-  (transient-define-prefix jnf/menu-dwim--tor ()
+  (transient-define-prefix jf/menu-dwim--tor ()
     "Define the Take on Rules menu."
     ["Take on Rules"
      ["Posts"
       :if-non-nil jnf-tor-minor-mode
-      ("p r" "Re-title post…" jnf/tor-retitle-post)
-      ("p t" "Tag post…" jnf/tor-tag-post :transient t)
-      ("p v" "View post…" jnf/tor-view-blog-post)
+      ("p r" "Re-title post…" jf/tor-retitle-post)
+      ("p t" "Tag post…" jf/tor-tag-post :transient t)
+      ("p v" "View post…" jf/tor-view-blog-post)
       ]
      ["Find"
-      ("f d" "in draft status…" jnf/tor-find-file-draft)
-      ("f u" "by url…" jnf/tor-find-hugo-file-by-url)
-      ("f f" "by filename…" jnf/tor-find-file)]
+      ("f d" "in draft status…" jf/tor-find-file-draft)
+      ("f u" "by url…" jf/tor-find-hugo-file-by-url)
+      ("f f" "by filename…" jf/tor-find-file)]
      ["Create"
-      ("c a" "Amplify the Blogosphere…" jnf/tor-post-amplifying-the-blogosphere)
-      ("c c" "Changelog entry…" jnf/tor-find-changelog-and-insert-entry)
-      ("c e" "Epigraph entry…" jnf/tor-insert-epigraph-entry)
-      ("c g" "Glossary entry…" jnf/tor-find-glossary-and-insert-entry)
-      ("c p" "Post…" jnf/tor-create-post)
-      ("c s" "Series…" jnf/tor-find-series-and-insert-entry)]
+      ("c a" "Amplify the Blogosphere…" jf/tor-post-amplifying-the-blogosphere)
+      ("c c" "Changelog entry…" jf/tor-find-changelog-and-insert-entry)
+      ("c e" "Epigraph entry…" jf/tor-insert-epigraph-entry)
+      ("c g" "Glossary entry…" jf/tor-find-glossary-and-insert-entry)
+      ("c p" "Post…" jf/tor-create-post)
+      ("c s" "Series…" jf/tor-find-series-and-insert-entry)]
      ])
 
-  (transient-define-prefix jnf/menu-dwim--hammerspoon ()
+  (transient-define-prefix jf/menu-dwim--hammerspoon ()
     "Define the Take on Rules find files prefix."
     ["Hammerspoon"
      :if-non-nil hammerspoon-edit-minor-mode
      ("m" "Toggle hammerspoon editor mode" hammerspoon-toggle-mode)
-     ("p" "Tidy pull request" jnf/forem-tidy-pull-request)])
+     ("p" "Tidy pull request" jf/forem-tidy-pull-request)])
 
-  (transient-define-suffix jnf/org-auto-tags--transient (tags)
+  (transient-define-suffix jf/org-auto-tags--transient (tags)
     "Set the tags from minibuffer read"
     :description '(lambda ()
 		    (concat
 		     "Org Tags: "
 		     (propertize
-		      (format "%s" jnf/org-auto-tags--current-list)
+		      (format "%s" jf/org-auto-tags--current-list)
 		      'face 'transient-argument)))
     (interactive
      (list (completing-read-multiple "Tag(s): " (org-roam-tag-completions))))
-    (setq jnf/org-auto-tags--current-list tags))
+    (setq jf/org-auto-tags--current-list tags))
 
-  (global-set-key (kbd "s-1") 'jnf/menu-dwim)
-  (transient-define-prefix jnf/menu-dwim ()
+  (global-set-key (kbd "s-1") 'jf/menu-dwim)
+  (transient-define-prefix jf/menu-dwim ()
     "Return a `transient' compliant list to apply to different transients."
     [["Markdown Utilities"
-      ("k h" "Kill slug version of given heading…" jnf/kill-new-markdown-heading-as-slug :if-derived (or markdown-mode html-mode))
-      ("w a" "A-tag at point or region…" jnf/tor-wrap-link-active-region-dwim  :if-derived (or markdown-mode html-mode))
-      ("w c" "CITE-tag point or region…" jnf/tor-wrap-cite-active-region-dwim  :if-derived (or markdown-mode html-mode))
-      ("w d" "DATETIME-tag point or region…" jnf/tor-wrap-date  :if-derived (or markdown-mode html-mode))
-      ("w f" "Wrap word or region in pseudo-DFN…" jnf/tor-wrap-as-pseudo-dfn  :if-derived (or markdown-mode html-mode))
+      ("k h" "Kill slug version of given heading…" jf/kill-new-markdown-heading-as-slug :if-derived (or markdown-mode html-mode))
+      ("w a" "A-tag at point or region…" jf/tor-wrap-link-active-region-dwim  :if-derived (or markdown-mode html-mode))
+      ("w c" "CITE-tag point or region…" jf/tor-wrap-cite-active-region-dwim  :if-derived (or markdown-mode html-mode))
+      ("w d" "DATETIME-tag point or region…" jf/tor-wrap-date  :if-derived (or markdown-mode html-mode))
+      ("w f" "Wrap word or region in pseudo-DFN…" jf/tor-wrap-as-pseudo-dfn  :if-derived (or markdown-mode html-mode))
       ]
      [
       "" ;; Deliberate space for menu
-      ("w m" "Margin-note line or region…" jnf/tor-wrap-as-marginnote-dwim  :if-derived (or markdown-mode html-mode))
-      ("w p" "Wrap point or region as Poem…" jnf/tor-wrap-in-poem  :if-derived (or markdown-mode html-mode))
-      ("w s" "Side-note sentence or region…" jnf/tor-wrap-as-sidenote-dwim  :if-derived (or markdown-mode html-mode))
-      ("w w" "Wrap point or region in html…" jnf/tor-wrap-in-html-tag  :if-derived (or markdown-mode html-mode))
+      ("w m" "Margin-note line or region…" jf/tor-wrap-as-marginnote-dwim  :if-derived (or markdown-mode html-mode))
+      ("w p" "Wrap point or region as Poem…" jf/tor-wrap-in-poem  :if-derived (or markdown-mode html-mode))
+      ("w s" "Side-note sentence or region…" jf/tor-wrap-as-sidenote-dwim  :if-derived (or markdown-mode html-mode))
+      ("w w" "Wrap point or region in html…" jf/tor-wrap-in-html-tag  :if-derived (or markdown-mode html-mode))
       ]]
     [["Contexts"
-      ("-b" "Burning Wheel…"  jnf/menu-dwim--bwg)
-      ("-f" "Forem…" jnf/menu-dwim--forem)
-      ("-h" "Hammerspoon…" jnf/menu-dwim--hammerspoon :if-non-nil hammerspoon-edit-minor-mode)
-      ("-t" "TakeOnRules…" jnf/menu-dwim--tor)
+      ("-b" "Burning Wheel…"  jf/menu-dwim--bwg)
+      ("-f" "Forem…" jf/menu-dwim--forem)
+      ("-h" "Hammerspoon…" jf/menu-dwim--hammerspoon :if-non-nil hammerspoon-edit-minor-mode)
+      ("-t" "TakeOnRules…" jf/menu-dwim--tor)
       ]
      ["Grab"
-      ("g e" "Elfeed" jnf/menu-dwim--org-capture-elfeed-show :if-derived elfeed-show-mode)
-      ("g f" "Firefox" jnf/menu-dwim--org-capture-firefox)
-      ("g s" "Safari" jnf/menu-dwim--org-capture-safari)
-      ("g w" "Eww" jnf/menu-dwim--org-capture-eww :if-derived eww-mode)
+      ("g e" "Elfeed" jf/menu-dwim--org-capture-elfeed-show :if-derived elfeed-show-mode)
+      ("g f" "Firefox" jf/menu-dwim--org-capture-firefox)
+      ("g s" "Safari" jf/menu-dwim--org-capture-safari)
+      ("g w" "Eww" jf/menu-dwim--org-capture-eww :if-derived eww-mode)
       ;; ("g u" "URL")
       ]
      ["Jump to"
@@ -4393,14 +4399,14 @@ I’ve opted to take a different path; write some Emacs functions instead.
       ;; I could write functions for these, but this is concise enough
       ("m t" "Typopunct ( )" typopunct-mode :if-nil typopunct-mode)
       ("m t" "Typopunct (*)" typopunct-mode :if-non-nil typopunct-mode)
-      ("m o" "MacOS Native Option ( )" jnf/toggle-osx-alternate-modifier :if-non-nil ns-alternate-modifier)
-      ("m o" "MacOS Native Option (*)" jnf/toggle-osx-alternate-modifier :if-nil ns-alternate-modifier)
+      ("m o" "MacOS Native Option ( )" jf/toggle-osx-alternate-modifier :if-non-nil ns-alternate-modifier)
+      ("m o" "MacOS Native Option (*)" jf/toggle-osx-alternate-modifier :if-nil ns-alternate-modifier)
       ]]
     [["Org Add-Ons"
-      ("o c" "Context…" jnf/org-auto-tags--set-by-context :transient t)
+      ("o c" "Context…" jf/org-auto-tags--set-by-context :transient t)
       ("o t" "Add Org Tag…" org-roam-tag-add :if-derived org-mode)
       ("o r" "Add Org Ref…" org-roam-ref-add :if-derived org-mode)
-      ("o s" jnf/org-auto-tags--transient :transient t)
+      ("o s" jf/org-auto-tags--transient :transient t)
       ]])
 #+end_src
 
