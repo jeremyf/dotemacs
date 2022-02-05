@@ -866,9 +866,9 @@ identical parameter list.
 #+end_src
 
 * TODO Projects
-** TODO projectile.el
+** WAITING projectile.el
 
-Projectile provides convenient organization and commands to run over projects.
+- ~projectile.el~ :: this package provides convenient organization and commands to run over projects.
 
 #+begin_src emacs-lisp
   (use-package projectile
@@ -1014,8 +1014,7 @@ I’m thinking on this one.
 		       buffer-file-name
 		       " | rg \"^summary\"")))))
 	(jnf/open-pull-request-for :summary summary)))
-    :bind (("C-c C-g" . magit-file-dispatch)
-	   ("s-7" . magit-status))
+    :bind (("s-7" . magit-status))
     ;; In other situations I bind s-6 to `git-messenger:popup-message'
     :bind (:map magit-log-mode-map ("s-6" . 'jnf/magit-browse-pull-request))
     :hook ((with-editor-post-finish-hook . magit-status)))
@@ -1223,6 +1222,12 @@ What follows is adjustments to emacs settings as they relate to completion.
 #+begin_src emacs-lisp
   (use-package emacs
     :init
+
+    ;; Emacs 28: Hide commands in M-x which do not apply to the current mode.
+    ;; Corfu commands are hidden, since they are not supposed to be used via M-x.
+    (setq read-extended-command-predicate
+	  #'command-completion-default-include-p)
+
     ;; TAB cycle if there are only few candidates
     (setq completion-cycle-threshold 3)
 
@@ -1403,6 +1408,9 @@ There’s a macro in here somewhere.
 #+end_src
 
 *** TODO Narrowing Functions
+
+Write about the narrowing functions, as these help create both broad and narrow use functions.
+
 *** TODO consult-org.el
 
 - [ ] In org-mode map ~s-2~ to ~consult-org-menu~ instead of ~consult-imenu~.
@@ -1622,12 +1630,15 @@ other projects; and then select a file within that project.
 and [[https://www.sublimetext.com/][Sublime Text]] days.  More than any other key combination, that one is
 entirely muscle memory.
 
-** TODO corfu.el et al
+** DONE corfu.el
 
-- ~cape.el~ ::
+- ~corfu.el~ :: An alternative to the ubiquitous [[https://github.com/company-mode/company-mode][Company]]; In [[https://takeonrules.com/2022/01/17/switching-from-company-to-corfu-for-emacs-completion/][Switching from
+  Company to Corfu for Emacs Completion]] I further explain my adoption of Corfu.
+  See https://github.com/minad/corfu for more details on Corfu.
+
+  /Note:/ I may explore [[https://gitlab.com/protesilaos/mct][MCT]] and see how it compares to Corfu.
 
 #+begin_src emacs-lisp
-  ;; Configure corfu
   (use-package corfu
     :straight t
     :demand t
@@ -1645,40 +1656,46 @@ entirely muscle memory.
 
     :config
     ;; Optionally enable cycling for `corfu-next' and `corfu-previous'.
-    (setq corfu-cycle t)
-    (defun corfu-move-to-minibuffer ()
-      (interactive)
-      (let (completion-cycle-threshold completion-cycling)
-	(apply #'consult-completion-in-region completion-in-region--data)))
-    (define-key corfu-map "\M-m" #'corfu-move-to-minibuffer))
+    (setq corfu-cycle t))
 #+end_src
 
-** TODO cape.el
+*** DONE Extending corfu.el
 
-- ~cape.el~ ::
+- ~corfu-move-to-minibuffer~ :: The completion at point “popup” can sometimes
+  be a little cryptic or terse.  The ~corfu-move-to-minibuffer~ provides a
+  means of moving the “popup” candidates to the minibuffer for further
+  inspection.
 
-#+begin_src
-(use-package cape
+#+begin_src emacs-lisp
+  (defun corfu-move-to-minibuffer ()
+    "Move \"popup\" completion candidates to minibuffer.
+
+  Useful if you want a more robust view into the recommend candidates."
+    (interactive)
+    (let (completion-cycle-threshold completion-cycling)
+      (apply #'consult-completion-in-region completion-in-region--data)))
+  (define-key corfu-map "\M-m" #'corfu-move-to-minibuffer)
+#+end_src
+
+** DONE cape.el
+
+- ~cape.el~ :: provides several Completion At Point Extensions (Capfs).  I like
+  having a Capf for spelling and files.
+
+#+begin_src emacs-lisp
+  (use-package cape
     :straight t
-    :bind (("C-c p" . completion-at-point)))
+    :bind (("C-c p p" . completion-at-point)
+	   ("C-c p d" . cape-dabbrev)
+	   ("C-c p f" . cape-file)
+	   ("C-c p s" . cape-symbol)
+	   ("C-c p i" . cape-ispell)))
 
+  ;; Use Company backends as Capfs.
   (setq-local completion-at-point-functions
-	      (mapcar #'cape-company-to-capf
-		      (list #'company-files #'company-ispell #'company-dabbrev)))
+    (mapcar #'cape-company-to-capf
+      (list #'company-files #'company-ispell #'company-dabbrev)))
 #+end_src
-
-** TODO Emacs configuration
-
-#+begin_src
-(use-package emacs
-    :straight nil
-    :init
-    ;; Emacs 28: Hide commands in M-x which do not apply to the current mode.
-    ;; Corfu commands are hidden, since they are not supposed to be used via M-x.
-    (setq read-extended-command-predicate
-	  #'command-completion-default-include-p))
-#+end_src
-
 
 * DONE Window Manipulation
 ** DONE Tab Line
@@ -1739,15 +1756,6 @@ quasi-opinionated compromise.
     :straight t)
 #+end_src
 
-** TODO link-hint.el
-
-#+begin_src emacs-lisp
-  (use-package link-hint
-    :straight t
-    :bind (("C-c l o" . link-hint-open-link)
-	   ("C-c l c" . link-hint-copy-link)))
-#+end_src
-
 ** TODO math-at-point.el
 
 #+begin_src emacs-lisp
@@ -1759,10 +1767,16 @@ quasi-opinionated compromise.
 
 ** TODO which-key.el
 
-#+begin_src emacs-lisp
+- ~which-key.el~ :: renders a menu of commands for an incomplete command
+  prefix.  For example if I type ~C-x~ and wait a moment, ~which-key.el~ will
+  generate a menu of available commands.
 
+#+begin_src emacs-lisp
   (use-package which-key
-    :config (which-key-mode)
+    :config
+    (which-key-mode)
+    (which-key-setup-side-window-right)
+    (which-key-show-major-mode)
     :diminish 'which-key-mode
     :straight t)
 #+end_src
