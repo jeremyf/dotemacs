@@ -4180,11 +4180,16 @@ I’ve opted to take a different path; write some Emacs functions instead.
 #+begin_src emacs-lisp
   (cl-defun jf/org-roam-capture-ref (&key title url)
     "Capture the TITLE and URL in the `org-roam' :refs template"
+    ;; This looks a bit odd, but to capture the :ref we need the callback from org-roam.
+    ;; (require 'org-roam-protocol)
+    ;;
+    ;; See https://github.com/org-roam/org-roam/issues/2078
     (org-roam-capture-
      :keys "r"
      ;; TODO: I would love to get tags working but I'm missing something
      :node (org-roam-node-create :title title)
-     :info '(:ref url :immediate-finish nil)
+     :info (list :ref url)
+     :props '(:immediate-finish nil)
      :templates (jf/org-roam-templates-list :refs)))
 
   (cl-defun jf/menu-dwim--org-capture-elfeed-show (&key (entry elfeed-show-entry))
