@@ -327,7 +327,7 @@ These are some “invisible” packages that do some behind the scenes work.
 	       :files (:defaults (:exclude "major-mode-hydra.el"))))
 #+end_src
 
-* WAITING Display
+* DONE Display
 
 ** DONE modus-themes.el
 
@@ -491,7 +491,7 @@ between toggles.
 
 #+end_src
 
-** WAITING shackle.el
+** DONE shackle.el
 
 - ~shackle.el~ :: Enforce rules for popups.  See https://depp.brause.cc/shackle/.
 
@@ -535,12 +535,15 @@ minibuffers.  This change ensures that there’s only one.
 #+begin_src emacs-lisp
   (use-package grab-mac-link
     :straight t
+    ;; Ensuring we load these, as I'll need them later.
+    :commands (grab-mac-link-safari-1 grab-mac-link-firefox-1)
     :config
     ;; A replacement function for existing grab-mac-link-make-html-link
     (defun jf/grab-mac-link-make-html-link (url name)
       "Using HTML syntax, link to and cite the URL with the NAME."
       (format "<cite><a href=\"%s\" class=\"u-url p-name\" rel=\"cite\">%s</a></cite>" url name))
     ;; The function advice to override the default behavior
+
     (advice-add
      'grab-mac-link-make-html-link
      :override
@@ -2068,129 +2071,8 @@ quasi-opinionated compromise.
 #+begin_src emacs-lisp
   (use-package smartparens :straight t)
 #+end_src
-
-** TODO Functions
-
-#+begin_src emacs-lisp
-  (global-set-key (kbd "C-w") 'jf/kill-region-or-backward-word)
-  (global-set-key (kbd "M-DEL") 'jf/kill-region-or-backward-word)
-  (global-set-key (kbd "<C-M-backspace>") 'backward-kill-paragraph)
-  (defun jf/kill-region-or-backward-word (&optional arg)
-    "Kill selected region otherwise kill backwards the ARG number of words."
-    (interactive "p")
-    (if (region-active-p)
-	(kill-region (region-beginning) (region-end))
-      (backward-kill-word arg)))
-
-  (global-set-key (kbd "C-k") 'jf/kill-line-or-region)
-  (defun jf/kill-line-or-region (&optional ARG)
-    "Kill the selected region otherwise kill the ARG number of lines."
-    (interactive "P")
-    (if (use-region-p)
-	(kill-region (region-beginning) (region-end))
-      (kill-line ARG)))
-
-  (global-set-key (kbd "C-c n") 'jf/nab-file-name-to-clipboard)
-  (defun jf/nab-file-name-to-clipboard ()
-    "Nab, I mean copy, the current buffer file name to the clipboard.
-
-    If you provide universal prefix (e.g. C-u), return the base
-    filename.  Otherwise, use the full filename path."
-    ;; https://blog.sumtypeofway.com/posts/emacs-config.html
-    (interactive)
-    (let* ((raw-filename
-	    (if (equal major-mode 'dired-mode) default-directory (buffer-file-name)))
-	   (filename
-	    (if (equal current-prefix-arg nil) raw-filename (file-name-nondirectory raw-filename))))
-      (when filename
-	(kill-new filename)
-	(message "Copied buffer file name '%s' to the clipboard." filename))))
-
-  (defun jf/sort-unique-lines (reverse beg end &optional adjacent keep-blanks interactive)
-    "Sort lines and delete duplicates.
-    By default the sort is lexigraphically ascending.  To sort as
-    descending set REVERSE to non-nil.  Specify BEG and END for the
-    bounds of sorting.  By default, this is the selected region.
-
-    I've included ADJACENT, KEEP-BLANKS, and INTERACTIVE so I can
-    echo the method signature of `'delete-duplicate-lines`"
-    ;; This is a common function that I've used in other text editors.
-    ;; It's a simple stitch together of sort-lines and
-    ;; delete-duplicate-lines.
-    (interactive "P\nr")
-    (sort-lines reverse beg end)
-    (delete-duplicate-lines beg end reverse adjacent keep-blanks interactive))
-
-  (global-set-key (kbd "s-q") 'save-buffers-kill-terminal)
-  (global-set-key (kbd "s-w") 'kill-current-buffer)
-
-  ;; Treat dashes and underscores as part of words for navigation
-  ;; (global-superword-mode t)
-
-  (global-set-key (kbd "C-s-\\") 'jf/display-buffer-in-side-window)
-  (cl-defun jf/display-buffer-in-side-window (&optional (buffer (current-buffer)))
-    "Display BUFFER in dedicated side window."
-    (interactive)
-    (let ((display-buffer-mark-dedicated t))
-      (display-buffer-in-side-window buffer
-				     '((side . right)
-				       (window-parameters
-					(no-delete-other-windows . t))))))
-
-  (global-set-key (kbd "C-s--") 'jf/display-buffer-in-bottom-window)
-  (cl-defun jf/display-buffer-in-bottom-window (&optional (buffer (current-buffer)))
-    "Display BUFFER in dedicated side window."
-    (interactive)
-    (let ((display-buffer-mark-dedicated t))
-      (display-buffer-in-side-window buffer
-				     '((side . bottom)
-				       (window-parameters
-					(no-delete-other-windows . t))))))
-
-  (global-set-key (kbd "C-x m") 'jf/move-file)
-  (defun jf/move-file (target-directory)
-    "Write this file to TARGET-DIRECTORY, and delete old one."
-    (interactive "DTarget Directory: ")
-    (let* ((source (expand-file-name (file-name-nondirectory (buffer-name)) default-directory))
-	   (target (f-join target-directory (file-name-nondirectory (buffer-name)))))
-      (save-buffer)
-      (rename-file source target)
-      (kill-current-buffer)))
-  (global-set-key (kbd "C-M-d") 'jf/duplicate-current-line-or-lines-of-region)
-  (global-set-key (kbd "C-c d") 'jf/duplicate-current-line-or-lines-of-region)
-  (defun jf/duplicate-current-line-or-lines-of-region (arg)
-    "Duplicate ARG times current line or the lines of the current region."
-    (interactive "p")
-    (if (use-region-p)
-	(progn
-	  (when (> (point) (mark))
-	    (exchange-point-and-mark))
-	  (beginning-of-line)
-	  (exchange-point-and-mark)
-	  (end-of-line)
-	  (goto-char (+ (point) 1))
-	  (exchange-point-and-mark)
-	  (let* ((end (mark))
-		 (beg (point))
-		 (region
-		  (buffer-substring-no-propertis beg end)))
-	    (dotimes (_i arg)
-	      (goto-char end)
-	      (insert region)
-	      (setq end (point)))))
-      (crux-duplicate-current-line-or-region arg)))
-
-  (global-set-key (kbd "<f12>") 'jf/create-org-scratch-buffer)
-  (cl-defun jf/create-org-scratch-buffer (&key (mode 'org-mode))
-    "Quickly open a scratch buffer and enable the given MODE."
-    (interactive)
-    (crux-create-scratch-buffer)
-    (rename-buffer (concat "*scratch* at " (format-time-string "%Y-%m-%d %H:%M")))
-    (funcall mode))
-#+end_src
-
-* TODO Org Mode
-** TODO org-mode.el
+* DONE Org Mode
+** DONE org-mode.el
 
 Oh ~org-mode~, one of the “why you should use Emacs” packages.  It’s a set of
 organizational tools that allow for progressive adoption.  You can start
@@ -2215,6 +2097,9 @@ system to gather sources for ~org-mode~ agenda.
     returning-list)
 #+end_src
 
+The rudimentary configuration of my ~org-mode~.  Later, I write about
+~org-roam~ which introduces my more generalized note taking system.
+
 #+begin_src emacs-lisp
   (use-package org
     :straight (org :type built-in)
@@ -2224,14 +2109,20 @@ system to gather sources for ~org-mode~ agenda.
 	     org-agenda-files (jf/org-agenda-files
 			       :paths jf/data-directories
 			       :basenames '("agenda.org"))
-	     org-default-notes-file (concat org-directory "/captured-notes.org")
-	     org-todo-keywords
-	     '((sequence "TODO" "WAITING" "|" "DONE")
-	       (sequence "PENDING" "TODO" "WAITING" "|" "READ")))
+	     org-default-notes-file (concat
+				     org-directory
+				     "/captured-notes.org")
+	     org-todo-keywords '((sequence
+				  "TODO"
+				  "WAITING"
+				  "|"
+				  "DONE")))
     (setq org-capture-templates
-	  '(
-	    ("@" "All Todo" entry (file "~/git/org/agenda.org")
-	     "* TODO %?\n  %i\n  %a" :empty-lines-before 1)))
+	  '(("@"
+	     "All Todo"
+	     entry (file "~/git/org/agenda.org")
+	     "* TODO %?\n  %i\n  %a"
+	     :empty-lines-before 1)))
 
     (org-babel-do-load-languages 'org-babel-load-languages
 				 (append org-babel-load-languages
@@ -2242,7 +2133,7 @@ system to gather sources for ~org-mode~ agenda.
     ;; mode.
     :custom (org-src-tab-acts-natively t)
     :bind (:map org-mode-map
-	   ("C-c l i". jf/org-insert-link-dwim))
+		("C-c l i". jf/org-insert-link-dwim))
     :bind (("C-c l s" . org-store-link)
 	   ("C-c a" . org-agenda)
 	   ("C-c c" . org-capture)
@@ -2836,7 +2727,7 @@ establish the current context (or clear it).
 	 (t ad-do-it)))))
 #+end_src
 
-* TODO Applications
+* WAITING Applications
 
 ** DONE elpher.el
 
@@ -2985,7 +2876,7 @@ establish the current context (or clear it).
     (setq rmh-elfeed-org-files (list "~/git/org/elfeed.org")))
 #+end_src
 
-** TODO shrface.el
+** WAITING shrface.el
 
 #+begin_src emacs-lisp
   (use-package shrface
@@ -3786,7 +3677,10 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
     (beginning-of-buffer))
 #+end_src
 
-** TODO jf/eval-region-dwim()
+** DONE jf/eval-region-dwim()
+
+I try to get quick feedback when writing emacs-lisp; the ~jf/eval-region-dwim~
+binds a mnemonic key sequence to an extend ~eval-region~.
 
 #+begin_src emacs-lisp
   (define-key emacs-lisp-mode-map (kbd "C-c C-c") 'jf/eval-region-dwim)
@@ -3804,24 +3698,19 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
       (setq-local deactivate-mark t)))
 #+end_src
 
-** TODO jf/toggle-osx-alternate-modifier()
+** DONE jf/toggle-osx-alternate-modifier()
+
+I like having MacOS’s native Option (e.g. =⌥=) modifier available.  But using
+that default in Emacs would be a significant hinderance.
+
+The following function facilitates a best of both worlds.  By default, I want Option to be ~M-~
+in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
+(e.g., =¨=), I can use MacOS’s native functions to type =⌥= + =u=.
 
 #+begin_src emacs-lisp
-
-  ;; On  I use ⌘ as meta and prefer ⌥ to do nothing so I can still insert special characters easily.
-  ;;
-  ;; (setq mac-command-modifier 'meta
-  ;;       mac-option-modifier 'none)
-
-  ;; (setq mac-right-option-modifier nil) ;; Disable Emacs capturing meta-key and fall back to OS X (useful for diacritics)
-  ;;
-  ;; (setq mac-right-option-modifier 'meta) ;; Enable Emacs capturing meta-key, so right M-x will execute extended command
-
-
-  (global-set-key (kbd "C-x /") 'jf/toggle-osx-alternate-modifier)
   (defun jf/toggle-osx-alternate-modifier ()
     "Toggle native OS-X Option modifier
-  setting (e.g. ns-alternate-modifier)."
+    setting (e.g. ns-alternate-modifier)."
     (interactive)
     (if ns-alternate-modifier
 	(progn (setq ns-alternate-modifier nil)
@@ -3841,49 +3730,20 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
      jnf-silence-loading-log))
 #+end_src
 
-** TODO help functions
+** DONE Quick Help
+
+The following ~jf/transient-quick-help~ macro helps generate “help menus” that
+I want to reference.
 
 #+begin_src emacs-lisp
-  ;;; Commentary:
-  ;;
-  ;; This file provides both a macro for generating quick-help and help buffers.
-  ;;
-  ;;; Code:
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-  (defmacro quick-help (name buffer text)
+  (cl-defmacro jf/transient-quick-help (name buffer &key label body)
     "Macro for creating callable functions that display help.
-  Where NAME is name of function, BUFFER is name of buffer, and TEXT is displayed."
-    (declare (indent defun))
-    `(progn
-       (defun ,name nil
-	 ,buffer
-	 (interactive)
-	 (let ((qh-buff (concat "*Quick Help: " ,buffer "*"))
-	       (qh-text ,text))
-	   (get-buffer-create qh-buff)
-	   (with-current-buffer qh-buff
-	     (insert qh-text)
-	     (goto-char (point-min))
-	     (not-modified)
-	     (read-only-mode)
-	     (special-mode)
-	     ;; (local-set-key (kbd "C-g") (lambda () (interactive) (other-window -1)))
-	     (local-set-key (kbd "q") 'kill-buffer-and-window))
-	   (pop-to-buffer qh-buff '((display-buffer-below-selected)
-				    (window-parameters . ((no-other-window . nil)))
-				    (window-height . fit-window-to-buffer)))
-	   (message "q - Remove Window")))))
 
-
-  (cl-defmacro transient-quick-help (name buffer &key label body mode)
-    "Macro for creating callable functions that display help.
-  Where NAME is name of function, BUFFER is name of buffer, and TEXT is displayed."
+    Where NAME is name of function, BUFFER is name of buffer, and TEXT is displayed."
     (declare (indent defun))
     `(progn
        (transient-define-suffix ,name nil
 	 ,buffer
-	 ;; :if-non-nil ,mode
 	 :description ,label
 	 (interactive)
 	 (let ((qh-buff (concat "*Quick Help: " ,buffer "*"))
@@ -3895,22 +3755,24 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
 	     (not-modified)
 	     (read-only-mode)
 	     (special-mode)
-	     ;; (local-set-key (kbd "C-g") (lambda () (interactive) (other-window -1)))
 	     (local-set-key (kbd "q") 'kill-buffer-and-window))
 	   (pop-to-buffer qh-buff '((display-buffer-below-selected)
 				    (window-parameters . ((no-other-window . nil)))
 				    (window-height . fit-window-to-buffer)))
 	   (message "q - Remove Window")))))
+#+end_src
 
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  ;;
-  ;;; BEGIN Burning Wheel Gold Tables
-  ;;
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  (transient-quick-help jf/qh--bwg-wises
+/Note:/ It might make sense to extract the quick help to files, but for now
+this was the least effort.
+
+*** DONE Burning Wheel Gold
+
+The following “quick help” methods are tables that I commonly reference when playing Burning Wheel Gold.
+
+#+begin_src emacs-lisp
+  (jf/transient-quick-help jf/qh--bwg-wises
     "BWG Wises Obstacles (page 309)"
     :label "Wises"
-    :mode 'jnf-bwg-minor-mode
     :body
     (concat
      "Common knowledge ............. Ob 1\n"
@@ -3921,10 +3783,9 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
      "Bizarre or obscure ........... Ob 7\n"
      "Freaky details or specifics .. Ob 8"))
 
-  (transient-quick-help jf/qh--bwg-expertise-exponent
+  (jf/transient-quick-help jf/qh--bwg-expertise-exponent
     "BWG Expertise Exponent (page 12)"
     :label "Exponents"
-    :mode 'jnf-bwg-minor-mode
     :body
     (concat
      "Exp 1  is naturally disinclined, crippled, or utterly incompetent.\n"
@@ -3938,10 +3799,9 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
      "Exp 9  is uncanny; incomprehensibly good.\n"
      "Exp 10 is as near perfection as the system allows."))
 
-  (transient-quick-help jf/qh--bwg-absolute-difficulty
+  (jf/transient-quick-help jf/qh--bwg-absolute-difficulty
     "BWG Absolute Difficulty (page 15)"
     :label "Difficulty"
-    :mode 'jnf-bwg-minor-mode
     :body
     (concat
      "Ob 1  A simple act done with little thought.\n"
@@ -3955,10 +3815,9 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
      "Ob 9  An act deemed nearly impossible.\n"
      "Ob 10 A miracle."))
 
-  (transient-quick-help jf/qh--bwg-circles-obstacles
+  (jf/transient-quick-help jf/qh--bwg-circles-obstacles
     "BWG Circles Obstacles (page 380-381)"
     :label "Circles"
-    :mode 'jnf-bwg-minor-mode
     :body
     (concat
      "Occupation\n"
@@ -3982,10 +3841,9 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
      "  Unusual for this character .................... +1-2 Ob\n"
      "  Right here and now in the middle of trouble ... +3 Ob"))
 
-  (transient-quick-help jf/qh--bwg-steel-test-adjustments
+  (jf/transient-quick-help jf/qh--bwg-steel-test-adjustments
     "BWG Steel Test Adjustments (page 363)"
     :label "Steel"
-    :mode 'jnf-bwg-minor-mode
     :body
     (concat
      "Conditions for Steel Advantags\n"
@@ -4005,12 +3863,6 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
      "  Volcanic eruptions, cataclysm .............. +4 Ob\n"
      "  Seeing horrible magic at work .............. +4 Ob\n"
      "  Being in the presence of the supernatural .. +5 Ob\n"))
-
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  ;;
-  ;;; END Burning Wheel Gold Tables
-  ;;
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 #+end_src
 
 
@@ -4044,7 +3896,6 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
 - ~jf/scroll-up-half-page~ :: See https://www.reddit.com/r/emacs/comments/r7l3ar/how_do_you_scroll_half_a_page/
 
 #+begin_src emacs-lisp
-
   (global-set-key (kbd "M-p") 'jf/scroll-up-half-page)
   (defun jf/scroll-up-half-page ()
     "Scroll up half a page while keeping the cursor centered"
@@ -4102,6 +3953,125 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
        ((= prefix 4)  (org-insert-time-stamp nil t nil))
        ((= prefix 16) (org-insert-time-stamp (org-read-date nil t nil "Date") nil nil)))))
 #+end_src
+
+#+begin_src emacs-lisp
+  (global-set-key (kbd "C-w") 'jf/kill-region-or-backward-word)
+  (global-set-key (kbd "M-DEL") 'jf/kill-region-or-backward-word)
+  (global-set-key (kbd "<C-M-backspace>") 'backward-kill-paragraph)
+  (defun jf/kill-region-or-backward-word (&optional arg)
+    "Kill selected region otherwise kill backwards the ARG number of words."
+    (interactive "p")
+    (if (region-active-p)
+	(kill-region (region-beginning) (region-end))
+      (backward-kill-word arg)))
+
+  (global-set-key (kbd "C-k") 'jf/kill-line-or-region)
+  (defun jf/kill-line-or-region (&optional ARG)
+    "Kill the selected region otherwise kill the ARG number of lines."
+    (interactive "P")
+    (if (use-region-p)
+	(kill-region (region-beginning) (region-end))
+      (kill-line ARG)))
+
+  (global-set-key (kbd "C-c n") 'jf/nab-file-name-to-clipboard)
+  (defun jf/nab-file-name-to-clipboard ()
+    "Nab, I mean copy, the current buffer file name to the clipboard.
+
+    If you provide universal prefix (e.g. C-u), return the base
+    filename.  Otherwise, use the full filename path."
+    ;; https://blog.sumtypeofway.com/posts/emacs-config.html
+    (interactive)
+    (let* ((raw-filename
+	    (if (equal major-mode 'dired-mode) default-directory (buffer-file-name)))
+	   (filename
+	    (if (equal current-prefix-arg nil) raw-filename (file-name-nondirectory raw-filename))))
+      (when filename
+	(kill-new filename)
+	(message "Copied buffer file name '%s' to the clipboard." filename))))
+
+  (defun jf/sort-unique-lines (reverse beg end &optional adjacent keep-blanks interactive)
+    "Sort lines and delete duplicates.
+    By default the sort is lexigraphically ascending.  To sort as
+    descending set REVERSE to non-nil.  Specify BEG and END for the
+    bounds of sorting.  By default, this is the selected region.
+
+    I've included ADJACENT, KEEP-BLANKS, and INTERACTIVE so I can
+    echo the method signature of `'delete-duplicate-lines`"
+    ;; This is a common function that I've used in other text editors.
+    ;; It's a simple stitch together of sort-lines and
+    ;; delete-duplicate-lines.
+    (interactive "P\nr")
+    (sort-lines reverse beg end)
+    (delete-duplicate-lines beg end reverse adjacent keep-blanks interactive))
+
+  (global-set-key (kbd "s-q") 'save-buffers-kill-terminal)
+  (global-set-key (kbd "s-w") 'kill-current-buffer)
+
+  ;; Treat dashes and underscores as part of words for navigation
+  ;; (global-superword-mode t)
+
+  (global-set-key (kbd "C-s-\\") 'jf/display-buffer-in-side-window)
+  (cl-defun jf/display-buffer-in-side-window (&optional (buffer (current-buffer)))
+    "Display BUFFER in dedicated side window."
+    (interactive)
+    (let ((display-buffer-mark-dedicated t))
+      (display-buffer-in-side-window buffer
+				     '((side . right)
+				       (window-parameters
+					(no-delete-other-windows . t))))))
+
+  (global-set-key (kbd "C-s--") 'jf/display-buffer-in-bottom-window)
+  (cl-defun jf/display-buffer-in-bottom-window (&optional (buffer (current-buffer)))
+    "Display BUFFER in dedicated side window."
+    (interactive)
+    (let ((display-buffer-mark-dedicated t))
+      (display-buffer-in-side-window buffer
+				     '((side . bottom)
+				       (window-parameters
+					(no-delete-other-windows . t))))))
+
+  (global-set-key (kbd "C-x m") 'jf/move-file)
+  (defun jf/move-file (target-directory)
+    "Write this file to TARGET-DIRECTORY, and delete old one."
+    (interactive "DTarget Directory: ")
+    (let* ((source (expand-file-name (file-name-nondirectory (buffer-name)) default-directory))
+	   (target (f-join target-directory (file-name-nondirectory (buffer-name)))))
+      (save-buffer)
+      (rename-file source target)
+      (kill-current-buffer)))
+  (global-set-key (kbd "C-M-d") 'jf/duplicate-current-line-or-lines-of-region)
+  (global-set-key (kbd "C-c d") 'jf/duplicate-current-line-or-lines-of-region)
+  (defun jf/duplicate-current-line-or-lines-of-region (arg)
+    "Duplicate ARG times current line or the lines of the current region."
+    (interactive "p")
+    (if (use-region-p)
+	(progn
+	  (when (> (point) (mark))
+	    (exchange-point-and-mark))
+	  (beginning-of-line)
+	  (exchange-point-and-mark)
+	  (end-of-line)
+	  (goto-char (+ (point) 1))
+	  (exchange-point-and-mark)
+	  (let* ((end (mark))
+		 (beg (point))
+		 (region
+		  (buffer-substring-no-propertis beg end)))
+	    (dotimes (_i arg)
+	      (goto-char end)
+	      (insert region)
+	      (setq end (point)))))
+      (crux-duplicate-current-line-or-region arg)))
+
+  (global-set-key (kbd "<f12>") 'jf/create-org-scratch-buffer)
+  (cl-defun jf/create-org-scratch-buffer (&key (mode 'org-mode))
+    "Quickly open a scratch buffer and enable the given MODE."
+    (interactive)
+    (crux-create-scratch-buffer)
+    (rename-buffer (concat "*scratch* at " (format-time-string "%Y-%m-%d %H:%M")))
+    (funcall mode))
+#+end_src
+
 
 *** TODO Window Layout Functions
 
@@ -4214,7 +4184,7 @@ I’ve opted to take a different path; write some Emacs functions instead.
      :keys "r"
      ;; TODO: I would love to get tags working but I'm missing something
      :node (org-roam-node-create :title title)
-     :info (list :ref url)
+     :info '(:ref url :immediate-finish nil)
      :templates (jf/org-roam-templates-list :refs)))
 
   (cl-defun jf/menu-dwim--org-capture-elfeed-show (&key (entry elfeed-show-entry))
