@@ -114,7 +114,7 @@ inline documentation in most cases.
    kept-new-versions 20        ;; how many of the newest versions to keep
    kept-old-versions 5         ;; and how many of the old
    kill-ring-max 120           ;; Set a generous kill ring size.
-   read-process-output-max (* 1024 1024 3)  ;; Increase read size per process
+   read-process-output-max (* 6 512 1024)  ;; Increase read size per process
    recentf-max-menu-items 50
    recentf-max-saved-items 50
    ring-bell-function 'ignore  ;; Stop ringing any bell
@@ -164,9 +164,6 @@ inline documentation in most cases.
   ;; Far to easy to type this on accident, and I'm not a fan of it's behavior.
   (unbind-key "C-z") ;; `suspend-frame'
 
-  ;; Given that C-c C-x is common within org-mode, I found myself
-  ;; accidentally invoking this transposition.  I have "s-q" command for
-  ;; this.
   (unbind-key "C-x C-c") ;; was `save-buffers-kill-terminal'
 #+end_src
 
@@ -1336,7 +1333,7 @@ package.
     ;; The :init configuration is always executed (Not lazy)
     :init
 
-    ;; Optionally configure the register formatting. This improves the register
+    ;; Optionally configure the register formatting.  This improves the register
     ;; preview for `consult-register', `consult-register-load',
     ;; `consult-register-store' and the Emacs built-ins.
     (setq register-preview-delay 0.1
@@ -1426,22 +1423,34 @@ Write about the narrowing functions, as these help create both broad and narrow 
 #+begin_src emacs-lisp
   (use-package consult-dir
     :straight t
+    :after (consult)
     :bind (("C-x C-d" . consult-dir)
 	   :map minibuffer-local-completion-map
 	   ("C-x C-d" . consult-dir)
 	   ("C-x C-j" . consult-dir-jump-file)))
 #+end_src
-** WAITING consult-flycheck.el
+*** DONE consult-projectile.el
 
-Do I even use this?
+- ~consult-projectile.el~ :: package provides a function I use everyday: ~M-x
+  consult-projectile~.  When I invoke ~consult-projectile~, I have the file
+  completion for the current project.  I can also type =b= + =SPACE= to narrow
+  my initial search to open buffers in the project.  Or =p= + =space= to narrow
+  to other projects; and then select a file within that project.
 
 #+begin_src emacs-lisp
-  ;; Optionally add the `consult-flycheck' command.
-  (use-package consult-flycheck
-    :straight t
-    :bind (:map flycheck-command-map
-		("!" . consult-flycheck)))
+  (use-package consult-projectile
+    :after consult
+    :straight (consult-projectile
+	       :type git
+	       :host gitlab
+	       :repo "OlMon/consult-projectile"
+	       :branch "master")
+    :bind ("s-t" . consult-projectile))
 #+end_src
+
+/Note:/ The =CMD= + =t= (e.g. ~s-t~ in Emacs) is a carryover from my [[https://macromates.com][Textmate]]
+and [[https://www.sublimetext.com/][Sublime Text]] days.  More than any other key combination, that one is
+entirely muscle memory.
 
 ** DONE embark.el
 
@@ -1451,7 +1460,7 @@ Do I even use this?
 
   When I call ~embark-act~ (via ~C-.~) Embark gives me buffer listing the actions I can take on the target.  A contextual menu if you will.
 
-  I can also gather up a group of targets (via ~embark-export~) and then take actions on them.  I write more about this in ~wgrep.el~.
+  I can also gather a group of targets (via ~embark-export~) and then take actions on them.  I write more about this in ~wgrep.el~.
 
   There’s also the ~embark-dwim~ (I map that to ~M-.~).  Given a target, say the place at point, when I call ~embark-dwim~ it takes an applicable action.  For a URL, it will open that URL in the configured browser.
 
@@ -1505,11 +1514,11 @@ Do I even use this?
   search results buffer and propogate the changes to the locations of the
   elements that matched the search.
 
-1. Call ~consult-ripgrep~ (via ~C-c f~) to search for something.
-2. Call ~embark-export~ (via ~C-s-e~) to export to a grep buffer.
-3. Call ~wgrep-change-to-wgrep-mode~ (via ~e~ or ~C-c C-p~)
-4. Edit the grep buffer as you would anywhere else.
-5. Save (via ~C-x C-s~) or Cancel (via ~C-c C-k~).
+1.  Call ~consult-ripgrep~ (via ~C-c f~) to search for something.
+2.  Call ~embark-export~ (via ~C-s-e~) to export to a grep buffer.
+3.  Call ~wgrep-change-to-wgrep-mode~ (via ~e~ or ~C-c C-p~)
+4.  Edit the grep buffer as you would anywhere else.
+5.  Save (via ~C-x C-s~) or Cancel (via ~C-c C-k~).
 
    I use this sequence at least once a day.
 
@@ -1606,29 +1615,6 @@ More on these component matchings styles is available at [[https://github.com/mi
 	  orderless-component-separator #'orderless-escapable-split-on-space ;; allow escaping space with backslash!
 	  orderless-style-dispatchers '(+orderless-dispatch)))
 #+end_src
-
-** DONE consult-projectile.el
-
-The ~consult-projectile.el~ package provides a function I use everyday: ~M-x
-consult-projectile~.  When I invoke ~consult-projectile~, I have the file
-completion for the current project.  I can also type =b= + =SPACE= to narrow my
-initial search to open buffers in the project.  Or =p= + =space= to narrow to
-other projects; and then select a file within that project.
-
-
-#+begin_src emacs-lisp
-  (use-package consult-projectile
-    :straight (consult-projectile
-	       :type git
-	       :host gitlab
-	       :repo "OlMon/consult-projectile"
-	       :branch "master")
-    :bind ("s-t" . consult-projectile))
-#+end_src
-
-/Note:/ The =CMD= + =t= (e.g. ~s-t~ in Emacs) is a carryover from my [[https://macromates.com][Textmate]]
-and [[https://www.sublimetext.com/][Sublime Text]] days.  More than any other key combination, that one is
-entirely muscle memory.
 
 ** DONE corfu.el
 
@@ -1747,7 +1733,7 @@ quasi-opinionated compromise.
 
 ** DONE avy.el
 
-- ~avy.el~ :: That letter is the beginning of a word. Narrow results from there.
+- ~avy.el~ :: That letter is the beginning of a word.  Narrow results from there.
 
 #+begin_src emacs-lisp
   (use-package avy
@@ -1756,10 +1742,12 @@ quasi-opinionated compromise.
     :straight t)
 #+end_src
 
-** TODO math-at-point.el
+** DONE math-at-point.el
+
+- ~math-at-point.el~ :: Calculate math functions at point and message result in
+  minibuffer.  See https://github.com/shankar2k/math-at-point.
 
 #+begin_src emacs-lisp
-  ;; https://github.com/shankar2k/math-at-point
   (use-package math-at-point
     :straight (math-at-point :type git :host github :repo "shankar2k/math-at-point")
     :bind ("C-c =" . math-at-point))
@@ -1828,7 +1816,7 @@ quasi-opinionated compromise.
 ** DONE expand-region.el
 
 - ~expand-region.el~ :: a simple package that does two related things really
-  well; expands and contracts the current region.  I use this all of the time.
+  well; expands and contracts the current region.  I use this all the time.
 
   In writing, with the cursor at point, when I expand it selects the word.  The
   next expand the sentence, then paragraph, then page.  In programming it
@@ -1866,14 +1854,11 @@ quasi-opinionated compromise.
   (use-package iedit :straight t)
 #+end_src
 
-** TODO crux.el
+** DONE crux.el
 
-- ~crux.el~ :: A mix of a few odd methods.
+- ~crux.el~ :: A mix of a few odd and useful functions.
 
 #+begin_src emacs-lisp
-
-  ;; C-a goes to the first non-whitepsace character on the line. Type it
-  ;; again, and go to the beginning of the line.
   (use-package crux
     :straight t
     :bind (("C-a" . crux-move-beginning-of-line)
@@ -1883,13 +1868,12 @@ quasi-opinionated compromise.
 	   ("<f9>" . crux-kill-other-buffers)))
 #+end_src
 
+** DONE ethan-wspace.el
 
-
-** TODO ethan-wspace.el
+- ~ethan-wspace-mode.el~ :: Whitespace hygene package.  The author's
+  documentation and commentary echoes my sentiments.
 
 #+begin_src emacs-lisp
-  ;; Whitespace hygene package.  The author's documentation and
-  ;; commentary echoes my sentiments
   (use-package ethan-wspace
     :straight t
     :hook (before-save . delete-trailing-whitespace)
@@ -1897,56 +1881,59 @@ quasi-opinionated compromise.
     :config (global-ethan-wspace-mode 1))
 #+end_src
 
-** TODO unfill.el
+** DONE unfill.el
+
+- ~unfill.el~ :: Provides the reverse of ~fill-paragraph~, and a toggle fill and unfill.
 
 #+begin_src emacs-lisp
-  ;; A package that is a bit of the inverse of 'fill-paragraph
-  ;; (e.g. M-q).
   (use-package unfill
     :bind ("M-q" . unfill-toggle)
     :straight t)
 #+end_src
 
-** TODO undo-tree.el
+** DONE undo-tree.el
+
+- ~undo-tree.el~ :: Provides a UI for undo trees.  I'm not certain what I want
+  to do with this.
 
 #+begin_src emacs-lisp
-  ;; Provides a UI for undo trees.  I'm not certain what I want to do
-  ;; with this.
   (use-package undo-tree
     :diminish
     :bind (("C-z" . undo)
-	   ("C-S-z" . undo-tree-redo))
+	   ("C-s-z" . undo-tree-redo))
     :config
     (global-undo-tree-mode +1)
     (unbind-key "M-_" undo-tree-map))
 
 #+end_src
 
-** TODO hungry-delete.el
+** DONE hungry-delete.el
+
+- ~hungry-delete.el~ :: Delete multiple spaces in one delete stroke.
 
 #+begin_src emacs-lisp
-  ;; Delete multiple spaces in one delete stroke
   (use-package hungry-delete
     :straight t
     :diminish 'hungry-delete-mode
     :config (global-hungry-delete-mode))
-
 #+end_src
 
-** TODO move-text.el
+** DONE move-text.el
+
+- ~move-text.el~ :: A simple package ability to move lines up and down.
 
 #+begin_src emacs-lisp
-  ;; Adding ability to move lines up and down
   (use-package move-text
     :straight t
     :bind (([C-s-down] . move-text-down)
 	   ([C-s-up] . move-text-up)))
 #+end_src
 
-** TODO rainbow-delimiters.el
+** DONE rainbow-delimiters.el
+
+- ~rainbow-delimiters.el~ :: A quick and useful visual queue for paranthesis.
 
 #+begin_src emacs-lisp
-  ;; A quick and useful visual queue for paranthesis
   (use-package rainbow-delimiters
     :straight t
     :hook ((fundamental-mode) . rainbow-delimiters-mode))
@@ -1983,20 +1970,24 @@ quasi-opinionated compromise.
     :config (unicode-fonts-setup))
 #+end_src
 
-** TODO yasnippet.el
+** DONE yasnippet.el
+
+- ~yasnippet.el~ :: A rather convenient snippet manager.  When you create a
+  snippet, it understands the mode you're in and puts the snippet in the right
+  place.
 
 #+begin_src emacs-lisp
-  ;; A rather convenient snippet manager.  When you create a snippet, it
-  ;; understands the mode you're in and puts the snippet in the right
-  ;; place.
   (use-package yasnippet
     :straight t
     :diminish yas-mode
-    :init (setq yas-snippet-dirs '("~/git/dotemacs/snippets"))
+    :init
+    (setq yas-snippet-dirs '("~/git/dotemacs/snippets"))
     (yas-global-mode 1))
 #+end_src
 
-** TODO consult-yasnippet.el
+** DONE consult-yasnippet.el
+
+- ~consult-yasnippet.el~ :: A bit of integration with ~consult.el~ and ~yasnippet.el~.
 
 #+begin_src emacs-lisp
   (use-package consult-yasnippet
@@ -2019,9 +2010,9 @@ quasi-opinionated compromise.
     (defun tempel-setup-capf ()
       ;; Add the Tempel Capf to `completion-at-point-functions'.
       ;; The depth is set to -1, such that `tempel-expand' is tried *before* the
-      ;; programming mode Capf. If a template name can be completed it takes
+      ;; programming mode Capf.  If a template name can be completed it takes
       ;; precedence over the programming mode completion. `tempel-expand' only
-      ;; triggers on exact matches. Alternatively use `tempel-complete' if you
+      ;; triggers on exact matches.  Alternatively use `tempel-complete' if you
       ;; want to see all matches, but then Tempel will probably trigger too
       ;; often when you don't expect it.
       (add-hook 'completion-at-point-functions #'tempel-expand -1 'local))
@@ -2638,109 +2629,43 @@ establish the current context (or clear it).
 	(message "%s => %s" expression result)))
     :straight (org-d20 :host github :repo "spwhitton/org-d20"))
 #+end_src
-* TODO Spelling
+* DONE Spelling
 
-This package provides configuration for spell checking.  It
-assumes the use of ivy; See the flyspell-correct-ivy package.
+** DONE flycheck.el
 
-By default, I don't render hints for spell checking nor grammar
-checking.  Instead I rely on two checks:
-
-1. flyspell-buffer (via kbd "C-,")
-2. writegood-mode (via kbd "C-c w")
-
-Once I've called flyspell-buffer, I can then navigate through
-identified issues and address them via flyspell-popup-correct (via
-kbd "C-").
-
-** TODO flycheck.el
+- ~flycheck.el~ :: a syntax checkling package.  Paired with [[http://proselint.com][proselint]], I can check grammar and other things.  See http://flycheck.org
 
 #+begin_src emacs-lisp
   (use-package flycheck
-    :straight t
-    :hook
-    (org-src-mode . disable-flycheck-for-elisp)
-    (after-init-hook . global-flycheck-mode)
-    :custom
-    (flycheck-display-errors-delay 0.1)
-    (flycheck-emacs-lisp-initialize-packages t)
+    :hook ((text-mode . flycheck-mode)
+	   (gfm-mode . flycheck-mode)
+	   (org-mode .  flycheck-mode)
+	   (markdown-mode .  flycheck-mode))
     :config
-    (flycheck-set-indication-mode 'left-margin)
-
-    (defun disable-flycheck-for-elisp ()
-      (setq-local flycheck-disabled-checkers '(emacs-lisp-checkdoc)))
-
-    (add-to-list 'flycheck-checkers 'proselint))
-  ;; (add-hook 'after-init-hook #'global-flycheck-mode)
+    (add-to-list 'flycheck-checkers 'proselint)
+    (flycheck-define-checker proselint
+      "A linter for prose."
+      :command ("proselint" source-inplace)
+      :error-patterns
+      ((warning line-start (file-name) ":" line ":" column ": "
+		(id (one-or-more (not (any " "))))
+		(message (one-or-more not-newline)
+			 (zero-or-more "\n" (any " ") (one-or-more not-newline)))
+		line-end))
+      :modes (text-mode markdown-mode gfm-mode org-mode)))
 #+end_src
 
-** TODO flyspell-correct
+** DONE consult-flycheck.el
+
+- ~consult-flycheck.el~ :: Creates a minibuffer listing the flycheck errors and enables previews.  Quick nice for navigating the prose violations.
 
 #+begin_src emacs-lisp
-  (use-package flyspell-correct
-    :straight t)
-
-  (eval-when-compile (require 'cl-lib))
-
-  (defun append-aspell-word (new-word)
-    "Append the given NEW-WORD to the current dictionary, and reload the dictionary."
-    (let ((header "personal_ws-1.1")
-	  (file-name (substitute-in-file-name "$HOME/.aspell.en.pws"))
-	  (read-words (lambda (file-name)
-			(let ((all-lines (with-temp-buffer
-					   (insert-file-contents file-name)
-					   (split-string (buffer-string) "\n" t))))
-			  (if (null all-lines)
-			      ""
-			    (split-string (mapconcat 'identity (cdr all-lines) "\n")
-					  nil
-					  t))))))
-      (when (file-readable-p file-name)
-	(let* ((cur-words (eval (list read-words file-name)))
-	       (all-words (delq header (cons new-word cur-words)))
-	       (words (delq nil (remove-duplicates all-words :test 'string=))))
-	  (with-temp-file file-name
-	    (insert (concat header
-			    " en "
-			    (number-to-string (length words))
-			    "\n"
-			    (mapconcat 'identity (sort words #'string<) "\n"))))))
-      (unless (file-readable-p file-name)
-	(with-temp-file file-name
-	  (insert (concat header " en 1\n" new-word "\n")))))
-    (ispell-kill-ispell t) ; restart ispell
-    (flyspell-mode))
-
-  (defun append-current-word-to-aspell-dictionary ()
-    "Add current word to aspell dictionary."
-    (interactive)
-    (append-aspell-word (thing-at-point 'word)))
-
-  (setq ispell-program-name "aspell"
-	;; force the English dictionary, support Camel Case spelling check (tested with aspell 0.6)
-	ispell-extra-args '("--sug-mode=ultra" "--lang=en_US" "--run-together"))
-#+end_src
-
-** TODO flyspell-popup.el
-
-#+begin_src emacs-lisp
-  ;; Run flyspell-buffer
-  (use-package flyspell-popup
+  (use-package consult-flycheck
+    :after (consult flycheck)
     :straight t
-    :hook (flyspell-mode . flyspell-popup-auto-correct-mode))
+    :bind (:map flycheck-command-map
+		("!" . consult-flycheck)))
 #+end_src
-
-** TODO writegood-mode.el
-
-#+begin_src emacs-lisp
-  ;; For grammar nerd
-  (use-package writegood-mode
-    :straight t
-    :bind ("C-c w" . writegood-mode)
-    :config
-    (add-to-list 'writegood-weasel-words "actionable"))
-#+end_src
-
 * TODO Typography
 
 #+begin_src emacs-lisp
@@ -2930,9 +2855,11 @@ kbd "C-").
   (use-package elpher :straight t)
 #+end_src
 
-** TODO elfeed.el
+** DONE elfeed.el
 
-This package includes the configuration for elfeed, an Emacs RSS reader.
+- ~elfeed.el~ :: An Emacs RSS reader.  I’ve used Google Reader, Feedly,
+  Inoreader, and Newsboat.  I wrote about [[https://takeonrules.com/2020/04/12/switching-from-inoreader-to-newsboat-for-rss-reader/][Switching from Inoreader to Newsboat
+  for RSS Reader]], and the principles apply for Elfeed.
 
 #+begin_src emacs-lisp
   (use-package elfeed
@@ -2940,29 +2867,9 @@ This package includes the configuration for elfeed, an Emacs RSS reader.
     :after org
     :config
     (setq-default elfeed-search-filter "@2-days-ago +unread ")
-    (defun jnf/amplify-elfeed ()
-      "Amplify the current `elfeed-show-entry'"
-      (interactive)
-      (let* ((citeURL (elfeed-entry-link elfeed-show-entry))
-	     (citeTitle (elfeed-entry-title elfeed-show-entry))
-	     ;; Grab the author from the elfeed metadata.  Making the
-	     ;; assumption that there's only one.
-	     (citeAuthor
-	      (plist-get
-	       (car (plist-get
-		     (elfeed-entry-meta elfeed-show-entry)
-		     :authors))
-	       :name)))
-	(jnf/tor-post-amplifying-the-blogosphere citeTitle
-						 :citeTitle citeTitle
-						 :citeURL citeURL
-						 :citeAuthor citeAuthor)))
     :bind (
 	   (:map elfeed-search-mode-map
-		 ("q" . jnf/elfeed-save-db-and-bury))
-	   (:map elfeed-show-mode-map
-		 ("<f7>" . jnf/amplify-elfeed)
-		 ("s-7" . jnf/amplify-elfeed))))
+		 ("q" . jnf/elfeed-save-db-and-bury))))
 
   ;;write to disk when quiting
   (defun jnf/elfeed-save-db-and-bury ()
@@ -2980,48 +2887,7 @@ This package includes the configuration for elfeed, an Emacs RSS reader.
     (elfeed-search-update--force))
   (defalias 'rss 'jnf/elfeed-load-db-and-open)
 
-  ;; https://github.com/alphapapa/unpackaged.el#feed-for-url
-  ;;;###autoload
-  (cl-defun unpackaged/feed-for-url (url &key (prefer 'atom) (all nil))
-    "Return feed URL for web page at URL.
-  Interactively, insert the URL at point.  PREFER may be
-  `atom' (the default) or `rss'.  When ALL is non-nil, return all
-  feed URLs of all types; otherwise, return only one feed URL,
-  preferring the preferred type."
-    (interactive (list (org-web-tools--get-first-url)))
-    (require 'esxml-query)
-    (require 'org-web-tools)
-    (cl-flet ((feed-p (type)
-		      ;; Return t if TYPE appears to be an RSS/ATOM feed
-		      (string-match-p (rx "application/" (or "rss" "atom") "+xml")
-				      type)))
-      (let* ((preferred-type (format "application/%s+xml" (symbol-name prefer)))
-	     (html (org-web-tools--get-url url))
-	     (dom (with-temp-buffer
-		    (insert html)
-		    (libxml-parse-html-region (point-min) (point-max))))
-	     (potential-feeds (esxml-query-all "link[rel=alternate]" dom))
-	     (return (if all
-			 ;; Return all URLs
-			 (cl-loop for (_tag attrs) in potential-feeds
-				  when (feed-p (alist-get 'type attrs))
-				  collect (url-expand-file-name (alist-get 'href attrs) url))
-		       (or
-			;; Return the first URL of preferred type
-			(cl-loop for (_tag attrs) in potential-feeds
-				 when (equal preferred-type (alist-get 'type attrs))
-				 return (url-expand-file-name (alist-get 'href attrs) url))
-			;; Return the first URL of non-preferred type
-			(cl-loop for (_tag attrs) in potential-feeds
-				 when (feed-p (alist-get 'type attrs))
-				 return (url-expand-file-name (alist-get 'href attrs) url))))))
-	(if (called-interactively-p 'interactive)
-	    (insert (if (listp return)
-			(s-join " " return)
-		      return))
-	  return))))
-
-  ;; From https://karthinks.com/blog/lazy-elfeed/
+    ;; From https://karthinks.com/blog/lazy-elfeed/
   (defun elfeed-search-show-entry-pre (&optional lines)
     "Returns a function to scroll forward or back in the Elfeed
     search results, displaying entries without switching to them."
@@ -3041,20 +2907,13 @@ This package includes the configuration for elfeed, an Emacs RSS reader.
   ;; End https://karthinks.com/blog/lazy-elfeed/
 #+end_src
 
-** TODO eww.el
+** DONE eww.el
 
+- ~eww.el~ :: a plain text browser.  Use this to see just how bad much of the web a
 #+begin_src emacs-lisp
   (use-package eww
     :straight t
     :config
-    (defun jnf/amplify-eww ()
-      "Amplify the current `eww-data'"
-      (interactive)
-      (let* ((citeURL (plist-get eww-data :url))
-	     (citeTitle (plist-get eww-data :title)))
-	(tor-post-amplifying-the-blogosphere citeTitle
-					     :citeTitle citeTitle
-					     :citeURL citeURL)))
     (defun shr-tag-dfn (dom)
       (shr-fontize-dom dom 'italic))
 
@@ -3132,6 +2991,9 @@ This package includes the configuration for elfeed, an Emacs RSS reader.
 #+end_src
 
 ** TODO elfeed-org.el
+
+- ~elfeed-org.el~ :: a package for maintaining and organizating my RSS
+  subscriptions in ~org-mode~ format.
 
 #+begin_src emacs-lisp
   (use-package elfeed-org
@@ -3856,7 +3718,7 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
   - Otherwise prompt for a URL.
 
   If the URL an empty string, then wrap the current region or point
-  in a CITE tag. Else, if we have a non-0 length URL, wrap it in
+  in a CITE tag.  Else, if we have a non-0 length URL, wrap it in
   CITE and A tag."
     (interactive (list (jnf/tor-prompt-or-kill-ring-for-url)))
 
@@ -3900,7 +3762,7 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
 
     ;; The text before the first HTML/Markdown
     ;; comments is the commit message.  Cut that
-    ;; text...
+    ;; text…
     (search-forward "<!--")
     (kill-region 1 (- (point) 4))
 
@@ -4352,7 +4214,7 @@ I’ve opted to take a different path; write some Emacs functions instead.
     (interactive)
     (let ((url (elfeed-entry-link entry))
 	  (title (elfeed-entry-title entry)))
-      (jnf/org-roam-capture-ref :ref ref :title title)))
+      (jnf/org-roam-capture-ref :url url :title title)))
 
   (defun jnf/menu-dwim--org-capture-firefox ()
     "Create an `org-roam-node' from Firefox page.
@@ -4372,6 +4234,13 @@ I’ve opted to take a different path; write some Emacs functions instead.
     (let* ((link-title-pair (grab-mac-link-safari-1))
 	   (url (car link-title-pair))
 	   (title (cadr link-title-pair)))
+      (jnf/org-roam-capture-ref :url url :title title)))
+
+  (defun jnf/menu-dwim--org-capture-eww ()
+    "Create an `org-roam-node' from `eww' data"
+    (interactive)
+    (let* ((url (plist-get eww-data :url))
+	   (title (plist-get eww-data :title)))
       (jnf/org-roam-capture-ref :url url :title title)))
 #+end_src
 
@@ -4508,11 +4377,13 @@ I’ve opted to take a different path; write some Emacs functions instead.
       ("g e" "Elfeed" jnf/menu-dwim--org-capture-elfeed-show :if-derived elfeed-show-mode)
       ("g f" "Firefox" jnf/menu-dwim--org-capture-firefox)
       ("g s" "Safari" jnf/menu-dwim--org-capture-safari)
+      ("g w" "Eww" jnf/menu-dwim--org-capture-eww :if-derived eww-mode)
       ;; ("g u" "URL")
       ]
      ["Jump to"
       ;; ("j a" "Agenda" ibuffer)
       ("j b" "Buffer" ibuffer)
+      ("j f" "Flycheck" consult-flycheck :if-derived (or markdown-mode org-mode))
       ("j g" "Global Mark" consult-global-mark)
       ("j m" "Mark" consult-mark)
       ]
