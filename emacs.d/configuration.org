@@ -1130,7 +1130,7 @@ That’s one of those hot-keys almost burned into soul.
     (blamer-min-offset 40)
     (blamer-max-commit-message-length 20))
 #+end_src
-* TODO Completion
+* DONE Completion
 
 ** DONE vertico.el
 
@@ -1249,7 +1249,7 @@ annotations.
 This ensures that it is enabled right away.  It also forces the loading of the
 package.
 
-** TODO consult.el
+** DONE consult.el
 
 - ~consult.el~ :: “Consult provides practical commands based on the Emacs
   completion function [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Minibuffer-Completion.html][completing-read]].”  I had previously used [[https://github.com/abo-abo/swiper][Ivy, Counsel,
@@ -1392,16 +1392,6 @@ There’s a macro in here somewhere.
 	      :around #'jf/consult-second-param-is-initial-text
 	      '((name . "wrapper")))
 #+end_src
-
-*** TODO Narrowing Functions
-
-Write about the narrowing functions, as these help create both broad and narrow use functions.
-
-*** TODO consult-org.el
-
-- [ ] In org-mode map ~s-2~ to ~consult-org-menu~ instead of ~consult-imenu~.
-- [ ] Consider leveraging ~consult-org-agenda~
-
 *** DONE consult-dir.el
 
 - ~consult-dir.el~ :: This package helps ease traveling across directories by
@@ -2842,7 +2832,6 @@ establish the current context (or clear it).
     :hook ((eww-mode . jf/reader-visual)))
 #+end_src
 
-
 ** DONE elfeed-org.el
 
 - ~elfeed-org.el~ :: a package for maintaining and organizating my RSS
@@ -4100,7 +4089,6 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
   ;; END frame and window quick setup
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 #+end_src
-
 
 * TODO Menus
 
