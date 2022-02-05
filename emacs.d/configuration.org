@@ -2184,28 +2184,33 @@ quasi-opinionated compromise.
 #+end_src
 
 * TODO Org Mode
-
 ** TODO org-mode.el
 
-#+begin_src emacs-lisp
-  ;; Consider https://github.com/jkitchin/org-ref as well
+Oh ~org-mode~, one of the “why you should use Emacs” packages.  It’s a set of
+organizational tools that allow for progressive adoption.  You can start
+writing in ~org-mode~ syntax and leave it at that.  From there you can delve
+further into the ~org-mode~ ecosystem.
 
-  (cl-defun jnf/org-agenda-files (&key paths basenames)
+A bit of pre-amble.  I maintain a list of data directories, each might have
+“relevant to org-mode” files.  The ~jnf/org-agenda-files~ reads the file
+system to gather sources for ~org-mode~ agenda.
+
+#+begin_src emacs-lisp
+  (cl-defun jnf/org-agenda-files (&key
+				  (paths jnf/data-directories)
+				  (basenames '("agenda.org")))
     "Return the list of filenames where BASENAMES exists in PATHS."
+    ;; I want to include my configuration file in my agenda querying.
     (setq returning-list '("~/git/dotemacs/emacs.d/configuration.org"))
     (dolist (path paths)
       (dolist (basename basenames)
-	(if (f-exists-p (f-join path basename))
+	(when (f-exists-p (f-join path basename))
 	    (add-to-list 'returning-list (f-join path basename)))))
     returning-list)
+#+end_src
 
+#+begin_src emacs-lisp
   (use-package org
-    ;; :straight t
-    ;; :straight (org
-    ;;            :type git
-    ;;            :url "https://git.savannah.gnu.org/git/emacs/org-mode.git"
-    ;;            :commit "73875939a8b5545ac53a86ec467239f510d14de8" ;; 9.5 stable
-    ;;            )
     :straight (org :type built-in)
     :hook (org-mode . turn-on-visual-line-mode)
     :config (setq
@@ -2249,26 +2254,17 @@ quasi-opinionated compromise.
 	      (t
 	       (call-interactively 'org-insert-link)))))
 
-    (defun org-files-names-in-project-list ()
-      "Return a list of filenames in the current files directory."
-      (split-string-and-unquote
-       (shell-command-to-string
-	(concat
-	 "ls " (file-name-directory buffer-file-name)))))
-
-
     (org-babel-do-load-languages 'org-babel-load-languages
 				 (append org-babel-load-languages
 					 '((emacs-lisp . t)
 					   (plantuml . t)
 					   (ruby . t))))
-    ;; Make TAB act as if it were issued from the buffer of the languages's major mode.
+    ;; Make TAB act as if it were issued from the buffer of the languages's major
+    ;; mode.
     :custom (org-src-tab-acts-natively t)
-    :bind (
-	   :map org-mode-map
+    :bind (:map org-mode-map
 	   ("C-c l i". jnf/org-insert-link-dwim))
-    :bind (
-	   ("C-c l s" . org-store-link)
+    :bind (("C-c l s" . org-store-link)
 	   ("C-c a" . org-agenda)
 	   ("C-c c" . org-capture)
 	   ("C-s-t" . org-toggle-link-display)))
@@ -2295,20 +2291,19 @@ quasi-opinionated compromise.
   ;; implementation of org-babel.
   (setq org-plantuml-jar-path (concat (string-trim (shell-command-to-string "brew-path plantuml")) "/libexec/plantuml.jar"))
 #+end_src
-** TODO functions
+*** DONE Copy Org and Paste in Rich Text Format
+
+Org Mode has built-in capabilities for exporting to HTML (and other languages).
+The following function does just a bit more.  It converts the org region to
+HTML and sends it to the clipboard as an RTF datatype.
+
+Why is that nice?  As an RTF datatype, the paste receiver better handles the
+HTML (e.g., I can more readily paste into an Email and it pastes as expected).
+
+See [[https://kitchingroup.cheme.cmu.edu/blog/2016/06/16/Copy-formatted-org-mode-text-from-Emacs-to-other-applications/][Copy formatted org-mode text from Emacs to other applications]] for more details.
 
 #+begin_src emacs-lisp
-  ;; ;; Insert immediate timestamp at point.
-  (defun jnf/org-insert-immediate-active-timestamp ()
-    "Insert an active date for today.  If given the universal arg (e.g., C-u) insert a timestamp instead."
-    (interactive)
-    (if (equal current-prefix-arg nil) ; no C-u
-	(org-insert-time-stamp nil nil nil)
-      (org-insert-time-stamp nil t nil)))
-
-  (global-set-key (kbd "s-5") 'jnf/org-insert-immediate-active-timestamp)
-
-  ;; ;; https://kitchingroup.cheme.cmu.edu/blog/2016/06/16/Copy-formatted-org-mode-text-from-Emacs-to-other-applications/
+  (global-set-key (kbd "C-M-s-c") 'jnf/formatted-copy-org-to-html)
   (defun jnf/formatted-copy-org-to-html ()
     "Export region to HTML, and copy it to the clipboard."
     (interactive)
@@ -2321,51 +2316,35 @@ quasi-opinionated compromise.
 	   (point-max)
 	   "textutil -stdin -format html -convert rtf -stdout | pbcopy"))
 	(kill-buffer buf))))
-  (global-set-key (kbd "C-M-s-c") 'jnf/formatted-copy-org-to-html)
-
-  (eval-after-load 'ox '(require 'ox-koma-letter))
-
-  (eval-after-load 'ox-koma-letter
-    '(progn
-       (add-to-list 'org-latex-classes
-		    '("jnf-letter"
-		      "\\documentclass\{scrlttr2\}
-       \\usepackage[english]{babel}
-       \\setkomavar{frombank}{(1234)\\,567\\,890}
-       \[DEFAULT-PACKAGES]
-       \[PACKAGES]
-       \[EXTRA]"))
-
-       (setq org-koma-letter-default-class "jnf-letter")))
 #+end_src
 
+*** DONE Swapping Tilde and Backtick in Org and More
+
+I jump between Markdown and Org Mode with some frequency.  In many cases I
+prefer Org Mode.  Except when it comes to code declaration.  The tilde (e.g.,
+=~=) is cumbersome compared to the backtick (e.g., =`=).
+
+What follows came from [[http://mbork.pl/2022-01-17_Making_code_snippets_in_Org-mode_easier_to_type][Marcin Borkowski: 2022-01-17 Making code snippets in
+Org-mode easier to type]].
+
+Now when I type =~~~=, I get a source block.  And I can even default that block
+to a specific language (via ~org-insert-tilde-language~).
+
 #+begin_src emacs-lisp
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  ;;
-  ;;; BEGIN Hacks for ORG to type a bit more like markdown
-  ;;
-  ;; See http://mbork.pl/2022-01-17_Making_code_snippets_in_Org-mode_easier_to_type
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  (define-key org-mode-map (kbd "~") #'org-insert-backtick)
   (defun org-insert-backtick ()
     "Insert a backtick using `org-self-insert-command'."
     (interactive)
     (setq last-command-event ?`)
     (call-interactively #'org-self-insert-command))
 
-  (defun org-insert-tilde ()
-    "Insert a tilde using `org-self-insert-command'."
-    (interactive)
-    (setq last-command-event ?~)
-    (call-interactively #'org-self-insert-command))
-
-  (define-key org-mode-map (kbd "`") #'org-insert-tilde)
-  (define-key org-mode-map (kbd "~") #'org-insert-backtick)
   (defvar-local org-insert-tilde-language nil
     "Default language name in the current Org file.
   If nil, `org-insert-tilde' after 2 tildes inserts an \"example\"
   block.  If a string, it inserts a \"src\" block with the given
   language name.")
 
+  (define-key org-mode-map (kbd "`") #'org-insert-tilde)
   (defun org-insert-tilde ()
     "Insert a tilde using `org-self-insert-command'."
     (interactive)
@@ -2382,21 +2361,19 @@ quasi-opinionated compromise.
 		 (org-edit-special)))
       (setq last-command-event ?~)
       (call-interactively #'org-self-insert-command)))
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  ;;
-  ;;; END Hacks for ORG to type a bit more like markdown
-  ;;
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 #+end_src
 
+** DONE org-menu.el
+
+- ~org-menu.el~ :: Context dependent menu for org-mode; leverages ~transient.el~.
+
 #+begin_src emacs-lisp
-  ;; Context dependent menu for org-mode.
   (use-package org-menu
     :straight (org-menu :host github :repo "sheijk/org-menu")
     :bind (:map org-mode-map ("C-c m" . 'org-menu)))
 #+end_src
 
-** TODO org-roam.el
+** DONE org-roam.el
 
 This is my third iteration on an ~org-roam~.  It's goal is to address use-cases
 that I've encountered while moving more of my note-taking with ~org-roam~.
@@ -2413,12 +2390,14 @@ community in which I participated).  Those notes might overlap but rarely did.
 Another use case is less refined, namely I'm writing but am not "in" a specific
 context.
 
-However, v2 of my org-roam structure, didn't quite get out of the way.  I never
-quite got to the speed of note taking that I had for the original Thel Sector
-campaign.
-
+However, v2 of my org-roam structure[fn:v2-org-roam], didn't quite get out of
+the way.  I never quite got to the speed of note taking that I had for the
+original Thel Sector campaign.
+s
 What follows builds on Jethro Kuan's [[https://jethrokuan.github.io/org-roam-guide/][How I Take Notes with Org-roam]].  Reading
 Jethro Kuan's post helped me see how I could do this.
+
+*** Org Roam Supporting Functions
 
 The ~jnf/org-context-plist~ defines and names some of the contexts in which I
 might be writing.  Each named context defines the tags.  These are the tags
@@ -2533,8 +2512,12 @@ establish the current context (or clear it).
   (cl-defun jnf/org-roam-filter-context-fn (node &key (tag-list jnf/org-auto-tags--current-list))
     "Determine TAG-LIST is subset of NODE's tags."
     (gnus-subsetp tag-list (org-roam-node-tags node)))
+#+end_src
 
-     ;;; BEGIN org-roam declaration
+
+*** Org Roam Configuration
+
+#+begin_src emacs-lisp
   (use-package org-roam
     :straight t
     :config
@@ -2573,8 +2556,6 @@ establish the current context (or clear it).
 			  :templates 'jnf/org-roam-templates-context-fn))
     :custom
     (org-roam-directory (file-truename "~/git/org"))
-    ;; Set more spaces for tags; As much as I prefer the old format,
-    ;; this is the new path forward.
     (org-roam-node-display-template
      (concat "${type:4}   ${title:*} " (propertize "${tags:40}" 'face 'org-tag)))
     (org-roam-capture-templates (jnf/org-roam-templates-list :all))
@@ -2600,7 +2581,6 @@ establish the current context (or clear it).
 
   ;; This needs to be after the `org-roam’ declaration as it is dependent on the
   ;; structures of `org-roam'.
-
   (cl-defmethod org-roam-node-type ((node org-roam-node))
     "Return the TYPE of NODE."
     (condition-case nil
@@ -2611,7 +2591,9 @@ establish the current context (or clear it).
       (error "")))
 #+end_src
 
-** TODO org-d20.el
+** DONE org-d20.el
+
+- ~org-d20.el~ :: I’m really only using this for the ~org-d20--roll~ function.
 
 #+begin_src emacs-lisp
   (use-package org-d20
@@ -2865,6 +2847,7 @@ establish the current context (or clear it).
   (use-package elfeed
     :straight t
     :after org
+    :hook ((elfeed-show-mode . jnf/reader-visual))
     :config
     (setq-default elfeed-search-filter "@2-days-ago +unread ")
     :bind (
@@ -2979,18 +2962,8 @@ establish the current context (or clear it).
     :hook ((eww-mode . jnf/reader-visual)))
 #+end_src
 
-** TODO feed functions
 
-#+begin_src emacs-lisp
-  ;; A little bit of RSS beautification
-  (add-hook 'elfeed-show-mode-hook 'jnf/reader-visual)
-  (defun jnf/reader-visual ()
-    "A method to turn on visual line mode and adjust text scale."
-    (text-scale-set 2)
-    (turn-on-visual-line-mode))
-#+end_src
-
-** TODO elfeed-org.el
+** DONE elfeed-org.el
 
 - ~elfeed-org.el~ :: a package for maintaining and organizating my RSS
   subscriptions in ~org-mode~ format.
@@ -4034,6 +4007,15 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
 
 ** TODO Functions
 
+- ~jnf/reader-visual~ :: A little bit of RSS beautification.
+
+#+begin_src emacs-lisp
+  (defun jnf/reader-visual ()
+    "A method to turn on visual line mode and adjust text scale."
+    (text-scale-set 2)
+    (turn-on-visual-line-mode))
+#+end_src
+
 - ~jnf/scroll-down-half-page~ :: See https://www.reddit.com/r/emacs/comments/r7l3ar/how_do_you_scroll_half_a_page/
 
 #+begin_src emacs-lisp
@@ -4093,6 +4075,23 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
 	    (load-theme 'modus-vivendi)
 	  (load-theme 'modus-operandi)))
       (load-theme 'modus-operandi)))
+#+end_src
+
+- ~jnf/org-insert-immediate-active-timestamp~ :: Insert an active timestamp, with a few options.
+
+#+begin_src emacs-lisp
+  (global-set-key (kbd "s-5") 'jnf/org-insert-immediate-active-timestamp)
+  (defun jnf/org-insert-immediate-active-timestamp (parg)
+    "Insert an active date for today.
+
+  One universal arg (e.g., prefix call with C-u) inserts timestamp.
+  Two universal arsg (e.g., prefix call with C-u C-u) prompts for date then insertes active date."
+    (interactive "P")
+    (let ((prefix (car parg)))
+      (cond
+       ((not prefix)  (org-insert-time-stamp nil nil nil))
+       ((= prefix 4)  (org-insert-time-stamp nil t nil))
+       ((= prefix 16) (org-insert-time-stamp (org-read-date nil t nil "Date") nil nil)))))
 #+end_src
 
 *** TODO Window Layout Functions
@@ -4404,7 +4403,10 @@ I’ve opted to take a different path; write some Emacs functions instead.
 
 * Footnotes
 
+[fn:v2-org-roam] Iterating on my v2 ~org-roam~ setup was critical in learning more about Emacs.  I will certainly [[https://codeberg.org/takeonrules/dotemacs/src/commit/2f5d6c81d68aaa0d4de9cc7b409c090c0886300a/jnf-emacs-packages/jnf-org-roam-v2.el][reference my v2 org roam configuration]] as I continue my Emacs usage.
+
 [fn:consult]  https://github.com/minad/consult#introduction
+
 [fn:squash-and-merge]  These functions assume that the repository is using a [[https://rietta.com/blog/github-merge-types/#squash-and-merge][Squash and Merge strategy]].
 
 [fn:e-reboot] My alias is as follows: ~alias e-reboot='cd ~/git/dotemacs; git stash ; edaemon ; git stash pop ; git edit'~.
