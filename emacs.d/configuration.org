@@ -8,6 +8,10 @@
 On <2022-02-01 Tue> I chose to begin extracting my the various ~*.el~ into a
 [[https://en.wikipedia.org/wiki/Literate_programming][Literate programming]] format.  As with all Emacs configurations, what follows is
 a work in progress.
+** Action Items
+
+- [ ] Continue working on the todo items of this document.
+- [ ] Convert this to the repository’s README.org.
 
 ** Tips on Troubleshooting
 
@@ -45,7 +49,6 @@ try to prefix them with ~jf/~.  And if I cribbed those functions from
 elsewhere, I attempt to give credit to the source.
 
 * Basic Configuration
-
 ** DONE straight.el
 
 I have chosen to adopt ~straight.el~ for my package management.  The fact that
@@ -173,7 +176,6 @@ inline documentation in most cases.
   (unbind-key "C-x C-c") ;; was `save-buffers-kill-terminal'
 #+end_src
 
-
 ** DONE Utility Packages
 
 These are some “invisible” packages that do some behind the scenes work.
@@ -274,16 +276,15 @@ These are some “invisible” packages that do some behind the scenes work.
 ** TODO Variable/const definitions
 
 #+begin_src emacs-lisp
-
   (defconst jf/fixed-width-font-name
     "Hack Nerd Font"
     "The name of the fixed width font.
-  I have it sprinkled through too many places.
+    I have it sprinkled through too many places.
 
-  Alternatives:
-  - \"Monaco\"
-  - \"JetBrains Mono\"
-  - \"Hack Nerd Font\"")
+    Alternatives:
+    - \"Monaco\"
+    - \"JetBrains Mono\"
+    - \"Hack Nerd Font\"")
 
   (set-frame-font jf/fixed-width-font-name)
 
@@ -2936,19 +2937,16 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
 
 ** TODO blogging specific
 
-#+begin_src emacs-lisp
-  ;;
-  ;;; Commentary:
-  ;;
-  ;;  This package includes numerous tools for helping me with my
-  ;;  blogging efforts.
-  ;;
-  ;;; Code:
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+*** decide.el
 
+- ~decide.el~ :: A package for random decision making.
+
+#+begin_src emacs-lisp
   (use-package decide
     :straight (decide :host github :type git :repo "jeremyf/decide-mode"))
+#+end_src
 
+#+begin_src emacs-lisp
   ;;******************************************************************************
   ;;
   ;;; BEGIN Non-Interactive Utility Functions
@@ -2987,6 +2985,7 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
 		     car-of-kill-ring))))
 
   (defun jf/slugify ()
+    "Convert the active region or line to a URL friendly slug."
     (interactive)
     (let* ((range (if (region-active-p)
 		      (list (region-beginning) (region-end))
@@ -3616,108 +3615,7 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
   ;;******************************************************************************
 #+end_src
 
-** TODO forem specific
 
-*** jf/forem-tidy-pull-request
-
-- ~jf/forem-tidy-pull-request~ :: At [[https://forem.com][Forem]] we use a [[https://github.com/forem/forem/blob/main/.github/PULL_REQUEST_TEMPLATE.md][pull request template]] that
-  has lots of instructions for contributors to complete.  The
-  ~jf/forem-tidy-pull-request~ function takes the initial contents (which
-  include the commit message of the first commit of the pull request) and
-  tidies it up so I can fill out the primary fields.
-
-#+begin_src emacs-lisp
-  (defun jf/forem-tidy-pull-request ()
-    "Perform some quick tidying of the Forem PR template."
-    (interactive)
-    ;; Start from the beginning.
-    (beginning-of-buffer)
-
-    ;; The text before the first HTML/Markdown
-    ;; comments is the commit message.  Cut that
-    ;; text…
-    (search-forward "<!--")
-    (kill-region 1 (- (point) 4))
-
-    ;; ...and paste it inside the description
-    ;; section.
-    (replace-string
-     "## Description\n\n"
-     (concat "## Description\n\n"
-	     (format "%s" (car kill-ring))))
-
-    ;; We've moved point (e.g., the cursor) so let's
-    ;; jump back to the beginning of the buffer.
-    (beginning-of-buffer)
-
-    ;; Remove HTML/Markdown comments
-    (replace-regexp
-     "\\(\n\\)*<!--\\(.\\|\n\\)*-->\\(\n\\)*"
-     "")
-
-    (beginning-of-buffer)
-
-    ;; Clear out the text I almost always delete.
-    ;;
-    ;; This clears out the two or three line "please"!
-    (replace-regexp ": _please.*\\(\n +.+\\)+_\n" ":\n")
-
-    (beginning-of-buffer)
-
-    ;; Clear out some comments.
-    (replace-regexp "^\n_\\(If\\|Please\\|Will\\).*\\(\n.+\\)+_\n+" "\n")
-
-    ;; Clean out the GIF section.  As much as I try
-    ;; I just don't like adding GIFs to PRs
-    (replace-regexp
-     "\n## \\[optional\\] What gif\\(.\\)*\n+\\!.*"
-     "")
-
-    ;; Jump to the beginning of the buffer...again.
-    (beginning-of-buffer))
-#+end_src
-
-** DONE jf/eval-region-dwim()
-
-I try to get quick feedback when writing emacs-lisp; the ~jf/eval-region-dwim~
-binds a mnemonic key sequence to an extend ~eval-region~.
-
-#+begin_src emacs-lisp
-  (define-key emacs-lisp-mode-map (kbd "C-c C-c") 'jf/eval-region-dwim)
-  (defun jf/eval-region-dwim ()
-    "When region is active, evaluate it and kill the mark. Else,
-    evaluate the whole buffer."
-    (interactive)
-    (if (not (region-active-p))
-	(progn
-	  (message "Evaluating buffer...")
-	  (eval-buffer))
-      (progn
-	(message "Evaluating region...")
-	(eval-region (region-beginning) (region-end)))
-      (setq-local deactivate-mark t)))
-#+end_src
-
-** DONE jf/toggle-osx-alternate-modifier()
-
-I like having MacOS’s native Option (e.g. =⌥=) modifier available.  But using
-that default in Emacs would be a significant hinderance.
-
-The following function facilitates a best of both worlds.  By default, I want Option to be ~M-~
-in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
-(e.g., =¨=), I can use MacOS’s native functions to type =⌥= + =u=.
-
-#+begin_src emacs-lisp
-  (defun jf/toggle-osx-alternate-modifier ()
-    "Toggle native OS-X Option modifier
-    setting (e.g. ns-alternate-modifier)."
-    (interactive)
-    (if ns-alternate-modifier
-	(progn (setq ns-alternate-modifier nil)
-	       (message "Enabling OS X native Option modifier"))
-      (progn (setq ns-alternate-modifier 'meta)
-	     (message "Disabling OX X native Option modifier (e.g. Option as Meta)"))))
-#+end_src
 
 ** TODO hammerspoon
 
@@ -3868,6 +3766,44 @@ The following “quick help” methods are tables that I commonly reference when
 
 ** TODO Functions
 
+- ~jf/toggle-osx-alternate-modifier~ :: I like having MacOS’s native Option (e.g. =⌥=) modifier available.  But using
+that default in Emacs would be a significant hinderance.
+
+The following function facilitates a best of both worlds.  By default, I want Option to be ~M-~
+in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
+(e.g., =¨=), I can use MacOS’s native functions to type =⌥= + =u=.
+
+#+begin_src emacs-lisp
+  (defun jf/toggle-osx-alternate-modifier ()
+    "Toggle native OS-X Option modifier
+    setting (e.g. ns-alternate-modifier)."
+    (interactive)
+    (if ns-alternate-modifier
+	(progn (setq ns-alternate-modifier nil)
+	       (message "Enabling OS X native Option modifier"))
+      (progn (setq ns-alternate-modifier 'meta)
+	     (message "Disabling OX X native Option modifier (e.g. Option as Meta)"))))
+#+end_src
+
+- ~jf/eval-region-dwim~ :: I try to get quick feedback when writing emacs-lisp;
+  the ~jf/eval-region-dwim~ binds a mnemonic key sequence to an extend ~eval-region~.
+
+#+begin_src emacs-lisp
+  (define-key emacs-lisp-mode-map (kbd "C-c C-c") 'jf/eval-region-dwim)
+  (defun jf/eval-region-dwim ()
+    "When region is active, evaluate it and kill the mark. Else,
+    evaluate the whole buffer."
+    (interactive)
+    (if (not (region-active-p))
+	(progn
+	  (message "Evaluating buffer...")
+	  (eval-buffer))
+      (progn
+	(message "Evaluating region...")
+	(eval-region (region-beginning) (region-end)))
+      (setq-local deactivate-mark t)))
+#+end_src
+
 - ~jf/reader-visual~ :: A little bit of RSS beautification.
 
 #+begin_src emacs-lisp
@@ -3952,6 +3888,63 @@ The following “quick help” methods are tables that I commonly reference when
        ((not prefix)  (org-insert-time-stamp nil nil nil))
        ((= prefix 4)  (org-insert-time-stamp nil t nil))
        ((= prefix 16) (org-insert-time-stamp (org-read-date nil t nil "Date") nil nil)))))
+#+end_src
+
+- ~jf/forem-tidy-pull-request~ :: At [[https://forem.com][Forem]] we use a [[https://github.com/forem/forem/blob/main/.github/PULL_REQUEST_TEMPLATE.md][pull request template]] that
+  has lots of instructions for contributors to complete.  The
+  ~jf/forem-tidy-pull-request~ function takes the initial contents (which
+  include the commit message of the first commit of the pull request) and
+  tidies it up so I can fill out the primary fields.
+
+#+begin_src emacs-lisp
+  (defun jf/forem-tidy-pull-request ()
+    "Perform some quick tidying of the Forem PR template."
+    (interactive)
+    ;; Start from the beginning.
+    (beginning-of-buffer)
+
+    ;; The text before the first HTML/Markdown
+    ;; comments is the commit message.  Cut that
+    ;; text…
+    (search-forward "<!--")
+    (kill-region 1 (- (point) 4))
+
+    ;; ...and paste it inside the description
+    ;; section.
+    (replace-string
+     "## Description\n\n"
+     (concat "## Description\n\n"
+	     (format "%s" (car kill-ring))))
+
+    ;; We've moved point (e.g., the cursor) so let's
+    ;; jump back to the beginning of the buffer.
+    (beginning-of-buffer)
+
+    ;; Remove HTML/Markdown comments
+    (replace-regexp
+     "\\(\n\\)*<!--\\(.\\|\n\\)*-->\\(\n\\)*"
+     "")
+
+    (beginning-of-buffer)
+
+    ;; Clear out the text I almost always delete.
+    ;;
+    ;; This clears out the two or three line "please"!
+    (replace-regexp ": _please.*\\(\n +.+\\)+_\n" ":\n")
+
+    (beginning-of-buffer)
+
+    ;; Clear out some comments.
+    (replace-regexp "^\n_\\(If\\|Please\\|Will\\).*\\(\n.+\\)+_\n+" "\n")
+
+    ;; Clean out the GIF section.  As much as I try
+    ;; I just don't like adding GIFs to PRs
+    (replace-regexp
+     "\n## \\[optional\\] What gif\\(.\\)*\n+\\!.*"
+     "")
+
+    ;; Jump to the beginning of the buffer...again.
+    (beginning-of-buffer))
 #+end_src
 
 #+begin_src emacs-lisp
