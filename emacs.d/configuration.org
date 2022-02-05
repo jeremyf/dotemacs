@@ -16,8 +16,8 @@ a work in progress.
 ** Tips on Troubleshooting
 
 As I migrated from my ~*.el~ configurations, I moved one ~.el~ file at a time.
-With each move, I would restart my Emacs daemon[fn:daemon].  I went so far as
-to write a ~e-reboot~ alias[fn:e-reboot].  So if I “messed up”, I could easily
+With each move, I would restart my Emacs daemon[fn:5].  I went so far as
+to write a ~e-reboot~ alias[fn:4].  So if I “messed up”, I could easily
 recover and fix the files I broke.
 
 In other words, when I’m working on extending my Emacs configuration, I tend to
@@ -863,7 +863,7 @@ packages don’t warrant including this.
 ** DONE ripgrep.el
 
 For many years, I’ve used “The Silver Searcher”, or ~ag~ on the command
-line.[fn:ag].  However, [[https://github.com/BurntSushi/ripgrep][ripgrep]] provides even faster searching, with an almost
+line.[fn:6].  However, [[https://github.com/BurntSushi/ripgrep][ripgrep]] provides even faster searching, with an almost
 identical parameter list.
 
 #+begin_src emacs-lisp
@@ -913,7 +913,7 @@ I’m thinking on this one.
 ** DONE magit.el
 
 - ~magit.el~ :: The awesome [[http://git-scm.com][git]] client for Emacs.  I’ve written a few functions
-  to help me jump to the Github page for the pull request.[fn:squash-and-merge]
+  to help me jump to the Github page for the pull request.[fn:3]
 
   - ~jf/magit-browse-pull-request~ :: In ‘magit-log-mode’ open the associated
     pull request.
@@ -1276,7 +1276,7 @@ package.
   completion function [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Minibuffer-Completion.html][completing-read]].”  I had previously used [[https://github.com/abo-abo/swiper][Ivy, Counsel,
   and Swiper]], but appreciate the design principles of Consult, namely “Consult
   fits well into existing setups and it helps you to create a full completion
-  environment out of small and independent components.”[fn:consult]
+  environment out of small and independent components.”[fn:2]
 
   With ~consult.el~ I’m able to bring in other components that focus on doing
   their “one thing” really well.
@@ -2291,7 +2291,7 @@ community in which I participated).  Those notes might overlap but rarely did.
 Another use case is less refined, namely I'm writing but am not "in" a specific
 context.
 
-However, v2 of my org-roam structure[fn:v2-org-roam], didn't quite get out of
+However, v2 of my org-roam structure[fn:1], didn't quite get out of
 the way.  I never quite got to the speed of note taking that I had for the
 original Thel Sector campaign.
 s
@@ -4380,14 +4380,14 @@ I’ve opted to take a different path; write some Emacs functions instead.
 
 * Footnotes
 
-[fn:v2-org-roam] Iterating on my v2 ~org-roam~ setup was critical in learning more about Emacs.  I will certainly [[https://codeberg.org/takeonrules/dotemacs/src/commit/2f5d6c81d68aaa0d4de9cc7b409c090c0886300a/jnf-emacs-packages/jnf-org-roam-v2.el][reference my v2 org roam configuration]] as I continue my Emacs usage.
+[fn:1] Iterating on my v2 ~org-roam~ setup was critical in learning more about Emacs.  I will certainly [[https://codeberg.org/takeonrules/dotemacs/src/commit/2f5d6c81d68aaa0d4de9cc7b409c090c0886300a/jnf-emacs-packages/jnf-org-roam-v2.el][reference my v2 org roam configuration]] as I continue my Emacs usage.
 
-[fn:consult]  https://github.com/minad/consult#introduction
+[fn:2]  https://github.com/minad/consult#introduction
 
-[fn:squash-and-merge]  These functions assume that the repository is using a [[https://rietta.com/blog/github-merge-types/#squash-and-merge][Squash and Merge strategy]].
+[fn:3]  These functions assume that the repository is using a [[https://rietta.com/blog/github-merge-types/#squash-and-merge][Squash and Merge strategy]].
 
-[fn:e-reboot] My alias is as follows: ~alias e-reboot='cd ~/git/dotemacs; git stash ; edaemon ; git stash pop ; git edit'~.
+[fn:4] My alias is as follows: ~alias e-reboot='cd ~/git/dotemacs; git stash ; edaemon ; git stash pop ; git edit'~.
 
-[fn:daemon] My [[https://codeberg.org/takeonrules/dotzshrc/src/ab8b781cbdddd2fdbe674e031436b7e9a8e8a024/README.org#L1][dotzshrc]] config has my ~$EDITOR~
+[fn:5] My [[https://codeberg.org/takeonrules/dotzshrc/src/ab8b781cbdddd2fdbe674e031436b7e9a8e8a024/README.org#L1][dotzshrc]] config has my ~$EDITOR~
 
-[fn:ag] “Ag” is the chemical symbol for the Silver element.
+[fn:6] “Ag” is the chemical symbol for the Silver element.
