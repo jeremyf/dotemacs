@@ -90,7 +90,7 @@ inline documentation in most cases.
   (setq user-full-name "Jeremy Friesen"
 	user-mail-address "jeremy@jeremyfriesen.com")
 
-  (defconst jnf-silence-loading-log t
+  (defconst jf/silence-loading-log t
     "When t log to stdout load messages from this configuration.
 
   In a previous iteration, I loaded lots of separate '*.el' files.
@@ -112,7 +112,7 @@ inline documentation in most cases.
   (setq
    backup-by-copying t         ;; Don't delink hardlinks
    backup-directory-alist '((".*" . "~/.emacs.d/backups/"))
-   bookmark-default-file "~/git/jnf-emacs-bookmarks/bookmarks"
+   bookmark-default-file "~/git/emacs-bookmarks/bookmarks"
    custom-safe-themes t        ;; I may as well trust themes.
    create-lockfiles nil        ;; Don't create lock files.
    delete-old-versions t       ;; Automatically delete excess backups
@@ -301,7 +301,7 @@ These are some “invisible” packages that do some behind the scenes work.
      jf/tor-home-directory
      "~/git/takeonrules.source/themes/hugo-tufte"
      "~/git/burning_wheel_lifepaths/"
-     "~/git/jnf-emacs-bookmarks"
+     "~/git/emacs-bookmarks"
      "~/git/dotzshrc/"
      "~/git/dotemacs/"
      "~/git/org/"
@@ -934,7 +934,7 @@ That’s one of those hot-keys almost burned into soul.
 	    ("~/git/burning_wheel_lifepaths/" . 1)
 	    ("~/git/dotzshrc/" .  1)
 	    ("~/git/dotemacs/" . 1)
-	    ("~/git/jnf-emacs-bookmarks/" . 1)
+	    ("~/git/emacs-bookmarks/" . 1)
 	    ("~/git/org" . 1)
 	    ("~/git/org/archive" . 1)
 	    ("~/git/takeonrules.source/themes/hugo-tufte" . 1)))
@@ -1162,7 +1162,7 @@ indicator is a nice bit of polish.
 #+begin_src emacs-lisp
   (load "~/.emacs.d/straight/build/vertico/extensions/vertico-indexed.elc"
 	nil
-	jnf-silence-loading-log)
+	jf/silence-loading-log)
   (vertico-indexed-mode)
 #+end_src
 
@@ -1175,7 +1175,7 @@ least I’m not trapped in the recursive mini-buffer challenges.
 #+begin_src emacs-lisp
   ;; (load "~/.emacs.d/straight/build/vertico/extensions/vertico-buffer.elc"
   ;;       nil
-  ;;       jnf-silence-loading-log)
+  ;;       jf/silence-loading-log)
   ;; (vertico-buffer-mode)
   ;; (setq vertico-buffer-display-action
   ;;       '(display-buffer-at-bottom (window-height . 15)))
@@ -1188,7 +1188,7 @@ can be super userful if I built up a complicated ~consult-ripgrep~.
 #+begin_src emacs-lisp
   (load "~/.emacs.d/straight/build/vertico/extensions/vertico-repeat.elc"
 	nil
-	jnf-silence-loading-log)
+	jf/silence-loading-log)
   (global-set-key (kbd "M-r") #'vertico-repeat)
   (add-hook 'minibuffer-setup-hook #'vertico-repeat-save)
 #+end_src
@@ -3568,7 +3568,7 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
     (load
      "~/git/dotzshrc/symlinks/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el"
      nil
-     jnf-silence-loading-log))
+     jf/silence-loading-log))
 #+end_src
 
 ** DONE Quick Help
@@ -4081,7 +4081,7 @@ those modes.
   Use TITLE to derive the docstring.
   Use ABBR to derive the mode-name lighter.
   Add hook to each HOOKS provided."
-    (let ((mode-name (intern (s-dashed-words (s-downcase (concat "jnf-" abbr "-minor-mode")))))
+    (let ((mode-name (intern (s-dashed-words (s-downcase (concat "jf/" abbr "-minor-mode")))))
 	  (lighter (concat " " abbr))
 	  (docstring (concat "Minor mode for " title ".")))
       `(progn
@@ -4230,7 +4230,7 @@ I’ve opted to take a different path; write some Emacs functions instead.
     "Define the Take on Rules menu."
     ["Take on Rules"
      ["Posts"
-      :if-non-nil jnf-tor-minor-mode
+      :if-non-nil jf/tor-minor-mode
       ("p r" "Re-title post…" jf/tor-retitle-post)
       ("p t" "Tag post…" jf/tor-tag-post :transient t)
       ("p v" "View post…" jf/tor-view-blog-post)
