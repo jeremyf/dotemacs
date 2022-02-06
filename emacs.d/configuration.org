@@ -67,15 +67,23 @@ My approach is to think back to my experience with the tutorial.  How it walked
 me through the concepts.  I also need to be mindful that as I introduce source
 code concepts, they are evaluated in that order.
 
+** Conventions
+
+I’ve written quite a few functions to further extend the utility of Emacs.  I
+try to prefix them with ~jf/~.  And if I cribbed those functions from
+elsewhere, I attempt to give credit to the source.
+
+
 * Into the Emacs
 ** Launching Emacs
 
-The things in place that I don’t think about.
+As we get started in Emacs, I want to make sure I have the basics lined up.
 
-- Straight.el
-- Configuration
-- Theming
-*** DONE straight.el
+- Package Management
+- Preliminary Configuration
+- Basic Theming
+
+*** DONE Package Management
 
 I have chosen to adopt ~straight.el~ for my package management.  The fact that
 it rather seamlessly works with ~use-package~ has help me keep my code more
@@ -107,10 +115,10 @@ organized.
   (straight-use-package 'use-package)
 #+end_src
 
-*** DONE Early Configuration
+*** DONE Preliminary Configuration
 
 These are some general configurations that I’ve slowly accumulated.  There’s
-inline documentation in most cases.
+inline documentation in most cases.  There might be little bits worth teasing out but for the most part, you can move along and reference this later.
 
 #+begin_src emacs-lisp
   (setq user-full-name "Jeremy Friesen"
@@ -143,7 +151,7 @@ inline documentation in most cases.
    create-lockfiles nil        ;; Don't create lock files.
    delete-old-versions t       ;; Automatically delete excess backups
    idle-update-delay 1.1       ;; Slow down the UI being updated to improve
-   ;; performance
+			       ;; performance
    indent-tabs-mode nil        ;; Ensure tabs are expanded, not inserted
    inhibit-startup-screen t    ;; Don't include the  emacs "start" window
    kept-new-versions 20        ;; how many of the newest versions to keep
@@ -183,90 +191,19 @@ inline documentation in most cases.
 		    (garbage-collect))))
 #+end_src
 
-*** TODO Keymappings
+*** TODO Basic Theming
+
+I want to start with a basic look and feel.  I’ve chosen the modus themes
+(e.g. ~modus-vivendi~ and ~modus-operandi~).  They provide a light and dark
+theme with a focus on visual accessibility.
+
+I love [[http://protesilaos.com][Prot]]’s attention to detail with the modus themes.  Here’s my
+configuration for these two sibling themes.  There’s a bit of chatter, but all
+told it sets things up how I like.
 
 #+begin_src emacs-lisp
-  (unbind-key "C-x C-d") ;; `list-directory'
-  (global-set-key (kbd "C-x C-d") 'dired) ;; We’ll override this later with
-					  ;; `consult-dir' but this is a good
-					  ;; stand-in.
 
-  (global-set-key (kbd "<M-delete>") 'kill-word)
-
-  (global-set-key (kbd "<s-down>") 'end-of-buffer)
-  (global-set-key (kbd "<s-up>") 'beginning-of-buffer)
-
-  ;; Far to easy to type this on accident, and I'm not a fan of it's behavior.
-  (unbind-key "C-z") ;; `suspend-frame'
-
-  (unbind-key "C-x C-c") ;; was `save-buffers-kill-terminal'
-#+end_src
-
-*** DONE Utility Packages
-
-These are some “invisible” packages that do some behind the scenes work.
-
-- ~diminish~ :: Provides a means of not displaying the :lighter of a minor mode in the modeline.
-
-#+begin_src emacs-lisp
-  (use-package diminish :straight t)
-  (diminish 'eldoc-mode)
-#+end_src
-
-- ~gcmh.el~ :: Do garbage collection (GC) when the user is idle.
-
-#+begin_src emacs-lisp
-  (use-package gcmh
-    :straight t
-    :diminish 'gcmh-mode
-    :init
-    (setq gcmh-idle-delay 5
-	  gcmh-high-cons-threshold (* 16 1024 1024))  ; 16mb
-    :config (gcmh-mode))
-#+end_src
-
-- ~keychain-environment.el~ :: Load keychain environment variables
-
-#+begin_src emacs-lisp
-  (use-package keychain-environment
-    :straight t
-    :config (keychain-refresh-environment))
-#+end_src
-
-- ~dash.el~ :: A modern list API for Emacs. No 'cl required.  (See https://github.com/magnars/dash.el/)
-
-#+begin_src emacs-lisp
-  (use-package dash :straight t)
-#+end_src
-
-- ~editorconfig.el~ :: “EditorConfig helps maintain consistent coding styles
-  for multiple developers working on the same project across various editors
-  and IDEs.”  See https://editorconfig.org/#overview for more details.
-
-#+begin_src emacs-lisp
-  (use-package editorconfig
-    :straight t
-    :diminish editorconfig-mode
-    :config
-    (editorconfig-mode 1))
-#+end_src
-
-- ~f.el~ :: A modern API for working with files and directories in Emacs. (See https://github.com/rejeep/f.el/)
-
-#+begin_src emacs-lisp
-  (use-package f :straight t)
-#+end_src
-
-- ~s.el~ :: The long lost Emacs string manipulation library.  (See https://github.com/magnars/s.el/)
-
-#+begin_src emacs-lisp
-  (use-package s :straight t)
-#+end_src
-
-*** TODO Variable/const definitions
-
-#+begin_src emacs-lisp
-  (defconst jf/fixed-width-font-name
+    (defconst jf/fixed-width-font-name
     "Hack Nerd Font"
     "The name of the fixed width font.
     I have it sprinkled through too many places.
@@ -278,37 +215,53 @@ These are some “invisible” packages that do some behind the scenes work.
 
   (set-frame-font jf/fixed-width-font-name)
 
-  (defconst jf/tor-home-directory
-    (file-truename "~/git/takeonrules.source")
-    "The home directory of TakeOnRules.com Hugo repository.")
-
-  (defconst jf/tor-default-local-hostname
-    "http://localhost:1313"
-    "The scheme, host name, and port for serving up a local TakeOnRules.com.")
-
-  (defvar jf/data-directories
-    (list
-     jf/tor-home-directory
-     "~/git/takeonrules.source/themes/hugo-tufte"
-     "~/git/burning_wheel_lifepaths/"
-     "~/git/emacs-bookmarks"
-     "~/git/dotzshrc/"
-     "~/git/dotemacs/"
-     "~/git/org/"
-     "~/git/org/archive")
-    "Relevant data directories for my day to day work.")
+  (use-package modus-themes
+    ;; :straight (modus-themes :type built-in)
+    :straight (:type git :host gitlab :repo "protesilaos/modus-themes" :branch "main")
+    :init
+    (setq
+     modus-themes-bold-constructs t
+     modus-themes-completions 'opinionated
+     modus-themes-diffs nil
+     modus-themes-fringes 'intense
+     modus-themes-hl-line '(accented intense)
+     modus-themes-intense-markup t
+     modus-themes-links '(faint background)
+     modus-themes-mixed-fonts t
+     modus-themes-mode-line '(accented 3d)
+     modus-themes-org-blocks 'gray-background
+     modus-themes-paren-match '(bold intense)
+     modus-themes-prompts '(intense accented)
+     modus-themes-region '(bg-only accented)
+     modus-themes-scale-headings t
+     modus-themes-slanted-constructs t
+     modus-themes-subtle-line-numbers t
+     modus-themes-syntax '(alt-syntax yellow-comments green-strings)
+     modus-themes-tabs-accented t
+     modus-themes-headings
+     '((1 . (variable-pitch light 1.6))
+       (2 . (overline semibold 1.4))
+       (3 . (monochrome overline 1.2))
+       (4 . (overline 1.1))
+       (t . (rainbow 1.05)))))
 #+end_src
 
-*** TODO pretty-hydra.el
+With a quick bit of testing, it appears that the following ~set-face-attribute~
+declarations should be made after the theme declarations.  When the following
+statements were declared before the themes, and I toggled my theme, the font
+changed to something unexpected.  With them declared after, I keep the fonts
+between toggles.
 
 #+begin_src emacs-lisp
-
-  ;; I use this package to "configure" menus, hence this is in the
-  ;; config section.
-  (use-package pretty-hydra
-    :straight (pretty-hydra
-	       :type git :host github :repo "jerrypnz/major-mode-hydra.el"
-	       :files (:defaults (:exclude "major-mode-hydra.el"))))
+  (set-face-attribute 'default nil
+		      :family jf/fixed-width-font-name
+		      :height 140)
+  (set-face-attribute 'variable-pitch nil
+		      :family "ETBembo"
+		      :height 1.1)
+  (set-face-attribute 'fixed-pitch nil
+		      :family jf/fixed-width-font-name
+		      :height 1.0)
 #+end_src
 
 ** How Does this Thing Work?
@@ -451,72 +404,123 @@ As I’m working
 
 Command/Query Separation:
 
-** Conventions
+* TODO Early Configuration
 
-I’ve written quite a few functions to further extend the utility of Emacs.  I
-try to prefix them with ~jf/~.  And if I cribbed those functions from
-elsewhere, I attempt to give credit to the source.
+*** TODO Keymappings
+
+#+begin_src emacs-lisp
+  (unbind-key "C-x C-d") ;; `list-directory'
+  (global-set-key (kbd "C-x C-d") 'dired) ;; We’ll override this later with
+					  ;; `consult-dir' but this is a good
+					  ;; stand-in.
+
+  (global-set-key (kbd "<M-delete>") 'kill-word)
+
+  (global-set-key (kbd "<s-down>") 'end-of-buffer)
+  (global-set-key (kbd "<s-up>") 'beginning-of-buffer)
+
+  ;; Far to easy to type this on accident, and I'm not a fan of it's behavior.
+  (unbind-key "C-z") ;; `suspend-frame'
+
+  (unbind-key "C-x C-c") ;; was `save-buffers-kill-terminal'
+#+end_src
+*** DONE Utility Packages
+
+These are some “invisible” packages that do some behind the scenes work.
+
+- ~diminish~ :: Provides a means of not displaying the :lighter of a minor mode in the modeline.
+
+#+begin_src emacs-lisp
+  (use-package diminish :straight t)
+  (diminish 'eldoc-mode)
+#+end_src
+
+- ~gcmh.el~ :: Do garbage collection (GC) when the user is idle.
+
+#+begin_src emacs-lisp
+  (use-package gcmh
+    :straight t
+    :diminish 'gcmh-mode
+    :init
+    (setq gcmh-idle-delay 5
+	  gcmh-high-cons-threshold (* 16 1024 1024))  ; 16mb
+    :config (gcmh-mode))
+#+end_src
+
+- ~keychain-environment.el~ :: Load keychain environment variables
+
+#+begin_src emacs-lisp
+  (use-package keychain-environment
+    :straight t
+    :config (keychain-refresh-environment))
+#+end_src
+
+- ~dash.el~ :: A modern list API for Emacs. No 'cl required.  (See https://github.com/magnars/dash.el/)
+
+#+begin_src emacs-lisp
+  (use-package dash :straight t)
+#+end_src
+
+- ~editorconfig.el~ :: “EditorConfig helps maintain consistent coding styles
+  for multiple developers working on the same project across various editors
+  and IDEs.”  See https://editorconfig.org/#overview for more details.
+
+#+begin_src emacs-lisp
+  (use-package editorconfig
+    :straight t
+    :diminish editorconfig-mode
+    :config
+    (editorconfig-mode 1))
+#+end_src
+
+- ~f.el~ :: A modern API for working with files and directories in Emacs. (See https://github.com/rejeep/f.el/)
+
+#+begin_src emacs-lisp
+  (use-package f :straight t)
+#+end_src
+
+- ~s.el~ :: The long lost Emacs string manipulation library.  (See https://github.com/magnars/s.el/)
+
+#+begin_src emacs-lisp
+  (use-package s :straight t)
+#+end_src
+*** TODO Variable/const definitions
+
+#+begin_src emacs-lisp
+(defconst jf/tor-home-directory
+    (file-truename "~/git/takeonrules.source")
+    "The home directory of TakeOnRules.com Hugo repository.")
+
+  (defconst jf/tor-default-local-hostname
+    "http://localhost:1313"
+    "The scheme, host name, and port for serving up a local TakeOnRules.com.")
+
+  (defvar jf/data-directories
+    (list
+     jf/tor-home-directory
+     "~/git/takeonrules.source/themes/hugo-tufte"
+     "~/git/burning_wheel_lifepaths/"
+     "~/git/emacs-bookmarks"
+     "~/git/dotzshrc/"
+     "~/git/dotemacs/"
+     "~/git/org/"
+     "~/git/org/archive")
+    "Relevant data directories for my day to day work.")
+#+end_src
+*** TODO pretty-hydra.el
+
+#+begin_src emacs-lisp
+
+  ;; I use this package to "configure" menus, hence this is in the
+  ;; config section.
+  (use-package pretty-hydra
+    :straight (pretty-hydra
+	       :type git :host github :repo "jerrypnz/major-mode-hydra.el"
+	       :files (:defaults (:exclude "major-mode-hydra.el"))))
+#+end_src
 
 
 * DONE Display
-
-** DONE modus-themes.el
-
-The modus themes (e.g. ~modus-vivendi~ and ~modus-operandi~) provide a light
-and dark theme with a focus on visual accessibility.
-
-I love [[http://protesilaos.com][Prot]]’s attention to detail with the modus themes).  Here’s my
-configuration for these two sibling themes.
-
-#+begin_src emacs-lisp
-  (use-package modus-themes
-    ;; :straight (modus-themes :type built-in)
-    :straight (:type git :host gitlab :repo "protesilaos/modus-themes" :branch "main")
-    :init
-    (setq
-     modus-themes-bold-constructs t
-     modus-themes-completions 'opinionated ; {nil,'moderate,'opinionated}
-     modus-themes-diffs nil ; {nil,'desaturated,'fg-only}
-     modus-themes-fringes 'intense ; {nil,'subtle,'intense}
-     modus-themes-hl-line '(accented intense)
-     modus-themes-intense-markup t
-     modus-themes-links '(faint background)
-     modus-themes-mixed-fonts t
-     modus-themes-mode-line '(accented 3d)
-     modus-themes-org-blocks 'gray-background
-     modus-themes-paren-match '(bold intense)
-     modus-themes-prompts '(intense accented)
-     modus-themes-region '(bg-only accented)
-     modus-themes-scale-headings t
-     modus-themes-slanted-constructs t
-     modus-themes-subtle-line-numbers t
-     modus-themes-syntax '(alt-syntax yellow-comments green-strings)
-     modus-themes-tabs-accented t
-     modus-themes-headings
-     '((1 . (variable-pitch light 1.6))
-       (2 . (overline semibold 1.4))
-       (3 . (monochrome overline 1.2))
-       (4 . (overline 1.1))
-       (t . (rainbow 1.05)))))
-#+end_src
-
-With a quick bit of testing, it appears that the following ~set-face-attribute~
-declarations should be made after the theme declarations.  When the following
-statements were declared before the themes, and I toggled my theme, the font
-changed to something unexpected.  With them declared after, I keep the fonts
-between toggles.
-
-#+begin_src emacs-lisp
-  (set-face-attribute 'default nil
-		      :family jf/fixed-width-font-name
-		      :height 140)
-  (set-face-attribute 'variable-pitch nil
-		      :family "ETBembo"
-		      :height 1.1)
-  (set-face-attribute 'fixed-pitch nil
-		      :family jf/fixed-width-font-name
-		      :height 1.0)
-#+end_src
 
 ** DONE lin.el
 
