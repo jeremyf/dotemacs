@@ -2845,30 +2845,6 @@ establish the current context (or clear it).
     (setq rmh-elfeed-org-files (list "~/git/org/elfeed.org")))
 #+end_src
 
-** WAITING shrface.el
-
-#+begin_src emacs-lisp
-  (use-package shrface
-    :straight t
-    :hook ((eww-mode . shrface-mode)
-           (elfeed-mode . shrface-mode))
-    :custom (shrface-toggle-bullets nil)
-    :config
-    (shrface-basic)
-    ;; (shrface-trial)
-    (setq shrface-href-versatile t)
-    :bind (:map
-           eww-mode-map (("<tab>" . shr-next-link)
-                         ("<backtab>" . shr-previous-link)))
-    :bind (:map
-           shrface-mode-map (("<C-M-tab>" . shrface-outline-cycle-buffer)
-                             ("C-t" . shrface-toggle-bullets)
-                             ("C-j" . shrface-next-headline)
-                             ("C-k" . shrface-previous-headline)
-                             ("M-l" . shrface-links-consult)
-                             ("M-h" . shrface-headlines-consult))))
-#+end_src
-
 * TODO Utilities
 
 ** DONE Opening multiple file names from command line
@@ -3584,7 +3560,6 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
 #+end_src
 
 
-
 ** TODO hammerspoon
 
 #+begin_src emacs-lisp
@@ -3730,7 +3705,6 @@ The following “quick help” methods are tables that I commonly reference when
      "  Seeing horrible magic at work .............. +4 Ob\n"
      "  Being in the presence of the supernatural .. +5 Ob\n"))
 #+end_src
-
 
 ** TODO Functions
 
