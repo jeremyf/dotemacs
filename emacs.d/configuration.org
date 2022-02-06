@@ -1662,6 +1662,33 @@ More on these component matchings styles is available at [[https://github.com/mi
       (list #'company-files #'company-ispell #'company-dabbrev)))
 #+end_src
 
+** DONE yasnippet.el
+
+- ~yasnippet.el~ :: A rather convenient snippet manager.  When you create a
+  snippet, it understands the mode you're in and puts the snippet in the right
+  place.
+
+#+begin_src emacs-lisp
+  (use-package yasnippet
+    :straight t
+    :diminish yas-mode
+    :init
+    (setq yas-snippet-dirs '("~/git/dotemacs/snippets"))
+    (yas-global-mode 1))
+#+end_src
+** DONE consult-yasnippet.el
+
+- ~consult-yasnippet.el~ :: A bit of integration with ~consult.el~ and ~yasnippet.el~.
+
+#+begin_src emacs-lisp
+  (use-package consult-yasnippet
+    :straight t
+    :after (consult yasnippet)
+    :bind ("C-c y" . consult-yasnippet))
+#+end_src
+
+
+
 * DONE Window Manipulation
 ** DONE Tab Line
 
@@ -1700,8 +1727,81 @@ quasi-opinionated compromise.
     :custom (titlecase-style 'wikipedia))
 #+end_src
 
-* TODO In Buffer
+** DONE fill-sentences-correctly.el
 
+- ~fill-sentences-correctly.el~ :: After using Emacs for awhile, with it’s
+  sentence navigation, I’ve come to strongly favor two spaces after a period.
+  The ~fill-sentences-correctly-mode~ ensures that ~fill-paragraph~
+  (e.g. ~M-q~) preserves two spaces.
+
+#+BEGIN_src emacs-lisp
+  (use-package fill-sentences-correctly
+    :straight (fill-sentences-correctly :host github :repo "duckwork/fill-sentences-correctly.el")
+    :hook (fundamental-mode . fill-sentences-correctly-mode))
+#+end_src
+* TODO Look and Feel
+** DONE rainbow-delimiters.el
+
+- ~rainbow-delimiters.el~ :: A quick and useful visual queue for paranthesis.
+
+#+begin_src emacs-lisp
+  (use-package rainbow-delimiters
+    :straight t
+    :hook ((fundamental-mode) . rainbow-delimiters-mode))
+#+end_src
+
+** DONE vi-tilde-fringe.el
+- ~vi-tilde-fringt.el~ :: Show tilde (e.g. ~\~~) on empty trailing lines.  This is a feature ported from [[https://en.wikipedia.org/wiki/Vi][vi]].
+
+#+begin_src emacs-lisp
+  (use-package vi-tilde-fringe
+    :straight t
+    :config (global-vi-tilde-fringe-mode))
+#+end_src
+
+** DONE goggles.el
+
+- ~goggles.el~ :: Adds a little bit of visual feedback as you delete chunks.
+
+#+begin_src emacs-lisp
+  (use-package goggles
+    :straight t
+    :hook ((prog-mode text-mode) . goggles-mode)
+    :diminish 'goggles-mode
+    :config (setq-default goggles-pulse t))
+#+end_src
+
+** DONE emojify.el
+
+- ~emojify.el~ :: Ensure rendering of correct emoji’s.
+
+#+begin_src emacs-lisp
+  (use-package emojify
+    :straight t
+    :config
+    (defun --set-emoji-font (frame)
+      "Adjust the font settings of FRAME so Emacs can display emoji properly."
+      (if (eq system-type 'darwin)
+	  ;; For NS/Cocoa
+	  (set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji") frame 'prepend)
+	;; For Linux
+	(set-fontset-font t 'symbol (font-spec :family "Symbola") frame 'prepend)))
+
+    ;; For when Emacs is started in GUI mode:
+    (--set-emoji-font nil)
+    ;; Hook for when a frame is created with emacsclient
+    ;; see https://www.gnu.org/software/emacs/manual/html_node/elisp/Creating-Frames.html
+    (add-hook 'after-make-frame-functions '--set-emoji-font))
+#+end_src
+** TODO unicode-fonts.el
+
+#+begin_src emacs-lisp
+  (use-package unicode-fonts
+    :straight t
+    :config (unicode-fonts-setup))
+#+end_src
+
+* TODO In Buffer
 ** DONE savekill.el
 
 - ~savekill.el~ :: Write "kill" command inputs to disk.
@@ -1746,28 +1846,6 @@ quasi-opinionated compromise.
     (which-key-show-major-mode)
     :diminish 'which-key-mode
     :straight t)
-#+end_src
-
-** DONE vi-tilde-fringe.el
-- ~vi-tilde-fringt.el~ :: Show tilde (e.g. ~\~~) on empty trailing lines.  This is a feature ported from [[https://en.wikipedia.org/wiki/Vi][vi]].
-
-#+begin_src emacs-lisp
-  (use-package vi-tilde-fringe
-    :straight t
-    :config (global-vi-tilde-fringe-mode))
-#+end_src
-
-** DONE fill-sentences-correctly.el
-
-- ~fill-sentences-correctly.el~ :: After using Emacs for awhile, with it’s
-  sentence navigation, I’ve come to strongly favor two spaces after a period.
-  The ~fill-sentences-correctly-mode~ ensures that ~fill-paragraph~
-  (e.g. ~M-q~) preserves two spaces.
-
-#+BEGIN_src emacs-lisp
-  (use-package fill-sentences-correctly
-    :straight (fill-sentences-correctly :host github :repo "duckwork/fill-sentences-correctly.el")
-    :hook (fundamental-mode . fill-sentences-correctly-mode))
 #+end_src
 
 ** DONE hippie-exp.el
@@ -1908,73 +1986,6 @@ quasi-opinionated compromise.
 	   ([C-s-up] . move-text-up)))
 #+end_src
 
-** DONE rainbow-delimiters.el
-
-- ~rainbow-delimiters.el~ :: A quick and useful visual queue for paranthesis.
-
-#+begin_src emacs-lisp
-  (use-package rainbow-delimiters
-    :straight t
-    :hook ((fundamental-mode) . rainbow-delimiters-mode))
-#+end_src
-
-** DONE emojify.el
-
-- ~emojify.el~ :: Ensure rendering of correct emoji’s.
-
-#+begin_src emacs-lisp
-  (use-package emojify
-    :straight t
-    :config
-    (defun --set-emoji-font (frame)
-      "Adjust the font settings of FRAME so Emacs can display emoji properly."
-      (if (eq system-type 'darwin)
-	  ;; For NS/Cocoa
-	  (set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji") frame 'prepend)
-	;; For Linux
-	(set-fontset-font t 'symbol (font-spec :family "Symbola") frame 'prepend)))
-
-    ;; For when Emacs is started in GUI mode:
-    (--set-emoji-font nil)
-    ;; Hook for when a frame is created with emacsclient
-    ;; see https://www.gnu.org/software/emacs/manual/html_node/elisp/Creating-Frames.html
-    (add-hook 'after-make-frame-functions '--set-emoji-font))
-#+end_src
-
-** TODO unicode-fonts.el
-
-#+begin_src emacs-lisp
-  (use-package unicode-fonts
-    :straight t
-    :config (unicode-fonts-setup))
-#+end_src
-
-** DONE yasnippet.el
-
-- ~yasnippet.el~ :: A rather convenient snippet manager.  When you create a
-  snippet, it understands the mode you're in and puts the snippet in the right
-  place.
-
-#+begin_src emacs-lisp
-  (use-package yasnippet
-    :straight t
-    :diminish yas-mode
-    :init
-    (setq yas-snippet-dirs '("~/git/dotemacs/snippets"))
-    (yas-global-mode 1))
-#+end_src
-
-** DONE consult-yasnippet.el
-
-- ~consult-yasnippet.el~ :: A bit of integration with ~consult.el~ and ~yasnippet.el~.
-
-#+begin_src emacs-lisp
-  (use-package consult-yasnippet
-    :straight t
-    :after (consult yasnippet)
-    :bind ("C-c y" . consult-yasnippet))
-#+end_src
-
 ** TODO tempel.el
 
 #+begin_src emacs-lisp
@@ -2005,18 +2016,6 @@ quasi-opinionated compromise.
     ;; (tempel-global-abbrev-mode)
     )
 
-#+end_src
-
-** DONE goggles.el
-
-- ~goggles.el~ :: Adds a little bit of visual feedback as you delete chunks.
-
-#+begin_src emacs-lisp
-  (use-package goggles
-    :straight t
-    :hook ((prog-mode text-mode) . goggles-mode)
-    :diminish 'goggles-mode
-    :config (setq-default goggles-pulse t))
 #+end_src
 
 ** DONE whole-line-or-region.el
@@ -2697,7 +2696,7 @@ establish the current context (or clear it).
 	 (t ad-do-it)))))
 #+end_src
 
-* WAITING Applications
+* DONE Applications
 
 ** DONE elpher.el
 
