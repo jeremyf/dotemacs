@@ -42,6 +42,35 @@ what else I may need to do.  A node marked as “DONE” should be viewed as “
 don’t need to go back and amend any documentation in that part.  However, it
 doesn’t mean I won’t put more things in that section.”
 
+** COMMENT Organizing the Ideas
+
+- Launching Emacs
+- I want to Edit a File, But How do I work this thing?
+  - Helpful
+  - Which key
+  - Orderless, Consult, Vertico, Marginalia
+- Rendering a File in a Buffer
+  - modes
+  - fringe
+- Creating or Editing the File
+- Asking information about the File and it’s Friends
+- Writing the File to Disk
+
+Separate by Command / Query
+
+
+
+Time based:
+
+- Past Me
+- Current Me
+- Future Me
+
+Before I get started
+As I’m working
+
+Command/Query Separation:
+
 ** Conventions
 
 I’ve written quite a few functions to further extend the utility of Emacs.  I
