@@ -3,12 +3,26 @@
 #+AUTHOR: Jeremy Friesen
 #+EMAIL: jeremy@jeremyfriesen.com
 #+STARTUP: overview
+
 * Introduction
+
+On <2020-05-25> I wrote [[https://takeonrules.com/2020/05/25/principles-of-my-text-editor/][Principles of My Text Editor]].  I was exploring adopting
+a new text editor, and wanted to ensure that I knew what I was looking for.
+You know, “begin with the end in mind.”[fn:8]
+
+When I first dove in, I looked into [[https://github.com/hlissner/doom-emacs][Doom]] and [[https://www.spacemacs.org][Spacemacs]].  However, in doing that
+I got ahead of myself.  So I started with an empty ~init.el~ and walked through
+the tutorial.
+
+From that point forward, I committed to use Emacs as is and when I knew I
+needed something, I’d look into how to do it.  The result?  A configuration
+that is uniquely mine.
 
 On <2022-02-01 Tue> I chose to begin extracting my the various ~*.el~ into a
 [[https://en.wikipedia.org/wiki/Literate_programming][Literate programming]] format.  As with all Emacs configurations, what follows is
 a work in progress.
-** Action Items
+
+** COMMENT Action Items
 
 - [ ] Continue working on the todo items of this document.
 - [ ] Convert this to the repository’s README.org.
@@ -22,7 +36,8 @@ recover and fix the files I broke.
 
 In other words, when I’m working on extending my Emacs configuration, I tend to
 favor a bisset approach.  Make a change, verify it, and commit.  This helps
-insulate me from “getting to far ahead of myself.”
+insulate me from “getting to far ahead of myself.”  Along the way, I failed to
+always apply that discipline.
 
 ** About the Current Structure
 
@@ -42,43 +57,25 @@ what else I may need to do.  A node marked as “DONE” should be viewed as “
 don’t need to go back and amend any documentation in that part.  However, it
 doesn’t mean I won’t put more things in that section.”
 
-** COMMENT Organizing the Ideas
+** Organizing the Ideas
 
-- Launching Emacs
-- I want to Edit a File, But How do I work this thing?
-  - Helpful
-  - Which key
-  - Orderless, Consult, Vertico, Marginalia
-- Rendering a File in a Buffer
-  - modes
-  - fringe
-- Creating or Editing the File
-- Asking information about the File and it’s Friends
-- Writing the File to Disk
+I’ve thought quite a bit about how to organize this file.  How does one narrate
+the intertwined concepts of a configuration that is an amalgamation of so many
+other people’s work?
 
-Separate by Command / Query
+My approach is to think back to my experience with the tutorial.  How it walked
+me through the concepts.  I also need to be mindful that as I introduce source
+code concepts, they are evaluated in that order.
 
+* Into the Emacs
+** Launching Emacs
 
+The things in place that I don’t think about.
 
-Time based:
-
-- Past Me
-- Current Me
-- Future Me
-
-Before I get started
-As I’m working
-
-Command/Query Separation:
-
-** Conventions
-
-I’ve written quite a few functions to further extend the utility of Emacs.  I
-try to prefix them with ~jf/~.  And if I cribbed those functions from
-elsewhere, I attempt to give credit to the source.
-
-* Basic Configuration
-** DONE straight.el
+- Straight.el
+- Configuration
+- Theming
+*** DONE straight.el
 
 I have chosen to adopt ~straight.el~ for my package management.  The fact that
 it rather seamlessly works with ~use-package~ has help me keep my code more
@@ -110,7 +107,7 @@ organized.
   (straight-use-package 'use-package)
 #+end_src
 
-** DONE Early Configuration
+*** DONE Early Configuration
 
 These are some general configurations that I’ve slowly accumulated.  There’s
 inline documentation in most cases.
@@ -186,7 +183,7 @@ inline documentation in most cases.
 		    (garbage-collect))))
 #+end_src
 
-** TODO Keymappings
+*** TODO Keymappings
 
 #+begin_src emacs-lisp
   (unbind-key "C-x C-d") ;; `list-directory'
@@ -205,7 +202,7 @@ inline documentation in most cases.
   (unbind-key "C-x C-c") ;; was `save-buffers-kill-terminal'
 #+end_src
 
-** DONE Utility Packages
+*** DONE Utility Packages
 
 These are some “invisible” packages that do some behind the scenes work.
 
@@ -266,43 +263,7 @@ These are some “invisible” packages that do some behind the scenes work.
   (use-package s :straight t)
 #+end_src
 
-- ~transient.el~ :: A package for building “menus” to prompt for additional
-  input before executing a command. See [[https://github.com/tecosaur/screenshot/blob/master/screenshot.el][screenshot.el]] for some examples or the
-  ubiquitous [[https://magit.vc][magit.el]].
-
-#+begin_src emacs-lisp
-  (use-package transient :straight t)
-#+end_src
-
-- ~helfpul.el~ :: A package to help introspect on Emacs.  When learning Emacs,
-  both then and now, I often invoke this helpful commands.
-
-#+begin_src emacs-lisp
-  ;; I have found this package quite "helpful"; When I want to know the
-  ;; name of a function or key or variable, I can use the helpful
-  ;; package.
-  (use-package helpful
-    :straight t
-    :config
-    (transient-define-prefix jf/helpful-menu ()
-      "Return a `transient' compliant list to apply to different transients."
-      ["Help"
-       ""
-       ("b" "Bindings" embark-bindings)
-       ("c" "Command" helpful-command)
-       ("f" "Function (interactive)" helpful-callable)
-       ("F" "Function (all)" helpful-function)
-       ("k" "Key" helpful-key)
-       ("l" "Library" find-library)
-       ("m" "Macro" helpful-macro)
-       ("p" "Thing at point" helpful-at-point)
-       ("." "Thing at point" helpful-at-point)
-       ("t" "Text properties" describe-text-properties)
-       ("v" "Variable" helpful-variable)])
-    :bind ("C-s-h" . jf/helpful-menu))
-#+end_src
-
-** TODO Variable/const definitions
+*** TODO Variable/const definitions
 
 #+begin_src emacs-lisp
   (defconst jf/fixed-width-font-name
@@ -334,18 +295,11 @@ These are some “invisible” packages that do some behind the scenes work.
      "~/git/dotzshrc/"
      "~/git/dotemacs/"
      "~/git/org/"
-     "~/git/org/archive"
-     "~/git/org/daily"
-     "~/git/org/public"
-     "~/git/org/personal"
-     "~/git/org/personal/thel-sector"
-     "~/git/org/hesburgh-libraries"
-     "~/git/org/forem"
-     )
+     "~/git/org/archive")
     "Relevant data directories for my day to day work.")
 #+end_src
 
-** TODO pretty-hydra.el
+*** TODO pretty-hydra.el
 
 #+begin_src emacs-lisp
 
@@ -356,6 +310,153 @@ These are some “invisible” packages that do some behind the scenes work.
 	       :type git :host github :repo "jerrypnz/major-mode-hydra.el"
 	       :files (:defaults (:exclude "major-mode-hydra.el"))))
 #+end_src
+
+** How Does this Thing Work?
+
+I want to make it easy to seek help on different aspects of Emacs.  There’s
+tooling baked into Emacs, but the ~helpful~ “provides much more contextual
+information.”
+
+#+begin_src emacs-lisp
+  (use-package helpful :straight t)
+#+end_src
+
+I want to make a menu to help remind me of the help I have available.  In
+previous incarnations I’ve written these menus using [[https://github.com/jerrypnz/major-mode-hydra.el#pretty-hydra][pretty-hydra]], but I’ve
+started moving these to [[https://github.com/magit/transient/tree/440a341831398b825dc2288a10821cf7be1999ca][transient]]; a package that’s a hard requirement for
+packages I’ll later introduce.
+
+#+begin_src emacs-lisp
+  (use-package transient
+    :straight t
+    :config
+    (transient-define-prefix jf/helpful-menu ()
+      "Return a `transient' compliant list to apply to different transients."
+      ["Help"
+       ""
+       ("b" "Bindings" embark-bindings)
+       ("c" "Command" helpful-command)
+       ("f" "Function (interactive)" helpful-callable)
+       ("F" "Function (all)" helpful-function)
+       ("k" "Key" helpful-key)
+       ("l" "Library" find-library)
+       ("m" "Macro" helpful-macro)
+       ("p" "Thing at point" helpful-at-point)
+       ("." "Thing at point" helpful-at-point)
+       ("t" "Text properties" describe-text-properties)
+       ("v" "Variable" helpful-variable)])
+    :bind ("C-s-h" . jf/helpful-menu))
+#+end_src
+
+With the above, I can now type ~C-s-h~ to bring up my helpful menu, and begin
+exploring.
+
+Emacs has lots of keybindings and many of them chain together several keys.  As
+I’m learning those keys, I might remember the first prefix.
+
+When I type the first few keys and wait, ~which-key~ popups up a menu of
+candidate functions and the keys to invoke each of them.  Another way to
+introspect Emacs.
+
+#+begin_src emacs-lisp
+  (use-package which-key
+    :config
+    (which-key-mode)
+    (which-key-setup-side-window-right)
+    (which-key-show-major-mode)
+    :diminish 'which-key-mode
+    :straight t)
+#+end_src
+
+Related to this, when I’m in a buffer, I want to know what can I do.  The
+~embark~ package provides the missing context menu (e.g. “right click”) for
+Emacs.  /It provides more, but we’ll get to that later./
+
+#+begin_src emacs-lisp
+  (use-package embark
+    :straight t
+    :bind
+    (("C-." . embark-act)       ;; pick some comfortable binding
+     ("M-." . embark-dwim)
+     ("C-s-e" . embark-export)
+     ("C-h b" . embark-bindings))
+    :init
+    ;; Optionally replace the key help with a completing-read interface
+    (setq prefix-help-command #'embark-prefix-help-command)
+    :config
+    (setq embark-action-indicator
+	  (lambda (map &optional _target)
+	    (which-key--show-keymap "Embark" map nil nil 'no-paging)
+	    #'which-key--hide-popup-ignore-command)
+	  embark-become-indicator embark-action-indicator)
+    ;; Hide the mode line of the Embark live/completions buffers
+    (add-to-list 'display-buffer-alist
+		 '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+		   nil
+		   (window-parameters (mode-line-format . none)))))
+#+end_src
+
+When I call ~embark-act~ (via ~C-.~) I get a buffer listing the actions I can
+take on the target.  A contextual menu if you will.
+
+There’s also the ~embark-dwim~ (I map that to ~M-.~).  Given a target, the
+place at point, when I call ~embark-dwim~ it takes an applicable action.  For a
+URL, it will open that URL in the configured browser.
+
+As a tangent, let’s think in terms of “pairs”.  A target and an action.
+
+With ~embark-export~ I can gather a group of targets (via ~embark-export~) and
+then take actions on them.  I write more about this later as it relates to
+~wgrep~.
+
+
+
+  - Helpful
+    - Transient (introd~ucing the concept for future discussion)
+  - Which Key
+  - Marginalia
+  - Embark
+  - Consult
+  - Vertico
+  - Orderless
+
+** Writing, Coding, Computering
+
+  - Fringe
+  - Modes
+  - Projects
+  - Customizations for Blogging
+
+** Integrated “Applications”
+
+  - Org Mode
+  - Org Roam
+  - Magit
+  - Elfeed
+  - Elpher
+- Remembering it All
+
+Separate by Command / Query
+
+
+
+Time based:
+
+- Past Me
+- Current Me
+- Future Me
+
+Before I get started
+As I’m working
+
+Command/Query Separation:
+
+** Conventions
+
+I’ve written quite a few functions to further extend the utility of Emacs.  I
+try to prefix them with ~jf/~.  And if I cribbed those functions from
+elsewhere, I attempt to give credit to the source.
+
 
 * DONE Display
 
@@ -1462,39 +1563,7 @@ entirely muscle memory.
 
 ** DONE embark.el
 
-- ~embark.el~ :: The missing context menu (e.g. “right click”) for Emacs, but conceptually so much more.  See https://github.com/oantolin/embark.
 
-  Let’s think in terms of “pairs”.  A targe and an action.
-
-  When I call ~embark-act~ (via ~C-.~) Embark gives me buffer listing the actions I can take on the target.  A contextual menu if you will.
-
-  I can also gather a group of targets (via ~embark-export~) and then take actions on them.  I write more about this in ~wgrep.el~.
-
-  There’s also the ~embark-dwim~ (I map that to ~M-.~).  Given a target, say the place at point, when I call ~embark-dwim~ it takes an applicable action.  For a URL, it will open that URL in the configured browser.
-
-#+begin_src emacs-lisp
-  (use-package embark
-    :straight t
-    :bind
-    (("C-." . embark-act)       ;; pick some comfortable binding
-     ("M-." . embark-dwim)
-     ("C-s-e" . embark-export)
-     ("C-h b" . embark-bindings))
-    :init
-    ;; Optionally replace the key help with a completing-read interface
-    (setq prefix-help-command #'embark-prefix-help-command)
-    :config
-    (setq embark-action-indicator
-	  (lambda (map &optional _target)
-	    (which-key--show-keymap "Embark" map nil nil 'no-paging)
-	    #'which-key--hide-popup-ignore-command)
-	  embark-become-indicator embark-action-indicator)
-    ;; Hide the mode line of the Embark live/completions buffers
-    (add-to-list 'display-buffer-alist
-		 '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
-		   nil
-		   (window-parameters (mode-line-format . none)))))
-#+end_src
 
 ** DONE embark-consult.el
 
@@ -1863,19 +1932,6 @@ quasi-opinionated compromise.
 
 ** DONE which-key.el
 
-- ~which-key.el~ :: renders a menu of commands for an incomplete command
-  prefix.  For example if I type ~C-x~ and wait a moment, ~which-key.el~ will
-  generate a menu of available commands.
-
-#+begin_src emacs-lisp
-  (use-package which-key
-    :config
-    (which-key-mode)
-    (which-key-setup-side-window-right)
-    (which-key-show-major-mode)
-    :diminish 'which-key-mode
-    :straight t)
-#+end_src
 
 ** DONE hippie-exp.el
 
@@ -4348,6 +4404,10 @@ I’ve opted to take a different path; write some Emacs functions instead.
 #+end_src
 
 * Footnotes
+
+[fn:8] Steve Covey, and trademarked by FranklinCovey.
+
+[fn:7] Yes, I said I didn’t want an Electron-based editor, but VS Code is a dominant player in the open source text editor.
 
 [fn:1] Iterating on my v2 ~org-roam~ setup was critical in learning more about Emacs.  I will certainly [[https://codeberg.org/takeonrules/dotemacs/src/commit/2f5d6c81d68aaa0d4de9cc7b409c090c0886300a/jnf-emacs-packages/jnf-org-roam-v2.el][reference my v2 org roam configuration]] as I continue my Emacs usage.
 
