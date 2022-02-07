@@ -127,9 +127,9 @@ inline documentation in most cases.  There might be little bits worth teasing ou
   (defconst jf/silence-loading-log t
     "When t log to stdout load messages from this configuration.
 
-  In a previous iteration, I loaded lots of separate '*.el' files.
-  This flag allowed me to more easily troubleshoot those load
-  attempts.")
+    In a previous iteration, I loaded lots of separate '*.el' files.
+    This flag allowed me to more easily troubleshoot those load
+    attempts.")
 
   (global-so-long-mode) ;; Handle long files.
   (electric-pair-mode)  ;; https://blog.sumtypeofway.com/posts/emacs-config.html
@@ -145,28 +145,55 @@ inline documentation in most cases.  There might be little bits worth teasing ou
 
   (setq
    backup-by-copying t         ;; Don't delink hardlinks
+
    backup-directory-alist '((".*" . "~/.emacs.d/backups/"))
+
    bookmark-default-file "~/git/emacs-bookmarks/bookmarks"
+
    custom-safe-themes t        ;; I may as well trust themes.
+
    create-lockfiles nil        ;; Don't create lock files.
+
    delete-old-versions t       ;; Automatically delete excess backups
+
    idle-update-delay 1.1       ;; Slow down the UI being updated to improve
 			       ;; performance
+
    indent-tabs-mode nil        ;; Ensure tabs are expanded, not inserted
+
    inhibit-startup-screen t    ;; Don't include the  emacs "start" window
+
    kept-new-versions 20        ;; how many of the newest versions to keep
+
    kept-old-versions 5         ;; and how many of the old
+
    kill-ring-max 120           ;; Set a generous kill ring size.
+
    read-process-output-max (* 6 512 1024)  ;; Increase read size per process
+
    recentf-max-menu-items 50
+
    recentf-max-saved-items 50
+
    ring-bell-function 'ignore  ;; Stop ringing any bell
+
    split-width-threshold 100   ;; Most of the times I favor two windows
-   ;; side-by-side within a frame
+			       ;; side-by-side within a frame
+
    vc-follow-symlinks t        ;; Follow symlinks instead of prompting.
+
    version-control t           ;; Use version numbers on backups
-   x-underline-at-descent-line t ;; Recommendation from https://protesilaos.com/emacs/modus-themes
+
+   x-underline-at-descent-line t ;; Recommendation from
+				 ;; https://protesilaos.com/emacs/modus-themes
    )
+
+  (setq enable-recursive-minibuffers nil) ;;   I tried enabling this, and found
+					  ;;   myself sometimes lost in a
+					  ;;   labyrinth of minibuffers.  This
+					  ;;   change ensures that there’s only
+					  ;;   one.
+
 
 
   (global-hl-line-mode)
@@ -191,19 +218,19 @@ inline documentation in most cases.  There might be little bits worth teasing ou
 		    (garbage-collect))))
 #+end_src
 
-*** TODO Basic Theming
-
-I want to start with a basic look and feel.  I’ve chosen the modus themes
-(e.g. ~modus-vivendi~ and ~modus-operandi~).  They provide a light and dark
-theme with a focus on visual accessibility.
-
-I love [[http://protesilaos.com][Prot]]’s attention to detail with the modus themes.  Here’s my
-configuration for these two sibling themes.  There’s a bit of chatter, but all
-told it sets things up how I like.
+And I’m going to disable a few key bindings.  These were always messing me up a bit.
 
 #+begin_src emacs-lisp
+  (unbind-key "C-z") ;; `suspend-frame'
+  (unbind-key "C-x C-c") ;; was `save-buffers-kill-terminal'
+#+end_src
 
-    (defconst jf/fixed-width-font-name
+*** DONE Basic Theming
+
+I want to start with a basic look and feel.  First, the choice of primary font.
+
+#+begin_src emacs-lisp
+  (defconst jf/fixed-width-font-name
     "Hack Nerd Font"
     "The name of the fixed width font.
     I have it sprinkled through too many places.
@@ -214,7 +241,17 @@ told it sets things up how I like.
     - \"Hack Nerd Font\"")
 
   (set-frame-font jf/fixed-width-font-name)
+#+end_src
 
+And now the theme.  I’ve chosen the modus themes (e.g. ~modus-vivendi~ and
+~modus-operandi~).  They provide a light and dark theme with a focus on visual
+accessibility.
+
+I love [[http://protesilaos.com][Prot]]’s attention to detail with the modus themes.  Here’s my
+configuration for these two sibling themes.  There’s a bit of chatter, but all
+told it sets things up how I like.
+
+#+begin_src emacs-lisp
   (use-package modus-themes
     ;; :straight (modus-themes :type built-in)
     :straight (:type git :host gitlab :repo "protesilaos/modus-themes" :branch "main")
@@ -266,9 +303,11 @@ between toggles.
 
 ** How Does this Thing Work?
 
-I want to make it easy to seek help on different aspects of Emacs.  There’s
-tooling baked into Emacs, but the ~helpful~ “provides much more contextual
-information.”
+With the initial “setup” out of the way, let’s dive into how things work.
+
+I want to make it easy to find help on different aspects of Emacs.  There’s
+tooling baked into Emacs, but the ~helpful~ package “provides much more
+contextual information.”
 
 #+begin_src emacs-lisp
   (use-package helpful :straight t)
@@ -307,7 +346,7 @@ exploring.
 Emacs has lots of keybindings and many of them chain together several keys.  As
 I’m learning those keys, I might remember the first prefix.
 
-When I type the first few keys and wait, ~which-key~ popups up a menu of
+When I type the first key of a sequence and wait, ~which-key~ pops up a menu of
 candidate functions and the keys to invoke each of them.  Another way to
 introspect Emacs.
 
@@ -359,16 +398,12 @@ URL, it will open that URL in the configured browser.
 As a tangent, let’s think in terms of “pairs”.  A target and an action.
 
 With ~embark-export~ I can gather a group of targets (via ~embark-export~) and
-then take actions on them.  I write more about this later as it relates to
+sthen take actions on them.  I write more about this later as it relates to
 ~wgrep~.
 
 
 
-  - Helpful
-    - Transient (introd~ucing the concept for future discussion)
-  - Which Key
   - Marginalia
-  - Embark
   - Consult
   - Vertico
   - Orderless
@@ -411,8 +446,8 @@ Command/Query Separation:
 #+begin_src emacs-lisp
   (unbind-key "C-x C-d") ;; `list-directory'
   (global-set-key (kbd "C-x C-d") 'dired) ;; We’ll override this later with
-					  ;; `consult-dir' but this is a good
-					  ;; stand-in.
+  ;; `consult-dir' but this is a good
+  ;; stand-in.
 
   (global-set-key (kbd "<M-delete>") 'kill-word)
 
@@ -420,9 +455,6 @@ Command/Query Separation:
   (global-set-key (kbd "<s-up>") 'beginning-of-buffer)
 
   ;; Far to easy to type this on accident, and I'm not a fan of it's behavior.
-  (unbind-key "C-z") ;; `suspend-frame'
-
-  (unbind-key "C-x C-c") ;; was `save-buffers-kill-terminal'
 #+end_src
 *** DONE Utility Packages
 
