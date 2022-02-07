@@ -332,6 +332,17 @@ Next up, let’s load the theme based on my operating system’s settings
       (load-theme 'modus-operandi)))
 #+end_src
 
+Show tabs in the current window.  The tab system is something I wrestle with,
+but I appreciate it’s existence.  These configurations make it easier to use.
+
+#+begin_src emacs-lisp
+  (global-tab-line-mode t)
+  ;; This maps to MacOS's tab switching keys.
+  (global-set-key (kbd "s-{") 'previous-buffer)
+  (global-set-key (kbd "s-}") 'next-buffer)
+#+end_src
+
+
 ** How Does this Thing Work?
 
 In this section my goal is to load some “fundamental” packages that help me
@@ -512,33 +523,7 @@ provides annotations to minibuffer completions, and pairs nicely with Vertico.
 #+end_src
 
 ** Writing, Coding, Computering
-
-  - Fringe
-  - Modes
-  - Projects
-  - Customizations for Blogging
-
-** Integrated “Applications”
-
-  - Org Mode
-  - Org Roam
-  - Magit/Git
-  - Elfeed
-  - Elpher
-  - Projects
-
-* TODO Early Configuration
-
-*** TODO Keymappings
-
-#+begin_src emacs-lisp
-  (unbind-key "C-x C-d") ;; `list-directory'
-  (global-set-key (kbd "C-x C-d") 'dired) ;; We’ll override this later with
-  ;; `consult-dir' but this is a good
-  ;; stand-in.
-  ;; Far to easy to type this on accident, and I'm not a fan of it's behavior.
-#+end_src
-*** DONE Utility Packages
+** DONE Utility Packages
 
 These are some “invisible” packages that do some behind the scenes work.
 
@@ -600,7 +585,28 @@ These are some “invisible” packages that do some behind the scenes work.
 #+end_src
 
 
-*** TODO Variable/const definitions
+
+  - Fringe
+  - Modes
+  - Projects
+  - Customizations for Blogging
+
+** Integrated “Applications”
+
+  - Org Mode
+  - Org Roam
+  - Magit/Git
+  - Elfeed
+  - Elpher
+  - Projects
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+* TODO Variable/const definitions
 
 #+begin_src emacs-lisp
   (defconst jf/tor-home-directory
@@ -1401,8 +1407,6 @@ What follows is adjustments to emacs settings as they relate to completion.
     (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode))
 #+end_src
 
-** DONE marginalia.el
-
 
 ** DONE consult.el
 
@@ -1585,10 +1589,6 @@ There’s a macro in here somewhere.
 /Note:/ The =CMD= + =t= (e.g. ~s-t~ in Emacs) is a carryover from my [[https://macromates.com][Textmate]]
 and [[https://www.sublimetext.com/][Sublime Text]] days.  More than any other key combination, that one is
 entirely muscle memory.
-
-** DONE embark.el
-
-
 
 ** DONE embark-consult.el
 
@@ -1813,17 +1813,6 @@ More on these component matchings styles is available at [[https://github.com/mi
 
 
 * DONE Window Manipulation
-** DONE Tab Line
-
-Show tabs in the current window.  The tab system is something I wrestle with,
-but I appreciate it’s existence.  These configurations make it easier to use.
-
-#+begin_src emacs-lisp
-  (global-tab-line-mode t)
-  (global-set-key (kbd "s-{") 'previous-buffer)
-  (global-set-key (kbd "s-}") 'next-buffer)
-#+end_src
-
 ** DONE buffer-move.el
 
 - ~buffer-move.el~ :: From [[https://github.com/lukhas/buffer-move][lukhas/buffer-move]], this package helps me quickly
