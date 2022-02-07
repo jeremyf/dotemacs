@@ -2431,6 +2431,19 @@ establish the current context (or clear it).
      (list (completing-read-multiple "Tag(s): " (org-roam-tag-completions))))
     (setq jf/org-auto-tags--current-list tags))
 
+  (cl-defun jf/org-context-list-completing-read (&key
+						   (context-plist
+						    jf/org-context-plist))
+      "Create a list of contexts from the CONTEXT-PLIST for completing read.
+
+	 The form should be '((\"forem\" 1) (\"burning-loscusts\" 2))."
+      ;; Skipping the even entries as those are the "keys" for the plist,
+      ;; the odds are the values.
+      (-non-nil (seq-map-indexed (lambda (context index)
+				   (when (oddp index)
+				     (list (plist-get context :name) index)))
+				 context-plist)))
+
   (cl-defun jf/org-auto-tags--set-by-context (context &key (context-plist jf/org-context-plist))
     "Set auto-tags by CONTEXT.
 
@@ -2453,6 +2466,12 @@ With the ~jf/org-auto-tags--current-list~ variable set, I want a function to inj
 	(concat ":" (s-join ":" tag-list) ":")
       ""))
 #+end_src
+
+And finally, we have functions to use for establishing what templates are available based on the context, as well as what to setup as the default filter-fn for org-capture.
+
+In other words, when I have set one or more tags, I want to use the templates
+appropriate for those tags and filter my org-roam-nodes so that only those
+nodes that have all of the tags are candidates.
 
 #+begin_src emacs-lisp
   (cl-defun jf/org-roam-templates-list (template &key (template-plist jf/org-roam-capture-templates-plist))
@@ -2477,19 +2496,6 @@ With the ~jf/org-auto-tags--current-list~ variable set, I want a function to inj
 	(jf/org-roam-templates-list :main)
       (jf/org-roam-templates-list :all)))
 
-  (cl-defun jf/org-context-list-completing-read (&key
-						 (context-plist
-						  jf/org-context-plist))
-    "Create a list from the CONTEXT-PLIST for completing read.
-
-       The form should be '((\"forem\" 1) (\"burning-loscusts\" 2))."
-    ;; Skipping the even entries as those are the "keys" for the plist,
-    ;; the odds are the values.
-    (-non-nil (seq-map-indexed (lambda (context index)
-				 (when (oddp index)
-				   (list (plist-get context :name) index)))
-			       context-plist)))
-
   (cl-defun jf/org-roam-filter-context-fn (node &key (tag-list jf/org-auto-tags--current-list))
     "Determine TAG-LIST is subset of NODE's tags."
     (gnus-subsetp tag-list (org-roam-node-tags node)))
@@ -2497,6 +2503,43 @@ With the ~jf/org-auto-tags--current-list~ variable set, I want a function to inj
 
 
 ***** Org Roam Configuration
+
+I wrote three functions to mirror three core functions of org-mode:
+
+- ~jf/org-roam-capture~ :: find or create a node and file it away.
+- ~jf/org-roam-node-insert~ :: find or create a node and insert a link to that
+  node.  This is my “take notes quick” function.
+- ~jf/org-roam-find-node~ :: find a node and open that node in the frame.
+
+For each of those functions, I establish the filter based on the current
+context and/or tags.  I also limit the available capture templates based on the
+context.
+
+#+begin_src emacs-lisp
+  (defun jf/org-roam-capture (&optional goto keys)
+    "Call `org-roam-capture' based on set tags."
+    (interactive "P")
+    (org-roam-capture goto
+		      keys
+		      :filter-fn 'jf/org-roam-filter-context-fn
+		      :templates (jf/org-roam-templates-context-fn)))
+
+  (defun jf/org-roam-node-insert ()
+    "Call `org-roam-node-insert' based on set tags."
+    (interactive)
+    (org-roam-node-insert 'jf/org-roam-filter-context-fn
+			  :templates (jf/org-roam-templates-context-fn)))
+
+  (defun jf/org-roam-find-node (&optional other-window initial-input)
+    "Call `org-roam-node-find' based on set tags."
+    (interactive current-prefix-arg)
+    (org-roam-node-find other-window
+			initial-input
+			'jf/org-roam-filter-context-fn
+			:templates 'jf/org-roam-templates-context-fn))
+#+end_src
+
+And with all of that, let’s get into the org-roam configuration.
 
 #+begin_src emacs-lisp
   (use-package org-roam
@@ -2514,31 +2557,11 @@ With the ~jf/org-auto-tags--current-list~ variable set, I want a function to inj
       ;; Note: you may need `org-roam-db-clear-all' followed by `org-roam-db-sync'
       (org-roam-db-sync)
       (org-roam-update-org-id-locations))
-    (defun jf/org-roam-capture (&optional goto keys)
-      "Call `org-roam-capture' based on set tags."
-      (interactive "P")
-      (org-roam-capture goto
-			keys
-			:filter-fn 'jf/org-roam-filter-context-fn
-			:templates (jf/org-roam-templates-context-fn)))
-
-    (defun jf/org-roam-node-insert ()
-      "Call `org-roam-node-insert' based on set tags."
-      (interactive)
-      (org-roam-node-insert 'jf/org-roam-filter-context-fn
-			    :templates (jf/org-roam-templates-context-fn)))
-
-    (defun jf/org-roam-find-node (&optional other-window initial-input)
-      "Call `org-roam-node-find' based on set tags."
-      (interactive current-prefix-arg)
-      (org-roam-node-find other-window
-			  initial-input
-			  'jf/org-roam-filter-context-fn
-			  :templates 'jf/org-roam-templates-context-fn))
     :custom
     (org-roam-directory (file-truename "~/git/org"))
     (org-roam-node-display-template
-     (concat "${type:4}   ${title:*} " (propertize "${tags:40}" 'face 'org-tag)))
+     (concat "${type:4}   ${title:*} "
+	     (propertize "${tags:40}" 'face 'org-tag)))
     (org-roam-capture-templates (jf/org-roam-templates-list :all))
     :bind (("C-s-f" . jf/org-roam-find-node)
 	   ("C-s-c" . jf/org-roam-capture))
@@ -2571,6 +2594,8 @@ With the ~jf/org-auto-tags--current-list~ variable set, I want a function to inj
 	   (file-relative-name (org-roam-node-file node) org-roam-directory))))
       (error "")))
 #+end_src
+
+All told, the past experience when running [[https://takeonrules.com/series/new-vistas-in-the-thel-sector/][New Vistas in the Thel Sector // Take on Rules]]
 
 **** DONE org-d20.el
 
