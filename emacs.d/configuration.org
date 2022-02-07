@@ -218,11 +218,16 @@ inline documentation in most cases.  There might be little bits worth teasing ou
 		    (garbage-collect))))
 #+end_src
 
-And I’m going to disable a few key bindings.  These were always messing me up a bit.
+And I’m going to disable a few key bindings.  These were always messing me up a
+bit.  Also enable a few that I find helpful.  (I’ll enable a lot more later).
 
 #+begin_src emacs-lisp
   (unbind-key "C-z") ;; `suspend-frame'
   (unbind-key "C-x C-c") ;; was `save-buffers-kill-terminal'
+
+  (global-set-key (kbd "<M-delete>") 'kill-word)
+  (global-set-key (kbd "<s-down>") 'end-of-buffer)
+  (global-set-key (kbd "<s-up>") 'beginning-of-buffer)
 #+end_src
 
 *** DONE Basic Theming
@@ -510,9 +515,6 @@ provides annotations to minibuffer completions, and pairs nicely with Vertico.
     :init (marginalia-mode))
 #+end_src
 
-
-
-
 ** Writing, Coding, Computering
 
   - Fringe
@@ -553,12 +555,6 @@ Command/Query Separation:
   (global-set-key (kbd "C-x C-d") 'dired) ;; We’ll override this later with
   ;; `consult-dir' but this is a good
   ;; stand-in.
-
-  (global-set-key (kbd "<M-delete>") 'kill-word)
-
-  (global-set-key (kbd "<s-down>") 'end-of-buffer)
-  (global-set-key (kbd "<s-up>") 'beginning-of-buffer)
-
   ;; Far to easy to type this on accident, and I'm not a fan of it's behavior.
 #+end_src
 *** DONE Utility Packages
