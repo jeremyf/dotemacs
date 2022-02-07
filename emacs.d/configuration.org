@@ -303,6 +303,9 @@ between toggles.
 
 ** How Does this Thing Work?
 
+In this section my goal is to load some “fundamental” packages that help me
+better introspect and navigate Emacs.
+
 With the initial “setup” out of the way, let’s dive into how things work.
 
 I want to make it easy to find help on different aspects of Emacs.  There’s
@@ -360,7 +363,7 @@ introspect Emacs.
     :straight t)
 #+end_src
 
-Related to this, when I’m in a buffer, I want to know what can I do.  The
+Related to this, when I’m in a buffer, I want to know what I can do.  The
 ~embark~ package provides the missing context menu (e.g. “right click”) for
 Emacs.  /It provides more, but we’ll get to that later./
 
@@ -401,11 +404,85 @@ With ~embark-export~ I can gather a group of targets (via ~embark-export~) and
 sthen take actions on them.  I write more about this later as it relates to
 ~wgrep~.
 
+Embark helps me know what actions are available, but I may want a broader
+context.
+
+Another mechanism for taking an action is ~M-x~ (or
+~execute-extended-command~).  When I type ~M-x~, I’m prompted to provide the
+name of a function.
+
+It would instead of typing ~[TAB]~, I could see a list of candidate functions.
+For that, I’m going to use the lightweight vertico package.
+
+#+begin_src emacs-lisp
+  (use-package vertico
+    :straight t
+    :config
+    (vertico-mode)
+    ;; Use `consult-completion-in-region' if Vertico is enabled.
+    ;; Otherwise use the default `completion--in-region' function.
+    (setq completion-in-region-function
+	  (lambda (&rest args)
+	    (apply (if vertico-mode
+		       #'consult-completion-in-region
+		     #'completion--in-region)
+		   args)))
+    (advice-add #'completing-read-multiple
+		:override #'consult-completing-read-multiple)
+    (setq vertico-cycle t))
+#+end_src
+
+Further more, I’m going to enable a few extensions.
+
+The ~vertico-indexed.elc~ extension adds a visual indicator of each candidate’s
+index.  Further, I can type ~C-<num> ENT~ and select that candidate.  Often
+it’s just as easy to navigate via ~TAB~ or ~C-n~ / ~C-p~ but the visual
+indicator is a nice bit of polish.
+
+#+begin_src emacs-lisp
+  (load "~/.emacs.d/straight/build/vertico/extensions/vertico-indexed.elc"
+	nil
+	jf/silence-loading-log)
+  (vertico-indexed-mode)
+#+end_src
+
+The ~vertico-repeat.elc~ extension does one simple thing: it remembers and
+gives quick access to the last command you entered in the “minibuffer.”  This
+can be super userful if I built up a complicated ~consult-ripgrep~.
+
+#+begin_src emacs-lisp
+  (load "~/.emacs.d/straight/build/vertico/extensions/vertico-repeat.elc"
+	nil
+	jf/silence-loading-log)
+  (global-set-key (kbd "M-r") #'vertico-repeat)
+  (add-hook 'minibuffer-setup-hook #'vertico-repeat-save)
+#+end_src
+
+Related to, but independent of ~vertico-repeat.elc~ is enabling
+~savehist-mode~.  With that enabled, I have access to a few dozen of the last
+minibuffer commands I issued.  These are, by default, in ~\~/.emacs.d/history~.
+
+#+begin_src emacs-lisp
+  (savehist-mode 1)
+#+end_src
+
+Now that I have a list of candidates commands, it would be nice if those
+candidates had some annotations.  Let’s load the ~marginalia~ package.  It
+provides annotations to minibuffer completions, and pairs nicely with Vertico.
+
+#+begin_src emacs-lisp
+  (use-package marginalia
+    :straight t
+    ;; /Note:/ The declaration of `marginalia-mode' must be in the :init
+    ;; section.This ensures that it is enabled right away.  It also forces the
+    ;; loading of the package.
+    :init (marginalia-mode))
+
+  (
+#+end_src
 
 
-  - Marginalia
   - Consult
-  - Vertico
   - Orderless
 
 ** Writing, Coding, Computering
@@ -519,7 +596,7 @@ These are some “invisible” packages that do some behind the scenes work.
 *** TODO Variable/const definitions
 
 #+begin_src emacs-lisp
-(defconst jf/tor-home-directory
+  (defconst jf/tor-home-directory
     (file-truename "~/git/takeonrules.source")
     "The home directory of TakeOnRules.com Hugo repository.")
 
@@ -1298,75 +1375,6 @@ That’s one of those hot-keys almost burned into soul.
 #+end_src
 * DONE Completion
 
-** DONE vertico.el
-
-#+begin_src emacs-lisp
-  (use-package vertico
-    :straight t
-    :config
-    (vertico-mode)
-    ;; Use `consult-completion-in-region' if Vertico is enabled.
-    ;; Otherwise use the default `completion--in-region' function.
-    (setq completion-in-region-function
-	  (lambda (&rest args)
-	    (apply (if vertico-mode
-		       #'consult-completion-in-region
-		     #'completion--in-region)
-		   args)))
-    (advice-add #'completing-read-multiple
-		:override #'consult-completing-read-multiple)
-    (setq vertico-cycle t))
-#+end_src
-
-*** Vertico Extensions
-
-The ~vertico-indexed.elc~ extension adds a visual indicator of each candidate’s
-index.  Further, I can type ~C-<num> ENT~ and select that candidate.  Often
-it’s just as easy to navigate via ~TAB~ or ~C-n~ / ~C-p~ but the visual
-indicator is a nice bit of polish.
-
-#+begin_src emacs-lisp
-  (load "~/.emacs.d/straight/build/vertico/extensions/vertico-indexed.elc"
-	nil
-	jf/silence-loading-log)
-  (vertico-indexed-mode)
-#+end_src
-
-I’ve commented out the ~vertico-buffer.elc~ extension.  When active, instead of
-using the mini-buffer it creates a new window.  I’m uncertain how I fully feel
-about this function.  When I activate it, I’m sometimes “surprised” at a
-different experience from what I’m accustomed to in Emacs.  Then again, at
-least I’m not trapped in the recursive mini-buffer challenges.
-
-#+begin_src emacs-lisp
-  ;; (load "~/.emacs.d/straight/build/vertico/extensions/vertico-buffer.elc"
-  ;;       nil
-  ;;       jf/silence-loading-log)
-  ;; (vertico-buffer-mode)
-  ;; (setq vertico-buffer-display-action
-  ;;       '(display-buffer-at-bottom (window-height . 15)))
-#+end_src
-
-The ~vertico-repeat.elc~ extension does one simple thing: it remembers and
-gives quick access to the last command you entered in the “minibuffer.”  This
-can be super userful if I built up a complicated ~consult-ripgrep~.
-
-#+begin_src emacs-lisp
-  (load "~/.emacs.d/straight/build/vertico/extensions/vertico-repeat.elc"
-	nil
-	jf/silence-loading-log)
-  (global-set-key (kbd "M-r") #'vertico-repeat)
-  (add-hook 'minibuffer-setup-hook #'vertico-repeat-save)
-#+end_src
-
-Related to, but independent of ~vertico-repeat.elc~ is enabling
-~savehist-mode~.  With that enabled, I have access to a few dozen of the last
-minibuffer commands I issued.  These are, by default, in ~\~/.emacs.d/history~.
-
-#+begin_src emacs-lisp
-  (savehist-mode 1)
-#+end_src
-
 ** Emacs Adjustments for Completion
 
 What follows is adjustments to emacs settings as they relate to completion.
@@ -1401,19 +1409,6 @@ What follows is adjustments to emacs settings as they relate to completion.
 
 ** DONE marginalia.el
 
-The ~marginalia~ package provides annotations to minibuffer completions; I
-shudder to think how hard it would be to navigate Emacs’s ~M-x~ command without
-annotations.
-
-#+begin_src emacs-lisp
-  (use-package marginalia
-    :straight t
-    :init (marginalia-mode))
-#+end_src
-
-/Note:/ The declaration of ~marginalia-mode~ must be in the ~;init~ section.
-This ensures that it is enabled right away.  It also forces the loading of the
-package.
 
 ** DONE consult.el
 
