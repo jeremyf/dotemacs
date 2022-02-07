@@ -543,6 +543,76 @@ provides annotations to minibuffer completions, and pairs nicely with Vertico.
 
 ** Writing, Coding, Computering
 
+*** DONE Support Packages
+
+When I start writing functions, there’s a few packages I want to consider.
+
+- ~keychain-environment.el~ :: Load keychain environment variables
+
+#+begin_src emacs-lisp
+  (use-package keychain-environment
+    :straight t
+    :config (keychain-refresh-environment))
+#+end_src
+
+- ~dash.el~ :: A modern list API for Emacs. No 'cl required.  (See https://github.com/magnars/dash.el/)
+
+#+begin_src emacs-lisp
+  (use-package dash :straight t)
+#+end_src
+
+- ~f.el~ :: A modern API for working with files and directories in Emacs. (See https://github.com/rejeep/f.el/)
+
+#+begin_src emacs-lisp
+  (use-package f :straight t)
+#+end_src
+
+- ~s.el~ :: The long lost Emacs string manipulation library.  (See https://github.com/magnars/s.el/)
+
+#+begin_src emacs-lisp
+  (use-package s :straight t)
+#+end_src
+
+- ~editorconfig.el~ :: “EditorConfig helps maintain consistent coding styles
+  for multiple developers working on the same project across various editors
+  and IDEs.”  See https://editorconfig.org/#overview for more details.
+
+#+begin_src emacs-lisp
+  (use-package editorconfig
+    :straight t
+    :diminish editorconfig-mode
+    :config
+    (editorconfig-mode 1))
+#+end_src
+
+- ~rigprep.el~ :: For many years, I’ve used “The Silver Searcher”, or ~ag~ on
+  the command line.[fn:6].  However, [[https://github.com/BurntSushi/ripgrep][ripgrep]] provides even faster searching,
+  with an almost identical parameter list.
+
+#+begin_src emacs-lisp
+  (use-package ripgrep
+    :init (setq ripgrep-arguments "--ignore-case")
+    :straight t)
+#+end_src
+
+
+
+
+  - Org Mode
+  - Org Roam
+  - Magit/Git
+  - Elfeed
+  - Elpher
+  - Projects
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
+
 *** DONE Display
 
 **** DONE lin.el
@@ -686,6 +756,69 @@ provides annotations to minibuffer completions, and pairs nicely with Vertico.
     :straight t
     :bind ("<C-s-f12>" . buf-move))
 #+end_src
+
+**** DONE rainbow-delimiters.el
+
+- ~rainbow-delimiters.el~ :: A quick and useful visual queue for paranthesis.
+
+#+begin_src emacs-lisp
+  (use-package rainbow-delimiters
+    :straight t
+    :hook ((fundamental-mode) . rainbow-delimiters-mode))
+#+end_src
+
+**** DONE vi-tilde-fringe.el
+- ~vi-tilde-fringt.el~ :: Show tilde (e.g. ~\~~) on empty trailing lines.  This is a feature ported from [[https://en.wikipedia.org/wiki/Vi][vi]].
+
+#+begin_src emacs-lisp
+  (use-package vi-tilde-fringe
+    :straight t
+    :config (global-vi-tilde-fringe-mode))
+#+end_src
+
+**** DONE goggles.el
+
+- ~goggles.el~ :: Adds a little bit of visual feedback as you delete chunks.
+
+#+begin_src emacs-lisp
+  (use-package goggles
+    :straight t
+    :hook ((prog-mode text-mode) . goggles-mode)
+    :diminish 'goggles-mode
+    :config (setq-default goggles-pulse t))
+#+end_src
+
+**** DONE emojify.el
+
+- ~emojify.el~ :: Ensure rendering of correct emoji’s.
+
+#+begin_src emacs-lisp
+  (use-package emojify
+    :straight t
+    :config
+    (defun --set-emoji-font (frame)
+      "Adjust the font settings of FRAME so Emacs can display emoji properly."
+      (if (eq system-type 'darwin)
+	  ;; For NS/Cocoa
+	  (set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji") frame 'prepend)
+	;; For Linux
+	(set-fontset-font t 'symbol (font-spec :family "Symbola") frame 'prepend)))
+
+    ;; For when Emacs is started in GUI mode:
+    (--set-emoji-font nil)
+    ;; Hook for when a frame is created with emacsclient
+    ;; see https://www.gnu.org/software/emacs/manual/html_node/elisp/Creating-Frames.html
+    (add-hook 'after-make-frame-functions '--set-emoji-font))
+#+end_src
+
+**** TODO unicode-fonts.el
+
+#+begin_src emacs-lisp
+  (use-package unicode-fonts
+    :straight t
+    :config (unicode-fonts-setup))
+#+end_src
+
 
 *** DONE Modes
 
@@ -994,65 +1127,253 @@ packages don’t warrant including this.
     :config (global-so-long-mode 1))
 #+end_src
 
-** Integrated “Applications”
-*** Utility Packages
+*** DONE Transformations
+**** DONE titlecase.el
 
-When I start writing functions, there’s a few packages I want to consider.
-
-- ~keychain-environment.el~ :: Load keychain environment variables
+The rules of “titlecase” are confounding.  The ~titlecase.el~ package provides
+numerous ways to cast a string to “titlecase.”  I chose wikipedia style as a
+quasi-opinionated compromise.
 
 #+begin_src emacs-lisp
-  (use-package keychain-environment
+  (use-package titlecase
+    :straight (titlecase :host github :repo "duckwork/titlecase.el")
+    :custom (titlecase-style 'wikipedia))
+#+end_src
+**** DONE fill-sentences-correctly.el
+
+- ~fill-sentences-correctly.el~ :: After using Emacs for awhile, with it’s
+  sentence navigation, I’ve come to strongly favor two spaces after a period.
+  The ~fill-sentences-correctly-mode~ ensures that ~fill-paragraph~
+  (e.g. ~M-q~) preserves two spaces.
+
+**** DONE savekill.el
+
+- ~savekill.el~ :: Write "kill" command inputs to disk.
+
+#+begin_src emacs-lisp
+  (use-package savekill :straight t)
+#+end_src
+
+**** DONE math-at-point.el
+
+- ~math-at-point.el~ :: Calculate math functions at point and message result in
+  minibuffer.  See https://github.com/shankar2k/math-at-point.
+
+#+begin_src emacs-lisp
+  (use-package math-at-point
+    :straight (math-at-point :type git :host github :repo "shankar2k/math-at-point")
+    :bind ("C-c =" . math-at-point))
+#+end_src
+
+**** DONE hippie-exp.el
+
+- ~hippie-exp.el~ :: Using Hippie expand, I toggle through words already referenced.
+
+#+begin_src emacs-lisp
+  (use-package hippie-exp
     :straight t
-    :config (keychain-refresh-environment))
-#+end_src
-
-- ~dash.el~ :: A modern list API for Emacs. No 'cl required.  (See https://github.com/magnars/dash.el/)
-
-#+begin_src emacs-lisp
-  (use-package dash :straight t)
-#+end_src
-
-- ~f.el~ :: A modern API for working with files and directories in Emacs. (See https://github.com/rejeep/f.el/)
-
-#+begin_src emacs-lisp
-  (use-package f :straight t)
-#+end_src
-
-- ~s.el~ :: The long lost Emacs string manipulation library.  (See https://github.com/magnars/s.el/)
-
-#+begin_src emacs-lisp
-  (use-package s :straight t)
-#+end_src
-
-- ~editorconfig.el~ :: “EditorConfig helps maintain consistent coding styles
-  for multiple developers working on the same project across various editors
-  and IDEs.”  See https://editorconfig.org/#overview for more details.
-
-#+begin_src emacs-lisp
-  (use-package editorconfig
-    :straight t
-    :diminish editorconfig-mode
     :config
-    (editorconfig-mode 1))
+    (setq hippie-expand-try-functions-list '(try-expand-dabbrev-visible
+					     try-expand-dabbrev
+					     try-expand-list
+					     try-expand-all-abbrevs
+					     try-expand-dabbrev-all-buffers
+					     try-expand-dabbrev-from-kill
+					     try-complete-file-name-partially
+					     try-complete-file-name
+					     try-complete-lisp-symbol-partially
+					     try-complete-lisp-symbol
+					     ))
+    :bind (("M-SPC" . hippie-expand)))
+#+end_src
+
+**** DONE expand-region.el
+
+- ~expand-region.el~ :: a simple package that does two related things really
+  well; expands and contracts the current region.  I use this all the time.
+
+  In writing, with the cursor at point, when I expand it selects the word.  The
+  next expand the sentence, then paragraph, then page.  In programming it
+  leverages sexp.
+
+#+begin_src emacs-lisp
+  (use-package expand-region
+    :straight t
+    :bind (("C-=" . er/expand-region)
+	   ("C-+" . er/contract-region)))
+#+end_src
+
+**** DONE multiple-cursors.el
+
+- ~multiple-cursors.el~ :: Allow Emacs to work with multiple cursors.  See
+  https://melpa.org/#/multiple-cursors.
+
+#+begin_src emacs-lisp
+  (use-package multiple-cursors
+    :bind (("C-M-SPC" . set-rectangular-region-anchor)
+	   ("C->" . mc/mark-next-like-this)
+	   ("C-<" . mc/mark-previous-like-this)
+	   ("C-s-<mouse-1>" . mc/add-cursor-on-click)
+	   ("C-c C->" . mc/mark-all-like-this)
+	   ("C-c C-SPC" . mc/edit-lines)) ;; CTRL+CMD+c
+    :straight t)
+#+end_src
+
+**** DONE iedit.el
+
+- ~iedit.el~ :: ~C-;~ to select current symbol and all matches; Then edit at
+  multiple points.
+
+#+begin_src emacs-lisp
+  (use-package iedit :straight t)
+#+end_src
+
+**** DONE crux.el
+
+- ~crux.el~ :: A mix of a few odd and useful functions.
+
+#+begin_src emacs-lisp
+  (use-package crux
+    :straight t
+    :bind (("C-a" . crux-move-beginning-of-line)
+	   ("<C-s-return>" . crux-smart-open-line-above)
+	   ("C-s-k" . crux-kill-line-backwards)
+	   ("<s-backspace>" . crux-kill-line-backwards)
+	   ("<f9>" . crux-kill-other-buffers)))
+#+end_src
+
+**** DONE ethan-wspace.el
+
+- ~ethan-wspace-mode.el~ :: Whitespace hygene package.  The author's
+  documentation and commentary echoes my sentiments.
+
+#+begin_src emacs-lisp
+  (use-package ethan-wspace
+    :straight t
+    :hook (before-save . delete-trailing-whitespace)
+    :init (setq-default mode-require-final-newline nil)
+    :config (global-ethan-wspace-mode 1))
+#+end_src
+
+**** DONE unfill.el
+
+- ~unfill.el~ :: Provides the reverse of ~fill-paragraph~, and a toggle fill and unfill.
+
+#+begin_src emacs-lisp
+  (use-package unfill
+    :bind ("M-q" . unfill-toggle)
+    :straight t)
+#+end_src
+
+**** DONE undo-tree.el
+
+- ~undo-tree.el~ :: Provides a UI for undo trees.  I'm not certain what I want
+  to do with this.
+
+#+begin_src emacs-lisp
+  (use-package undo-tree
+    :diminish
+    :bind (("C-z" . undo)
+	   ("C-s-z" . undo-tree-redo))
+    :config
+    (global-undo-tree-mode +1)
+    (unbind-key "M-_" undo-tree-map))
+
+#+end_src
+
+**** DONE hungry-delete.el
+
+- ~hungry-delete.el~ :: Delete multiple spaces in one delete stroke.
+
+#+begin_src emacs-lisp
+  (use-package hungry-delete
+    :straight t
+    :diminish 'hungry-delete-mode
+    :config (global-hungry-delete-mode))
+#+end_src
+
+**** DONE move-text.el
+
+- ~move-text.el~ :: A simple package ability to move lines up and down.
+
+#+begin_src emacs-lisp
+  (use-package move-text
+    :straight t
+    :bind (([C-s-down] . move-text-down)
+	   ([C-s-up] . move-text-up)))
+#+end_src
+
+**** TODO tempel.el
+
+#+begin_src emacs-lisp
+  (use-package tempel
+    :straight (tempel :host github :repo "minad/tempel")
+    :bind (("M-+" . tempel-complete) ;; Alternative tempel-expand
+	   ("M-*" . tempel-insert))
+
+    :init
+
+    ;; Setup completion at point
+    (defun tempel-setup-capf ()
+      ;; Add the Tempel Capf to `completion-at-point-functions'.
+      ;; The depth is set to -1, such that `tempel-expand' is tried *before* the
+      ;; programming mode Capf.  If a template name can be completed it takes
+      ;; precedence over the programming mode completion. `tempel-expand' only
+      ;; triggers on exact matches.  Alternatively use `tempel-complete' if you
+      ;; want to see all matches, but then Tempel will probably trigger too
+      ;; often when you don't expect it.
+      (add-hook 'completion-at-point-functions #'tempel-expand -1 'local))
+
+    (add-hook 'prog-mode-hook 'tempel-setup-capf)
+    (add-hook 'text-mode-hook 'tempel-setup-capf)
+
+    ;; Optionally make the Tempel templates available to Abbrev,
+    ;; either locally or globally. `expand-abbrev' is bound to C-x '.
+    ;; (add-hook 'prog-mode-hook #'tempel-abbrev-mode)
+    ;; (tempel-global-abbrev-mode)
+    )
+
+#+end_src
+
+**** DONE whole-line-or-region.el
+
+- ~whole-line-or-region.el~ :: From the package commentary, “This minor mode
+  allows functions to operate on the current line if they would normally
+  operate on a region and region is currently undefined.”  I’ve used this for
+  awhile and believe it’s not baked into my assumptions regarding how I
+  navigation Emacs.
+
+#+begin_src emacs-lisp
+  (use-package whole-line-or-region
+    :straight t
+    :diminish 'whole-line-or-region-local-mode
+    :config (whole-line-or-region-global-mode))
+#+end_src
+
+**** DONE smartparens.el
+
+- ~smartparens.el~ :: provides some “intelligent” treatment of parentheses.  I’ve been using this for awhile, so I assume it’s baked into my memory.
+
+#+begin_src emacs-lisp
+  (use-package smartparens :straight t)
+#+end_src
+
+
+*** DONE Navigation
+**** DONE avy.el
+
+- ~avy.el~ :: That letter is the beginning of a word.  Narrow results from there.
+
+#+begin_src emacs-lisp
+  (use-package avy
+    :bind (("C-j" . avy-goto-char-timer))
+    :bind (:map org-mode-map ("C-j" . avy-goto-char-timer))
+    :straight t)
 #+end_src
 
 
 
-
-  - Org Mode
-  - Org Roam
-  - Magit/Git
-  - Elfeed
-  - Elpher
-  - Projects
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
+** Integrated “Applications”
 *** RSS Feed
 
 *** Knowledge Management
@@ -1129,18 +1450,6 @@ When I start writing functions, there’s a few packages I want to consider.
     :bind (:map org-mode-map (("C-c g" . org-mac-grab-link))))
 #+end_src
 ** DONE Support
-
-*** DONE ripgrep.el
-
-For many years, I’ve used “The Silver Searcher”, or ~ag~ on the command
-line.[fn:6].  However, [[https://github.com/BurntSushi/ripgrep][ripgrep]] provides even faster searching, with an almost
-identical parameter list.
-
-#+begin_src emacs-lisp
-  (use-package ripgrep
-    :init (setq ripgrep-arguments "--ignore-case")
-    :straight t)
-#+end_src
 
 ** DONE Projects
 *** DONE projectile.el
@@ -1838,321 +2147,12 @@ More on these component matchings styles is available at [[https://github.com/mi
 #+end_src
 
 
-
-** DONE Window Manipulation
 ** DONE Text Manipulation
-
-*** DONE titlecase.el
-
-The rules of “titlecase” are confounding.  The ~titlecase.el~ package provides
-numerous ways to cast a string to “titlecase.”  I chose wikipedia style as a
-quasi-opinionated compromise.
-
-#+begin_src emacs-lisp
-  (use-package titlecase
-    :straight (titlecase :host github :repo "duckwork/titlecase.el")
-    :custom (titlecase-style 'wikipedia))
-#+end_src
-
-*** DONE fill-sentences-correctly.el
-
-- ~fill-sentences-correctly.el~ :: After using Emacs for awhile, with it’s
-  sentence navigation, I’ve come to strongly favor two spaces after a period.
-  The ~fill-sentences-correctly-mode~ ensures that ~fill-paragraph~
-  (e.g. ~M-q~) preserves two spaces.
 
 #+BEGIN_src emacs-lisp
   (use-package fill-sentences-correctly
     :straight (fill-sentences-correctly :host github :repo "duckwork/fill-sentences-correctly.el")
     :hook (fundamental-mode . fill-sentences-correctly-mode))
-#+end_src
-** TODO Look and Feel
-*** DONE rainbow-delimiters.el
-
-- ~rainbow-delimiters.el~ :: A quick and useful visual queue for paranthesis.
-
-#+begin_src emacs-lisp
-  (use-package rainbow-delimiters
-    :straight t
-    :hook ((fundamental-mode) . rainbow-delimiters-mode))
-#+end_src
-
-*** DONE vi-tilde-fringe.el
-- ~vi-tilde-fringt.el~ :: Show tilde (e.g. ~\~~) on empty trailing lines.  This is a feature ported from [[https://en.wikipedia.org/wiki/Vi][vi]].
-
-#+begin_src emacs-lisp
-  (use-package vi-tilde-fringe
-    :straight t
-    :config (global-vi-tilde-fringe-mode))
-#+end_src
-
-*** DONE goggles.el
-
-- ~goggles.el~ :: Adds a little bit of visual feedback as you delete chunks.
-
-#+begin_src emacs-lisp
-  (use-package goggles
-    :straight t
-    :hook ((prog-mode text-mode) . goggles-mode)
-    :diminish 'goggles-mode
-    :config (setq-default goggles-pulse t))
-#+end_src
-
-*** DONE emojify.el
-
-- ~emojify.el~ :: Ensure rendering of correct emoji’s.
-
-#+begin_src emacs-lisp
-  (use-package emojify
-    :straight t
-    :config
-    (defun --set-emoji-font (frame)
-      "Adjust the font settings of FRAME so Emacs can display emoji properly."
-      (if (eq system-type 'darwin)
-	  ;; For NS/Cocoa
-	  (set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji") frame 'prepend)
-	;; For Linux
-	(set-fontset-font t 'symbol (font-spec :family "Symbola") frame 'prepend)))
-
-    ;; For when Emacs is started in GUI mode:
-    (--set-emoji-font nil)
-    ;; Hook for when a frame is created with emacsclient
-    ;; see https://www.gnu.org/software/emacs/manual/html_node/elisp/Creating-Frames.html
-    (add-hook 'after-make-frame-functions '--set-emoji-font))
-#+end_src
-*** TODO unicode-fonts.el
-
-#+begin_src emacs-lisp
-  (use-package unicode-fonts
-    :straight t
-    :config (unicode-fonts-setup))
-#+end_src
-
-** TODO In Buffer
-*** DONE savekill.el
-
-- ~savekill.el~ :: Write "kill" command inputs to disk.
-
-#+begin_src emacs-lisp
-  (use-package savekill :straight t)
-#+end_src
-
-*** DONE avy.el
-
-- ~avy.el~ :: That letter is the beginning of a word.  Narrow results from there.
-
-#+begin_src emacs-lisp
-  (use-package avy
-    :bind (("C-j" . avy-goto-char-timer))
-    :bind (:map org-mode-map ("C-j" . avy-goto-char-timer))
-    :straight t)
-#+end_src
-
-*** DONE math-at-point.el
-
-- ~math-at-point.el~ :: Calculate math functions at point and message result in
-  minibuffer.  See https://github.com/shankar2k/math-at-point.
-
-#+begin_src emacs-lisp
-  (use-package math-at-point
-    :straight (math-at-point :type git :host github :repo "shankar2k/math-at-point")
-    :bind ("C-c =" . math-at-point))
-#+end_src
-
-*** DONE which-key.el
-
-
-*** DONE hippie-exp.el
-
-- ~hippie-exp.el~ :: Using Hippie expand, I toggle through words already referenced.
-
-#+begin_src emacs-lisp
-  (use-package hippie-exp
-    :straight t
-    :config
-    (setq hippie-expand-try-functions-list '(try-expand-dabbrev-visible
-					     try-expand-dabbrev
-					     try-expand-list
-					     try-expand-all-abbrevs
-					     try-expand-dabbrev-all-buffers
-					     try-expand-dabbrev-from-kill
-					     try-complete-file-name-partially
-					     try-complete-file-name
-					     try-complete-lisp-symbol-partially
-					     try-complete-lisp-symbol
-					     ))
-    :bind (("M-SPC" . hippie-expand)))
-#+end_src
-
-*** DONE expand-region.el
-
-- ~expand-region.el~ :: a simple package that does two related things really
-  well; expands and contracts the current region.  I use this all the time.
-
-  In writing, with the cursor at point, when I expand it selects the word.  The
-  next expand the sentence, then paragraph, then page.  In programming it
-  leverages sexp.
-
-#+begin_src emacs-lisp
-  (use-package expand-region
-    :straight t
-    :bind (("C-=" . er/expand-region)
-	   ("C-+" . er/contract-region)))
-#+end_src
-
-*** DONE multiple-cursors.el
-
-- ~multiple-cursors.el~ :: Allow Emacs to work with multiple cursors.  See
-  https://melpa.org/#/multiple-cursors.
-
-#+begin_src emacs-lisp
-  (use-package multiple-cursors
-    :bind (("C-M-SPC" . set-rectangular-region-anchor)
-	   ("C->" . mc/mark-next-like-this)
-	   ("C-<" . mc/mark-previous-like-this)
-	   ("C-s-<mouse-1>" . mc/add-cursor-on-click)
-	   ("C-c C->" . mc/mark-all-like-this)
-	   ("C-c C-SPC" . mc/edit-lines)) ;; CTRL+CMD+c
-    :straight t)
-#+end_src
-
-*** DONE iedit.el
-
-- ~iedit.el~ :: ~C-;~ to select current symbol and all matches; Then edit at
-  multiple points.
-
-#+begin_src emacs-lisp
-  (use-package iedit :straight t)
-#+end_src
-
-*** DONE crux.el
-
-- ~crux.el~ :: A mix of a few odd and useful functions.
-
-#+begin_src emacs-lisp
-  (use-package crux
-    :straight t
-    :bind (("C-a" . crux-move-beginning-of-line)
-	   ("<C-s-return>" . crux-smart-open-line-above)
-	   ("C-s-k" . crux-kill-line-backwards)
-	   ("<s-backspace>" . crux-kill-line-backwards)
-	   ("<f9>" . crux-kill-other-buffers)))
-#+end_src
-
-*** DONE ethan-wspace.el
-
-- ~ethan-wspace-mode.el~ :: Whitespace hygene package.  The author's
-  documentation and commentary echoes my sentiments.
-
-#+begin_src emacs-lisp
-  (use-package ethan-wspace
-    :straight t
-    :hook (before-save . delete-trailing-whitespace)
-    :init (setq-default mode-require-final-newline nil)
-    :config (global-ethan-wspace-mode 1))
-#+end_src
-
-*** DONE unfill.el
-
-- ~unfill.el~ :: Provides the reverse of ~fill-paragraph~, and a toggle fill and unfill.
-
-#+begin_src emacs-lisp
-  (use-package unfill
-    :bind ("M-q" . unfill-toggle)
-    :straight t)
-#+end_src
-
-*** DONE undo-tree.el
-
-- ~undo-tree.el~ :: Provides a UI for undo trees.  I'm not certain what I want
-  to do with this.
-
-#+begin_src emacs-lisp
-  (use-package undo-tree
-    :diminish
-    :bind (("C-z" . undo)
-	   ("C-s-z" . undo-tree-redo))
-    :config
-    (global-undo-tree-mode +1)
-    (unbind-key "M-_" undo-tree-map))
-
-#+end_src
-
-*** DONE hungry-delete.el
-
-- ~hungry-delete.el~ :: Delete multiple spaces in one delete stroke.
-
-#+begin_src emacs-lisp
-  (use-package hungry-delete
-    :straight t
-    :diminish 'hungry-delete-mode
-    :config (global-hungry-delete-mode))
-#+end_src
-
-*** DONE move-text.el
-
-- ~move-text.el~ :: A simple package ability to move lines up and down.
-
-#+begin_src emacs-lisp
-  (use-package move-text
-    :straight t
-    :bind (([C-s-down] . move-text-down)
-	   ([C-s-up] . move-text-up)))
-#+end_src
-
-*** TODO tempel.el
-
-#+begin_src emacs-lisp
-  (use-package tempel
-    :straight (tempel :host github :repo "minad/tempel")
-    :bind (("M-+" . tempel-complete) ;; Alternative tempel-expand
-	   ("M-*" . tempel-insert))
-
-    :init
-
-    ;; Setup completion at point
-    (defun tempel-setup-capf ()
-      ;; Add the Tempel Capf to `completion-at-point-functions'.
-      ;; The depth is set to -1, such that `tempel-expand' is tried *before* the
-      ;; programming mode Capf.  If a template name can be completed it takes
-      ;; precedence over the programming mode completion. `tempel-expand' only
-      ;; triggers on exact matches.  Alternatively use `tempel-complete' if you
-      ;; want to see all matches, but then Tempel will probably trigger too
-      ;; often when you don't expect it.
-      (add-hook 'completion-at-point-functions #'tempel-expand -1 'local))
-
-    (add-hook 'prog-mode-hook 'tempel-setup-capf)
-    (add-hook 'text-mode-hook 'tempel-setup-capf)
-
-    ;; Optionally make the Tempel templates available to Abbrev,
-    ;; either locally or globally. `expand-abbrev' is bound to C-x '.
-    ;; (add-hook 'prog-mode-hook #'tempel-abbrev-mode)
-    ;; (tempel-global-abbrev-mode)
-    )
-
-#+end_src
-
-*** DONE whole-line-or-region.el
-
-- ~whole-line-or-region.el~ :: From the package commentary, “This minor mode
-  allows functions to operate on the current line if they would normally
-  operate on a region and region is currently undefined.”  I’ve used this for
-  awhile and believe it’s not baked into my assumptions regarding how I
-  navigation Emacs.
-
-#+begin_src emacs-lisp
-  (use-package whole-line-or-region
-    :straight t
-    :diminish 'whole-line-or-region-local-mode
-    :config (whole-line-or-region-global-mode))
-#+end_src
-
-*** DONE smartparens.el
-
-- ~smartparens.el~ :: provides some “intelligent” treatment of parentheses.  I’ve been using this for awhile, so I assume it’s baked into my memory.
-
-#+begin_src emacs-lisp
-  (use-package smartparens :straight t)
 #+end_src
 ** DONE Org Mode
 *** DONE org-mode.el
