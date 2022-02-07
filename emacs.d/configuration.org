@@ -301,6 +301,37 @@ between toggles.
 		      :height 1.0)
 #+end_src
 
+Next up, let’s load the theme based on my operating system’s settings
+(e.g. Light or Dark mode).  /Note:/ I could just start with ~(load-theme
+‘modus-operandi)~ but figure I’ll add a little bit of “nice to have up front.
+
+#+begin_src emacs-lisp
+  (if (eq system-type 'darwin)
+      (progn
+	(defun jf/dark ()
+	  "Toggle system-wide Dark or Light setting."
+	  (interactive)
+	  (shell-command "osascript -e 'tell application \"System Events\" to tell appearance preferences to set dark mode to not dark mode'")
+	  (jf/emacs-theme-by-osx-appearance))
+
+	(defalias 'modus-themes-toggle 'jf/dark)
+	(defun jf/emacs-theme-by-osx-appearance ()
+	  "Set theme based on OSX apperance state."
+	  (if (equal "Dark" (substring (shell-command-to-string "defaults read -g AppleInterfaceStyle") 0 4))
+	      (load-theme 'modus-vivendi)
+	    (load-theme 'modus-operandi)))
+	;; And load the appropriate theme
+	(jf/emacs-theme-by-osx-appearance))
+    (progn
+      (defun modus-themes-toggle ()
+	"Toggle between `modus-operandi' and `modus-vivendi' themes."
+	(interactive)
+	(if (eq (car custom-enabled-themes) 'modus-operandi)
+	    (load-theme 'modus-vivendi)
+	  (load-theme 'modus-operandi)))
+      (load-theme 'modus-operandi)))
+#+end_src
+
 ** How Does this Thing Work?
 
 In this section my goal is to load some “fundamental” packages that help me
@@ -3897,34 +3928,6 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
 	    (t (progn
 		 (move-to-window-line 0)
 		 (recenter))))))
-#+end_src
-
-- ~jf/dark~ :: Toggle from Dark to Light setting based on system preferences.
-
-#+begin_src emacs-lisp
-  (if (eq system-type 'darwin)
-      (progn
-	(defun jf/dark ()
-	  "Toggle system-wide Dark or Light setting."
-	  (interactive)
-	  (shell-command "osascript -e 'tell application \"System Events\" to tell appearance preferences to set dark mode to not dark mode'")
-	  (jf/emacs-theme-by-osx-appearance))
-
-	(defalias 'modus-themes-toggle 'jf/dark)
-	(defun jf/emacs-theme-by-osx-appearance ()
-	  "Set theme based on OSX apperance state."
-	  (if (equal "Dark" (substring (shell-command-to-string "defaults read -g AppleInterfaceStyle") 0 4))
-	      (load-theme 'modus-vivendi)
-	    (load-theme 'modus-operandi)))
-	(jf/emacs-theme-by-osx-appearance))
-    (progn
-      (defun modus-themes-toggle ()
-	"Toggle between `modus-operandi' and `modus-vivendi' themes."
-	(interactive)
-	(if (eq (car custom-enabled-themes) 'modus-operandi)
-	    (load-theme 'modus-vivendi)
-	  (load-theme 'modus-operandi)))
-      (load-theme 'modus-operandi)))
 #+end_src
 
 - ~jf/org-insert-immediate-active-timestamp~ :: Insert an active timestamp, with a few options.
