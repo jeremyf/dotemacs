@@ -2370,13 +2370,7 @@ Jethro Kuan's post helped me see how I could do this.
 
 ***** Org Roam Supporting Functions
 
-The ~jf/org-context-plist~ defines and names some of the contexts in which I
-might be writing.  Each named context defines the tags.  These are the tags
-that all nodes will have when they were written in the defined context.
-
-I can use ~jf/org-auto-tags--set~ to create a "yet to be named" context (e.g.,
-an ad hoc context).  Or I can use ~jf/org-auto-tags--set-by-context~ to
-establish the current context (or clear it).
+The ~jf/org-roam-capture-templates-plist~ variable defines the possible org-roam capture templates that I will use.
 
 #+begin_src emacs-lisp
   (defvar jf/org-roam-capture-templates-plist
@@ -2397,7 +2391,17 @@ establish the current context (or clear it).
 	     :immediate-finish t
 	     :unnarrowed t))
     "Templates to use for `org-roam' capture.")
+#+end_src
 
+The ~jf/org-context-plist~ defines and names some of the contexts in which I
+might be writing.  Each named context defines the tags.  These are the tags
+that all nodes will have when they were written in the defined context.
+
+I can use ~jf/org-auto-tags--set~ to create a "yet to be named" context (e.g.,
+an ad hoc context).  Or I can use ~jf/org-auto-tags--set-by-context~ to
+establish the current context (or clear it).
+
+#+begin_src emacs-lisp
   (defvar jf/org-context-plist
     (list
      :none (list
@@ -2436,21 +2440,27 @@ establish the current context (or clear it).
 		   "Context: " (jf/org-context-list-completing-read))))
     (setq jf/org-auto-tags--current-list
 	  (plist-get (plist-get context-plist (intern (concat ":" context))) :tags)))
+#+end_src
 
+With the ~jf/org-auto-tags--current-list~ variable set, I want a function to inject those tags onto my captures.  Looking at the [[https://www.orgroam.com/manual.html#Org_002droam-Template-Expansion][org-roam docs on template expansion]], I want to create a function named ~org-roam-node-auto-tags~.
+
+#+begin_src emacs-lisp
   (cl-defun org-roam-node-auto-tags (node &key (tag-list jf/org-auto-tags--current-list))
     "Inject the TAG-LIST into the {auto-tags} region of captured NODE.
 
-     See https://www.orgroam.com/manual.html#Template-Walkthrough"
+       See https://www.orgroam.com/manual.html#Template-Walkthrough"
     (if (and tag-list (> (length tag-list) 0))
 	(concat ":" (s-join ":" tag-list) ":")
       ""))
+#+end_src
 
+#+begin_src emacs-lisp
   (cl-defun jf/org-roam-templates-list (template &key (template-plist jf/org-roam-capture-templates-plist))
-    "List of `org-roam' capture templates based on given TEMPLATE.
+    "List of `org-roam' capture templates based on the given TEMPLATE.
 
-     Searches the TEMPLATE-PLIST for the templates.
+       Searches the TEMPLATE-PLIST for the templates.
 
-     Note, the :all template assumes we use the whole list."
+       Note, the :all template assumes we use the whole list."
     (if (eq template :all)
 	(-non-nil (seq-map-indexed (lambda (tmp index)
 				     (when (oddp index)
@@ -2461,18 +2471,18 @@ establish the current context (or clear it).
   (cl-defun jf/org-roam-templates-context-fn (&key (tag-list jf/org-auto-tags--current-list))
     "Returns a set of templates based on TAG-LIST.
 
-     A key assumption is that if there's a default tag list, use the
-     :main template."
+       A key assumption is that if there's a default tag list, use the
+       :main template."
     (if (and tag-list (> (length tag-list) 0))
 	(jf/org-roam-templates-list :main)
       (jf/org-roam-templates-list :all)))
 
   (cl-defun jf/org-context-list-completing-read (&key
-						  (context-plist
-						   jf/org-context-plist))
+						 (context-plist
+						  jf/org-context-plist))
     "Create a list from the CONTEXT-PLIST for completing read.
 
-     The form should be '((\"forem\" 1) (\"burning-loscusts\" 2))."
+       The form should be '((\"forem\" 1) (\"burning-loscusts\" 2))."
     ;; Skipping the even entries as those are the "keys" for the plist,
     ;; the odds are the values.
     (-non-nil (seq-map-indexed (lambda (context index)
