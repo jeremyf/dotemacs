@@ -2,7 +2,7 @@
 #+TITLE: Emacs Configuration
 #+AUTHOR: Jeremy Friesen
 #+EMAIL: jeremy@jeremyfriesen.com
-#+STARTUP: overview
+#+STARTUP: showall
 
 * Introduction
 
@@ -543,6 +543,150 @@ provides annotations to minibuffer completions, and pairs nicely with Vertico.
 
 ** Writing, Coding, Computering
 
+*** DONE Display
+
+**** DONE lin.el
+
+- ~lin.el~ :: “LIN locally remaps the hl-line face to a style that is optimal for major modes where line selection is the primary mode of interaction.”  In otherwords, ~lin.el~ improves the highlighted line behavior for the competing contexts.
+
+#+begin_src emacs-lisp
+  (use-package lin
+    :straight (lin :host gitlab :repo "protesilaos/lin")
+    :config (lin-add-to-many-modes))
+#+end_src
+
+**** DONE all-the-icons.el
+
+- ~all-the-icons.el~ :: Provides a nice set of reference icons.  The various
+  ~jf/all-with--with-~ functions give access to the icons of the named set.
+
+#+begin_src emacs-lisp
+  ;; Useful for referential icons.
+  (use-package all-the-icons
+    :straight t
+    :config
+    (cl-defmacro jf/all-the-icons--with(&key name)
+      (let ((defun-fn (intern (concat "jf/all-the-icons--with-" name)))
+	    (icon-fn (intern (concat "all-the-icons-" name)))
+	    (docstring (concat "Displays an ICON from `all-the-icons-" name "'.")))
+	`(defun ,defun-fn (icon str &optional height v-adjust)
+	   ,docstring
+	   (s-concat (,icon-fn
+		      icon
+		      :v-adjust (or v-adjust 0)
+		      :height (or height 1))
+		     " " str))))
+    (jf/all-the-icons--with :name "faicon")
+    (jf/all-the-icons--with :name "material")
+    (jf/all-the-icons--with :name "octicon")
+    (jf/all-the-icons--with :name "alltheicon"))
+#+end_src
+
+**** DONE all-the-icons-dired.el
+
+- ~all-the-icons-dired.el~ :: Incorporates file icons with file listings of
+  dired.  /Note/: On 2021-04-11 I was getting the following error with this
+  package: "*ERROR*: Symbol's value as variable is void: file"
+
+#+begin_src emacs-lisp
+  (use-package all-the-icons-dired
+    :straight t
+    :after all-the-icons
+    :hook (dired-mode . all-the-icons-dired-mode))
+#+end_src
+
+**** DONE spaceline.el
+
+- ~spaceline.el~ :: A nice looking modeline enhancement
+
+#+begin_src emacs-lisp
+  (use-package spaceline :straight t)
+#+end_src
+
+**** DONE spaceline-all-the-icons.el
+
+- ~spaceline-all-the-icons.el~ ::  Add some visual flair to the modeline enhancements.  Disabled as of <2022-02-03 Thu>.
+
+#+begin_src emacs-lisp
+  ;; (use-package spaceline-all-the-icons
+  ;;  :straight t
+  ;;  :after spaceline
+  ;;  :config (spaceline-all-the-icons-theme))
+#+end_src
+
+**** DONE popper.el
+
+- ~popper.el~ :: Treat some types of windows as popups (e.g., something easier
+  to dismiss, a bit more like the mini-buffer).  Further ~jf/popper~ can
+  toggle the popup buffer.  See that method for further implementation details.
+
+#+begin_src emacs-lisp
+  (use-package popper
+    :straight t
+    :bind (("C-`" . jf/popper))
+    :config
+    (defun jf/popper (prefix_arg)
+      "Call `popper-cycle', but with PREFIX_ARG invoke a less common popper method.
+
+  With one PREFIX_ARG, `popper-toggle-latest'.
+  With two (or more) PREFIX_ARG `popper-toggle-type'."
+      (interactive "P")
+      (let ((prefix (car prefix_arg)))
+	(cond
+	 ((not prefix)  (popper-cycle))
+	 ((= prefix 4)  (popper-toggle-latest))
+	 (t (popper-toggle-type)))))
+    :init
+    (setq popper-reference-buffers
+	  '("\\*Messages\\*"
+	    "Output\\*$"
+	    "\\*Async Shell Command\\*"
+	    help-mode
+	    compilation-mode
+	    "^\\*helpful.*\\*$"))
+    (popper-mode +1)
+    (popper-echo-mode +1))
+
+#+end_src
+
+**** DONE shackle.el
+
+- ~shackle.el~ :: Enforce rules for popups.  See https://depp.brause.cc/shackle/.
+
+#+begin_src emacs-lisp
+  (use-package shackle
+    :straight t
+    :custom
+    (shackle-rules '((compilation-mode :noselect t))
+		   shackle-default-rule '(:select t)))
+#+end_src
+
+/Note:/ How does this related to ~popper.el~?
+
+**** DONE ace-window.el
+
+- ~ace-window.el~ :: A window manager for emacs, allowing fast toggles between
+  windows as well as opening or moving those windows.  See
+  https://github.com/abo-abo/ace-window for more details.
+
+#+begin_src emacs-lisp
+  (use-package ace-window
+    :straight t
+    :bind (("M-o" . ace-window)))
+#+end_src
+
+**** DONE buffer-move.el
+
+- ~buffer-move.el~ :: From [[https://github.com/lukhas/buffer-move][lukhas/buffer-move]], this package helps me quickly
+  move a window elsewhre.  As of <2022-02-01 Tue>, I don’t often use this
+  command.  Consider it “on notice” for removal.
+
+#+begin_src emacs-lisp
+  (use-package buffer-move
+    :straight t
+    :bind ("<C-s-f12>" . buf-move))
+#+end_src
+
 *** DONE Modes
 
 Emacs has the concept of modes.  Each buffer has one major mode and can have
@@ -835,6 +979,20 @@ packages don’t warrant including this.
   - Fringe
   - Modes
 
+**** DONE so-long.el
+
+- ~so-long.el~ :: Really long files or long lines can cause problems for Emacs.  This mode helps with that.
+
+#+begin_src emacs-lisp
+  (use-package so-long
+    :defer t
+    :straight t
+    :bind
+    (:map so-long-mode-map
+	  ("C-s" . isearch-forward)
+	  ("C-r" . isearch-backward))
+    :config (global-so-long-mode 1))
+#+end_src
 
 ** Integrated “Applications”
 *** Utility Packages
@@ -934,138 +1092,6 @@ When I start writing functions, there’s a few packages I want to consider.
      "~/git/org/archive")
     "Relevant data directories for my day to day work.")
 #+end_src
-** DONE Display
-
-*** DONE lin.el
-
-- ~lin.el~ :: “LIN locally remaps the hl-line face to a style that is optimal for major modes where line selection is the primary mode of interaction.”  In otherwords, ~lin.el~ improves the highlighted line behavior for the competing contexts.
-
-#+begin_src emacs-lisp
-  (use-package lin
-    :straight (lin :host gitlab :repo "protesilaos/lin")
-    :config (lin-add-to-many-modes))
-#+end_src
-
-*** DONE all-the-icons.el
-
-- ~all-the-icons.el~ :: Provides a nice set of reference icons.  The various
-  ~jf/all-with--with-~ functions give access to the icons of the named set.
-
-#+begin_src emacs-lisp
-  ;; Useful for referential icons.
-  (use-package all-the-icons
-    :straight t
-    :config
-    (cl-defmacro jf/all-the-icons--with(&key name)
-      (let ((defun-fn (intern (concat "jf/all-the-icons--with-" name)))
-	    (icon-fn (intern (concat "all-the-icons-" name)))
-	    (docstring (concat "Displays an ICON from `all-the-icons-" name "'.")))
-	`(defun ,defun-fn (icon str &optional height v-adjust)
-	   ,docstring
-	   (s-concat (,icon-fn
-		      icon
-		      :v-adjust (or v-adjust 0)
-		      :height (or height 1))
-		     " " str))))
-    (jf/all-the-icons--with :name "faicon")
-    (jf/all-the-icons--with :name "material")
-    (jf/all-the-icons--with :name "octicon")
-    (jf/all-the-icons--with :name "alltheicon"))
-#+end_src
-
-*** DONE all-the-icons-dired.el
-
-- ~all-the-icons-dired.el~ :: Incorporates file icons with file listings of
-  dired.  /Note/: On 2021-04-11 I was getting the following error with this
-  package: "*ERROR*: Symbol's value as variable is void: file"
-
-#+begin_src emacs-lisp
-  (use-package all-the-icons-dired
-    :straight t
-    :after all-the-icons
-    :hook (dired-mode . all-the-icons-dired-mode))
-#+end_src
-
-*** DONE spaceline.el
-
-- ~spaceline.el~ :: A nice looking modeline enhancement
-
-#+begin_src emacs-lisp
-  (use-package spaceline :straight t)
-#+end_src
-
-*** DONE spaceline-all-the-icons.el
-
-- ~spaceline-all-the-icons.el~ ::  Add some visual flair to the modeline enhancements.  Disabled as of <2022-02-03 Thu>.
-
-#+begin_src emacs-lisp
-  ;; (use-package spaceline-all-the-icons
-  ;;  :straight t
-  ;;  :after spaceline
-  ;;  :config (spaceline-all-the-icons-theme))
-#+end_src
-
-*** DONE popper.el
-
-- ~popper.el~ :: Treat some types of windows as popups (e.g., something easier
-  to dismiss, a bit more like the mini-buffer).  Further ~jf/popper~ can
-  toggle the popup buffer.  See that method for further implementation details.
-
-#+begin_src emacs-lisp
-  (use-package popper
-    :straight t
-    :bind (("C-`" . jf/popper))
-    :config
-    (defun jf/popper (prefix_arg)
-      "Call `popper-cycle', but with PREFIX_ARG invoke a less common popper method.
-
-  With one PREFIX_ARG, `popper-toggle-latest'.
-  With two (or more) PREFIX_ARG `popper-toggle-type'."
-      (interactive "P")
-      (let ((prefix (car prefix_arg)))
-	(cond
-	 ((not prefix)  (popper-cycle))
-	 ((= prefix 4)  (popper-toggle-latest))
-	 (t (popper-toggle-type)))))
-    :init
-    (setq popper-reference-buffers
-	  '("\\*Messages\\*"
-	    "Output\\*$"
-	    "\\*Async Shell Command\\*"
-	    help-mode
-	    compilation-mode
-	    "^\\*helpful.*\\*$"))
-    (popper-mode +1)
-    (popper-echo-mode +1))
-
-#+end_src
-
-*** DONE shackle.el
-
-- ~shackle.el~ :: Enforce rules for popups.  See https://depp.brause.cc/shackle/.
-
-#+begin_src emacs-lisp
-  (use-package shackle
-    :straight t
-    :custom
-    (shackle-rules '((compilation-mode :noselect t))
-		   shackle-default-rule '(:select t)))
-#+end_src
-
-/Note:/ How does this related to ~popper.el~?
-
-*** DONE ace-window.el
-
-- ~ace-window.el~ :: A window manager for emacs, allowing fast toggles between
-  windows as well as opening or moving those windows.  See
-  https://github.com/abo-abo/ace-window for more details.
-
-#+begin_src emacs-lisp
-  (use-package ace-window
-    :straight t
-    :bind (("M-o" . ace-window)))
-#+end_src
-
 ** WAITING General Emacs Configuration
 *** DONE MacOS Specific
 
@@ -1102,22 +1128,6 @@ When I start writing functions, there’s a few packages I want to consider.
     :straight (org-mac-link :type git :host github :repo "jeremyf/org-mac-link")
     :bind (:map org-mode-map (("C-c g" . org-mac-grab-link))))
 #+end_src
-
-**** DONE so-long.el
-
-- ~so-long.el~ :: Really long files or long lines can cause problems for Emacs.  This mode helps with that.
-
-#+begin_src emacs-lisp
-  (use-package so-long
-    :defer t
-    :straight t
-    :bind
-    (:map so-long-mode-map
-	  ("C-s" . isearch-forward)
-	  ("C-r" . isearch-backward))
-    :config (global-so-long-mode 1))
-#+end_src
-
 ** DONE Support
 
 *** DONE ripgrep.el
@@ -1830,18 +1840,6 @@ More on these component matchings styles is available at [[https://github.com/mi
 
 
 ** DONE Window Manipulation
-*** DONE buffer-move.el
-
-- ~buffer-move.el~ :: From [[https://github.com/lukhas/buffer-move][lukhas/buffer-move]], this package helps me quickly
-  move a window elsewhre.  As of <2022-02-01 Tue>, I don’t often use this
-  command.  Consider it “on notice” for removal.
-
-#+begin_src emacs-lisp
-  (use-package buffer-move
-    :straight t
-    :bind ("<C-s-f12>" . buf-move))
-#+end_src
-
 ** DONE Text Manipulation
 
 *** DONE titlecase.el
