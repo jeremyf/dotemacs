@@ -614,7 +614,6 @@ When I start writing functions, there’s a few packages I want to consider.
 
 
 *** DONE Display
-
 **** DONE lin.el
 
 - ~lin.el~ :: “LIN locally remaps the hl-line face to a style that is optimal for major modes where line selection is the primary mode of interaction.”  In otherwords, ~lin.el~ improves the highlighted line behavior for the competing contexts.
@@ -819,6 +818,41 @@ When I start writing functions, there’s a few packages I want to consider.
     :config (unicode-fonts-setup))
 #+end_src
 
+**** DONE flycheck.el
+
+- ~flycheck.el~ :: a syntax checkling package.  Paired with [[http://proselint.com][proselint]], I can check grammar and other things.  See http://flycheck.org
+
+#+begin_src emacs-lisp
+  (use-package flycheck
+    :hook ((text-mode . flycheck-mode)
+	   (gfm-mode . flycheck-mode)
+	   (org-mode .  flycheck-mode)
+	   (markdown-mode .  flycheck-mode))
+    :config
+    (add-to-list 'flycheck-checkers 'proselint)
+    (flycheck-define-checker proselint
+      "A linter for prose."
+      :command ("proselint" source-inplace)
+      :error-patterns
+      ((warning line-start (file-name) ":" line ":" column ": "
+		(id (one-or-more (not (any " "))))
+		(message (one-or-more not-newline)
+			 (zero-or-more "\n" (any " ") (one-or-more not-newline)))
+		line-end))
+      :modes (text-mode markdown-mode gfm-mode org-mode)))
+#+end_src
+
+**** DONE consult-flycheck.el
+
+- ~consult-flycheck.el~ :: Creates a minibuffer listing the flycheck errors and enables previews.  Quick nice for navigating the prose violations.
+
+#+begin_src emacs-lisp
+  (use-package consult-flycheck
+    :after (consult flycheck)
+    :straight t
+    :bind (:map flycheck-command-map
+		("!" . consult-flycheck)))
+#+end_src
 
 *** DONE Modes
 
@@ -1146,6 +1180,12 @@ quasi-opinionated compromise.
   The ~fill-sentences-correctly-mode~ ensures that ~fill-paragraph~
   (e.g. ~M-q~) preserves two spaces.
 
+#+BEGIN_src emacs-lisp
+  (use-package fill-sentences-correctly
+    :straight (fill-sentences-correctly :host github :repo "duckwork/fill-sentences-correctly.el")
+    :hook (fundamental-mode . fill-sentences-correctly-mode))
+#+end_src
+
 **** DONE savekill.el
 
 - ~savekill.el~ :: Write "kill" command inputs to disk.
@@ -1358,64 +1398,6 @@ quasi-opinionated compromise.
   (use-package smartparens :straight t)
 #+end_src
 
-
-*** DONE Navigation
-**** DONE avy.el
-
-- ~avy.el~ :: That letter is the beginning of a word.  Narrow results from there.
-
-#+begin_src emacs-lisp
-  (use-package avy
-    :bind (("C-j" . avy-goto-char-timer))
-    :bind (:map org-mode-map ("C-j" . avy-goto-char-timer))
-    :straight t)
-#+end_src
-
-
-
-** Integrated “Applications”
-*** RSS Feed
-
-*** Knowledge Management
-
-*** Working on Projects
-*** TODO Stuff
-
-  - Customizations for Blogging
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-* Past Work
-** TODO Variable/const definitions
-
-#+begin_src emacs-lisp
-  (defconst jf/tor-home-directory
-    (file-truename "~/git/takeonrules.source")
-    "The home directory of TakeOnRules.com Hugo repository.")
-
-  (defconst jf/tor-default-local-hostname
-    "http://localhost:1313"
-    "The scheme, host name, and port for serving up a local TakeOnRules.com.")
-
-  (defvar jf/data-directories
-    (list
-     jf/tor-home-directory
-     "~/git/takeonrules.source/themes/hugo-tufte"
-     "~/git/burning_wheel_lifepaths/"
-     "~/git/emacs-bookmarks"
-     "~/git/dotzshrc/"
-     "~/git/dotemacs/"
-     "~/git/org/"
-     "~/git/org/archive")
-    "Relevant data directories for my day to day work.")
-#+end_src
-** WAITING General Emacs Configuration
-*** DONE MacOS Specific
-
 **** DONE grab-mac-link.el
 
 - ~grab-mac-link.el~ :: Grab a link from a variety of MacOS applications.
@@ -1449,8 +1431,63 @@ quasi-opinionated compromise.
     :straight (org-mac-link :type git :host github :repo "jeremyf/org-mac-link")
     :bind (:map org-mode-map (("C-c g" . org-mac-grab-link))))
 #+end_src
-** DONE Support
 
+*** DONE Navigation
+**** DONE avy.el
+
+- ~avy.el~ :: That letter is the beginning of a word.  Narrow results from there.
+
+#+begin_src emacs-lisp
+  (use-package avy
+    :bind (("C-j" . avy-goto-char-timer))
+    :bind (:map org-mode-map ("C-j" . avy-goto-char-timer))
+    :straight t)
+#+end_src
+
+
+
+** Integrated “Applications”
+
+*** TODO Variable/const definitions
+
+#+begin_src emacs-lisp
+  (defconst jf/tor-home-directory
+    (file-truename "~/git/takeonrules.source")
+    "The home directory of TakeOnRules.com Hugo repository.")
+
+  (defconst jf/tor-default-local-hostname
+    "http://localhost:1313"
+    "The scheme, host name, and port for serving up a local TakeOnRules.com.")
+
+  (defvar jf/data-directories
+    (list
+     jf/tor-home-directory
+     "~/git/takeonrules.source/themes/hugo-tufte"
+     "~/git/burning_wheel_lifepaths/"
+     "~/git/emacs-bookmarks"
+     "~/git/dotzshrc/"
+     "~/git/dotemacs/"
+     "~/git/org/"
+     "~/git/org/archive")
+    "Relevant data directories for my day to day work.")
+#+end_src
+
+*** RSS Feed
+
+*** Knowledge Management
+
+*** Working on Projects
+*** TODO Stuff
+
+  - Customizations for Blogging
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+* Past Work
 ** DONE Projects
 *** DONE projectile.el
 
@@ -2149,11 +2186,6 @@ More on these component matchings styles is available at [[https://github.com/mi
 
 ** DONE Text Manipulation
 
-#+BEGIN_src emacs-lisp
-  (use-package fill-sentences-correctly
-    :straight (fill-sentences-correctly :host github :repo "duckwork/fill-sentences-correctly.el")
-    :hook (fundamental-mode . fill-sentences-correctly-mode))
-#+end_src
 ** DONE Org Mode
 *** DONE org-mode.el
 
@@ -2594,43 +2626,7 @@ establish the current context (or clear it).
 	(message "%s => %s" expression result)))
     :straight (org-d20 :host github :repo "spwhitton/org-d20"))
 #+end_src
-** DONE Spelling
 
-*** DONE flycheck.el
-
-- ~flycheck.el~ :: a syntax checkling package.  Paired with [[http://proselint.com][proselint]], I can check grammar and other things.  See http://flycheck.org
-
-#+begin_src emacs-lisp
-  (use-package flycheck
-    :hook ((text-mode . flycheck-mode)
-	   (gfm-mode . flycheck-mode)
-	   (org-mode .  flycheck-mode)
-	   (markdown-mode .  flycheck-mode))
-    :config
-    (add-to-list 'flycheck-checkers 'proselint)
-    (flycheck-define-checker proselint
-      "A linter for prose."
-      :command ("proselint" source-inplace)
-      :error-patterns
-      ((warning line-start (file-name) ":" line ":" column ": "
-		(id (one-or-more (not (any " "))))
-		(message (one-or-more not-newline)
-			 (zero-or-more "\n" (any " ") (one-or-more not-newline)))
-		line-end))
-      :modes (text-mode markdown-mode gfm-mode org-mode)))
-#+end_src
-
-*** DONE consult-flycheck.el
-
-- ~consult-flycheck.el~ :: Creates a minibuffer listing the flycheck errors and enables previews.  Quick nice for navigating the prose violations.
-
-#+begin_src emacs-lisp
-  (use-package consult-flycheck
-    :after (consult flycheck)
-    :straight t
-    :bind (:map flycheck-command-map
-		("!" . consult-flycheck)))
-#+end_src
 ** TODO Typography
 
 #+begin_src emacs-lisp
