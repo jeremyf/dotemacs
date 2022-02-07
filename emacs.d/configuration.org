@@ -477,13 +477,10 @@ provides annotations to minibuffer completions, and pairs nicely with Vertico.
     ;; section.This ensures that it is enabled right away.  It also forces the
     ;; loading of the package.
     :init (marginalia-mode))
-
-  (
 #+end_src
 
 
-  - Consult
-  - Orderless
+
 
 ** Writing, Coding, Computering
 
