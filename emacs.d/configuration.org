@@ -225,6 +225,26 @@ bit.  Also enable a few that I find helpful.  (I’ll enable a lot more later).
   (global-set-key (kbd "<s-up>") 'beginning-of-buffer)
 #+end_src
 
+Some basic packages to keep things less chatty.
+
+*Diminish* provides a means of not displaying the :lighter of a minor mode in the modeline.
+
+#+begin_src emacs-lisp
+  (use-package diminish :straight t)
+#+end_src
+
+*Gcmh* does garbage collection (GC) when the user is idle.
+
+#+begin_src emacs-lisp
+  (use-package gcmh
+    :straight t
+    :diminish 'gcmh-mode
+    :init
+    (setq gcmh-idle-delay 5
+	  gcmh-high-cons-threshold (* 16 1024 1024))  ; 16mb
+    :config (gcmh-mode))
+#+end_src
+
 *** DONE Basic Theming
 
 I want to start with a basic look and feel.  First, the choice of primary font.
@@ -341,7 +361,6 @@ but I appreciate it’s existence.  These configurations make it easier to use.
   (global-set-key (kbd "s-{") 'previous-buffer)
   (global-set-key (kbd "s-}") 'next-buffer)
 #+end_src
-
 
 ** How Does this Thing Work?
 
@@ -523,28 +542,304 @@ provides annotations to minibuffer completions, and pairs nicely with Vertico.
 #+end_src
 
 ** Writing, Coding, Computering
-** DONE Utility Packages
 
-These are some “invisible” packages that do some behind the scenes work.
+*** DONE Modes
 
-- ~diminish~ :: Provides a means of not displaying the :lighter of a minor mode in the modeline.
+Emacs has the concept of modes.  Each buffer has one major mode and can have
+multiple minor modes.  A major mode may derive from another major mode.
+
+These modes impact lots of things; key bindings being one of them.
+
+What follows are a list of modes presented in a somewhat random order.  Some
+are major modes others are minor modes.
+
+**** DONE emmet-mode.el
+
+- ~emmet-mode.el~ :: I’ve only scratched the surface of this.  Namely when I
+  write a haiku, in my editor it type =pre.poem= followed by ~C-c C-e~ and that
+  expands to a ~pre~ tag with the ~class="poem"~.  There's a lot more, but I
+  write comparatively little HTML.
 
 #+begin_src emacs-lisp
-  (use-package diminish :straight t)
-  (diminish 'eldoc-mode)
-#+end_src
-
-- ~gcmh.el~ :: Do garbage collection (GC) when the user is idle.
-
-#+begin_src emacs-lisp
-  (use-package gcmh
+  (use-package emmet-mode
     :straight t
-    :diminish 'gcmh-mode
-    :init
-    (setq gcmh-idle-delay 5
-	  gcmh-high-cons-threshold (* 16 1024 1024))  ; 16mb
-    :config (gcmh-mode))
+    :bind (("C-c C-e" . emmet-expand-yas ))
+    :hook ((sgml-mode . emmet-mode)
+	   (html-mode . emmet-mode)
+	   (css-mode . emmet-mode)))
 #+end_src
+
+**** DONE web-mode.el
+
+- ~web-mode.el~ :: Some configurations for web development.
+
+#+begin_src emacs-lisp
+  (use-package web-mode
+    :straight t
+    :config (setq web-mode-markup-indent-offset 2
+		  web-mode-css-indent-offset 2
+		  web-mode-code-indent-offset 2))
+  (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+#+end_src
+
+Sometimes I want to edit svg files.  Often times if I open them directly in
+Emacs, I want to edit them.  This setting helps with that default.  /Note:/
+without this setting, Emacs will happily render the SVG as an image,
+
+#+begin_src emacs-lisp
+  (add-to-list `auto-mode-alist '("\\.svg\\'" . xml-mode))
+#+end_src
+
+**** DONE plantuml-mode.el
+
+- ~plantuml-mode.el~ :: A mode for working with PlantUML.  See https://plantuml.com.
+
+#+begin_src emacs-lisp
+  (use-package plantuml-mode
+    :config (setq plantuml-executable-path (concat (getenv "HB_PATH") "/bin/plantuml")
+		  plantuml-default-exec-mode 'executable
+		  org-plantuml-executable-path (concat (getenv "HB_PATH") "/bin/plantuml")
+		  org-plantuml-exec-mode 'executable)
+    :mode (("\\.plantuml\\'" . plantuml-mode))
+    :straight t)
+#+end_src
+
+**** DONE json-mode.el
+
+- ~json.el~ :: In modern web-development, JSON is nigh unavoidable.
+
+#+begin_src emacs-lisp
+  (use-package json-mode :straight t)
+#+end_src
+
+**** DONE json-reformat.el
+
+- ~json-reformat.el~ :: Because JSON can be quite ugly, I want something to help tidy it up.
+
+#+begin_src emacs-lisp
+  (use-package json-reformat
+    :straight t
+    :after json-mode
+    :init (setq json-reformat:indent-width 2))
+
+#+end_src
+
+**** DONE go-mode.el
+
+Every so often I stumble upon a Go package.  The ~go-mode~ package gives me the
+syntax highlighting that makes reading ~Go-lang~ tolerable.
+
+#+begin_src emacs-lisp
+  (use-package go-mode :straight t)
+#+end_src
+
+**** DONE markdown-mode.el
+
+- ~markdown-mode.el~ :: Oh ubiquitous Markdown.
+
+#+begin_src emacs-lisp
+  (use-package markdown-mode
+    :straight t
+    :hook ((markdown-mode . turn-on-visual-line-mode))
+    :mode (("README\\.md\\'" . gfm-mode)
+	   ("\\.md\\'" . markdown-mode)
+	   ("\\.markdown\\'" . markdown-mode))
+    :init (setq markdown-command "/usr/local/bin/pandoc"))
+#+end_src
+
+**** DONE yaml-mode.el
+
+- ~yaml-mode.el~ :: Visual parsing for yaml.
+
+#+begin_src emacs-lisp
+  (use-package yaml-mode :straight t)
+#+end_src
+
+**** DONE lua-mode.el
+
+- ~lua-mode.el~ :: For working with [[https://www.hammerspoon.org][Hammerspoon]]; which provides me the
+  wonderful [[https://github.com/dmgerman/editWithEmacs.spoon/][edit with Emacs]].
+
+#+begin_src emacs-lisp
+  (use-package lua-mode :straight t)
+#+end_src
+
+**** DONE git-modes.el
+
+- ~git-modes.el~ :: For editing various Git configuration files.
+
+#+begin_src emacs-lisp
+  (use-package git-modes :straight t)
+#+end_src
+
+**** DONE enh-ruby-mode.el
+
+- ~enh-ruby-mode.el~ :: Emacs ships with ~ruby-mode.el~, but I’ve found that
+  ~enh-ruby-mode.el~ has more convenient navigation functions:
+
+  - ~enh-ruby-mark-defun~ :: Put mark at end of this Ruby definition, point at
+    beginning.
+  - ~enh-ruby-up-sexp~ :: Move up one balanced expression (sexp).
+  - ~enh-ruby-toggle-block~ :: Toggle block type from do-end to braces or back.
+  - ~enh-ruby-backward-sexp~ :: Move backward across one balanced expression
+    (sexp).
+  - ~enh-ruby-forward-sexp~ :: Move backward across one balanced expression
+    (sexp).
+
+#+begin_src emacs-lisp
+  (use-package enh-ruby-mode
+    :straight t
+    :hook (enh-ruby-mode . (lambda () (setq fill-column 100)))
+    :hook (enh-ruby-mode . eldoc-mode)
+    :bind (:map enh-ruby-mode-map ("C-j" . avy-goto-char-timer))
+    :mode (("\\(?:\\.rb\\|ru\\|rake\\|thor\\|jbuilder\\|gemspec\\|podspec\\|/\\(?:Gem\\|Rake\\|Cap\\|Thor\\|Vagrant\\|Guard\\|Pod\\)file\\)\\'" . enh-ruby-mode)))
+  (add-to-list 'interpreter-mode-alist '("ruby" . enh-ruby-mode))
+#+end_src
+
+**** DONE rspec-mode.el
+
+- ~rspec-mode.el~ :: [[http://rspec.info][RSpec]] is my Ruby testing framework of choice.  As I’ve
+  been doing much more extensive Ruby coding, I’ve been using a lot of:
+
+  - ~rspec-toggle-spec-and-target~ :: Jump between spec and target;
+    ~spec/models/user_spec.rb~ and ~app/models/user.rb~ respectively.
+  - ~rspec-verify~ :: Run ~rspec~ for the current file; either the spec or the
+    spec associated with the target.
+  - ~rspec-verify-single~ :: Run ~rspec~ for the current line.
+
+#+begin_src emacs-lisp
+  (use-package rspec-mode
+    :straight t
+    ;; Ensure that we’re loading enh-ruby-mode before we do any rspec loading.
+    :after enh-ruby-mode
+    :custom (rspec-use-spring-when-possible nil)
+    :bind (:map rspec-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
+    :bind (:map enh-ruby-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
+    :diminish 'rspec-mode)
+
+  (eval-after-load 'rspec-mode '(rspec-install-snippets))
+#+end_src
+
+/Note:/ The =CMD= + =.= is a carryover from my [[https://macromates.com][Textmate]] and [[https://www.sublimetext.com/][Sublime Text]] days.
+That’s one of those hot-keys almost burned into soul.
+**** DONE ruby-interpolation.el
+
+- ~ruby-interpolation.el~ :: A simple package to expand ~#~ to ~#{<cursor>}~.
+
+#+begin_src emacs-lisp
+  ;; Nice and simple package for string interpolation.
+  (use-package ruby-interpolation
+    :straight t
+    :diminish 'ruby-interpolation-mode
+    :hook (enh-ruby-mode . ruby-interpolation-mode))
+#+end_src
+
+**** DONE yard-mode.el
+
+- ~yard-mode.el~ :: When writing Ruby documentation, I favor YARD syntax.  See https://yardoc.org fore more details.
+
+#+begin_src emacs-lisp
+  (use-package yard-mode
+    :straight t
+    :hook (enh-ruby-mode . yard-mode))
+#+end_src
+
+**** DONE bundler.el
+
+- ~bundler.el~ :: Adds the useful ~bundle-open~ command.
+
+#+begin_src emacs-lisp
+  (use-package bundler
+    :straight (bundler :type git :host github :repo "endofunky/bundler.el"))
+#+end_src
+
+**** DONE lsp-mode.el
+
+- ~lsp-mode.el~ :: Language Server Protocol; provides some nice interactions with code.
+
+#+begin_src emacs-lisp
+  (use-package lsp-mode
+    :straight t
+    :hook ((ruby-mode . lsp)
+	   (enh-ruby-mode . lsp))
+    :config (setq read-process-output-max (* 1024 1024 3)
+		  lsp-completion-provider nil
+		  lsp-completion-mode nil
+		  lsp--show-message nil
+		  lsp-idle-delay 1.00)
+    :custom (lsp-keymap-prefix "C-c C-l")
+    :commands (lsp))
+
+  (with-eval-after-load 'lsp-mode
+    (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration))
+#+end_src
+
+**** DONE lsp-ui.el
+
+- ~lsp-ui.el~ :: Some nice UI for LSP mode.
+
+What I’m finding is that I occasionally use it, and it also has some flake-outs
+as it relates to the minibuffer.
+
+But a bit flakey.  For example, as I’m using ~consult-recent-file~, when I move
+the minibuffer selection (via ~C-n~) to a Ruby file, ~consult-recent-file~
+renders a preview of that file.  It appears that the ~lsp-mode~’s hooks loses
+or pulls the focus away from the minibuffer to the previewed buffer.
+
+This makes it hard to navigate for search candidates.  I find the preview very
+helpful, so favor that over ~lsp-mode~.  With some “bisect” debugging, I’ve
+found that this is related to the ~lsp-ui.el~ package.  In particular the
+~lsp-ui-peek-mode~.
+
+In other words, the functions are nice, but the interactions with other useful
+packages don’t warrant including this.
+
+#+begin_src emacs-lisp
+  ;; This package provides some nice UI behavior for documentation and linting
+  ;;
+  ;; In particular, I like 'lsp-ui-peek-find-reference
+  (use-package lsp-ui
+    :straight t
+    :hook ((enh-ruby-mode . lsp-ui-mode))
+    :after lsp-mode)
+
+  ;; By default indent levels are often 4; That is against what I've seen.
+  (setq ruby-indent-level 2
+	typescript-indent-level 2
+	js-indent-level 2)
+
+  ;; (add-hook 'emacs-lisp-mode 'eldoc-mode)
+#+end_src
+
+**** DONE tree-sitter.el
+
+- ~tree-sitter.el~ :: An incremental parsing library for languages.  See https://tree-sitter.github.io/tree-sitter/.
+
+#+begin_src emacs-lisp
+  ;; See https://github.com/emacs-tree-sitter/elisp-tree-sitter
+  ;; Waiting on https://github.com/emacs-tree-sitter/elisp-tree-sitter/issues/197 to resolve.
+  (use-package tree-sitter
+    :straight (tree-sitter :host github :repo "emacs-tree-sitter/elisp-tree-sitter")
+    :config
+    (add-to-list 'tree-sitter-major-mode-language-alist '(enh-ruby-mode . ruby)))
+
+  (global-tree-sitter-mode)
+  (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
+
+  (use-package tree-sitter-langs
+    :straight t)
+#+end_src
+
+
+  - Fringe
+  - Modes
+
+
+** Integrated “Applications”
+*** Utility Packages
+
+When I start writing functions, there’s a few packages I want to consider.
 
 - ~keychain-environment.el~ :: Load keychain environment variables
 
@@ -586,12 +881,6 @@ These are some “invisible” packages that do some behind the scenes work.
 
 
 
-  - Fringe
-  - Modes
-  - Projects
-  - Customizations for Blogging
-
-** Integrated “Applications”
 
   - Org Mode
   - Org Roam
@@ -606,7 +895,23 @@ These are some “invisible” packages that do some behind the scenes work.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-* TODO Variable/const definitions
+*** RSS Feed
+
+*** Knowledge Management
+
+*** Working on Projects
+*** TODO Stuff
+
+  - Customizations for Blogging
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+* Past Work
+** TODO Variable/const definitions
 
 #+begin_src emacs-lisp
   (defconst jf/tor-home-directory
@@ -629,9 +934,9 @@ These are some “invisible” packages that do some behind the scenes work.
      "~/git/org/archive")
     "Relevant data directories for my day to day work.")
 #+end_src
-* DONE Display
+** DONE Display
 
-** DONE lin.el
+*** DONE lin.el
 
 - ~lin.el~ :: “LIN locally remaps the hl-line face to a style that is optimal for major modes where line selection is the primary mode of interaction.”  In otherwords, ~lin.el~ improves the highlighted line behavior for the competing contexts.
 
@@ -641,7 +946,7 @@ These are some “invisible” packages that do some behind the scenes work.
     :config (lin-add-to-many-modes))
 #+end_src
 
-** DONE all-the-icons.el
+*** DONE all-the-icons.el
 
 - ~all-the-icons.el~ :: Provides a nice set of reference icons.  The various
   ~jf/all-with--with-~ functions give access to the icons of the named set.
@@ -668,7 +973,7 @@ These are some “invisible” packages that do some behind the scenes work.
     (jf/all-the-icons--with :name "alltheicon"))
 #+end_src
 
-** DONE all-the-icons-dired.el
+*** DONE all-the-icons-dired.el
 
 - ~all-the-icons-dired.el~ :: Incorporates file icons with file listings of
   dired.  /Note/: On 2021-04-11 I was getting the following error with this
@@ -681,7 +986,7 @@ These are some “invisible” packages that do some behind the scenes work.
     :hook (dired-mode . all-the-icons-dired-mode))
 #+end_src
 
-** DONE spaceline.el
+*** DONE spaceline.el
 
 - ~spaceline.el~ :: A nice looking modeline enhancement
 
@@ -689,7 +994,7 @@ These are some “invisible” packages that do some behind the scenes work.
   (use-package spaceline :straight t)
 #+end_src
 
-** DONE spaceline-all-the-icons.el
+*** DONE spaceline-all-the-icons.el
 
 - ~spaceline-all-the-icons.el~ ::  Add some visual flair to the modeline enhancements.  Disabled as of <2022-02-03 Thu>.
 
@@ -700,7 +1005,7 @@ These are some “invisible” packages that do some behind the scenes work.
   ;;  :config (spaceline-all-the-icons-theme))
 #+end_src
 
-** DONE popper.el
+*** DONE popper.el
 
 - ~popper.el~ :: Treat some types of windows as popups (e.g., something easier
   to dismiss, a bit more like the mini-buffer).  Further ~jf/popper~ can
@@ -735,7 +1040,7 @@ These are some “invisible” packages that do some behind the scenes work.
 
 #+end_src
 
-** DONE shackle.el
+*** DONE shackle.el
 
 - ~shackle.el~ :: Enforce rules for popups.  See https://depp.brause.cc/shackle/.
 
@@ -749,7 +1054,7 @@ These are some “invisible” packages that do some behind the scenes work.
 
 /Note:/ How does this related to ~popper.el~?
 
-** DONE ace-window.el
+*** DONE ace-window.el
 
 - ~ace-window.el~ :: A window manager for emacs, allowing fast toggles between
   windows as well as opening or moving those windows.  See
@@ -761,18 +1066,10 @@ These are some “invisible” packages that do some behind the scenes work.
     :bind (("M-o" . ace-window)))
 #+end_src
 
-* WAITING General Emacs Configuration
+** WAITING General Emacs Configuration
+*** DONE MacOS Specific
 
-I tried enabling this, and found myself sometimes lost in a labyrinth of
-minibuffers.  This change ensures that there’s only one.
-
-#+begin_src emacs-lisp
-  (setq enable-recursive-minibuffers nil)
-#+end_src
-
-** DONE MacOS Specific
-
-*** DONE grab-mac-link.el
+**** DONE grab-mac-link.el
 
 - ~grab-mac-link.el~ :: Grab a link from a variety of MacOS applications.
 
@@ -796,7 +1093,7 @@ minibuffers.  This change ensures that there’s only one.
     :bind (("C-c g" . grab-mac-link)))
 #+end_src
 
-*** DONE org-mac-link.el
+**** DONE org-mac-link.el
 
 - ~org-mac-link.el~ :: Similar to ~grab-mac-link.el~ this specifically grabs a link and insersts in ~org-mode~ format.
 
@@ -806,7 +1103,7 @@ minibuffers.  This change ensures that there’s only one.
     :bind (:map org-mode-map (("C-c g" . org-mac-grab-link))))
 #+end_src
 
-*** DONE so-long.el
+**** DONE so-long.el
 
 - ~so-long.el~ :: Really long files or long lines can cause problems for Emacs.  This mode helps with that.
 
@@ -821,289 +1118,9 @@ minibuffers.  This change ensures that there’s only one.
     :config (global-so-long-mode 1))
 #+end_src
 
-* DONE Modes
+** DONE Support
 
-Sometimes I want to edit svg files.  Often times if I open them directly in
-Emacs, I want to edit them.  This setting helps with that default.  /Note:/
-without this setting, Emacs will happily render the SVG as an image,
-
-#+begin_src emacs-lisp
-  (add-to-list `auto-mode-alist '("\\.svg\\'" . xml-mode))
-#+end_src
-
-** DONE emmet-mode.el
-
-- ~emmet-mode.el~ :: I’ve only scratched the surface of this.  Namely when I
-  write a haiku, in my editor it type =pre.poem= followed by ~C-c C-e~ and that
-  expands to a ~pre~ tag with the ~class="poem"~.  There's a lot more, but I
-  write comparatively little HTML.
-
-#+begin_src emacs-lisp
-  (use-package emmet-mode
-    :straight t
-    :bind (("C-c C-e" . emmet-expand-yas ))
-    :hook ((sgml-mode . emmet-mode)
-	   (html-mode . emmet-mode)
-	   (css-mode . emmet-mode)))
-#+end_src
-
-** DONE web-mode.el
-
-- ~web-mode.el~ :: Some configurations for web development.
-
-#+begin_src emacs-lisp
-  (use-package web-mode
-    :straight t
-    :config (setq web-mode-markup-indent-offset 2
-		  web-mode-css-indent-offset 2
-		  web-mode-code-indent-offset 2))
-  (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
-#+end_src
-
-** DONE plantuml-mode.el
-
-- ~plantuml-mode.el~ :: A mode for working with PlantUML.  See https://plantuml.com.
-
-#+begin_src emacs-lisp
-  (use-package plantuml-mode
-    :config (setq plantuml-executable-path (concat (getenv "HB_PATH") "/bin/plantuml")
-		  plantuml-default-exec-mode 'executable
-		  org-plantuml-executable-path (concat (getenv "HB_PATH") "/bin/plantuml")
-		  org-plantuml-exec-mode 'executable)
-    :mode (("\\.plantuml\\'" . plantuml-mode))
-    :straight t)
-#+end_src
-
-** DONE json-mode.el
-
-- ~json.el~ :: In modern web-development, JSON is nigh unavoidable.
-
-#+begin_src emacs-lisp
-  (use-package json-mode :straight t)
-#+end_src
-
-** DONE json-reformat.el
-
-- ~json-reformat.el~ :: Because JSON can be quite ugly, I want something to help tidy it up.
-
-#+begin_src emacs-lisp
-  (use-package json-reformat
-    :straight t
-    :after json-mode
-    :init (setq json-reformat:indent-width 2))
-
-#+end_src
-
-** DONE go-mode.el
-
-Every so often I stumble upon a Go package.  The ~go-mode~ package gives me the
-syntax highlighting that makes reading ~Go-lang~ tolerable.
-
-#+begin_src emacs-lisp
-  (use-package go-mode :straight t)
-#+end_src
-
-** DONE markdown-mode.el
-
-- ~markdown-mode.el~ :: Oh ubiquitous Markdown.
-
-#+begin_src emacs-lisp
-  (use-package markdown-mode
-    :straight t
-    :hook ((markdown-mode . turn-on-visual-line-mode))
-    :mode (("README\\.md\\'" . gfm-mode)
-	   ("\\.md\\'" . markdown-mode)
-	   ("\\.markdown\\'" . markdown-mode))
-    :init (setq markdown-command "/usr/local/bin/pandoc"))
-#+end_src
-
-** DONE yaml-mode.el
-
-- ~yaml-mode.el~ :: Visual parsing for yaml.
-
-#+begin_src emacs-lisp
-  (use-package yaml-mode :straight t)
-#+end_src
-
-** DONE lua-mode.el
-
-- ~lua-mode.el~ :: For working with [[https://www.hammerspoon.org][Hammerspoon]]; which provides me the
-  wonderful [[https://github.com/dmgerman/editWithEmacs.spoon/][edit with Emacs]].
-
-#+begin_src emacs-lisp
-  (use-package lua-mode :straight t)
-#+end_src
-
-** DONE git-modes.el
-
-- ~git-modes.el~ :: For editing various Git configuration files.
-
-#+begin_src emacs-lisp
-  (use-package git-modes :straight t)
-#+end_src
-
-** DONE enh-ruby-mode.el
-
-- ~enh-ruby-mode.el~ :: Emacs ships with ~ruby-mode.el~, but I’ve found that
-  ~enh-ruby-mode.el~ has more convenient navigation functions:
-
-  - ~enh-ruby-mark-defun~ :: Put mark at end of this Ruby definition, point at
-    beginning.
-  - ~enh-ruby-up-sexp~ :: Move up one balanced expression (sexp).
-  - ~enh-ruby-toggle-block~ :: Toggle block type from do-end to braces or back.
-  - ~enh-ruby-backward-sexp~ :: Move backward across one balanced expression
-    (sexp).
-  - ~enh-ruby-forward-sexp~ :: Move backward across one balanced expression
-    (sexp).
-
-#+begin_src emacs-lisp
-  (use-package enh-ruby-mode
-    :straight t
-    :hook (enh-ruby-mode . (lambda () (setq fill-column 100)))
-    :hook (enh-ruby-mode . eldoc-mode)
-    :bind (:map enh-ruby-mode-map ("C-j" . avy-goto-char-timer))
-    :mode (("\\(?:\\.rb\\|ru\\|rake\\|thor\\|jbuilder\\|gemspec\\|podspec\\|/\\(?:Gem\\|Rake\\|Cap\\|Thor\\|Vagrant\\|Guard\\|Pod\\)file\\)\\'" . enh-ruby-mode)))
-  (add-to-list 'interpreter-mode-alist '("ruby" . enh-ruby-mode))
-#+end_src
-
-** DONE rspec-mode.el
-
-- ~rspec-mode.el~ :: [[http://rspec.info][RSpec]] is my Ruby testing framework of choice.  As I’ve
-  been doing much more extensive Ruby coding, I’ve been using a lot of:
-
-  - ~rspec-toggle-spec-and-target~ :: Jump between spec and target;
-    ~spec/models/user_spec.rb~ and ~app/models/user.rb~ respectively.
-  - ~rspec-verify~ :: Run ~rspec~ for the current file; either the spec or the
-    spec associated with the target.
-  - ~rspec-verify-single~ :: Run ~rspec~ for the current line.
-
-#+begin_src emacs-lisp
-  (use-package rspec-mode
-    :straight t
-    ;; Ensure that we’re loading enh-ruby-mode before we do any rspec loading.
-    :after enh-ruby-mode
-    :custom (rspec-use-spring-when-possible nil)
-    :bind (:map rspec-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
-    :bind (:map enh-ruby-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
-    :diminish 'rspec-mode)
-
-  (eval-after-load 'rspec-mode '(rspec-install-snippets))
-#+end_src
-
-/Note:/ The =CMD= + =.= is a carryover from my [[https://macromates.com][Textmate]] and [[https://www.sublimetext.com/][Sublime Text]] days.
-That’s one of those hot-keys almost burned into soul.
-** DONE ruby-interpolation.el
-
-- ~ruby-interpolation.el~ :: A simple package to expand ~#~ to ~#{<cursor>}~.
-
-#+begin_src emacs-lisp
-  ;; Nice and simple package for string interpolation.
-  (use-package ruby-interpolation
-    :straight t
-    :diminish 'ruby-interpolation-mode
-    :hook (enh-ruby-mode . ruby-interpolation-mode))
-#+end_src
-
-** DONE yard-mode.el
-
-- ~yard-mode.el~ :: When writing Ruby documentation, I favor YARD syntax.  See https://yardoc.org fore more details.
-
-#+begin_src emacs-lisp
-  (use-package yard-mode
-    :straight t
-    :hook (enh-ruby-mode . yard-mode))
-#+end_src
-
-** DONE bundler.el
-
-- ~bundler.el~ :: Adds the useful ~bundle-open~ command.
-
-#+begin_src emacs-lisp
-  (use-package bundler
-    :straight (bundler :type git :host github :repo "endofunky/bundler.el"))
-#+end_src
-
-** DONE lsp-mode.el
-
-- ~lsp-mode.el~ :: Language Server Protocol; provides some nice interactions with code.
-
-#+begin_src emacs-lisp
-  (use-package lsp-mode
-    :straight t
-    :hook ((ruby-mode . lsp)
-	   (enh-ruby-mode . lsp))
-    :config (setq read-process-output-max (* 1024 1024 3)
-		  lsp-completion-provider nil
-		  lsp-completion-mode nil
-		  lsp--show-message nil
-		  lsp-idle-delay 1.00)
-    :custom (lsp-keymap-prefix "C-c C-l")
-    :commands (lsp))
-
-  (with-eval-after-load 'lsp-mode
-    (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration))
-#+end_src
-
-** DONE lsp-ui.el
-
-- ~lsp-ui.el~ :: Some nice UI for LSP mode.
-
-What I’m finding is that I occasionally use it, and it also has some flake-outs
-as it relates to the minibuffer.
-
-But a bit flakey.  For example, as I’m using ~consult-recent-file~, when I move
-the minibuffer selection (via ~C-n~) to a Ruby file, ~consult-recent-file~
-renders a preview of that file.  It appears that the ~lsp-mode~’s hooks loses
-or pulls the focus away from the minibuffer to the previewed buffer.
-
-This makes it hard to navigate for search candidates.  I find the preview very
-helpful, so favor that over ~lsp-mode~.  With some “bisect” debugging, I’ve
-found that this is related to the ~lsp-ui.el~ package.  In particular the
-~lsp-ui-peek-mode~.
-
-In other words, the functions are nice, but the interactions with other useful
-packages don’t warrant including this.
-
-#+begin_src emacs-lisp
-  ;; This package provides some nice UI behavior for documentation and linting
-  ;;
-  ;; In particular, I like 'lsp-ui-peek-find-reference
-  (use-package lsp-ui
-    :straight t
-    :hook ((enh-ruby-mode . lsp-ui-mode))
-    :after lsp-mode)
-
-  ;; By default indent levels are often 4; That is against what I've seen.
-  (setq ruby-indent-level 2
-	typescript-indent-level 2
-	js-indent-level 2)
-
-  ;; (add-hook 'emacs-lisp-mode 'eldoc-mode)
-#+end_src
-
-** DONE tree-sitter.el
-
-- ~tree-sitter.el~ :: An incremental parsing library for languages.  See https://tree-sitter.github.io/tree-sitter/.
-
-#+begin_src emacs-lisp
-  ;; See https://github.com/emacs-tree-sitter/elisp-tree-sitter
-  ;; Waiting on https://github.com/emacs-tree-sitter/elisp-tree-sitter/issues/197 to resolve.
-  (use-package tree-sitter
-    :straight (tree-sitter :host github :repo "emacs-tree-sitter/elisp-tree-sitter")
-    :config
-    (add-to-list 'tree-sitter-major-mode-language-alist '(enh-ruby-mode . ruby)))
-
-  (global-tree-sitter-mode)
-  (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode)
-
-  (use-package tree-sitter-langs
-    :straight t)
-#+end_src
-
-* DONE Support
-
-** DONE ripgrep.el
+*** DONE ripgrep.el
 
 For many years, I’ve used “The Silver Searcher”, or ~ag~ on the command
 line.[fn:6].  However, [[https://github.com/BurntSushi/ripgrep][ripgrep]] provides even faster searching, with an almost
@@ -1115,8 +1132,8 @@ identical parameter list.
     :straight t)
 #+end_src
 
-* DONE Projects
-** DONE projectile.el
+** DONE Projects
+*** DONE projectile.el
 
 - ~projectile.el~ :: this package provides convenient organization and commands to run over projects.
 
@@ -1132,7 +1149,7 @@ identical parameter list.
 /Note:/ The =CMD= + =.= is a carryover from my [[https://macromates.com][Textmate]] and [[https://www.sublimetext.com/][Sublime Text]] days.
 That’s one of those hot-keys almost burned into soul.
 
-** DONE magit.el
+*** DONE magit.el
 
 - ~magit.el~ :: The awesome [[http://git-scm.com][git]] client for Emacs.  I’ve written a few functions
   to help me jump to the Github page for the pull request.[fn:3]
@@ -1249,7 +1266,7 @@ That’s one of those hot-keys almost burned into soul.
     :hook ((with-editor-post-finish-hook . magit-status)))
 #+end_src
 
-** DONE forge.el
+*** DONE forge.el
 
 - ~forge.el~ :: Additional interactions interactions with [[https://en.wikipedia.org/wiki/Forge_(software)][Git forge]].  Right
   now, I’ve commented out most things, as I wasn’t figuring out how to refresh
@@ -1266,7 +1283,7 @@ That’s one of those hot-keys almost burned into soul.
 
 #+end_src
 
-** DONE libgit.el
+*** DONE libgit.el
 
 - ~libgit.el~ :: Provides bindings to [[https://libgit2.org][libgit2]].  These bindings help improve the speed of ~magit.el~; or so I’m told.
 
@@ -1274,7 +1291,7 @@ That’s one of those hot-keys almost burned into soul.
   (use-package libgit :straight t)
 #+end_src
 
-** DONE magit-libgit.el
+*** DONE magit-libgit.el
 
 - ~libgit.el~ :: Connects ~magit.el~ to ~libgit.el~, helping improve the speed of ~magit.el~; or so I’m told.
 
@@ -1282,7 +1299,7 @@ That’s one of those hot-keys almost burned into soul.
   (use-package magit-libgit :straight t)
 #+end_src
 
-** DONE git-timemachine.el
+*** DONE git-timemachine.el
 
 - ~git-timemachine.el~ :: With the time machine, travel back and forth through a files history.
 
@@ -1290,7 +1307,7 @@ That’s one of those hot-keys almost burned into soul.
   (use-package git-timemachine :straight t)
 #+end_src
 
-** DONE git-gutter-fringe.el
+*** DONE git-gutter-fringe.el
 
 - ~git-gutter-fringe.el~ :: Show the current git state in the gutter.  As you
   edit a line in a file track by git, the fringe’s indicators change to reflect
@@ -1306,7 +1323,7 @@ That’s one of those hot-keys almost burned into soul.
 	  git-gutter:deleted-sign "-"))
 #+end_src
 
-** DONE git-link.el
+*** DONE git-link.el
 
 - ~git-link.el~ :: Type ~M-x git-link~ and the function pushes the Git forge
   URL to the kill ring; I’ve configured the URL to use the SHA of the commit of
@@ -1326,7 +1343,7 @@ That’s one of those hot-keys almost burned into soul.
     :straight t)
 #+end_src
 
-** DONE git-messenger.el
+*** DONE git-messenger.el
 
 - ~git-messenger.el~ :: Sometimes I want to see more ~git~ information
   regarding the current line.  ~git-messenger.el~ provides a popup that shows
@@ -1354,7 +1371,7 @@ That’s one of those hot-keys almost burned into soul.
     :straight t)
 #+end_src
 
-** DONE blamer.el
+*** DONE blamer.el
 
 - ~blamer.el~ :: When working in code, I want different ways to view the
   metadata around the code.  ~blammer.el~ adds a quick annotation to the
@@ -1373,9 +1390,9 @@ That’s one of those hot-keys almost burned into soul.
     (blamer-min-offset 40)
     (blamer-max-commit-message-length 20))
 #+end_src
-* DONE Completion
+** DONE Completion
 
-** Emacs Adjustments for Completion
+*** Emacs Adjustments for Completion
 
 What follows is adjustments to emacs settings as they relate to completion.
 
@@ -1408,7 +1425,7 @@ What follows is adjustments to emacs settings as they relate to completion.
 #+end_src
 
 
-** DONE consult.el
+*** DONE consult.el
 
 - ~consult.el~ :: “Consult provides practical commands based on the Emacs
   completion function [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Minibuffer-Completion.html][completing-read]].”  I had previously used [[https://github.com/abo-abo/swiper][Ivy, Counsel,
@@ -1502,7 +1519,7 @@ What follows is adjustments to emacs settings as they relate to completion.
     (setq consult-project-root-function #'projectile-project-root))
 #+end_src
 
-*** DONE Advising Functions
+**** DONE Advising Functions
 
 I wrote some advising functions to wrap around ~consult-line~ and
 ~consult-ripgrep~.  These wrapping functions use the active region as the
@@ -1551,7 +1568,7 @@ There’s a macro in here somewhere.
 	      :around #'jf/consult-second-param-is-initial-text
 	      '((name . "wrapper")))
 #+end_src
-*** DONE consult-dir.el
+**** DONE consult-dir.el
 
 - ~consult-dir.el~ :: This package helps ease traveling across directories by
   providing directory candidates related to current buffers, bookmarks, and
@@ -1567,7 +1584,7 @@ There’s a macro in here somewhere.
 	   ("C-x C-d" . consult-dir)
 	   ("C-x C-j" . consult-dir-jump-file)))
 #+end_src
-*** DONE consult-projectile.el
+**** DONE consult-projectile.el
 
 - ~consult-projectile.el~ :: package provides a function I use everyday: ~M-x
   consult-projectile~.  When I invoke ~consult-projectile~, I have the file
@@ -1590,7 +1607,7 @@ There’s a macro in here somewhere.
 and [[https://www.sublimetext.com/][Sublime Text]] days.  More than any other key combination, that one is
 entirely muscle memory.
 
-** DONE embark-consult.el
+*** DONE embark-consult.el
 
 - ~embark-consult.el~ :: I use ~embark.el~ and ~consult.el~, let’s add a little
   bit more connective tissue.
@@ -1608,7 +1625,7 @@ entirely muscle memory.
     (embark-collect-mode . embark-consult-preview-minor-mode))
 #+end_src
 
-** DONE wgrep.el
+*** DONE wgrep.el
 
 - ~wgrep.el~ :: “Edit a grep buffer and apply those changes to the file
   buffer.”  In other words, after “searching” for something, sending the
@@ -1637,7 +1654,7 @@ entirely muscle memory.
 		("e" . wgrep-change-to-wgrep-mode)))
 #+end_src
 
-** DONE orderless.el
+*** DONE orderless.el
 
 The [[https://github.com/minad/orderless][orderless]] package provides completion tooling for non-strict word order.  I
 spent considerable time reading through the [[https://github.com/minad/consult/wiki][Orderless section of Consult’s
@@ -1718,7 +1735,7 @@ More on these component matchings styles is available at [[https://github.com/mi
 	  orderless-style-dispatchers '(+orderless-dispatch)))
 #+end_src
 
-** DONE corfu.el
+*** DONE corfu.el
 
 - ~corfu.el~ :: An alternative to the ubiquitous [[https://github.com/company-mode/company-mode][Company]]; In [[https://takeonrules.com/2022/01/17/switching-from-company-to-corfu-for-emacs-completion/][Switching from
   Company to Corfu for Emacs Completion]] I further explain my adoption of Corfu.
@@ -1747,7 +1764,7 @@ More on these component matchings styles is available at [[https://github.com/mi
     (setq corfu-cycle t))
 #+end_src
 
-*** DONE Extending corfu.el
+**** DONE Extending corfu.el
 
 - ~corfu-move-to-minibuffer~ :: The completion at point “popup” can sometimes
   be a little cryptic or terse.  The ~corfu-move-to-minibuffer~ provides a
@@ -1765,7 +1782,7 @@ More on these component matchings styles is available at [[https://github.com/mi
   (define-key corfu-map "\M-m" #'corfu-move-to-minibuffer)
 #+end_src
 
-** DONE cape.el
+*** DONE cape.el
 
 - ~cape.el~ :: provides several Completion At Point Extensions (Capfs).  I like
   having a Capf for spelling and files.
@@ -1785,7 +1802,7 @@ More on these component matchings styles is available at [[https://github.com/mi
       (list #'company-files #'company-ispell #'company-dabbrev)))
 #+end_src
 
-** DONE yasnippet.el
+*** DONE yasnippet.el
 
 - ~yasnippet.el~ :: A rather convenient snippet manager.  When you create a
   snippet, it understands the mode you're in and puts the snippet in the right
@@ -1799,7 +1816,7 @@ More on these component matchings styles is available at [[https://github.com/mi
     (setq yas-snippet-dirs '("~/git/dotemacs/snippets"))
     (yas-global-mode 1))
 #+end_src
-** DONE consult-yasnippet.el
+*** DONE consult-yasnippet.el
 
 - ~consult-yasnippet.el~ :: A bit of integration with ~consult.el~ and ~yasnippet.el~.
 
@@ -1812,8 +1829,8 @@ More on these component matchings styles is available at [[https://github.com/mi
 
 
 
-* DONE Window Manipulation
-** DONE buffer-move.el
+** DONE Window Manipulation
+*** DONE buffer-move.el
 
 - ~buffer-move.el~ :: From [[https://github.com/lukhas/buffer-move][lukhas/buffer-move]], this package helps me quickly
   move a window elsewhre.  As of <2022-02-01 Tue>, I don’t often use this
@@ -1825,9 +1842,9 @@ More on these component matchings styles is available at [[https://github.com/mi
     :bind ("<C-s-f12>" . buf-move))
 #+end_src
 
-* DONE Text Manipulation
+** DONE Text Manipulation
 
-** DONE titlecase.el
+*** DONE titlecase.el
 
 The rules of “titlecase” are confounding.  The ~titlecase.el~ package provides
 numerous ways to cast a string to “titlecase.”  I chose wikipedia style as a
@@ -1839,7 +1856,7 @@ quasi-opinionated compromise.
     :custom (titlecase-style 'wikipedia))
 #+end_src
 
-** DONE fill-sentences-correctly.el
+*** DONE fill-sentences-correctly.el
 
 - ~fill-sentences-correctly.el~ :: After using Emacs for awhile, with it’s
   sentence navigation, I’ve come to strongly favor two spaces after a period.
@@ -1851,8 +1868,8 @@ quasi-opinionated compromise.
     :straight (fill-sentences-correctly :host github :repo "duckwork/fill-sentences-correctly.el")
     :hook (fundamental-mode . fill-sentences-correctly-mode))
 #+end_src
-* TODO Look and Feel
-** DONE rainbow-delimiters.el
+** TODO Look and Feel
+*** DONE rainbow-delimiters.el
 
 - ~rainbow-delimiters.el~ :: A quick and useful visual queue for paranthesis.
 
@@ -1862,7 +1879,7 @@ quasi-opinionated compromise.
     :hook ((fundamental-mode) . rainbow-delimiters-mode))
 #+end_src
 
-** DONE vi-tilde-fringe.el
+*** DONE vi-tilde-fringe.el
 - ~vi-tilde-fringt.el~ :: Show tilde (e.g. ~\~~) on empty trailing lines.  This is a feature ported from [[https://en.wikipedia.org/wiki/Vi][vi]].
 
 #+begin_src emacs-lisp
@@ -1871,7 +1888,7 @@ quasi-opinionated compromise.
     :config (global-vi-tilde-fringe-mode))
 #+end_src
 
-** DONE goggles.el
+*** DONE goggles.el
 
 - ~goggles.el~ :: Adds a little bit of visual feedback as you delete chunks.
 
@@ -1883,7 +1900,7 @@ quasi-opinionated compromise.
     :config (setq-default goggles-pulse t))
 #+end_src
 
-** DONE emojify.el
+*** DONE emojify.el
 
 - ~emojify.el~ :: Ensure rendering of correct emoji’s.
 
@@ -1905,7 +1922,7 @@ quasi-opinionated compromise.
     ;; see https://www.gnu.org/software/emacs/manual/html_node/elisp/Creating-Frames.html
     (add-hook 'after-make-frame-functions '--set-emoji-font))
 #+end_src
-** TODO unicode-fonts.el
+*** TODO unicode-fonts.el
 
 #+begin_src emacs-lisp
   (use-package unicode-fonts
@@ -1913,8 +1930,8 @@ quasi-opinionated compromise.
     :config (unicode-fonts-setup))
 #+end_src
 
-* TODO In Buffer
-** DONE savekill.el
+** TODO In Buffer
+*** DONE savekill.el
 
 - ~savekill.el~ :: Write "kill" command inputs to disk.
 
@@ -1922,7 +1939,7 @@ quasi-opinionated compromise.
   (use-package savekill :straight t)
 #+end_src
 
-** DONE avy.el
+*** DONE avy.el
 
 - ~avy.el~ :: That letter is the beginning of a word.  Narrow results from there.
 
@@ -1933,7 +1950,7 @@ quasi-opinionated compromise.
     :straight t)
 #+end_src
 
-** DONE math-at-point.el
+*** DONE math-at-point.el
 
 - ~math-at-point.el~ :: Calculate math functions at point and message result in
   minibuffer.  See https://github.com/shankar2k/math-at-point.
@@ -1944,10 +1961,10 @@ quasi-opinionated compromise.
     :bind ("C-c =" . math-at-point))
 #+end_src
 
-** DONE which-key.el
+*** DONE which-key.el
 
 
-** DONE hippie-exp.el
+*** DONE hippie-exp.el
 
 - ~hippie-exp.el~ :: Using Hippie expand, I toggle through words already referenced.
 
@@ -1969,7 +1986,7 @@ quasi-opinionated compromise.
     :bind (("M-SPC" . hippie-expand)))
 #+end_src
 
-** DONE expand-region.el
+*** DONE expand-region.el
 
 - ~expand-region.el~ :: a simple package that does two related things really
   well; expands and contracts the current region.  I use this all the time.
@@ -1985,7 +2002,7 @@ quasi-opinionated compromise.
 	   ("C-+" . er/contract-region)))
 #+end_src
 
-** DONE multiple-cursors.el
+*** DONE multiple-cursors.el
 
 - ~multiple-cursors.el~ :: Allow Emacs to work with multiple cursors.  See
   https://melpa.org/#/multiple-cursors.
@@ -2001,7 +2018,7 @@ quasi-opinionated compromise.
     :straight t)
 #+end_src
 
-** DONE iedit.el
+*** DONE iedit.el
 
 - ~iedit.el~ :: ~C-;~ to select current symbol and all matches; Then edit at
   multiple points.
@@ -2010,7 +2027,7 @@ quasi-opinionated compromise.
   (use-package iedit :straight t)
 #+end_src
 
-** DONE crux.el
+*** DONE crux.el
 
 - ~crux.el~ :: A mix of a few odd and useful functions.
 
@@ -2024,7 +2041,7 @@ quasi-opinionated compromise.
 	   ("<f9>" . crux-kill-other-buffers)))
 #+end_src
 
-** DONE ethan-wspace.el
+*** DONE ethan-wspace.el
 
 - ~ethan-wspace-mode.el~ :: Whitespace hygene package.  The author's
   documentation and commentary echoes my sentiments.
@@ -2037,7 +2054,7 @@ quasi-opinionated compromise.
     :config (global-ethan-wspace-mode 1))
 #+end_src
 
-** DONE unfill.el
+*** DONE unfill.el
 
 - ~unfill.el~ :: Provides the reverse of ~fill-paragraph~, and a toggle fill and unfill.
 
@@ -2047,7 +2064,7 @@ quasi-opinionated compromise.
     :straight t)
 #+end_src
 
-** DONE undo-tree.el
+*** DONE undo-tree.el
 
 - ~undo-tree.el~ :: Provides a UI for undo trees.  I'm not certain what I want
   to do with this.
@@ -2063,7 +2080,7 @@ quasi-opinionated compromise.
 
 #+end_src
 
-** DONE hungry-delete.el
+*** DONE hungry-delete.el
 
 - ~hungry-delete.el~ :: Delete multiple spaces in one delete stroke.
 
@@ -2074,7 +2091,7 @@ quasi-opinionated compromise.
     :config (global-hungry-delete-mode))
 #+end_src
 
-** DONE move-text.el
+*** DONE move-text.el
 
 - ~move-text.el~ :: A simple package ability to move lines up and down.
 
@@ -2085,7 +2102,7 @@ quasi-opinionated compromise.
 	   ([C-s-up] . move-text-up)))
 #+end_src
 
-** TODO tempel.el
+*** TODO tempel.el
 
 #+begin_src emacs-lisp
   (use-package tempel
@@ -2117,7 +2134,7 @@ quasi-opinionated compromise.
 
 #+end_src
 
-** DONE whole-line-or-region.el
+*** DONE whole-line-or-region.el
 
 - ~whole-line-or-region.el~ :: From the package commentary, “This minor mode
   allows functions to operate on the current line if they would normally
@@ -2132,15 +2149,15 @@ quasi-opinionated compromise.
     :config (whole-line-or-region-global-mode))
 #+end_src
 
-** DONE smartparens.el
+*** DONE smartparens.el
 
 - ~smartparens.el~ :: provides some “intelligent” treatment of parentheses.  I’ve been using this for awhile, so I assume it’s baked into my memory.
 
 #+begin_src emacs-lisp
   (use-package smartparens :straight t)
 #+end_src
-* DONE Org Mode
-** DONE org-mode.el
+** DONE Org Mode
+*** DONE org-mode.el
 
 Oh ~org-mode~, one of the “why you should use Emacs” packages.  It’s a set of
 organizational tools that allow for progressive adoption.  You can start
@@ -2259,7 +2276,7 @@ I cribbed the following function from [[https://xenodium.com/emacs-dwim-do-what-
 		 (call-interactively 'org-insert-link)))))
 #+end_src
 
-*** DONE Copy Org and Paste in Rich Text Format
+**** DONE Copy Org and Paste in Rich Text Format
 
 Org Mode has built-in capabilities for exporting to HTML (and other languages).
 The following function does just a bit more.  It converts the org region to
@@ -2286,7 +2303,7 @@ See [[https://kitchingroup.cheme.cmu.edu/blog/2016/06/16/Copy-formatted-org-mode
 	(kill-buffer buf))))
 #+end_src
 
-*** DONE Swapping Tilde and Backtick in Org and More
+**** DONE Swapping Tilde and Backtick in Org and More
 
 I jump between Markdown and Org Mode with some frequency.  In many cases I
 prefer Org Mode.  Except when it comes to code declaration.  The tilde (e.g.,
@@ -2331,7 +2348,7 @@ to a specific language (via ~org-insert-tilde-language~).
       (call-interactively #'org-self-insert-command)))
 #+end_src
 
-** DONE org-menu.el
+*** DONE org-menu.el
 
 - ~org-menu.el~ :: Context dependent menu for org-mode; leverages ~transient.el~.
 
@@ -2341,7 +2358,7 @@ to a specific language (via ~org-insert-tilde-language~).
     :bind (:map org-mode-map ("C-c m" . 'org-menu)))
 #+end_src
 
-** DONE org-roam.el
+*** DONE org-roam.el
 
 This is my third iteration on an ~org-roam~.  It's goal is to address use-cases
 that I've encountered while moving more of my note-taking with ~org-roam~.
@@ -2365,7 +2382,7 @@ s
 What follows builds on Jethro Kuan's [[https://jethrokuan.github.io/org-roam-guide/][How I Take Notes with Org-roam]].  Reading
 Jethro Kuan's post helped me see how I could do this.
 
-*** Org Roam Supporting Functions
+**** Org Roam Supporting Functions
 
 The ~jf/org-context-plist~ defines and names some of the contexts in which I
 might be writing.  Each named context defines the tags.  These are the tags
@@ -2483,7 +2500,7 @@ establish the current context (or clear it).
 #+end_src
 
 
-*** Org Roam Configuration
+**** Org Roam Configuration
 
 #+begin_src emacs-lisp
   (use-package org-roam
@@ -2559,7 +2576,7 @@ establish the current context (or clear it).
       (error "")))
 #+end_src
 
-** DONE org-d20.el
+*** DONE org-d20.el
 
 - ~org-d20.el~ :: I’m really only using this for the ~org-d20--roll~ function.
 
@@ -2579,9 +2596,9 @@ establish the current context (or clear it).
 	(message "%s => %s" expression result)))
     :straight (org-d20 :host github :repo "spwhitton/org-d20"))
 #+end_src
-* DONE Spelling
+** DONE Spelling
 
-** DONE flycheck.el
+*** DONE flycheck.el
 
 - ~flycheck.el~ :: a syntax checkling package.  Paired with [[http://proselint.com][proselint]], I can check grammar and other things.  See http://flycheck.org
 
@@ -2605,7 +2622,7 @@ establish the current context (or clear it).
       :modes (text-mode markdown-mode gfm-mode org-mode)))
 #+end_src
 
-** DONE consult-flycheck.el
+*** DONE consult-flycheck.el
 
 - ~consult-flycheck.el~ :: Creates a minibuffer listing the flycheck errors and enables previews.  Quick nice for navigating the prose violations.
 
@@ -2616,7 +2633,7 @@ establish the current context (or clear it).
     :bind (:map flycheck-command-map
 		("!" . consult-flycheck)))
 #+end_src
-* TODO Typography
+** TODO Typography
 
 #+begin_src emacs-lisp
   ;;; Commentary:
@@ -2697,7 +2714,7 @@ establish the current context (or clear it).
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 #+end_src
 
-** TODO typopunct.el
+*** TODO typopunct.el
 
 #+begin_src emacs-lisp
   (use-package typopunct
@@ -2799,9 +2816,9 @@ establish the current context (or clear it).
 	 (t ad-do-it)))))
 #+end_src
 
-* DONE Applications
+** DONE Applications
 
-** DONE elpher.el
+*** DONE elpher.el
 
 - ~elpher.el~ :: A Gopher and Gemini client.
 
@@ -2809,7 +2826,7 @@ establish the current context (or clear it).
   (use-package elpher :straight t)
 #+end_src
 
-** DONE elfeed.el
+*** DONE elfeed.el
 
 - ~elfeed.el~ :: An Emacs RSS reader.  I’ve used Google Reader, Feedly,
   Inoreader, and Newsboat.  I wrote about [[https://takeonrules.com/2020/04/12/switching-from-inoreader-to-newsboat-for-rss-reader/][Switching from Inoreader to Newsboat
@@ -2862,7 +2879,7 @@ establish the current context (or clear it).
   ;; End https://karthinks.com/blog/lazy-elfeed/
 #+end_src
 
-** DONE eww.el
+*** DONE eww.el
 
 - ~eww.el~ :: a plain text browser.  Use this to see just how bad much of the web a
 #+begin_src emacs-lisp
@@ -2934,7 +2951,7 @@ establish the current context (or clear it).
     :hook ((eww-mode . jf/reader-visual)))
 #+end_src
 
-** DONE elfeed-org.el
+*** DONE elfeed-org.el
 
 - ~elfeed-org.el~ :: a package for maintaining and organizating my RSS
   subscriptions in ~org-mode~ format.
@@ -2947,9 +2964,9 @@ establish the current context (or clear it).
     (setq rmh-elfeed-org-files (list "~/git/org/elfeed.org")))
 #+end_src
 
-* TODO Utilities
+** TODO Utilities
 
-** DONE Opening multiple file names from command line
+*** DONE Opening multiple file names from command line
 
 The following chunk of allows me to take multiple filenames passed via the
 emacsclient and open those files in windows within the same frame.
@@ -2981,9 +2998,9 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
   (add-hook 'server-visit-hook 'server-visit-hook-custom-find)
 #+end_src
 
-** TODO blogging specific
+*** TODO blogging specific
 
-*** decide.el
+**** decide.el
 
 - ~decide.el~ :: A package for random decision making.
 
@@ -3662,7 +3679,7 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
 #+end_src
 
 
-** TODO hammerspoon
+*** TODO hammerspoon
 
 #+begin_src emacs-lisp
   (when (file-directory-p
@@ -3673,7 +3690,7 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
      jf/silence-loading-log))
 #+end_src
 
-** DONE Quick Help
+*** DONE Quick Help
 
 The following ~jf/transient-quick-help~ macro helps generate “help menus” that
 I want to reference.
@@ -3708,7 +3725,7 @@ I want to reference.
 /Note:/ It might make sense to extract the quick help to files, but for now
 this was the least effort.
 
-*** DONE Burning Wheel Gold
+**** DONE Burning Wheel Gold
 
 The following “quick help” methods are tables that I commonly reference when playing Burning Wheel Gold.
 
@@ -3808,7 +3825,7 @@ The following “quick help” methods are tables that I commonly reference when
      "  Being in the presence of the supernatural .. +5 Ob\n"))
 #+end_src
 
-** TODO Functions
+*** TODO Functions
 
 - ~jf/toggle-osx-alternate-modifier~ :: I like having MacOS’s native Option (e.g. =⌥=) modifier available.  But using
 that default in Emacs would be a significant hinderance.
@@ -4082,7 +4099,7 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
 #+end_src
 
 
-*** TODO Window Layout Functions
+**** TODO Window Layout Functions
 
 #+begin_src emacs-lisp
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -4138,10 +4155,10 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 #+end_src
 
-* TODO Menus
+** TODO Menus
 
-** TODO jf/menu-dwim
-*** Minor Modes
+*** TODO jf/menu-dwim
+**** Minor Modes
 
 In work and in play, there are several “me” specific contexts.  The
 ~jf/minor-mode-maker~ macro helps me quickly and consistently make those
@@ -4175,7 +4192,7 @@ those modes.
 			:abbr "forem")
 #+end_src
 
-*** Org Capture Commands
+**** Org Capture Commands
 
 Try as I may, based on my configuration, I can’t get [[https://orgmode.org/manual/Protocols.html#Protocols][org-protocol]] to work.  So
 I’ve opted to take a different path; write some Emacs functions instead.
@@ -4188,10 +4205,13 @@ I’ve opted to take a different path; write some Emacs functions instead.
 #+begin_src emacs-lisp
   (cl-defun jf/org-roam-capture-ref (&key title url)
     "Capture the TITLE and URL in the `org-roam' :refs template"
+    ;; If your installation of org-roam includes the fix fore
+    ;; https://github.com/org-roam/org-roam/issues/2078 then you can leave the
+    ;; below commented out.
+    ;;
     ;; This looks a bit odd, but to capture the :ref we need the callback from org-roam.
     ;; (require 'org-roam-protocol)
     ;;
-    ;; See https://github.com/org-roam/org-roam/issues/2078
     (org-roam-capture-
      :keys "r"
      ;; TODO: I would love to get tags working but I'm missing something
@@ -4235,7 +4255,7 @@ I’ve opted to take a different path; write some Emacs functions instead.
       (jf/org-roam-capture-ref :url url :title title)))
 #+end_src
 
-*** TODO A Consistent Transient Menu
+**** TODO A Consistent Transient Menu
 
 #+begin_src emacs-lisp
   (defconst jf/forem-dashboard-filename
@@ -4392,6 +4412,7 @@ I’ve opted to take a different path; write some Emacs functions instead.
       ("o s" jf/org-auto-tags--transient :transient t)
       ]])
 #+end_src
+
 
 * Footnotes
 
