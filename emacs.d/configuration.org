@@ -1537,7 +1537,7 @@ There’s a macro in here somewhere.
   When there's an active region, use that as the first parameter
   for CONSULT-FN.  Otherwise, use an empty string the second
   parameter.  This function handles the REST of the parameters."
-    (interactive)
+    (interactive "P")
     (apply consult-fn
 	   first
 	   (when (use-region-p)
