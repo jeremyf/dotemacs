@@ -68,7 +68,6 @@ I’ve written quite a few functions to further extend the utility of Emacs.  I
 try to prefix them with ~jf/~.  And if I cribbed those functions from
 elsewhere, I attempt to give credit to the source.
 
-
 * Into the Emacs
 ** Launching Emacs
 
@@ -360,6 +359,38 @@ but I appreciate it’s existence.  These configurations make it easier to use.
   ;; This maps to MacOS's tab switching keys.
   (global-set-key (kbd "s-{") 'previous-buffer)
   (global-set-key (kbd "s-}") 'next-buffer)
+#+end_src
+
+*** DONE Opening files from the command line
+
+The following chunk of allows me to take multiple filenames passed via the
+emacsclient and open those files in windows within the same frame.
+
+You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/main/bin/git-edit][git-edit]] command line tool.
+
+#+begin_src emacs-lisp
+  (defvar server-visit-files-custom-find:buffer-count
+    "A counter for assisting with opening multiple files via a single
+  client call.")
+  (defadvice server-visit-files
+      (around server-visit-files-custom-find
+	      activate compile)
+    "Maintain a counter of visited files from a single client call."
+    (let ((server-visit-files-custom-find:buffer-count 0))
+      ad-do-it))
+  (defun server-visit-hook-custom-find ()
+    "Arrange to visit the files from a client call in separate windows."
+    (if (zerop server-visit-files-custom-find:buffer-count)
+	(progn
+	  (delete-other-windows)
+	  (switch-to-buffer (current-buffer)))
+      (let ((buffer (current-buffer))
+	    (window (split-window-sensibly)))
+	(switch-to-buffer buffer)
+	(balance-windows)))
+    (setq server-visit-files-custom-find:buffer-count
+	  (1+ server-visit-files-custom-find:buffer-count)))
+  (add-hook 'server-visit-hook 'server-visit-hook-custom-find)
 #+end_src
 
 ** How Does this Thing Work?
@@ -2078,7 +2109,6 @@ quasi-opinionated compromise.
 	 (t ad-do-it)))))
 #+end_src
 
-
 ** Integrated “Applications”
 *** TODO Variable/const definitions
 
@@ -2948,38 +2978,6 @@ establish the current context (or clear it).
 
 * Past Work
 ** TODO Utilities
-
-*** DONE Opening multiple file names from command line
-
-The following chunk of allows me to take multiple filenames passed via the
-emacsclient and open those files in windows within the same frame.
-
-You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/main/bin/git-edit][git-edit]] command line tool.
-
-#+begin_src emacs-lisp
-  (defvar server-visit-files-custom-find:buffer-count
-    "A counter for assisting with opening multiple files via a single
-  client call.")
-  (defadvice server-visit-files
-      (around server-visit-files-custom-find
-	      activate compile)
-    "Maintain a counter of visited files from a single client call."
-    (let ((server-visit-files-custom-find:buffer-count 0))
-      ad-do-it))
-  (defun server-visit-hook-custom-find ()
-    "Arrange to visit the files from a client call in separate windows."
-    (if (zerop server-visit-files-custom-find:buffer-count)
-	(progn
-	  (delete-other-windows)
-	  (switch-to-buffer (current-buffer)))
-      (let ((buffer (current-buffer))
-	    (window (split-window-sensibly)))
-	(switch-to-buffer buffer)
-	(balance-windows)))
-    (setq server-visit-files-custom-find:buffer-count
-	  (1+ server-visit-files-custom-find:buffer-count)))
-  (add-hook 'server-visit-hook 'server-visit-hook-custom-find)
-#+end_src
 
 *** TODO blogging specific
 
@@ -4396,7 +4394,6 @@ I’ve opted to take a different path; write some Emacs functions instead.
       ("o s" jf/org-auto-tags--transient :transient t)
       ]])
 #+end_src
-
 
 * Footnotes
 
