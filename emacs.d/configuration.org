@@ -542,6 +542,21 @@ provides annotations to minibuffer completions, and pairs nicely with Vertico.
 #+end_src
 
 ** Writing, Coding, Computering
+*** DONE projectile.el
+
+- ~projectile.el~ :: this package provides convenient organization and commands to run over projects.
+
+#+begin_src emacs-lisp
+  (use-package projectile
+    :straight t
+    :diminish 'projectile-mode
+    :config (projectile-mode 1)
+    :custom (projectile-project-search-path '("~/git/"))
+    :bind ("s-." . projectile-toggle-between-implementation-and-test))
+#+end_src
+
+/Note:/ The =CMD= + =.= is a carryover from my [[https://macromates.com][Textmate]] and [[https://www.sublimetext.com/][Sublime Text]] days.
+That’s one of those hot-keys almost burned into soul.
 
 *** DONE Support Packages
 
@@ -611,6 +626,454 @@ When I start writing functions, there’s a few packages I want to consider.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
+*** DONE Completion
+
+**** Emacs Adjustments for Completion
+
+What follows is adjustments to emacs settings as they relate to completion.
+
+#+begin_src emacs-lisp
+  (use-package emacs
+    :init
+
+    ;; Emacs 28: Hide commands in M-x which do not apply to the current mode.
+    ;; Corfu commands are hidden, since they are not supposed to be used via M-x.
+    (setq read-extended-command-predicate
+	  #'command-completion-default-include-p)
+
+    ;; TAB cycle if there are only few candidates
+    (setq completion-cycle-threshold 3)
+
+    ;; Enable indentation+completion using the TAB key.
+    ;; `completion-at-point' is often bound to M-TAB.
+    (setq tab-always-indent 'complete)
+
+    ;; Add prompt indicator to `completing-read-multiple'.
+    ;; Alternatively try `consult-completing-read-multiple'.
+    (defun crm-indicator (args)
+      (cons (concat "[CRM] " (car args)) (cdr args)))
+    (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
+
+    ;; Do not allow the cursor in the minibuffer prompt
+    (setq minibuffer-prompt-properties
+	  '(read-only t cursor-intangible t face minibuffer-prompt))
+    (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode))
+#+end_src
+
+
+**** DONE consult.el
+
+- ~consult.el~ :: “Consult provides practical commands based on the Emacs
+  completion function [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Minibuffer-Completion.html][completing-read]].”  I had previously used [[https://github.com/abo-abo/swiper][Ivy, Counsel,
+  and Swiper]], but appreciate the design principles of Consult, namely “Consult
+  fits well into existing setups and it helps you to create a full completion
+  environment out of small and independent components.”[fn:2]
+
+  With ~consult.el~ I’m able to bring in other components that focus on doing
+  their “one thing” really well.
+
+#+begin_src emacs-lisp
+  (use-package consult
+    :straight t
+    ;; Replace bindings. Lazily loaded due by `use-package'.
+    :bind (;; C-c bindings (mode-specific-map)
+	   ("C-c h" . consult-history)
+	   ;; ("C-c m" . consult-mode-command)
+	   ("C-c b" . consult-bookmark)
+	   ("C-c k" . consult-kmacro)
+	   ;; C-x bindings (ctl-x-map)
+	   ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complet-command
+	   ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
+	   ("s-b" . consult-buffer)                ;; orig. switch-to-buffer
+	   ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
+	   ("C-s-b" . consult-buffer-other-window)
+	   ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
+	   ;; Custom M-# bindings for fast register access
+	   ("M-#" . consult-register-load)
+	   ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
+	   ("C-M-#" . consult-register)
+	   ;; Other custom bindings
+	   ("M-y" . consult-yank-from-kill-ring)                ;; orig. yank-pop
+	   ("<help> a" . consult-apropos)            ;; orig. apropos-command
+	   ;; M-g bindings (goto-map)
+	   ("M-g e" . consult-compile-error)
+	   ("M-g g" . consult-goto-line)             ;; orig. goto-line
+	   ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
+	   ("s-l" . consult-goto-line)           ;; orig. goto-line
+	   ("M-g o" . consult-outline)
+	   ("M-g m" . consult-mark)
+	   ("M-g k" . consult-global-mark)
+	   ("C-x C-SPC" . consult-mark)
+	   ("M-g i" . consult-imenu)
+	   ("s-2" . consult-imenu)
+	   ("M-g I" . consult-imenu-multi)
+	   ;; M-s bindings (search-map)
+	   ("M-s f" . consult-find)
+	   ("M-s L" . consult-locate)
+	   ("M-s g" . consult-grep)
+	   ("M-s G" . consult-git-grep)
+	   ("M-s r" . consult-ripgrep)
+	   ("C-c f" . consult-ripgrep)
+	   ("M-s l" . consult-line)
+	   ("M-s m" . consult-multi-occur)
+	   ("M-s k" . consult-keep-lines)
+	   ("M-s u" . consult-focus-lines)
+	   ;; Customizations that map to ivy
+	   ("s-r" . consult-recent-file) ;; Deprecate
+	   ("C-c r" . consult-recent-file)
+	   ("C-c o" . consult-file-externally)
+	   ("C-y" . yank)
+	   ("C-s" . consult-line) ;; I've long favored Swiper mapped to c-s
+	   ;; Isearch integration
+	   ("M-s e" . consult-isearch)
+	   :map isearch-mode-map
+	   ("M-e" . consult-isearch)                 ;; orig. isearch-edit-string
+	   ("M-s e" . consult-isearch)               ;; orig. isearch-edit-string
+	   ("M-s l" . consult-line))                 ;; required by consult-line to detect isearch
+
+    ;; The :init configuration is always executed (Not lazy)
+    :init
+
+    ;; Optionally configure the register formatting.  This improves the register
+    ;; preview for `consult-register', `consult-register-load',
+    ;; `consult-register-store' and the Emacs built-ins.
+    (setq register-preview-delay 0.1
+	  register-preview-function #'consult-register-format)
+
+    ;; Use Consult to select xref locations with preview
+    (setq xref-show-xrefs-function #'consult-xref
+	  xref-show-definitions-function #'consult-xref)
+
+    ;; Updating the default to include "--ignore-case"
+    (setq consult-ripgrep-command "rg --null --line-buffered --color=ansi --max-columns=1000 --ignore-case --no-heading --line-number . -e ARG OPTS")
+
+    ;; Configure other variables and modes in the :config section,
+    ;; after lazily loading the package.
+    :config
+
+    (autoload 'projectile-project-root "projectile")
+    (setq consult-project-root-function #'projectile-project-root))
+#+end_src
+
+***** DONE Advising Functions
+
+I wrote some advising functions to wrap around ~consult-line~ and
+~consult-ripgrep~.  These wrapping functions use the active region as the
+initial text or an empty string if there’s no active region.
+
+There’s a macro in here somewhere.
+
+#+begin_src emacs-lisp
+  (defun jf/consult-first-param-is-initial-text (consult-fn &rest rest)
+    "Advising function around CONSULT-FN.
+
+  The CONSULT-FN's first parameter should be the initial text.
+
+  When there's an active region, use that as the first parameter
+  for CONSULT-FN.  Otherwise, use an empty string the first
+  parameter.  This function handles the REST of the parameters."
+    (interactive)
+    (apply consult-fn
+	   (when (use-region-p)
+	     (buffer-substring
+	      (region-beginning) (region-end)))
+	   rest))
+
+  (defun jf/consult-second-param-is-initial-text (consult-fn &optional first &rest rest)
+    "Advising function around CONSULT-FN.
+
+  We'll pass the FIRST parameter through.  The CONSULT-FN's second
+  parameter should be the initial text.
+
+  When there's an active region, use that as the first parameter
+  for CONSULT-FN.  Otherwise, use an empty string the second
+  parameter.  This function handles the REST of the parameters."
+    (interactive "P")
+    (apply consult-fn
+	   first
+	   (when (use-region-p)
+	     (buffer-substring
+	      (region-beginning) (region-end)))
+	   rest))
+
+
+  (advice-add #'consult-line
+	      :around #'jf/consult-first-param-is-initial-text
+	      '((name . "wrapper")))
+  (advice-add #'consult-ripgrep
+	      :around #'jf/consult-second-param-is-initial-text
+	      '((name . "wrapper")))
+#+end_src
+***** DONE consult-dir.el
+
+- ~consult-dir.el~ :: This package helps ease traveling across directories by
+  providing directory candidates related to current buffers, bookmarks, and
+  projects.  Further, like other ~consult.el~ functions, you can use narrowing
+  keys.  See https://github.com/karthink/consult-dir.
+
+#+begin_src emacs-lisp
+  (use-package consult-dir
+    :straight t
+    :after (consult)
+    :bind (("C-x C-d" . consult-dir)
+	   :map minibuffer-local-completion-map
+	   ("C-x C-d" . consult-dir)
+	   ("C-x C-j" . consult-dir-jump-file)))
+#+end_src
+***** DONE consult-projectile.el
+
+- ~consult-projectile.el~ :: package provides a function I use everyday: ~M-x
+  consult-projectile~.  When I invoke ~consult-projectile~, I have the file
+  completion for the current project.  I can also type =b= + =SPACE= to narrow
+  my initial search to open buffers in the project.  Or =p= + =space= to narrow
+  to other projects; and then select a file within that project.
+
+#+begin_src emacs-lisp
+  (use-package consult-projectile
+    :commands (consult-projectile)
+    :straight (consult-projectile
+	       :type git
+	       :host gitlab
+	       :repo "OlMon/consult-projectile"
+	       :branch "master")
+    :bind ("s-t" . consult-projectile))
+#+end_src
+
+/Note:/ The =CMD= + =t= (e.g. ~s-t~ in Emacs) is a carryover from my [[https://macromates.com][Textmate]]
+and [[https://www.sublimetext.com/][Sublime Text]] days.  More than any other key combination, that one is
+entirely muscle memory.
+
+**** DONE embark-consult.el
+
+- ~embark-consult.el~ :: I use ~embark.el~ and ~consult.el~, let’s add a little
+  bit more connective tissue.
+
+#+begin_src emacs-lisp
+  (use-package embark-consult
+    :straight t
+    :after (embark consult)
+    :demand t ; only necessary if you have the hook below
+    ;; if you want to have consult previews as you move around an
+    ;; auto-updating embark collect buffer
+    :hook
+
+    (embark-collect-mode . consult-preview-at-point-mode)
+    (embark-collect-mode . embark-consult-preview-minor-mode))
+#+end_src
+
+**** DONE wgrep.el
+
+- ~wgrep.el~ :: “Edit a grep buffer and apply those changes to the file
+  buffer.”  In other words, after “searching” for something, sending the
+  results to a buffer (via ~embark-export~ or such thing), you can edit that
+  search results buffer and propogate the changes to the locations of the
+  elements that matched the search.
+
+1.  Call ~consult-ripgrep~ (via ~C-c f~) to search for something.
+2.  Call ~embark-export~ (via ~C-s-e~) to export to a grep buffer.
+3.  Call ~wgrep-change-to-wgrep-mode~ (via ~e~ or ~C-c C-p~)
+4.  Edit the grep buffer as you would anywhere else.
+5.  Save (via ~C-x C-s~) or Cancel (via ~C-c C-k~).
+
+   I use this sequence at least once a day.
+
+#+begin_src emacs-lisp
+(use-package wgrep
+    :after (embark-consult ripgrep)
+    :straight t
+    :bind (:map wgrep-mode-map
+		;; Added keybinding to echo Magit behavior
+		("C-c C-c" . save-buffer)
+		:map grep-mode-map
+		("e" . wgrep-change-to-wgrep-mode)
+		:map ripgrep-search-mode-map
+		("e" . wgrep-change-to-wgrep-mode)))
+#+end_src
+
+**** DONE orderless.el
+
+The [[https://github.com/minad/orderless][orderless]] package provides completion tooling for non-strict word order.  I
+spent considerable time reading through the [[https://github.com/minad/consult/wiki][Orderless section of Consult’s
+wiki]].
+
+As configured the orderless completion recognizes the following “switches”:
+
+- Flex (~\~~) :: Just start typing characters and you’ll get matches that have
+  those characters
+- File Extension (~\.ext~) :: Match files with this extension.
+- Regexp ~^.$~ :: Use some regular expression syntax
+  - ~^~ matching beginning
+  - ~.~ any ol’ character
+  - ~$~ matching ending
+- Initialism (~`~) :: In ~M-x~ when I typed ~`pl~ the ~previous-line~ function
+  was a top match.  The initialism switch “explodes” the characters and says
+  match methods who’s words start with those characters.
+- Not Literal ~!~ :: Exclude candidates that match the literal
+  (e.g. ~!previous~ won’t show ~previous-line~ in the ~M-x~ completion).
+- Literal ~=~ :: No “fuzzy buziness”, just match exactly what I typed.
+
+There is another case (e.g. ~%~ character fold) that I don’t yet understand.
+
+More on these component matchings styles is available at [[https://github.com/minad/orderless#component-matching-styles][github.com/minad/orderless]].
+
+#+begin_src emacs-lisp
+  (use-package orderless
+    :straight t
+    :config
+    (defvar +orderless-dispatch-alist
+      '((?% . char-fold-to-regexp)
+	(?! . orderless-without-literal)
+	(?`. orderless-initialism)
+	(?= . orderless-literal)
+	(?~ . orderless-flex)))
+    (defun +orderless-dispatch (pattern index _total)
+      (cond
+       ;; Ensure that $ works with Consult commands, which add disambiguation suffixes
+       ((string-suffix-p "$" pattern)
+	`(orderless-regexp . ,(concat (substring pattern 0 -1) "[\x100000-\x10FFFD]*$")))
+       ;; File extensions
+       ((and
+	 ;; Completing filename or eshell
+	 (or minibuffer-completing-file-name
+	     (derived-mode-p 'eshell-mode))
+	 ;; File extension
+	 (string-match-p "\\`\\.." pattern))
+	`(orderless-regexp . ,(concat "\\." (substring pattern 1) "[\x100000-\x10FFFD]*$")))
+       ;; Ignore single !
+       ((string= "!" pattern) `(orderless-literal . ""))
+       ;; Prefix and suffix
+       ((if-let (x (assq (aref pattern 0) +orderless-dispatch-alist))
+	    (cons (cdr x) (substring pattern 1))
+	  (when-let (x (assq (aref pattern (1- (length pattern))) +orderless-dispatch-alist))
+	    (cons (cdr x) (substring pattern 0 -1)))))))
+
+    ;; Define orderless style with initialism by default
+    (orderless-define-completion-style +orderless-with-initialism
+      (orderless-matching-styles '(orderless-initialism orderless-literal orderless-regexp)))
+
+    ;; Certain dynamic completion tables (completion-table-dynamic)
+    ;; do not work properly with orderless. One can add basic as a fallback.
+    ;; Basic will only be used when orderless fails, which happens only for
+    ;; these special tables.
+    (setq completion-styles '(orderless basic)
+	  completion-category-defaults nil
+	    ;;; Enable partial-completion for files.
+	    ;;; Either give orderless precedence or partial-completion.
+	    ;;; Note that completion-category-overrides is not really an override,
+	    ;;; but rather prepended to the default completion-styles.
+	  ;; completion-category-overrides '((file (styles orderless partial-completion))) ;; orderless is tried first
+	  completion-category-overrides '((file (styles partial-completion)) ;; partial-completion is tried first
+					  ;; enable initialism by default for symbols
+					  (command (styles +orderless-with-initialism))
+					  (variable (styles +orderless-with-initialism))
+					  (symbol (styles +orderless-with-initialism)))
+	  orderless-component-separator #'orderless-escapable-split-on-space ;; allow escaping space with backslash!
+	  orderless-style-dispatchers '(+orderless-dispatch)))
+#+end_src
+
+**** DONE corfu.el
+
+- ~corfu.el~ :: An alternative to the ubiquitous [[https://github.com/company-mode/company-mode][Company]]; In [[https://takeonrules.com/2022/01/17/switching-from-company-to-corfu-for-emacs-completion/][Switching from
+  Company to Corfu for Emacs Completion]] I further explain my adoption of Corfu.
+  See https://github.com/minad/corfu for more details on Corfu.
+
+  /Note:/ I may explore [[https://gitlab.com/protesilaos/mct][MCT]] and see how it compares to Corfu.
+
+#+begin_src emacs-lisp
+  (use-package corfu
+    :straight t
+    :demand t
+    ;; Optionally use TAB for cycling, default is `corfu-complete'.
+    :bind (:map corfu-map
+		("TAB" . corfu-next)
+		([tab] . corfu-next)
+		("S-TAB" . corfu-previous)
+		([backtab] . corfu-previous))
+    :init
+
+    ;; Recommended: Enable Corfu globally.
+    ;; This is recommended since dabbrev can be used globally (M-/).
+    (corfu-global-mode)
+
+    :config
+    ;; Optionally enable cycling for `corfu-next' and `corfu-previous'.
+    (setq corfu-cycle t))
+#+end_src
+
+***** DONE Extending corfu.el
+
+- ~corfu-move-to-minibuffer~ :: The completion at point “popup” can sometimes
+  be a little cryptic or terse.  The ~corfu-move-to-minibuffer~ provides a
+  means of moving the “popup” candidates to the minibuffer for further
+  inspection.
+
+#+begin_src emacs-lisp
+  (defun corfu-move-to-minibuffer ()
+    "Move \"popup\" completion candidates to minibuffer.
+
+  Useful if you want a more robust view into the recommend candidates."
+    (interactive)
+    (let (completion-cycle-threshold completion-cycling)
+      (apply #'consult-completion-in-region completion-in-region--data)))
+  (define-key corfu-map "\M-m" #'corfu-move-to-minibuffer)
+#+end_src
+
+**** DONE cape.el
+
+- ~cape.el~ :: provides several Completion At Point Extensions (Capfs).  I like
+  having a Capf for spelling and files.
+
+#+begin_src emacs-lisp
+  (use-package cape
+    :straight t
+    :bind (("C-c p p" . completion-at-point)
+	   ("C-c p d" . cape-dabbrev)
+	   ("C-c p f" . cape-file)
+	   ("C-c p s" . cape-symbol)
+	   ("C-c p i" . cape-ispell)))
+
+  ;; Use Company backends as Capfs.
+  (setq-local completion-at-point-functions
+    (mapcar #'cape-company-to-capf
+      (list #'company-files #'company-ispell #'company-dabbrev)))
+#+end_src
+
+**** DONE yasnippet.el
+
+- ~yasnippet.el~ :: A rather convenient snippet manager.  When you create a
+  snippet, it understands the mode you're in and puts the snippet in the right
+  place.
+
+#+begin_src emacs-lisp
+  (use-package yasnippet
+    :straight t
+    :diminish yas-mode
+    :init
+    (setq yas-snippet-dirs '("~/git/dotemacs/snippets"))
+    (yas-global-mode 1))
+#+end_src
+**** DONE consult-yasnippet.el
+
+- ~consult-yasnippet.el~ :: A bit of integration with ~consult.el~ and ~yasnippet.el~.
+
+#+begin_src emacs-lisp
+  (use-package consult-yasnippet
+    :straight t
+    :after (consult yasnippet)
+    :bind ("C-c y" . consult-yasnippet))
+#+end_src
+
+*** DONE Navigation
+**** DONE avy.el
+
+- ~avy.el~ :: That letter is the beginning of a word.  Narrow results from there.
+
+#+begin_src emacs-lisp
+  (use-package avy
+    :bind (("C-j" . avy-goto-char-timer))
+    :bind (:map org-mode-map ("C-j" . avy-goto-char-timer))
+    :straight t)
+#+end_src
 
 
 *** DONE Display
@@ -1432,22 +1895,191 @@ quasi-opinionated compromise.
     :bind (:map org-mode-map (("C-c g" . org-mac-grab-link))))
 #+end_src
 
-*** DONE Navigation
-**** DONE avy.el
-
-- ~avy.el~ :: That letter is the beginning of a word.  Narrow results from there.
+*** TODO Typography
 
 #+begin_src emacs-lisp
-  (use-package avy
-    :bind (("C-j" . avy-goto-char-timer))
-    :bind (:map org-mode-map ("C-j" . avy-goto-char-timer))
-    :straight t)
+  ;;; Commentary:
+  ;;
+  ;;  This package serves the purpose of assisting with adding
+  ;;  characters that are not readily available on an ANSI keyboard.
+  ;;
+  ;;; Code:
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;;
+  ;;; BEGIN Typography Menu
+  ;;
+  ;;  The purpose of the typography menu is to provide easier access to
+  ;;  typographic characters that I use; It also provides a bit of a
+  ;;  mnemonic device (e.g. "C-x 8 RET" searches for a character to insert).
+  ;;
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  (use-package pretty-hydra
+      :straight (pretty-hydra
+		 :type git :host github :repo "jerrypnz/major-mode-hydra.el"
+		 :files (:defaults (:exclude "major-mode-hydra.el"))))
+
+  (defvar jf/typography--title
+    (jf/all-the-icons--with-octicon "pencil" "Typography (C-x 8 RET for Search)" 1 -0.05)
+    "The menu title for typography")
+  (pretty-hydra-define jf/typography--menu (:foreign-keys warn :title jf/typography--title :quit-key "q" :exit t)
+    ("Characters" (
+		   ("d d" (insert "-") "- dash")
+		   ("d m" (insert "—") "— em dash")
+		   ("d n" (insert "–") "– en dash")
+		   (". e" (insert "…") "… ellipsis")
+		   (". d" (insert "·") "º degree")
+		   (". m" (insert "·") "· middot")
+		   ("t d" (insert "†") "† dagger")
+		   ("t 2" (insert "‡") "‡ double dagger")
+		   ("t s" (insert "§") "§ section")
+		   ("t p" (insert "¶") "¶ paragraph")
+		   ("? !" (insert "‽") "‽ Interobang")
+		   )
+     "Math" (
+	     ("a x" (insert "×") "× Multiplication Sign")
+	     ("a d" (insert "÷") "÷ Division Sign")
+	     ("a m" (insert "−") "− Minus Sign")
+	     ("a p" (insert "±") "± Plus or Minus Sign")
+	     ("m n" (insert "¬") "¬ Negation")
+	     ;; For declaring regex functions.  See
+	     ;; https://www.johndcook.com/blog/2022/01/08/corner-quotes-in-unicode/
+	     ;; and https://irreal.org/blog/?p=10265
+	     ("c l" (insert "⌜") "⌜ Left Corner Quote")
+	     ("c r" (insert " ⌟") "⌟ Right Corner Quote")
+	     ;; Included as a reminder as I use these for menu structures
+	     ("f h"   (insert "─") "─ Forms light horizontal")
+	     ("f D l" (insert "┐") "┐ Forms light down and left")
+	     ("f v"   (insert "│") "│ Forms light vertical")
+	     ("f V r" (insert "├") "├ Forms light vertical and right")
+	     ("f U r" (insert "└") "└ Forms light up and right")
+	     )
+     "Quotes" (
+	       ("\" o" (insert "“") "“ Double quote open")
+	       ("\" c" (insert "”") "” Doule quote close")
+	       ("\" O" (insert "«") "« Guillemet open")
+	       ("\" C" (insert "»") "» Guillemet close")
+	       ("\" l" (insert "⌈") "⌈ Left ceiling")
+	       ("' o" (insert "‘") "‘ Single quote open")
+	       ("' c" (insert "’") "’ Single quote close")
+	       ("' O" (insert "‹") "‹ Single guillemet open")
+	       ("' C" (insert "›") "› Single guillemet close")
+	       ("p 1" (insert "′") "′ Single Prime (feet, arcminutes)")
+	       ("p 2" (insert "″") "″ Double Prime (inches, arcseconds)")
+	       ("p 3" (insert "‴") "‴ Triple Prime"))
+     ))
+
+  (global-set-key (kbd "C-s-8") 'jf/typography--menu/body)
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;;
+  ;;; END Typography Menu
+  ;;
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+#+end_src
+
+**** TODO typopunct.el
+
+#+begin_src emacs-lisp
+  (use-package typopunct
+    :straight t
+    :config
+    (add-hook 'org-mode-hook 'jf/typopunct-init)
+    (defun jf/typopunct-init ()
+      (require 'typopunct)
+      (typopunct-change-language 'english)
+      (typopunct-mode 1))
+    (setq typopunct-buffer-language 'english)
+
+    ;; To insert a typographical ellipsis sign (…) on three consecutive
+    ;; dots, or a middle dot (·) on ‘^.’
+    (defconst typopunct-ellipsis (decode-char 'ucs #x2026))
+    (defconst typopunct-middot   (decode-char 'ucs #xB7)) ; or 2219
+    (defun typopunct-insert-ellipsis-or-middot (arg)
+      "Change three consecutive dots to a typographical ellipsis mark."
+      (interactive "p")
+      (cond
+       ((and (= 1 arg)
+	     (eq (char-before) ?^))
+	(delete-char -1)
+	(insert typopunct-middot))
+       ((and (= 1 arg)
+	     (eq this-command last-command)
+	     (looking-back "\\.\\." 1))
+	(replace-match "")
+	(insert typopunct-ellipsis))
+       (t
+	(self-insert-command arg))))
+    (define-key typopunct-map "." 'typopunct-insert-ellipsis-or-middot)
+
+
+    (defconst typopunct-prime  (decode-char 'ucs #x2032)) ; feet, arcminutes, derivatives
+    (defconst typopunct-dprime (decode-char 'ucs #x2033)) ; inches, arcseconds, double derivatives
+    (defconst typopunct-tprime (decode-char 'ucs #x2034))
+
+    ;; The minus sign (−) is separate from the hyphen (-), en dash (–) and
+    ;; em dash (—). To build upon the clever behavior of the ‘-’ key
+    (defconst typopunct-minus (decode-char 'ucs #x2212))
+    (defconst typopunct-pm    (decode-char 'ucs #xB1))
+    (defconst typopunct-mp    (decode-char 'ucs #x2213))
+    (defadvice typopunct-insert-typographical-dashes
+	(around minus-or-pm activate)
+      (cond
+       ((or (eq (char-before) typopunct-em-dash)
+	    (looking-back "\\([[:blank:]]\\|^\\)\\^" 2))
+	(delete-char -1)
+	(insert typopunct-minus))
+       ((looking-back "[^[:blank:]]\\^" 1)
+	(insert typopunct-minus))
+       ((looking-back "+/" 1)
+	(progn (replace-match "")
+	       (insert typopunct-pm)))
+       (t ad-do-it)))
+    (defun typopunct-insert-mp (arg)
+      (interactive "p")
+      (if (and (= 1 arg) (looking-back "-/" 2))
+	  (progn (replace-match "")
+		 (insert typopunct-mp))
+	(self-insert-command arg)))
+    (define-key typopunct-map "+" 'typopunct-insert-mp)
+    (defconst typopunct-times (decode-char 'ucs #xD7))
+    (defun typopunct-insert-times (arg)
+      "Insert multiplication sign at ARG."
+      (interactive "p")
+      (if (and (= 1 arg) (looking-back "\\([[:blank:]]\\|^\\)\\^"))
+	  (progn (delete-char -1)
+		 (insert typopunct-times))
+	(self-insert-command arg)))
+    (define-key typopunct-map "x" 'typopunct-insert-times)
+
+    (defadvice typopunct-insert-quotation-mark (around wrap-region activate)
+      (let* ((lang (or (get-text-property (point) 'typopunct-language)
+		       typopunct-buffer-language))
+	     (omark (if single
+			(typopunct-opening-single-quotation-mark lang)
+		      (typopunct-opening-quotation-mark lang)))
+	     (qmark (if single
+			(typopunct-closing-single-quotation-mark lang)
+		      (typopunct-closing-quotation-mark lang))))
+	(cond
+	 (mark-active
+	  (let ((skeleton-end-newline nil)
+		(singleo (typopunct-opening-single-quotation-mark lang))
+		(singleq (typopunct-closing-single-quotation-mark lang)))
+	    (if (> (point) (mark))
+		(exchange-point-and-mark))
+	    (save-excursion
+	      (while (re-search-forward (regexp-quote (string omark)) (mark) t)
+		(replace-match (regexp-quote (string singleo)) nil nil)))
+	    (save-excursion
+	      (while (re-search-forward (regexp-quote (string qmark)) (mark) t)
+		(replace-match (regexp-quote (string singleq)) nil nil)))
+	    (skeleton-insert (list nil omark '_ qmark) -1)))
+	 ((looking-at (regexp-opt (list (string omark) (string qmark))))
+	  (forward-char 1))
+	 (t ad-do-it)))))
 #+end_src
 
 
-
 ** Integrated “Applications”
-
 *** TODO Variable/const definitions
 
 #+begin_src emacs-lisp
@@ -1472,722 +2104,16 @@ quasi-opinionated compromise.
     "Relevant data directories for my day to day work.")
 #+end_src
 
-*** RSS Feed
+*** DONE Knowledge Management
 
-*** Knowledge Management
+By now, with all that I’ve written, it should be evident that knowledge
+management is both a critical need and something that Emacs must certainly
+support.
 
-*** Working on Projects
-*** TODO Stuff
+Another “killer feature” of Emacs is org-mode and it’s constellation of
+packages.
 
-  - Customizations for Blogging
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-* Past Work
-** DONE Projects
-*** DONE projectile.el
-
-- ~projectile.el~ :: this package provides convenient organization and commands to run over projects.
-
-#+begin_src emacs-lisp
-  (use-package projectile
-    :straight t
-    :diminish 'projectile-mode
-    :config (projectile-mode 1)
-    :custom (projectile-project-search-path '("~/git/"))
-    :bind ("s-." . projectile-toggle-between-implementation-and-test))
-#+end_src
-
-/Note:/ The =CMD= + =.= is a carryover from my [[https://macromates.com][Textmate]] and [[https://www.sublimetext.com/][Sublime Text]] days.
-That’s one of those hot-keys almost burned into soul.
-
-*** DONE magit.el
-
-- ~magit.el~ :: The awesome [[http://git-scm.com][git]] client for Emacs.  I’ve written a few functions
-  to help me jump to the Github page for the pull request.[fn:3]
-
-  - ~jf/magit-browse-pull-request~ :: In ‘magit-log-mode’ open the associated
-    pull request.
-  - ~jf/git-current-remote-url~ :: Get the current remote url.
-  - ~jf/open-pull-request-for~ :: Given the SUMMARY open the related pull
-    request.
-  - ~jf/open-pull-request-for-current-line~ :: For the current line open the
-    applicable pull request.
-
-#+begin_src emacs-lisp
-  (use-package magit
-    :straight t
-    :init (use-package with-editor :straight t)
-
-    ;; Adding format to git-commit-fill-column of 72 as best practice.
-    (setq git-commit-fill-column 72)
-
-    ;; Keeping the summary terse helps with legibility when you run a
-    ;; report with only summary.
-    (setq git-commit-summary-max-length 50)
-
-    ;; Set the tabular display columns for the `magit-list-repositories'
-    (setq magit-repolist-columns
-	  '(("Name"    25 magit-repolist-column-ident ())
-	    ("Version" 25 magit-repolist-column-version ())
-	    ("δ"        1 magit-repolist-column-dirty ())
-	    ("⇣"        3 magit-repolist-column-unpulled-from-upstream
-	     ((:right-align t)
-	      (:help-echo "Upstream changes not in branch")))
-	    ("⇡"        3 magit-repolist-column-unpushed-to-upstream
-	     ((:right-align t)
-	      (:help-echo "Local changes not in upstream")))
-	    ("Branch"  25 magit-repolist-column-branch ())
-	    ("Path"    99 magit-repolist-column-path ())))
-
-    ;; The default relevant `magit-list-repositories'
-    (setq magit-repository-directories
-	  `(("~/git/takeonrules.source/" . 1)
-	    ("~/git/burning_wheel_lifepaths/" . 1)
-	    ("~/git/dotzshrc/" .  1)
-	    ("~/git/dotemacs/" . 1)
-	    ("~/git/emacs-bookmarks/" . 1)
-	    ("~/git/org" . 1)
-	    ("~/git/org/archive" . 1)
-	    ("~/git/takeonrules.source/themes/hugo-tufte" . 1)))
-
-    ;; Have magit-status go full screen and quit to previous
-    ;; configuration.  Taken from
-    ;; http://whattheemacsd.com/setup-magit.el-01.html#comment-748135498
-    ;; and http://irreal.org/blog/?p=2253
-    (defadvice magit-status (around magit-fullscreen activate)
-      (window-configuration-to-register :magit-fullscreen)
-      ad-do-it
-      (delete-other-windows))
-    (defadvice magit-mode-quit-window (after magit-restore-screen activate)
-      (jump-to-register :magit-fullscreen))
-    :config
-    (remove-hook 'magit-status-sections-hook 'magit-insert-tags-header)
-    (defun jf/magit-browse-pull-request ()
-      "In `magit-log-mode' open the associated pull request
-  at point.
-
-  Assumes that the commit log title ends in the PR #, which
-  is the case when you use the Squash and Merge strategy.
-
-  This implementation is dependent on `magit' and `s'."
-      (interactive)
-      (let* ((beg (line-beginning-position))
-	     (end (line-end-position))
-	     (summary
-	      (buffer-substring-no-properties
-	       beg end)))
-	(jf/open-pull-request-for :summary summary)))
-    (defun jf/git-current-remote-url ()
-      "Get the current remote url."
-      (s-trim
-       (shell-command-to-string
-	(concat
-	 "git remote get-url "
-	 (format "%s" (magit-get-current-remote))))))
-    (cl-defun jf/open-pull-request-for (&key summary)
-      "Given the SUMMARY open the related pull request.
-
-  This method assumes you're using Github's Squash and Strategy."
-      (let ((remote-url (jf/git-current-remote-url)))
-	(save-match-data
-	  (and (string-match "(\\#\\([0-9]+\\))$" summary)
-	       (browse-url
-		(concat
-		 ;; I tend to favor HTTPS and the repos end in ".git"
-		 (s-replace ".git" "" remote-url)
-		 "/pull/"
-		 (match-string 1 summary)))))))
-    (defun jf/open-pull-request-for-current-line ()
-      "For the current line open the applicable pull request."
-      (interactive)
-      (let ((summary
-	     (s-trim
-	      (shell-command-to-string
-	       (concat "git --no-pager annotate "
-		       "-w -L "
-		       (format "%s" (line-number-at-pos))
-		       ",+1 "
-		       "--porcelain "
-		       buffer-file-name
-		       " | rg \"^summary\"")))))
-	(jf/open-pull-request-for :summary summary)))
-    :bind (("s-7" . magit-status))
-    ;; In other situations I bind s-6 to `git-messenger:popup-message'
-    :bind (:map magit-log-mode-map ("s-6" . 'jf/magit-browse-pull-request))
-    :hook ((with-editor-post-finish-hook . magit-status)))
-#+end_src
-
-*** DONE forge.el
-
-- ~forge.el~ :: Additional interactions interactions with [[https://en.wikipedia.org/wiki/Forge_(software)][Git forge]].  Right
-  now, I’ve commented out most things, as I wasn’t figuring out how to refresh
-  the appended sections.  I live this here as a reminder.
-
-#+begin_src emacs-lisp
-  (use-package forge
-    :config
-    (setq auth-sources '("~/.authinfo"))
-    ;; (magit-add-section-hook 'magit-status-sections-hook 'forge-insert-authored-pullreqs nil 'append)
-    ;; (magit-add-section-hook 'magit-status-sections-hook 'forge-insert-requested-reviews nil 'append)
-    ;; (magit-add-section-hook 'magit-status-sections-hook 'forge-insert-assigned-issues nil 'append)
-    :straight t)
-
-#+end_src
-
-*** DONE libgit.el
-
-- ~libgit.el~ :: Provides bindings to [[https://libgit2.org][libgit2]].  These bindings help improve the speed of ~magit.el~; or so I’m told.
-
-#+begin_src emacs-lisp
-  (use-package libgit :straight t)
-#+end_src
-
-*** DONE magit-libgit.el
-
-- ~libgit.el~ :: Connects ~magit.el~ to ~libgit.el~, helping improve the speed of ~magit.el~; or so I’m told.
-
-#+begin_src emacs-lisp
-  (use-package magit-libgit :straight t)
-#+end_src
-
-*** DONE git-timemachine.el
-
-- ~git-timemachine.el~ :: With the time machine, travel back and forth through a files history.
-
-#+begin_src emacs-lisp
-  (use-package git-timemachine :straight t)
-#+end_src
-
-*** DONE git-gutter-fringe.el
-
-- ~git-gutter-fringe.el~ :: Show the current git state in the gutter.  As you
-  edit a line in a file track by git, the fringe’s indicators change to reflect
-  if this is a modification, addition, or deletion.
-
-#+begin_src emacs-lisp
-  (use-package git-gutter-fringe
-    :straight (git-gutter-fringe :type git :host github :repo "emacsorphanage/git-gutter-fringe")
-    :diminish 'git-gutter-mode
-    :config (global-git-gutter-mode 't)
-    (setq git-gutter:modified-sign "Δ"
-	  git-gutter:added-sign "+"
-	  git-gutter:deleted-sign "-"))
-#+end_src
-
-*** DONE git-link.el
-
-- ~git-link.el~ :: Type ~M-x git-link~ and the function pushes the Git forge
-  URL to the kill ring; I’ve configured the URL to use the SHA of the commit of
-  the line on which I called ~git-link()~.  This is helpful for sharing links
-  with other folks.  I use this /all of the time./ See
-  https://github.com/sshaw/git-link.
-
-#+begin_src emacs-lisp
-  (use-package git-link
-    :config
-    (defun jf/git-browse-to-repository (remote)
-      "Open in external browser the current repository's given REMOTE."
-      (interactive (list (git-link--select-remote)))
-      (git-link-homepage remote)
-      (browse-url (car kill-ring)))
-    (setq git-link-use-commit t) ;; URL will be SHA instead of branch
-    :straight t)
-#+end_src
-
-*** DONE git-messenger.el
-
-- ~git-messenger.el~ :: Sometimes I want to see more ~git~ information
-  regarding the current line.  ~git-messenger.el~ provides a popup that shows
-  the information and provides some additional options.
-
-#+begin_src emacs-lisp
-  (use-package git-messenger
-    :config (setq git-messenger:show-detail t)
-    (defun jf/git-messenger-popup ()
-      "Open `git-messenger' or github PR.
-
-  With universal argument, open the github PR for current line.
-
-  Without universal argument, open `git-messenger'."
-      (interactive)
-      (if (equal current-prefix-arg nil) ; no C-u
-	  (git-messenger:popup-message)
-	(jf/open-pull-request-for-current-line)))
-    :custom
-    (git-messenger:use-magit-popup t)
-    :bind (:map git-messenger-map (("p" . 'jf/open-pull-request-for-current-line)
-				   ("l" . 'git-link)))
-    :bind (("s-6" . jf/git-messenger-popup)
-	   ("<f6>" . jf/git-messenger-popup))
-    :straight t)
-#+end_src
-
-*** DONE blamer.el
-
-- ~blamer.el~ :: When working in code, I want different ways to view the
-  metadata around the code.  ~blammer.el~ adds a quick annotation to the
-  current line; When did the last person touch this and what was the message.
-
-#+begin_src emacs-lisp
-  (use-package blamer
-    :straight (blamer :host github :repo "Artawower/blamer.el")
-    :custom
-    ;; Set to 0 because I don’t enable by default.  So I’m in a mindset of show
-    ;; me who and when.
-    (blamer-idle-time 0.0)
-    (blamer-author-formatter "✎ %s ")
-    (blamer-datetime-formatter "[%s] ")
-    (blamer-commit-formatter "● %s")
-    (blamer-min-offset 40)
-    (blamer-max-commit-message-length 20))
-#+end_src
-** DONE Completion
-
-*** Emacs Adjustments for Completion
-
-What follows is adjustments to emacs settings as they relate to completion.
-
-#+begin_src emacs-lisp
-  (use-package emacs
-    :init
-
-    ;; Emacs 28: Hide commands in M-x which do not apply to the current mode.
-    ;; Corfu commands are hidden, since they are not supposed to be used via M-x.
-    (setq read-extended-command-predicate
-	  #'command-completion-default-include-p)
-
-    ;; TAB cycle if there are only few candidates
-    (setq completion-cycle-threshold 3)
-
-    ;; Enable indentation+completion using the TAB key.
-    ;; `completion-at-point' is often bound to M-TAB.
-    (setq tab-always-indent 'complete)
-
-    ;; Add prompt indicator to `completing-read-multiple'.
-    ;; Alternatively try `consult-completing-read-multiple'.
-    (defun crm-indicator (args)
-      (cons (concat "[CRM] " (car args)) (cdr args)))
-    (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
-
-    ;; Do not allow the cursor in the minibuffer prompt
-    (setq minibuffer-prompt-properties
-	  '(read-only t cursor-intangible t face minibuffer-prompt))
-    (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode))
-#+end_src
-
-
-*** DONE consult.el
-
-- ~consult.el~ :: “Consult provides practical commands based on the Emacs
-  completion function [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Minibuffer-Completion.html][completing-read]].”  I had previously used [[https://github.com/abo-abo/swiper][Ivy, Counsel,
-  and Swiper]], but appreciate the design principles of Consult, namely “Consult
-  fits well into existing setups and it helps you to create a full completion
-  environment out of small and independent components.”[fn:2]
-
-  With ~consult.el~ I’m able to bring in other components that focus on doing
-  their “one thing” really well.
-
-#+begin_src emacs-lisp
-  (use-package consult
-    :straight t
-    ;; Replace bindings. Lazily loaded due by `use-package'.
-    :bind (;; C-c bindings (mode-specific-map)
-	   ("C-c h" . consult-history)
-	   ;; ("C-c m" . consult-mode-command)
-	   ("C-c b" . consult-bookmark)
-	   ("C-c k" . consult-kmacro)
-	   ;; C-x bindings (ctl-x-map)
-	   ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complet-command
-	   ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
-	   ("s-b" . consult-buffer)                ;; orig. switch-to-buffer
-	   ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
-	   ("C-s-b" . consult-buffer-other-window)
-	   ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
-	   ;; Custom M-# bindings for fast register access
-	   ("M-#" . consult-register-load)
-	   ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
-	   ("C-M-#" . consult-register)
-	   ;; Other custom bindings
-	   ("M-y" . consult-yank-from-kill-ring)                ;; orig. yank-pop
-	   ("<help> a" . consult-apropos)            ;; orig. apropos-command
-	   ;; M-g bindings (goto-map)
-	   ("M-g e" . consult-compile-error)
-	   ("M-g g" . consult-goto-line)             ;; orig. goto-line
-	   ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
-	   ("s-l" . consult-goto-line)           ;; orig. goto-line
-	   ("M-g o" . consult-outline)
-	   ("M-g m" . consult-mark)
-	   ("M-g k" . consult-global-mark)
-	   ("C-x C-SPC" . consult-mark)
-	   ("M-g i" . consult-imenu)
-	   ("s-2" . consult-imenu)
-	   ("M-g I" . consult-imenu-multi)
-	   ;; M-s bindings (search-map)
-	   ("M-s f" . consult-find)
-	   ("M-s L" . consult-locate)
-	   ("M-s g" . consult-grep)
-	   ("M-s G" . consult-git-grep)
-	   ("M-s r" . consult-ripgrep)
-	   ("C-c f" . consult-ripgrep)
-	   ("M-s l" . consult-line)
-	   ("M-s m" . consult-multi-occur)
-	   ("M-s k" . consult-keep-lines)
-	   ("M-s u" . consult-focus-lines)
-	   ;; Customizations that map to ivy
-	   ("s-r" . consult-recent-file) ;; Deprecate
-	   ("C-c r" . consult-recent-file)
-	   ("C-c o" . consult-file-externally)
-	   ("C-y" . yank)
-	   ("C-s" . consult-line) ;; I've long favored Swiper mapped to c-s
-	   ;; Isearch integration
-	   ("M-s e" . consult-isearch)
-	   :map isearch-mode-map
-	   ("M-e" . consult-isearch)                 ;; orig. isearch-edit-string
-	   ("M-s e" . consult-isearch)               ;; orig. isearch-edit-string
-	   ("M-s l" . consult-line))                 ;; required by consult-line to detect isearch
-
-    ;; The :init configuration is always executed (Not lazy)
-    :init
-
-    ;; Optionally configure the register formatting.  This improves the register
-    ;; preview for `consult-register', `consult-register-load',
-    ;; `consult-register-store' and the Emacs built-ins.
-    (setq register-preview-delay 0.1
-	  register-preview-function #'consult-register-format)
-
-    ;; Use Consult to select xref locations with preview
-    (setq xref-show-xrefs-function #'consult-xref
-	  xref-show-definitions-function #'consult-xref)
-
-    ;; Updating the default to include "--ignore-case"
-    (setq consult-ripgrep-command "rg --null --line-buffered --color=ansi --max-columns=1000 --ignore-case --no-heading --line-number . -e ARG OPTS")
-
-    ;; Configure other variables and modes in the :config section,
-    ;; after lazily loading the package.
-    :config
-
-    (autoload 'projectile-project-root "projectile")
-    (setq consult-project-root-function #'projectile-project-root))
-#+end_src
-
-**** DONE Advising Functions
-
-I wrote some advising functions to wrap around ~consult-line~ and
-~consult-ripgrep~.  These wrapping functions use the active region as the
-initial text or an empty string if there’s no active region.
-
-There’s a macro in here somewhere.
-
-#+begin_src emacs-lisp
-  (defun jf/consult-first-param-is-initial-text (consult-fn &rest rest)
-    "Advising function around CONSULT-FN.
-
-  The CONSULT-FN's first parameter should be the initial text.
-
-  When there's an active region, use that as the first parameter
-  for CONSULT-FN.  Otherwise, use an empty string the first
-  parameter.  This function handles the REST of the parameters."
-    (interactive)
-    (apply consult-fn
-	   (when (use-region-p)
-	     (buffer-substring
-	      (region-beginning) (region-end)))
-	   rest))
-
-  (defun jf/consult-second-param-is-initial-text (consult-fn &optional first &rest rest)
-    "Advising function around CONSULT-FN.
-
-  We'll pass the FIRST parameter through.  The CONSULT-FN's second
-  parameter should be the initial text.
-
-  When there's an active region, use that as the first parameter
-  for CONSULT-FN.  Otherwise, use an empty string the second
-  parameter.  This function handles the REST of the parameters."
-    (interactive "P")
-    (apply consult-fn
-	   first
-	   (when (use-region-p)
-	     (buffer-substring
-	      (region-beginning) (region-end)))
-	   rest))
-
-
-  (advice-add #'consult-line
-	      :around #'jf/consult-first-param-is-initial-text
-	      '((name . "wrapper")))
-  (advice-add #'consult-ripgrep
-	      :around #'jf/consult-second-param-is-initial-text
-	      '((name . "wrapper")))
-#+end_src
-**** DONE consult-dir.el
-
-- ~consult-dir.el~ :: This package helps ease traveling across directories by
-  providing directory candidates related to current buffers, bookmarks, and
-  projects.  Further, like other ~consult.el~ functions, you can use narrowing
-  keys.  See https://github.com/karthink/consult-dir.
-
-#+begin_src emacs-lisp
-  (use-package consult-dir
-    :straight t
-    :after (consult)
-    :bind (("C-x C-d" . consult-dir)
-	   :map minibuffer-local-completion-map
-	   ("C-x C-d" . consult-dir)
-	   ("C-x C-j" . consult-dir-jump-file)))
-#+end_src
-**** DONE consult-projectile.el
-
-- ~consult-projectile.el~ :: package provides a function I use everyday: ~M-x
-  consult-projectile~.  When I invoke ~consult-projectile~, I have the file
-  completion for the current project.  I can also type =b= + =SPACE= to narrow
-  my initial search to open buffers in the project.  Or =p= + =space= to narrow
-  to other projects; and then select a file within that project.
-
-#+begin_src emacs-lisp
-  (use-package consult-projectile
-    :commands (consult-projectile)
-    :straight (consult-projectile
-	       :type git
-	       :host gitlab
-	       :repo "OlMon/consult-projectile"
-	       :branch "master")
-    :bind ("s-t" . consult-projectile))
-#+end_src
-
-/Note:/ The =CMD= + =t= (e.g. ~s-t~ in Emacs) is a carryover from my [[https://macromates.com][Textmate]]
-and [[https://www.sublimetext.com/][Sublime Text]] days.  More than any other key combination, that one is
-entirely muscle memory.
-
-*** DONE embark-consult.el
-
-- ~embark-consult.el~ :: I use ~embark.el~ and ~consult.el~, let’s add a little
-  bit more connective tissue.
-
-#+begin_src emacs-lisp
-  (use-package embark-consult
-    :straight t
-    :after (embark consult)
-    :demand t ; only necessary if you have the hook below
-    ;; if you want to have consult previews as you move around an
-    ;; auto-updating embark collect buffer
-    :hook
-
-    (embark-collect-mode . consult-preview-at-point-mode)
-    (embark-collect-mode . embark-consult-preview-minor-mode))
-#+end_src
-
-*** DONE wgrep.el
-
-- ~wgrep.el~ :: “Edit a grep buffer and apply those changes to the file
-  buffer.”  In other words, after “searching” for something, sending the
-  results to a buffer (via ~embark-export~ or such thing), you can edit that
-  search results buffer and propogate the changes to the locations of the
-  elements that matched the search.
-
-1.  Call ~consult-ripgrep~ (via ~C-c f~) to search for something.
-2.  Call ~embark-export~ (via ~C-s-e~) to export to a grep buffer.
-3.  Call ~wgrep-change-to-wgrep-mode~ (via ~e~ or ~C-c C-p~)
-4.  Edit the grep buffer as you would anywhere else.
-5.  Save (via ~C-x C-s~) or Cancel (via ~C-c C-k~).
-
-   I use this sequence at least once a day.
-
-#+begin_src emacs-lisp
-(use-package wgrep
-    :after (embark-consult ripgrep)
-    :straight t
-    :bind (:map wgrep-mode-map
-		;; Added keybinding to echo Magit behavior
-		("C-c C-c" . save-buffer)
-		:map grep-mode-map
-		("e" . wgrep-change-to-wgrep-mode)
-		:map ripgrep-search-mode-map
-		("e" . wgrep-change-to-wgrep-mode)))
-#+end_src
-
-*** DONE orderless.el
-
-The [[https://github.com/minad/orderless][orderless]] package provides completion tooling for non-strict word order.  I
-spent considerable time reading through the [[https://github.com/minad/consult/wiki][Orderless section of Consult’s
-wiki]].
-
-As configured the orderless completion recognizes the following “switches”:
-
-- Flex (~\~~) :: Just start typing characters and you’ll get matches that have
-  those characters
-- File Extension (~\.ext~) :: Match files with this extension.
-- Regexp ~^.$~ :: Use some regular expression syntax
-  - ~^~ matching beginning
-  - ~.~ any ol’ character
-  - ~$~ matching ending
-- Initialism (~`~) :: In ~M-x~ when I typed ~`pl~ the ~previous-line~ function
-  was a top match.  The initialism switch “explodes” the characters and says
-  match methods who’s words start with those characters.
-- Not Literal ~!~ :: Exclude candidates that match the literal
-  (e.g. ~!previous~ won’t show ~previous-line~ in the ~M-x~ completion).
-- Literal ~=~ :: No “fuzzy buziness”, just match exactly what I typed.
-
-There is another case (e.g. ~%~ character fold) that I don’t yet understand.
-
-More on these component matchings styles is available at [[https://github.com/minad/orderless#component-matching-styles][github.com/minad/orderless]].
-
-#+begin_src emacs-lisp
-  (use-package orderless
-    :straight t
-    :config
-    (defvar +orderless-dispatch-alist
-      '((?% . char-fold-to-regexp)
-	(?! . orderless-without-literal)
-	(?`. orderless-initialism)
-	(?= . orderless-literal)
-	(?~ . orderless-flex)))
-    (defun +orderless-dispatch (pattern index _total)
-      (cond
-       ;; Ensure that $ works with Consult commands, which add disambiguation suffixes
-       ((string-suffix-p "$" pattern)
-	`(orderless-regexp . ,(concat (substring pattern 0 -1) "[\x100000-\x10FFFD]*$")))
-       ;; File extensions
-       ((and
-	 ;; Completing filename or eshell
-	 (or minibuffer-completing-file-name
-	     (derived-mode-p 'eshell-mode))
-	 ;; File extension
-	 (string-match-p "\\`\\.." pattern))
-	`(orderless-regexp . ,(concat "\\." (substring pattern 1) "[\x100000-\x10FFFD]*$")))
-       ;; Ignore single !
-       ((string= "!" pattern) `(orderless-literal . ""))
-       ;; Prefix and suffix
-       ((if-let (x (assq (aref pattern 0) +orderless-dispatch-alist))
-	    (cons (cdr x) (substring pattern 1))
-	  (when-let (x (assq (aref pattern (1- (length pattern))) +orderless-dispatch-alist))
-	    (cons (cdr x) (substring pattern 0 -1)))))))
-
-    ;; Define orderless style with initialism by default
-    (orderless-define-completion-style +orderless-with-initialism
-      (orderless-matching-styles '(orderless-initialism orderless-literal orderless-regexp)))
-
-    ;; Certain dynamic completion tables (completion-table-dynamic)
-    ;; do not work properly with orderless. One can add basic as a fallback.
-    ;; Basic will only be used when orderless fails, which happens only for
-    ;; these special tables.
-    (setq completion-styles '(orderless basic)
-	  completion-category-defaults nil
-	    ;;; Enable partial-completion for files.
-	    ;;; Either give orderless precedence or partial-completion.
-	    ;;; Note that completion-category-overrides is not really an override,
-	    ;;; but rather prepended to the default completion-styles.
-	  ;; completion-category-overrides '((file (styles orderless partial-completion))) ;; orderless is tried first
-	  completion-category-overrides '((file (styles partial-completion)) ;; partial-completion is tried first
-					  ;; enable initialism by default for symbols
-					  (command (styles +orderless-with-initialism))
-					  (variable (styles +orderless-with-initialism))
-					  (symbol (styles +orderless-with-initialism)))
-	  orderless-component-separator #'orderless-escapable-split-on-space ;; allow escaping space with backslash!
-	  orderless-style-dispatchers '(+orderless-dispatch)))
-#+end_src
-
-*** DONE corfu.el
-
-- ~corfu.el~ :: An alternative to the ubiquitous [[https://github.com/company-mode/company-mode][Company]]; In [[https://takeonrules.com/2022/01/17/switching-from-company-to-corfu-for-emacs-completion/][Switching from
-  Company to Corfu for Emacs Completion]] I further explain my adoption of Corfu.
-  See https://github.com/minad/corfu for more details on Corfu.
-
-  /Note:/ I may explore [[https://gitlab.com/protesilaos/mct][MCT]] and see how it compares to Corfu.
-
-#+begin_src emacs-lisp
-  (use-package corfu
-    :straight t
-    :demand t
-    ;; Optionally use TAB for cycling, default is `corfu-complete'.
-    :bind (:map corfu-map
-		("TAB" . corfu-next)
-		([tab] . corfu-next)
-		("S-TAB" . corfu-previous)
-		([backtab] . corfu-previous))
-    :init
-
-    ;; Recommended: Enable Corfu globally.
-    ;; This is recommended since dabbrev can be used globally (M-/).
-    (corfu-global-mode)
-
-    :config
-    ;; Optionally enable cycling for `corfu-next' and `corfu-previous'.
-    (setq corfu-cycle t))
-#+end_src
-
-**** DONE Extending corfu.el
-
-- ~corfu-move-to-minibuffer~ :: The completion at point “popup” can sometimes
-  be a little cryptic or terse.  The ~corfu-move-to-minibuffer~ provides a
-  means of moving the “popup” candidates to the minibuffer for further
-  inspection.
-
-#+begin_src emacs-lisp
-  (defun corfu-move-to-minibuffer ()
-    "Move \"popup\" completion candidates to minibuffer.
-
-  Useful if you want a more robust view into the recommend candidates."
-    (interactive)
-    (let (completion-cycle-threshold completion-cycling)
-      (apply #'consult-completion-in-region completion-in-region--data)))
-  (define-key corfu-map "\M-m" #'corfu-move-to-minibuffer)
-#+end_src
-
-*** DONE cape.el
-
-- ~cape.el~ :: provides several Completion At Point Extensions (Capfs).  I like
-  having a Capf for spelling and files.
-
-#+begin_src emacs-lisp
-  (use-package cape
-    :straight t
-    :bind (("C-c p p" . completion-at-point)
-	   ("C-c p d" . cape-dabbrev)
-	   ("C-c p f" . cape-file)
-	   ("C-c p s" . cape-symbol)
-	   ("C-c p i" . cape-ispell)))
-
-  ;; Use Company backends as Capfs.
-  (setq-local completion-at-point-functions
-    (mapcar #'cape-company-to-capf
-      (list #'company-files #'company-ispell #'company-dabbrev)))
-#+end_src
-
-*** DONE yasnippet.el
-
-- ~yasnippet.el~ :: A rather convenient snippet manager.  When you create a
-  snippet, it understands the mode you're in and puts the snippet in the right
-  place.
-
-#+begin_src emacs-lisp
-  (use-package yasnippet
-    :straight t
-    :diminish yas-mode
-    :init
-    (setq yas-snippet-dirs '("~/git/dotemacs/snippets"))
-    (yas-global-mode 1))
-#+end_src
-*** DONE consult-yasnippet.el
-
-- ~consult-yasnippet.el~ :: A bit of integration with ~consult.el~ and ~yasnippet.el~.
-
-#+begin_src emacs-lisp
-  (use-package consult-yasnippet
-    :straight t
-    :after (consult yasnippet)
-    :bind ("C-c y" . consult-yasnippet))
-#+end_src
-
-
-** DONE Text Manipulation
-
-** DONE Org Mode
-*** DONE org-mode.el
+**** DONE org-mode.el
 
 Oh ~org-mode~, one of the “why you should use Emacs” packages.  It’s a set of
 organizational tools that allow for progressive adoption.  You can start
@@ -2306,7 +2232,7 @@ I cribbed the following function from [[https://xenodium.com/emacs-dwim-do-what-
 		 (call-interactively 'org-insert-link)))))
 #+end_src
 
-**** DONE Copy Org and Paste in Rich Text Format
+***** DONE Copy Org and Paste in Rich Text Format
 
 Org Mode has built-in capabilities for exporting to HTML (and other languages).
 The following function does just a bit more.  It converts the org region to
@@ -2333,7 +2259,7 @@ See [[https://kitchingroup.cheme.cmu.edu/blog/2016/06/16/Copy-formatted-org-mode
 	(kill-buffer buf))))
 #+end_src
 
-**** DONE Swapping Tilde and Backtick in Org and More
+***** DONE Swapping Tilde and Backtick in Org and More
 
 I jump between Markdown and Org Mode with some frequency.  In many cases I
 prefer Org Mode.  Except when it comes to code declaration.  The tilde (e.g.,
@@ -2378,7 +2304,7 @@ to a specific language (via ~org-insert-tilde-language~).
       (call-interactively #'org-self-insert-command)))
 #+end_src
 
-*** DONE org-menu.el
+**** DONE org-menu.el
 
 - ~org-menu.el~ :: Context dependent menu for org-mode; leverages ~transient.el~.
 
@@ -2388,7 +2314,7 @@ to a specific language (via ~org-insert-tilde-language~).
     :bind (:map org-mode-map ("C-c m" . 'org-menu)))
 #+end_src
 
-*** DONE org-roam.el
+**** DONE org-roam.el
 
 This is my third iteration on an ~org-roam~.  It's goal is to address use-cases
 that I've encountered while moving more of my note-taking with ~org-roam~.
@@ -2412,7 +2338,7 @@ s
 What follows builds on Jethro Kuan's [[https://jethrokuan.github.io/org-roam-guide/][How I Take Notes with Org-roam]].  Reading
 Jethro Kuan's post helped me see how I could do this.
 
-**** Org Roam Supporting Functions
+***** Org Roam Supporting Functions
 
 The ~jf/org-context-plist~ defines and names some of the contexts in which I
 might be writing.  Each named context defines the tags.  These are the tags
@@ -2530,7 +2456,7 @@ establish the current context (or clear it).
 #+end_src
 
 
-**** Org Roam Configuration
+***** Org Roam Configuration
 
 #+begin_src emacs-lisp
   (use-package org-roam
@@ -2606,7 +2532,7 @@ establish the current context (or clear it).
       (error "")))
 #+end_src
 
-*** DONE org-d20.el
+**** DONE org-d20.el
 
 - ~org-d20.el~ :: I’m really only using this for the ~org-d20--roll~ function.
 
@@ -2627,200 +2553,9 @@ establish the current context (or clear it).
     :straight (org-d20 :host github :repo "spwhitton/org-d20"))
 #+end_src
 
-** TODO Typography
+*** DONE RSS Feed
 
-#+begin_src emacs-lisp
-  ;;; Commentary:
-  ;;
-  ;;  This package serves the purpose of assisting with adding
-  ;;  characters that are not readily available on an ANSI keyboard.
-  ;;
-  ;;; Code:
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  ;;
-  ;;; BEGIN Typography Menu
-  ;;
-  ;;  The purpose of the typography menu is to provide easier access to
-  ;;  typographic characters that I use; It also provides a bit of a
-  ;;  mnemonic device (e.g. "C-x 8 RET" searches for a character to insert).
-  ;;
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  (use-package pretty-hydra
-      :straight (pretty-hydra
-		 :type git :host github :repo "jerrypnz/major-mode-hydra.el"
-		 :files (:defaults (:exclude "major-mode-hydra.el"))))
-
-  (defvar jf/typography--title
-    (jf/all-the-icons--with-octicon "pencil" "Typography (C-x 8 RET for Search)" 1 -0.05)
-    "The menu title for typography")
-  (pretty-hydra-define jf/typography--menu (:foreign-keys warn :title jf/typography--title :quit-key "q" :exit t)
-    ("Characters" (
-		   ("d d" (insert "-") "- dash")
-		   ("d m" (insert "—") "— em dash")
-		   ("d n" (insert "–") "– en dash")
-		   (". e" (insert "…") "… ellipsis")
-		   (". d" (insert "·") "º degree")
-		   (". m" (insert "·") "· middot")
-		   ("t d" (insert "†") "† dagger")
-		   ("t 2" (insert "‡") "‡ double dagger")
-		   ("t s" (insert "§") "§ section")
-		   ("t p" (insert "¶") "¶ paragraph")
-		   ("? !" (insert "‽") "‽ Interobang")
-		   )
-     "Math" (
-	     ("a x" (insert "×") "× Multiplication Sign")
-	     ("a d" (insert "÷") "÷ Division Sign")
-	     ("a m" (insert "−") "− Minus Sign")
-	     ("a p" (insert "±") "± Plus or Minus Sign")
-	     ("m n" (insert "¬") "¬ Negation")
-	     ;; For declaring regex functions.  See
-	     ;; https://www.johndcook.com/blog/2022/01/08/corner-quotes-in-unicode/
-	     ;; and https://irreal.org/blog/?p=10265
-	     ("c l" (insert "⌜") "⌜ Left Corner Quote")
-	     ("c r" (insert " ⌟") "⌟ Right Corner Quote")
-	     ;; Included as a reminder as I use these for menu structures
-	     ("f h"   (insert "─") "─ Forms light horizontal")
-	     ("f D l" (insert "┐") "┐ Forms light down and left")
-	     ("f v"   (insert "│") "│ Forms light vertical")
-	     ("f V r" (insert "├") "├ Forms light vertical and right")
-	     ("f U r" (insert "└") "└ Forms light up and right")
-	     )
-     "Quotes" (
-	       ("\" o" (insert "“") "“ Double quote open")
-	       ("\" c" (insert "”") "” Doule quote close")
-	       ("\" O" (insert "«") "« Guillemet open")
-	       ("\" C" (insert "»") "» Guillemet close")
-	       ("\" l" (insert "⌈") "⌈ Left ceiling")
-	       ("' o" (insert "‘") "‘ Single quote open")
-	       ("' c" (insert "’") "’ Single quote close")
-	       ("' O" (insert "‹") "‹ Single guillemet open")
-	       ("' C" (insert "›") "› Single guillemet close")
-	       ("p 1" (insert "′") "′ Single Prime (feet, arcminutes)")
-	       ("p 2" (insert "″") "″ Double Prime (inches, arcseconds)")
-	       ("p 3" (insert "‴") "‴ Triple Prime"))
-     ))
-
-  (global-set-key (kbd "C-s-8") 'jf/typography--menu/body)
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  ;;
-  ;;; END Typography Menu
-  ;;
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-#+end_src
-
-*** TODO typopunct.el
-
-#+begin_src emacs-lisp
-  (use-package typopunct
-    :straight t
-    :config
-    (add-hook 'org-mode-hook 'jf/typopunct-init)
-    (defun jf/typopunct-init ()
-      (require 'typopunct)
-      (typopunct-change-language 'english)
-      (typopunct-mode 1))
-    (setq typopunct-buffer-language 'english)
-
-    ;; To insert a typographical ellipsis sign (…) on three consecutive
-    ;; dots, or a middle dot (·) on ‘^.’
-    (defconst typopunct-ellipsis (decode-char 'ucs #x2026))
-    (defconst typopunct-middot   (decode-char 'ucs #xB7)) ; or 2219
-    (defun typopunct-insert-ellipsis-or-middot (arg)
-      "Change three consecutive dots to a typographical ellipsis mark."
-      (interactive "p")
-      (cond
-       ((and (= 1 arg)
-	     (eq (char-before) ?^))
-	(delete-char -1)
-	(insert typopunct-middot))
-       ((and (= 1 arg)
-	     (eq this-command last-command)
-	     (looking-back "\\.\\." 1))
-	(replace-match "")
-	(insert typopunct-ellipsis))
-       (t
-	(self-insert-command arg))))
-    (define-key typopunct-map "." 'typopunct-insert-ellipsis-or-middot)
-
-
-    (defconst typopunct-prime  (decode-char 'ucs #x2032)) ; feet, arcminutes, derivatives
-    (defconst typopunct-dprime (decode-char 'ucs #x2033)) ; inches, arcseconds, double derivatives
-    (defconst typopunct-tprime (decode-char 'ucs #x2034))
-
-    ;; The minus sign (−) is separate from the hyphen (-), en dash (–) and
-    ;; em dash (—). To build upon the clever behavior of the ‘-’ key
-    (defconst typopunct-minus (decode-char 'ucs #x2212))
-    (defconst typopunct-pm    (decode-char 'ucs #xB1))
-    (defconst typopunct-mp    (decode-char 'ucs #x2213))
-    (defadvice typopunct-insert-typographical-dashes
-	(around minus-or-pm activate)
-      (cond
-       ((or (eq (char-before) typopunct-em-dash)
-	    (looking-back "\\([[:blank:]]\\|^\\)\\^" 2))
-	(delete-char -1)
-	(insert typopunct-minus))
-       ((looking-back "[^[:blank:]]\\^" 1)
-	(insert typopunct-minus))
-       ((looking-back "+/" 1)
-	(progn (replace-match "")
-	       (insert typopunct-pm)))
-       (t ad-do-it)))
-    (defun typopunct-insert-mp (arg)
-      (interactive "p")
-      (if (and (= 1 arg) (looking-back "-/" 2))
-	  (progn (replace-match "")
-		 (insert typopunct-mp))
-	(self-insert-command arg)))
-    (define-key typopunct-map "+" 'typopunct-insert-mp)
-    (defconst typopunct-times (decode-char 'ucs #xD7))
-    (defun typopunct-insert-times (arg)
-      "Insert multiplication sign at ARG."
-      (interactive "p")
-      (if (and (= 1 arg) (looking-back "\\([[:blank:]]\\|^\\)\\^"))
-	  (progn (delete-char -1)
-		 (insert typopunct-times))
-	(self-insert-command arg)))
-    (define-key typopunct-map "x" 'typopunct-insert-times)
-
-    (defadvice typopunct-insert-quotation-mark (around wrap-region activate)
-      (let* ((lang (or (get-text-property (point) 'typopunct-language)
-		       typopunct-buffer-language))
-	     (omark (if single
-			(typopunct-opening-single-quotation-mark lang)
-		      (typopunct-opening-quotation-mark lang)))
-	     (qmark (if single
-			(typopunct-closing-single-quotation-mark lang)
-		      (typopunct-closing-quotation-mark lang))))
-	(cond
-	 (mark-active
-	  (let ((skeleton-end-newline nil)
-		(singleo (typopunct-opening-single-quotation-mark lang))
-		(singleq (typopunct-closing-single-quotation-mark lang)))
-	    (if (> (point) (mark))
-		(exchange-point-and-mark))
-	    (save-excursion
-	      (while (re-search-forward (regexp-quote (string omark)) (mark) t)
-		(replace-match (regexp-quote (string singleo)) nil nil)))
-	    (save-excursion
-	      (while (re-search-forward (regexp-quote (string qmark)) (mark) t)
-		(replace-match (regexp-quote (string singleq)) nil nil)))
-	    (skeleton-insert (list nil omark '_ qmark) -1)))
-	 ((looking-at (regexp-opt (list (string omark) (string qmark))))
-	  (forward-char 1))
-	 (t ad-do-it)))))
-#+end_src
-
-** DONE Applications
-
-*** DONE elpher.el
-
-- ~elpher.el~ :: A Gopher and Gemini client.
-
-#+begin_src emacs-lisp
-  (use-package elpher :straight t)
-#+end_src
-
-*** DONE elfeed.el
+**** DONE elfeed.el
 
 - ~elfeed.el~ :: An Emacs RSS reader.  I’ve used Google Reader, Feedly,
   Inoreader, and Newsboat.  I wrote about [[https://takeonrules.com/2020/04/12/switching-from-inoreader-to-newsboat-for-rss-reader/][Switching from Inoreader to Newsboat
@@ -2873,6 +2608,270 @@ establish the current context (or clear it).
   ;; End https://karthinks.com/blog/lazy-elfeed/
 #+end_src
 
+
+**** DONE elfeed-org.el
+
+- ~elfeed-org.el~ :: a package for maintaining and organizating my RSS
+  subscriptions in ~org-mode~ format.
+
+#+begin_src emacs-lisp
+  (use-package elfeed-org
+    :straight t
+    :after elfeed
+    :config (elfeed-org)
+    (setq rmh-elfeed-org-files (list "~/git/org/elfeed.org")))
+#+end_src
+
+*** DONE Source Control
+**** DONE magit.el
+
+- ~magit.el~ :: The awesome [[http://git-scm.com][git]] client for Emacs.  I’ve written a few functions
+  to help me jump to the Github page for the pull request.[fn:3]
+
+  - ~jf/magit-browse-pull-request~ :: In ‘magit-log-mode’ open the associated
+    pull request.
+  - ~jf/git-current-remote-url~ :: Get the current remote url.
+  - ~jf/open-pull-request-for~ :: Given the SUMMARY open the related pull
+    request.
+  - ~jf/open-pull-request-for-current-line~ :: For the current line open the
+    applicable pull request.
+
+#+begin_src emacs-lisp
+  (use-package magit
+    :straight t
+    :init (use-package with-editor :straight t)
+
+    ;; Adding format to git-commit-fill-column of 72 as best practice.
+    (setq git-commit-fill-column 72)
+
+    ;; Keeping the summary terse helps with legibility when you run a
+    ;; report with only summary.
+    (setq git-commit-summary-max-length 50)
+
+    ;; Set the tabular display columns for the `magit-list-repositories'
+    (setq magit-repolist-columns
+	  '(("Name"    25 magit-repolist-column-ident ())
+	    ("Version" 25 magit-repolist-column-version ())
+	    ("δ"        1 magit-repolist-column-dirty ())
+	    ("⇣"        3 magit-repolist-column-unpulled-from-upstream
+	     ((:right-align t)
+	      (:help-echo "Upstream changes not in branch")))
+	    ("⇡"        3 magit-repolist-column-unpushed-to-upstream
+	     ((:right-align t)
+	      (:help-echo "Local changes not in upstream")))
+	    ("Branch"  25 magit-repolist-column-branch ())
+	    ("Path"    99 magit-repolist-column-path ())))
+
+    ;; The default relevant `magit-list-repositories'
+    (setq magit-repository-directories
+	  `(("~/git/takeonrules.source/" . 1)
+	    ("~/git/burning_wheel_lifepaths/" . 1)
+	    ("~/git/dotzshrc/" .  1)
+	    ("~/git/dotemacs/" . 1)
+	    ("~/git/emacs-bookmarks/" . 1)
+	    ("~/git/org" . 1)
+	    ("~/git/org/archive" . 1)
+	    ("~/git/takeonrules.source/themes/hugo-tufte" . 1)))
+
+    ;; Have magit-status go full screen and quit to previous
+    ;; configuration.  Taken from
+    ;; http://whattheemacsd.com/setup-magit.el-01.html#comment-748135498
+    ;; and http://irreal.org/blog/?p=2253
+    (defadvice magit-status (around magit-fullscreen activate)
+      (window-configuration-to-register :magit-fullscreen)
+      ad-do-it
+      (delete-other-windows))
+    (defadvice magit-mode-quit-window (after magit-restore-screen activate)
+      (jump-to-register :magit-fullscreen))
+    :config
+    (remove-hook 'magit-status-sections-hook 'magit-insert-tags-header)
+    (defun jf/magit-browse-pull-request ()
+      "In `magit-log-mode' open the associated pull request
+  at point.
+
+  Assumes that the commit log title ends in the PR #, which
+  is the case when you use the Squash and Merge strategy.
+
+  This implementation is dependent on `magit' and `s'."
+      (interactive)
+      (let* ((beg (line-beginning-position))
+	     (end (line-end-position))
+	     (summary
+	      (buffer-substring-no-properties
+	       beg end)))
+	(jf/open-pull-request-for :summary summary)))
+    (defun jf/git-current-remote-url ()
+      "Get the current remote url."
+      (s-trim
+       (shell-command-to-string
+	(concat
+	 "git remote get-url "
+	 (format "%s" (magit-get-current-remote))))))
+    (cl-defun jf/open-pull-request-for (&key summary)
+      "Given the SUMMARY open the related pull request.
+
+  This method assumes you're using Github's Squash and Strategy."
+      (let ((remote-url (jf/git-current-remote-url)))
+	(save-match-data
+	  (and (string-match "(\\#\\([0-9]+\\))$" summary)
+	       (browse-url
+		(concat
+		 ;; I tend to favor HTTPS and the repos end in ".git"
+		 (s-replace ".git" "" remote-url)
+		 "/pull/"
+		 (match-string 1 summary)))))))
+    (defun jf/open-pull-request-for-current-line ()
+      "For the current line open the applicable pull request."
+      (interactive)
+      (let ((summary
+	     (s-trim
+	      (shell-command-to-string
+	       (concat "git --no-pager annotate "
+		       "-w -L "
+		       (format "%s" (line-number-at-pos))
+		       ",+1 "
+		       "--porcelain "
+		       buffer-file-name
+		       " | rg \"^summary\"")))))
+	(jf/open-pull-request-for :summary summary)))
+    :bind (("s-7" . magit-status))
+    ;; In other situations I bind s-6 to `git-messenger:popup-message'
+    :bind (:map magit-log-mode-map ("s-6" . 'jf/magit-browse-pull-request))
+    :hook ((with-editor-post-finish-hook . magit-status)))
+#+end_src
+
+**** DONE forge.el
+
+- ~forge.el~ :: Additional interactions interactions with [[https://en.wikipedia.org/wiki/Forge_(software)][Git forge]].  Right
+  now, I’ve commented out most things, as I wasn’t figuring out how to refresh
+  the appended sections.  I live this here as a reminder.
+
+#+begin_src emacs-lisp
+  (use-package forge
+    :config
+    (setq auth-sources '("~/.authinfo"))
+    ;; (magit-add-section-hook 'magit-status-sections-hook 'forge-insert-authored-pullreqs nil 'append)
+    ;; (magit-add-section-hook 'magit-status-sections-hook 'forge-insert-requested-reviews nil 'append)
+    ;; (magit-add-section-hook 'magit-status-sections-hook 'forge-insert-assigned-issues nil 'append)
+    :straight t)
+
+#+end_src
+
+**** DONE libgit.el
+
+- ~libgit.el~ :: Provides bindings to [[https://libgit2.org][libgit2]].  These bindings help improve the speed of ~magit.el~; or so I’m told.
+
+#+begin_src emacs-lisp
+  (use-package libgit :straight t)
+#+end_src
+
+**** DONE magit-libgit.el
+
+- ~libgit.el~ :: Connects ~magit.el~ to ~libgit.el~, helping improve the speed of ~magit.el~; or so I’m told.
+
+#+begin_src emacs-lisp
+  (use-package magit-libgit :straight t)
+#+end_src
+
+**** DONE git-timemachine.el
+
+- ~git-timemachine.el~ :: With the time machine, travel back and forth through a files history.
+
+#+begin_src emacs-lisp
+  (use-package git-timemachine :straight t)
+#+end_src
+
+**** DONE git-gutter-fringe.el
+
+- ~git-gutter-fringe.el~ :: Show the current git state in the gutter.  As you
+  edit a line in a file track by git, the fringe’s indicators change to reflect
+  if this is a modification, addition, or deletion.
+
+#+begin_src emacs-lisp
+  (use-package git-gutter-fringe
+    :straight (git-gutter-fringe :type git :host github :repo "emacsorphanage/git-gutter-fringe")
+    :diminish 'git-gutter-mode
+    :config (global-git-gutter-mode 't)
+    (setq git-gutter:modified-sign "Δ"
+	  git-gutter:added-sign "+"
+	  git-gutter:deleted-sign "-"))
+#+end_src
+
+**** DONE git-link.el
+
+- ~git-link.el~ :: Type ~M-x git-link~ and the function pushes the Git forge
+  URL to the kill ring; I’ve configured the URL to use the SHA of the commit of
+  the line on which I called ~git-link()~.  This is helpful for sharing links
+  with other folks.  I use this /all of the time./ See
+  https://github.com/sshaw/git-link.
+
+#+begin_src emacs-lisp
+  (use-package git-link
+    :config
+    (defun jf/git-browse-to-repository (remote)
+      "Open in external browser the current repository's given REMOTE."
+      (interactive (list (git-link--select-remote)))
+      (git-link-homepage remote)
+      (browse-url (car kill-ring)))
+    (setq git-link-use-commit t) ;; URL will be SHA instead of branch
+    :straight t)
+#+end_src
+
+**** DONE git-messenger.el
+
+- ~git-messenger.el~ :: Sometimes I want to see more ~git~ information
+  regarding the current line.  ~git-messenger.el~ provides a popup that shows
+  the information and provides some additional options.
+
+#+begin_src emacs-lisp
+  (use-package git-messenger
+    :config (setq git-messenger:show-detail t)
+    (defun jf/git-messenger-popup ()
+      "Open `git-messenger' or github PR.
+
+  With universal argument, open the github PR for current line.
+
+  Without universal argument, open `git-messenger'."
+      (interactive)
+      (if (equal current-prefix-arg nil) ; no C-u
+	  (git-messenger:popup-message)
+	(jf/open-pull-request-for-current-line)))
+    :custom
+    (git-messenger:use-magit-popup t)
+    :bind (:map git-messenger-map (("p" . 'jf/open-pull-request-for-current-line)
+				   ("l" . 'git-link)))
+    :bind (("s-6" . jf/git-messenger-popup)
+	   ("<f6>" . jf/git-messenger-popup))
+    :straight t)
+#+end_src
+
+**** DONE blamer.el
+
+- ~blamer.el~ :: When working in code, I want different ways to view the
+  metadata around the code.  ~blammer.el~ adds a quick annotation to the
+  current line; When did the last person touch this and what was the message.
+
+#+begin_src emacs-lisp
+  (use-package blamer
+    :straight (blamer :host github :repo "Artawower/blamer.el")
+    :custom
+    ;; Set to 0 because I don’t enable by default.  So I’m in a mindset of show
+    ;; me who and when.
+    (blamer-idle-time 0.0)
+    (blamer-author-formatter "✎ %s ")
+    (blamer-datetime-formatter "[%s] ")
+    (blamer-commit-formatter "● %s")
+    (blamer-min-offset 40)
+    (blamer-max-commit-message-length 20))
+#+end_src
+
+*** DONE elpher.el
+
+- ~elpher.el~ :: A Gopher and Gemini client.
+
+#+begin_src emacs-lisp
+  (use-package elpher :straight t)
+#+end_src
 *** DONE eww.el
 
 - ~eww.el~ :: a plain text browser.  Use this to see just how bad much of the web a
@@ -2945,19 +2944,9 @@ establish the current context (or clear it).
     :hook ((eww-mode . jf/reader-visual)))
 #+end_src
 
-*** DONE elfeed-org.el
+** Connective Tissue
 
-- ~elfeed-org.el~ :: a package for maintaining and organizating my RSS
-  subscriptions in ~org-mode~ format.
-
-#+begin_src emacs-lisp
-  (use-package elfeed-org
-    :straight t
-    :after elfeed
-    :config (elfeed-org)
-    (setq rmh-elfeed-org-files (list "~/git/org/elfeed.org")))
-#+end_src
-
+* Past Work
 ** TODO Utilities
 
 *** DONE Opening multiple file names from command line
@@ -3002,6 +2991,8 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
   (use-package decide
     :straight (decide :host github :type git :repo "jeremyf/decide-mode"))
 #+end_src
+
+**** TODO Wrapping Functions
 
 #+begin_src emacs-lisp
   ;;******************************************************************************
@@ -3672,7 +3663,6 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
   ;;******************************************************************************
 #+end_src
 
-
 *** TODO hammerspoon
 
 #+begin_src emacs-lisp
@@ -4166,7 +4156,7 @@ those modes.
   Use TITLE to derive the docstring.
   Use ABBR to derive the mode-name lighter.
   Add hook to each HOOKS provided."
-    (let ((mode-name (intern (s-dashed-words (s-downcase (concat "jf/" abbr "-minor-mode")))))
+    (let ((mode-name (intern (s-downcase (concat "jf/" abbr "-minor-mode"))))
 	  (lighter (concat " " abbr))
 	  (docstring (concat "Minor mode for " title ".")))
       `(progn
