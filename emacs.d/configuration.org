@@ -4006,7 +4006,7 @@ The following “quick help” methods are tables that I commonly reference when
      "  Being in the presence of the supernatural .. +5 Ob\n"))
 #+end_src
 
-*** TODO Functions
+*** DONE Functions
 
 - ~jf/toggle-osx-alternate-modifier~ :: I like having MacOS’s native Option (e.g. =⌥=) modifier available.  But using
 that default in Emacs would be a significant hinderance.
@@ -4226,7 +4226,15 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
     (interactive "P\nr")
     (sort-lines reverse beg end)
     (delete-duplicate-lines beg end reverse adjacent keep-blanks interactive))
+#+end_src
 
+- ~jf/display-buffer-in-side-window~ :: Creates a sticky side window on the
+  right.  Sometimes this is just the right thing for reviewing files.  I don’t
+  know when I need it, but when I use it I’m always thankful I have it.
+- ~jf/display-buffer-in-side-window~ :: As ~jf/display-buffer-in-side-window~,
+  but creates a side window on the bottom.
+
+#+begin_src emacs-lisp
   (global-set-key (kbd "C-s-\\") 'jf/display-buffer-in-side-window)
   (cl-defun jf/display-buffer-in-side-window (&optional (buffer (current-buffer)))
     "Display BUFFER in dedicated side window."
@@ -4236,7 +4244,12 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
 				     '((side . right)
 				       (window-parameters
 					(no-delete-other-windows . t))))))
+#+end_src
 
+- ~jf/display-buffer-in-side-window~ :: As ~jf/display-buffer-in-side-window~,
+  but creates a side window on the bottom.
+
+#+begin_src emacs-lisp
   (global-set-key (kbd "C-s--") 'jf/display-buffer-in-bottom-window)
   (cl-defun jf/display-buffer-in-bottom-window (&optional (buffer (current-buffer)))
     "Display BUFFER in dedicated side window."
@@ -4246,7 +4259,12 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
 				     '((side . bottom)
 				       (window-parameters
 					(no-delete-other-windows . t))))))
+#+end_src
 
+- ~jf/move-file~ :: Sometimes I want to move, without renaming, a file.  This
+  function helps make that easy.
+
+#+begin_src emacs-lisp
   (global-set-key (kbd "C-x m") 'jf/move-file)
   (defun jf/move-file (target-directory)
     "Write this file to TARGET-DIRECTORY, and delete old one."
@@ -4256,6 +4274,13 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
       (save-buffer)
       (rename-file source target)
       (kill-current-buffer)))
+#+end_src
+
+- ~jf/duplicate-current-line-or-lines-of-region~ :: Sometimes I just want to
+  duplicate an area without copy and paste.  This helps that process.  It’s not
+  as smart as TextMate’s equivalent function, but it’s close enough.
+
+#+begin_src emacs-lisp
   (global-set-key (kbd "C-M-d") 'jf/duplicate-current-line-or-lines-of-region)
   (global-set-key (kbd "C-c d") 'jf/duplicate-current-line-or-lines-of-region)
   (defun jf/duplicate-current-line-or-lines-of-region (arg)
@@ -4280,8 +4305,14 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
 	      (setq end (point)))))
       (crux-duplicate-current-line-or-region arg)))
 
-  (global-set-key (kbd "<f12>") 'jf/create-org-scratch-buffer)
-  (cl-defun jf/create-org-scratch-buffer (&key (mode 'org-mode))
+#+end_src
+
+- ~jf/create-scratch-buffer~ :: A simple wrapper around scratch, that helps
+  name it and sets the major mode to ~org-mode~.
+
+#+begin_src emacs-lisp
+  (global-set-key (kbd "<f12>") 'jf/create-scratch-buffer)
+  (cl-defun jf/create-scratch-buffer (&key (mode 'org-mode))
     "Quickly open a scratch buffer and enable the given MODE."
     (interactive)
     (crux-create-scratch-buffer)
