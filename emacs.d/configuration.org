@@ -222,6 +222,8 @@ bit.  Also enable a few that I find helpful.  (I’ll enable a lot more later).
   (global-set-key (kbd "<M-delete>") 'kill-word)
   (global-set-key (kbd "<s-down>") 'end-of-buffer)
   (global-set-key (kbd "<s-up>") 'beginning-of-buffer)
+  (global-set-key (kbd "s-q") 'save-buffers-kill-terminal)
+  (global-set-key (kbd "s-w") 'kill-current-buffer)
 #+end_src
 
 Some basic packages to keep things less chatty.
@@ -1372,6 +1374,16 @@ are major modes others are minor modes.
     :hook ((sgml-mode . emmet-mode)
 	   (html-mode . emmet-mode)
 	   (css-mode . emmet-mode)))
+#+end_src
+
+**** DONE graphql-mode.el
+
+- ~graphql-mode.el~ :: I started exploring graphql, so I suppose it’s time to bring in a proper mode
+for syntax highlighting and what have you.
+
+#+begin_src emacs-lisp
+  (use-package graphql-mode
+    :straight t)
 #+end_src
 
 **** DONE web-mode.el
@@ -4159,7 +4171,12 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
     (if (region-active-p)
 	(kill-region (region-beginning) (region-end))
       (backward-kill-word arg)))
+#+end_src
 
+- ~jf/kill-line-org-region~ :: Wedding two methods together: ~kill-region~ and
+  ~kill-line~.
+
+#+begin_src emacs-lisp
   (global-set-key (kbd "C-k") 'jf/kill-line-or-region)
   (defun jf/kill-line-or-region (&optional ARG)
     "Kill the selected region otherwise kill the ARG number of lines."
@@ -4167,7 +4184,13 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
     (if (use-region-p)
 	(kill-region (region-beginning) (region-end))
       (kill-line ARG)))
+#+end_src
 
+- ~jf/nab-file-name-to-clipboard~ :: There are plenty of times where I want the
+  file name.  This command helps me get either it’s full path, or it’s base
+  name.
+
+#+begin_src emacs-lisp
   (global-set-key (kbd "C-c n") 'jf/nab-file-name-to-clipboard)
   (defun jf/nab-file-name-to-clipboard ()
     "Nab, I mean copy, the current buffer file name to the clipboard.
@@ -4183,7 +4206,12 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
       (when filename
 	(kill-new filename)
 	(message "Copied buffer file name '%s' to the clipboard." filename))))
+#+end_src
 
+- ~jf/sort-unique-lines~ :: A simple combination of two functions ~sort-lines~
+  and ~delete-duplicate-lines~.
+
+#+begin_src emacs-lisp
   (defun jf/sort-unique-lines (reverse beg end &optional adjacent keep-blanks interactive)
     "Sort lines and delete duplicates.
     By default the sort is lexigraphically ascending.  To sort as
@@ -4198,12 +4226,6 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
     (interactive "P\nr")
     (sort-lines reverse beg end)
     (delete-duplicate-lines beg end reverse adjacent keep-blanks interactive))
-
-  (global-set-key (kbd "s-q") 'save-buffers-kill-terminal)
-  (global-set-key (kbd "s-w") 'kill-current-buffer)
-
-  ;; Treat dashes and underscores as part of words for navigation
-  ;; (global-superword-mode t)
 
   (global-set-key (kbd "C-s-\\") 'jf/display-buffer-in-side-window)
   (cl-defun jf/display-buffer-in-side-window (&optional (buffer (current-buffer)))
@@ -4404,7 +4426,7 @@ those modes.
       ("p" "Browse to pull requests…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/pulls/")))
       ]
      ["Jeremy's Workflow"
-
+      ("a" "Browse Authorization System Project 46" (lambda () (interactive) (browse-url "https://github.com/orgs/forem/projects/46")))
       ("I" "Browse to Jeremy's [I]ssues…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/issues/assigned/jeremyf")))
       ("J" "Browse to Content Experience pro[J]ects…" (lambda () (interactive) (browse-url "https://github.com/orgs/forem/projects/39")))
       ("M" "Browse Jeremy's [M]erged Pull Requests…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/pulls/jeremyf?q=is%3Apr+is%3Aclosed")))
