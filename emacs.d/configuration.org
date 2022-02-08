@@ -2671,7 +2671,8 @@ And with all of that, let’s get into the org-roam configuration.
       (error "")))
 #+end_src
 
-All told, the past experience when running [[https://takeonrules.com/series/new-vistas-in-the-thel-sector/][New Vistas in the Thel Sector // Take on Rules]]
+All told, the past experience when running [[https://takeonrules.com/series/new-vistas-in-the-thel-sector/][New Vistas in the Thel Sector //
+Take on Rules]] informed how I thought about my note taking.
 
 ***** Other Contexts
 

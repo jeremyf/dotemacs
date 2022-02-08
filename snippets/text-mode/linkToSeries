@@ -3,4 +3,4 @@
 # name: {{< linkToSeries >}}
 # key: lts
 # --
-{{< linkToSeries "${1:$$(yas-choose-value (jnf/tor-series-list))}" >}}$0
+{{< linkToSeries "${1:$$(yas-choose-value (jf/tor-series-list))}" >}}$0

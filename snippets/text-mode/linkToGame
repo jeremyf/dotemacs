@@ -3,4 +3,4 @@
 # name: glossary - linkToGame
 # key: ltg
 # --
-{{< glossary key="${1:$$(yas-choose-value (jnf/tor-game-list))}"${2:${3: abbr="t"}${4: title="$5"}} >}}$0
+{{< glossary key="${1:$$(yas-choose-value (jf/tor-game-list))}"${2:${3: abbr="t"}${4: title="$5"}} >}}$0

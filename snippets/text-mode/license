@@ -3,5 +3,5 @@
 # key: license
 # name: license
 # --
-- ${1:$$(yas-choose-value (jnf/tor-licenses-list))}
+- ${1:$$(yas-choose-value (jf/tor-licenses-list))}
 $0

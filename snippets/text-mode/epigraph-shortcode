@@ -3,4 +3,4 @@
 # name: epigraph-shortcode
 # key: epigraph
 # --
-{{< epigraph key="${1:$$(yas-choose-value (jnf/tor-epigraph-list))}" >}}$0
+{{< epigraph key="${1:$$(yas-choose-value (jf/tor-epigraph-list))}" >}}$0

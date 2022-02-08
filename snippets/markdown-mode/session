@@ -5,5 +5,5 @@
 # --
 sessionReport:
   date: ${1:`(format-time-string "%Y-%m-%d")`}
-  game: ${2:$$(yas-choose-value (jnf/tor-game-list))}
+  game: ${2:$$(yas-choose-value (jf/tor-game-list))}
   location: ${3:$$(yas-choose-value '("around the table" "via Zoom" "via Discord and Roll20"))}

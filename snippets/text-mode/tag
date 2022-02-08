@@ -3,5 +3,5 @@
 # name: ToR tag list
 # key: tag
 # --
-- ${1:$$(yas-choose-value (jnf/tor-tags-list))}
+- ${1:$$(yas-choose-value (jf/tor-tags-list))}
 ${0:tag}

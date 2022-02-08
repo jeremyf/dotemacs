@@ -3,4 +3,4 @@
 # name: ToR series list
 # key: series
 # --
-series: ${1:$$(yas-choose-value (jnf/tor-series-list))}
+series: ${1:$$(yas-choose-value (jf/tor-series-list))}

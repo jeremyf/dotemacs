@@ -3,4 +3,4 @@
 # key: cp
 # name: citePage
 # --
-{{< citePage ref="/${1:$$(yas-choose-value (jnf/tor-page-relative-pathname-list))}"${2:${3: title="$4"}${5: withSubtitle="t"}${6: anchor="$7"}} >}}$0
+{{< citePage ref="/${1:$$(yas-choose-value (jf/tor-page-relative-pathname-list))}"${2:${3: title="$4"}${5: withSubtitle="t"}${6: anchor="$7"}} >}}$0
