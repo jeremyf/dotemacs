@@ -2344,19 +2344,22 @@ to a specific language (via ~org-insert-tilde-language~).
     :bind (:map org-mode-map ("C-c m" . 'org-menu)))
 #+end_src
 
-**** DONE org-roam.el
+**** DONE OrgRoam
 
 This is my third iteration on an ~org-roam~.  It's goal is to address use-cases
 that I've encountered while moving more of my note-taking with ~org-roam~.
 
 One use-case is when I'm running or playing in an RPG session.  During those
-sessions, when I create/find/insert nodes, I almost certainly want to use the
-same tag filter.  This is something I observed while running my 13 session
-"Thel Sector" campaign.
+sessions, when I create/find/insert nodes, I almost want to leverage the same
+tags.  That can be in my capturing of nodes or in my searching for nodes.  This
+is something I observed while running my 13 session "Thel Sector" campaign.
 
 A second use-case is when I'm writing notes or thoughts related to work.  In a
 past life, I might have written notes for either my employer or Samvera (a
 community in which I participated).  Those notes might overlap but rarely did.
+
+While I’m writing those notes, if I’m developing out concepts, I might want to
+filter my captures and searches to similar tags.
 
 Another use case is less refined, namely I'm writing but am not "in" a specific
 context.
@@ -2364,13 +2367,24 @@ context.
 However, v2 of my org-roam structure[fn:1], didn't quite get out of
 the way.  I never quite got to the speed of note taking that I had for the
 original Thel Sector campaign.
-s
+
 What follows builds on Jethro Kuan's [[https://jethrokuan.github.io/org-roam-guide/][How I Take Notes with Org-roam]].  Reading
 Jethro Kuan's post helped me see how I could do this.
 
-***** Org Roam Supporting Functions
+***** Preliminaries
 
-The ~jf/org-roam-capture-templates-plist~ variable defines the possible org-roam capture templates that I will use.
+The ~jf/org-roam-capture-templates-plist~ variable defines the possible
+org-roam capture templates that I will use.  I have chosen to narrow these to
+three types:
+
+- ~refs~ :: References to other people’s thoughts.
+- ~main~ :: My thoughts, still churning, referencing other thoughts.
+- ~pubs~ :: My thoughts, published and ready to share.  Referencing any
+  thoughts I’ve captured (and probably more).
+
+/Note:/ I chose to go with 4 character types to minimize it’s impact on
+rendering “type” in the search results (4 characters requires less visual space
+than 10 characters).
 
 #+begin_src emacs-lisp
   (defvar jf/org-roam-capture-templates-plist
@@ -2394,71 +2408,107 @@ The ~jf/org-roam-capture-templates-plist~ variable defines the possible org-roam
 #+end_src
 
 The ~jf/org-context-plist~ defines and names some of the contexts in which I
-might be writing.  Each named context defines the tags.  These are the tags
-that all nodes will have when they were written in the defined context.
+might be writing.  Each named context defines the associated tags.  These are
+the tags that all nodes will have when they are written in the defined context.
 
-I can use ~jf/org-auto-tags--set~ to create a "yet to be named" context (e.g.,
-an ad hoc context).  Or I can use ~jf/org-auto-tags--set-by-context~ to
-establish the current context (or clear it).
+Loosely related is the ~jf/org-auto-tags--current-list~; Contexts are a named
+set of tags.  However, other functions don’t operate based on context.  They
+instead operated based on the tags.
 
 #+begin_src emacs-lisp
   (defvar jf/org-context-plist
     (list
-     :none (list
-	    :name "none"
-	    :tags (list))
-     :burning-locusts (list
-		       :name "burning-locusts"
-		       :tags '("burning-locusts" "rpg" "burning-wheel"))
-     :forem (list
-	     :name "forem"
-	     :tags '("forem"))
-     :mistimed-scroll (list
-		       :name "mistimed-scroll"
-		       :tags '("eberron" "mistimed-scroll" "rpg" "burning-wheel"))
-     :thel-sector (list
-		   :name "thel-sector"
-		   :tags '("thel-sector" "rpg" "swn")))
+     :none
+     (list
+      :name "none"
+      :tags (list))
+
+     :burning-locusts
+     (list
+      :name "burning-locusts"
+      :tags '("burning-locusts"
+	      "rpg"
+	      "burning-wheel"))
+
+     :forem
+     (list
+      :name "forem"
+      :tags '("forem"))
+
+     :mistimed-scroll
+     (list
+      :name "mistimed-scroll"
+      :tags '("eberron"
+	      "mistimed-scroll"
+	      "rpg"
+	      "burning-wheel"))
+     :thel-sector
+     (list
+      :name "thel-sector"
+      :tags '("thel-sector"
+	      "rpg" "swn")))
     "A list of contexts that I regularly write about.")
 
   (defvar jf/org-auto-tags--current-list
     (list)
     "The list of tags to automatically apply to an `org-roam' capture.")
+#+end_src
 
+I can use ~jf/org-auto-tags--set~ to create an ad hoc context, or perhaps a
+"yet to be named" context.  I can use ~jf/org-auto-tags--set-by-context~ to
+establish the current context (or clear it).
+
+#+begin_src emacs-lisp
   (defun jf/org-auto-tags--set (tags)
     "Prompt user or more TAGS."
     (interactive
-     (list (completing-read-multiple "Tag(s): " (org-roam-tag-completions))))
+     (list
+      (completing-read-multiple
+       "Tag(s): " (org-roam-tag-completions))))
     (setq jf/org-auto-tags--current-list tags))
 
-  (cl-defun jf/org-context-list-completing-read (&key
-						   (context-plist
-						    jf/org-context-plist))
-      "Create a list of contexts from the CONTEXT-PLIST for completing read.
+  (cl-defun jf/org-context-list-completing-read
+      (&key
+       (context-plist
+	jf/org-context-plist))
+    "Create a list of contexts from the CONTEXT-PLIST for completing read.
 
 	 The form should be '((\"forem\" 1) (\"burning-loscusts\" 2))."
-      ;; Skipping the even entries as those are the "keys" for the plist,
-      ;; the odds are the values.
-      (-non-nil (seq-map-indexed (lambda (context index)
-				   (when (oddp index)
-				     (list (plist-get context :name) index)))
-				 context-plist)))
+    ;; Skipping the even entries as those are the "keys" for the plist,
+    ;; the odds are the values.
+    (-non-nil (seq-map-indexed
+	       (lambda (context index)
+		 (when (oddp index)
+		   (list (plist-get context :name) index)))
+	       context-plist)))
 
-  (cl-defun jf/org-auto-tags--set-by-context (context &key (context-plist jf/org-context-plist))
+  (cl-defun jf/org-auto-tags--set-by-context
+      (context
+       &key
+       (context-plist jf/org-context-plist))
     "Set auto-tags by CONTEXT.
 
      Prompt for CONTEXT from CONTEXT-PLIST."
-    (interactive (list
-		  (completing-read
-		   "Context: " (jf/org-context-list-completing-read))))
+    (interactive
+     (list
+      (completing-read
+       "Context: " (jf/org-context-list-completing-read))))
     (setq jf/org-auto-tags--current-list
-	  (plist-get (plist-get context-plist (intern (concat ":" context))) :tags)))
+	  (plist-get
+	   (plist-get
+	    context-plist (intern (concat ":" context)))
+	   :tags)))
 #+end_src
 
-With the ~jf/org-auto-tags--current-list~ variable set, I want a function to inject those tags onto my captures.  Looking at the [[https://www.orgroam.com/manual.html#Org_002droam-Template-Expansion][org-roam docs on template expansion]], I want to create a function named ~org-roam-node-auto-tags~.
+With the ~jf/org-auto-tags--current-list~ variable set, I want a function to
+inject those tags onto my captures.  Looking at the [[https://www.orgroam.com/manual.html#Org_002droam-Template-Expansion][org-roam docs on template
+expansion]], I want to create a function named ~org-roam-node-auto-tags~.
 
 #+begin_src emacs-lisp
-  (cl-defun org-roam-node-auto-tags (node &key (tag-list jf/org-auto-tags--current-list))
+  (cl-defun org-roam-node-auto-tags
+      (node
+       &key
+       (tag-list jf/org-auto-tags--current-list))
     "Inject the TAG-LIST into the {auto-tags} region of captured NODE.
 
        See https://www.orgroam.com/manual.html#Template-Walkthrough"
@@ -2467,27 +2517,36 @@ With the ~jf/org-auto-tags--current-list~ variable set, I want a function to inj
       ""))
 #+end_src
 
-And finally, we have functions to use for establishing what templates are available based on the context, as well as what to setup as the default filter-fn for org-capture.
+And finally, we have functions to use for establishing what templates are
+available based on the context, as well as what to setup as the default
+filter-fn for org-capture.
 
 In other words, when I have set one or more tags, I want to use the templates
 appropriate for those tags and filter my org-roam-nodes so that only those
 nodes that have all of the tags are candidates.
 
 #+begin_src emacs-lisp
-  (cl-defun jf/org-roam-templates-list (template &key (template-plist jf/org-roam-capture-templates-plist))
+  (cl-defun jf/org-roam-templates-list
+      (template
+       &key
+       (template-plist jf/org-roam-capture-templates-plist))
     "List of `org-roam' capture templates based on the given TEMPLATE.
 
        Searches the TEMPLATE-PLIST for the templates.
 
        Note, the :all template assumes we use the whole list."
     (if (eq template :all)
-	(-non-nil (seq-map-indexed (lambda (tmp index)
-				     (when (oddp index)
-				       tmp))
-				   template-plist))
+	(-non-nil
+	 (seq-map-indexed
+	  (lambda (tmp index)
+	    (when (oddp index)
+	      tmp))
+	  template-plist))
       (list (plist-get template-plist template))))
 
-  (cl-defun jf/org-roam-templates-context-fn (&key (tag-list jf/org-auto-tags--current-list))
+  (cl-defun jf/org-roam-templates-context-fn
+      (&key
+       (tag-list jf/org-auto-tags--current-list))
     "Returns a set of templates based on TAG-LIST.
 
        A key assumption is that if there's a default tag list, use the
@@ -2496,13 +2555,18 @@ nodes that have all of the tags are candidates.
 	(jf/org-roam-templates-list :main)
       (jf/org-roam-templates-list :all)))
 
-  (cl-defun jf/org-roam-filter-context-fn (node &key (tag-list jf/org-auto-tags--current-list))
+  (cl-defun jf/org-roam-filter-context-fn
+      (node
+       &key
+       (tag-list jf/org-auto-tags--current-list))
     "Determine TAG-LIST is subset of NODE's tags."
+    ;; gnus-subsetp is a more "permissive" version of subsetp.  It doesn't
+    ;; consider order.  And looks at strings as equal if their values are the
+    ;; same.
     (gnus-subsetp tag-list (org-roam-node-tags node)))
 #+end_src
 
-
-***** Org Roam Configuration
+***** Configuration
 
 I wrote three functions to mirror three core functions of org-mode:
 
@@ -2516,27 +2580,36 @@ context and/or tags.  I also limit the available capture templates based on the
 context.
 
 #+begin_src emacs-lisp
-  (defun jf/org-roam-capture (&optional goto keys)
+  (defun jf/org-roam-capture
+      (&optional
+       goto
+       keys)
     "Call `org-roam-capture' based on set tags."
     (interactive "P")
-    (org-roam-capture goto
-		      keys
-		      :filter-fn 'jf/org-roam-filter-context-fn
-		      :templates (jf/org-roam-templates-context-fn)))
+    (org-roam-capture
+     goto
+     keys
+     :filter-fn 'jf/org-roam-filter-context-fn
+     :templates (jf/org-roam-templates-context-fn)))
 
   (defun jf/org-roam-node-insert ()
     "Call `org-roam-node-insert' based on set tags."
     (interactive)
-    (org-roam-node-insert 'jf/org-roam-filter-context-fn
-			  :templates (jf/org-roam-templates-context-fn)))
+    (org-roam-node-insert
+     'jf/org-roam-filter-context-fn
+     :templates (jf/org-roam-templates-context-fn)))
 
-  (defun jf/org-roam-find-node (&optional other-window initial-input)
+  (defun jf/org-roam-find-node
+      (&optional
+       other-window
+       initial-input)
     "Call `org-roam-node-find' based on set tags."
     (interactive current-prefix-arg)
-    (org-roam-node-find other-window
-			initial-input
-			'jf/org-roam-filter-context-fn
-			:templates 'jf/org-roam-templates-context-fn))
+    (org-roam-node-find
+     other-window
+     initial-input
+     'jf/org-roam-filter-context-fn
+     :templates 'jf/org-roam-templates-context-fn))
 #+end_src
 
 And with all of that, let’s get into the org-roam configuration.
@@ -2565,9 +2638,10 @@ And with all of that, let’s get into the org-roam configuration.
     (org-roam-capture-templates (jf/org-roam-templates-list :all))
     :bind (("C-s-f" . jf/org-roam-find-node)
 	   ("C-s-c" . jf/org-roam-capture))
-    :bind (:map org-mode-map (
-			      ("C-s-;" . org-roam-buffer-toggle)
-			      ("s-i" . jf/org-roam-node-insert)))
+    :bind (:map org-mode-map
+		(
+		 ("C-s-;" . org-roam-buffer-toggle)
+		 ("s-i" . jf/org-roam-node-insert)))
     :init
     ;; Help keep the `org-roam-buffer', toggled via `org-roam-buffer-toggle', sticky.
     (add-to-list 'display-buffer-alist
@@ -2591,11 +2665,88 @@ And with all of that, let’s get into the org-roam configuration.
 	(file-name-nondirectory
 	 (directory-file-name
 	  (file-name-directory
-	   (file-relative-name (org-roam-node-file node) org-roam-directory))))
+	   (file-relative-name
+	    (org-roam-node-file node)
+	    org-roam-directory))))
       (error "")))
 #+end_src
 
 All told, the past experience when running [[https://takeonrules.com/series/new-vistas-in-the-thel-sector/][New Vistas in the Thel Sector // Take on Rules]]
+
+***** Other Contexts
+
+Try as I may, based on my configuration, I can’t get [[https://orgmode.org/manual/Protocols.html#Protocols][org-protocol]] to work.  So
+I’ve opted to take a different path; write some Emacs functions instead.
+
+- ~jf/org-roam-capture-ref~ :: Capture a “refs” context ~org-roam-node~ for the given title and url.
+- ~jf/menu-dwim--org-capture-elfeed-show~ :: Capture an RSS entry.
+- ~jf/menu-dwim--org-capture-firefox~ :: Capture the active tab of Firefox.
+- ~jf/menu-dwim--org-capture-safari~ :: Capture the active tab of Safari.
+
+These tie into my the context and auto-tags.
+
+#+begin_src emacs-lisp
+  (cl-defun jf/org-roam-capture-ref (&key title url)
+    "Capture the TITLE and URL in the `org-roam' :refs template"
+    ;; If your installation of org-roam includes the fix fore
+    ;; https://github.com/org-roam/org-roam/issues/2078 then you can leave the
+    ;; below commented out.
+    ;;
+    ;; This looks a bit odd, but to capture the :ref we need the callback from org-roam.
+    ;; (require 'org-roam-protocol)
+    ;;
+    (org-roam-capture-
+     :keys "r"
+     ;; TODO: I would love to get tags working but I'm missing something
+     :node (org-roam-node-create :title title)
+     :info (list :ref url)
+     :props '(:immediate-finish nil)
+     :templates (jf/org-roam-templates-list :refs)))
+
+  (cl-defun jf/menu-dwim--org-capture-elfeed-show (&key (entry elfeed-show-entry))
+    "Create an `org-roam-node' from elfeed ENTRY."
+    (interactive)
+    (let ((url (elfeed-entry-link entry))
+	  (title (elfeed-entry-title entry)))
+      (jf/org-roam-capture-ref :url url :title title)))
+
+  (defun jf/menu-dwim--org-capture-firefox ()
+    "Create an `org-roam-node' from Firefox page.
+
+    Depends on the `grab-mac-link' package."
+    (interactive)
+    (let* ((link-title-pair (grab-mac-link-firefox-1))
+	   (url (car link-title-pair))
+	   (title (cadr link-title-pair)))
+      (jf/org-roam-capture-ref :url url :title title)))
+
+  (defun jf/menu-dwim--org-capture-safari ()
+    "Create an `org-roam-node' from Safari page.
+
+    Depends on the `grab-mac-link' package."
+    (interactive)
+    (let* ((link-title-pair (grab-mac-link-safari-1))
+	   (url (car link-title-pair))
+	   (title (cadr link-title-pair)))
+      (jf/org-roam-capture-ref :url url :title title)))
+
+  (defun jf/menu-dwim--org-capture-eww ()
+    "Create an `org-roam-node' from `eww' data"
+    (interactive)
+    (let* ((url (plist-get eww-data :url))
+	   (title (plist-get eww-data :title)))
+      (jf/org-roam-capture-ref :url url :title title)))
+#+end_src
+
+***** Conclusion
+
+This is the core of my note taking engine.  It builds on the idea that I want
+to reduce the number of decisions I make.  This is extremely important when I’m
+writing session notes.
+
+While I’m playing in a session, my entire context ideally collapses to the
+relevant tags that I’ve established at the beginning of the session.  That way
+I’m certain that I’m filing away notes to their proper location.
 
 **** DONE org-d20.el
 
@@ -4207,69 +4358,6 @@ those modes.
 			:abbr "tor")
   (jf/minor-mode-maker :title "Forem"
 			:abbr "forem")
-#+end_src
-
-**** Org Capture Commands
-
-Try as I may, based on my configuration, I can’t get [[https://orgmode.org/manual/Protocols.html#Protocols][org-protocol]] to work.  So
-I’ve opted to take a different path; write some Emacs functions instead.
-
-- ~jf/org-roam-capture-ref~ :: Capture a “refs” context ~org-roam-node~ for the given title and url.
-- ~jf/menu-dwim--org-capture-elfeed-show~ :: Capture an RSS entry.
-- ~jf/menu-dwim--org-capture-firefox~ :: Capture the active tab of Firefox.
-- ~jf/menu-dwim--org-capture-safari~ :: Capture the active tab of Safari.
-
-#+begin_src emacs-lisp
-  (cl-defun jf/org-roam-capture-ref (&key title url)
-    "Capture the TITLE and URL in the `org-roam' :refs template"
-    ;; If your installation of org-roam includes the fix fore
-    ;; https://github.com/org-roam/org-roam/issues/2078 then you can leave the
-    ;; below commented out.
-    ;;
-    ;; This looks a bit odd, but to capture the :ref we need the callback from org-roam.
-    ;; (require 'org-roam-protocol)
-    ;;
-    (org-roam-capture-
-     :keys "r"
-     ;; TODO: I would love to get tags working but I'm missing something
-     :node (org-roam-node-create :title title)
-     :info (list :ref url)
-     :props '(:immediate-finish nil)
-     :templates (jf/org-roam-templates-list :refs)))
-
-  (cl-defun jf/menu-dwim--org-capture-elfeed-show (&key (entry elfeed-show-entry))
-    "Create an `org-roam-node' from elfeed ENTRY."
-    (interactive)
-    (let ((url (elfeed-entry-link entry))
-	  (title (elfeed-entry-title entry)))
-      (jf/org-roam-capture-ref :url url :title title)))
-
-  (defun jf/menu-dwim--org-capture-firefox ()
-    "Create an `org-roam-node' from Firefox page.
-
-    Depends on the `grab-mac-link' package."
-    (interactive)
-    (let* ((link-title-pair (grab-mac-link-firefox-1))
-	   (url (car link-title-pair))
-	   (title (cadr link-title-pair)))
-      (jf/org-roam-capture-ref :url url :title title)))
-
-  (defun jf/menu-dwim--org-capture-safari ()
-    "Create an `org-roam-node' from Safari page.
-
-    Depends on the `grab-mac-link' package."
-    (interactive)
-    (let* ((link-title-pair (grab-mac-link-safari-1))
-	   (url (car link-title-pair))
-	   (title (cadr link-title-pair)))
-      (jf/org-roam-capture-ref :url url :title title)))
-
-  (defun jf/menu-dwim--org-capture-eww ()
-    "Create an `org-roam-node' from `eww' data"
-    (interactive)
-    (let* ((url (plist-get eww-data :url))
-	   (title (plist-get eww-data :title)))
-      (jf/org-roam-capture-ref :url url :title title)))
 #+end_src
 
 **** TODO A Consistent Transient Menu
