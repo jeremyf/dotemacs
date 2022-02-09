@@ -2700,9 +2700,9 @@ Try as I may, based on my configuration, I can’t get [[https://orgmode.org/man
 I’ve opted to take a different path; write some Emacs functions instead.
 
 - ~jf/org-roam-capture-ref~ :: Capture a “refs” context ~org-roam-node~ for the given title and url.
-- ~jf/menu-dwim--org-capture-elfeed-show~ :: Capture an RSS entry.
-- ~jf/menu-dwim--org-capture-firefox~ :: Capture the active tab of Firefox.
-- ~jf/menu-dwim--org-capture-safari~ :: Capture the active tab of Safari.
+- ~jf/menu--org-capture-elfeed-show~ :: Capture an RSS entry.
+- ~jf/menu--org-capture-firefox~ :: Capture the active tab of Firefox.
+- ~jf/menu--org-capture-safari~ :: Capture the active tab of Safari.
 
 These tie into my the context and auto-tags.
 
@@ -2724,14 +2724,14 @@ These tie into my the context and auto-tags.
      :props '(:immediate-finish nil)
      :templates (jf/org-roam-templates-list :refs)))
 
-  (cl-defun jf/menu-dwim--org-capture-elfeed-show (&key (entry elfeed-show-entry))
+  (cl-defun jf/menu--org-capture-elfeed-show (&key (entry elfeed-show-entry))
     "Create an `org-roam-node' from elfeed ENTRY."
     (interactive)
     (let ((url (elfeed-entry-link entry))
 	  (title (elfeed-entry-title entry)))
       (jf/org-roam-capture-ref :url url :title title)))
 
-  (defun jf/menu-dwim--org-capture-firefox ()
+  (defun jf/menu--org-capture-firefox ()
     "Create an `org-roam-node' from Firefox page.
 
     Depends on the `grab-mac-link' package."
@@ -2741,7 +2741,7 @@ These tie into my the context and auto-tags.
 	   (title (cadr link-title-pair)))
       (jf/org-roam-capture-ref :url url :title title)))
 
-  (defun jf/menu-dwim--org-capture-safari ()
+  (defun jf/menu--org-capture-safari ()
     "Create an `org-roam-node' from Safari page.
 
     Depends on the `grab-mac-link' package."
@@ -2751,7 +2751,7 @@ These tie into my the context and auto-tags.
 	   (title (cadr link-title-pair)))
       (jf/org-roam-capture-ref :url url :title title)))
 
-  (defun jf/menu-dwim--org-capture-eww ()
+  (defun jf/menu--org-capture-eww ()
     "Create an `org-roam-node' from `eww' data"
     (interactive)
     (let* ((url (plist-get eww-data :url))
@@ -4386,7 +4386,7 @@ The following “quick help” methods are tables that I commonly reference when
 
 ** TODO Menus
 
-*** TODO jf/menu-dwim
+*** TODO jf/menu
 **** Minor Modes
 
 In work and in play, there are several “me” specific contexts.  The
@@ -4502,9 +4502,11 @@ Next up is defining the transient prefixes.  The prefixes are the “start of”
 command sequence.  In this case, I’m using them as menu’s which expose
 additional actions.
 
+First up, the Forem menu:
+
 #+begin_src emacs-lisp
-  (global-set-key (kbd "C-M-s-f") 'jf/menu-dwim--forem)
-  (transient-define-prefix jf/menu-dwim--forem ()
+  (global-set-key (kbd "C-M-s-f") 'jf/menu--forem)
+  (transient-define-prefix jf/menu--forem ()
     [["Hammerspoon"
       :if-non-nil hammerspoon-edit-minor-mode
       ("C-t" "Tidy pull request" jf/forem-tidy-pull-request)
@@ -4527,8 +4529,13 @@ additional actions.
       ("D" "[D]ashboard open…" jf/open-dashboard)
       ("d" "Visit [d]ashboard file…" (lambda () (interactive) (find-file jf/forem-dashboard-filename)))
       ]])
+#+end_src
 
-  (transient-define-prefix jf/menu-dwim--bwg ()
+The following menu is for quick help while playing Burning Wheel games.
+
+#+begin_src emacs-lisp
+  (global-set-key (kbd "C-M-s-b") 'jf/menu--bwg)
+  (transient-define-prefix jf/menu--bwg ()
     "Define the BWG help prefix."
     ["Burning Wheel"
      ("c" jf/qh--bwg-circles-obstacles)
@@ -4537,15 +4544,21 @@ additional actions.
      ("s" jf/qh--bwg-steel-test-adjustments)
      ("w" jf/qh--bwg-wises)
      ])
+#+end_src
 
-  (transient-define-prefix jf/menu-dwim--tor ()
+A menu for my TakeOnRules blogging tasks.
+
+#+begin_src emacs-lisp
+  (transient-define-prefix jf/menu--tor ()
     "Define the Take on Rules menu."
     ["Take on Rules"
-     ["Posts"
+     ["Host"
+      ("-h" jf/tor-hostname-current-toggle :transient t)
+     ]]
+     [["Posts"
       :if-non-nil jf/tor-minor-mode
       ("p r" "Re-title post…" jf/tor-retitle-post)
       ("p t" "Tag post…" jf/tor-tag-post :transient t)
-      ("p -" jf/tor-hostname-current-toggle :transient t)
       ("p v" "View post…" jf/tor-view-blog-post)
       ]
      ["Find"
@@ -4560,10 +4573,16 @@ additional actions.
       ("c p" "Post…" jf/tor-create-post)
       ("c s" "Series…" jf/tor-find-series-and-insert-entry)]
      ])
+#+end_src
 
-  (global-set-key (kbd "s-1") 'jf/menu-dwim)
-  (transient-define-prefix jf/menu-dwim ()
+Finally the main menu that connects all of the above together, and provides
+some additional options.
+
+#+begin_src emacs-lisp
+  (global-set-key (kbd "s-1") 'jf/menu)
+  (transient-define-prefix jf/menu ()
     "Return a `transient' compliant list to apply to different transients."
+    ;; Todo, can I get this section into a function so I can duplicate it in the jf/menu--tor?
     [["Markdown Utilities"
       ("k h" "Kill slug version of given heading…" jf/kill-new-markdown-heading-as-slug :if-derived (or markdown-mode html-mode))
       ("w a" "A-tag at point or region…" jf/tor-wrap-link-active-region-dwim  :if-derived (or markdown-mode html-mode))
@@ -4579,15 +4598,15 @@ additional actions.
       ("w w" "Wrap point or region in html…" jf/tor-wrap-in-html-tag  :if-derived (or markdown-mode html-mode))
       ]]
     [["Contexts"
-      ("-b" "Burning Wheel…"  jf/menu-dwim--bwg)
-      ("-f" "Forem…" jf/menu-dwim--forem)
-      ("-t" "TakeOnRules…" jf/menu-dwim--tor)
+      ("-b" "Burning Wheel…"  jf/menu--bwg)
+      ("-f" "Forem…" jf/menu--forem)
+      ("-t" "TakeOnRules…" jf/menu--tor)
       ]
      ["Grab"
-      ("g e" "Elfeed" jf/menu-dwim--org-capture-elfeed-show :if-derived elfeed-show-mode)
-      ("g f" "Firefox" jf/menu-dwim--org-capture-firefox)
-      ("g s" "Safari" jf/menu-dwim--org-capture-safari)
-      ("g w" "Eww" jf/menu-dwim--org-capture-eww :if-derived eww-mode)
+      ("g e" "Elfeed" jf/menu--org-capture-elfeed-show :if-derived elfeed-show-mode)
+      ("g f" "Firefox" jf/menu--org-capture-firefox)
+      ("g s" "Safari" jf/menu--org-capture-safari)
+      ("g w" "Eww" jf/menu--org-capture-eww :if-derived eww-mode)
       ;; ("g u" "URL")
       ]
      ["Jump to"
