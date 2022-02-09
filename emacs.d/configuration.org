@@ -2129,9 +2129,17 @@ quasi-opinionated compromise.
     (file-truename "~/git/takeonrules.source")
     "The home directory of TakeOnRules.com Hugo repository.")
 
-  (defconst jf/tor-default-local-hostname
+  (defconst jf/tor-hostname-default-local
     "http://localhost:1313"
     "The scheme, host name, and port for serving up a local TakeOnRules.com.")
+
+  (defconst jf/tor-hostname-default-remote
+    "https://takeonrules.com"
+    "The scheme and host name for TakeOnRules.com.")
+
+  (defvar jf/tor-hostname-current
+    jf/tor-hostname-default-local
+    "What is the current hostname for serving TakeOnRules content.")
 
   (defvar jf/data-directories
     (list
@@ -3929,8 +3937,8 @@ The following “quick help” methods are tables that I commonly reference when
      (t (message "Unable to find post for \"%s\"" url))))
 
   (cl-defun jf/tor-view-blog-post (&key
-				    (hostname jf/tor-default-local-hostname))
-    "Open `eww' in a new window to preview the current buffer at the HOSTNAME.
+				    (hostname jf/tor-hostname-current))
+    "Browse the url for the HOSTNAME
 
   The front matter of blog posts contains YAML, with two
   attributes: slug and date.  Based on the site configuration, the
@@ -3953,10 +3961,7 @@ The following “quick help” methods are tables that I commonly reference when
 	(push (match-string 1) slugs)
 	;; And finally the host name.
 	(push hostname slugs))
-      (delete-other-windows)
-      (split-window-horizontally)
-      (other-window 1)
-      (eww (format "%s" (s-join "/" slugs)))))
+      (browse-url (format "%s" (s-join "/" slugs)))))
 
   (defun jf/tor-create-post (title)
     "Create and visit a new draft post.  Prompt for a TITLE.
@@ -4436,9 +4441,14 @@ those modes.
 		 " | rg \"[^\\[|\\]]+\" --only-matching"
 		 " | xargs open"))
       (find-file filename)))
+#+end_src
 
+Next I want some transient suffixes (e.g. functions that I call at the end of
+my foray into a transient prefix, or menu).
+
+#+begin_src emacs-lisp
   (transient-define-suffix jf/org-auto-tags--transient (tags)
-    "Set the tags from minibuffer read"
+    "Set the TAGS from minibuffer read"
     :description '(lambda ()
 		    (concat
 		     "Org Tags: "
@@ -4461,6 +4471,38 @@ those modes.
     (interactive)
     (hammerspoon-toggle-mode))
 
+  (transient-define-suffix jf/tor-hostname-current-toggle (hostname)
+    "Set `jf/tor-hostname-current' to HOSTNAME."
+    :description '(lambda ()
+		    (concat "Host: "
+		    (propertize
+		      (format "%s" jf/tor-hostname-current)
+		      'face 'transient-argument)))
+    (interactive (list (completing-read
+			"Host: " (list
+				  (list jf/tor-hostname-default-local 1)
+				  (list jf/tor-hostname-default-remote 2)
+				  ))))
+    (setq jf/tor-hostname-current hostname))
+
+  (transient-define-suffix jf/org-auto-tags--transient (tags)
+    "Set the TAGS from minibuffer read"
+    :description '(lambda ()
+		    (concat
+		     "Org Tags: "
+		     (propertize
+		      (format "%s" jf/org-auto-tags--current-list)
+		      'face 'transient-argument)))
+    (interactive
+     (list (completing-read-multiple "Tag(s): " (org-roam-tag-completions))))
+    (setq jf/org-auto-tags--current-list tags))
+#+end_src
+
+Next up is defining the transient prefixes.  The prefixes are the “start of” a
+command sequence.  In this case, I’m using them as menu’s which expose
+additional actions.
+
+#+begin_src emacs-lisp
   (global-set-key (kbd "C-M-s-f") 'jf/menu-dwim--forem)
   (transient-define-prefix jf/menu-dwim--forem ()
     [["Hammerspoon"
@@ -4503,6 +4545,7 @@ those modes.
       :if-non-nil jf/tor-minor-mode
       ("p r" "Re-title post…" jf/tor-retitle-post)
       ("p t" "Tag post…" jf/tor-tag-post :transient t)
+      ("p -" jf/tor-hostname-current-toggle :transient t)
       ("p v" "View post…" jf/tor-view-blog-post)
       ]
      ["Find"
@@ -4517,25 +4560,6 @@ those modes.
       ("c p" "Post…" jf/tor-create-post)
       ("c s" "Series…" jf/tor-find-series-and-insert-entry)]
      ])
-
-  (transient-define-prefix jf/menu-dwim--hammerspoon ()
-    "Define the Take on Rules find files prefix."
-    ["Hammerspoon"
-
-
-     ("p" "Tidy pull request" jf/forem-tidy-pull-request)])
-
-  (transient-define-suffix jf/org-auto-tags--transient (tags)
-    "Set the tags from minibuffer read"
-    :description '(lambda ()
-		    (concat
-		     "Org Tags: "
-		     (propertize
-		      (format "%s" jf/org-auto-tags--current-list)
-		      'face 'transient-argument)))
-    (interactive
-     (list (completing-read-multiple "Tag(s): " (org-roam-tag-completions))))
-    (setq jf/org-auto-tags--current-list tags))
 
   (global-set-key (kbd "s-1") 'jf/menu-dwim)
   (transient-define-prefix jf/menu-dwim ()
