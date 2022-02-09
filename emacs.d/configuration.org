@@ -3466,7 +3466,7 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
 	  (let* ((end (mark))
 		 (beg (point))
 		 (region
-		  (buffer-substring-no-propertis beg end)))
+		  (buffer-substring-no-properties beg end)))
 	    (dotimes (_i arg)
 	      (goto-char end)
 	      (insert region)
