@@ -17,8 +17,8 @@
 	hungry-delete-backward
 	hungry-delete-forward
 	indent-for-tab-command
-	jnf/kill-line-or-region
-	jnf/kill-region-or-backward-word
+	jf/kill-line-or-region
+	jf/kill-region-or-backward-word
 	kill-visual-line
 	magit-status
 	markdown-cycle
