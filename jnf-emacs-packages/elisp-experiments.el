@@ -210,6 +210,35 @@ With two prefix args, insert an x'ed checkbox."
 
 (message "%s" (jnf/lookup 3 table/swn/ability-modifier))
 
+(use-package org-lookup-dnd
+  :straight t)
+
+(use-package org-pdftools
+  :straight t)
+
+
+(defun jf/entry-evaluator (entry)
+  (if (stringp entry)
+      entry
+    (jf/entry-evaluator (cddr (seq-random-elt entry)))))
+
+;; What we have here is a modification of the tabular behavior
+;;
+;; The seq-random-elt is "rolling" on the table
+;; The `cddr' gets the 3rd+ elements in the list
+(defvar modifier '((1 1 "less")
+		   (2 2 "more")))
+(defvar suffix '((1 1 "Wise")
+		 (2 2 "Filth" modifier)))
+(let* ((table '((1 2 "Sam" modifier)
+		(3 4 "Frodo")))
+       (result (jf/entry-evaluator table)))
+  (message "%s" result))
+  (message "%s" (s-join "" (seq-map #'jf/entry-evaluator result))))
+  (message "%s" ))
+(message "%s" (cddr '(3 4 "Frodo")))
+
+
 
 ;; Macro to kill a markdown link
 ;; {M-x search-backward RET [ C-d RET C-SPC M-x search-forward RET ] RET M-x search-forward RET ) RET  S-<delete>}
