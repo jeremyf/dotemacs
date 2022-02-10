@@ -1,8 +1,9 @@
--*- org-insert-tilde-language: emacs-lisp; -*-
+#-*- org-insert-tilde-language: emacs-lisp; -*-
 #+TITLE: Emacs Configuration
 #+AUTHOR: Jeremy Friesen
 #+EMAIL: jeremy@jeremyfriesen.com
 #+STARTUP: showall
+#+OPTIONS: toc:3
 
 * Introduction
 
