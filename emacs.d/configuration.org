@@ -70,6 +70,7 @@ try to prefix them with ~jf/~.  And if I cribbed those functions from
 elsewhere, I attempt to give credit to the source.
 
 * Into the Emacs
+
 ** Launching Emacs
 
 As we get started in Emacs, I want to make sure I have the basics lined up.
@@ -78,7 +79,7 @@ As we get started in Emacs, I want to make sure I have the basics lined up.
 - Preliminary Configuration
 - Basic Theming
 
-*** DONE Package Management
+*** Package Management
 
 I have chosen to adopt ~straight.el~ for my package management.  The fact that
 it rather seamlessly works with ~use-package~ has help me keep my code more
@@ -110,10 +111,11 @@ organized.
   (straight-use-package 'use-package)
 #+end_src
 
-*** DONE Preliminary Configuration
+*** Preliminary Configuration
 
 These are some general configurations that I’ve slowly accumulated.  There’s
-inline documentation in most cases.  There might be little bits worth teasing out but for the most part, you can move along and reference this later.
+inline documentation in most cases.  There might be little bits worth teasing
+out but for the most part, you can move along and reference this later.
 
 #+begin_src emacs-lisp
   (setq user-full-name "Jeremy Friesen"
@@ -247,7 +249,7 @@ Some basic packages to keep things less chatty.
     :config (gcmh-mode))
 #+end_src
 
-*** DONE Basic Theming
+*** Basic Theming
 
 I want to start with a basic look and feel.  First, the choice of primary font.
 
@@ -544,7 +546,7 @@ provides annotations to minibuffer completions, and pairs nicely with Vertico.
 #+end_src
 
 ** Writing, Coding, Computering
-*** DONE projectile.el
+*** projectile.el
 
 - ~projectile.el~ :: this package provides convenient organization and commands to run over projects.
 
@@ -560,7 +562,7 @@ provides annotations to minibuffer completions, and pairs nicely with Vertico.
 /Note:/ The =CMD= + =.= is a carryover from my [[https://macromates.com][Textmate]] and [[https://www.sublimetext.com/][Sublime Text]] days.
 That’s one of those hot-keys almost burned into soul.
 
-*** DONE Support Packages
+*** Support Packages
 
 When I start writing functions, there’s a few packages I want to consider.
 
@@ -628,7 +630,7 @@ When I start writing functions, there’s a few packages I want to consider.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-*** DONE Completion
+*** Completion
 
 **** Emacs Adjustments for Completion
 
@@ -663,7 +665,7 @@ What follows is adjustments to emacs settings as they relate to completion.
 #+end_src
 
 
-**** DONE consult.el
+**** consult.el
 
 - ~consult.el~ :: “Consult provides practical commands based on the Emacs
   completion function [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Minibuffer-Completion.html][completing-read]].”  I had previously used [[https://github.com/abo-abo/swiper][Ivy, Counsel,
@@ -707,7 +709,6 @@ What follows is adjustments to emacs settings as they relate to completion.
 	   ("M-g k" . consult-global-mark)
 	   ("C-x C-SPC" . consult-mark)
 	   ("M-g i" . consult-imenu)
-	   ("s-2" . consult-imenu)
 	   ("M-g I" . consult-imenu-multi)
 	   ;; M-s bindings (search-map)
 	   ("M-s f" . consult-find)
@@ -757,7 +758,7 @@ What follows is adjustments to emacs settings as they relate to completion.
     (setq consult-project-root-function #'projectile-project-root))
 #+end_src
 
-***** DONE Advising Functions
+***** Advising Functions
 
 I wrote some advising functions to wrap around ~consult-line~ and
 ~consult-ripgrep~.  These wrapping functions use the active region as the
@@ -806,7 +807,7 @@ There’s a macro in here somewhere.
 	      :around #'jf/consult-second-param-is-initial-text
 	      '((name . "wrapper")))
 #+end_src
-***** DONE consult-dir.el
+***** consult-dir.el
 
 - ~consult-dir.el~ :: This package helps ease traveling across directories by
   providing directory candidates related to current buffers, bookmarks, and
@@ -822,7 +823,7 @@ There’s a macro in here somewhere.
 	   ("C-x C-d" . consult-dir)
 	   ("C-x C-j" . consult-dir-jump-file)))
 #+end_src
-***** DONE consult-projectile.el
+***** consult-projectile.el
 
 - ~consult-projectile.el~ :: package provides a function I use everyday: ~M-x
   consult-projectile~.  When I invoke ~consult-projectile~, I have the file
@@ -845,7 +846,7 @@ There’s a macro in here somewhere.
 and [[https://www.sublimetext.com/][Sublime Text]] days.  More than any other key combination, that one is
 entirely muscle memory.
 
-**** DONE embark-consult.el
+**** embark-consult.el
 
 - ~embark-consult.el~ :: I use ~embark.el~ and ~consult.el~, let’s add a little
   bit more connective tissue.
@@ -863,7 +864,7 @@ entirely muscle memory.
     (embark-collect-mode . embark-consult-preview-minor-mode))
 #+end_src
 
-**** DONE wgrep.el
+**** wgrep.el
 
 - ~wgrep.el~ :: “Edit a grep buffer and apply those changes to the file
   buffer.”  In other words, after “searching” for something, sending the
@@ -892,7 +893,7 @@ entirely muscle memory.
 		("e" . wgrep-change-to-wgrep-mode)))
 #+end_src
 
-**** DONE orderless.el
+**** orderless.el
 
 The [[https://github.com/minad/orderless][orderless]] package provides completion tooling for non-strict word order.  I
 spent considerable time reading through the [[https://github.com/minad/consult/wiki][Orderless section of Consult’s
@@ -973,7 +974,7 @@ More on these component matchings styles is available at [[https://github.com/mi
 	  orderless-style-dispatchers '(+orderless-dispatch)))
 #+end_src
 
-**** DONE corfu.el
+**** corfu.el
 
 - ~corfu.el~ :: An alternative to the ubiquitous [[https://github.com/company-mode/company-mode][Company]]; In [[https://takeonrules.com/2022/01/17/switching-from-company-to-corfu-for-emacs-completion/][Switching from
   Company to Corfu for Emacs Completion]] I further explain my adoption of Corfu.
@@ -1002,7 +1003,7 @@ More on these component matchings styles is available at [[https://github.com/mi
     (setq corfu-cycle t))
 #+end_src
 
-***** DONE Extending corfu.el
+***** Extending corfu.el
 
 - ~corfu-move-to-minibuffer~ :: The completion at point “popup” can sometimes
   be a little cryptic or terse.  The ~corfu-move-to-minibuffer~ provides a
@@ -1020,7 +1021,7 @@ More on these component matchings styles is available at [[https://github.com/mi
   (define-key corfu-map "\M-m" #'corfu-move-to-minibuffer)
 #+end_src
 
-**** DONE cape.el
+**** cape.el
 
 - ~cape.el~ :: provides several Completion At Point Extensions (Capfs).  I like
   having a Capf for spelling and files.
@@ -1040,7 +1041,7 @@ More on these component matchings styles is available at [[https://github.com/mi
       (list #'company-files #'company-ispell #'company-dabbrev)))
 #+end_src
 
-**** DONE yasnippet.el
+**** yasnippet.el
 
 - ~yasnippet.el~ :: A rather convenient snippet manager.  When you create a
   snippet, it understands the mode you're in and puts the snippet in the right
@@ -1054,7 +1055,7 @@ More on these component matchings styles is available at [[https://github.com/mi
     (setq yas-snippet-dirs '("~/git/dotemacs/snippets"))
     (yas-global-mode 1))
 #+end_src
-**** DONE consult-yasnippet.el
+**** consult-yasnippet.el
 
 - ~consult-yasnippet.el~ :: A bit of integration with ~consult.el~ and ~yasnippet.el~.
 
@@ -1065,8 +1066,8 @@ More on these component matchings styles is available at [[https://github.com/mi
     :bind ("C-c y" . consult-yasnippet))
 #+end_src
 
-*** DONE Navigation
-**** DONE avy.el
+*** Navigation
+**** avy.el
 
 - ~avy.el~ :: That letter is the beginning of a word.  Narrow results from there.
 
@@ -1078,8 +1079,8 @@ More on these component matchings styles is available at [[https://github.com/mi
 #+end_src
 
 
-*** DONE Display
-**** DONE lin.el
+*** Display
+**** lin.el
 
 - ~lin.el~ :: “LIN locally remaps the hl-line face to a style that is optimal for major modes where line selection is the primary mode of interaction.”  In otherwords, ~lin.el~ improves the highlighted line behavior for the competing contexts.
 
@@ -1089,7 +1090,7 @@ More on these component matchings styles is available at [[https://github.com/mi
     :config (lin-add-to-many-modes))
 #+end_src
 
-**** DONE all-the-icons.el
+**** all-the-icons.el
 
 - ~all-the-icons.el~ :: Provides a nice set of reference icons.  The various
   ~jf/all-with--with-~ functions give access to the icons of the named set.
@@ -1116,7 +1117,7 @@ More on these component matchings styles is available at [[https://github.com/mi
     (jf/all-the-icons--with :name "alltheicon"))
 #+end_src
 
-**** DONE all-the-icons-dired.el
+**** all-the-icons-dired.el
 
 - ~all-the-icons-dired.el~ :: Incorporates file icons with file listings of
   dired.  /Note/: On 2021-04-11 I was getting the following error with this
@@ -1129,7 +1130,7 @@ More on these component matchings styles is available at [[https://github.com/mi
     :hook (dired-mode . all-the-icons-dired-mode))
 #+end_src
 
-**** DONE spaceline.el
+**** spaceline.el
 
 - ~spaceline.el~ :: A nice looking modeline enhancement
 
@@ -1137,7 +1138,7 @@ More on these component matchings styles is available at [[https://github.com/mi
   (use-package spaceline :straight t)
 #+end_src
 
-**** DONE spaceline-all-the-icons.el
+**** spaceline-all-the-icons.el
 
 - ~spaceline-all-the-icons.el~ ::  Add some visual flair to the modeline enhancements.  Disabled as of <2022-02-03 Thu>.
 
@@ -1148,7 +1149,7 @@ More on these component matchings styles is available at [[https://github.com/mi
   ;;  :config (spaceline-all-the-icons-theme))
 #+end_src
 
-**** DONE popper.el
+**** popper.el
 
 - ~popper.el~ :: Treat some types of windows as popups (e.g., something easier
   to dismiss, a bit more like the mini-buffer).  Further ~jf/popper~ can
@@ -1183,7 +1184,7 @@ More on these component matchings styles is available at [[https://github.com/mi
 
 #+end_src
 
-**** DONE shackle.el
+**** shackle.el
 
 - ~shackle.el~ :: Enforce rules for popups.  See https://depp.brause.cc/shackle/.
 
@@ -1197,7 +1198,7 @@ More on these component matchings styles is available at [[https://github.com/mi
 
 /Note:/ How does this related to ~popper.el~?
 
-**** DONE ace-window.el
+**** ace-window.el
 
 - ~ace-window.el~ :: A window manager for emacs, allowing fast toggles between
   windows as well as opening or moving those windows.  See
@@ -1209,7 +1210,7 @@ More on these component matchings styles is available at [[https://github.com/mi
     :bind (("M-o" . ace-window)))
 #+end_src
 
-**** DONE buffer-move.el
+**** buffer-move.el
 
 - ~buffer-move.el~ :: From [[https://github.com/lukhas/buffer-move][lukhas/buffer-move]], this package helps me quickly
   move a window elsewhre.  As of <2022-02-01 Tue>, I don’t often use this
@@ -1221,7 +1222,7 @@ More on these component matchings styles is available at [[https://github.com/mi
     :bind ("<C-s-f12>" . buf-move))
 #+end_src
 
-**** DONE rainbow-delimiters.el
+**** rainbow-delimiters.el
 
 - ~rainbow-delimiters.el~ :: A quick and useful visual queue for paranthesis.
 
@@ -1231,7 +1232,7 @@ More on these component matchings styles is available at [[https://github.com/mi
     :hook ((fundamental-mode) . rainbow-delimiters-mode))
 #+end_src
 
-**** DONE vi-tilde-fringe.el
+**** vi-tilde-fringe.el
 - ~vi-tilde-fringt.el~ :: Show tilde (e.g. ~\~~) on empty trailing lines.  This is a feature ported from [[https://en.wikipedia.org/wiki/Vi][vi]].
 
 #+begin_src emacs-lisp
@@ -1240,7 +1241,7 @@ More on these component matchings styles is available at [[https://github.com/mi
     :config (global-vi-tilde-fringe-mode))
 #+end_src
 
-**** DONE goggles.el
+**** goggles.el
 
 - ~goggles.el~ :: Adds a little bit of visual feedback as you delete chunks.
 
@@ -1252,7 +1253,7 @@ More on these component matchings styles is available at [[https://github.com/mi
     :config (setq-default goggles-pulse t))
 #+end_src
 
-**** DONE emojify.el
+**** emojify.el
 
 - ~emojify.el~ :: Ensure rendering of correct emoji’s.
 
@@ -1275,7 +1276,9 @@ More on these component matchings styles is available at [[https://github.com/mi
     (add-hook 'after-make-frame-functions '--set-emoji-font))
 #+end_src
 
-**** TODO unicode-fonts.el
+**** DONE unicode-fonts.el
+
+I’m uncertain why I included this, aside from “sure would be nice to have unicode fonts.”
 
 #+begin_src emacs-lisp
   (use-package unicode-fonts
@@ -1283,7 +1286,7 @@ More on these component matchings styles is available at [[https://github.com/mi
     :config (unicode-fonts-setup))
 #+end_src
 
-**** DONE flycheck.el
+**** flycheck.el
 
 - ~flycheck.el~ :: a syntax checkling package.  Paired with [[http://proselint.com][proselint]], I can check grammar and other things.  See http://flycheck.org
 
@@ -1307,7 +1310,7 @@ More on these component matchings styles is available at [[https://github.com/mi
       :modes (text-mode markdown-mode gfm-mode org-mode)))
 #+end_src
 
-**** DONE consult-flycheck.el
+**** consult-flycheck.el
 
 - ~consult-flycheck.el~ :: Creates a minibuffer listing the flycheck errors and enables previews.  Quick nice for navigating the prose violations.
 
@@ -1319,7 +1322,7 @@ More on these component matchings styles is available at [[https://github.com/mi
 		("!" . consult-flycheck)))
 #+end_src
 
-*** DONE Modes
+*** Modes
 
 Emacs has the concept of modes.  Each buffer has one major mode and can have
 multiple minor modes.  A major mode may derive from another major mode.
@@ -1329,7 +1332,7 @@ These modes impact lots of things; key bindings being one of them.
 What follows are a list of modes presented in a somewhat random order.  Some
 are major modes others are minor modes.
 
-**** DONE emmet-mode.el
+**** emmet-mode.el
 
 - ~emmet-mode.el~ :: I’ve only scratched the surface of this.  Namely when I
   write a haiku, in my editor it type =pre.poem= followed by ~C-c C-e~ and that
@@ -1345,7 +1348,7 @@ are major modes others are minor modes.
 	   (css-mode . emmet-mode)))
 #+end_src
 
-**** DONE graphql-mode.el
+**** graphql-mode.el
 
 - ~graphql-mode.el~ :: I started exploring graphql, so I suppose it’s time to bring in a proper mode
 for syntax highlighting and what have you.
@@ -1355,7 +1358,7 @@ for syntax highlighting and what have you.
     :straight t)
 #+end_src
 
-**** DONE web-mode.el
+**** web-mode.el
 
 - ~web-mode.el~ :: Some configurations for web development.
 
@@ -1377,7 +1380,7 @@ without this setting, Emacs will happily render the SVG as an image,
   (add-to-list `auto-mode-alist '("\\.svg\\'" . xml-mode))
 #+end_src
 
-**** DONE plantuml-mode.el
+**** plantuml-mode.el
 
 - ~plantuml-mode.el~ :: A mode for working with PlantUML.  See https://plantuml.com.
 
@@ -1391,7 +1394,7 @@ without this setting, Emacs will happily render the SVG as an image,
     :straight t)
 #+end_src
 
-**** DONE json-mode.el
+**** json-mode.el
 
 - ~json.el~ :: In modern web-development, JSON is nigh unavoidable.
 
@@ -1399,7 +1402,7 @@ without this setting, Emacs will happily render the SVG as an image,
   (use-package json-mode :straight t)
 #+end_src
 
-**** DONE json-reformat.el
+**** json-reformat.el
 
 - ~json-reformat.el~ :: Because JSON can be quite ugly, I want something to help tidy it up.
 
@@ -1411,7 +1414,7 @@ without this setting, Emacs will happily render the SVG as an image,
 
 #+end_src
 
-**** DONE go-mode.el
+**** go-mode.el
 
 Every so often I stumble upon a Go package.  The ~go-mode~ package gives me the
 syntax highlighting that makes reading ~Go-lang~ tolerable.
@@ -1420,7 +1423,7 @@ syntax highlighting that makes reading ~Go-lang~ tolerable.
   (use-package go-mode :straight t)
 #+end_src
 
-**** DONE markdown-mode.el
+**** markdown-mode.el
 
 - ~markdown-mode.el~ :: Oh ubiquitous Markdown.
 
@@ -1434,7 +1437,7 @@ syntax highlighting that makes reading ~Go-lang~ tolerable.
     :init (setq markdown-command "/usr/local/bin/pandoc"))
 #+end_src
 
-**** DONE yaml-mode.el
+**** yaml-mode.el
 
 - ~yaml-mode.el~ :: Visual parsing for yaml.
 
@@ -1442,7 +1445,7 @@ syntax highlighting that makes reading ~Go-lang~ tolerable.
   (use-package yaml-mode :straight t)
 #+end_src
 
-**** DONE lua-mode.el
+**** lua-mode.el
 
 - ~lua-mode.el~ :: For working with [[https://www.hammerspoon.org][Hammerspoon]]; which provides me the
   wonderful [[https://github.com/dmgerman/editWithEmacs.spoon/][edit with Emacs]].
@@ -1451,7 +1454,7 @@ syntax highlighting that makes reading ~Go-lang~ tolerable.
   (use-package lua-mode :straight t)
 #+end_src
 
-**** DONE git-modes.el
+**** git-modes.el
 
 - ~git-modes.el~ :: For editing various Git configuration files.
 
@@ -1459,7 +1462,7 @@ syntax highlighting that makes reading ~Go-lang~ tolerable.
   (use-package git-modes :straight t)
 #+end_src
 
-**** DONE enh-ruby-mode.el
+**** enh-ruby-mode.el
 
 - ~enh-ruby-mode.el~ :: Emacs ships with ~ruby-mode.el~, but I’ve found that
   ~enh-ruby-mode.el~ has more convenient navigation functions:
@@ -1483,7 +1486,7 @@ syntax highlighting that makes reading ~Go-lang~ tolerable.
   (add-to-list 'interpreter-mode-alist '("ruby" . enh-ruby-mode))
 #+end_src
 
-**** DONE rspec-mode.el
+**** rspec-mode.el
 
 - ~rspec-mode.el~ :: [[http://rspec.info][RSpec]] is my Ruby testing framework of choice.  As I’ve
   been doing much more extensive Ruby coding, I’ve been using a lot of:
@@ -1509,7 +1512,7 @@ syntax highlighting that makes reading ~Go-lang~ tolerable.
 
 /Note:/ The =CMD= + =.= is a carryover from my [[https://macromates.com][Textmate]] and [[https://www.sublimetext.com/][Sublime Text]] days.
 That’s one of those hot-keys almost burned into soul.
-**** DONE ruby-interpolation.el
+**** ruby-interpolation.el
 
 - ~ruby-interpolation.el~ :: A simple package to expand ~#~ to ~#{<cursor>}~.
 
@@ -1521,7 +1524,7 @@ That’s one of those hot-keys almost burned into soul.
     :hook (enh-ruby-mode . ruby-interpolation-mode))
 #+end_src
 
-**** DONE yard-mode.el
+**** yard-mode.el
 
 - ~yard-mode.el~ :: When writing Ruby documentation, I favor YARD syntax.  See https://yardoc.org fore more details.
 
@@ -1531,7 +1534,7 @@ That’s one of those hot-keys almost burned into soul.
     :hook (enh-ruby-mode . yard-mode))
 #+end_src
 
-**** DONE bundler.el
+**** bundler.el
 
 - ~bundler.el~ :: Adds the useful ~bundle-open~ command.
 
@@ -1540,7 +1543,7 @@ That’s one of those hot-keys almost burned into soul.
     :straight (bundler :type git :host github :repo "endofunky/bundler.el"))
 #+end_src
 
-**** DONE lsp-mode.el
+**** lsp-mode.el
 
 - ~lsp-mode.el~ :: Language Server Protocol; provides some nice interactions with code.
 
@@ -1561,7 +1564,7 @@ That’s one of those hot-keys almost burned into soul.
     (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration))
 #+end_src
 
-**** DONE lsp-ui.el
+**** lsp-ui.el
 
 - ~lsp-ui.el~ :: Some nice UI for LSP mode.
 
@@ -1598,7 +1601,7 @@ packages don’t warrant including this.
   ;; (add-hook 'emacs-lisp-mode 'eldoc-mode)
 #+end_src
 
-**** DONE tree-sitter.el
+**** tree-sitter.el
 
 - ~tree-sitter.el~ :: An incremental parsing library for languages.  See https://tree-sitter.github.io/tree-sitter/.
 
@@ -1621,7 +1624,7 @@ packages don’t warrant including this.
   - Fringe
   - Modes
 
-**** DONE so-long.el
+**** so-long.el
 
 - ~so-long.el~ :: Really long files or long lines can cause problems for Emacs.  This mode helps with that.
 
@@ -1636,8 +1639,8 @@ packages don’t warrant including this.
     :config (global-so-long-mode 1))
 #+end_src
 
-*** DONE Transformations
-**** DONE titlecase.el
+*** Transformations
+**** titlecase.el
 
 The rules of “titlecase” are confounding.  The ~titlecase.el~ package provides
 numerous ways to cast a string to “titlecase.”  I chose wikipedia style as a
@@ -1648,7 +1651,7 @@ quasi-opinionated compromise.
     :straight (titlecase :host github :repo "duckwork/titlecase.el")
     :custom (titlecase-style 'wikipedia))
 #+end_src
-**** DONE fill-sentences-correctly.el
+**** fill-sentences-correctly.el
 
 - ~fill-sentences-correctly.el~ :: After using Emacs for awhile, with it’s
   sentence navigation, I’ve come to strongly favor two spaces after a period.
@@ -1661,7 +1664,7 @@ quasi-opinionated compromise.
     :hook (fundamental-mode . fill-sentences-correctly-mode))
 #+end_src
 
-**** DONE savekill.el
+**** savekill.el
 
 - ~savekill.el~ :: Write "kill" command inputs to disk.
 
@@ -1669,7 +1672,7 @@ quasi-opinionated compromise.
   (use-package savekill :straight t)
 #+end_src
 
-**** DONE math-at-point.el
+**** math-at-point.el
 
 - ~math-at-point.el~ :: Calculate math functions at point and message result in
   minibuffer.  See https://github.com/shankar2k/math-at-point.
@@ -1680,7 +1683,7 @@ quasi-opinionated compromise.
     :bind ("C-c =" . math-at-point))
 #+end_src
 
-**** DONE hippie-exp.el
+**** hippie-exp.el
 
 - ~hippie-exp.el~ :: Using Hippie expand, I toggle through words already referenced.
 
@@ -1702,7 +1705,7 @@ quasi-opinionated compromise.
     :bind (("M-SPC" . hippie-expand)))
 #+end_src
 
-**** DONE expand-region.el
+**** expand-region.el
 
 - ~expand-region.el~ :: a simple package that does two related things really
   well; expands and contracts the current region.  I use this all the time.
@@ -1718,7 +1721,7 @@ quasi-opinionated compromise.
 	   ("C-+" . er/contract-region)))
 #+end_src
 
-**** DONE multiple-cursors.el
+**** multiple-cursors.el
 
 - ~multiple-cursors.el~ :: Allow Emacs to work with multiple cursors.  See
   https://melpa.org/#/multiple-cursors.
@@ -1734,7 +1737,7 @@ quasi-opinionated compromise.
     :straight t)
 #+end_src
 
-**** DONE iedit.el
+**** iedit.el
 
 - ~iedit.el~ :: ~C-;~ to select current symbol and all matches; Then edit at
   multiple points.
@@ -1743,7 +1746,7 @@ quasi-opinionated compromise.
   (use-package iedit :straight t)
 #+end_src
 
-**** DONE crux.el
+**** crux.el
 
 - ~crux.el~ :: A mix of a few odd and useful functions.
 
@@ -1757,7 +1760,7 @@ quasi-opinionated compromise.
 	   ("<f9>" . crux-kill-other-buffers)))
 #+end_src
 
-**** DONE ethan-wspace.el
+**** ethan-wspace.el
 
 - ~ethan-wspace-mode.el~ :: Whitespace hygene package.  The author's
   documentation and commentary echoes my sentiments.
@@ -1770,7 +1773,7 @@ quasi-opinionated compromise.
     :config (global-ethan-wspace-mode 1))
 #+end_src
 
-**** DONE unfill.el
+**** unfill.el
 
 - ~unfill.el~ :: Provides the reverse of ~fill-paragraph~, and a toggle fill and unfill.
 
@@ -1780,7 +1783,7 @@ quasi-opinionated compromise.
     :straight t)
 #+end_src
 
-**** DONE undo-tree.el
+**** undo-tree.el
 
 - ~undo-tree.el~ :: Provides a UI for undo trees.  I'm not certain what I want
   to do with this.
@@ -1796,7 +1799,7 @@ quasi-opinionated compromise.
 
 #+end_src
 
-**** DONE hungry-delete.el
+**** hungry-delete.el
 
 - ~hungry-delete.el~ :: Delete multiple spaces in one delete stroke.
 
@@ -1807,7 +1810,7 @@ quasi-opinionated compromise.
     :config (global-hungry-delete-mode))
 #+end_src
 
-**** DONE move-text.el
+**** move-text.el
 
 - ~move-text.el~ :: A simple package ability to move lines up and down.
 
@@ -1818,7 +1821,9 @@ quasi-opinionated compromise.
 	   ([C-s-up] . move-text-up)))
 #+end_src
 
-**** TODO tempel.el
+**** tempel.el
+
+I have only provisionally adopted this.  I like the idea of abbreviations/snippets using emacs-lisp.  This is a “to be determined” package.
 
 #+begin_src emacs-lisp
   (use-package tempel
@@ -1850,7 +1855,7 @@ quasi-opinionated compromise.
 
 #+end_src
 
-**** DONE whole-line-or-region.el
+**** whole-line-or-region.el
 
 - ~whole-line-or-region.el~ :: From the package commentary, “This minor mode
   allows functions to operate on the current line if they would normally
@@ -1865,7 +1870,7 @@ quasi-opinionated compromise.
     :config (whole-line-or-region-global-mode))
 #+end_src
 
-**** DONE smartparens.el
+**** smartparens.el
 
 - ~smartparens.el~ :: provides some “intelligent” treatment of parentheses.  I’ve been using this for awhile, so I assume it’s baked into my memory.
 
@@ -1873,7 +1878,7 @@ quasi-opinionated compromise.
   (use-package smartparens :straight t)
 #+end_src
 
-**** DONE grab-mac-link.el
+**** grab-mac-link.el
 
 - ~grab-mac-link.el~ :: Grab a link from a variety of MacOS applications.
 
@@ -1897,7 +1902,7 @@ quasi-opinionated compromise.
     :bind (("C-c g" . grab-mac-link)))
 #+end_src
 
-**** DONE org-mac-link.el
+**** org-mac-link.el
 
 - ~org-mac-link.el~ :: Similar to ~grab-mac-link.el~ this specifically grabs a link and insersts in ~org-mode~ format.
 
@@ -2123,7 +2128,7 @@ quasi-opinionated compromise.
     "Relevant data directories for my day to day work.")
 #+end_src
 
-*** DONE Knowledge Management
+*** Knowledge Management
 
 By now, with all that I’ve written, it should be evident that knowledge
 management is both a critical need and something that Emacs must certainly
@@ -2132,7 +2137,7 @@ support.
 Another “killer feature” of Emacs is org-mode and it’s constellation of
 packages.
 
-**** DONE org-mode.el
+**** org-mode.el
 
 Oh ~org-mode~, one of the “why you should use Emacs” packages.  It’s a set of
 organizational tools that allow for progressive adoption.  You can start
@@ -2251,7 +2256,7 @@ I cribbed the following function from [[https://xenodium.com/emacs-dwim-do-what-
 		 (call-interactively 'org-insert-link)))))
 #+end_src
 
-***** DONE Copy Org and Paste in Rich Text Format
+***** Copy Org and Paste in Rich Text Format
 
 Org Mode has built-in capabilities for exporting to HTML (and other languages).
 The following function does just a bit more.  It converts the org region to
@@ -2278,7 +2283,7 @@ See [[https://kitchingroup.cheme.cmu.edu/blog/2016/06/16/Copy-formatted-org-mode
 	(kill-buffer buf))))
 #+end_src
 
-***** DONE Swapping Tilde and Backtick in Org and More
+***** Swapping Tilde and Backtick in Org and More
 
 I jump between Markdown and Org Mode with some frequency.  In many cases I
 prefer Org Mode.  Except when it comes to code declaration.  The tilde (e.g.,
@@ -2323,7 +2328,7 @@ to a specific language (via ~org-insert-tilde-language~).
       (call-interactively #'org-self-insert-command)))
 #+end_src
 
-**** DONE org-menu.el
+**** org-menu.el
 
 - ~org-menu.el~ :: Context dependent menu for org-mode; leverages ~transient.el~.
 
@@ -2333,7 +2338,7 @@ to a specific language (via ~org-insert-tilde-language~).
     :bind (:map org-mode-map ("C-c m" . 'org-menu)))
 #+end_src
 
-**** DONE OrgRoam
+**** OrgRoam
 
 This is my third iteration on an ~org-roam~.  It's goal is to address use-cases
 that I've encountered while moving more of my note-taking with ~org-roam~.
@@ -2738,7 +2743,7 @@ While I’m playing in a session, my entire context ideally collapses to the
 relevant tags that I’ve established at the beginning of the session.  That way
 I’m certain that I’m filing away notes to their proper location.
 
-**** DONE org-d20.el
+**** org-d20.el
 
 - ~org-d20.el~ :: I’m really only using this for the ~org-d20--roll~ function.
 
@@ -2759,7 +2764,7 @@ I’m certain that I’m filing away notes to their proper location.
     :straight (org-d20 :host github :repo "spwhitton/org-d20"))
 #+end_src
 
-**** DONE Indesk
+**** Indesk
 
 When running an RPG, I might have one or more books that I want to reference.
 With physical books, I might rely on positional memory to help me navigate to
@@ -2796,7 +2801,7 @@ entries of the books on my desk.
 Each candidate in the search would show the entry, page, and file basename.
 Selecting a candidate opens the associated PDF to the respective page.
 
-****** DONE Create a reference org document
+****** Create a reference org document
 
 My initial thought is to store each book as an org document.  Org Mode provides
 a means of describing each of those attributes.
@@ -2813,7 +2818,7 @@ that page.
 In the case of the org file’s node, that would be a great place for annotations
 and summary notes.
 
-****** DONE Phase 1 Functions
+****** Phase 1 Functions
 
 I want a script to convert the output of ~pdftocio~ to an org file for indesk.
 That script should provide a title and a path.  I tried to use emacs-lisp for
@@ -2856,10 +2861,17 @@ org heading element.
 put a wrapper around ~consult-org-heading~ that passes the scope parameter.
 
 #+begin_src emacs-lisp
+  (global-set-key (kbd "s-2") 'jf/indesk-jump-to-file)
   (cl-defun jf/indesk-jump-to-file (&key (files jf/indesk-current-files-on-desk))
-    "Jump to a heading from one of the FILES."
+    "Jump to a heading from one of the FILES.
+
+  If no FILES given, invoke `consult-imenu'."
     (interactive)
-    (consult-org-heading nil files))
+    (if (or (eq nil files) (seq-empty-p files))
+	(if (derived-mode-p 'org-mode)
+	    (consult-org-heading)
+	  (consult-imenu))
+      (consult-org-heading nil files)))
 #+end_src
 
 Given my ~jf/menu~, I probably should see what’s on my desk.  Let’s write a
@@ -2887,9 +2899,9 @@ transient function for that.
 
 
 
-*** DONE RSS Feed
+*** RSS Feed
 
-**** DONE elfeed.el
+**** elfeed.el
 
 - ~elfeed.el~ :: An Emacs RSS reader.  I’ve used Google Reader, Feedly,
   Inoreader, and Newsboat.  I wrote about [[https://takeonrules.com/2020/04/12/switching-from-inoreader-to-newsboat-for-rss-reader/][Switching from Inoreader to Newsboat
@@ -2943,7 +2955,7 @@ transient function for that.
 #+end_src
 
 
-**** DONE elfeed-org.el
+**** elfeed-org.el
 
 - ~elfeed-org.el~ :: a package for maintaining and organizating my RSS
   subscriptions in ~org-mode~ format.
@@ -2956,8 +2968,8 @@ transient function for that.
     (setq rmh-elfeed-org-files (list "~/git/org/elfeed.org")))
 #+end_src
 
-*** DONE Source Control
-**** DONE magit.el
+*** Source Control
+**** magit.el
 
 - ~magit.el~ :: The awesome [[http://git-scm.com][git]] client for Emacs.  I’ve written a few functions
   to help me jump to the Github page for the pull request.[fn:3]
@@ -3074,7 +3086,7 @@ transient function for that.
     :hook ((with-editor-post-finish-hook . magit-status)))
 #+end_src
 
-**** DONE forge.el
+**** forge.el
 
 - ~forge.el~ :: Additional interactions interactions with [[https://en.wikipedia.org/wiki/Forge_(software)][Git forge]].  Right
   now, I’ve commented out most things, as I wasn’t figuring out how to refresh
@@ -3091,7 +3103,7 @@ transient function for that.
 
 #+end_src
 
-**** DONE libgit.el
+**** libgit.el
 
 - ~libgit.el~ :: Provides bindings to [[https://libgit2.org][libgit2]].  These bindings help improve the speed of ~magit.el~; or so I’m told.
 
@@ -3099,7 +3111,7 @@ transient function for that.
   (use-package libgit :straight t)
 #+end_src
 
-**** DONE magit-libgit.el
+**** magit-libgit.el
 
 - ~libgit.el~ :: Connects ~magit.el~ to ~libgit.el~, helping improve the speed of ~magit.el~; or so I’m told.
 
@@ -3107,7 +3119,7 @@ transient function for that.
   (use-package magit-libgit :straight t)
 #+end_src
 
-**** DONE git-timemachine.el
+**** git-timemachine.el
 
 - ~git-timemachine.el~ :: With the time machine, travel back and forth through a files history.
 
@@ -3115,7 +3127,7 @@ transient function for that.
   (use-package git-timemachine :straight t)
 #+end_src
 
-**** DONE git-gutter-fringe.el
+**** git-gutter-fringe.el
 
 - ~git-gutter-fringe.el~ :: Show the current git state in the gutter.  As you
   edit a line in a file track by git, the fringe’s indicators change to reflect
@@ -3131,7 +3143,7 @@ transient function for that.
 	  git-gutter:deleted-sign "-"))
 #+end_src
 
-**** DONE git-link.el
+**** git-link.el
 
 - ~git-link.el~ :: Type ~M-x git-link~ and the function pushes the Git forge
   URL to the kill ring; I’ve configured the URL to use the SHA of the commit of
@@ -3151,7 +3163,7 @@ transient function for that.
     :straight t)
 #+end_src
 
-**** DONE git-messenger.el
+**** git-messenger.el
 
 - ~git-messenger.el~ :: Sometimes I want to see more ~git~ information
   regarding the current line.  ~git-messenger.el~ provides a popup that shows
@@ -3179,7 +3191,7 @@ transient function for that.
     :straight t)
 #+end_src
 
-**** DONE blamer.el
+**** blamer.el
 
 - ~blamer.el~ :: When working in code, I want different ways to view the
   metadata around the code.  ~blammer.el~ adds a quick annotation to the
@@ -3199,14 +3211,14 @@ transient function for that.
     (blamer-max-commit-message-length 20))
 #+end_src
 
-*** DONE elpher.el
+*** elpher.el
 
 - ~elpher.el~ :: A Gopher and Gemini client.
 
 #+begin_src emacs-lisp
   (use-package elpher :straight t)
 #+end_src
-*** DONE eww.el
+*** eww.el
 
 - ~eww.el~ :: a plain text browser.  Use this to see just how bad much of the web a
 #+begin_src emacs-lisp
@@ -3279,7 +3291,7 @@ transient function for that.
 #+end_src
 
 ** Connective Tissue and Oddities
-*** DONE Functions
+*** Functions
 
 The following chunk of allows me to take multiple filenames passed via the
 emacsclient and open those files in windows within the same frame.
@@ -3688,7 +3700,7 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
 #+end_src
 
 
-*** DONE Quick Help
+*** Quick Help
 
 The following ~jf/transient-quick-help~ macro helps generate “help menus” that
 I want to reference.
@@ -3723,7 +3735,7 @@ I want to reference.
 /Note:/ It might make sense to extract the quick help to files, but for now
 this was the least effort.
 
-**** DONE Burning Wheel Gold
+**** Burning Wheel Gold
 
 The following “quick help” methods are tables that I commonly reference when playing Burning Wheel Gold.
 
@@ -4745,7 +4757,7 @@ some additional options.
       ]
      ["Jump to"
       ;; ("j a" "Agenda" ibuffer)
-      ("j b" "Buffer" ibuffer)
+      ("j b" "iBuffer" ibuffer)
       ("j f" "Flycheck" consult-flycheck :if-derived (or markdown-mode org-mode))
       ("j g" "Global Mark" consult-global-mark)
       ("j i" "Indesk" jf/indesk-jump-to-file :if-non-nil jf/indesk-current-files-on-desk)
