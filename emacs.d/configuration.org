@@ -3494,17 +3494,24 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
 
 #+begin_src emacs-lisp
   (global-set-key (kbd "C-c n") 'jf/nab-file-name-to-clipboard)
-  (defun jf/nab-file-name-to-clipboard ()
+  (defun jf/nab-file-name-to-clipboard (parg)
     "Nab, I mean copy, the current buffer file name to the clipboard.
 
-    If you provide universal prefix (e.g. C-u), return the base
-    filename.  Otherwise, use the full filename path."
+  The PARG is the universal prefix argument.
+
+  If you pass no args, copy the filename with full path.
+  If you pass one arg, copy the filename without path.
+  If you pass two args, copy the path to the directory of the file."
     ;; https://blog.sumtypeofway.com/posts/emacs-config.html
-    (interactive)
-    (let* ((raw-filename
+    (interactive "P")
+    (let* ((prefix (car parg))
+	   (raw-filename
 	    (if (equal major-mode 'dired-mode) default-directory (buffer-file-name)))
 	   (filename
-	    (if (equal current-prefix-arg nil) raw-filename (file-name-nondirectory raw-filename))))
+	    (cond
+	     ((not prefix)  raw-filename)
+	     ((= prefix 4)  (file-name-nondirectory raw-filename))
+	     ((= prefix 16) (file-name-directory raw-filename)))))
       (when filename
 	(kill-new filename)
 	(message "Copied buffer file name '%s' to the clipboard." filename))))
