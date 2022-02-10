@@ -1,0 +1,79 @@
+-*- org-insert-tilde-language: emacs-lisp; -*-
+#+TITLE: indesk.org
+#+SUBTITLE: A package for referencing multiple PDFs.
+#+AUTHOR: Jeremy Friesen
+#+EMAIL: jeremy@jeremyfriesen.com
+#+STARTUP: showall
+
+** TODO Phase 2 Functions
+
+Now that I’m at an org-heading-element, I may want to jump to a PDF that’s
+associated with this document.  If the heading has a page, I’d really like to
+be positioned in the PDF to that page.
+
+/Note:/ This is a function that is not dependendent on indesk concepts.
+
+#+begin_src emacs-lisp
+  (cl-defun jf/org-jump-to-pdf (&key (page :PAGE) (path: :PATH_TO_PDF))
+    "Jump to PAGE for PATH_TO_PDF of current `org-element--current-element'"
+    (interactive))
+#+end_src
+
+A future consideration is to look to my org-roam contexts and consider creating
+pre-defined desks.  But that’s a future consideration.
+
+*** COMMENT Create a completing read over a single document
+
+There are a few steps to consider:
+
+1. I want a list of all nodes in the org document (preferrably those with
+   ~PAGE~ properities so as to allow other nodes to co-exist)
+2. I want the candidates to follow the form: ~<HEADING-LEVEL>: <DERIVED_NAME> (p<PAGE>) [<FILENAME>]~
+   - HEADING-LEVEL :: I’m thinking of H1, H2, etc as those are less likely to
+     interfere with filtering commands that might leverage regexp.
+   - DERIVED_NAME :: The nested headinigs for this node “Chapter > Section > Subsection” if you will.
+   - PAGE :: The page that starts this node in the PDF.
+   - FILENAME :: The basename of the file (e.g. no directories), as a clue.
+3. I want this function to return an org node.  Having the node will allow me
+   to later decide what to do.
+
+My current working assumption will be to look at either ~consult-imenu~ or
+~consult-org-heading~.  There may be other implementations, such as ~org-toc~
+from the contrib package that might provide insight.
+**** COMMENT Exploring the consult-org-heading call chain
+- [[file:~/.emacs.d/straight/repos/consult/consult-org.el::defun consult-org-heading (&optional match scope][consult-org-heading]] ::
+  - [[file:~/.emacs.d/straight/repos/consult/consult-org.el::defun consult-org--headings (prefix match scope &rest skip][consult-org--headings]] :: Return a list of Org heading candidates
+    - Uses a lambda to pass to org-map-entries
+    - [[file:/opt/homebrew/Cellar/emacs-plus@28/28.0.50/share/emacs/28.0.90/lisp/org/org.el.gz::defun org-map-entries (func &optional match scope &rest skip][org-map-entries]] :: “Call FUNC at each headline selected by MATCH in SCOPE.”
+      - SCOPE should be (list file file)
+
+**** Experiments
+
+The below set of code will return a list ~(nil "1" "3")~ which are the headings
+page property.
+
+#+begin_src emacs-lisp
+  (cl-defun jf/org-map-entries-get-pages (&key (property :PAGE) (max-scan-length 1000))
+    "Get's the PROPERTY property of the current element (as limited by MAX-SCAN-LENGTH)."
+    (let ((element ((org-element--current-element max-scan-length)))
+      (org-element-property page))))
+  (let* ((scope '("/Users/jfriesen/git/dotemacs/lib/simple.indesk.org")))
+    (message "%S" (org-map-entries #'jf/org-map-entries nil scope)))
+#+end_src
+
+The below renders as the "raw string" the results of ~put-text-property~.
+
+#+begin_src emacs-lisp
+  (let* ((scope '("/Users/jfriesen/git/dotemacs/lib/bwgr-indesk.org"))
+	 (node (car (consult-org--headings nil nil scope))))
+    (message "%S" node))
+#+end_src
+
+#+RESULTS:
+: #("The Burning Wheel - Gold Edition Revised􀂲" 0 1 (face org-level-1 consult-org--heading (#<marker at 178 in bwgr-indesk.org> 1 nil nil)) 1 40 (face org-level-1) 40 41 (consult-strip t invisible t))
+
+These experiments highlight something:
+
+1. I think I may be interested in a two step approach.  First, find the
+   appropriate node.  Jump to that node.  Then launch the PDF viewer based on
+   that node.  That gets me a significant degree of automation.
