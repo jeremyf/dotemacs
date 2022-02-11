@@ -4532,7 +4532,7 @@ repository.
 	       (slugified-title (replace-regexp-in-string "-?\.-issue-[[:digit:]]+.*" "" (jf/tor-convert-text-to-slug title)))
 	       (prefix (format "%s/%s" jf/github-username slugified-title))
 	       (branch-name (concat prefix "---" suffix)))
-	  (jf/git-branch-create :branch-name branch-name :directory directory)))))
+	  (message (jf/git-branch-create :branch-name branch-name :directory directory))))))
 #+end_src
 
 - ~jf/git-branch-create~ :: This function manipulates the git repository.  We
