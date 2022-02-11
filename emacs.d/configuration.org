@@ -4448,106 +4448,6 @@ I want to reference.
 /Note:/ It might make sense to extract the quick help to files, but for now
 this was the least effort.
 
-**** Burning Wheel Gold
-
-The following “quick help” methods are tables that I commonly reference when playing Burning Wheel Gold.
-
-#+begin_src emacs-lisp
-  (jf/transient-quick-help jf/qh--bwg-wises
-    "BWG Wises Obstacles (page 309)"
-    :label "Wises"
-    :body
-    (concat
-     "Common knowledge ............. Ob 1\n"
-     "An interesting fact .......... Ob 2\n"
-     "Details ...................... Ob 3\n"
-     "Uncommon knowledge ........... Ob 4\n"
-     "Rare goods ................... Ob 5\n"
-     "Bizarre or obscure ........... Ob 7\n"
-     "Freaky details or specifics .. Ob 8"))
-
-  (jf/transient-quick-help jf/qh--bwg-expertise-exponent
-    "BWG Expertise Exponent (page 12)"
-    :label "Exponents"
-    :body
-    (concat
-     "Exp 1  is naturally disinclined, crippled, or utterly incompetent.\n"
-     "Exp 2  is untrained, raw, weak, or unpracticed.\n"
-     "Exp 3  is nominally trained and practiced.\n"
-     "Exp 4  is competent; everday stuff doesn't pose a challenge.\n"
-     "Exp 5  is expert.\n"
-     "Exp 6  is near mastery.\n"
-     "Exp 7  is excellence.\n"
-     "Exp 8  is total mastery, complete understanding.\n"
-     "Exp 9  is uncanny; incomprehensibly good.\n"
-     "Exp 10 is as near perfection as the system allows."))
-
-  (jf/transient-quick-help jf/qh--bwg-absolute-difficulty
-    "BWG Absolute Difficulty (page 15)"
-    :label "Difficulty"
-    :body
-    (concat
-     "Ob 1  A simple act done with little thought.\n"
-     "Ob 2  An act performed routinely at your job.\n"
-     "Ob 3  An act you can accomplish if you concentrate.\n"
-     "Ob 4  A risky act.\n"
-     "Ob 5  An act that requires expertise.\n"
-     "Ob 6  An act that requires a heroic effort.\n"
-     "Ob 7  An improbable feat.\n"
-     "Ob 8  An act requiring preternatural ability or a lot of help.\n"
-     "Ob 9  An act deemed nearly impossible.\n"
-     "Ob 10 A miracle."))
-
-  (jf/transient-quick-help jf/qh--bwg-circles-obstacles
-    "BWG Circles Obstacles (page 380-381)"
-    :label "Circles"
-    :body
-    (concat
-     "Occupation\n"
-     "  Broad occupation/profession, same life path ... +0 Ob\n"
-     "  Uncommon occupation, or within same setting ... +2 Ob\n"
-     "  Specific occupation, rare/unique occupation ... +3 Ob\n"
-     "\n"
-     "Station\n"
-     "  Same station .................................. +0 Ob\n"
-     "  Lower rank, station, or class ................. +1 Ob\n"
-     "  Higher rank, station, or class ................ +2 Ob\n"
-     "  Highest station or rank in the setting ........ +3 Ob\n"
-     "\n"
-     "Disposition and Knowledge\n"
-     "  Common to circle .............................. +0 Ob\n"
-     "  Different from circle members ................. +1-2 Ob\n"
-     "  Specific, detailed, or rare ................... +3 Ob\n"
-     "\n"
-     "Time and Place\n"
-     "  Doesn't matter ................................ +0 Ob\n"
-     "  Unusual for this character .................... +1-2 Ob\n"
-     "  Right here and now in the middle of trouble ... +3 Ob"))
-
-  (jf/transient-quick-help jf/qh--bwg-steel-test-adjustments
-    "BWG Steel Test Adjustments (page 363)"
-    :label "Steel"
-    :body
-    (concat
-     "Conditions for Steel Advantags\n"
-     "  Being startled by something mundane ........ +2D\n"
-     "  Feeling safe in a group of friends/allies .. +1D\n"
-     "\n"
-     "Conditions for Steel Disadvantages\n"
-     "  Being shot at .............................. +1 Ob\n"
-     "  Being directly affect by magic ............. +1 Ob\n"
-     "  Witnessing a person killed ................. +1 Ob\n"
-     "  Small explosions ........................... +2 Ob\n"
-     "  Committing murder .......................... +2 Ob\n"
-     "  Explosions ................................. +3 Ob\n"
-     "  Witnessing pronounced sorcery at play ...... +3 Ob\n"
-     "  Seeing a ghost ............................. +3 Ob\n"
-     "  Seeing the living dead ..................... +4 Ob\n"
-     "  Volcanic eruptions, cataclysm .............. +4 Ob\n"
-     "  Seeing horrible magic at work .............. +4 Ob\n"
-     "  Being in the presence of the supernatural .. +5 Ob\n"))
-#+end_src
-
 *** Minor Modes
 
 In work and in play, there are several “me” specific contexts.  The
@@ -4654,8 +4554,18 @@ repository.
 	(unless (eq 0 (length (shell-command-to-string "git status --porcelain")))
 	  (throw 'dirty-branch (format "After updating from remote, repository \"%s\" is dirty repository." default-directory)))
 
-	(magit-branch-create branch-name starting-branch))
+	(magit-branch-create branch-name starting-branch)
+	(magit-branch-checkout branch-name))
       (format "Created branch on %s" directory)))
+#+end_src
+
+** Burning Wheel
+
+Let’s add some [[file:burning-wheel-emacs-config.org][Burning Wheel Tooling]].
+
+#+begin_src emacs-lisp
+  (org-babel-load-file
+   (concat user-emacs-directory "burning-wheel-emacs-config.org"))
 #+end_src
 
 
@@ -4783,22 +4693,6 @@ aspects of my work.
       ("D" "[D]ashboard open…" jf/open-dashboard)
       ("d" "Visit [d]ashboard file…" (lambda () (interactive) (find-file jf/forem-dashboard-filename)))
       ]])
-#+end_src
-
-The following menu is for quick help while playing Burning Wheel games.  I
-previously defined the suffixes.
-
-#+begin_src emacs-lisp
-  (global-set-key (kbd "C-M-s-b") 'jf/menu--bwg)
-  (transient-define-prefix jf/menu--bwg ()
-    "Define the BWG help prefix."
-    ["Burning Wheel"
-     ("c" jf/qh--bwg-circles-obstacles)
-     ("d" jf/qh--bwg-absolute-difficulty)
-     ("e" jf/qh--bwg-expertise-exponent)
-     ("s" jf/qh--bwg-steel-test-adjustments)
-     ("w" jf/qh--bwg-wises)
-     ])
 #+end_src
 
 A menu for my TakeOnRules blogging tasks.
