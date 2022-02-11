@@ -549,7 +549,8 @@ provides annotations to minibuffer completions, and pairs nicely with Vertico.
 #+end_src
 
 ** Writing, Coding, Computering
-*** projectile.el
+
+*** Projects
 
 - ~projectile.el~ :: this package provides convenient organization and commands to run over projects.
 
@@ -617,22 +618,6 @@ When I start writing functions, there’s a few packages I want to consider.
     :straight t)
 #+end_src
 
-
-
-
-  - Org Mode
-  - Org Roam
-  - Magit/Git
-  - Elfeed
-  - Elpher
-  - Projects
-
-
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
 *** Completion
 
 **** Emacs Adjustments for Completion
@@ -666,7 +651,6 @@ What follows is adjustments to emacs settings as they relate to completion.
 	  '(read-only t cursor-intangible t face minibuffer-prompt))
     (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode))
 #+end_src
-
 
 **** consult.el
 
@@ -1068,6 +1052,7 @@ More on these component matchings styles is available at [[https://github.com/mi
     :after (consult yasnippet)
     :bind ("C-c y" . consult-yasnippet))
 #+end_src
+
 
 *** Navigation
 **** avy.el
