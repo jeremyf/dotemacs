@@ -2279,8 +2279,11 @@ See [[https://kitchingroup.cheme.cmu.edu/blog/2016/06/16/Copy-formatted-org-mode
 	  (shell-command-on-region
 	   (point-min)
 	   (point-max)
-	   "textutil -stdin -format html -convert rtf -stdout | pbcopy"))
+	   "textutil -inputencoding UTF-8 -stdin -format html -convert rtf -stdout | pbcopy"))
 	(kill-buffer buf))))
+
+  (use-package htmlize
+    :straight t)
 #+end_src
 
 ***** Swapping Tilde and Backtick in Org and More
