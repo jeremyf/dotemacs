@@ -1,4 +1,4 @@
-q# -*- org-insert-tilde-language: emacs-lisp; -*-
+# -*- org-insert-tilde-language: emacs-lisp; -*-
 #+TITLE: Burning Wheel Emacs Configuration
 #+AUTHOR: Jeremy Friesen
 #+EMAIL: jeremy@jeremyfriesen.com
