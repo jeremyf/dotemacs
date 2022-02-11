@@ -2096,7 +2096,9 @@ I have only provisionally adopted this.  I like the idea of abbreviations/snippe
 #+end_src
 
 ** Integrated “Applications”
-*** TODO Variable/const definitions
+*** Variable and Constant Definitions
+
+These are a few variables and cosntants that I use throughout my configuration.
 
 #+begin_src emacs-lisp
   (defconst jf/tor-home-directory
@@ -2899,9 +2901,6 @@ transient function for that.
       (completing-read-multiple "Files(s): " (jf/indesk-file-candidates-for-cr))))
     (setq jf/indesk-current-files-on-desk files))
 #+end_src
-
-
-
 *** RSS Feed
 
 **** elfeed.el
@@ -3221,9 +3220,10 @@ transient function for that.
 #+begin_src emacs-lisp
   (use-package elpher :straight t)
 #+end_src
-*** eww.el
+*** EWW
 
-- ~eww.el~ :: a plain text browser.  Use this to see just how bad much of the web a
+- ~eww.el~ :: a plain text browser.  Use this to see just how bad much of the web has become.
+
 #+begin_src emacs-lisp
   (use-package eww
     :straight t
@@ -4651,11 +4651,13 @@ Next up is defining the transient prefixes.  The prefixes are the “start of”
 command sequence.  In this case, I’m using them as menu’s which expose
 additional actions.
 
-First up, the Forem menu:
+Next is my Forem menu; these are the commands the help me navigate various
+aspects of my work.
 
 #+begin_src emacs-lisp
   (global-set-key (kbd "C-M-s-f") 'jf/menu--forem)
   (transient-define-prefix jf/menu--forem ()
+    "Menu of Forem related functions."
     [["Hammerspoon"
       :if-non-nil hammerspoon-edit-minor-mode
       ("C-t" "Tidy pull request" jf/forem-tidy-pull-request)
@@ -4680,7 +4682,8 @@ First up, the Forem menu:
       ]])
 #+end_src
 
-The following menu is for quick help while playing Burning Wheel games.
+The following menu is for quick help while playing Burning Wheel games.  I
+previously defined the suffixes.
 
 #+begin_src emacs-lisp
   (global-set-key (kbd "C-M-s-b") 'jf/menu--bwg)
@@ -4699,7 +4702,7 @@ A menu for my TakeOnRules blogging tasks.
 
 #+begin_src emacs-lisp
   (transient-define-prefix jf/menu--tor ()
-    "Define the Take on Rules menu."
+    "My Take on Rules menu; useful when developing my blog."
     ["Take on Rules"
      ["Host"
       ("-h" jf/tor-hostname-current-toggle :transient t)
@@ -4730,7 +4733,7 @@ some additional options.
 #+begin_src emacs-lisp
   (global-set-key (kbd "s-1") 'jf/menu)
   (transient-define-prefix jf/menu ()
-    "Return a `transient' compliant list to apply to different transients."
+    "A context specific \"mega\" menu."
     ;; Todo, can I get this section into a function so I can duplicate it in the jf/menu--tor?
     [["Markdown Utilities"
       ("k h" "Kill slug version of given heading…" jf/kill-new-markdown-heading-as-slug :if-derived (or markdown-mode html-mode))
