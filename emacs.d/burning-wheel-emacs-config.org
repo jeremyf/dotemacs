@@ -5,7 +5,7 @@
 #+STARTUP: showall
 #+OPTIONS: toc:3
 
-* Burning Wheel Emacs Configuration
+* Minor Mode for Burning Wheel
 
 #+begin_src emacs-lisp
   (jf/minor-mode-maker :title "Burning Wheel Gold"
@@ -13,10 +13,11 @@
 		       :hooks (list 'org-mode-hook 'markdown-mode-hook))
 #+end_src
 
-** Reference Functions
+* Quick Help Functions
 
-The following “quick help” methods are tables that I commonly reference when
-playing Burning Wheel Gold.
+Most role-playing games I play may require a bit of consultation. The following
+“quick help” methods are tables that I commonly reference when playing Burning
+Wheel Gold.
 
 #+begin_src emacs-lisp
   (jf/transient-quick-help jf/bwg-qh-wises
@@ -114,7 +115,7 @@ playing Burning Wheel Gold.
      "  Being in the presence of the supernatural .. +5 Ob\n"))
 #+end_src
 
-*** Physical Trauma Gray Scale (PTGS)
+** Physical Trauma Gray Scale (PTGS)
 
 When running Burning Wheel Gold, on occassion I need to establish the PTGS for
 a creature or person.  This is a quick help function for that.
@@ -149,7 +150,7 @@ a creature or person.  This is a quick help function for that.
       (message text)))
 #+end_src
 
-** Menu
+* Menu
 
 The following menu is for quick help while playing Burning Wheel games.  I
 previously defined the suffixes.
