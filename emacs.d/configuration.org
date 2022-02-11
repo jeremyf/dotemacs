@@ -3283,6 +3283,30 @@ transient function for that.
     :hook ((eww-mode . jf/reader-visual)))
 #+end_src
 
+*** Decide
+
+- ~decide.el~ :: A package for random decision making.  Kind of nice for games.
+
+#+begin_src emacs-lisp
+  (use-package decide
+    :straight (decide :host github :type git :repo "jeremyf/decide-mode"))
+#+end_src
+
+*** Hammerspoon
+
+Hammerspoon is Lua application that provides a consistent API for interacting
+with MacOS.  The editWithEmacs.spoon allows me to copy text from one region,
+edit it in Emacs, and paste it back into the Application.
+
+#+begin_src emacs-lisp
+  (when (file-directory-p
+	 "~/git/dotzshrc/symlinks/.hammerspoon/Spoons/editWithEmacs.spoon")
+    (load
+     "~/git/dotzshrc/symlinks/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el"
+     nil
+     jf/silence-loading-log))
+#+end_src
+
 ** Connective Tissue and Oddities
 *** Functions
 
@@ -3302,7 +3326,7 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
     (let ((server-visit-files-custom-find:buffer-count 0))
       ad-do-it))
   (defun server-visit-hook-custom-find ()
-    "Arrange to visit the files from a client call in separate windows."
+    "Arrange to visit the files from a cli3ent call in separate windows."
     (if (zerop server-visit-files-custom-find:buffer-count)
 	(progn
 	  (delete-other-windows)
@@ -3457,394 +3481,10 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
     (beginning-of-buffer)
 
     ;; Clear out some comments.
-    (replace-regexp "^\n_\\(If\\|Please\\|Will\\).*\\(\n.+\\)+_\n+" "\n")
-
-    ;; Clean out the GIF section.  As much as I try
-    ;; I just don't like adding GIFs to PRs
-    (replace-regexp
-     "\n## \\[optional\\] What gif\\(.\\)*\n+\\!.*"
-     "")
-
-    ;; Jump to the beginning of the buffer...again.
-    (beginning-of-buffer))
+    (replace-regexp "^\n_\\(If\\|Please\\|Will\\).*\\(\n.+\\)+_\n+" "\n"))
 #+end_src
 
-#+begin_src emacs-lisp
-  (global-set-key (kbd "C-w") 'jf/kill-region-or-backward-word)
-  (global-set-key (kbd "M-DEL") 'jf/kill-region-or-backward-word)
-  (global-set-key (kbd "<C-M-backspace>") 'backward-kill-paragraph)
-  (defun jf/kill-region-or-backward-word (&optional arg)
-    "Kill selected region otherwise kill backwards the ARG number of words."
-    (interactive "p")
-    (if (region-active-p)
-	(kill-region (region-beginning) (region-end))
-      (backward-kill-word arg)))
-#+end_src
-
-- ~jf/kill-line-org-region~ :: Wedding two methods together: ~kill-region~ and
-  ~kill-line~.
-
-#+begin_src emacs-lisp
-  (global-set-key (kbd "C-k") 'jf/kill-line-or-region)
-  (defun jf/kill-line-or-region (&optional ARG)
-    "Kill the selected region otherwise kill the ARG number of lines."
-    (interactive "P")
-    (if (use-region-p)
-	(kill-region (region-beginning) (region-end))
-      (kill-line ARG)))
-#+end_src
-
-- ~jf/nab-file-name-to-clipboard~ :: There are plenty of times where I want the
-  file name.  This command helps me get either it’s full path, or it’s base
-  name.
-
-#+begin_src emacs-lisp
-  (global-set-key (kbd "C-c n") 'jf/nab-file-name-to-clipboard)
-  (defun jf/nab-file-name-to-clipboard (parg)
-    "Nab, I mean copy, the current buffer file name to the clipboard.
-
-  The PARG is the universal prefix argument.
-
-  If you pass no args, copy the filename with full path.
-  If you pass one arg, copy the filename without path.
-  If you pass two args, copy the path to the directory of the file."
-    ;; https://blog.sumtypeofway.com/posts/emacs-config.html
-    (interactive "P")
-    (let* ((prefix (car parg))
-	   (raw-filename
-	    (if (equal major-mode 'dired-mode) default-directory (buffer-file-name)))
-	   (filename
-	    (cond
-	     ((not prefix)  raw-filename)
-	     ((= prefix 4)  (file-name-nondirectory raw-filename))
-	     ((= prefix 16) (file-name-directory raw-filename)))))
-      (when filename
-	(kill-new filename)
-	(message "Copied buffer file name '%s' to the clipboard." filename))))
-#+end_src
-
-- ~jf/sort-unique-lines~ :: A simple combination of two functions ~sort-lines~
-  and ~delete-duplicate-lines~.
-
-#+begin_src emacs-lisp
-  (defun jf/sort-unique-lines (reverse beg end &optional adjacent keep-blanks interactive)
-    "Sort lines and delete duplicates.
-    By default the sort is lexigraphically ascending.  To sort as
-    descending set REVERSE to non-nil.  Specify BEG and END for the
-    bounds of sorting.  By default, this is the selected region.
-
-    I've included ADJACENT, KEEP-BLANKS, and INTERACTIVE so I can
-    echo the method signature of `'delete-duplicate-lines`"
-    ;; This is a common function that I've used in other text editors.
-    ;; It's a simple stitch together of sort-lines and
-    ;; delete-duplicate-lines.
-    (interactive "P\nr")
-    (sort-lines reverse beg end)
-    (delete-duplicate-lines beg end reverse adjacent keep-blanks interactive))
-#+end_src
-
-- ~jf/display-buffer-in-side-window~ :: Creates a sticky side window on the
-  right.  Sometimes this is just the right thing for reviewing files.  I don’t
-  know when I need it, but when I use it I’m always thankful I have it.
-- ~jf/display-buffer-in-side-window~ :: As ~jf/display-buffer-in-side-window~,
-  but creates a side window on the bottom.
-
-#+begin_src emacs-lisp
-  (global-set-key (kbd "C-s-\\") 'jf/display-buffer-in-side-window)
-  (cl-defun jf/display-buffer-in-side-window (&optional (buffer (current-buffer)))
-    "Display BUFFER in dedicated side window."
-    (interactive)
-    (let ((display-buffer-mark-dedicated t))
-      (display-buffer-in-side-window buffer
-				     '((side . right)
-				       (window-parameters
-					(no-delete-other-windows . t))))))
-#+end_src
-
-- ~jf/display-buffer-in-side-window~ :: As ~jf/display-buffer-in-side-window~,
-  but creates a side window on the bottom.
-
-#+begin_src emacs-lisp
-  (global-set-key (kbd "C-s--") 'jf/display-buffer-in-bottom-window)
-  (cl-defun jf/display-buffer-in-bottom-window (&optional (buffer (current-buffer)))
-    "Display BUFFER in dedicated side window."
-    (interactive)
-    (let ((display-buffer-mark-dedicated t))
-      (display-buffer-in-side-window buffer
-				     '((side . bottom)
-				       (window-parameters
-					(no-delete-other-windows . t))))))
-#+end_src
-
-- ~jf/move-file~ :: Sometimes I want to move, without renaming, a file.  This
-  function helps make that easy.
-
-#+begin_src emacs-lisp
-  (global-set-key (kbd "C-x m") 'jf/move-file)
-  (defun jf/move-file (target-directory)
-    "Write this file to TARGET-DIRECTORY, and delete old one."
-    (interactive "DTarget Directory: ")
-    (let* ((source (expand-file-name (file-name-nondirectory (buffer-name)) default-directory))
-	   (target (f-join target-directory (file-name-nondirectory (buffer-name)))))
-      (save-buffer)
-      (rename-file source target)
-      (kill-current-buffer)))
-#+end_src
-
-- ~jf/duplicate-current-line-or-lines-of-region~ :: Sometimes I just want to
-  duplicate an area without copy and paste.  This helps that process.  It’s not
-  as smart as TextMate’s equivalent function, but it’s close enough.
-
-#+begin_src emacs-lisp
-  (global-set-key (kbd "C-M-d") 'jf/duplicate-current-line-or-lines-of-region)
-  (global-set-key (kbd "C-c d") 'jf/duplicate-current-line-or-lines-of-region)
-  (defun jf/duplicate-current-line-or-lines-of-region (arg)
-    "Duplicate ARG times current line or the lines of the current region."
-    (interactive "p")
-    (if (use-region-p)
-	(progn
-	  (when (> (point) (mark))
-	    (exchange-point-and-mark))
-	  (beginning-of-line)
-	  (exchange-point-and-mark)
-	  (end-of-line)
-	  (goto-char (+ (point) 1))
-	  (exchange-point-and-mark)
-	  (let* ((end (mark))
-		 (beg (point))
-		 (region
-		  (buffer-substring-no-properties beg end)))
-	    (dotimes (_i arg)
-	      (goto-char end)
-	      (insert region)
-	      (setq end (point)))))
-      (crux-duplicate-current-line-or-region arg)))
-
-#+end_src
-
-- ~jf/create-scratch-buffer~ :: A simple wrapper around scratch, that helps
-  name it and sets the major mode to ~org-mode~.
-
-#+begin_src emacs-lisp
-  (global-set-key (kbd "<f12>") 'jf/create-scratch-buffer)
-  (cl-defun jf/create-scratch-buffer (&key (mode 'org-mode))
-    "Quickly open a scratch buffer and enable the given MODE."
-    (interactive)
-    (crux-create-scratch-buffer)
-    (rename-buffer (concat "*scratch* at " (format-time-string "%Y-%m-%d %H:%M")))
-    (funcall mode))
-#+end_src
-
-
-**** TODO Window Layout Functions
-
-#+begin_src emacs-lisp
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  ;;; BEGIN frame and window quick setup
-  (defun gk-layouts-3col ()
-    "Three column layout.
-
-  Tries to preserve the order of window buffers and active window."
-    (interactive)
-    ;; Record active window buffer.
-    (let ((cbuf (current-buffer)))
-      ;; Switch to leftmost window.
-      (ignore-errors (cl-loop do (windmove-left)))
-      (let ((buffers
-	     (mapcar #'window-buffer (-take 3 (window-list))))
-	    (width (/ (frame-width) 3)))
-	(delete-other-windows)
-	(split-window-horizontally width)
-	(other-window 1)
-	(split-window-horizontally)
-	(other-window -1)
-	(dolist (b buffers)
-	  (switch-to-buffer b)
-	  (other-window 1)))
-      ;; Switch to previously visible buffer’s window.
-      (select-window (get-buffer-window cbuf))))
-
-
-  (defun gk-layouts-main-and-sidekicks ()
-    "One horizontal split, the right window split in two.
-
-  Tries to preserve the order of window buffers and active window."
-    (interactive)
-    ;; Record active window buffer.
-    (let ((cbuf (current-buffer)))
-      ;; Switch to leftmost window.
-      (ignore-errors (cl-loop do (windmove-left)))
-      (let ((buffers
-	     (mapcar #'window-buffer (-take 3 (window-list)))))
-	(delete-other-windows)
-	(split-window-horizontally)
-	(other-window 1)
-	(split-window-vertically)
-	(other-window -1)
-	(dolist (b buffers)
-	  (switch-to-buffer b)
-	  (other-window 1)))
-      ;; Switch to previously visible buffer’s window.
-      (select-window (get-buffer-window cbuf))))
-
-  (bind-key "C-x \\" #'gk-layouts-main-and-sidekicks)
-  ;; END frame and window quick setup
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-#+end_src
-
-
-*** Quick Help
-
-The following ~jf/transient-quick-help~ macro helps generate “help menus” that
-I want to reference.
-
-#+begin_src emacs-lisp
-  (cl-defmacro jf/transient-quick-help (name buffer &key label body)
-    "Macro for creating callable functions that display help.
-
-    Where NAME is name of function, BUFFER is name of buffer, and TEXT is displayed."
-    (declare (indent defun))
-    `(progn
-       (transient-define-suffix ,name nil
-	 ,buffer
-	 :description ,label
-	 (interactive)
-	 (let ((qh-buff (concat "*Quick Help: " ,buffer "*"))
-	       (qh-text ,body))
-	   (get-buffer-create qh-buff)
-	   (with-current-buffer qh-buff
-	     (insert qh-text)
-	     (goto-char (point-min))
-	     (not-modified)
-	     (read-only-mode)
-	     (special-mode)
-	     (local-set-key (kbd "q") 'kill-buffer-and-window))
-	   (pop-to-buffer qh-buff '((display-buffer-below-selected)
-				    (window-parameters . ((no-other-window . nil)))
-				    (window-height . fit-window-to-buffer)))
-	   (message "q - Remove Window")))))
-#+end_src
-
-/Note:/ It might make sense to extract the quick help to files, but for now
-this was the least effort.
-
-**** Burning Wheel Gold
-
-The following “quick help” methods are tables that I commonly reference when playing Burning Wheel Gold.
-
-#+begin_src emacs-lisp
-  (jf/transient-quick-help jf/qh--bwg-wises
-    "BWG Wises Obstacles (page 309)"
-    :label "Wises"
-    :body
-    (concat
-     "Common knowledge ............. Ob 1\n"
-     "An interesting fact .......... Ob 2\n"
-     "Details ...................... Ob 3\n"
-     "Uncommon knowledge ........... Ob 4\n"
-     "Rare goods ................... Ob 5\n"
-     "Bizarre or obscure ........... Ob 7\n"
-     "Freaky details or specifics .. Ob 8"))
-
-  (jf/transient-quick-help jf/qh--bwg-expertise-exponent
-    "BWG Expertise Exponent (page 12)"
-    :label "Exponents"
-    :body
-    (concat
-     "Exp 1  is naturally disinclined, crippled, or utterly incompetent.\n"
-     "Exp 2  is untrained, raw, weak, or unpracticed.\n"
-     "Exp 3  is nominally trained and practiced.\n"
-     "Exp 4  is competent; everday stuff doesn't pose a challenge.\n"
-     "Exp 5  is expert.\n"
-     "Exp 6  is near mastery.\n"
-     "Exp 7  is excellence.\n"
-     "Exp 8  is total mastery, complete understanding.\n"
-     "Exp 9  is uncanny; incomprehensibly good.\n"
-     "Exp 10 is as near perfection as the system allows."))
-
-  (jf/transient-quick-help jf/qh--bwg-absolute-difficulty
-    "BWG Absolute Difficulty (page 15)"
-    :label "Difficulty"
-    :body
-    (concat
-     "Ob 1  A simple act done with little thought.\n"
-     "Ob 2  An act performed routinely at your job.\n"
-     "Ob 3  An act you can accomplish if you concentrate.\n"
-     "Ob 4  A risky act.\n"
-     "Ob 5  An act that requires expertise.\n"
-     "Ob 6  An act that requires a heroic effort.\n"
-     "Ob 7  An improbable feat.\n"
-     "Ob 8  An act requiring preternatural ability or a lot of help.\n"
-     "Ob 9  An act deemed nearly impossible.\n"
-     "Ob 10 A miracle."))
-
-  (jf/transient-quick-help jf/qh--bwg-circles-obstacles
-    "BWG Circles Obstacles (page 380-381)"
-    :label "Circles"
-    :body
-    (concat
-     "Occupation\n"
-     "  Broad occupation/profession, same life path ... +0 Ob\n"
-     "  Uncommon occupation, or within same setting ... +2 Ob\n"
-     "  Specific occupation, rare/unique occupation ... +3 Ob\n"
-     "\n"
-     "Station\n"
-     "  Same station .................................. +0 Ob\n"
-     "  Lower rank, station, or class ................. +1 Ob\n"
-     "  Higher rank, station, or class ................ +2 Ob\n"
-     "  Highest station or rank in the setting ........ +3 Ob\n"
-     "\n"
-     "Disposition and Knowledge\n"
-     "  Common to circle .............................. +0 Ob\n"
-     "  Different from circle members ................. +1-2 Ob\n"
-     "  Specific, detailed, or rare ................... +3 Ob\n"
-     "\n"
-     "Time and Place\n"
-     "  Doesn't matter ................................ +0 Ob\n"
-     "  Unusual for this character .................... +1-2 Ob\n"
-     "  Right here and now in the middle of trouble ... +3 Ob"))
-
-  (jf/transient-quick-help jf/qh--bwg-steel-test-adjustments
-    "BWG Steel Test Adjustments (page 363)"
-    :label "Steel"
-    :body
-    (concat
-     "Conditions for Steel Advantags\n"
-     "  Being startled by something mundane ........ +2D\n"
-     "  Feeling safe in a group of friends/allies .. +1D\n"
-     "\n"
-     "Conditions for Steel Disadvantages\n"
-     "  Being shot at .............................. +1 Ob\n"
-     "  Being directly affect by magic ............. +1 Ob\n"
-     "  Witnessing a person killed ................. +1 Ob\n"
-     "  Small explosions ........................... +2 Ob\n"
-     "  Committing murder .......................... +2 Ob\n"
-     "  Explosions ................................. +3 Ob\n"
-     "  Witnessing pronounced sorcery at play ...... +3 Ob\n"
-     "  Seeing a ghost ............................. +3 Ob\n"
-     "  Seeing the living dead ..................... +4 Ob\n"
-     "  Volcanic eruptions, cataclysm .............. +4 Ob\n"
-     "  Seeing horrible magic at work .............. +4 Ob\n"
-     "  Being in the presence of the supernatural .. +5 Ob\n"))
-#+end_src
-
-
-
-* Past Work
-** TODO Utilities
-
-*** TODO blogging specific
-
-**** decide.el
-
-- ~decide.el~ :: A package for random decision making.
-
-#+begin_src emacs-lisp
-  (use-package decide
-    :straight (decide :host github :type git :repo "jeremyf/decide-mode"))
-#+end_src
-
-**** TODO Wrapping Functions
+*** TODO Blogging Functions
 
 #+begin_src emacs-lisp
   ;;******************************************************************************
@@ -4512,21 +4152,167 @@ The following “quick help” methods are tables that I commonly reference when
   ;;******************************************************************************
 #+end_src
 
-*** TODO hammerspoon
+*** Work Specific Functions
+
+This is a hold-over function from my early days at [[https://forem.com][Forem]].  I include it as a
+reminder, but also for it’s occassional usage.
 
 #+begin_src emacs-lisp
-  (when (file-directory-p
-	 "~/git/dotzshrc/symlinks/.hammerspoon/Spoons/editWithEmacs.spoon")
-    (load
-     "~/git/dotzshrc/symlinks/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el"
-     nil
-     jf/silence-loading-log))
+  (defconst jf/forem-dashboard-filename
+    "~/git/org/forem-dashboard.org"
+    "The file to the dashboard documentation and links for Forem.")
+
+  (cl-defun jf/open-dashboard (&key (filename jf/forem-dashboard-filename))
+    "For the given FILENAME open the links in the default browser.
+
+      With the universal prefix (e.g. C-u) open the file instead."
+    (interactive)
+    (if (equal current-prefix-arg nil) ; no C-u
+	(call-process-shell-command
+	 (concat "rg \"\\[\\[(.*)\\]\\[\" "
+		 filename
+		 " --only-matching"
+		 " | rg \"[^\\[|\\]]+\" --only-matching"
+		 " | xargs open"))
+      (find-file filename)))
 #+end_src
 
-** TODO Menus
+*** Quick Help
 
-*** TODO jf/menu
-**** Minor Modes
+The following ~jf/transient-quick-help~ macro helps generate “help menus” that
+I want to reference.
+
+#+begin_src emacs-lisp
+  (cl-defmacro jf/transient-quick-help (name buffer &key label body)
+    "Macro for creating callable functions that display help.
+
+    Where NAME is name of function, BUFFER is name of buffer, and TEXT is displayed."
+    (declare (indent defun))
+    `(progn
+       (transient-define-suffix ,name nil
+	 ,buffer
+	 :description ,label
+	 (interactive)
+	 (let ((qh-buff (concat "*Quick Help: " ,buffer "*"))
+	       (qh-text ,body))
+	   (get-buffer-create qh-buff)
+	   (with-current-buffer qh-buff
+	     (insert qh-text)
+	     (goto-char (point-min))
+	     (not-modified)
+	     (read-only-mode)
+	     (special-mode)
+	     (local-set-key (kbd "q") 'kill-buffer-and-window))
+	   (pop-to-buffer qh-buff '((display-buffer-below-selected)
+				    (window-parameters . ((no-other-window . nil)))
+				    (window-height . fit-window-to-buffer)))
+	   (message "q - Remove Window")))))
+#+end_src
+
+/Note:/ It might make sense to extract the quick help to files, but for now
+this was the least effort.
+
+**** Burning Wheel Gold
+
+The following “quick help” methods are tables that I commonly reference when playing Burning Wheel Gold.
+
+#+begin_src emacs-lisp
+  (jf/transient-quick-help jf/qh--bwg-wises
+    "BWG Wises Obstacles (page 309)"
+    :label "Wises"
+    :body
+    (concat
+     "Common knowledge ............. Ob 1\n"
+     "An interesting fact .......... Ob 2\n"
+     "Details ...................... Ob 3\n"
+     "Uncommon knowledge ........... Ob 4\n"
+     "Rare goods ................... Ob 5\n"
+     "Bizarre or obscure ........... Ob 7\n"
+     "Freaky details or specifics .. Ob 8"))
+
+  (jf/transient-quick-help jf/qh--bwg-expertise-exponent
+    "BWG Expertise Exponent (page 12)"
+    :label "Exponents"
+    :body
+    (concat
+     "Exp 1  is naturally disinclined, crippled, or utterly incompetent.\n"
+     "Exp 2  is untrained, raw, weak, or unpracticed.\n"
+     "Exp 3  is nominally trained and practiced.\n"
+     "Exp 4  is competent; everday stuff doesn't pose a challenge.\n"
+     "Exp 5  is expert.\n"
+     "Exp 6  is near mastery.\n"
+     "Exp 7  is excellence.\n"
+     "Exp 8  is total mastery, complete understanding.\n"
+     "Exp 9  is uncanny; incomprehensibly good.\n"
+     "Exp 10 is as near perfection as the system allows."))
+
+  (jf/transient-quick-help jf/qh--bwg-absolute-difficulty
+    "BWG Absolute Difficulty (page 15)"
+    :label "Difficulty"
+    :body
+    (concat
+     "Ob 1  A simple act done with little thought.\n"
+     "Ob 2  An act performed routinely at your job.\n"
+     "Ob 3  An act you can accomplish if you concentrate.\n"
+     "Ob 4  A risky act.\n"
+     "Ob 5  An act that requires expertise.\n"
+     "Ob 6  An act that requires a heroic effort.\n"
+     "Ob 7  An improbable feat.\n"
+     "Ob 8  An act requiring preternatural ability or a lot of help.\n"
+     "Ob 9  An act deemed nearly impossible.\n"
+     "Ob 10 A miracle."))
+
+  (jf/transient-quick-help jf/qh--bwg-circles-obstacles
+    "BWG Circles Obstacles (page 380-381)"
+    :label "Circles"
+    :body
+    (concat
+     "Occupation\n"
+     "  Broad occupation/profession, same life path ... +0 Ob\n"
+     "  Uncommon occupation, or within same setting ... +2 Ob\n"
+     "  Specific occupation, rare/unique occupation ... +3 Ob\n"
+     "\n"
+     "Station\n"
+     "  Same station .................................. +0 Ob\n"
+     "  Lower rank, station, or class ................. +1 Ob\n"
+     "  Higher rank, station, or class ................ +2 Ob\n"
+     "  Highest station or rank in the setting ........ +3 Ob\n"
+     "\n"
+     "Disposition and Knowledge\n"
+     "  Common to circle .............................. +0 Ob\n"
+     "  Different from circle members ................. +1-2 Ob\n"
+     "  Specific, detailed, or rare ................... +3 Ob\n"
+     "\n"
+     "Time and Place\n"
+     "  Doesn't matter ................................ +0 Ob\n"
+     "  Unusual for this character .................... +1-2 Ob\n"
+     "  Right here and now in the middle of trouble ... +3 Ob"))
+
+  (jf/transient-quick-help jf/qh--bwg-steel-test-adjustments
+    "BWG Steel Test Adjustments (page 363)"
+    :label "Steel"
+    :body
+    (concat
+     "Conditions for Steel Advantags\n"
+     "  Being startled by something mundane ........ +2D\n"
+     "  Feeling safe in a group of friends/allies .. +1D\n"
+     "\n"
+     "Conditions for Steel Disadvantages\n"
+     "  Being shot at .............................. +1 Ob\n"
+     "  Being directly affect by magic ............. +1 Ob\n"
+     "  Witnessing a person killed ................. +1 Ob\n"
+     "  Small explosions ........................... +2 Ob\n"
+     "  Committing murder .......................... +2 Ob\n"
+     "  Explosions ................................. +3 Ob\n"
+     "  Witnessing pronounced sorcery at play ...... +3 Ob\n"
+     "  Seeing a ghost ............................. +3 Ob\n"
+     "  Seeing the living dead ..................... +4 Ob\n"
+     "  Volcanic eruptions, cataclysm .............. +4 Ob\n"
+     "  Seeing horrible magic at work .............. +4 Ob\n"
+     "  Being in the presence of the supernatural .. +5 Ob\n"))
+#+end_src
+
+*** Minor Modes
 
 In work and in play, there are several “me” specific contexts.  The
 ~jf/minor-mode-maker~ macro helps me quickly and consistently make those
@@ -4559,71 +4345,34 @@ those modes.
   (jf/minor-mode-maker :title "Forem"
 			:abbr "forem")
 #+end_src
+** Crafting Menus to Help Organize
 
-**** TODO A Consistent Transient Menu
+I use Emacs for software development, knowledge management, blogging, and just
+about whatever else I can.  And as I wrote in [[*Knowledge Management][Knowledge Management]], I try to
+provide guidance when working within those contexts.
+
+As I wrote earlier, I’ve settled on transient as my “menu creation” tool.  I am
+thankful to the author of [[https://www.reddit.com/r/emacs/comments/m518xh/transient_api_example_alternative_bindings_part_1/][Transient API Example (Alternative Bindings Part 1) :
+emacs]], as they helped me understand what is a relatively straight forward
+system.
+
+I’ll explain the language just a bit.  We have a prefix, infix, and suffix.
+The prefix is what you start doing, the infix is modifications/adjustments,
+before you finally invoke the suffix to “complete” the sequence.  A prefix and
+a suffix are emacs-lisp functions, and transient provides a macro to make more
+composable prefixes and suffixes.
+
+I already introduced a simple transient prefix in the helpful package.  I want
+to write some transient suffixes to.  As you’ll see later, you don’t need to
+use the ~transient-define-suffix~ for adding a function to a transient prefix,
+but a suffix can provide a description.
+
+- ~jf/org-auto-tags--transient~ :: provides a description and a function.  The
+description is dynamic (hence the ~lambda~); it shows the tags that are
+currently set in ~jf/org-auto-tags--transient~.  The function prompts me to
+adjust those tags and store them in the aforementioned variable.
 
 #+begin_src emacs-lisp
-  (defconst jf/forem-dashboard-filename
-    "~/git/org/forem-dashboard.org"
-    "The file to the dashboard documentation and links for Forem.")
-
-  (cl-defun jf/open-dashboard (&key (filename jf/forem-dashboard-filename))
-    "For the given FILENAME open the links in the default browser.
-
-      With the universal prefix (e.g. C-u) open the file instead."
-    (interactive)
-    (if (equal current-prefix-arg nil) ; no C-u
-	(call-process-shell-command
-	 (concat "rg \"\\[\\[(.*)\\]\\[\" "
-		 filename
-		 " --only-matching"
-		 " | rg \"[^\\[|\\]]+\" --only-matching"
-		 " | xargs open"))
-      (find-file filename)))
-#+end_src
-
-Next I want some transient suffixes (e.g. functions that I call at the end of
-my foray into a transient prefix, or menu).
-
-#+begin_src emacs-lisp
-  (transient-define-suffix jf/org-auto-tags--transient (tags)
-    "Set the TAGS from minibuffer read"
-    :description '(lambda ()
-		    (concat
-		     "Org Tags: "
-		     (propertize
-		      (format "%s" jf/org-auto-tags--current-list)
-		      'face 'transient-argument)))
-    (interactive (list
-		  (completing-read-multiple
-		   "Tag(s): " (org-roam-tag-completions))))
-    (setq jf/org-auto-tags--current-list tags))
-
-  (transient-define-suffix jf/hammerspoon-toggle-mode ()
-    "Set the hammerspoon mode"
-    :description '(lambda ()
-		    (concat
-		     "Hammerspoon Mode: "
-		     (propertize
-		      (format "%s" major-mode)
-		      'face 'transient-argument)))
-    (interactive)
-    (hammerspoon-toggle-mode))
-
-  (transient-define-suffix jf/tor-hostname-current-toggle (hostname)
-    "Set `jf/tor-hostname-current' to HOSTNAME."
-    :description '(lambda ()
-		    (concat "Host: "
-		    (propertize
-		      (format "%s" jf/tor-hostname-current)
-		      'face 'transient-argument)))
-    (interactive (list (completing-read
-			"Host: " (list
-				  (list jf/tor-hostname-default-local 1)
-				  (list jf/tor-hostname-default-remote 2)
-				  ))))
-    (setq jf/tor-hostname-current hostname))
-
   (transient-define-suffix jf/org-auto-tags--transient (tags)
     "Set the TAGS from minibuffer read"
     :description '(lambda ()
@@ -4635,6 +4384,43 @@ my foray into a transient prefix, or menu).
     (interactive
      (list (completing-read-multiple "Tag(s): " (org-roam-tag-completions))))
     (setq jf/org-auto-tags--current-list tags))
+#+end_src
+
+- ~jf/hammerspoon-toggle-mode~ :: this suffix provides a dynamic description of
+  the current major mode for a ~hammerspoon-edit-minor-mode~ buffer.  And the
+  prefix’s function toggles that mode.
+
+#+begin_src emacs-lisp
+  (transient-define-suffix jf/hammerspoon-toggle-mode ()
+    "Set the hammerspoon mode"
+    :description '(lambda ()
+		    (concat
+		     "Hammerspoon Mode: "
+		     (propertize
+		      (format "%s" major-mode)
+		      'face 'transient-argument)))
+    (interactive)
+    (hammerspoon-toggle-mode))
+#+end_src
+
+- ~jf/tor-hostname-current-toggle~ :: this suffix provides a dynamic
+  description of the current host I want to use for my blog.  And the prefix’s
+  function toggles the host.
+
+#+begin_src emacs-lisp
+  (transient-define-suffix jf/tor-hostname-current-toggle (hostname)
+      "Set `jf/tor-hostname-current' to HOSTNAME."
+      :description '(lambda ()
+		      (concat "Host: "
+		      (propertize
+			(format "%s" jf/tor-hostname-current)
+			'face 'transient-argument)))
+      (interactive (list (completing-read
+			  "Host: " (list
+				    (list jf/tor-hostname-default-local 1)
+				    (list jf/tor-hostname-default-remote 2)
+				    ))))
+      (setq jf/tor-hostname-current hostname))
 #+end_src
 
 Next up is defining the transient prefixes, as I’m using them “menus.”  The
@@ -4784,6 +4570,7 @@ some additional options.
       ("o i" jf/indesk-current-files-on-desk--transient)
       ]])
 #+end_src
+
 
 * Footnotes
 
