@@ -2333,16 +2333,6 @@ to a specific language (via ~org-insert-tilde-language~).
       (call-interactively #'org-self-insert-command)))
 #+end_src
 
-**** org-menu.el
-
-- ~org-menu.el~ :: Context dependent menu for org-mode; leverages ~transient.el~.
-
-#+begin_src emacs-lisp
-  (use-package org-menu
-    :straight (org-menu :host github :repo "sheijk/org-menu")
-    :bind (:map org-mode-map ("C-c m" . 'org-menu)))
-#+end_src
-
 **** OrgRoam
 
 This is my third iteration on an ~org-roam~.  It's goal is to address use-cases
@@ -4647,9 +4637,18 @@ my foray into a transient prefix, or menu).
     (setq jf/org-auto-tags--current-list tags))
 #+end_src
 
-Next up is defining the transient prefixes.  The prefixes are the “start of” a
-command sequence.  In this case, I’m using them as menu’s which expose
-additional actions.
+Next up is defining the transient prefixes, as I’m using them “menus.”  The
+prefixes are the “start of” a command sequence.  In this case, I’m using them
+as menu’s which expose additional actions.
+
+Right away, I’m going to leverage the ~org-menu.el~ package; it leverages
+~transient.el~ for context specific options.
+
+#+begin_src emacs-lisp
+  (use-package org-menu
+    :straight (org-menu :host github :repo "sheijk/org-menu")
+    :bind (:map org-mode-map ("C-c m" . 'org-menu)))
+#+end_src
 
 Next is my Forem menu; these are the commands the help me navigate various
 aspects of my work.
