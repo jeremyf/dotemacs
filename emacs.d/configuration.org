@@ -4616,9 +4616,11 @@ repository.
   ~jf/git-branch-create~.
 
 #+begin_src emacs-lisp
-  (cl-defun jf/git-branch-create-from-safari (directory (&key username jf/github-username))
+  (defun jf/git-branch-create-from-safari (directory)
     "Create a git branch in project DIRECTORY from Safari url."
-    (interactive (list (project-prompt-project-dir)))
+    (interactive (list (projectile-completing-read
+			     "Project name: "
+			     (projectile-relevant-known-projects))))
     (catch 'not-a-github-repository
       (let* ((link-title-pair (grab-mac-link-safari-1))
 	     (url (car link-title-pair)))
@@ -4628,7 +4630,7 @@ repository.
 	       (slugs (s-split "/" url))
 	       (suffix (format  "%s/%s#%s" (nth 3 slugs) (nth 4 slugs) (nth 6 slugs)))
 	       (slugified-title (replace-regexp-in-string "-?\.-issue-[[:digit:]]+.*" "" (jf/tor-convert-text-to-slug title)))
-	       (prefix (format "%s/%s" username slugified-title))
+	       (prefix (format "%s/%s" jf/github-username slugified-title))
 	       (branch-name (concat prefix "---" suffix)))
 	  (jf/git-branch-create :branch-name branch-name :directory directory)))))
 #+end_src
