@@ -163,7 +163,7 @@ previously defined the suffixes.
      ("c" jf/bwg-qh-circles-obstacles)
      ("d" jf/bwg-qh-absolute-difficulty)
      ("e" jf/bwg-qh-expertise-exponent)
-     ("p" "PTGS" jf/bwg-ptgs)
+     ("p" "PTGS" jf/bwg-qh-ptgs)
      ("s" jf/bwg-qh-steel-test-adjustments)
      ("w" jf/bwg-qh-wises)
      ])
