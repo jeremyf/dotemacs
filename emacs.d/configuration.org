@@ -156,6 +156,8 @@ out but for the most part, you can move along and reference this later.
 
    delete-old-versions t       ;; Automatically delete excess backups
 
+   echo-key-strokes 0.2
+
    idle-update-delay 1.1       ;; Slow down the UI being updated to improve
 			       ;; performance
 
@@ -4630,13 +4632,6 @@ some additional options.
       ("-f" "Forem…" jf/menu--forem)
       ("-t" "TakeOnRules…" jf/menu--tor)
       ]
-     ["Grab"
-      ("g e" "Elfeed" jf/menu--org-capture-elfeed-show :if-derived elfeed-show-mode)
-      ("g f" "Firefox" jf/menu--org-capture-firefox)
-      ("g s" "Safari" jf/menu--org-capture-safari)
-      ("g w" "Eww" jf/menu--org-capture-eww :if-derived eww-mode)
-      ;; ("g u" "URL")
-      ]
      ["Jump to"
       ;; ("j a" "Agenda" ibuffer)
       ("j b" "iBuffer" ibuffer)
@@ -4653,13 +4648,21 @@ some additional options.
       ("m o" "MacOS Native Option ( )" jf/toggle-osx-alternate-modifier :if-non-nil ns-alternate-modifier)
       ("m o" "MacOS Native Option (*)" jf/toggle-osx-alternate-modifier :if-nil ns-alternate-modifier)
       ]]
-    [["Org Add-Ons"
+    ["Org"
+     ["Add-Ons"
       ("o c" "Context set…" jf/org-auto-tags--set-by-context :transient t)
       ("o t" "Tag add…" org-roam-tag-add :if-derived org-mode)
       ("o r" "Ref add…" org-roam-ref-add :if-derived org-mode)
       ("o s" jf/org-auto-tags--transient :transient t)
       ("o i" jf/indesk-current-files-on-desk--transient)
-      ]])
+      ]
+     ["Grag Refs"
+      ("g e" "Elfeed" jf/menu--org-capture-elfeed-show :if-derived elfeed-show-mode)
+      ("g f" "Firefox" jf/menu--org-capture-firefox)
+      ("g s" "Safari" jf/menu--org-capture-safari)
+      ("g w" "Eww" jf/menu--org-capture-eww :if-derived eww-mode)
+      ]
+     ])
 #+end_src
 
 #+begin_src emacs-lisp
