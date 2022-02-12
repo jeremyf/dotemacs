@@ -11,7 +11,8 @@ automation.
 
 * Forem Minor Mode
 
-Before I go too far I want to make sure I have a minor mode for Forem:
+Before I go too far I want to make sure I have a minor mode for Forem.  Here, I
+use the ~jf/minor-mode-maker~ macro.
 
 #+begin_src emacs-lisp
   (jf/minor-mode-maker :title "Forem" :abbr "forem")
@@ -31,14 +32,23 @@ file:
 #+end_example
 
 This provides me with a mechanism for hiding or showing specific things in my
-Forem Menu.
+Forem Menu.  Further, it keeps my mind open to considering additional modes.
+
+For example, we have multiple repositories at Forem.  Some are documenation
+oriented.  The “menu” for a documentation repository might be very different
+from the menu for a “code” repository.  Again, opening my thinking to
+possibilities and holding them lightly.
 
 * Forem Menu
 
-Next is my Forem menu; these are the commands the help me navigate various
-aspects of my work.
+Next is my Forem menu; these are the functions to help me navigate various
+aspects of my work. As of <2022-02-12 Sat>, I have a “Browse Authorization
+System Project 46” in my menu.  When the project ends, I’ll remove that line.
 
 #+begin_src emacs-lisp
+  ;; Doing just a bit of hygiene.
+  (use-package transient :straight t)
+
   (global-set-key (kbd "C-M-s-f") 'jf/menu--forem)
   (transient-define-prefix jf/menu--forem ()
     "Menu of Forem related functions."
@@ -97,7 +107,6 @@ have what I want.
     :straight t
     :commands (grab-mac-link-safari-1))
 #+end_src
-
 
 *** Implementation
 
@@ -266,3 +275,13 @@ describe them.
 		 " | xargs open"))
       (find-file filename)))
 #+end_src
+
+As I look at this Dashboard with fresh eyes, I think I may move this concept to my ~indesk~ framing.
+
+* Conclusion
+
+The functions that I’ve written to help me “get things done” at Forem, build on
+and help build out other Emacs extensions for my “How I use my computer”
+environment.  In other words, I’m thinking in terms of automation, or more
+precisely reducing decisions I need to make while “wearing” one of the many
+hats I “wear” throughout the day.
