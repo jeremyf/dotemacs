@@ -1053,7 +1053,6 @@ More on these component matchings styles is available at [[https://github.com/mi
     :bind ("C-c y" . consult-yasnippet))
 #+end_src
 
-
 *** Navigation
 **** avy.el
 
@@ -1065,7 +1064,6 @@ More on these component matchings styles is available at [[https://github.com/mi
     :bind (:map org-mode-map ("C-j" . avy-goto-char-timer))
     :straight t)
 #+end_src
-
 
 *** Display
 **** lin.el
@@ -3274,13 +3272,13 @@ transient function for that.
     :hook ((eww-mode . jf/reader-visual)))
 #+end_src
 
-*** Decide
+*** Random Tables
 
-- ~decide.el~ :: A package for random decision making.  Kind of nice for games.
+Let’s add some [[file:random-tables.org][Random Table tooling]].
 
 #+begin_src emacs-lisp
-  (use-package decide
-    :straight (decide :host github :type git :repo "jeremyf/decide-mode"))
+  (org-babel-load-file
+   (concat user-emacs-directory "random-tables.org"))
 #+end_src
 
 *** Hammerspoon
@@ -3425,63 +3423,6 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
        ((not prefix)  (org-insert-time-stamp nil nil nil))
        ((= prefix 4)  (org-insert-time-stamp nil t nil))
        ((= prefix 16) (org-insert-time-stamp (org-read-date nil t nil "Date") nil nil)))))
-#+end_src
-
-- ~jf/forem-tidy-pull-request~ :: At [[https://forem.com][Forem]] we use a [[https://github.com/forem/forem/blob/main/.github/PULL_REQUEST_TEMPLATE.md][pull request template]] that
-  has lots of instructions for contributors to complete.  The
-  ~jf/forem-tidy-pull-request~ function takes the initial contents (which
-  include the commit message of the first commit of the pull request) and
-  tidies it up so I can fill out the primary fields.
-
-#+begin_src emacs-lisp
-  (defun jf/forem-tidy-pull-request ()
-    "Perform some quick tidying of the Forem PR template."
-    (interactive)
-    ;; Start from the beginning.
-    (beginning-of-buffer)
-
-    ;; The text before the first HTML/Markdown
-    ;; comments is the commit message.  Cut that
-    ;; text…
-    (search-forward "<!--")
-    (kill-region 1 (- (point) 4))
-
-    ;; ...and paste it inside the description
-    ;; section.
-    (replace-string
-     "## Description\n\n"
-     (concat "## Description\n\n"
-	     (format "%s" (car kill-ring))))
-
-    ;; We've moved point (e.g., the cursor) so let's
-    ;; jump back to the beginning of the buffer.
-    (beginning-of-buffer)
-
-    ;; Remove HTML/Markdown comments
-    (replace-regexp
-     "\\(\n\\)*<!--\\(.\\|\n\\)*-->\\(\n\\)*"
-     "")
-
-    (beginning-of-buffer)
-
-    ;; Clear out the text I almost always delete.
-    ;;
-    ;; This clears out the two or three line "please"!
-    (replace-regexp ": _please.*\\(\n +.+\\)+_\n" ":\n")
-
-    (beginning-of-buffer)
-
-    ;; Clear out some comments.
-    (replace-regexp "^\n_\\(If\\|Please\\|Will\\).*\\(\n.+\\)+_\n+" "\n")
-
-    ;; Clean out the GIF section.  As much as I try
-    ;; I just don't like adding GIFs to PRs
-    (replace-regexp
-     "\n## \\[optional\\] What gif\\(.\\)*\n+\\!.*"
-     "")
-
-    ;; Jump to the beginning of the buffer...again.
-    (beginning-of-buffer))
 #+end_src
 
 #+begin_src emacs-lisp
@@ -4376,31 +4317,6 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
   ;;******************************************************************************
 #+end_src
 
-*** Work Specific Functions
-
-This is a hold-over function from my early days at [[https://forem.com][Forem]].  I include it as a
-reminder, but also for it’s occassional usage.
-
-#+begin_src emacs-lisp
-  (defconst jf/forem-dashboard-filename
-    "~/git/org/forem-dashboard.org"
-    "The file to the dashboard documentation and links for Forem.")
-
-  (cl-defun jf/open-dashboard (&key (filename jf/forem-dashboard-filename))
-    "For the given FILENAME open the links in the default browser.
-
-      With the universal prefix (e.g. C-u) open the file instead."
-    (interactive)
-    (if (equal current-prefix-arg nil) ; no C-u
-	(call-process-shell-command
-	 (concat "rg \"\\[\\[(.*)\\]\\[\" "
-		 filename
-		 " --only-matching"
-		 " | rg \"[^\\[|\\]]+\" --only-matching"
-		 " | xargs open"))
-      (find-file filename)))
-#+end_src
-
 *** Quick Help
 
 The following ~jf/transient-quick-help~ macro helps generate “help menus” that
@@ -4470,8 +4386,6 @@ those modes.
 
   (jf/minor-mode-maker :title "Take on Rules"
 			:abbr "tor")
-  (jf/minor-mode-maker :title "Forem"
-			:abbr "forem")
 #+end_src
 
 *** Create a branch from a Github Issue
@@ -4560,6 +4474,14 @@ Let’s add some [[file:burning-wheel-emacs-config.org][Burning Wheel Tooling]].
    (concat user-emacs-directory "burning-wheel-emacs-config.org"))
 #+end_src
 
+** Forem, or Where I Work
+
+Let’s add some [[file:forem.org][Forem tooling]].
+
+#+begin_src emacs-lisp
+  (org-babel-load-file
+   (concat user-emacs-directory "forem-config.org"))
+#+end_src
 
 ** Crafting Menus to Help Organize
 
@@ -4650,41 +4572,6 @@ Right away, I’m going to leverage the ~org-menu.el~ package; it leverages
   (use-package org-menu
     :straight (org-menu :host github :repo "sheijk/org-menu")
     :bind (:map org-mode-map ("C-c m" . 'org-menu)))
-#+end_src
-
-Next is my Forem menu; these are the commands the help me navigate various
-aspects of my work.
-
-#+begin_src emacs-lisp
-  (global-set-key (kbd "C-M-s-f") 'jf/menu--forem)
-  (transient-define-prefix jf/menu--forem ()
-    "Menu of Forem related functions."
-    [["Hammerspoon"
-      :if-non-nil hammerspoon-edit-minor-mode
-      ("C-p" "Tidy pull request" jf/forem-tidy-pull-request)
-      ]]
-    [[
-      "Issues"
-      ("i a" "All issues…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/issues/")))
-      ("i b" "Create branch from issue" jf/git-branch-create-from-safari)
-      ("i m" "My issues…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/issues/assigned/jeremyf")))
-      ]]
-    [["Forem's Workflow"
-      ("j" "Browse to pro[j]ects…" (lambda () (interactive) (browse-url "https://github.com/orgs/forem/projects/")))
-      ("m" "Browse [m]erged Pull Requests…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/pulls?q=is%3Apr+is%3Aclosed")))
-      ("p" "Browse to pull requests…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/pulls/")))
-      ]
-     ["Jeremy's Workflow"
-      ("a" "Browse Authorization System Project 46" (lambda () (interactive) (browse-url "https://github.com/orgs/forem/projects/46")))
-      ("J" "Browse to Content Experience pro[J]ects…" (lambda () (interactive) (browse-url "https://github.com/orgs/forem/projects/39")))
-      ("M" "Browse Jeremy's [M]erged Pull Requests…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/pulls/jeremyf?q=is%3Apr+is%3Aclosed")))
-      ("P" "Browse to Jeremy's [P]ull requests…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/pulls/jeremyf")))
-      ("N" "Browse Github [N]otifications" (lambda () (interactive) (browse-url "https://github.com/notifications")))
-      ]
-     ["Org-Mode"
-      ("D" "[D]ashboard open…" jf/open-dashboard)
-      ("d" "Visit [d]ashboard file…" (lambda () (interactive) (find-file jf/forem-dashboard-filename)))
-      ]])
 #+end_src
 
 A menu for my TakeOnRules blogging tasks.

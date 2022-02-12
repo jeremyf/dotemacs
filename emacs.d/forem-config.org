@@ -1,0 +1,156 @@
+# -*- org-insert-tilde-language: emacs-lisp; -*-
+#+TITLE: Forem Configuration
+#+AUTHOR: Jeremy Friesen
+#+EMAIL: jeremy@jeremyfriesen.com
+#+STARTUP: showall
+#+OPTIONS: toc:3
+
+On <2021-10-04 Mon> I started working at [[https://forem.com][Forem]].  My role involves software
+development and managing people.  I use Emacs to provide some of that
+automation.
+
+* Forem Minor Mode
+
+Before I go too far I want to make sure I have a minor mode for Forem:
+
+#+begin_src emacs-lisp
+  (jf/minor-mode-maker :title "Forem" :abbr "forem")
+#+end_src
+
+In my “forem” oriented repositories, I have the following ~.dir-locals.el~
+file:
+
+#+begin_example
+  ;;; Directory Local Variables
+  ;;; For more information see (info "(emacs) Directory Variables")
+
+  (
+   (prog-mode . ((jf/forem-minor-mode . 1)))
+   (text-mode . ((jf/forem-minor-mode . 1)))
+  )
+#+end_example
+
+This provides me with a mechanism for hiding or showing specific things in my
+Forem Menu.
+
+* Forem Menu
+
+Next is my Forem menu; these are the commands the help me navigate various
+aspects of my work.
+
+#+begin_src emacs-lisp
+  (global-set-key (kbd "C-M-s-f") 'jf/menu--forem)
+  (transient-define-prefix jf/menu--forem ()
+    "Menu of Forem related functions."
+    [["Transformations"
+      ("C-p" "Tidy pull request" jf/forem-tidy-pull-request :if-non-nil hammerspoon-edit-minor-mode)
+      ("C-b" "Create branch from issue" jf/git-branch-create-from-safari :if-non-nil jf/forem-minor-mode)
+      ]]
+    [["Forem's Workflow"
+      ("i" "All issues…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/issues/")))
+      ("j" "Browse to pro[j]ects…" (lambda () (interactive) (browse-url "https://github.com/orgs/forem/projects/")))
+      ("m" "Browse [m]erged Pull Requests…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/pulls?q=is%3Apr+is%3Aclosed")))
+      ("p" "Browse to pull requests…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/pulls/")))
+      ]
+     ["Jeremy's Workflow"
+      ("a" "Browse Authorization System Project 46" (lambda () (interactive) (browse-url "https://github.com/orgs/forem/projects/46")))
+      ("I" "My issues…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/issues/assigned/jeremyf")))
+      ("J" "Browse to Content Experience pro[J]ects…" (lambda () (interactive) (browse-url "https://github.com/orgs/forem/projects/39")))
+      ("M" "Browse Jeremy's [M]erged Pull Requests…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/pulls/jeremyf?q=is%3Apr+is%3Aclosed")))
+      ("P" "Browse to Jeremy's [P]ull requests…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/pulls/jeremyf")))
+      ("N" "Browse Github [N]otifications" (lambda () (interactive) (browse-url "https://github.com/notifications")))
+      ]
+     ["Org-Mode"
+      ("D" "[D]ashboard open…" jf/open-dashboard)
+      ("d" "Visit [d]ashboard file…" (lambda () (interactive) (find-file jf/forem-dashboard-filename)))
+      ]])
+#+end_src
+
+* Tidying a Pull Request
+
+At [[https://forem.com][Forem]] we use a [[https://github.com/forem/forem/blob/main/.github/PULL_REQUEST_TEMPLATE.md][pull request template]] that has lots of instructions for
+contributors to complete.  The ~jf/forem-tidy-pull-request~ function takes the
+initial contents (which include the commit message of the first commit of the
+pull request) and tidies it up so I can fill out the primary fields.
+
+#+begin_src emacs-lisp
+  (defun jf/forem-tidy-pull-request ()
+    "Perform some quick tidying of the Forem PR template."
+    (interactive)
+    ;; Start from the beginning.
+    (beginning-of-buffer)
+
+    ;; The text before the first HTML/Markdown
+    ;; comments is the commit message.  Cut that
+    ;; text…
+    (search-forward "<!--")
+    (kill-region 1 (- (point) 4))
+
+    ;; ...and paste it inside the description
+    ;; section.
+    (replace-string
+     "## Description\n\n"
+     (concat "## Description\n\n"
+	     (format "%s" (car kill-ring))))
+
+    ;; We've moved point (e.g., the cursor) so let's
+    ;; jump back to the beginning of the buffer.
+    (beginning-of-buffer)
+
+    ;; Remove HTML/Markdown comments
+    (replace-regexp
+     "\\(\n\\)*<!--\\(.\\|\n\\)*-->\\(\n\\)*"
+     "")
+
+    (beginning-of-buffer)
+
+    ;; Clear out the text I almost always delete.
+    ;;
+    ;; This clears out the two or three line "please"!
+    (replace-regexp ": _please.*\\(\n +.+\\)+_\n" ":\n")
+
+    (beginning-of-buffer)
+
+    ;; Clear out some comments.
+    (replace-regexp "^\n_\\(If\\|Please\\|Will\\).*\\(\n.+\\)+_\n+" "\n")
+
+    ;; Clean out the GIF section.  As much as I try
+    ;; I just don't like adding GIFs to PRs
+    (replace-regexp
+     "\n## \\[optional\\] What gif\\(.\\)*\n+\\!.*"
+     "")
+
+    ;; Jump to the beginning of the buffer...again.
+    (beginning-of-buffer))
+#+end_src
+
+* Dashboard - A Partially Deprecated Function
+
+When I first started at Forem, I had to track a lot of URLs.  And with
+[[https://en.wikipedia.org/wiki/Gnolia][ma.gnolia]]’s demise, I never invested heavily in browser nor SaaS-based
+bookmarking.  So, with Emacs in-hand, I whipped up a quick dashboard function.
+
+I don’t use it much, but keep it around as a reference implementation of
+~ripgrep~ and ~xargs~; I have long learned that it’s a good idea to tuck away
+snippets for future reference.  Especially if I take time to document and
+describe them.
+
+#+begin_src emacs-lisp
+  (defconst jf/forem-dashboard-filename
+    "~/git/org/forem-dashboard.org"
+    "The file to the dashboard documentation and links for Forem.")
+
+  (cl-defun jf/open-dashboard (&key (filename jf/forem-dashboard-filename))
+    "For the given FILENAME open the links in the default browser.
+
+      With the universal prefix (e.g. C-u) open the file instead."
+    (interactive)
+    (if (equal current-prefix-arg nil) ; no C-u
+	(call-process-shell-command
+	 (concat "rg \"\\[\\[(.*)\\]\\[\" "
+		 filename
+		 " --only-matching"
+		 " | rg \"[^\\[|\\]]+\" --only-matching"
+		 " | xargs open"))
+      (find-file filename)))
+#+end_src
