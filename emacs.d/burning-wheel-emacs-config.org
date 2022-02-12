@@ -254,6 +254,25 @@ with additional instructions for calculating Gray-shaded attributes.
       (list su li mi se tr mo)))
 #+end_src
 
+** Lifepath Browser
+
+While running (or playing) a game of Burning Wheel, it can be useful to have
+access to character lifepaths.  These can give you insight into a quick NPC.
+
+I have transformed and edited the [[http://charred-black.herokuapp.com/#/][Charred - The Burning Wheel Gold Character
+Burner]] data into individual YAML files that sit on my local machine.  I also
+created a bit of [[https://gohugo.io/][Hugo]] code to render lifepaths from those YAML files.  You can
+see an example at [[https://takeonrules.com/2018/10/10/burning-wheel-lifepaths-inspired-by-warhammer-fantasy/][Burning Wheel Lifepaths Inspired by Warhammer Fantasy]].
+
+I’m thinking what would be useful to create a searchable index of those
+lifepaths.  For now, I’ll search based on the stock, setting, and lifepath name
+(all of which happen to be in the pathname of the YAML file).
+
+But instead of hopping to the YAML file, I’d like to jump to the spot on an
+HTML page with that information.  This way when I “find” a lifepath, I can see
+what other lifepaths are of comparable station (a common need when testing
+Circles).
+
 * Menu
 
 The following menu is for quick help while playing Burning Wheel games.  I

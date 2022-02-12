@@ -30,7 +30,8 @@ Below is the top-level directory:
 The files and directories:
 
 - README.org :: This file.
-- emacs.d :: A directory that contains files symlinked into =$HOME/.emacs.d= directory.
+- emacs.d :: A directory that contains files symlinked into =$HOME/.emacs.d=
+  directory.
 - deprecated-packages :: A directory of elisp-files.  I have since moved
   towards a literate configuration style.
 - snippets :: A directory of [[https://joaotavora.github.io/yasnippet/][yasnippets]] I’ve created.
@@ -45,3 +46,21 @@ There are two “primary” files to consider in ~./emacs.d~:
   Literate Programming mindset.)
 - [[file:emacs.d/init.el][init.el]] :: The file evaluated when Emacs launches.  Using [[https://orgmode.org/worg/org-contrib/babel/intro.html][Org Babel]], it
   evaluates the configuration.org file.
+
+/At some point, I move the configuration file up to the repository README
+level; that would mean treating the configuration as my almost entire discourse
+on how I Emacs./
+
+* Digging Further into emacs.d
+
+I’m starting to disassemble the large singular configuration file.  At present
+the org files I have are as follows:
+
+- configuration.org :: I wrote about that above.
+- [[file:emacs.d/burning-wheel-emacs-config.org][burning-wheel-emacs-config.org]] :: This contains specific utilities that I use
+  when playing Burning Wheel.  It’s a prototype for how I might think about
+  other games; looking at you “Stars without Number” and “Worlds without
+  Number.”
+- [[file:emacs.d/forem-config.org][forem-config.org]] :: These are functions that help me do my day job.
+- [[file:emacs.d/random-tables.org][random-tables.org]] :: Some random tables mixed with further thoughts about
+  random tables.
