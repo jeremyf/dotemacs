@@ -66,7 +66,107 @@ aspects of my work.
       ]])
 #+end_src
 
-* Tidying a Pull Request
+* Further Automation
+
+** Create a branch from a Github Issue
+
+I want a function that I can call which will walk me through the predictable
+and safe creation of a branch.
+
+My goal is to have the branch name adhear to the following convention:
+
+- :githubUserName/:slugifiedDescription---:owner/:repo#:number
+
+Why do this?  First, I want to “entice” myself to use Issue tracking.  This is
+good collaborative form.  Second, with a predictable branch name, I can later
+use Emacs to jump to the corresponding issue.
+
+*** Two Approaches
+
+I can provide a URL/slug or leverage an already open browser.  The URL/slug
+approach might require authentication and token management.  That’s
+troublesome.  The browser path requires that I have an integration with my
+browser; but I won’t need to manage authentication issues, so let’s explore that.
+
+Let’s use the ~grab-mac-link~ package.  I’m certain I’m already including this
+in my [[file:configuration.org][Emacs Configuration]] file, I’m “using” it again, so I’m going to ensure I
+have what I want.
+
+#+begin_src emacs-lisp
+  (use-package grab-mac-link
+    :straight t
+    :commands (grab-mac-link-safari-1))
+#+end_src
+
+
+*** Implementation
+
+As I think through my approach, I have two concerns, an interactive function to
+gather the data and a function for using that data to manipulate the git
+repository.
+
+- ~jf/git-branch-create-from-safari~ :: This is the function that gathers the
+  data.  It’s responsible for prompting for the correct project, verifying that
+  Safari’s URL is correct, and then calling the non-interactive function
+  ~jf/git-branch-create~.
+
+#+begin_src emacs-lisp
+  (defun jf/git-branch-create-from-safari (directory)
+    "Create a git branch in project DIRECTORY from Safari url."
+    (interactive (list (projectile-completing-read
+			     "Project name: "
+			     (projectile-relevant-known-projects))))
+    (catch 'not-a-github-repository
+      (let* ((link-title-pair (grab-mac-link-safari-1))
+	     (url (car link-title-pair)))
+	(unless (string-match "^https://github\\.com/[[:alpha:]]+/[[:alpha:]]+/issues?/[[:digit:]]+" url)
+	  (throw 'not-a-github-repository (message "Expected URL \"%s\" to be a Github Issue URL." url)))
+	(let* ((title (cadr link-title-pair))
+	       (slugs (s-split "/" url))
+	       (suffix (format  "%s/%s#%s" (nth 3 slugs) (nth 4 slugs) (nth 6 slugs)))
+	       (slugified-title (replace-regexp-in-string "-?\.-issue-[[:digit:]]+.*" "" (jf/tor-convert-text-to-slug title)))
+	       (prefix (format "%s/%s" jf/github-username slugified-title))
+	       (branch-name (concat prefix "---" suffix)))
+	  (message (jf/git-branch-create :branch-name branch-name :directory directory))))))
+#+end_src
+
+- ~jf/git-branch-create~ :: This function manipulates the git repository.  We
+  have a valid (enough) directory and a new branch-name, now let’s do the file
+  system work to ensure we can safely do this work.
+
+#+begin_src emacs-lisp
+  (cl-defun jf/git-branch-create (&key branch-name directory (starting-branch "main"))
+    "Create BRANCH-NAME from STARTING-BRANCH in DIRECTORY.  Ensure clean state."
+    (catch 'dirty-branch
+      (let* ((default-directory directory))
+	(unless (eq 0 (length (shell-command-to-string "git status --porcelain")))
+	  (throw 'dirty-branch
+		 (format
+		  "Repository \"%s\" is dirty repository."
+		  default-directory)))
+
+	(magit-branch-checkout starting-branch)
+
+	(magit-pull-from-upstream "--rebase")
+
+	(unless (eq 0 (length (shell-command-to-string "git status --porcelain")))
+	  (throw 'dirty-branch
+		 (format
+		  "After updating from remote, repository \"%s\" is dirty repository."
+		  default-directory)))
+
+	(magit-branch-create branch-name starting-branch)
+	(magit-branch-checkout branch-name))
+      (format "Created branch on %s" directory)))
+#+end_src
+
+This gets me what I want, and helps frame the next exercise (e.g. “For the
+current branch, open the corresponding issue in the browser”).  It also has me
+thinking that I might want to inject into my commit message a “References
+#:number” line.  That sounds like another function.
+
+
+** Tidying a Pull Request
 
 At [[https://forem.com][Forem]] we use a [[https://github.com/forem/forem/blob/main/.github/PULL_REQUEST_TEMPLATE.md][pull request template]] that has lots of instructions for
 contributors to complete.  The ~jf/forem-tidy-pull-request~ function takes the
@@ -123,6 +223,18 @@ pull request) and tidies it up so I can fill out the primary fields.
     ;; Jump to the beginning of the buffer...again.
     (beginning-of-buffer))
 #+end_src
+
+The above took me about 2 hours to write, but as of <2022-02-12 Sat> I’ve
+written and merged 94 pull requests using this tidy function.
+
+#+begin_src shell-script
+  cd ~/git/forem ; git shortlog -se --since=2021-11-24 | rg "Jeremy Friesen"
+#+end_src
+
+Each time I use the tidy function, I save about a minute, reduce points for
+decision making, and more consistently clear out the clutter to answer the
+specific questions in the checklist.  In other words, this function helps me
+stay focused on the task of writing a meaningful commit message.
 
 * Dashboard - A Partially Deprecated Function
 
