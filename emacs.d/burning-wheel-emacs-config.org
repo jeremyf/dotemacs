@@ -29,8 +29,8 @@ Wheel Gold.
 
 #+begin_src emacs-lisp
   (jf/transient-quick-help jf/bwg-qh-wises
-    "BWG Wises Obstacles (page 309)"
     :label "Wises"
+    :header "BWG Wises Obstacles (page 309)"
     :body
     (concat
      "Common knowledge ............. Ob 1\n"
@@ -42,8 +42,8 @@ Wheel Gold.
      "Freaky details or specifics .. Ob 8"))
 
   (jf/transient-quick-help jf/bwg-qh-expertise-exponent
-    "BWG Expertise Exponent (page 12)"
     :label "Exponents"
+    :header "BWG Expertise Exponent (page 12)"
     :body
     (concat
      "Exp 1  is naturally disinclined, crippled, or utterly incompetent.\n"
@@ -58,8 +58,8 @@ Wheel Gold.
      "Exp 10 is as near perfection as the system allows."))
 
   (jf/transient-quick-help jf/bwg-qh-absolute-difficulty
-    "BWG Absolute Difficulty (page 15)"
     :label "Difficulty"
+    :header "BWG Absolute Difficulty (page 15)"
     :body
     (concat
      "Ob 1  A simple act done with little thought.\n"
@@ -74,8 +74,8 @@ Wheel Gold.
      "Ob 10 A miracle."))
 
   (jf/transient-quick-help jf/bwg-qh-circles-obstacles
-    "BWG Circles Obstacles (page 380-381)"
     :label "Circles"
+    :header "BWG Circles Obstacles (page 380-381)"
     :body
     (concat
      "Occupation\n"
@@ -100,7 +100,7 @@ Wheel Gold.
      "  Right here and now in the middle of trouble ... +3 Ob"))
 
   (jf/transient-quick-help jf/bwg-qh-steel-test-adjustments
-    "BWG Steel Test Adjustments (page 363)"
+    :header "BWG Steel Test Adjustments (page 363)"
     :label "Steel"
     :body
     (concat
@@ -160,57 +160,57 @@ elegant, but it works.
 
   This requires FORTE, POWER, and ROUND-UP.
 
-  Note, this assumes Black shade only."
+  Note, this assumes Black or Grey shade only."
     (interactive "sForte: \nsPower: \nP")
     ;; Note the / function uses integer floor division.
     (let* ((forte-index (-elem-index (upcase forte) jf/bwg-mortal-wounds-scale))
 	   (power-index (-elem-index (upcase power) jf/bwg-mortal-wounds-scale)))
       (unless forte-index (throw 'invalid-entry (format "Invalid Forte %s" forte)))
       (unless power-index (throw 'invalid-entry (format "Invalid Power %s" power)))
-      (cond ((and (< forte-index 14) (< power-index 14))
-	     (jf/bwg-qh-ptgs-black forte-index
-				   power-index
-				   round-up
-				   :power-label power
-				   :forte-label forte))
-	    ((and (< forte-index 14) (< power-index 28))
-	     (jf/bwg-qh-ptgs-black forte-index
-				   (- power-index 13)
-				   round-up
-				   :add 2
-				   :power-label power
-				   :forte-label forte))
-	    ((and (< forte-index 28) (< power-index 14))
-	     (jf/bwg-qh-ptgs-black (- forte-index 13)
-				   power-index
-				   round-up
-				   :add 2
-				   :power-label power
-				   :forte-label forte))
-	    ((and (< forte-index 28) (< power-index 28))
-	     (jf/bwg-qh-ptgs-gray forte-index
-				  power-index
-				  round-up
-				  :power-label power
-				  :forte-label forte)))))
+      (let ((scale (cond ((and (< forte-index 14) (< power-index 14))
+			  (jf/bwg-qh-ptgs--shade-black forte-index
+						       power-index
+						       round-up))
+			 ((and (< forte-index 14) (< power-index 28))
+			  (jf/bwg-qh-ptgs--shade-black forte-index
+						       (- power-index 13)
+						       round-up
+						       :add 2))
+			 ((and (< forte-index 28) (< power-index 14))
+			  (jf/bwg-qh-ptgs--shade-black (- forte-index 13)
+						       power-index
+						       round-up
+						       :add 2))
+			 ((and (< forte-index 28) (< power-index 28))
+			  (jf/bwg-qh-ptgs--shade-gray forte-index
+						      power-index
+						      round-up)))))
+	(jf/bwg-qh-ptgs--render-popup :power power
+				      :forte forte
+				      :round-up round-up
+				      :scale scale))))
+
+  (cl-defun jf/bwg-qh-ptgs--render-popup (&key power forte round-up scale)
+    "Render PTGS help for given POWER, FORTE, ROUND-UP, and SCALE
+
+    Where SCALE is a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
+    (jf/quick-help
+     :header "BWG PTGS (p98, 546)"
+     :body (format (concat
+		    "Su %s; Li %s; Mi %s; Se %s; Tr %s; Mo %s"
+		    "\n\nForte: %s\nPower: %s"
+		    (when round-up "\n(Rounded up)"))
+		   (nth (nth 0 scale) jf/bwg-mortal-wounds-scale)
+		   (nth (nth 1 scale) jf/bwg-mortal-wounds-scale)
+		   (nth (nth 2 scale) jf/bwg-mortal-wounds-scale)
+		   (nth (nth 3 scale) jf/bwg-mortal-wounds-scale)
+		   (nth (nth 4 scale) jf/bwg-mortal-wounds-scale)
+		   (nth (nth 5 scale) jf/bwg-mortal-wounds-scale)
+		   (upcase forte)
+		   (upcase power))))
 #+end_src
 
 #+begin_src emacs-lisp
-  (cl-defun jf/quick-help (&key title body)
-    (let ((qh-buff (concat "*Quick Help: " title "*"))
-	  (qh-text body))
-      (get-buffer-create qh-buff)
-      (with-current-buffer qh-buff
-	(insert qh-text)
-	(goto-char (point-min))
-	(not-modified)
-	(read-only-mode)
-	(special-mode)
-	(local-set-key (kbd "q") 'kill-buffer-and-window))
-      (pop-to-buffer qh-buff '((display-buffer-below-selected)
-			       (window-parameters . ((no-other-window . nil)))
-			       (window-height . fit-window-to-buffer)))
-      (message "q - Remove Window")))
 #+end_src
 
 On page 546 of “Burning Wheel Gold Revised” we have instructions for
@@ -218,12 +218,12 @@ calculating PTGS for Gray-shaded attributes.  This overlays with the
 instructions on page 98 of “Burning Wheel Gold Revised”.
 
 #+begin_src emacs-lisp
-  (cl-defun jf/bwg-qh-ptgs-black (forte power &optional round-up &key forte-label power-label (add 0))
-    "Calculate Burning Wheel PTGS.
+  (cl-defun jf/bwg-qh-ptgs--shade-black (forte power &optional round-up &key (add 0))
+    "Calculate Black shade PTGS.
 
   This requires FORTE, POWER, and ROUND-UP.
 
-  Note, this assumes Black shade only."
+  Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
     (interactive "nForte: \nnPower: \nP")
     ;; Note the / function uses integer floor division.
     (let* ((mw-rnd (if round-up 1 0))
@@ -237,43 +237,23 @@ instructions on page 98 of “Burning Wheel Gold Revised”.
 	   (tr (if (< tr mo) tr (- mo 1)))
 	   (se (if (< se tr) se (- tr 1)))
 	   (mi (if (< mi se) mi (- se 1)))
-	   (li (if (< li mi) li (- mi 1)))
-	   (text (format
-		  (concat "PTGS: Su %s, Li %s, Mi %s, Se %s, Tr %s, Mo %s"
-			  "\nForte: %s, Power: %s, Round Up: %s")
-		  (nth su jf/bwg-mortal-wounds-scale)
-		  (nth li jf/bwg-mortal-wounds-scale)
-		  (nth mi jf/bwg-mortal-wounds-scale)
-		  (nth se jf/bwg-mortal-wounds-scale)
-		  (nth tr jf/bwg-mortal-wounds-scale)
-		  (nth mo jf/bwg-mortal-wounds-scale)
-		  forte-label power-label (if round-up "yes" "no"))))
-      (kill-new text)
-      (message text)))
-#+end_src
+	   (li (if (< li mi) li (- mi 1))))
+      (list su li mi se tr mo)))
 
-#+begin_src emacs-lisp
-    (cl-defun jf/bwg-qh-ptgs-gray (forte power &optional round-up &key power-label forte-label)
-      "Calculate gray FORTE and POWER PTGS"
-      (let* ((mw-rnd (if round-up 1 0))
-	     (mo (+ 6 (/ (+ forte power mw-rnd) 2)))
-	     (su (- forte 13))
-	     (li (+ su forte -13))
-	     (mi (- mo 4))
-	     (se (- mo 2))
-	     (tr (- mo 1))
-	     (text (format
-		    (concat "PTGS: Su %s, Li %s, Mi %s, Se %s, Tr %s, Mo %s"
-			    "\nForte: %s, Power: %s, Round Up: %s")
-		    (nth su jf/bwg-mortal-wounds-scale)
-		    (nth li jf/bwg-mortal-wounds-scale)
-		    (nth mi jf/bwg-mortal-wounds-scale)
-		    (nth se jf/bwg-mortal-wounds-scale)
-		    (nth tr jf/bwg-mortal-wounds-scale)
-		    (nth mo jf/bwg-mortal-wounds-scale)
-		    forte-label power-label (if round-up "yes" "no"))))
-	(kill-new text)
-	  (message text)))
+  (defun jf/bwg-qh-ptgs--shade-gray (forte power &optional round-up)
+    "Calculate Gray shade PTGS.
+
+  This requires FORTE, POWER, and ROUND-UP.
+
+  Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
+    (let* ((mw-rnd (if round-up 1 0))
+	   (mo (+ 6 (/ (+ forte power mw-rnd) 2)))
+	   (su (- forte 13))
+	   (li (+ su forte -13))
+	   (mi (- mo 4))
+	   (se (- mo 2))
+	   (tr (- mo 1)))
+      (list su li mi se tr mo)))
 #+end_src
 
 * Menu
@@ -294,3 +274,9 @@ previously defined the suffixes.
      ("w" jf/bwg-qh-wises)
      ])
 #+end_src
+
+* Footnotes
+
+[fn:1] I copyied that text string from the introspected variable.  Because if I
+wasn't going to write it the first time, I sure wasn't going to do it if I had
+already stored that value in a constant.

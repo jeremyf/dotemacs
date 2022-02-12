@@ -4407,30 +4407,36 @@ The following ~jf/transient-quick-help~ macro helps generate “help menus” th
 I want to reference.
 
 #+begin_src emacs-lisp
-  (cl-defmacro jf/transient-quick-help (name buffer &key label body)
+  (cl-defun jf/quick-help (&key header body)
+    "Create a help window with HEADER and BODY."
+    (let ((qh-buff (concat "*Quick Help: " header "*"))
+	  (qh-text body))
+      (get-buffer-create qh-buff)
+      (with-current-buffer qh-buff
+	(insert qh-text)
+	(goto-char (point-min))
+	(not-modified)
+	(read-only-mode)
+	(special-mode)
+	(local-set-key (kbd "q") 'kill-buffer-and-window))
+      (pop-to-buffer qh-buff '((display-buffer-below-selected)
+			       (window-parameters . ((no-other-window . nil)))
+			       (window-height . fit-window-to-buffer)))
+      (message "q - Remove Window")))
+
+  (cl-defmacro jf/transient-quick-help (name &key header label body)
     "Macro for creating callable functions that display help.
 
-    Where NAME is name of function, BUFFER is name of buffer, and TEXT is displayed."
+    NAME is name of function,
+    LABEL is label for the menu
+    HEADER is name of buffer, and TEXT is displayed."
     (declare (indent defun))
     `(progn
        (transient-define-suffix ,name nil
-	 ,buffer
+	 ,header
 	 :description ,label
 	 (interactive)
-	 (let ((qh-buff (concat "*Quick Help: " ,buffer "*"))
-	       (qh-text ,body))
-	   (get-buffer-create qh-buff)
-	   (with-current-buffer qh-buff
-	     (insert qh-text)
-	     (goto-char (point-min))
-	     (not-modified)
-	     (read-only-mode)
-	     (special-mode)
-	     (local-set-key (kbd "q") 'kill-buffer-and-window))
-	   (pop-to-buffer qh-buff '((display-buffer-below-selected)
-				    (window-parameters . ((no-other-window . nil)))
-				    (window-height . fit-window-to-buffer)))
-	   (message "q - Remove Window")))))
+	 (jf/quick-help :header ,header :body ,body))))
 #+end_src
 
 /Note:/ It might make sense to extract the quick help to files, but for now
@@ -4461,9 +4467,7 @@ those modes.
 	 (when ,hooks
 	   (-each ,hooks (lambda(hook) (add-hook hook (lambda () (,mode-name)))))))))
 
-  (jf/minor-mode-maker :title "Burning Wheel Gold"
-			:abbr "bwg"
-			:hooks (list 'org-mode-hook 'markdown-mode-hook))
+
   (jf/minor-mode-maker :title "Take on Rules"
 			:abbr "tor")
   (jf/minor-mode-maker :title "Forem"
@@ -4657,7 +4661,7 @@ aspects of my work.
     "Menu of Forem related functions."
     [["Hammerspoon"
       :if-non-nil hammerspoon-edit-minor-mode
-      ("C-t" "Tidy pull request" jf/forem-tidy-pull-request)
+      ("C-p" "Tidy pull request" jf/forem-tidy-pull-request)
       ]]
     [[
       "Issues"
@@ -4771,6 +4775,15 @@ some additional options.
       ]])
 #+end_src
 
+#+begin_src emacs-lisp
+  (autoload 'org-buffer-list "org")
+  (defvar org-buffer-source
+    `(:name     "Org"
+		:narrow   ?o
+		:category buffer
+		:state    ,#'consult--buffer-state
+		:items    ,(lambda () (mapcar #'buffer-name (org-buffer-list)))))
+#+end_src
 
 * Footnotes
 
