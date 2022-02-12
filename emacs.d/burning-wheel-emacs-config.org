@@ -5,6 +5,8 @@
 #+STARTUP: showall
 #+OPTIONS: toc:3
 
+The functions of this file build on functions from [[file:configuration.org][Configuration]].
+
 * Minor Mode for Burning Wheel
 
 #+begin_src emacs-lisp
