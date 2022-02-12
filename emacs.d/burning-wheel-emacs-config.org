@@ -7,6 +7,12 @@
 
 The functions of this file build on functions from [[file:configuration.org][Configuration]].
 
+Being a programmer and someone who plays table top role-playing games (TTRPG),
+I’ve often used the TTRPG rules-set or systems to explore programming languages
+and processes.  After all, I understand the TTRPG rules well enough (or the
+algorithm’s description) that I can spend time thinking through my approach in
+a programming language.
+
 * Minor Mode for Burning Wheel
 
 #+begin_src emacs-lisp
@@ -122,6 +128,13 @@ Wheel Gold.
 When running Burning Wheel Gold, on occassion I need to establish the PTGS for
 a creature or person.
 
+Yes, I could’ve written out ~(0 "B1" "B2" "B3" "B4" "B5" "B6" "B7" "B8" "B9"
+"B10" "B11" "B12" "B13" "B14" "B15" "B16" "G1" "G2" "G3" "G4" "G5" "G6" "G7"
+"G8" "G9" "G10" "G11" "G12" "G13" "G14" "G15" "G16" "W1" "W2" "W3" "W4" "W5"
+"W6" "W7" "W8" "W9" "W10" "W11" "W12" "W13" "W14" "W15" "W16")~ faster than the
+following constant, but I wanted to learn a bit of emacs-lisp, so I chose to
+write the following.[fn:1]
+
 #+begin_src emacs-lisp
   (defconst jf/bwg-mortal-wounds-scale
     (let* ((shades '("B" "G" "W"))
@@ -138,7 +151,7 @@ a creature or person.
     "The BWG Physical Tolerance Grayscale (from B1 to W16).")
 #+end_src
 
-A function for calculating a Black or Gray PTGS.  This is not clean nor
+Next up is a function for calculating a Black or Gray PTGS.  This is not clean nor
 elegant, but it works.
 
 #+begin_src emacs-lisp
@@ -180,6 +193,24 @@ elegant, but it works.
 				  round-up
 				  :power-label power
 				  :forte-label forte)))))
+#+end_src
+
+#+begin_src emacs-lisp
+  (cl-defun jf/quick-help (&key title body)
+    (let ((qh-buff (concat "*Quick Help: " title "*"))
+	  (qh-text body))
+      (get-buffer-create qh-buff)
+      (with-current-buffer qh-buff
+	(insert qh-text)
+	(goto-char (point-min))
+	(not-modified)
+	(read-only-mode)
+	(special-mode)
+	(local-set-key (kbd "q") 'kill-buffer-and-window))
+      (pop-to-buffer qh-buff '((display-buffer-below-selected)
+			       (window-parameters . ((no-other-window . nil)))
+			       (window-height . fit-window-to-buffer)))
+      (message "q - Remove Window")))
 #+end_src
 
 On page 546 of “Burning Wheel Gold Revised” we have instructions for
