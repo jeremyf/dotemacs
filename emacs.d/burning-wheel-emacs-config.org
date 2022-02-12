@@ -120,7 +120,25 @@ Wheel Gold.
 ** Physical Trauma Gray Scale (PTGS)
 
 When running Burning Wheel Gold, on occassion I need to establish the PTGS for
-a creature or person.  This is a quick help function for that.
+a creature or person.
+
+#+begin_src emacs-lisp
+  (defconst jf/bwg-mortal-wounds-scale
+    (let* ((shades '("B" "G" "W"))
+	   (rank '(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16))
+	   (scale (-flatten
+		   (-map (lambda (s)
+			   (-map (lambda (r)
+				   (format "%s%s" s r))
+				 rank))
+			 shades))))
+      ;; I want B1 to have an index of 1.  Hence pre-pending the 0 to the list.
+      (add-to-list 'scale 0)
+      scale)
+    "The BWG Physical Tolerance Grayscale (from B1 to W16).")
+#+end_src
+
+A quick help function for that.
 
 #+begin_src emacs-lisp
   (defun jf/bwg-qh-ptgs (forte power &optional round-up)
@@ -129,10 +147,51 @@ a creature or person.  This is a quick help function for that.
   This requires FORTE, POWER, and ROUND-UP.
 
   Note, this assumes Black shade only."
+    (interactive "sForte: \nsPower: \nP")
+    ;; Note the / function uses integer floor division.
+    (let* ((forte-index (-elem-index (upcase forte) jf/bwg-mortal-wounds-scale))
+	   (power-index (-elem-index (upcase power) jf/bwg-mortal-wounds-scale)))
+      (unless forte-index (throw 'invalid-entry (format "Invalid Forte %s" forte)))
+      (unless power-index (throw 'invalid-entry (format "Invalid Power %s" power)))
+      (cond ((and (< forte-index 14) (< power-index 14))
+	     (jf/bwg-qh-ptgs-black forte-index
+				   power-index
+				   round-up
+				   :power-label power
+				   :forte-label forte))
+	    ((and (< forte-index 14) (< power-index 28))
+	     (jf/bwg-qh-ptgs-black forte-index
+				   (- power-index 13)
+				   round-up
+				   :add 2
+				   :power-label power
+				   :forte-label forte))
+	    ((and (< forte-index 28) (< power-index 14))
+	     (jf/bwg-qh-ptgs-black (- forte-index 13)
+				   power-index
+				   round-up
+				   :add 2
+				   :power-label power
+				   :forte-label forte))
+	    ((and (< forte-index 28) (< power-index 28))
+	     (jf/bwg-qh-ptgs-gray forte-index
+				  power-index
+				  round-up
+				  :power-label power
+				  :forte-label forte)))))
+#+end_src
+
+#+begin_src emacs-lisp
+  (cl-defun jf/bwg-qh-ptgs-black (forte power &optional round-up &key forte-label power-label (add 0))
+    "Calculate Burning Wheel PTGS.
+
+  This requires FORTE, POWER, and ROUND-UP.
+
+  Note, this assumes Black shade only."
     (interactive "nForte: \nnPower: \nP")
     ;; Note the / function uses integer floor division.
     (let* ((mw-rnd (if round-up 1 0))
-	   (mo (+ 6 (/ (+ forte power mw-rnd) 2)))
+	   (mo (+ 6 add (/ (+ forte power mw-rnd) 2)))
 	   (step (+ (/ (+ 1 forte) 2)))
 	   (su (+ 1 (/ forte 2)))
 	   (li (+ su step))
@@ -146,10 +205,39 @@ a creature or person.  This is a quick help function for that.
 	   (text (format
 		  (concat "PTGS: Su %s, Li %s, Mi %s, Se %s, Tr %s, Mo %s"
 			  "\nForte: %s, Power: %s, Round Up: %s")
-		  su li mi se tr mo
-		  forte power (if round-up "yes" "no"))))
+		  (nth su jf/bwg-mortal-wounds-scale)
+		  (nth li jf/bwg-mortal-wounds-scale)
+		  (nth mi jf/bwg-mortal-wounds-scale)
+		  (nth se jf/bwg-mortal-wounds-scale)
+		  (nth tr jf/bwg-mortal-wounds-scale)
+		  (nth mo jf/bwg-mortal-wounds-scale)
+		  forte-label power-label (if round-up "yes" "no"))))
       (kill-new text)
       (message text)))
+#+end_src
+
+#+begin_src emacs-lisp
+    (cl-defun jf/bwg-qh-ptgs-gray (forte power &optional round-up &key power-label forte-label)
+      "Calculate gray FORTE and POWER PTGS"
+      (let* ((mw-rnd (if round-up 1 0))
+	     (mo (+ 6 (/ (+ forte power mw-rnd) 2)))
+	     (su (- forte 13))
+	     (li (+ su forte -13))
+	     (mi (- mo 4))
+	     (se (- mo 2))
+	     (tr (- mo 1))
+	     (text (format
+		    (concat "PTGS: Su %s, Li %s, Mi %s, Se %s, Tr %s, Mo %s"
+			    "\nForte: %s, Power: %s, Round Up: %s")
+		    (nth su jf/bwg-mortal-wounds-scale)
+		    (nth li jf/bwg-mortal-wounds-scale)
+		    (nth mi jf/bwg-mortal-wounds-scale)
+		    (nth se jf/bwg-mortal-wounds-scale)
+		    (nth tr jf/bwg-mortal-wounds-scale)
+		    (nth mo jf/bwg-mortal-wounds-scale)
+		    forte-label power-label (if round-up "yes" "no"))))
+	(kill-new text)
+	  (message text)))
 #+end_src
 
 * Menu
