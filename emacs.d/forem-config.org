@@ -276,7 +276,8 @@ describe them.
       (find-file filename)))
 #+end_src
 
-As I look at this Dashboard with fresh eyes, I think I may move this concept to my ~indesk~ framing.
+As I look at this Dashboard with fresh eyes, I think I may move this concept to
+my ~indesk~ framing; See [[file:configuration.org][Configuration.org]] for details.
 
 * Conclusion
 
