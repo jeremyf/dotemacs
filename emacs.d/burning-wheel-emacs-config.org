@@ -138,7 +138,8 @@ a creature or person.
     "The BWG Physical Tolerance Grayscale (from B1 to W16).")
 #+end_src
 
-A quick help function for that.
+A function for calculating a Black or Gray PTGS.  This is not clean nor
+elegant, but it works.
 
 #+begin_src emacs-lisp
   (defun jf/bwg-qh-ptgs (forte power &optional round-up)
@@ -180,6 +181,10 @@ A quick help function for that.
 				  :power-label power
 				  :forte-label forte)))))
 #+end_src
+
+On page 546 of “Burning Wheel Gold Revised” we have instructions for
+calculating PTGS for Gray-shaded attributes.  This overlays with the
+instructions on page 98 of “Burning Wheel Gold Revised”.
 
 #+begin_src emacs-lisp
   (cl-defun jf/bwg-qh-ptgs-black (forte power &optional round-up &key forte-label power-label (add 0))
