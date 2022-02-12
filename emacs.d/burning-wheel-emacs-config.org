@@ -195,7 +195,7 @@ elegant, but it works.
 
     Where SCALE is a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
     (jf/quick-help
-     :header "BWG PTGS (p98, 546)"
+     :header "BWG PTGS (p98, p546)"
      :body (format (concat
 		    "Su %s; Li %s; Mi %s; Se %s; Tr %s; Mo %s"
 		    "\n\nForte: %s\nPower: %s"
@@ -210,16 +210,13 @@ elegant, but it works.
 		   (upcase power))))
 #+end_src
 
-#+begin_src emacs-lisp
-#+end_src
-
-On page 546 of “Burning Wheel Gold Revised” we have instructions for
-calculating PTGS for Gray-shaded attributes.  This overlays with the
-instructions on page 98 of “Burning Wheel Gold Revised”.
+On page 98 of “Burning Wheel Gold Revised”, we have instructions for
+calculating PTGS for most characters.  Page 546 overlays those instructions
+with additional instructions for calculating Gray-shaded attributes.
 
 #+begin_src emacs-lisp
   (cl-defun jf/bwg-qh-ptgs--shade-black (forte power &optional round-up &key (add 0))
-    "Calculate Black shade PTGS.
+    "Calculate Black shade PTGS (BWGR p98, p546).
 
   This requires FORTE, POWER, and ROUND-UP.
 
@@ -241,15 +238,16 @@ instructions on page 98 of “Burning Wheel Gold Revised”.
       (list su li mi se tr mo)))
 
   (defun jf/bwg-qh-ptgs--shade-gray (forte power &optional round-up)
-    "Calculate Gray shade PTGS.
+    "Calculate Gray shade PTGS (BWGR p546).
 
   This requires FORTE, POWER, and ROUND-UP.
 
   Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
-    (let* ((mw-rnd (if round-up 1 0))
+    (let* ((fort-exponent (- forte 16))
+	   (mw-rnd (if round-up 1 0))
 	   (mo (+ 6 (/ (+ forte power mw-rnd) 2)))
-	   (su (- forte 13))
-	   (li (+ su forte -13))
+	   (su fort-exponent)
+	   (li (+ su fort-exponent))
 	   (mi (- mo 4))
 	   (se (- mo 2))
 	   (tr (- mo 1)))
