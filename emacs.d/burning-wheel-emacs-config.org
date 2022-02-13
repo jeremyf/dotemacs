@@ -273,6 +273,9 @@ HTML page with that information.  This way when I “find” a lifepath, I can s
 what other lifepaths are of comparable station (a common need when testing
 Circles).
 
+- [ ] I need a “stable” HTML files with all lifepaths.  Each lifepath should
+  have a unique DOM ID.
+
 * Menu
 
 The following menu is for quick help while playing Burning Wheel games.  I
