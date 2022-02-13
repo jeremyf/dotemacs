@@ -2356,6 +2356,10 @@ original Thel Sector campaign.
 What follows builds on Jethro Kuan's [[https://jethrokuan.github.io/org-roam-guide/][How I Take Notes with Org-roam]].  Reading
 Jethro Kuan's post helped me see how I could do this.
 
+Additional resources:
+
+- [[https://sqrtminusone.xyz/configs/emacs/#org-roam][Pavel Korytov’s Emacs config (Org Roam)]]
+
 ***** Preliminaries
 
 The ~jf/org-roam-capture-templates-plist~ variable defines the possible
@@ -2723,6 +2727,14 @@ These tie into my the context and auto-tags.
 	   (title (plist-get eww-data :title)))
       (jf/org-roam-capture-ref :url url :title title)))
 #+end_src
+
+***** Things I’ve Learned about Org Roam
+
+Reading https://sqrtminusone.xyz/configs/emacs/#managing-tables, I learned
+about ~org-table-export~.
+
+Reading [[https://systemcrafters.net/build-a-second-brain-in-emacs/5-org-roam-hacks/#build-your-org-agenda-from-org-roam-notes][5 Org Roam Hacks for Better Productivity in Emacs - System Crafters]], I
+learned about how to incorporate ~org-roam~ docs into my agenda.
 
 ***** Conclusion
 
