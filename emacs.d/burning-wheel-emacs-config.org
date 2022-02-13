@@ -32,95 +32,139 @@ Wheel Gold.
     :label "Wises"
     :header "BWG Wises Obstacles (page 309)"
     :body
-    (concat
-     "Common knowledge ............. Ob 1\n"
-     "An interesting fact .......... Ob 2\n"
-     "Details ...................... Ob 3\n"
-     "Uncommon knowledge ........... Ob 4\n"
-     "Rare goods ................... Ob 5\n"
-     "Bizarre or obscure ........... Ob 7\n"
-     "Freaky details or specifics .. Ob 8"))
+    (s-join
+     "\n"
+     '("Common knowledge ............. Ob 1"
+       "An interesting fact .......... Ob 2"
+       "Details ...................... Ob 3"
+       "Uncommon knowledge ........... Ob 4"
+       "Rare goods ................... Ob 5"
+       "Bizarre or obscure ........... Ob 7"
+       "Freaky details or specifics .. Ob 8")))
 
   (jf/transient-quick-help jf/bwg-qh-expertise-exponent
     :label "Exponents"
     :header "BWG Expertise Exponent (page 12)"
     :body
-    (concat
-     "Exp 1  is naturally disinclined, crippled, or utterly incompetent.\n"
-     "Exp 2  is untrained, raw, weak, or unpracticed.\n"
-     "Exp 3  is nominally trained and practiced.\n"
-     "Exp 4  is competent; everday stuff doesn't pose a challenge.\n"
-     "Exp 5  is expert.\n"
-     "Exp 6  is near mastery.\n"
-     "Exp 7  is excellence.\n"
-     "Exp 8  is total mastery, complete understanding.\n"
-     "Exp 9  is uncanny; incomprehensibly good.\n"
-     "Exp 10 is as near perfection as the system allows."))
+    (s-join
+     "\n"
+     '("Exp 1  is naturally disinclined, crippled, or utterly incompetent."
+       "Exp 2  is untrained, raw, weak, or unpracticed."
+       "Exp 3  is nominally trained and practiced."
+       "Exp 4  is competent; everday stuff doesn't pose a challenge."
+       "Exp 5  is expert."
+       "Exp 6  is near mastery."
+       "Exp 7  is excellence."
+       "Exp 8  is total mastery, complete understanding."
+       "Exp 9  is uncanny; incomprehensibly good."
+       "Exp 10 is as near perfection as the system allows.")))
 
   (jf/transient-quick-help jf/bwg-qh-absolute-difficulty
     :label "Difficulty"
     :header "BWG Absolute Difficulty (page 15)"
     :body
-    (concat
-     "Ob 1  A simple act done with little thought.\n"
-     "Ob 2  An act performed routinely at your job.\n"
-     "Ob 3  An act you can accomplish if you concentrate.\n"
-     "Ob 4  A risky act.\n"
-     "Ob 5  An act that requires expertise.\n"
-     "Ob 6  An act that requires a heroic effort.\n"
-     "Ob 7  An improbable feat.\n"
-     "Ob 8  An act requiring preternatural ability or a lot of help.\n"
-     "Ob 9  An act deemed nearly impossible.\n"
-     "Ob 10 A miracle."))
+    (s-join
+     "\n"
+     '("Ob 1  A simple act done with little thought."
+       "Ob 2  An act performed routinely at your job."
+       "Ob 3  An act you can accomplish if you concentrate."
+       "Ob 4  A risky act."
+       "Ob 5  An act that requires expertise."
+       "Ob 6  An act that requires a heroic effort."
+       "Ob 7  An improbable feat."
+       "Ob 8  An act requiring preternatural ability or a lot of help."
+       "Ob 9  An act deemed nearly impossible."
+       "Ob 10 A miracle.")))
 
   (jf/transient-quick-help jf/bwg-qh-circles-obstacles
     :label "Circles"
     :header "BWG Circles Obstacles (page 380-381)"
     :body
-    (concat
-     "Occupation\n"
-     "  Broad occupation/profession, same life path ... +0 Ob\n"
-     "  Uncommon occupation, or within same setting ... +2 Ob\n"
-     "  Specific occupation, rare/unique occupation ... +3 Ob\n"
+    (s-join
      "\n"
-     "Station\n"
-     "  Same station .................................. +0 Ob\n"
-     "  Lower rank, station, or class ................. +1 Ob\n"
-     "  Higher rank, station, or class ................ +2 Ob\n"
-     "  Highest station or rank in the setting ........ +3 Ob\n"
+     '("Occupation"
+       "  Broad occupation/profession, same life path ... +0 Ob"
+       "  Uncommon occupation, or within same setting ... +2 Ob"
+       "  Specific occupation, rare/unique occupation ... +3 Ob"
+       ""
+       "Station"
+       "  Same station .................................. +0 Ob"
+       "  Lower rank, station, or class ................. +1 Ob"
+       "  Higher rank, station, or class ................ +2 Ob"
+       "  Highest station or rank in the setting ........ +3 Ob"
+       ""
+       "Disposition and Knowledge"
+       "  Common to circle .............................. +0 Ob"
+       "  Different from circle members ................. +1-2 Ob"
+       "  Specific, detailed, or rare ................... +3 Ob"
+       ""
+       "Time and Place"
+       "  Doesn't matter ................................ +0 Ob"
+       "  Unusual for this character .................... +1-2 Ob"
+       "  Right here and now in the middle of trouble ... +3 Ob")))
+
+  (jf/transient-quick-help jf/bwg-qh-circles-alternate
+    :header "BWG Circles 2006 (Burning Anthology p7)"
+    :label "Circles 2006"
+    :body
+    (s-join
      "\n"
-     "Disposition and Knowledge\n"
-     "  Common to circle .............................. +0 Ob\n"
-     "  Different from circle members ................. +1-2 Ob\n"
-     "  Specific, detailed, or rare ................... +3 Ob\n"
-     "\n"
-     "Time and Place\n"
-     "  Doesn't matter ................................ +0 Ob\n"
-     "  Unusual for this character .................... +1-2 Ob\n"
-     "  Right here and now in the middle of trouble ... +3 Ob"))
+     '("Occupation"
+       "  Broad/common .................... +0 Ob"
+       "  Uncommon ........................ +2 Ob"
+       "  Specific/rare/unique ............ +2 Ob"
+       ""
+       "Station"
+       "  Same station .................... +0 Ob"
+       "  Higher or lower rank ............ +1 Ob"
+       "  Lowest .......................... +2 Ob"
+       "  Highest ......................... +3 Ob"
+       ""
+       "Attitude"
+       "  Neutral to PC ................... +0 Ob"
+       "  Predisposed or opposed .......... +1 Ob"
+       "  Proponent, loyal, or specific ... +3 Ob"
+       ""
+       "Knowledge"
+       "  Unimportant ..................... +0 Ob"
+       "  General for subject ............. +1 Ob"
+       "  Specific subject ................ +3 Ob"
+       ""
+       "Skill"
+       "  Typical (Exponent 3) ............ +0 Ob"
+       "  Competent (Exponent 4) .......... +1 Ob"
+       "  Expert (Expoonent 5) ............ +2 Ob"
+       "  Master (Exponent 6) ............. +3 Ob"
+       ""
+       "Place/Time"
+       "  Prior to important test ......... +0 Ob"
+       "  Prior to conflict ............... +1 Ob"
+       "  In midst of conflict ............ +3 Ob"
+       )))
 
   (jf/transient-quick-help jf/bwg-qh-steel-test-adjustments
     :header "BWG Steel Test Adjustments (page 363)"
     :label "Steel"
     :body
-    (concat
-     "Conditions for Steel Advantags\n"
-     "  Being startled by something mundane ........ +2D\n"
-     "  Feeling safe in a group of friends/allies .. +1D\n"
+    (s-join
      "\n"
-     "Conditions for Steel Disadvantages\n"
-     "  Being shot at .............................. +1 Ob\n"
-     "  Being directly affect by magic ............. +1 Ob\n"
-     "  Witnessing a person killed ................. +1 Ob\n"
-     "  Small explosions ........................... +2 Ob\n"
-     "  Committing murder .......................... +2 Ob\n"
-     "  Explosions ................................. +3 Ob\n"
-     "  Witnessing pronounced sorcery at play ...... +3 Ob\n"
-     "  Seeing a ghost ............................. +3 Ob\n"
-     "  Seeing the living dead ..................... +4 Ob\n"
-     "  Volcanic eruptions, cataclysm .............. +4 Ob\n"
-     "  Seeing horrible magic at work .............. +4 Ob\n"
-     "  Being in the presence of the supernatural .. +5 Ob\n"))
+     '("Conditions for Steel Advantags"
+       "  Being startled by something mundane ........ +2D"
+       "  Feeling safe in a group of friends/allies .. +1D"
+       ""
+       "Conditions for Steel Disadvantages"
+       "  Being shot at .............................. +1 Ob"
+       "  Being directly affect by magic ............. +1 Ob"
+       "  Witnessing a person killed ................. +1 Ob"
+       "  Small explosions ........................... +2 Ob"
+       "  Committing murder .......................... +2 Ob"
+       "  Explosions ................................. +3 Ob"
+       "  Witnessing pronounced sorcery at play ...... +3 Ob"
+       "  Seeing a ghost ............................. +3 Ob"
+       "  Seeing the living dead ..................... +4 Ob"
+       "  Volcanic eruptions, cataclysm .............. +4 Ob"
+       "  Seeing horrible magic at work .............. +4 Ob"
+       "  Being in the presence of the supernatural .. +5 Ob")))
 #+end_src
 
 ** Physical Trauma Gray Scale (PTGS)
@@ -276,6 +320,25 @@ Circles).
 - [ ] I need a “stable” HTML files with all lifepaths.  Each lifepath should
   have a unique DOM ID.
 
+#+begin_src emacs-lisp
+  (defconst jf/bwg-lifepath--path-to-html-file
+    "~/git/org/assets/burning-wheel.html"
+    "The path to an HTML")
+
+  (defconst jf/bwg-lifepath--narrowing-regexp
+    "data-lifepath="
+    "All lines in `jf/bwg-lifepath--path-to-html-file' that have this substring contain filterable data.")
+
+  (defun jf/consult-ripgrep ()
+    (interactive)
+    (consult-ripgrep "~/git/org/assets/" "data-lifepath="))
+#+end_src
+
+#+begin_example
+> rg "id=\"(?P<domId>[^\"]*)\" data-description=\"(?P<desc>[^\"]*)\"" -r '$desc $domId' -o \
+     ~/git/org/assets/burning-wheel.html
+#+end_example
+
 * Menu
 
 The following menu is for quick help while playing Burning Wheel games.  I
@@ -287,6 +350,7 @@ previously defined the suffixes.
     "Define the BWG help prefix."
     ["Burning Wheel"
      ("c" jf/bwg-qh-circles-obstacles)
+     ("C" jf/bwg-qh-circles-alternate)
      ("d" jf/bwg-qh-absolute-difficulty)
      ("e" jf/bwg-qh-expertise-exponent)
      ("p" "PTGS" jf/bwg-qh-ptgs)
