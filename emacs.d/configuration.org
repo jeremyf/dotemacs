@@ -1325,6 +1325,21 @@ These modes impact lots of things; key bindings being one of them.
 What follows are a list of modes presented in a somewhat random order.  Some
 are major modes others are minor modes.
 
+**** bundler.el
+
+- ~bundler.el~ :: Adds the useful ~bundle-open~ command.
+
+#+begin_src emacs-lisp
+  (use-package bundler
+    :straight (bundler :type git :host github :repo "endofunky/bundler.el"))
+#+end_src
+
+**** csv-mode.el
+
+#+begin_src emacs-lisp
+  (use-package csv-mode :straight t)
+#+end_src
+
 **** emmet-mode.el
 
 - ~emmet-mode.el~ :: I’ve only scratched the surface of this.  Namely when I
@@ -1339,120 +1354,6 @@ are major modes others are minor modes.
     :hook ((sgml-mode . emmet-mode)
 	   (html-mode . emmet-mode)
 	   (css-mode . emmet-mode)))
-#+end_src
-
-**** graphql-mode.el
-
-- ~graphql-mode.el~ :: I started exploring graphql, so I suppose it’s time to bring in a proper mode
-for syntax highlighting and what have you.
-
-#+begin_src emacs-lisp
-  (use-package graphql-mode
-    :straight t)
-#+end_src
-
-**** web-mode.el
-
-- ~web-mode.el~ :: Some configurations for web development.
-
-#+begin_src emacs-lisp
-  (use-package web-mode
-    :straight t
-    :config (setq web-mode-markup-indent-offset 2
-		  web-mode-css-indent-offset 2
-		  web-mode-code-indent-offset 2))
-  (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
-  (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
-#+end_src
-
-Sometimes I want to edit svg files.  Often times if I open them directly in
-Emacs, I want to edit them.  This setting helps with that default.  /Note:/
-without this setting, Emacs will happily render the SVG as an image,
-
-#+begin_src emacs-lisp
-  (add-to-list `auto-mode-alist '("\\.svg\\'" . xml-mode))
-#+end_src
-
-**** plantuml-mode.el
-
-- ~plantuml-mode.el~ :: A mode for working with PlantUML.  See https://plantuml.com.
-
-#+begin_src emacs-lisp
-  (use-package plantuml-mode
-    :config (setq plantuml-executable-path (concat (getenv "HB_PATH") "/bin/plantuml")
-		  plantuml-default-exec-mode 'executable
-		  org-plantuml-executable-path (concat (getenv "HB_PATH") "/bin/plantuml")
-		  org-plantuml-exec-mode 'executable)
-    :mode (("\\.plantuml\\'" . plantuml-mode))
-    :straight t)
-#+end_src
-
-**** json-mode.el
-
-- ~json.el~ :: In modern web-development, JSON is nigh unavoidable.
-
-#+begin_src emacs-lisp
-  (use-package json-mode :straight t)
-#+end_src
-
-**** json-reformat.el
-
-- ~json-reformat.el~ :: Because JSON can be quite ugly, I want something to help tidy it up.
-
-#+begin_src emacs-lisp
-  (use-package json-reformat
-    :straight t
-    :after json-mode
-    :init (setq json-reformat:indent-width 2))
-
-#+end_src
-
-**** go-mode.el
-
-Every so often I stumble upon a Go package.  The ~go-mode~ package gives me the
-syntax highlighting that makes reading ~Go-lang~ tolerable.
-
-#+begin_src emacs-lisp
-  (use-package go-mode :straight t)
-#+end_src
-
-**** markdown-mode.el
-
-- ~markdown-mode.el~ :: Oh ubiquitous Markdown.
-
-#+begin_src emacs-lisp
-  (use-package markdown-mode
-    :straight t
-    :hook ((markdown-mode . turn-on-visual-line-mode))
-    :mode (("README\\.md\\'" . gfm-mode)
-	   ("\\.md\\'" . markdown-mode)
-	   ("\\.markdown\\'" . markdown-mode))
-    :init (setq markdown-command "/usr/local/bin/pandoc"))
-#+end_src
-
-**** yaml-mode.el
-
-- ~yaml-mode.el~ :: Visual parsing for yaml.
-
-#+begin_src emacs-lisp
-  (use-package yaml-mode :straight t)
-#+end_src
-
-**** lua-mode.el
-
-- ~lua-mode.el~ :: For working with [[https://www.hammerspoon.org][Hammerspoon]]; which provides me the
-  wonderful [[https://github.com/dmgerman/editWithEmacs.spoon/][edit with Emacs]].
-
-#+begin_src emacs-lisp
-  (use-package lua-mode :straight t)
-#+end_src
-
-**** git-modes.el
-
-- ~git-modes.el~ :: For editing various Git configuration files.
-
-#+begin_src emacs-lisp
-  (use-package git-modes :straight t)
 #+end_src
 
 **** enh-ruby-mode.el
@@ -1479,61 +1380,51 @@ syntax highlighting that makes reading ~Go-lang~ tolerable.
   (add-to-list 'interpreter-mode-alist '("ruby" . enh-ruby-mode))
 #+end_src
 
-**** rspec-mode.el
+**** git-modes.el
 
-- ~rspec-mode.el~ :: [[http://rspec.info][RSpec]] is my Ruby testing framework of choice.  As I’ve
-  been doing much more extensive Ruby coding, I’ve been using a lot of:
-
-  - ~rspec-toggle-spec-and-target~ :: Jump between spec and target;
-    ~spec/models/user_spec.rb~ and ~app/models/user.rb~ respectively.
-  - ~rspec-verify~ :: Run ~rspec~ for the current file; either the spec or the
-    spec associated with the target.
-  - ~rspec-verify-single~ :: Run ~rspec~ for the current line.
+- ~git-modes.el~ :: For editing various Git configuration files.
 
 #+begin_src emacs-lisp
-  (use-package rspec-mode
-    :straight t
-    ;; Ensure that we’re loading enh-ruby-mode before we do any rspec loading.
-    :after enh-ruby-mode
-    :custom (rspec-use-spring-when-possible nil)
-    :bind (:map rspec-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
-    :bind (:map enh-ruby-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
-    :diminish 'rspec-mode)
-
-  (eval-after-load 'rspec-mode '(rspec-install-snippets))
+  (use-package git-modes :straight t)
 #+end_src
 
-/Note:/ The =CMD= + =.= is a carryover from my [[https://macromates.com][Textmate]] and [[https://www.sublimetext.com/][Sublime Text]] days.
-That’s one of those hot-keys almost burned into soul.
-**** ruby-interpolation.el
+**** go-mode.el
 
-- ~ruby-interpolation.el~ :: A simple package to expand ~#~ to ~#{<cursor>}~.
+Every so often I stumble upon a Go package.  The ~go-mode~ package gives me the
+syntax highlighting that makes reading ~Go-lang~ tolerable.
 
 #+begin_src emacs-lisp
-  ;; Nice and simple package for string interpolation.
-  (use-package ruby-interpolation
-    :straight t
-    :diminish 'ruby-interpolation-mode
-    :hook (enh-ruby-mode . ruby-interpolation-mode))
+  (use-package go-mode :straight t)
 #+end_src
 
-**** yard-mode.el
+**** graphql-mode.el
 
-- ~yard-mode.el~ :: When writing Ruby documentation, I favor YARD syntax.  See https://yardoc.org fore more details.
+- ~graphql-mode.el~ :: I started exploring graphql, so I suppose it’s time to bring in a proper mode
+for syntax highlighting and what have you.
 
 #+begin_src emacs-lisp
-  (use-package yard-mode
-    :straight t
-    :hook (enh-ruby-mode . yard-mode))
+  (use-package graphql-mode
+    :straight t)
 #+end_src
 
-**** bundler.el
+**** json-mode.el
 
-- ~bundler.el~ :: Adds the useful ~bundle-open~ command.
+- ~json.el~ :: In modern web-development, JSON is nigh unavoidable.
 
 #+begin_src emacs-lisp
-  (use-package bundler
-    :straight (bundler :type git :host github :repo "endofunky/bundler.el"))
+  (use-package json-mode :straight t)
+#+end_src
+
+**** json-reformat.el
+
+- ~json-reformat.el~ :: Because JSON can be quite ugly, I want something to help tidy it up.
+
+#+begin_src emacs-lisp
+  (use-package json-reformat
+    :straight t
+    :after json-mode
+    :init (setq json-reformat:indent-width 2))
+
 #+end_src
 
 **** lsp-mode.el
@@ -1594,6 +1485,95 @@ packages don’t warrant including this.
   ;; (add-hook 'emacs-lisp-mode 'eldoc-mode)
 #+end_src
 
+**** lua-mode.el
+
+- ~lua-mode.el~ :: For working with [[https://www.hammerspoon.org][Hammerspoon]]; which provides me the
+  wonderful [[https://github.com/dmgerman/editWithEmacs.spoon/][edit with Emacs]].
+
+#+begin_src emacs-lisp
+  (use-package lua-mode :straight t)
+#+end_src
+
+**** markdown-mode.el
+
+- ~markdown-mode.el~ :: Oh ubiquitous Markdown.
+
+#+begin_src emacs-lisp
+  (use-package markdown-mode
+    :straight t
+    :hook ((markdown-mode . turn-on-visual-line-mode))
+    :mode (("README\\.md\\'" . gfm-mode)
+	   ("\\.md\\'" . markdown-mode)
+	   ("\\.markdown\\'" . markdown-mode))
+    :init (setq markdown-command "/usr/local/bin/pandoc"))
+#+end_src
+
+**** plantuml-mode.el
+
+- ~plantuml-mode.el~ :: A mode for working with PlantUML.  See https://plantuml.com.
+
+#+begin_src emacs-lisp
+  (use-package plantuml-mode
+    :config (setq plantuml-executable-path (concat (getenv "HB_PATH") "/bin/plantuml")
+		  plantuml-default-exec-mode 'executable
+		  org-plantuml-executable-path (concat (getenv "HB_PATH") "/bin/plantuml")
+		  org-plantuml-exec-mode 'executable)
+    :mode (("\\.plantuml\\'" . plantuml-mode))
+    :straight t)
+#+end_src
+
+**** rspec-mode.el
+
+- ~rspec-mode.el~ :: [[http://rspec.info][RSpec]] is my Ruby testing framework of choice.  As I’ve
+  been doing much more extensive Ruby coding, I’ve been using a lot of:
+
+  - ~rspec-toggle-spec-and-target~ :: Jump between spec and target;
+    ~spec/models/user_spec.rb~ and ~app/models/user.rb~ respectively.
+  - ~rspec-verify~ :: Run ~rspec~ for the current file; either the spec or the
+    spec associated with the target.
+  - ~rspec-verify-single~ :: Run ~rspec~ for the current line.
+
+#+begin_src emacs-lisp
+  (use-package rspec-mode
+    :straight t
+    ;; Ensure that we’re loading enh-ruby-mode before we do any rspec loading.
+    :after enh-ruby-mode
+    :custom (rspec-use-spring-when-possible nil)
+    :bind (:map rspec-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
+    :bind (:map enh-ruby-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
+    :diminish 'rspec-mode)
+
+  (eval-after-load 'rspec-mode '(rspec-install-snippets))
+#+end_src
+
+/Note:/ The =CMD= + =.= is a carryover from my [[https://macromates.com][Textmate]] and [[https://www.sublimetext.com/][Sublime Text]] days.
+That’s one of those hot-keys almost burned into soul.
+**** ruby-interpolation.el
+
+- ~ruby-interpolation.el~ :: A simple package to expand ~#~ to ~#{<cursor>}~.
+
+#+begin_src emacs-lisp
+  ;; Nice and simple package for string interpolation.
+  (use-package ruby-interpolation
+    :straight t
+    :diminish 'ruby-interpolation-mode
+    :hook (enh-ruby-mode . ruby-interpolation-mode))
+#+end_src
+
+**** so-long.el
+
+- ~so-long.el~ :: Really long files or long lines can cause problems for Emacs.  This mode helps with that.
+
+#+begin_src emacs-lisp
+  (use-package so-long
+    :defer t
+    :straight t
+    :bind
+    (:map so-long-mode-map
+	  ("C-s" . isearch-forward)
+	  ("C-r" . isearch-backward))
+    :config (global-so-long-mode 1))
+#+end_src
 **** tree-sitter.el
 
 - ~tree-sitter.el~ :: An incremental parsing library for languages.  See https://tree-sitter.github.io/tree-sitter/.
@@ -1617,20 +1597,46 @@ packages don’t warrant including this.
   - Fringe
   - Modes
 
-**** so-long.el
+**** web-mode.el
 
-- ~so-long.el~ :: Really long files or long lines can cause problems for Emacs.  This mode helps with that.
+- ~web-mode.el~ :: Some configurations for web development.
 
 #+begin_src emacs-lisp
-  (use-package so-long
-    :defer t
+  (use-package web-mode
     :straight t
-    :bind
-    (:map so-long-mode-map
-	  ("C-s" . isearch-forward)
-	  ("C-r" . isearch-backward))
-    :config (global-so-long-mode 1))
+    :config (setq web-mode-markup-indent-offset 2
+		  web-mode-css-indent-offset 2
+		  web-mode-code-indent-offset 2))
+  (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
 #+end_src
+
+Sometimes I want to edit svg files.  Often times if I open them directly in
+Emacs, I want to edit them.  This setting helps with that default.  /Note:/
+without this setting, Emacs will happily render the SVG as an image,
+
+#+begin_src emacs-lisp
+  (add-to-list `auto-mode-alist '("\\.svg\\'" . xml-mode))
+#+end_src
+
+**** yaml-mode.el
+
+- ~yaml-mode.el~ :: Visual parsing for yaml.
+
+#+begin_src emacs-lisp
+  (use-package yaml-mode :straight t)
+#+end_src
+
+**** yard-mode.el
+
+- ~yard-mode.el~ :: When writing Ruby documentation, I favor YARD syntax.  See https://yardoc.org fore more details.
+
+#+begin_src emacs-lisp
+  (use-package yard-mode
+    :straight t
+    :hook (enh-ruby-mode . yard-mode))
+#+end_src
+
 
 *** Transformations
 **** titlecase.el
@@ -3283,10 +3289,7 @@ transient function for that.
       (shr-ensure-paragraph))
 
     (setq browse-url-browser-function 'browse-url-default-macosx-browser)
-    :bind (:map eww-mode-map
-		("U" . eww-up-url)
-		("<f7>" . jf/amplify-eww)
-		("s-7" . jf/amplify-eww))
+    :bind (:map eww-mode-map ("U" . eww-up-url))
     :bind (("C-s-w" . browse-url-at-point))
     :hook ((eww-mode . jf/reader-visual)))
 #+end_src
