@@ -286,6 +286,11 @@ told it sets things up how I like.
     :straight (:type git :host gitlab :repo "protesilaos/modus-themes" :branch "main")
     :init
     (setq
+     modus-themes-vivendi-color-overrides
+     ;; '((bg-region-accent-subtle . "#240f55")) ;; Default
+     ;; '((bg-region-accent-subtle . "#323da2"));; Good candidate
+     '((bg-region-accent-subtle . "#304466"))
+
      modus-themes-bold-constructs t
      modus-themes-completions 'opinionated
      modus-themes-diffs nil
