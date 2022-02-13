@@ -776,29 +776,22 @@ There’s a macro in here somewhere.
 	      (region-beginning) (region-end)))
 	   rest))
 
-  (defun jf/consult-second-param-is-initial-text (consult-fn &optional first &rest rest)
-    "Advising function around CONSULT-FN.
-
-  We'll pass the FIRST parameter through.  The CONSULT-FN's second
-  parameter should be the initial text.
-
-  When there's an active region, use that as the first parameter
-  for CONSULT-FN.  Otherwise, use an empty string the second
-  parameter.  This function handles the REST of the parameters."
+  (defun jf/consult-ripgrep-wrapper (consult-fn &optional dir initial)
+    "Advising function around CONSULT-FN."
     (interactive "P")
     (apply consult-fn
 	   first
-	   (when (use-region-p)
+	   (if (use-region-p)
 	     (buffer-substring
-	      (region-beginning) (region-end)))
-	   rest))
+	      (region-beginning) (region-end))
+	     initial)))
 
 
   (advice-add #'consult-line
 	      :around #'jf/consult-first-param-is-initial-text
 	      '((name . "wrapper")))
   (advice-add #'consult-ripgrep
-	      :around #'jf/consult-second-param-is-initial-text
+	      :around #'jf/consult-ripgrep-wrapper
 	      '((name . "wrapper")))
 #+end_src
 ***** consult-dir.el
