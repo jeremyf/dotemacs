@@ -1,3 +1,4 @@
+
 # -*- org-insert-tilde-language: emacs-lisp; -*-
 #+TITLE: Forem Configuration
 #+AUTHOR: Jeremy Friesen
@@ -38,43 +39,6 @@ For example, we have multiple repositories at Forem.  Some are documenation
 oriented.  The “menu” for a documentation repository might be very different
 from the menu for a “code” repository.  Again, opening my thinking to
 possibilities and holding them lightly.
-
-* Forem Menu
-
-Next is my Forem menu; these are the functions to help me navigate various
-aspects of my work. As of <2022-02-12 Sat>, I have a “Browse Authorization
-System Project 46” in my menu.  When the project ends, I’ll remove that line.
-
-#+begin_src emacs-lisp
-  ;; Doing just a bit of hygiene.
-  (use-package transient :straight t)
-
-  (global-set-key (kbd "C-M-s-f") 'jf/menu--forem)
-  (transient-define-prefix jf/menu--forem ()
-    "Menu of Forem related functions."
-    [["Transformations"
-      ("C-p" "Tidy pull request" jf/forem-tidy-pull-request :if-non-nil hammerspoon-edit-minor-mode)
-      ("C-b" "Create branch from issue" jf/git-branch-create-from-safari :if-non-nil jf/forem-minor-mode)
-      ]]
-    [["Forem's Workflow"
-      ("i" "All issues…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/issues/")))
-      ("j" "Browse to pro[j]ects…" (lambda () (interactive) (browse-url "https://github.com/orgs/forem/projects/")))
-      ("m" "Browse [m]erged Pull Requests…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/pulls?q=is%3Apr+is%3Aclosed")))
-      ("p" "Browse to pull requests…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/pulls/")))
-      ]
-     ["Jeremy's Workflow"
-      ("a" "Browse Authorization System Project 46" (lambda () (interactive) (browse-url "https://github.com/orgs/forem/projects/46")))
-      ("I" "My issues…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/issues/assigned/jeremyf")))
-      ("J" "Browse to Content Experience pro[J]ects…" (lambda () (interactive) (browse-url "https://github.com/orgs/forem/projects/39")))
-      ("M" "Browse Jeremy's [M]erged Pull Requests…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/pulls/jeremyf?q=is%3Apr+is%3Aclosed")))
-      ("P" "Browse to Jeremy's [P]ull requests…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/pulls/jeremyf")))
-      ("N" "Browse Github [N]otifications" (lambda () (interactive) (browse-url "https://github.com/notifications")))
-      ]
-     ["Org-Mode"
-      ("D" "[D]ashboard open…" jf/open-dashboard)
-      ("d" "Visit [d]ashboard file…" (lambda () (interactive) (find-file jf/forem-dashboard-filename)))
-      ]])
-#+end_src
 
 * Further Automation
 
@@ -173,6 +137,31 @@ This gets me what I want, and helps frame the next exercise (e.g. “For the
 current branch, open the corresponding issue in the browser”).  It also has me
 thinking that I might want to inject into my commit message a “References
 #:number” line.  That sounds like another function.
+
+#+begin_src emacs-lisp
+  (cl-defun jf/git-github-issue-short-ref (parg &key (url-template "https://github.com/%s/issues/%s" ))
+    "This function will parse the current branch and open the Github issue.
+
+  With no universal PARG, browse to the associated github issue.
+  With universal PARG, insert github short ref.
+
+  Regardless, add the github short ref to the kill ring.
+
+  Plays nicely with `jf/git-branch-create'"
+    (interactive "P")
+    (let* ((prefix (car parg))
+	   (branch (magit-get-current-branch))
+	   (gh-short-ref (cadr (s-split "---" branch)))
+	   (parts (s-split "#" gh-short-ref))
+	   (repo (car parts))
+	   (number (cadr parts))
+	   (url (format url-template repo number)))
+      (kill-new gh-short-ref)
+      (message "\"%s\" added to kill-ring" gh-short-ref)
+      (if (not prefix)
+	  (browse-url url)
+	(insert gh-short-ref))))
+#+end_src
 
 
 ** Tidying a Pull Request
@@ -278,6 +267,49 @@ describe them.
 
 As I look at this Dashboard with fresh eyes, I think I may move this concept to
 my ~indesk~ framing; See [[file:configuration.org][Configuration.org]] for details.
+
+* Forem Menu
+
+Next is my Forem menu; these are the functions to help me navigate various
+aspects of my work. As of <2022-02-12 Sat>, I have a “Browse Authorization
+System Project 46” in my menu.  When the project ends, I’ll remove that line.
+
+#+begin_src emacs-lisp
+  ;; Doing just a bit of hygiene.
+  (use-package transient :straight t)
+
+  (global-set-key (kbd "C-M-s-f") 'jf/menu--forem)
+  (transient-define-prefix jf/menu--forem ()
+    "Menu of Forem related functions."
+    [["Transformations"
+      ("C-p" "Tidy pull request" jf/forem-tidy-pull-request :if-non-nil hammerspoon-edit-minor-mode)
+      ("C-b" "Create branch from issue" jf/git-branch-create-from-safari :if-non-nil jf/forem-minor-mode)
+      ("C-i" "Goto issue for branch" jf/git-github-issue-short-ref :if-non-nil jf/forem-minor-mode)
+      ]]
+    [["Forem's Workflow"
+      ("i" "All issues…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/issues/")))
+      ("j" "Browse to pro[j]ects…" (lambda () (interactive) (browse-url "https://github.com/orgs/forem/projects/")))
+      ("m" "Browse [m]erged Pull Requests…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/pulls?q=is%3Apr+is%3Aclosed")))
+      ("p" "Browse to pull requests…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/pulls/")))
+      ]
+     ["Jeremy's Workflow"
+      ("a" "Browse Authorization System Project 46" (lambda () (interactive) (browse-url "https://github.com/orgs/forem/projects/46")))
+      ("I" "My issues…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/issues/assigned/jeremyf")))
+      ("J" "Browse to Content Experience pro[J]ects…" (lambda () (interactive) (browse-url "https://github.com/orgs/forem/projects/39")))
+      ("M" "Browse Jeremy's [M]erged Pull Requests…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/pulls/jeremyf?q=is%3Apr+is%3Aclosed")))
+      ("P" "Browse to Jeremy's [P]ull requests…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/pulls/jeremyf")))
+      ("N" "Browse Github [N]otifications" (lambda () (interactive) (browse-url "https://github.com/notifications")))
+      ]
+     ["Org-Mode"
+      ("D" "[D]ashboard open…" jf/open-dashboard)
+      ("d" "Visit [d]ashboard file…" (lambda () (interactive) (find-file jf/forem-dashboard-filename)))
+      ]])
+#+end_src
+
+#+RESULTS:
+| [1 transient-columns nil ([1 transient-column (:description Transformations) ((1 transient-suffix (:key C-p :description Tidy pull request :command jf/forem-tidy-pull-request :if-non-nil hammerspoon-edit-minor-mode)) (1 transient-suffix (:key C-b :description Create branch from issue :command jf/git-branch-create-from-safari :if-non-nil jf/forem-minor-mode)) (1 transient-suffix (:key C-i :description Goto issue for branch :command jf/git-github-issue-short-ref :if-non-nil jf/forem-tidy-pull-request)))])] | [1 transient-columns nil ([1 transient-column (:description Forem's Workflow) ((1 transient-suffix (:key i :description All issues… :command transient:jf/menu--forem:All issues…)) (1 transient-suffix (:key j :description Browse to pro[j]ects… :command transient:jf/menu--forem:Browse to pro[j]ects…)) (1 transient-suffix (:key m :description Browse [m]erged Pull Requests… :command transient:jf/menu--forem:Browse [m]erged Pull Requests…)) (1 transient-suffix (:key p :description Browse to pull requests… :command transient:jf/menu--forem:Browse to pull requests…)))] [1 transient-column (:description Jeremy's Workflow) ((1 transient-suffix (:key a :description Browse Authorization System Project 46 :command transient:jf/menu--forem:Browse Authorization System Project 46)) (1 transient-suffix (:key I :description My issues… :command transient:jf/menu--forem:My issues…)) (1 transient-suffix (:key J :description Browse to Content Experience pro[J]ects… :command transient:jf/menu--forem:Browse to Content Experience pro[J]ects…)) (1 transient-suffix (:key M :description Browse Jeremy's [M]erged Pull Requests… :command transient:jf/menu--forem:Browse Jeremy's [M]erged Pull Requests…)) (1 transient-suffix (:key P :description Browse to Jeremy's [P]ull requests… :command transient:jf/menu--forem:Browse to Jeremy's [P]ull requests…)) (1 transient-suffix (:key N :description Browse Github [N]otifications :command transient:jf/menu--forem:Browse Github [N]otifications)))] [1 transient-column (:description Org-Mode) ((1 transient-suffix (:key D :description [D]ashboard open… :command jf/open-dashboard)) (1 transient-suffix (:key d :description Visit [d]ashboard file… :command transient:jf/menu--forem:Visit [d]ashboard file…)))])] |
+
+
 
 * Conclusion
 
