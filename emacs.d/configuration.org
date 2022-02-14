@@ -776,15 +776,15 @@ There’s a macro in here somewhere.
 	      (region-beginning) (region-end)))
 	   rest))
 
-  (defun jf/consult-ripgrep-wrapper (consult-fn &optional dir initial)
-    "Advising function around CONSULT-FN."
-    (interactive "P")
-    (apply consult-fn
-	   dir
-	   (if (use-region-p)
-	       (buffer-substring (region-beginning) (region-end))
-	     initial)))
+  (defun jf/consult-ripgrep-wrapper (consult-fn &optional dir given-initial)
+    "Advising function around CONSULT-FN.
 
+  DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
+    (interactive)
+    (let ((initial (list (or given-initial
+		    (when (use-region-p)
+		      (buffer-substring (region-beginning) (region-end)))))))
+      (apply consult-fn dir initial)))
 
   (advice-add #'consult-line
 	      :around #'jf/consult-first-param-is-initial-text
