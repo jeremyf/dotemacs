@@ -780,10 +780,9 @@ There’s a macro in here somewhere.
     "Advising function around CONSULT-FN."
     (interactive "P")
     (apply consult-fn
-	   first
+	   dir
 	   (if (use-region-p)
-	     (buffer-substring
-	      (region-beginning) (region-end))
+	       (buffer-substring (region-beginning) (region-end))
 	     initial)))
 
 
@@ -2745,6 +2744,12 @@ While I’m playing in a session, my entire context ideally collapses to the
 relevant tags that I’ve established at the beginning of the session.  That way
 I’m certain that I’m filing away notes to their proper location.
 
+**** Org Transclutions
+
+#+begin_src emacs-lisp
+  (use-package org-transclusion :straight t)
+#+end_src
+
 **** org-d20.el
 
 - ~org-d20.el~ :: I’m really only using this for the ~org-d20--roll~ function.
@@ -4405,7 +4410,7 @@ those modes.
 
 ** Burning Wheel
 
-Let’s add some [[file:burning-wheel-emacs-config.org][Burning Wheel Tooling]].
+I wrote [[file:burning-wheel-emacs-config.org][some tooling to help wile playing Burning Wheel]].
 
 #+begin_src emacs-lisp
   (org-babel-load-file
