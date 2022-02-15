@@ -780,7 +780,7 @@ There’s a macro in here somewhere.
     "Advising function around CONSULT-FN.
 
   DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
-    (interactive)
+    (interactive "P")
     (let ((initial (list (or given-initial
 		    (when (use-region-p)
 		      (buffer-substring (region-beginning) (region-end)))))))

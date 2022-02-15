@@ -88,7 +88,7 @@ repository.
     "Create a git branch in project DIRECTORY from Safari url."
     (interactive (list (projectile-completing-read
 			     "Project name: "
-			     (projectile-relevant-known-projects))))
+			     projectile-known-projects)))
     (catch 'not-a-github-repository
       (let* ((link-title-pair (grab-mac-link-safari-1))
 	     (url (car link-title-pair)))
