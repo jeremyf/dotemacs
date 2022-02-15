@@ -34,13 +34,13 @@ Wheel Gold.
     :body
     (s-join
      "\n"
-     '("Common knowledge ............. Ob 1"
-       "An interesting fact .......... Ob 2"
-       "Details ...................... Ob 3"
-       "Uncommon knowledge ........... Ob 4"
-       "Rare goods ................... Ob 5"
-       "Bizarre or obscure ........... Ob 7"
-       "Freaky details or specifics .. Ob 8")))
+     '("Common knowledge .............. Ob 1"
+       "An interesting fact ........... Ob 2"
+       "Details ....................... Ob 3"
+       "Uncommon knowledge ............ Ob 4"
+       "Rare goods .................... Ob 5"
+       "Bizarre or obscure ............ Ob 7"
+       "Freaky details or specifics ... Ob 8")))
 
   (jf/transient-quick-help jf/bwg-qh-expertise-exponent
     :label "Exponents"
@@ -149,22 +149,22 @@ Wheel Gold.
     (s-join
      "\n"
      '("Conditions for Steel Advantags"
-       "  Being startled by something mundane ........ +2D"
-       "  Feeling safe in a group of friends/allies .. +1D"
+       "  Being startled by something mundane ......... +2D"
+       "  Feeling safe in a group of friends/allies ... +1D"
        ""
        "Conditions for Steel Disadvantages"
-       "  Being shot at .............................. +1 Ob"
-       "  Being directly affect by magic ............. +1 Ob"
-       "  Witnessing a person killed ................. +1 Ob"
-       "  Small explosions ........................... +2 Ob"
-       "  Committing murder .......................... +2 Ob"
-       "  Explosions ................................. +3 Ob"
-       "  Witnessing pronounced sorcery at play ...... +3 Ob"
-       "  Seeing a ghost ............................. +3 Ob"
-       "  Seeing the living dead ..................... +4 Ob"
-       "  Volcanic eruptions, cataclysm .............. +4 Ob"
-       "  Seeing horrible magic at work .............. +4 Ob"
-       "  Being in the presence of the supernatural .. +5 Ob")))
+       "  Being shot at ............................... +1 Ob"
+       "  Being directly affect by magic .............. +1 Ob"
+       "  Witnessing a person killed .................. +1 Ob"
+       "  Small explosions ............................ +2 Ob"
+       "  Committing murder ........................... +2 Ob"
+       "  Explosions .................................. +3 Ob"
+       "  Witnessing pronounced sorcery at play ....... +3 Ob"
+       "  Seeing a ghost .............................. +3 Ob"
+       "  Seeing the living dead ...................... +4 Ob"
+       "  Volcanic eruptions, cataclysm ............... +4 Ob"
+       "  Seeing horrible magic at work ............... +4 Ob"
+       "  Being in the presence of the supernatural ... +5 Ob")))
 #+end_src
 
 ** Physical Trauma Gray Scale (PTGS)
