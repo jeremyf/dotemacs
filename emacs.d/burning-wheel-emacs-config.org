@@ -139,8 +139,7 @@ Wheel Gold.
        "Place/Time"
        "  Prior to important test ......... +0 Ob"
        "  Prior to conflict ............... +1 Ob"
-       "  In midst of conflict ............ +3 Ob"
-       )))
+       "  In midst of conflict ............ +3 Ob")))
 
   (jf/transient-quick-help jf/bwg-qh-steel-test-adjustments
     :header "BWG Steel Test Adjustments (page 363)"
@@ -211,21 +210,21 @@ elegant, but it works.
 	   (power-index (-elem-index (upcase power) jf/bwg-mortal-wounds-scale)))
       (unless forte-index (throw 'invalid-entry (format "Invalid Forte %s" forte)))
       (unless power-index (throw 'invalid-entry (format "Invalid Power %s" power)))
-      (let ((scale (cond ((and (< forte-index 14) (< power-index 14))
+      (let ((scale (cond ((and (< forte-index 17) (< power-index 17))
 			  (jf/bwg-qh-ptgs--shade-black forte-index
 						       power-index
 						       round-up))
-			 ((and (< forte-index 14) (< power-index 28))
+			 ((and (< forte-index 17) (< power-index 34))
 			  (jf/bwg-qh-ptgs--shade-black forte-index
-						       (- power-index 13)
+						       (- power-index 16)
 						       round-up
 						       :add 2))
-			 ((and (< forte-index 28) (< power-index 14))
-			  (jf/bwg-qh-ptgs--shade-black (- forte-index 13)
+			 ((and (< forte-index 34) (< power-index 17))
+			  (jf/bwg-qh-ptgs--shade-black (- forte-index 16)
 						       power-index
 						       round-up
 						       :add 2))
-			 ((and (< forte-index 28) (< power-index 28))
+			 ((and (< forte-index 34) (< power-index 34))
 			  (jf/bwg-qh-ptgs--shade-gray forte-index
 						      power-index
 						      round-up)))))
