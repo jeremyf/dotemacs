@@ -49,7 +49,7 @@ and safe creation of a branch.
 
 My goal is to have the branch name adhear to the following convention:
 
-- :githubUserName/:slugifiedDescription---:owner/:repo#:number
+- :githubUserName/issue---:owner/:repo#:number
 
 Why do this?  First, I want to “entice” myself to use Issue tracking.  This is
 good collaborative form.  Second, with a predictable branch name, I can later
@@ -97,7 +97,8 @@ repository.
 	(let* ((title (cadr link-title-pair))
 	       (slugs (s-split "/" url))
 	       (suffix (format  "%s/%s#%s" (nth 3 slugs) (nth 4 slugs) (nth 6 slugs)))
-	       (slugified-title (replace-regexp-in-string "-?\.-issue-[[:digit:]]+.*" "" (jf/tor-convert-text-to-slug title)))
+	       (slugified-title "issue")
+	       ;; (slugified-title (replace-regexp-in-string "-?\.-issue-[[:digit:]]+.*" "" (jf/tor-convert-text-to-slug title)))
 	       (prefix (format "%s/%s" jf/github-username slugified-title))
 	       (branch-name (concat prefix "---" suffix)))
 	  (message (jf/git-branch-create :branch-name branch-name :directory directory))))))
@@ -305,11 +306,6 @@ System Project 46” in my menu.  When the project ends, I’ll remove that line
       ("d" "Visit [d]ashboard file…" (lambda () (interactive) (find-file jf/forem-dashboard-filename)))
       ]])
 #+end_src
-
-#+RESULTS:
-| [1 transient-columns nil ([1 transient-column (:description Transformations) ((1 transient-suffix (:key C-p :description Tidy pull request :command jf/forem-tidy-pull-request :if-non-nil hammerspoon-edit-minor-mode)) (1 transient-suffix (:key C-b :description Create branch from issue :command jf/git-branch-create-from-safari :if-non-nil jf/forem-minor-mode)) (1 transient-suffix (:key C-i :description Goto issue for branch :command jf/git-github-issue-short-ref :if-non-nil jf/forem-tidy-pull-request)))])] | [1 transient-columns nil ([1 transient-column (:description Forem's Workflow) ((1 transient-suffix (:key i :description All issues… :command transient:jf/menu--forem:All issues…)) (1 transient-suffix (:key j :description Browse to pro[j]ects… :command transient:jf/menu--forem:Browse to pro[j]ects…)) (1 transient-suffix (:key m :description Browse [m]erged Pull Requests… :command transient:jf/menu--forem:Browse [m]erged Pull Requests…)) (1 transient-suffix (:key p :description Browse to pull requests… :command transient:jf/menu--forem:Browse to pull requests…)))] [1 transient-column (:description Jeremy's Workflow) ((1 transient-suffix (:key a :description Browse Authorization System Project 46 :command transient:jf/menu--forem:Browse Authorization System Project 46)) (1 transient-suffix (:key I :description My issues… :command transient:jf/menu--forem:My issues…)) (1 transient-suffix (:key J :description Browse to Content Experience pro[J]ects… :command transient:jf/menu--forem:Browse to Content Experience pro[J]ects…)) (1 transient-suffix (:key M :description Browse Jeremy's [M]erged Pull Requests… :command transient:jf/menu--forem:Browse Jeremy's [M]erged Pull Requests…)) (1 transient-suffix (:key P :description Browse to Jeremy's [P]ull requests… :command transient:jf/menu--forem:Browse to Jeremy's [P]ull requests…)) (1 transient-suffix (:key N :description Browse Github [N]otifications :command transient:jf/menu--forem:Browse Github [N]otifications)))] [1 transient-column (:description Org-Mode) ((1 transient-suffix (:key D :description [D]ashboard open… :command jf/open-dashboard)) (1 transient-suffix (:key d :description Visit [d]ashboard file… :command transient:jf/menu--forem:Visit [d]ashboard file…)))])] |
-
-
 
 * Conclusion
 

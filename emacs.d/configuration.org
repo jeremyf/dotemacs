@@ -1207,6 +1207,13 @@ More on these component matchings styles is available at [[https://github.com/mi
     :bind ("<C-s-f12>" . buf-move))
 #+end_src
 
+**** Folding
+
+#+begin_src emacs-lisp
+  (use-package yafolding
+    :straight t)
+#+end_src
+
 **** rainbow-delimiters.el
 
 - ~rainbow-delimiters.el~ :: A quick and useful visual queue for paranthesis.
@@ -2262,6 +2269,9 @@ See [[https://kitchingroup.cheme.cmu.edu/blog/2016/06/16/Copy-formatted-org-mode
 details.  One addition I made was to add the ~-inputencoding UTF-8~ switch.
 Without it, I would end up with some weird characters from odd smartquote
 handling.
+
+/Note:/ For this to work, I needed to permit my =\~/bin/emacsclient= iin the
+Security & Privacy > Accessibility system preference.  /At least I think that’s what got things working./
 
 #+begin_src emacs-lisp
   (global-set-key (kbd "C-M-s-c") 'jf/formatted-copy-org-to-html)
