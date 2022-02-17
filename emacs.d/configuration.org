@@ -1635,8 +1635,6 @@ without this setting, Emacs will happily render the SVG as an image,
     :straight t
     :hook (enh-ruby-mode . yard-mode))
 #+end_src
-
-
 *** Transformations
 **** titlecase.el
 
@@ -4387,6 +4385,13 @@ I want to reference.
 
 /Note:/ It might make sense to extract the quick help to files, but for now
 this was the least effort.
+
+*** Keyboard Macros
+
+#+begin_src emacs-lisp
+  (org-babel-load-file
+     (concat user-emacs-directory "keyboard-macros-config.org"))
+#+end_src
 
 *** Minor Modes
 

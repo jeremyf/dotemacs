@@ -1,0 +1,27 @@
+# -*- org-insert-tilde-language: emacs-lisp; -*-
+#+TITLE: Keyboard Macros Configuration
+#+AUTHOR: Jeremy Friesen
+#+EMAIL: jeremy@jeremyfriesen.com
+#+STARTUP: showall
+#+OPTIONS: toc:3
+
+As I’m using Emacs with greater regularity, I’ve been leveraging keyboard
+Macros.  Sometimes I should save those.
+
+#+begin_src emacs-lisp
+  (defun jf/save-macro (name)
+    "Save a macro.  Take a NAME as argument and save the last defined macro under this name at the end of your .emacs"
+    (interactive "SName of the macro: ")
+    (kmacro-name-last-macro name)
+    (find-file "~/git/dotemacs/emacs.d/keyboard-macros-config.org")
+    (goto-char (point-max))
+    (insert (format "\n\n** TODO %s macro\n\nCreated on" name))
+    (org-insert-time-stamp nil nil nil)
+    (insert "\n\n#+begin_src emacs-lisp\n")
+    (insert-kbd-macro name)
+    (insert "\n#+end_src\n")
+    (save-buffer)
+    (switch-to-buffer nil))
+#+end_src
+
+* Macros
