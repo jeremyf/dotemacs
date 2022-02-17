@@ -1064,6 +1064,22 @@ More on these component matchings styles is available at [[https://github.com/mi
     :straight t)
 #+end_src
 
+**** ibuffer-sidebar.el
+
+Prioir to Emacs, I might use a side panel for directory/file navigation.
+However, that’s something I just don’t use in Emacs.  Instead, I’m thinking
+about buffers.
+
+The ~ibuffer-sidebar~ package provides an interesting take on the side panel.
+It shows me what I’ve opened.  I like that.
+
+#+begin_src emacs-lisp
+  (global-set-key (kbd "s-4") 'ibuffer-sidebar-toggle-sidebar)
+  (use-package ibuffer-sidebar
+    :straight t
+    :commands (ibuffer-sidebar-toggle-sidebar))
+#+end_src
+
 *** Display
 **** lin.el
 
