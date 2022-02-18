@@ -232,6 +232,7 @@ bit.  Also enable a few that I find helpful.  (I’ll enable a lot more later).
   (global-set-key (kbd "<s-up>") 'beginning-of-buffer)
   (global-set-key (kbd "s-q") 'save-buffers-kill-terminal)
   (global-set-key (kbd "s-w") 'kill-current-buffer)
+  (global-set-key (kbd "C-x C-b") 'ibuffer)
 #+end_src
 
 Some basic packages to keep things less chatty.
