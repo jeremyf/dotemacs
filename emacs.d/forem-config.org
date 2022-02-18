@@ -198,7 +198,7 @@ pull request) and tidies it up so I can fill out the primary fields.
 
     ;; Remove HTML/Markdown comments
     (replace-regexp
-     "\\(\n\\)*<!--\\(.\\|\n\\)*-->\\(\n\\)*"
+     "\\(\n\\)*<!--\\(.\\|\n\\)+?-->\\(\n\\)*"
      "")
 
     (beginning-of-buffer)
