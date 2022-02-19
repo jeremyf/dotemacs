@@ -1,0 +1,33 @@
+# -*- org-insert-tilde-language: emacs-lisp; -*-
+#+TITLE: Org Mode Macros
+#+AUTHOR: Jeremy Friesen
+#+EMAIL: jeremy@jeremyfriesen.com
+#+hugo_base_dir: ~/git/takeonrules.source/
+#+STARTUP: showall
+#+OPTIONS: toc:3
+
+#+begin_src emacs-lisp
+  (use-package ox-hugo
+    :straight t
+    :after ox)
+#+end_src
+
+#+begin_src emacs-lisp
+  (setq org-export-global-macros (list))
+#+end_src
+
+First, I’m considering swapping in and out the macros based on export context.  But I’m getting ahead of myself.
+
+* General
+
+#+begin_src emacs-lisp
+  (add-to-list 'org-export-global-macros
+	       '("kbd" . "@@html:<kbd>@@$1@@html:</kbd>@@"))
+#+end_src
+
+* Hugo Specific
+
+#+begin_src emacs-lisp
+  (add-to-list 'org-export-global-macros
+	       '("glossary" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" >}}@@"))
+#+end_src
