@@ -621,8 +621,9 @@ When I start writing functions, there’s a few packages I want to consider.
   with an almost identical parameter list.
 
 #+begin_src emacs-lisp
-  (use-package ripgrep
-    :init (setq ripgrep-arguments "--ignore-case")
+  (use-package rg
+    :config (rg-enable-menu)
+    ;; :init (setq ripgrep-arguments "--ignore-case")
     :straight t)
 #+end_src
 
