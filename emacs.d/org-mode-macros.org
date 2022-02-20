@@ -2,7 +2,6 @@
 #+TITLE: Org Mode Macros
 #+AUTHOR: Jeremy Friesen
 #+EMAIL: jeremy@jeremyfriesen.com
-#+hugo_base_dir: ~/git/takeonrules.source/
 #+STARTUP: showall
 #+OPTIONS: toc:3
 
@@ -16,18 +15,30 @@
   (setq org-export-global-macros (list))
 #+end_src
 
-First, I’m considering swapping in and out the macros based on export context.  But I’m getting ahead of myself.
+First, I’m considering swapping in and out the macros based on export context.
+But I’m getting ahead of myself.
 
-* General
+* Macro Expansion
+
+** General
 
 #+begin_src emacs-lisp
   (add-to-list 'org-export-global-macros
 	       '("kbd" . "@@html:<kbd>@@$1@@html:</kbd>@@"))
 #+end_src
 
-* Hugo Specific
+** Hugo Specific
 
 #+begin_src emacs-lisp
   (add-to-list 'org-export-global-macros
 	       '("glossary" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" >}}@@"))
+
+  (add-to-list 'org-export-global-macros
+	       '("abbr" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" abbr=\"t\" >}}@@"))
+
+  (add-to-list 'org-export-global-macros
+	       '("pdfn" . "@@html:<i class=\"dfn\">@@$1@@html:</i>@@"))
+
+  (add-to-list 'org-export-global-macros
+	       '("sidenote" . "@@hugo:{{< sidenote >}}@@$1@@hugo:{{< /sidenote >}}@@"))
 #+end_src
