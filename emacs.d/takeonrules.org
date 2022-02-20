@@ -59,7 +59,7 @@ render the description (perhaps with an indicator that this is).
 	   (url (jf/org-file-get-roam-refs filepath)))
       (if url (format "[%s](%s)" desc url)
 	;; I'm choosing the I-tag as it's similar to my i.dfn for pseudo-definitions.
-	(format "<i class=\"internal\">%s</i>" desc))))
+	(format "<i class=\"ref\">%s</i>" desc))))
 
   (cl-defun jf/org-file-get-roam-refs (filepath)
     "Return first ROAM_REFS property in the FILEPATH."
