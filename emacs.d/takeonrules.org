@@ -1,0 +1,68 @@
+# -*- org-insert-tilde-language: emacs-lisp; -*-
+:PROPERTIES:
+:ID:       C6186B18-0AEC-4863-B9D6-46BE400815F1
+:END:
+#+TITLE: Take on Rules
+#+SUBTITLE: Or How I Want to Test This Thing Out
+#+AUTHOR: Jeremy Friesen
+#+EMAIL: jeremy@jeremyfriesen.com
+#+filetags: :takeonrules:
+#+STARTUP: showall
+#+OPTIONS: toc:3
+
+* Org Export
+
+I want to add a custom org exporter for [[id:C8741E14-55FB-4250-A43B-2CCFB74A7A59][Take on Rules]].  First, I need to ensure
+that I have required ~ox~.
+
+#+BEGIN_SRC emacs-lisp
+  (use-package org
+    :init (require 'ox))
+#+END_SRC
+
+I use ~org-roam~ for my organization, so I’m assuming I’ll be exporting one
+file at a time.  I have considered using [[https://ox-hugo.scripter.co/][ox-hugo]], but it’s not quite what I’m
+after.  In [[id:23288DD9-9559-4870-A0BE-E01087A8EC5D][Migrating from Hugo to Org]], a private file, I considered what to do.
+/Note: When I use org’s export for this file, there shouldn’t be a link for
+Migrating from Hugo to Org.  However, those of you reading this file outside of
+the export will have a link to a Not Found resource/
+
+** Extending the Ox
+
+When I’m exporting an ~org~ file, it likely includes links to files on my
+file-system.  However, in that export, it’s not overly helpful to provide links
+to those personal files.
+
+Instead, I want to leverage [[https://www.orgroam.com/manual.html#Refs-1][org-roam ~ROAM_REFS~ property]].  During export, if the
+link is an ~id~ link, I’ll assume it’s an internal reference.  When that
+internal reference has a ~ROAM_REFS~ property, I’ll use that as the URL.
+Otherwise, I’ll assume I haven’t “exported” that document, and will instead
+render the description (perhaps with an indicator that this is).
+
+#+begin_src emacs-lisp
+  (defun jf/org-tor-link (fn link desc &rest rest)
+    "Conditional LINK and DESC rendering for ID-based links.
+
+  Otherwise `apply' the FN with the REST of the parameters."
+    (if (string= "id" (org-element-property :type link))
+	(jf/org-md-link-by-id link desc)
+      (apply fn link desc rest)))
+
+  (advice-add #'org-md-link :around #'jf/org-tor-link '((name . "wrapper")))
+  (advice-add #'org-hugo-link :around #'jf/org-tor-link '((name . "wrapper")))
+
+  (defun jf/org-md-link-by-id (link desc)
+    "With an \"id\" type LINK render the markdown.
+
+    DESC is the text of the link."
+    (let* ((filepath (org-id-find-id-file (org-element-property :path link)))
+	   (url (jf/org-file-get-roam-refs filepath)))
+      (if url (format "[%s](%s)" desc url)
+	;; I'm choosing the I-tag as it's similar to my i.dfn for pseudo-definitions.
+	(format "<i class=\"internal\">%s</i>" desc))))
+
+  (cl-defun jf/org-file-get-roam-refs (filepath)
+    "Return first ROAM_REFS property in the FILEPATH."
+    (with-current-buffer (find-file-noselect filepath)
+      (car (org-property-values "ROAM_REFS"))))
+#+end_src

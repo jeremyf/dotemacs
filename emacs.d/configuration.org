@@ -2272,6 +2272,14 @@ I cribbed the following function from [[https://xenodium.com/emacs-dwim-do-what-
 		 (call-interactively 'org-insert-link)))))
 #+end_src
 
+***** Ox Hugo Export
+
+#+begin_src emacs-lisp
+  (org-babel-load-file
+   (concat user-emacs-directory "org-mode-macros.org"))
+#+end_src
+
+
 ***** Copy Org and Paste in Rich Text Format
 
 Org Mode has built-in capabilities for exporting to HTML (and other languages).
@@ -3696,6 +3704,13 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
 
 
 *** TODO Blogging Functions
+
+
+#+begin_src emacs-lisp
+  (org-babel-load-file
+     (concat user-emacs-directory "takeonrules.org"))
+#+end_src
+
 
 #+begin_src emacs-lisp
   ;;******************************************************************************
