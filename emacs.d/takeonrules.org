@@ -1,3 +1,4 @@
+# -*- lexical-binding: t; -*-
 # -*- org-insert-tilde-language: emacs-lisp; -*-
 :PROPERTIES:
 :ID:       C6186B18-0AEC-4863-B9D6-46BE400815F1
@@ -6,9 +7,10 @@
 #+SUBTITLE: Or How I Want to Test This Thing Out
 #+AUTHOR: Jeremy Friesen
 #+EMAIL: jeremy@jeremyfriesen.com
-#+filetags: :takeonrules:
+#+FILETAGS: :takeonrules:
 #+STARTUP: showall
 #+OPTIONS: toc:3
+#+HUGO_BASE_DIR: ~/git/takeonrules.source
 
 * Org Export
 
@@ -66,3 +68,85 @@ render the description (perhaps with an indicator that this is).
     (with-current-buffer (find-file-noselect filepath)
       (car (org-property-values "ROAM_REFS"))))
 #+end_src
+
+#+begin_src emacs-lisp
+  (defun jf/export-org-to-tor ()
+    "Export current org buffer for TakeOnRules post."
+    (interactive)
+    ;; Ensure that we have an ID property.
+    (jf/export-org-to-tor--ensure-org-id-property)
+    (let* ((export-global-plist (jf/org-global-props-as-plist))
+	   (title (jf/export-org-to-tor--global-buffer-prop-ensure
+		   :key "TITLE"
+		   :plist export-global-plist))
+	   (subtitle (jf/export-org-to-tor--global-buffer-prop-ensure
+		      :key "SUBTITLE"
+		      :plist export-global-plist))
+	   (section (jf/export-org-to-tor--global-buffer-prop-ensure
+		     :key "HUGO_SECTION"
+		     :plist export-global-plist
+		     :default (format-time-string "content/%Y")))
+	   (format (jf/export-org-to-tor--global-buffer-prop-ensure
+		    :key "HUGO_FRONT_MATTER_FORMAT"
+		    :plist export-global-plist
+		    :default "yaml"))
+	   (base_dir (jf/export-org-to-tor--global-buffer-prop-ensure
+		      :key "HUGO_BASE_DIR"
+		      :plist export-global-plist
+		      :default "~/git/takeonrules.source")))
+      )
+    ;; - Inject front_matter_extra section
+    ;; - Add filetag :exported:
+
+
+    ;; During this process, write source-filename to exported-filename's
+    ;; metadata.
+    ;; (org-open-file (org-hugo-export-wim-to-md nil nil t))
+    )
+
+  (defun jf/export-org-to-tor--ensure-org-id-property ()
+    "Ensure the current buffer has an ID property."
+    (save-excursion
+      (beginning-of-buffer)
+      (org-id-get-create)))
+
+  (cl-defun jf/export-org-to-tor--global-buffer-prop-ensure (&key key plist (default nil) (buffer (current-buffer)))
+    "Ensure the BUFFER has the given KEY in the global PLIST, if not set the DEFAULT or prompt for it."
+    (let ((value (lax-plist-get plist key)))
+      (if value value
+	(jf/export-org-to-tor--global-buffer-prop-set
+	 :key key
+	 :buffer buffer
+	 :value (or default (read-from-minibuffer (format "%s: " key)))))))
+
+  (cl-defun jf/export-org-to-tor--global-buffer-prop-set (&key key value buffer)
+    "Set the global property named KEY to the VALUE for the given BUFFER"
+    (message "KEY %s\nVALUE %s" key value))
+
+  (defun jf/org-global-props-as-plist ()
+    (-flatten (mapcar (lambda (prop)
+	    (list (org-element-property :key prop)
+		  (org-element-property :value prop)))
+	    (jf/org-global-props "\\(FILETAGS\\|HUGO_FRONT_MATTER_FORMAT\\|HUGO_SECTION\\|HUGO_BASE_DIR\\|TITLE\\|SUBTITLE\\)"))))
+
+
+  (defun jf/org-global-props (&optional property buffer)
+    "Get the plists of global org properties of current buffer."
+    (unless property (setq property "PROPERTY"))
+    (with-current-buffer (or buffer (current-buffer))
+      (org-element-map
+	  (org-element-parse-buffer)
+	  'keyword
+	(lambda (el)
+	  (when (string-match property (org-element-property :key el)) el)))))
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+  ;; Stuff for your org-file:
+#+end_src
+
+** Things to Work
+
+- [ ] After export shift series from tag.
+- [ ] Include in export the source file; when rake publish, update ~ROAM_REFS~ of source.
+- [X] Adjust tags to have dashes.
+- [ ] ~org-hugo-export-snippet~ works for hugo, md, and markdhown contexts.
+  But this function doesn’t exist for markdown export.
