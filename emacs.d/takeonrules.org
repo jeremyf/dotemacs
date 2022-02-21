@@ -93,7 +93,7 @@ two concerns:
 			 :key "HUGO_SECTION"
 			 :plist export-global-plist
 			 :drawer drawer
-			 :default (format-time-string "content/%Y")))
+			 :default (format-time-string "posts/%Y")))
 	       (base_dir (jf/export-org-to-tor--global-buffer-prop-ensure
 			  :key "HUGO_BASE_DIR"
 			  :plist export-global-plist
@@ -110,7 +110,6 @@ two concerns:
 	       (title (jf/export-org-to-tor--global-buffer-prop-ensure
 		       :key "TITLE"
 		       :plist export-global-plist)))
-	  (org-roam-tag-add '("exported" "takeonrules"))
 	  (save-buffer)
 	  (jf/export-org-to-tor--inject-additional-front-matter
 	   :subtitle subtitle
