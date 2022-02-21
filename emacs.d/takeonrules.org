@@ -149,6 +149,7 @@ two concerns:
     (insert (concat
 	     "\n#+HUGO_CUSTOM_FRONT_MATTER: :slug " (jf/tor-convert-text-to-slug title)
 	     "\n#+HUGO_CUSTOM_FRONT_MATTER: :headline " subtitle
+	     "\n#+HUGO_CUSTOM_FRONT_MATTER: :date " (format-time-string "%Y-%m-%d %H:%M")
 	     "\n#+HUGO_CUSTOM_FRONT_MATTER: :type post"
 	     "\n#+HUGO_CUSTOM_FRONT_MATTER: :layout post"
 	     "\n#+HUGO_CUSTOM_FRONT_MATTER: :draft true"
