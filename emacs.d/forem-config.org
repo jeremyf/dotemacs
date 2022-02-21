@@ -288,6 +288,7 @@ System Project 46” in my menu.  When the project ends, I’ll remove that line
       ("C-i" "Goto issue for branch" jf/git-github-issue-short-ref :if-non-nil jf/forem-minor-mode)
       ]]
     [["Forem's Workflow"
+      ("e" "Browse Epics" (lambda () (interactive) (browse-url "https://github.com/forem/forem-internal-eng/issues/")))
       ("i" "All issues…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/issues/")))
       ("j" "Browse to pro[j]ects…" (lambda () (interactive) (browse-url "https://github.com/orgs/forem/projects/")))
       ("m" "Browse [m]erged Pull Requests…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/pulls?q=is%3Apr+is%3Aclosed")))
@@ -295,6 +296,7 @@ System Project 46” in my menu.  When the project ends, I’ll remove that line
       ]
      ["Jeremy's Workflow"
       ("a" "Browse Authorization System Project 46" (lambda () (interactive) (browse-url "https://github.com/orgs/forem/projects/46")))
+      ("E" "Browse Epics Assigned to Jeremy" (lambda () (interactive) (browse-url "https://github.com/forem/forem-internal-eng/issues/assigned/jeremyf")))
       ("I" "My issues…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/issues/assigned/jeremyf")))
       ("J" "Browse to Content Experience pro[J]ects…" (lambda () (interactive) (browse-url "https://github.com/orgs/forem/projects/39")))
       ("M" "Browse Jeremy's [M]erged Pull Requests…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/pulls/jeremyf?q=is%3Apr+is%3Aclosed")))
