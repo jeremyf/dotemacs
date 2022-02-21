@@ -70,75 +70,110 @@ render the description (perhaps with an indicator that this is).
 #+end_src
 
 #+begin_src emacs-lisp
-  (defun jf/export-org-to-tor ()
+  (cl-defun jf/export-org-to-tor (&key (buffer (current-buffer)))
     "Export current org buffer for TakeOnRules post."
     (interactive)
     ;; Ensure that we have an ID property.
-    (jf/export-org-to-tor--ensure-org-id-property)
-    (let* ((export-global-plist (jf/org-global-props-as-plist))
-	   (title (jf/export-org-to-tor--global-buffer-prop-ensure
-		   :key "TITLE"
-		   :plist export-global-plist))
-	   (subtitle (jf/export-org-to-tor--global-buffer-prop-ensure
-		      :key "SUBTITLE"
-		      :plist export-global-plist))
-	   (section (jf/export-org-to-tor--global-buffer-prop-ensure
-		     :key "HUGO_SECTION"
-		     :plist export-global-plist
-		     :default (format-time-string "content/%Y")))
-	   (format (jf/export-org-to-tor--global-buffer-prop-ensure
-		    :key "HUGO_FRONT_MATTER_FORMAT"
-		    :plist export-global-plist
-		    :default "yaml"))
-	   (base_dir (jf/export-org-to-tor--global-buffer-prop-ensure
-		      :key "HUGO_BASE_DIR"
-		      :plist export-global-plist
-		      :default "~/git/takeonrules.source")))
-      )
-    ;; - Inject front_matter_extra section
-    ;; - Add filetag :exported:
-
-
-    ;; During this process, write source-filename to exported-filename's
-    ;; metadata.
-    ;; (org-open-file (org-hugo-export-wim-to-md nil nil t))
-    )
+    (with-current-buffer buffer
+      (save-excursion
+	(let* ((org_id (jf/export-org-to-tor--ensure-org-id-property))
+	       (drawer (jf/export-org-to-tor--ensure-drawer "HUGO"))
+	       (export-global-plist (jf/org-global-props-as-plist))
+	       ;; Note this will be added after the :PROPERTIES::END:
+	       (section (jf/export-org-to-tor--global-buffer-prop-ensure
+			 :key "HUGO_SECTION"
+			 :plist export-global-plist
+			 :drawer drawer
+			 :default (format-time-string "content/%Y")))
+	       (base_dir (jf/export-org-to-tor--global-buffer-prop-ensure
+			  :key "HUGO_BASE_DIR"
+			  :plist export-global-plist
+			  :drawer drawer
+			  :default "~/git/takeonrules.source"))
+	       (format (jf/export-org-to-tor--global-buffer-prop-ensure
+			:key "HUGO_FRONT_MATTER_FORMAT"
+			:plist export-global-plist
+			:drawer drawer
+			:default "yaml"))
+	       (subtitle (jf/export-org-to-tor--global-buffer-prop-ensure
+			  :key "SUBTITLE"
+			  :plist export-global-plist))
+	       (title (jf/export-org-to-tor--global-buffer-prop-ensure
+		       :key "TITLE"
+		       :plist export-global-plist)))
+	  (org-roam-tag-add '("exported" "takeonrules"))
+	  (save-buffer)
+	  (jf/export-org-to-tor--inject-additional-front-matter
+	   :subtitle subtitle
+	   :title title
+	   :org_id org_id
+	   :drawer drawer)
+	  ;; Write metadata
+	  (save-buffer)
+	  (org-open-file (org-hugo-export-wim-to-md nil nil t))))))
 
   (defun jf/export-org-to-tor--ensure-org-id-property ()
     "Ensure the current buffer has an ID property."
-    (save-excursion
-      (beginning-of-buffer)
-      (org-id-get-create)))
+    (beginning-of-buffer)
+    (org-id-get-create))
 
-  (cl-defun jf/export-org-to-tor--global-buffer-prop-ensure (&key key plist (default nil) (buffer (current-buffer)))
-    "Ensure the BUFFER has the given KEY in the global PLIST, if not set the DEFAULT or prompt for it."
+  (defun jf/export-org-to-tor--ensure-drawer (name)
+    (beginning-of-buffer)
+    (if (search-forward-regexp
+	 (format ":%s:\n\\(.\\|\n\\)+?:END:\n" (upcase name))
+	 nil t)
+	(upcase name)
+      (progn
+	(beginning-of-buffer)
+	(search-forward-regexp ":PROPERTIES:\n\\(.\\|\n\\)+?:END:\n")
+	(insert (format ":%s:\n:END:\n" (upcase name)))
+	(upcase name))))
+
+  (cl-defun jf/export-org-to-tor--inject-additional-front-matter (&key org_id subtitle title drawer)
+    (beginning-of-buffer)
+    (search-forward-regexp "#\\+HUGO_FRONT_MATTER_FORMAT: yaml")
+    (insert (concat
+	     "\n#+begin_src yaml :front_matter_extra t"
+	     "\nslug: " (jf/tor-convert-text-to-slug title)
+	     "\nheadline: " subtitle
+	     "\ntype: post"
+	     "\nlayout: post"
+	     "\norg_id: " org_id
+	     "\n#+end_src"
+	     )))
+
+  (cl-defun jf/export-org-to-tor--global-buffer-prop-ensure (&key key plist (default nil) drawer)
+    "Ensure the current buffer has the given KEY in the global PLIST, if not set the DEFAULT or prompt for it."
     (let ((value (lax-plist-get plist key)))
       (if value value
 	(jf/export-org-to-tor--global-buffer-prop-set
 	 :key key
-	 :buffer buffer
+	 :drawer drawer
 	 :value (or default (read-from-minibuffer (format "%s: " key)))))))
 
-  (cl-defun jf/export-org-to-tor--global-buffer-prop-set (&key key value buffer)
-    "Set the global property named KEY to the VALUE for the given BUFFER"
-    (message "KEY %s\nVALUE %s" key value))
+  (cl-defun jf/export-org-to-tor--global-buffer-prop-set (&key key value drawer)
+    "Set the global property named KEY to the VALUE for the current buffer"
+    (beginning-of-buffer)
+    (if drawer
+	(search-forward-regexp (format "^:%s:\n" drawer))
+      (search-forward-regexp ":PROPERTIES:\n\\(.\\|\n\\)+?:END:\n"))
+    (insert (format "#+%s: %s\n" (upcase key) value)))
 
   (defun jf/org-global-props-as-plist ()
     (-flatten (mapcar (lambda (prop)
-	    (list (org-element-property :key prop)
-		  (org-element-property :value prop)))
-	    (jf/org-global-props "\\(FILETAGS\\|HUGO_FRONT_MATTER_FORMAT\\|HUGO_SECTION\\|HUGO_BASE_DIR\\|TITLE\\|SUBTITLE\\)"))))
+			(list (org-element-property :key prop)
+			      (org-element-property :value prop)))
+		      (jf/org-global-props "\\(FILETAGS\\|HUGO_FRONT_MATTER_FORMAT\\|HUGO_SECTION\\|HUGO_BASE_DIR\\|TITLE\\|SUBTITLE\\)"))))
 
 
-  (defun jf/org-global-props (&optional property buffer)
+  (defun jf/org-global-props (&optional property)
     "Get the plists of global org properties of current buffer."
     (unless property (setq property "PROPERTY"))
-    (with-current-buffer (or buffer (current-buffer))
       (org-element-map
 	  (org-element-parse-buffer)
 	  'keyword
 	(lambda (el)
-	  (when (string-match property (org-element-property :key el)) el)))))
+	  (when (string-match property (org-element-property :key el)) el))))
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;; Stuff for your org-file:
 #+end_src
