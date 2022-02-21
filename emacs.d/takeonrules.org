@@ -69,6 +69,15 @@ render the description (perhaps with an indicator that this is).
       (car (org-property-values "ROAM_REFS"))))
 #+end_src
 
+While the org export dispatcher is quite nice, I’m going to write
+~jf/export-org-to-tor~ to handle the export.  That function is responsible for
+two concerns:
+
+1. Ensuring that I have all of the necessary front-matter.
+2. Performing the export.
+
+/Note: at present my blog assumes Markdown front-matter./
+
 #+begin_src emacs-lisp
   (cl-defun jf/export-org-to-tor (&key (buffer (current-buffer)))
     "Export current org buffer for TakeOnRules post."
@@ -118,6 +127,7 @@ render the description (perhaps with an indicator that this is).
     (org-id-get-create))
 
   (defun jf/export-org-to-tor--ensure-drawer (name)
+    "Ensure that a top-level drawer with the given NAME."
     (beginning-of-buffer)
     (if (search-forward-regexp
 	 (format ":%s:\n\\(.\\|\n\\)+?:END:\n" (upcase name))
@@ -130,6 +140,10 @@ render the description (perhaps with an indicator that this is).
 	(upcase name))))
 
   (cl-defun jf/export-org-to-tor--inject-additional-front-matter (&key org_id subtitle title drawer)
+    "Export additional front matter.
+
+  We want to ensure that we export the ORG_ID, SUBTITLE, and TITLE.
+  When DRAWER is not nil, put the front-matter in the drawer."
     (beginning-of-buffer)
     (search-forward-regexp "#\\+HUGO_FRONT_MATTER_FORMAT: yaml")
     (insert (concat
@@ -138,6 +152,7 @@ render the description (perhaps with an indicator that this is).
 	     "\nheadline: " subtitle
 	     "\ntype: post"
 	     "\nlayout: post"
+	     "\ndraft: true"
 	     "\norg_id: " org_id
 	     "\n#+end_src"
 	     )))
@@ -174,8 +189,6 @@ render the description (perhaps with an indicator that this is).
 	  'keyword
 	(lambda (el)
 	  (when (string-match property (org-element-property :key el)) el))))
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  ;; Stuff for your org-file:
 #+end_src
 
 ** Things to Work
