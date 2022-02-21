@@ -116,9 +116,9 @@ two concerns:
 	   :title title
 	   :org_id org_id
 	   :drawer drawer)
+	  ;; Write metadata
 	  (save-buffer)
-	  (org-open-file (org-hugo-export-wim-to-md nil nil t))
-	  ))))
+	  (org-open-file (org-hugo-export-wim-to-md nil nil t))))))
 
   (defun jf/export-org-to-tor--ensure-org-id-property ()
     "Ensure the current buffer has an ID property."

@@ -4639,11 +4639,12 @@ some additional options.
       ]]
     ["Org"
      ["Add-Ons"
-      ("o c" "Context set…" jf/org-auto-tags--set-by-context :transient t)
-      ("o t" "Tag add…" org-roam-tag-add :if-derived org-mode)
-      ("o r" "Ref add…" org-roam-ref-add :if-derived org-mode)
-      ("o s" jf/org-auto-tags--transient :transient t)
-      ("o i" jf/indesk-current-files-on-desk--transient)
+      ("C-r" "Ref add…" org-roam-ref-add :if-derived org-mode)
+      ("C-s" "Tag as session report…" jf/org-tag-as-session-report :if-derived org-mode)
+      ("C-t" "Tag add…" org-roam-tag-add :if-derived org-mode)
+      ("M-c" "Context set…" jf/org-auto-tags--set-by-context :transient t)
+      ("M-s" jf/org-auto-tags--transient :transient t)
+      ("M-i" jf/indesk-current-files-on-desk--transient)
       ]
      ["Grag Refs"
       ("g e" "Elfeed" jf/menu--org-capture-elfeed-show :if-derived elfeed-show-mode)
