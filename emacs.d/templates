@@ -9,3 +9,4 @@ org-mode
 (Ob "{{{abbr(OB)}}}")
 (pdfn "{{{pdfn(" p ")}}}")
 (sn "{{{sidenote(" p ")}}}")
+(mn "HEY YOU SHOULD MAKE THIS")
