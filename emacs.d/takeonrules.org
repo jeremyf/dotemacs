@@ -181,11 +181,14 @@ two concerns:
       (search-forward-regexp ":PROPERTIES:\n\\(.\\|\n\\)+?:END:\n"))
     (insert (format "#+%s: %s\n" (upcase key) value)))
 
+  (defvar jf/tor-session-report-location
+    '("around the table" "via Zoom" "via Discord and Roll20")
+    "TakeOnRules session report locations")
+
   (cl-defun jf/org-tag-as-session-report (&key (buffer (current-buffer)))
     "Set the current BUFFER as a \"session-report\".
 
-  This involves adding a FILETAG and metadata around the details of the session report.
-  "
+  This involves adding a FILETAG and metadata around the details of the session report."
     (interactive)
     (with-current-buffer buffer
       (save-excursion
@@ -193,8 +196,8 @@ two concerns:
 	(jf/export-org-to-tor--ensure-org-id-property)
 	(org-roam-tag-add '("session-report"))
 	(let* ((date (org-read-date nil nil nil "Session Date"))
-	       (game "BURNING-WHEEL-GOLD")
-	       (location "via Discord and Roll20"))
+	       (game (completing-read "Game: " (jf/tor-game-list)))
+	       (location (completing-read "Location: " jf/tor-session-report-location)))
 	  (org-set-property "SESSION_REPORT_DATE" date)
 	  (org-set-property "SESSION_REPORT_GAME" game)
 	  (org-set-property "SESSION_REPORT_LOCATION" location)))))
