@@ -7,3 +7,5 @@ fundamental-mode ;; Available everywhere
 org-mode
 
 (Ob "{{{abbr(OB)}}}")
+(pdfn "{{{pdfn(" p ")}}}")
+(sn "{{{sidenote(" p ")}}}")
