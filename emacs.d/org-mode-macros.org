@@ -31,7 +31,7 @@ But I’m getting ahead of myself.
 
 #+begin_src emacs-lisp
   (add-to-list 'org-export-global-macros
-	       '("glossary" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" >}}@@"))
+	       '("mention" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" >}}@@"))
 
   (add-to-list 'org-export-global-macros
 	       '("abbr" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" abbr=\"t\" >}}@@"))
