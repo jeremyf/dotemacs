@@ -153,8 +153,7 @@ two concerns:
 	     "\n#+HUGO_CUSTOM_FRONT_MATTER: :type post"
 	     "\n#+HUGO_CUSTOM_FRONT_MATTER: :layout post"
 	     "\n#+HUGO_CUSTOM_FRONT_MATTER: :draft true"
-	     "\n#+HUGO_CUSTOM_FRONT_MATTER: :org_id " org_id
-	     ))
+	     "\n#+HUGO_CUSTOM_FRONT_MATTER: :org_id " org_id))
     (let ((date (car (org-property-values "SESSION_REPORT_DATE"))))
       (when date
 	(let ((game (car (org-property-values "SESSION_REPORT_GAME")))
