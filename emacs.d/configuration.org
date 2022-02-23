@@ -1,4 +1,12 @@
 # -*- org-insert-tilde-language: emacs-lisp; -*-
+:PROPERTIES:
+:ID:       82C14F1A-163D-4774-A27F-1D792495922A
+:END:
+:HUGO:
+#+HUGO_FRONT_MATTER_FORMAT: yaml
+#+HUGO_BASE_DIR: ~/git/takeonrules.source
+#+HUGO_SECTION: posts/2022
+:END:
 #+TITLE: Emacs Configuration
 #+AUTHOR: Jeremy Friesen
 #+EMAIL: jeremy@jeremyfriesen.com
@@ -2654,7 +2662,7 @@ And with all of that, let’s get into the org-roam configuration.
     :custom
     (org-roam-directory (file-truename "~/git/org"))
     (org-roam-node-display-template
-     (concat "${type:4}   ${title:*} "
+     (concat "${type:7}  ${title:*} "
 	     (propertize "${tags:40}" 'face 'org-tag)))
     (org-roam-capture-templates (jf/org-roam-templates-list :all))
     :bind (("C-s-f" . jf/org-roam-find-node)
@@ -4627,7 +4635,12 @@ some additional options.
       ("j f" "Flycheck" consult-flycheck :if-derived (or markdown-mode org-mode))
       ("j g" "Global Mark" consult-global-mark)
       ("j i" "Indesk" jf/indesk-jump-to-file :if-non-nil jf/indesk-current-files-on-desk)
-      ("j m" "Mark" consult-mark)
+      ("j m" "Mark" consult-mark)]
+     ["Dailies"
+      ("d p" "Pick a daily" org-roam-dailies-goto-date)
+      ("d t" "Today's daily" org-roam-dailies-goto-today)
+      ("d T" "Tomorrow's daily" org-roam-dailies-goto-tomorrow)
+      ("d y" "Yesterday's daily" org-roam-dailies-goto-yesterday)
       ]
      ["Modes"
       ;; I could write functions for these, but this is concise enough
@@ -4639,6 +4652,7 @@ some additional options.
       ]]
     ["Org"
      ["Add-Ons"
+      ("C-e" "Export to TakeOnRules…" jf/export-org-to-tor :if-derived org-mode)
       ("C-r" "Ref add…" org-roam-ref-add :if-derived org-mode)
       ("C-s" "Tag as session report…" jf/org-tag-as-session-report :if-derived org-mode)
       ("C-t" "Tag add…" org-roam-tag-add :if-derived org-mode)

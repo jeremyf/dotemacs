@@ -7,8 +7,7 @@
 
 #+begin_src emacs-lisp
   (use-package ox-hugo
-    :straight t
-    :after ox)
+    :straight t)
 #+end_src
 
 #+begin_src emacs-lisp
@@ -25,6 +24,9 @@ But I’m getting ahead of myself.
 #+begin_src emacs-lisp
   (add-to-list 'org-export-global-macros
 	       '("kbd" . "@@html:<kbd>@@$1@@html:</kbd>@@"))
+
+  (add-to-list 'org-export-global-macros
+	       '("date" . "@@html:<time datetime=\"$1\">@@$2@@html:</time>@@"))
 #+end_src
 
 ** Hugo Specific

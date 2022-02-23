@@ -6,7 +6,13 @@ fundamental-mode ;; Available everywhere
 
 org-mode
 
+(title "#+title: " p n "#+author: Jeremy Friesen" n "#+language: en" n n)
+(src "#+begin_src " p n> r> n> "#+end_src")
+(quote "#+begin_quote" n> r> n> "#+end_quote")
 (Ob "{{{abbr(OB)}}}")
 (pdfn "{{{pdfn(" p ")}}}")
 (sn "{{{sidenote(" p ")}}}")
 (mn "HEY YOU SHOULD MAKE THIS")
+(DoW "{{{pdfn(Duel of Wits)}}}")
+(ant "[[id:73B585B0-632C-441A-BAC6-E49B4D9A9A17][Antonius]]")
+(ans "[[id:95297E1A-AB4D-4395-A286-62EA72854493][Ansidora]]")
