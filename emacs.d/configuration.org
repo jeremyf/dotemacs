@@ -2682,7 +2682,7 @@ And with all of that, let’s get into the org-roam configuration.
 		   (window-parameters . ((no-other-window . t)
 					 (no-delete-other-windows . t)))))
     ;; When t the autocomplete in org documents will query the org roam database
-    (setq org-roam-completion-everywhere t)
+    ;; (setq org-roam-completion-everywhere t)
     (setq org-roam-v2-ack t)
     (org-roam-db-autosync-mode))
 
