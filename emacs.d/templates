@@ -14,5 +14,9 @@ org-mode
 (sn "{{{sidenote(" p ")}}}")
 (mn "HEY YOU SHOULD MAKE THIS")
 (DoW "{{{pdfn(Duel of Wits)}}}")
+(ltg "{{{linkToGame(" (p (completing-read "Game: " (jf/tor-game-list)) ) ")}}}")
+
+;; Burning Locusts
 (ant "[[id:73B585B0-632C-441A-BAC6-E49B4D9A9A17][Antonius]]")
 (ans "[[id:95297E1A-AB4D-4395-A286-62EA72854493][Ansidora]]")
+(fre "[[id:AF52E196-0DB9-4F91-AF15-D7B7BF51F624][Frederico]]")
