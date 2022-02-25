@@ -43,4 +43,7 @@ But I’m getting ahead of myself.
 
   (add-to-list 'org-export-global-macros
 	       '("sidenote" . "@@hugo:{{< sidenote >}}@@$1@@hugo:{{< /sidenote >}}@@"))
+
+  (add-to-list 'org-export-global-macros
+	       '("linkToGame" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" abbr=\"t\" >}}@@"))
 #+end_src
