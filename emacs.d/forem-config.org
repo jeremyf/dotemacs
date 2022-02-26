@@ -92,7 +92,7 @@ repository.
     (catch 'not-a-github-repository
       (let* ((link-title-pair (grab-mac-link-safari-1))
 	     (url (car link-title-pair)))
-	(unless (string-match "^https://github\\.com/[[:alpha:]]+/[[:alpha:]]+/issues?/[[:digit:]]+" url)
+	(unless (string-match "^https://github\\.com/[[:alpha:]]+/[^/]+/issues?/[[:digit:]]+" url)
 	  (throw 'not-a-github-repository (message "Expected URL \"%s\" to be a Github Issue URL." url)))
 	(let* ((title (cadr link-title-pair))
 	       (slugs (s-split "/" url))
