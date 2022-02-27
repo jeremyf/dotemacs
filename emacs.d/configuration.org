@@ -4656,7 +4656,9 @@ some additional options.
       ("j f" "Flycheck" consult-flycheck :if-derived (or markdown-mode org-mode))
       ("j g" "Global Mark" consult-global-mark)
       ("j i" "Indesk" jf/indesk-jump-to-file :if-non-nil jf/indesk-current-files-on-desk)
-      ("j m" "Mark" consult-mark)]
+      ("j m" "Mark" consult-mark)
+      ("j o" "Org File" jf/jump_to_corresponding_org_file :if-non-nil jf/tor-minor-mode)
+      ]
      ["Dailies"
       ("d p" "Pick a daily" org-roam-dailies-goto-date)
       ("d t" "Today's daily" org-roam-dailies-goto-today)

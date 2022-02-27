@@ -220,3 +220,20 @@ two concerns:
 	(lambda (el)
 	  (when (string-match property (org-element-property :key el)) el))))
 #+end_src
+
+** Jumping to the Blog Markdown File to Org File
+
+Given that I have files in my [[id:1173D588-E239-4B13-BFA6-0C670DCE484A][Hugo]] source directory, I want a way to jump to the corresponding [[id:1D7B007F-C257-412E-B329-3E85AB8BC43E][Org-Mode]] file.
+
+#+begin_src emacs-lisp
+  (cl-defun jf/jump_to_corresponding_org_file (&key (buffer (current-buffer)))
+    "Find the org id in the BUFFER and jump to corresponding file."
+    (interactive)
+    (with-current-buffer buffer
+      (save-excursion
+	(beginning-of-buffer)
+	(save-match-data
+	  (if (re-search-forward "\norg_id: \\(.+\\)\n" nil t)
+	      (find-file (org-id-find-id-file (match-string 1)))
+	    (message "Unable to find org_id: in document"))))))
+#+end_src
