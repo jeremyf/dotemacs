@@ -2693,7 +2693,7 @@ nodes that have all of the tags are candidates.
     (gnus-subsetp tag-list (org-roam-node-tags node)))
 #+end_src
 
-***** Configuration
+***** COMMENT Configuration
 
 I wrote three functions to mirror three core functions of org-mode:
 
@@ -2782,9 +2782,29 @@ And with all of that, let’s get into the org-roam configuration.
 		   (window-parameters . ((no-other-window . t)
 					 (no-delete-other-windows . t)))))
     ;; When t the autocomplete in org documents will query the org roam database
-    ;; (setq org-roam-completion-everywhere t)
+    (setq org-roam-completion-everywhere t)
     (setq org-roam-v2-ack t)
-    (org-roam-db-autosync-mode))
+    (org-roam-db-autosync-mode)
+
+    ;; This resolves the auto-complete prompt to conform to the contexts I
+    ;; previously wrote about.
+    (cl-defun org-roam--get-titles (&key (tag-list jf/org-auto-tags--current-list))
+      "Return all distinct titles and aliases in the Org-roam database.
+
+  When given a TAG-LIST select only titles that are associated with the given tag."
+      (if (and tag-list (> (length tag-list) 0))
+	  (mapcar #'car (org-roam-db-query
+			 [:select :distinct title :from nodes
+				  :inner :join tags :on (= tags:node_id nodes:id)
+				  :where (in tag $v1)
+				  :union :select alias :from aliases
+				  :inner :join tags :on (= tags:node_id aliases:node_id)
+				  :where (in tag $v1)]
+			 (list (seq--into-vector tag-list))))
+	(mapcar #'car (org-roam-db-query
+		       [:select :distinct title :from nodes
+				:union :select alias :from aliases])))))
+
 
   ;; This needs to be after the `org-roam’ declaration as it is dependent on the
   ;; structures of `org-roam'.
