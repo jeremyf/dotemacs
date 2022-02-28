@@ -22,7 +22,12 @@ that I have required ~ox~.
     :init (require 'ox))
 
   (use-package ox-hugo
-    :straight t)
+    :straight t
+    :custom (org-hugo-paired-shortcodes "marginnote sidenote"))
+
+
+  (with-eval-after-load 'ox-hugo
+    (add-to-list 'org-hugo-special-block-type-properties '("sidenote" . (:trim-pre t :trim-post t))))
 #+END_SRC
 
 I use ~org-roam~ for my organization, so I’m assuming I’ll be exporting one
@@ -120,6 +125,7 @@ two concerns:
 	   :drawer drawer)
 	  ;; Write metadata
 	  (save-buffer)
+	  (unless org-transclusion-mode (org-transclusion-mode))
 	  (org-open-file (org-hugo-export-wim-to-md nil nil t))))))
 
   (defun jf/export-org-to-tor--ensure-org-id-property ()

@@ -981,22 +981,57 @@ More on these component matchings styles is available at [[https://github.com/mi
 #+begin_src emacs-lisp
   (use-package corfu
     :straight t
+    :hook (lsp-completion-mode . jf/corfu-setup-lsp)
     :demand t
     ;; Optionally use TAB for cycling, default is `corfu-complete'.
     :bind (:map corfu-map
+		("<escape>". corfu-quit)
+		("<return>" . corfu-insert)
+		("M-d" . corfu-show-documentation)
+		("M-l" . 'corfu-show-location)
 		("TAB" . corfu-next)
 		([tab] . corfu-next)
 		("S-TAB" . corfu-previous)
 		([backtab] . corfu-previous))
-    :init
 
-    ;; Recommended: Enable Corfu globally.
+    :custom
+    ;; Works with `indent-for-tab-command'. Make sure tab doesn't indent when you
+    ;; want to perform completion
+    (tab-always-indent 'complete)
+    (completion-cycle-threshold nil)      ; Always show candidates in menu
+
+    (corfu-auto nil)
+    (corfu-auto-prefix 2)
+    (corfu-auto-delay 0.25)
+
+    (corfu-min-width 80)
+    (corfu-max-width corfu-min-width)     ; Always have the same width
+    (corfu-count 14)
+    (corfu-scroll-margin 4)
+    (corfu-cycle nil)
+
+    (corfu-echo-documentation nil)        ; Already use corfu-doc
+    (corfu-separator ?\s)                 ; Necessary for use with orderless
+    (corfu-quit-no-match 'separator)
+
+    (corfu-preview-current 'insert)       ; Preview current candidate?
+    (corfu-preselect-first t)             ; Preselect first candidate?
+
+    ;; Other
+    (lsp-completion-provider :none)       ; Use corfu instead for lsp completions
+
+    :init
+  ;; Recommended: Enable Corfu globally.
     ;; This is recommended since dabbrev can be used globally (M-/).
     (corfu-global-mode)
 
     :config
-    ;; Optionally enable cycling for `corfu-next' and `corfu-previous'.
-    (setq corfu-cycle t))
+    ;; Setup lsp to use corfu for lsp completion
+    (defun jf/corfu-setup-lsp ()
+      "Use orderless completion style with lsp-capf instead of the
+  default lsp-passthrough."
+      (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
+	    '(orderless))))
 #+end_src
 
 ***** Extending corfu.el
@@ -1015,6 +1050,68 @@ More on these component matchings styles is available at [[https://github.com/mi
     (let (completion-cycle-threshold completion-cycling)
       (apply #'consult-completion-in-region completion-in-region--data)))
   (define-key corfu-map "\M-m" #'corfu-move-to-minibuffer)
+#+end_src
+
+- ~kind-icons~ :: From [[https://kristofferbalintona.me/posts/corfu-kind-icon-and-corfu-doc/][Corfu, Kind-icon, and Corfu-doc | Kristoffer Balintona]]
+
+#+begin_src emacs-lisp
+  (use-package kind-icon
+    :straight t
+    :after corfu
+    :custom
+    (kind-icon-use-icons t)
+    (kind-icon-default-face 'corfu-default) ; Have background color be the same as `corfu' face background
+    (kind-icon-blend-background nil)  ; Use midpoint color between foreground and background colors ("blended")?
+    (kind-icon-blend-frac 0.08)
+
+    ;; NOTE 2022-02-05: `kind-icon' depends `svg-lib' which creates a cache
+    ;; directory that defaults to the `user-emacs-directory'. Here, I change that
+    ;; directory to a location appropriate to `no-littering' conventions, a
+    ;; package which moves directories of other packages to sane locations.
+    ;; (svg-lib-icons-dir (no-littering-expand-var-file-name "svg-lib/cache/")) ; Change cache dir
+    :config
+    (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter) ; Enable `kind-icon'
+
+    ;; Add hook to reset cache so the icon colors match my theme
+    ;; NOTE 2022-02-05: This is a hook which resets the cache whenever I switch
+    ;; the theme using my custom defined command for switching themes. If I don't
+    ;; do this, then the backgound color will remain the same, meaning it will not
+    ;; match the background color corresponding to the current theme. Important
+    ;; since I have a light theme and dark theme I switch between. This has no
+    ;; function unless you use something similar
+    (add-hook 'kb/themes-hooks #'(lambda () (interactive) (kind-icon-reset-cache))))
+#+end_src
+
+- ~corfu-doc~ :: From [[https://kristofferbalintona.me/posts/corfu-kind-icon-and-corfu-doc/][Corfu, Kind-icon, and Corfu-doc | Kristoffer Balintona]]
+
+#+begin_src emacs-lisp
+  (use-package corfu-doc
+    ;; NOTE 2022-02-05: At the time of writing, `corfu-doc' is not yet on melpa
+    :straight (corfu-doc :type git :host github :repo "galeo/corfu-doc")
+    :after corfu
+    :bind (:map corfu-map
+		;; This is a manual toggle for the documentation window.
+		([remap corfu-show-documentation] . corfu-doc-toggle) ; Remap the default doc command
+		;; Scroll in the documentation window
+		("M-n" . corfu-doc-scroll-up)
+		("M-p" . corfu-doc-scroll-down))
+    :custom
+    (corfu-doc-delay 0.5)
+    (corfu-doc-max-width 70)
+    (corfu-doc-max-height 20)
+
+    ;; NOTE 2022-02-05: I've also set this in the `corfu' use-package to be
+    ;; extra-safe that this is set when corfu-doc is loaded. I do not want
+    ;; documentation shown in both the echo area and in the `corfu-doc' popup.
+    (corfu-echo-documentation nil)
+    :config
+    ;; NOTE 2022-02-05: This is optional. Enabling the mode means that every corfu
+    ;; popup will have corfu-doc already enabled. This isn't desirable for me
+    ;; since (i) most of the time I do not need to see the documentation and (ii)
+    ;; when scrolling through many candidates, corfu-doc makes the corfu popup
+    ;; considerably laggy when there are many candidates. Instead, I rely on
+    ;; manual toggling via `corfu-doc-toggle'.
+    (corfu-doc-mode))
 #+end_src
 
 **** cape.el
@@ -1462,7 +1559,7 @@ for syntax highlighting and what have you.
     :hook ((ruby-mode . lsp)
 	   (enh-ruby-mode . lsp))
     :config (setq read-process-output-max (* 1024 1024 3)
-		  lsp-completion-provider nil
+		  lsp-completion-provider :none
 		  lsp-completion-mode nil
 		  lsp--show-message nil
 		  lsp-idle-delay 1.00)
