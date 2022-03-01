@@ -7,11 +7,7 @@
 
 The functions of this file build on functions from [[file:configuration.org][Configuration]].
 
-Being a programmer and someone who plays table top role-playing games (TTRPG),
-I’ve often used the TTRPG rules-set or systems to explore programming languages
-and processes.  After all, I understand the TTRPG rules well enough (or the
-algorithm’s description) that I can spend time thinking through my approach in
-a programming language.
+Being a programmer and someone who plays table top role-playing games (TTRPG), I’ve often used the TTRPG rules-set or systems to explore programming languages and processes.  After all, I understand the TTRPG rules well enough (or the algorithm’s description) that I can spend time thinking through my approach in a programming language.
 
 * Minor Mode for Burning Wheel
 
@@ -23,9 +19,7 @@ a programming language.
 
 * Quick Help Functions
 
-Most role-playing games I play may require a bit of consultation.  The following
-“quick help” methods are tables that I commonly reference when playing Burning
-Wheel Gold.
+Most role-playing games I play may require a bit of consultation.  The following “quick help” methods are tables that I commonly reference when playing Burning Wheel Gold.
 
 #+begin_src emacs-lisp
   (jf/transient-quick-help jf/bwg-qh-wises

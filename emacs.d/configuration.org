@@ -3933,7 +3933,16 @@ those modes.
 
 ** Burning Wheel
 
-I wrote [[file:burning-wheel-emacs-config.org][some tooling to help wile playing Burning Wheel]].
+I wrote [[file:burning-wheel-emacs-config.org][some tooling to help while playing Burning Wheel]].
+
+#+begin_src emacs-lisp
+  (org-babel-load-file
+   (concat user-emacs-directory "burning-wheel-emacs-config.org"))
+#+end_src
+
+** Eberron
+
+I wrote [[file:eberron.org][some tooling to help wile playing Burning Wheel]].
 
 #+begin_src emacs-lisp
   (org-babel-load-file
@@ -4093,6 +4102,7 @@ some additional options.
       ]]
     [["Contexts"
       ("-b" "Burning Wheel…"  jf/menu--bwg)
+      ("-e" "Eberron…" jf/menu--eberron)
       ("-f" "Forem…" jf/menu--forem)
       ("-t" "TakeOnRules…" jf/menu--tor)
       ]
