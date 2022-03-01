@@ -1,5 +1,4 @@
-# -*- lexical-binding: t; -*-
-# -*- org-insert-tilde-language: emacs-lisp; -*-
+# -*- lexical-binding: t; org-insert-tilde-language: emacs-lisp; -*-
 :PROPERTIES:
 :ID:       C6186B18-0AEC-4863-B9D6-46BE400815F1
 :END:
@@ -10,7 +9,6 @@
 #+FILETAGS: :takeonrules:
 #+STARTUP: showall
 #+OPTIONS: toc:3
-#+HUGO_BASE_DIR: ~/git/takeonrules.source
 
 * Org Export
 

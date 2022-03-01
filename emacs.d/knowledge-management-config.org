@@ -1,0 +1,679 @@
+# -*- lexical-binding: t; org-insert-tilde-language: emacs-lisp; -*-
+#+TITLE: Take on Rules
+#+SUBTITLE: Or How I Want to Test This Thing Out
+#+AUTHOR: Jeremy Friesen
+#+EMAIL: jeremy@jeremyfriesen.com
+#+FILETAGS: :takeonrules:
+#+STARTUP: showall
+#+OPTIONS: toc:3
+
+By now, with all that I’ve written, it should be evident that knowledge management is both a critical need and something that Emacs must certainly support.
+
+Another “killer feature” of Emacs is org-mode and it’s constellation of packages.
+
+* Org-Mode
+
+Oh ~org-mode~, one of the “why you should use Emacs” packages.  It’s a set of organizational tools that allow for progressive adoption.  You can start writing in ~org-mode~ syntax and leave it at that.  From there you can delve further into the ~org-mode~ ecosystem.
+
+A bit of pre-amble.  I maintain a list of data directories, each might have “relevant to org-mode” files.  The ~jf/org-agenda-files~ reads the file system to gather sources for ~org-mode~ agenda.
+
+#+begin_src emacs-lisp
+  (cl-defun jf/org-agenda-files (&key
+				  (paths jf/data-directories)
+				  (basenames '("agenda.org")))
+    "Return the list of filenames where BASENAMES exists in PATHS."
+    ;; I want to include my configuration file in my agenda querying.
+    (setq returning-list '("~/git/dotemacs/emacs.d/configuration.org"))
+    (dolist (path paths)
+      (dolist (basename basenames)
+	(when (f-exists-p (f-join path basename))
+	    (add-to-list 'returning-list (f-join path basename)))))
+    returning-list)
+#+end_src
+
+The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~ which introduces my more generalized note taking system.
+
+#+begin_src emacs-lisp
+  (use-package org
+    :straight (org :type built-in)
+    :hook (org-mode . turn-on-visual-line-mode)
+    :config (setq
+	     org-directory (file-truename "~/git/org")
+	     org-agenda-files (jf/org-agenda-files
+			       :paths jf/data-directories
+			       :basenames '("agenda.org"))
+	     org-default-notes-file (concat
+				     org-directory
+				     "/captured-notes.org")
+	     org-todo-keywords '((sequence
+				  "TODO"
+				  "WAITING"
+				  "|"
+				  "DONE")))
+    (setq org-capture-templates
+	  '(("@"
+	     "All Todo"
+	     entry (file "~/git/org/agenda.org")
+	     "* TODO %?\n  %i\n  %a"
+	     :empty-lines-before 1)))
+
+    (org-babel-do-load-languages 'org-babel-load-languages
+				 (append org-babel-load-languages
+					 '((emacs-lisp . t)
+					   (plantuml . t)
+					   (ruby . t))))
+    ;; Make TAB act as if it were issued from the buffer of the languages's major
+    ;; mode.
+    :custom (org-src-tab-acts-natively t)
+    :bind (:map org-mode-map
+		("C-c l i". jf/org-insert-link-dwim))
+    :bind (("C-c l s" . org-store-link)
+	   ("C-c a" . org-agenda)
+	   ("C-c c" . org-capture)
+	   ("C-s-t" . org-toggle-link-display)))
+
+  (defun my-org-confirm-babel-evaluate (lang body) nil)
+  (setq org-confirm-babel-evaluate #'my-org-confirm-babel-evaluate)
+
+  ;; To make Org mode take care of versioning of attachments for you,
+  ;; add the following to your Emacs config:
+  (require 'org-attach-git)
+
+  ;; See
+  ;; https://www.reddit.com/r/orgmode/comments/i6hl8b/image_preview_size_in_org_mode/
+  ;; for further discussion
+  ;;
+  ;; One consideration is that the below setq should be called as part
+  ;; of the `org-toggle-inline-images`.  <2020-11-14 Sat 12:09>: I
+  ;; commented out the lines below as it created a very small image
+  ;; (about the size of one character).  (setq org-image-actual-width
+  ;; (truncate (* (window-pixel-width) 0.8)))
+
+
+  ;; I'd prefer to use the executable, but that doe not appear to be the
+  ;; implementation of org-babel.
+  (setq org-plantuml-jar-path (concat (string-trim (shell-command-to-string "brew-path plantuml")) "/libexec/plantuml.jar"))
+#+end_src
+
+I cribbed the following function from [[https://xenodium.com/emacs-dwim-do-what-i-mean/][Emacs DWIM: do what ✨I✨ mean]].
+
+#+begin_src emacs-lisp
+  (defun jf/org-insert-link-dwim ()
+	"Like `org-insert-link' but with personal dwim preferences."
+	(interactive)
+	(let* ((point-in-link (org-in-regexp org-link-any-re 1))
+	       (clipboard-url (when (string-match-p "^http" (current-kill 0))
+				(current-kill 0)))
+	       (region-content (when (region-active-p)
+				 (buffer-substring-no-properties (region-beginning)
+								 (region-end)))))
+	  (cond ((and region-content clipboard-url (not point-in-link))
+		 (delete-region (region-beginning) (region-end))
+		 (insert (org-make-link-string clipboard-url region-content)))
+		((and clipboard-url (not point-in-link))
+		 (insert (org-make-link-string
+			  clipboard-url
+			  (read-string "Title: "
+				       (with-current-buffer (url-retrieve-synchronously clipboard-url)
+					 (dom-text (car
+						    (dom-by-tag (libxml-parse-html-region
+								 (point-min)
+								 (point-max))
+								'title))))))))
+		(t
+		 (call-interactively 'org-insert-link)))))
+#+end_src
+
+** Copy Org and Paste in Rich Text Format
+
+Org Mode has built-in capabilities for exporting to HTML (and other languages).  The following function does just a bit more.  It converts the org region to HTML and sends it to the clipboard as an RTF datatype.
+
+Why is that nice?  As an RTF datatype, the paste receiver better handles the HTML (e.g., I can more readily paste into an Email and it pastes as expected).
+
+See [[https://kitchingroup.cheme.cmu.edu/blog/2016/06/16/Copy-formatted-org-mode-text-from-Emacs-to-other-applications/][Copy formatted org-mode text from Emacs to other applications]] for more details.  One addition I made was to add the ~-inputencoding UTF-8~ switch.  Without it, I would end up with some weird characters from odd smartquote handling.
+
+/Note:/ For this to work, I needed to permit my =\~/bin/emacsclient= iin the Security & Privacy > Accessibility system preference.  /At least I think that’s what got things working./
+
+#+begin_src emacs-lisp
+  (global-set-key (kbd "C-M-s-c") 'jf/formatted-copy-org-to-html)
+  (defun jf/formatted-copy-org-to-html ()
+    "Export region to HTML, and copy it to the clipboard."
+    (interactive)
+    (save-window-excursion
+      (let* ((buf (org-export-to-buffer 'html "*Formatted Copy*" nil nil t t))
+	     (html (with-current-buffer buf (buffer-string))))
+	(with-current-buffer buf
+	  (shell-command-on-region
+	   (point-min)
+	   (point-max)
+	   "textutil -inputencoding UTF-8 -stdin -format html -convert rtf -stdout | pbcopy"))
+	(kill-buffer buf))))
+
+  (use-package htmlize
+    :straight t)
+#+end_src
+
+** Swapping Tilde and Backtick in Org and More
+
+I jump between Markdown and Org Mode with some frequency.  In many cases I prefer Org Mode.  Except when it comes to code declaration.  The tilde (e.g., =~=) is cumbersome compared to the backtick (e.g., =`=).
+
+What follows came from [[http://mbork.pl/2022-01-17_Making_code_snippets_in_Org-mode_easier_to_type][Marcin Borkowski: 2022-01-17 Making code snippets in Org-mode easier to type]].
+
+Now when I type =~~~=, I get a source block.  And I can even default that block to a specific language (via ~org-insert-tilde-language~).
+
+#+begin_src emacs-lisp
+  (define-key org-mode-map (kbd "~") #'org-insert-backtick)
+  (defun org-insert-backtick ()
+    "Insert a backtick using `org-self-insert-command'."
+    (interactive)
+    (setq last-command-event ?`)
+    (call-interactively #'org-self-insert-command))
+
+  (defvar-local org-insert-tilde-language nil
+    "Default language name in the current Org file.
+  If nil, `org-insert-tilde' after 2 tildes inserts an \"example\"
+  block.  If a string, it inserts a \"src\" block with the given
+  language name.")
+
+  (define-key org-mode-map (kbd "`") #'org-insert-tilde)
+  (defun org-insert-tilde ()
+    "Insert a tilde using `org-self-insert-command'."
+    (interactive)
+    (if (string= (buffer-substring-no-properties (- (point) 3) (point))
+		 "\n~~")
+	(progn (delete-char -2)
+	       (if org-insert-tilde-language
+		   (insert (format "#+begin_src %s\n#+end_src"
+				   org-insert-tilde-language))
+		 (insert "#+begin_example\n#+end_example"))
+	       (forward-line -1)
+	       (if (string= org-insert-tilde-language "")
+		   (move-end-of-line nil)
+		 (org-edit-special)))
+      (setq last-command-event ?~)
+      (call-interactively #'org-self-insert-command)))
+#+end_src
+
+* Org-Roam
+
+This is my third iteration on an ~org-roam~.  It's goal is to address use-cases that I've encountered while moving more of my note-taking with ~org-roam~.
+
+One use-case is when I'm running or playing in an RPG session.  During those sessions, when I create/find/insert nodes, I almost want to leverage the same tags.  That can be in my capturing of nodes or in my searching for nodes.  This is something I observed while running my 13 session "Thel Sector" campaign.
+
+A second use-case is when I'm writing notes or thoughts related to work.  In a past life, I might have written notes for either my employer or Samvera (a community in which I participated).  Those notes might overlap but rarely did.
+
+While I’m writing those notes, if I’m developing out concepts, I might want to filter my captures and searches to similar tags.
+
+Another use case is less refined, namely I'm writing but am not "in" a specific context.
+
+However, v2 of my org-roam structure[fn:1], didn't quite get out of the way.  I never quite got to the speed of note taking that I had for the original Thel Sector campaign.
+
+What follows builds on Jethro Kuan's [[https://jethrokuan.github.io/org-roam-guide/][How I Take Notes with Org-roam]].  Reading Jethro Kuan's post helped me see how I could do this.
+
+Additional resources:
+
+- [[https://sqrtminusone.xyz/configs/emacs/#org-roam][Pavel Korytov’s Emacs config (Org Roam)]]
+
+** Preliminaries
+
+The ~jf/org-roam-capture-templates-plist~ variable defines the possible org-roam capture templates that I will use.  I have chosen to narrow these to three types:
+
+- ~refs~ :: References to other people’s thoughts.
+- ~main~ :: My thoughts, still churning, referencing other thoughts.
+- ~pubs~ :: My thoughts, published and ready to share.  Referencing any thoughts I’ve captured (and probably more).
+
+/Note:/ I chose to go with 4 character types to minimize it’s impact on rendering “type” in the search results (4 characters requires less visual space than 10 characters).
+
+#+begin_src emacs-lisp
+  (defvar jf/org-roam-capture-templates-plist
+    (list
+     ;; These are references to "other people's thoughts."
+     :refs '("r" "refs" plain "%?"
+	     :if-new (file+head "refs/%<%Y%m%d>---${slug}.org" "#+title: ${title}\n#+FILETAGS:\n")
+	     :unnarrowed t)
+     ;; These are "my thoughts" with references to "other people's thoughts."
+     :main '("m" "main" plain "%?"
+	     :if-new (file+head "main/%<%Y%m%d>---${slug}.org"
+				"#+title: ${title}\n#+FILETAGS: ${auto-tags}\n")
+	     :immediate-finish t
+	     :unnarrowed t)
+     ;; These are publications of "my thoughts" referencing "other people's thoughts".
+     :pubs '("p" "pubs" plain "%?"
+	     :if-new (file+head "pubs/%<%Y%m%d>---${slug}.org" "#+title: ${title}\n#+FILETAGS:\n")
+	     :immediate-finish t
+	     :unnarrowed t))
+    "Templates to use for `org-roam' capture.")
+#+end_src
+
+The ~jf/org-context-plist~ defines and names some of the contexts in which I might be writing.  Each named context defines the associated tags.  These are the tags that all nodes will have when they are written in the defined context.
+
+Loosely related is the ~jf/org-auto-tags--current-list~; Contexts are a named set of tags.  However, other functions don’t operate based on context.  They instead operated based on the tags.
+
+#+begin_src emacs-lisp
+  (defvar jf/org-context-plist
+    (list
+     :none
+     (list
+      :name "none"
+      :tags (list))
+
+     :burning-locusts
+     (list
+      :name "burning-locusts"
+      :tags '("burning-locusts"
+	      "rpg"
+	      "burning-wheel"))
+
+     :forem
+     (list
+      :name "forem"
+      :tags '("forem"))
+
+     :mistimed-scroll
+     (list
+      :name "mistimed-scroll"
+      :tags '("eberron"
+	      "mistimed-scroll"
+	      "rpg"
+	      "burning-wheel"))
+     :thel-sector
+     (list
+      :name "thel-sector"
+      :tags '("thel-sector"
+	      "rpg" "swn")))
+    "A list of contexts that I regularly write about.")
+
+  (defvar jf/org-auto-tags--current-list
+    (list)
+    "The list of tags to automatically apply to an `org-roam' capture.")
+#+end_src
+
+I can use ~jf/org-auto-tags--set~ to create an ad hoc context, or perhaps a "yet to be named" context.  I can use ~jf/org-auto-tags--set-by-context~ to establish the current context (or clear it).
+
+#+begin_src emacs-lisp
+  (defun jf/org-auto-tags--set (tags)
+    "Prompt user or more TAGS."
+    (interactive
+     (list
+      (completing-read-multiple
+       "Tag(s): " (org-roam-tag-completions))))
+    (setq jf/org-auto-tags--current-list tags))
+
+  (cl-defun jf/org-context-list-completing-read
+      (&key
+       (context-plist
+	jf/org-context-plist))
+    "Create a list of contexts from the CONTEXT-PLIST for completing read.
+
+	 The form should be '((\"forem\" 1) (\"burning-loscusts\" 2))."
+    ;; Skipping the even entries as those are the "keys" for the plist,
+    ;; the odds are the values.
+    (-non-nil (seq-map-indexed
+	       (lambda (context index)
+		 (when (oddp index)
+		   (list (plist-get context :name) index)))
+	       context-plist)))
+
+  (cl-defun jf/org-auto-tags--set-by-context
+      (context
+       &key
+       (context-plist jf/org-context-plist))
+    "Set auto-tags by CONTEXT.
+
+     Prompt for CONTEXT from CONTEXT-PLIST."
+    (interactive
+     (list
+      (completing-read
+       "Context: " (jf/org-context-list-completing-read))))
+    (setq jf/org-auto-tags--current-list
+	  (plist-get
+	   (plist-get
+	    context-plist (intern (concat ":" context)))
+	   :tags)))
+#+end_src
+
+With the ~jf/org-auto-tags--current-list~ variable set, I want a function to inject those tags onto my captures.  Looking at the [[https://www.orgroam.com/manual.html#Org_002droam-Template-Expansion][org-roam docs on template expansion]], I want to create a function named ~org-roam-node-auto-tags~.
+
+#+begin_src emacs-lisp
+  (cl-defun org-roam-node-auto-tags
+      (node
+       &key
+       (tag-list jf/org-auto-tags--current-list))
+    "Inject the TAG-LIST into the {auto-tags} region of captured NODE.
+
+       See https://www.orgroam.com/manual.html#Template-Walkthrough"
+    (if (and tag-list (> (length tag-list) 0))
+	(concat ":" (s-join ":" tag-list) ":")
+      ""))
+#+end_src
+
+And finally, we have functions to use for establishing what templates are available based on the context, as well as what to setup as the default filter-fn for org-capture.
+
+In other words, when I have set one or more tags, I want to use the templates appropriate for those tags and filter my org-roam-nodes so that only those nodes that have all of the tags are candidates.
+
+#+begin_src emacs-lisp
+  (cl-defun jf/org-roam-templates-list
+      (template
+       &key
+       (template-plist jf/org-roam-capture-templates-plist))
+    "List of `org-roam' capture templates based on the given TEMPLATE.
+
+       Searches the TEMPLATE-PLIST for the templates.
+
+       Note, the :all template assumes we use the whole list."
+    (if (eq template :all)
+	(-non-nil
+	 (seq-map-indexed
+	  (lambda (tmp index)
+	    (when (oddp index)
+	      tmp))
+	  template-plist))
+      (list (plist-get template-plist template))))
+
+  (cl-defun jf/org-roam-templates-context-fn
+      (&key
+       (tag-list jf/org-auto-tags--current-list))
+    "Returns a set of templates based on TAG-LIST.
+
+       A key assumption is that if there's a default tag list, use the
+       :main template."
+    (if (and tag-list (> (length tag-list) 0))
+	(jf/org-roam-templates-list :main)
+      (jf/org-roam-templates-list :all)))
+
+  (cl-defun jf/org-roam-filter-context-fn
+      (node
+       &key
+       (tag-list jf/org-auto-tags--current-list))
+    "Determine TAG-LIST is subset of NODE's tags."
+    ;; gnus-subsetp is a more "permissive" version of subsetp.  It doesn't
+    ;; consider order.  And looks at strings as equal if their values are the
+    ;; same.
+    (gnus-subsetp tag-list (org-roam-node-tags node)))
+#+end_src
+
+** Configuration
+
+I wrote three functions to mirror three core functions of org-mode:
+
+- ~jf/org-roam-capture~ :: find or create a node and file it away.
+- ~jf/org-roam-node-insert~ :: find or create a node and insert a link to that node.  This is my “take notes quick” function.
+- ~jf/org-roam-find-node~ :: find a node and open that node in the frame.
+
+For each of those functions, I establish the filter based on the current context and/or tags.  I also limit the available capture templates based on the context.
+
+#+begin_src emacs-lisp
+  (defun jf/org-roam-capture
+      (&optional
+       goto
+       keys)
+    "Call `org-roam-capture' based on set tags."
+    (interactive "P")
+    (org-roam-capture
+     goto
+     keys
+     :filter-fn 'jf/org-roam-filter-context-fn
+     :templates (jf/org-roam-templates-context-fn)))
+
+  (defun jf/org-roam-node-insert ()
+    "Call `org-roam-node-insert' based on set tags."
+    (interactive)
+    (org-roam-node-insert
+     'jf/org-roam-filter-context-fn
+     :templates (jf/org-roam-templates-context-fn)))
+
+  (defun jf/org-roam-find-node
+      (&optional
+       other-window
+       initial-input)
+    "Call `org-roam-node-find' based on set tags."
+    (interactive current-prefix-arg)
+    (org-roam-node-find
+     other-window
+     initial-input
+     'jf/org-roam-filter-context-fn
+     :templates 'jf/org-roam-templates-context-fn))
+#+end_src
+
+And with all of that, let’s get into the org-roam configuration.
+
+#+begin_src emacs-lisp
+  (use-package org-roam
+    :straight t
+    :config
+    ;; I encountered the following message when attempting to export data:
+    ;;
+    ;; => "org-export-data: Unable to resolve link: EXISTING-PROPERTY-ID"
+    ;;
+    ;; See https://takeonrules.com/2022/01/11/resolving-an-unable-to-resolve-link-error-for-org-mode-in-emacs/ for details
+    (defun jf/force-org-rebuild-cache ()
+      "Call some functions to rebuild the `org-mode' and `org-roam' cache."
+      (interactive)
+      (org-id-update-id-locations)
+      ;; Note: you may need `org-roam-db-clear-all' followed by `org-roam-db-sync'
+      (org-roam-db-sync)
+      (org-roam-update-org-id-locations))
+    :custom
+    ;; See https://github.com/nobiot/org-transclusion/issues/136
+    (org-roam-db-extra-links-exclude-keys '((node-property "ROAM_REFS")))
+    (org-roam-directory (file-truename "~/git/org"))
+    (org-roam-node-display-template
+     (concat "${type:7}  ${title:*} "
+	     (propertize "${tags:40}" 'face 'org-tag)))
+    (org-roam-capture-templates (jf/org-roam-templates-list :all))
+    :bind (("C-s-f" . jf/org-roam-find-node)
+	   ("C-s-c" . jf/org-roam-capture))
+    :bind (:map org-mode-map
+		(
+		 ("C-s-;" . org-roam-buffer-toggle)
+		 ("s-i" . jf/org-roam-node-insert)))
+    :init
+    ;; Help keep the `org-roam-buffer', toggled via `org-roam-buffer-toggle', sticky.
+    (add-to-list 'display-buffer-alist
+		 '("\\*org-roam\\#"
+		   (display-buffer-in-side-window)
+		   (side . right)
+		   (slot . 0)
+		   (window-width . 0.33)
+		   (window-parameters . ((no-other-window . t)
+					 (no-delete-other-windows . t)))))
+    ;; When t the autocomplete in org documents will query the org roam database
+    (setq org-roam-completion-everywhere t)
+    (setq org-roam-v2-ack t)
+    (org-roam-db-autosync-mode))
+#+end_src
+
+This function returns the node’s type (e.g., it’s directory).
+
+#+begin_src emacs-lisp
+  ;; This needs to be after the `org-roam’ declaration as it is dependent on the
+  ;; structures of `org-roam'.
+  (cl-defmethod org-roam-node-type ((node org-roam-node))
+    "Return the TYPE of NODE."
+    (condition-case nil
+	(file-name-nondirectory
+	 (directory-file-name
+	  (file-name-directory
+	   (file-relative-name
+	    (org-roam-node-file node)
+	    org-roam-directory))))
+      (error "")))
+#+end_src
+
+This function pairs with ~jf/org-roam-filter-context-fn~ contexts.  It’s an inner function to the auto-completes that ~org-roam~ exposes.  This way, while I have a context “activated”, when I use auto-complete, it limits the titles to those with the matching tags.
+
+#+begin_src emacs-lisp
+  ;; This resolves the auto-complete prompt to conform to the contexts I
+  ;; previously wrote about.
+  (cl-defun org-roam--get-titles (&key (tag-list jf/org-auto-tags--current-list))
+    "Return all distinct titles and aliases in the Org-roam database.
+
+    When given a TAG-LIST select only titles that are associated with the given tag."
+    (if (and tag-list (> (length tag-list) 0))
+	(mapcar #'car (org-roam-db-query
+		       [:select :distinct title :from nodes
+				:inner :join tags :on (= tags:node_id nodes:id)
+				:where (in tag $v1)
+				:union :select alias :from aliases
+				:inner :join tags :on (= tags:node_id aliases:node_id)
+				:where (in tag $v1)]
+		       (list (seq--into-vector tag-list))))
+      (mapcar #'car (org-roam-db-query
+		     [:select :distinct title :from nodes
+			      :union :select alias :from aliases]))))
+#+end_src
+
+** Org-Roam UI
+
+The ~org-roam-ui~ package provides a graphical representation of the graph of ~org-roam~ documents.
+
+#+begin_src emacs-lisp
+  (use-package org-roam-ui
+    :straight
+      (:host github :repo "org-roam/org-roam-ui" :branch "main" :files ("*.el" "out"))
+      :after org-roam
+  ;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
+  ;;         a hookable mode anymore, you're advised to pick something yourself
+  ;;         if you don't care about startup time, use
+  ;;  :hook (after-init . org-roam-ui-mode)
+      :config
+      (setq org-roam-ui-sync-theme t
+	    org-roam-ui-follow t
+	    org-roam-ui-update-on-save t
+	    org-roam-ui-open-on-start t))
+#+end_src
+
+All told, the past experience when running [[https://takeonrules.com/series/new-vistas-in-the-thel-sector/][New Vistas in the Thel Sector // Take on Rules]] informed how I thought about my note taking.
+
+** Other Contexts
+
+Try as I may, based on my configuration, I can’t get [[https://orgmode.org/manual/Protocols.html#Protocols][org-protocol]] to work.  So I’ve opted to take a different path; write some Emacs functions instead.
+
+- ~jf/org-roam-capture-ref~ :: Capture a “refs” context ~org-roam-node~ for the given title and url.
+- ~jf/menu--org-capture-elfeed-show~ :: Capture an RSS entry.
+- ~jf/menu--org-capture-firefox~ :: Capture the active tab of Firefox.
+- ~jf/menu--org-capture-safari~ :: Capture the active tab of Safari.
+
+These tie into my the context and auto-tags.
+
+#+begin_src emacs-lisp
+  (cl-defun jf/org-roam-capture-ref (&key title url)
+    "Capture the TITLE and URL in the `org-roam' :refs template"
+    ;; If your installation of org-roam includes the fix fore
+    ;; https://github.com/org-roam/org-roam/issues/2078 then you can leave the
+    ;; below commented out.
+    ;;
+    ;; This looks a bit odd, but to capture the :ref we need the callback from org-roam.
+    ;; (require 'org-roam-protocol)
+    ;;
+    (org-roam-capture-
+     :keys "r"
+     ;; TODO: I would love to get tags working but I'm missing something
+     :node (org-roam-node-create :title title)
+     :info (list :ref url)
+     :props '(:immediate-finish nil)
+     :templates (jf/org-roam-templates-list :refs)))
+
+  (cl-defun jf/menu--org-capture-elfeed-show (&key (entry elfeed-show-entry))
+    "Create an `org-roam-node' from elfeed ENTRY."
+    (interactive)
+    (let ((url (elfeed-entry-link entry))
+	  (title (elfeed-entry-title entry)))
+      (jf/org-roam-capture-ref :url url :title title)))
+
+  (defun jf/menu--org-capture-firefox ()
+    "Create an `org-roam-node' from Firefox page.
+
+    Depends on the `grab-mac-link' package."
+    (interactive)
+    (let* ((link-title-pair (grab-mac-link-firefox-1))
+	   (url (car link-title-pair))
+	   (title (cadr link-title-pair)))
+      (jf/org-roam-capture-ref :url url :title title)))
+
+  (defun jf/menu--org-capture-safari ()
+    "Create an `org-roam-node' from Safari page.
+
+    Depends on the `grab-mac-link' package."
+    (interactive)
+    (let* ((link-title-pair (grab-mac-link-safari-1))
+	   (url (car link-title-pair))
+	   (title (cadr link-title-pair)))
+      (jf/org-roam-capture-ref :url url :title title)))
+
+  (defun jf/menu--org-capture-eww ()
+    "Create an `org-roam-node' from `eww' data"
+    (interactive)
+    (let* ((url (plist-get eww-data :url))
+	   (title (plist-get eww-data :title)))
+      (jf/org-roam-capture-ref :url url :title title)))
+#+end_src
+
+** Things I’ve Learned about Org Roam
+
+Reading https://sqrtminusone.xyz/configs/emacs/#managing-tables, I learned about ~org-table-export~.
+
+Reading [[https://systemcrafters.net/build-a-second-brain-in-emacs/5-org-roam-hacks/#build-your-org-agenda-from-org-roam-notes][5 Org Roam Hacks for Better Productivity in Emacs - System Crafters]], I learned about how to incorporate ~org-roam~ docs into my agenda.
+
+* Org Transclusions
+
+In [[https://takeonrules.com/2022/02/26/note-taking-with-org-roam-and-transclusion/][Note Taking with Org Roam and Transclusion]], I wrote about ~org-transclusion~.  The quick version, ~org-transclusion~ allows you to include text from one file into another.  This allows for document composition.
+
+#+begin_src emacs-lisp
+  (use-package org-transclusion
+    :straight t
+    :init (setq org-transclusion-exclude-elements '(property-drawer keyword)))
+#+end_src
+
+#+begin_src emacs-lisp
+  (setq org-export-global-macros (list))
+#+end_src
+
+First, I’m considering swapping in and out the macros based on export context.  But I’m getting ahead of myself.
+
+* Macro Expansion
+
+~org-mode~ provides macro expansion.  Here’s I’m declaring a few “global macros”.
+
+** General
+
+#+begin_src emacs-lisp
+  (add-to-list 'org-export-global-macros
+	       '("kbd" . "@@html:<kbd>@@$1@@html:</kbd>@@"))
+
+  (add-to-list 'org-export-global-macros
+	       '("date" . "@@html:<time datetime=\"$1\">@@$2@@html:</time>@@"))
+
+  (add-to-list 'org-export-global-macros
+	       '("cite" . "@@html:<cite>@@$2@@html:</cite>@@"))
+#+end_src
+
+** Hugo Specific
+
+#+begin_src emacs-lisp
+  (add-to-list 'org-export-global-macros
+	       '("mention" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" >}}@@"))
+
+  (add-to-list 'org-export-global-macros
+	       '("abbr" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" abbr=\"t\" >}}@@"))
+
+  (add-to-list 'org-export-global-macros
+	       '("abbr-plural" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" abbr=\"t\" plural=\"t\" >}}@@"))
+
+  (add-to-list 'org-export-global-macros
+	       '("pdfn" . "@@html:<i class=\"dfn\">@@$1@@html:</i>@@"))
+
+  (add-to-list 'org-export-global-macros
+	       '("sidenote" . "@@hugo:{{< sidenote >}}@@$1@@hugo:{{< /sidenote >}}@@"))
+
+  (add-to-list 'org-export-global-macros
+	       '("linkToGame" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" abbr=\"t\" >}}@@"))
+#+end_src
+
+* Conclusion
+
+This is the core of my note taking engine.  It builds on the idea that I want to reduce the number of decisions I make.  This is extremely important when I’m writing session notes.
+
+While I’m playing in a session, my entire context ideally collapses to the relevant tags that I’ve established at the beginning of the session.  That way I’m certain that I’m filing away notes to their proper location.
+
+[fn:1] Iterating on my v2 ~org-roam~ setup was critical in learning more about Emacs.  I will certainly [[https://codeberg.org/takeonrules/dotemacs/src/commit/2f5d6c81d68aaa0d4de9cc7b409c090c0886300a/jnf-emacs-packages/jnf-org-roam-v2.el][reference my v2 org roam configuration]] as I continue my Emacs usage.
