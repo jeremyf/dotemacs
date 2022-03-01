@@ -3942,11 +3942,11 @@ I wrote [[file:burning-wheel-emacs-config.org][some tooling to help while playin
 
 ** Eberron
 
-I wrote [[file:eberron.org][some tooling to help wile playing Burning Wheel]].
+I wrote [[file:eberron.org][some tooling to help wile playing Eberron]].
 
 #+begin_src emacs-lisp
   (org-babel-load-file
-   (concat user-emacs-directory "burning-wheel-emacs-config.org"))
+   (concat user-emacs-directory "eberron.org"))
 #+end_src
 
 ** Forem, or Where I Work

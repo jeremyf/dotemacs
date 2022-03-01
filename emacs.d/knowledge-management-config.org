@@ -510,16 +510,28 @@ This function pairs with ~jf/org-roam-filter-context-fn~ contexts.  It’s an in
   (cl-defun org-roam--get-titles (&key (tag-list jf/org-auto-tags--current-list))
     "Return all distinct titles and aliases in the Org-roam database.
 
-    When given a TAG-LIST select only titles that are associated with the given tag."
+    When given a TAG-LIST select only titles that are associated with *all* of the given tags."
     (if (and tag-list (> (length tag-list) 0))
-	(mapcar #'car (org-roam-db-query
-		       [:select :distinct title :from nodes
-				:inner :join tags :on (= tags:node_id nodes:id)
-				:where (in tag $v1)
-				:union :select alias :from aliases
-				:inner :join tags :on (= tags:node_id aliases:node_id)
-				:where (in tag $v1)]
-		       (list (seq--into-vector tag-list))))
+	(let ((tag-vector (seq--into-vector tag-list))
+	      (count (length tag-list)))
+	  (mapcar #'car (org-roam-db-query
+			 [:select :distinct title :from nodes
+				  :where (in id
+					     [:select node_id
+						      :from tags
+						      :where (in tag $v1)
+						      :group :by node_id
+						      :having (>= (funcall count node_id) $s2)])
+				  :union :select :distinct alias :from aliases
+				  :where (in node_id
+					     [:select node_id
+						      :from tags
+						      :where (in tag $v3)
+						      :group :by node_id
+						      :having (>= (funcall count node_id) $s4)])]
+			 ;; Note: I tried re-using $v1 and $s2 for the alias, but
+			 ;; that resulted in hitting a grinding halt.
+			 tag-vector count tag-vector count)))
       (mapcar #'car (org-roam-db-query
 		     [:select :distinct title :from nodes
 			      :union :select alias :from aliases]))))
