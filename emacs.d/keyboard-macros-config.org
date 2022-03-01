@@ -27,12 +27,12 @@ Macros.  Sometimes I should save those.
 * Macros
 
 
-** TODO jf/tidy-ox-hugo-header-export macro
+** jf/tidy-ox-hugo-header-export macro
 
-Created on<2022-02-23 Wed>
+Created on <2022-02-23 Wed>
 
 #+begin_src emacs-lisp
-(fset 'jf/tidy-ox-hugo-header-export
-   (kmacro-lambda-form [?\C-c ?\C-n ?\s-f ?\{ return ?\C-b ?\C-b ?\C-k] 0 "%d"))
+  (fset 'jf/tidy-ox-hugo-header-export
+     (kmacro-lambda-form [?\C-c ?\C-n ?\s-f ?\{ return ?\C-b ?\C-b ?\C-k] 0 "%d"))
 
 #+end_src
