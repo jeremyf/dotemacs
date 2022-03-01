@@ -500,6 +500,8 @@ This function returns the node’s type (e.g., it’s directory).
       (error "")))
 #+end_src
 
+** Leveraging Tag Filtering with Org-Roam CAPF
+
 This function pairs with ~jf/org-roam-filter-context-fn~ contexts.  It’s an inner function to the auto-completes that ~org-roam~ exposes.  This way, while I have a context “activated”, when I use auto-complete, it limits the titles to those with the matching tags.
 
 #+begin_src emacs-lisp
@@ -522,6 +524,8 @@ This function pairs with ~jf/org-roam-filter-context-fn~ contexts.  It’s an in
 		     [:select :distinct title :from nodes
 			      :union :select alias :from aliases]))))
 #+end_src
+
+/I tried to use an advising function, but ran into problems.  I instead chose to rewrite the function used by Org-Roam’s ~org-roam-complete-link-at-point~ and ~org-roam-complete-everywhere~.
 
 ** Org-Roam UI
 
