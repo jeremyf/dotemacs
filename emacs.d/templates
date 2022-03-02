@@ -17,6 +17,7 @@ org-mode
 (pdfn "{{{pdfn(" p ")}}}")
 (sn "{{{sidenote(" p ")}}}")
 (DoW "{{{pdfn(Duel of Wits)}}}")
+(lts "{{{linkToSeries(" (p (completing-read "Series: " (jf/tor-series-list)) ) ")}}}")
 (ltg "{{{linkToGame(" (p (completing-read "Game: " (jf/tor-game-list)) ) ")}}}")
 
 ;; Burning Locusts
