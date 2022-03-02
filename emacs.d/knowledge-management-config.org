@@ -647,6 +647,16 @@ In [[https://takeonrules.com/2022/02/26/note-taking-with-org-roam-and-transclusi
 
 First, I’m considering swapping in and out the macros based on export context.  But I’m getting ahead of myself.
 
+* Org Modern
+
+I love [[https://github.com/minad][Daniel Mendler]]’s work; let’s test drive ~org-modern~.
+
+#+begin_src emacs-lisp
+  ;; (use-package org-modern
+  ;;   :straight (:host github :repo "minad/org-modern")
+  ;;   :hook (org-mode . org-modern-mode))
+#+end_src
+
 * Macro Expansion
 
 ~org-mode~ provides macro expansion.  Here’s I’m declaring a few “global macros”.
@@ -661,7 +671,7 @@ First, I’m considering swapping in and out the macros based on export context.
 	       '("date" . "@@html:<time datetime=\"$1\">@@$2@@html:</time>@@"))
 
   (add-to-list 'org-export-global-macros
-	       '("cite" . "@@html:<cite>@@$2@@html:</cite>@@"))
+	       '("cite" . "@@html:<cite>@@$1@@html:</cite>@@"))
 #+end_src
 
 ** Hugo Specific
@@ -684,6 +694,9 @@ First, I’m considering swapping in and out the macros based on export context.
 
   (add-to-list 'org-export-global-macros
 	       '("linkToGame" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" abbr=\"t\" >}}@@"))
+
+  (add-to-list 'org-export-global-macros
+	       '("linkToSeries" . "@@hugo:{{< linkToSeries \"@@$1@@hugo:\" >}}@@"))
 #+end_src
 
 * Conclusion
