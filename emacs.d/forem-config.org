@@ -297,7 +297,8 @@ System Project 46” in my menu.  When the project ends, I’ll remove that line
      ["Jeremy's Workflow"
       ("a" "Browse Authorization System Project 46" (lambda () (interactive) (browse-url "https://github.com/orgs/forem/projects/46")))
       ("E" "Browse Epics Assigned to Jeremy" (lambda () (interactive) (browse-url "https://github.com/forem/forem-internal-eng/issues/assigned/jeremyf")))
-      ("I" "My issues…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/issues/assigned/jeremyf")))
+      ("I" "My assigned issues…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/issues/assigned/jeremyf")))
+      ("C-i" "My created and open issues" (lambda () (interactive) (browse-url "https://github.com/forem/forem/issues/created_by/@me")))
       ("J" "Browse to Content Experience pro[J]ects…" (lambda () (interactive) (browse-url "https://github.com/orgs/forem/projects/39")))
       ("M" "Browse Jeremy's [M]erged Pull Requests…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/pulls/jeremyf?q=is%3Apr+is%3Aclosed")))
       ("P" "Browse to Jeremy's [P]ull requests…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/pulls/jeremyf")))
@@ -306,6 +307,7 @@ System Project 46” in my menu.  When the project ends, I’ll remove that line
      ["Org-Mode"
       ("D" "[D]ashboard open…" jf/open-dashboard)
       ("d" "Visit [d]ashboard file…" (lambda () (interactive) (find-file jf/forem-dashboard-filename)))
+      ("C-f" "Go to the Forem config file." (lambda () (interactive) (find-file "~/git/dotemacs/emacs.d/forem-config.org")))
       ]])
 #+end_src
 

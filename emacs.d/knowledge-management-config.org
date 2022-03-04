@@ -458,8 +458,12 @@ And with all of that, let’s get into the org-roam configuration.
     (org-roam-db-extra-links-exclude-keys '((node-property "ROAM_REFS")))
     (org-roam-directory (file-truename "~/git/org"))
     (org-roam-node-display-template
-     (concat "${type:7}  ${title:*} "
-	     (propertize "${tags:40}" 'face 'org-tag)))
+     (concat "${type:7} "
+	     " ${title:80} "
+	     (propertize "${tags:50}" 'face 'org-tag)))
+    (org-roam-node-annotation-function
+     (lambda (node)
+	(org-roam-node-backlinkscount node)))
     (org-roam-capture-templates (jf/org-roam-templates-list :all))
     :bind (("C-s-f" . jf/org-roam-find-node)
 	   ("C-s-c" . jf/org-roam-capture))
@@ -483,6 +487,9 @@ And with all of that, let’s get into the org-roam configuration.
     (org-roam-db-autosync-mode))
 #+end_src
 
+#+RESULTS:
+: jf/org-roam-node-insert
+
 This function returns the node’s type (e.g., it’s directory).
 
 #+begin_src emacs-lisp
@@ -498,6 +505,16 @@ This function returns the node’s type (e.g., it’s directory).
 	    (org-roam-node-file node)
 	    org-roam-directory))))
       (error "")))
+
+  ;; From https://github.com/org-roam/org-roam/wiki/User-contributed-Tricks
+  (cl-defmethod org-roam-node-backlinkscount ((node org-roam-node))
+    (let* ((count (caar (org-roam-db-query
+			 [:select (funcall count source)
+				  :from links
+				  :where (= dest $s1)
+				  :and (= type "id")]
+			 (org-roam-node-id node)))))
+      (format "    %4d \xf0c1" count)))
 #+end_src
 
 ** Leveraging Tag Filtering with Org-Roam CAPF
@@ -687,7 +704,7 @@ I love [[https://github.com/minad][Daniel Mendler]]’s work; let’s test drive
 	       '("abbr-plural" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" abbr=\"t\" plural=\"t\" >}}@@"))
 
   (add-to-list 'org-export-global-macros
-	       '("pdfn" . "@@html:<i class=\"dfn\">@@$1@@html:</i>@@"))
+	       '("idiomatic" . "@@html:<i class=\"dfn\">@@$1@@html:</i>@@"))
 
   (add-to-list 'org-export-global-macros
 	       '("sidenote" . "@@hugo:{{< sidenote >}}@@$1@@hugo:{{< /sidenote >}}@@"))
@@ -697,6 +714,24 @@ I love [[https://github.com/minad][Daniel Mendler]]’s work; let’s test drive
 
   (add-to-list 'org-export-global-macros
 	       '("linkToSeries" . "@@hugo:{{< linkToSeries \"@@$1@@hugo:\" >}}@@"))
+#+end_src
+
+** Listing Function
+
+#+begin_src emacs-lisp
+  (cl-defun jf/org-macro-value-list (macro-name &key (dir org-directory))
+    "List the unique inner text of all uses of MACRO-NAME in given DIR."
+    (s-split
+     "\n"
+     (s-trim
+      (shell-command-to-string
+       (concat
+	"rg \"\\{\\{\\{"
+	macro-name
+	"\\((.+?)\\)\\}\\}\\}"
+	"\" --only-matching --no-filename -r '$1' "
+	dir
+	" | sort | uniq")))))
 #+end_src
 
 * Conclusion

@@ -1973,6 +1973,7 @@ I have only provisionally adopted this.  I like the idea of abbreviations/snippe
     ;; (tempel-global-abbrev-mode)
     )
 
+  (tempel-key "C-c i" idomatic org-mode-map)
 #+end_src
 
 **** whole-line-or-region.el

@@ -106,7 +106,7 @@ Most role-playing games I play may require a bit of consultation.  The following
      '("Occupation"
        "  Broad/common .................... +0 Ob"
        "  Uncommon ........................ +2 Ob"
-       "  Specific/rare/unique ............ +2 Ob"
+       "  Specific/rare/unique ............ +3 Ob"
        ""
        "Station"
        "  Same station .................... +0 Ob"
