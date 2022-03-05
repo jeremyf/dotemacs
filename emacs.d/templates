@@ -19,7 +19,6 @@ org-mode
 (abbr "{{{abbr(" (p (completing-read "Glossary: " (jf/tor-glossary-key-list))) ")}}}")
 (abbr-plural "{{{abbr-plural(" (p (completing-read "Glossary: " (jf/tor-glossary-key-list))) ")}}}")
 (idiomatic "{{{idiomatic(" (p (completing-read "Pseudo Definition: " (jf/org-macro-value-list "idiomatic"))) ")}}}")
-(DoW "{{{pdfn(Duel of Wits)}}}")
 (lts "{{{linkToSeries(" (p (completing-read "Series: " (jf/tor-series-list)) ) ")}}}")
 (ltg "{{{linkToGame(" (p (completing-read "Game: " (jf/tor-game-list)) ) ")}}}")
 
