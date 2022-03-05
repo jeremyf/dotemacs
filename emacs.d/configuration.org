@@ -375,14 +375,9 @@ Next up, let’s load the theme based on my operating system’s settings
       (load-theme 'modus-operandi)))
 #+end_src
 
-Show tabs in the current window.  The tab system is something I wrestle with,
-but I appreciate it’s existence.  These configurations make it easier to use.
-
 #+begin_src emacs-lisp
-  (global-tab-line-mode t)
-  ;; This maps to MacOS's tab switching keys.
-  (global-set-key (kbd "s-{") 'previous-buffer)
-  (global-set-key (kbd "s-}") 'next-buffer)
+  (org-babel-load-file
+   (concat user-emacs-directory "emacs-tabs.org"))
 #+end_src
 
 ** How Does this Thing Work?

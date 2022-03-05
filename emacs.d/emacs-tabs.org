@@ -1,0 +1,59 @@
+Show tabs in the current window.  The tab system is something I wrestle with, but I appreciate it’s existence.  These configurations make it easier to use.
+
+#+begin_src emacs-lisp
+  (global-tab-line-mode t)
+  ;; This maps to MacOS's tab switching keys.
+  (global-set-key (kbd "s-{") 'previous-buffer)
+  (global-set-key (kbd "s-}") 'next-buffer)
+#+end_src
+
+#+begin_src emacs-lisp
+  ;; Cribbed from https://mmk2410.org/2022/02/11/using-emacs-tab-bar-mode/
+  ;;
+  ;; Though reworked to reflect "my" namespace and misnamed functions.
+  (defun jf/tab-bar-switch-or-create (name func)
+    (if (jf/tab-bar-tab-exists name)
+	(tab-bar-switch-to-tab name)
+      (jf/tab-bar-new-tab name func)))
+
+  (defun jf/tab-bar-tab-exists (name)
+    (member name
+	    (mapcar #'(lambda (tab) (alist-get 'name tab))
+		    (tab-bar-tabs))))
+
+  (defun jf/tab-bar-new-tab (name func)
+    (when (eq nil tab-bar-mode)
+      (tab-bar-mode))
+    (tab-bar-new-tab)
+    (tab-bar-rename-tab name)
+    (funcall func))
+
+  (defun jf/tab-bar-run-rss ()
+    (interactive)
+    (jf/tab-bar-switch-or-create
+     "RSS"
+     #'rss))
+
+  (defun jf/tab-bar-run-agenda ()
+    (interactive)
+    (jf/tab-bar-switch-or-create
+     "Agenda"
+     #'(lambda ()
+	 (org-agenda nil "a"))))
+
+  (defun jf/tab-bar-run-daily ()
+    (interactive)
+    (jf/tab-bar-switch-or-create
+     "Daily"
+     #'(lambda ()
+	 (org-roam-dailies-find-today)
+	 (global-tab-line-mode nil))))
+
+  (defun jf/tab-bar-run-forem-code ()
+    (interactive)
+    (jf/tab-bar-switch-or-create
+     "Forem Code"
+     #'(lambda ()
+	 (find-file "~/git/forem/README.md")
+	 (global-tab-line-mode t))))
+#+end_src
