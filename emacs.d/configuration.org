@@ -243,6 +243,52 @@ bit.  Also enable a few that I find helpful.  (I’ll enable a lot more later).
   (global-set-key (kbd "C-x C-b") 'ibuffer)
 #+end_src
 
+In using a literate config, I have a mixture of two types of text: prose and code.  The following ~imenu-literate-emacs-lisp~ was pulled from [[https://www.reddit.com/r/emacs/comments/t6noeb/literate_imenu/][Literate imenu? : emacs]].
+
+#+begin_src emacs-lisp
+  (use-package imenu-list
+    :custom (imenu-list-focus-after-activation t)
+    :straight t)
+
+  (defvar imenu-literate-modes-alist
+    '((lisp-mode . (:expressions lisp-imenu-generic-expression))
+      (emacs-lisp-mode . (:expressions lisp-imenu-generic-expression))))
+
+  (defvar imenu-literate-current-mode nil)
+
+  (defun imenu-literate-set-mode ()
+    (interactive)
+    (let ((mode (intern
+		 (completing-read "Imenu literate mode: "
+				  (mapcar #'car imenu-literate-modes-alist)))))
+      (setq-local imenu-literate-current-mode mode)))
+
+  (defun imenu-literate (src-edit?)
+    "Imenu of expressions in a literate file.
+
+    When provided SRC-EDIT? via the Universal Parameter
+    prefix (e.g. C-u), open the selected imenu subject using
+    `org-edit-special'."
+    (interactive "P")
+    (unless imenu-literate-current-mode (imenu-literate-set-mode))
+    (let* ((pair (or (alist-get imenu-literate-current-mode
+				imenu-literate-modes-alist)
+		     (error "Mode %s not found!" imenu-literate-current-mode)))
+	   (expressions (getf pair :expressions))
+	   (index-function (getf pair :index-function
+				 #'imenu-default-create-index-function))
+	   ;;
+	   (imenu-generic-expression (eval expressions))
+	   (imenu-create-index-function index-function))
+      (imenu-list-update-safe)
+      (imenu-list-refresh)
+      (call-interactively #'imenu)
+      (when src-edit?
+	(org-edit-special))))
+
+  (global-set-key (kbd "C-s-2") 'imenu-literate)
+#+end_src
+
 Some basic packages to keep things less chatty.
 
 *Diminish* provides a means of not displaying the :lighter of a minor mode in the modeline.
@@ -1494,6 +1540,7 @@ are major modes others are minor modes.
     :straight t
     :hook (enh-ruby-mode . (lambda () (setq fill-column 100)))
     :hook (enh-ruby-mode . eldoc-mode)
+    :hook (enh-ruby-mode . imenu-create-index-function)
     :bind (:map enh-ruby-mode-map ("C-j" . avy-goto-char-timer))
     :mode (("\\(?:\\.rb\\|ru\\|rake\\|thor\\|jbuilder\\|gemspec\\|podspec\\|/\\(?:Gem\\|Rake\\|Cap\\|Thor\\|Vagrant\\|Guard\\|Pod\\)file\\)\\'" . enh-ruby-mode)))
   (add-to-list 'interpreter-mode-alist '("ruby" . enh-ruby-mode))
@@ -4078,6 +4125,8 @@ some additional options.
      ["Modes"
       ;; I could write functions for these, but this is concise enough
       ("m h" jf/hammerspoon-toggle-mode  :if-non-nil hammerspoon-edit-minor-mode)
+      ("m i" "Imenu list ( )" imenu-list-minor-mode :if-nil imenu-list-minor-mode)
+      ("m i" "Imenu list (*)" imenu-list-minor-mode :if-non-nil imenu-list-minor-mode)
       ("m t" "Typopunct ( )" typopunct-mode :if-nil typopunct-mode)
       ("m t" "Typopunct (*)" typopunct-mode :if-non-nil typopunct-mode)
       ("m o" "MacOS Native Option ( )" jf/toggle-osx-alternate-modifier :if-non-nil ns-alternate-modifier)
