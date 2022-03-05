@@ -1551,62 +1551,18 @@ for syntax highlighting and what have you.
 
 #+end_src
 
-**** lsp-mode.el
 
-- ~lsp-mode.el~ :: Language Server Protocol; provides some nice interactions with code.
-
-#+begin_src emacs-lisp
-  (use-package lsp-mode
-    :straight t
-    :hook ((ruby-mode . lsp)
-	   (enh-ruby-mode . lsp))
-    :config (setq read-process-output-max (* 1024 1024 3)
-		  lsp-completion-provider :none
-		  lsp-completion-mode nil
-		  lsp--show-message nil
-		  lsp-idle-delay 1.00)
-    :custom (lsp-keymap-prefix "C-c C-l")
-    :commands (lsp))
-
-  (with-eval-after-load 'lsp-mode
-    (add-hook 'lsp-mode-hook #'lsp-enable-which-key-integration))
-#+end_src
-
-**** lsp-ui.el
-
-- ~lsp-ui.el~ :: Some nice UI for LSP mode.
-
-What I’m finding is that I occasionally use it, and it also has some flake-outs
-as it relates to the minibuffer.
-
-But a bit flakey.  For example, as I’m using ~consult-recent-file~, when I move
-the minibuffer selection (via ~C-n~) to a Ruby file, ~consult-recent-file~
-renders a preview of that file.  It appears that the ~lsp-mode~’s hooks loses
-or pulls the focus away from the minibuffer to the previewed buffer.
-
-This makes it hard to navigate for search candidates.  I find the preview very
-helpful, so favor that over ~lsp-mode~.  With some “bisect” debugging, I’ve
-found that this is related to the ~lsp-ui.el~ package.  In particular the
-~lsp-ui-peek-mode~.
-
-In other words, the functions are nice, but the interactions with other useful
-packages don’t warrant including this.
+For awhile, I was trying to use lsp-mode.  It might look a bit nicer, but it was a little to “nosy”.  On my read, ~eglot~ leverages many of the built-in APIs of Emacs.
 
 #+begin_src emacs-lisp
-  ;; This package provides some nice UI behavior for documentation and linting
-  ;;
-  ;; In particular, I like 'lsp-ui-peek-find-reference
-  (use-package lsp-ui
-    :straight t
-    :hook ((enh-ruby-mode . lsp-ui-mode))
-    :after lsp-mode)
+  (use-package eglot
+    :hook (enh-ruby-mode . eglot-ensure)
+    :config
+    (setq eglot-ignored-server-capabilites (quote (:documentHighlightProvider)))
+    :straight t)
 
-  ;; By default indent levels are often 4; That is against what I've seen.
-  (setq ruby-indent-level 2
-	typescript-indent-level 2
-	js-indent-level 2)
-
-  ;; (add-hook 'emacs-lisp-mode 'eldoc-mode)
+  (add-to-list 'eglot-server-programs
+	       `(enh-ruby-mode . ("solargraph" "socket" "--port" :autoport)))
 #+end_src
 
 **** lua-mode.el
