@@ -441,6 +441,7 @@ introspect Emacs.
 
 #+begin_src emacs-lisp
   (use-package which-key
+    :diminish 'which-key-mode
     :config
     (which-key-mode)
     (which-key-setup-side-window-right)
@@ -1143,7 +1144,7 @@ More on these component matchings styles is available at [[https://github.com/mi
 #+begin_src emacs-lisp
   (use-package yasnippet
     :straight t
-    :diminish yas-mode
+    :diminish 'yas-minor-mode
     :init
     (setq yas-snippet-dirs '("~/git/dotemacs/snippets"))
     (yas-global-mode 1))
@@ -1353,6 +1354,7 @@ It shows me what I’ve opened.  I like that.
 #+begin_src emacs-lisp
   (use-package vi-tilde-fringe
     :straight t
+    :diminish 'vi-tilde-fringe-mode
     :config (global-vi-tilde-fringe-mode))
 #+end_src
 
@@ -1973,7 +1975,7 @@ I have only provisionally adopted this.  I like the idea of abbreviations/snippe
     ;; (tempel-global-abbrev-mode)
     )
 
-  (tempel-key "C-c i" idomatic org-mode-map)
+  (tempel-key "C-c i" idiomatic org-mode-map)
 #+end_src
 
 **** whole-line-or-region.el
