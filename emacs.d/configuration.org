@@ -1444,40 +1444,15 @@ I’m uncertain why I included this, aside from “sure would be nice to have un
     :config (unicode-fonts-setup))
 #+end_src
 
-**** flycheck.el
-
-- ~flycheck.el~ :: a syntax checkling package.  Paired with [[http://proselint.com][proselint]], I can check grammar and other things.  See http://flycheck.org
+**** flymake-proselint
 
 #+begin_src emacs-lisp
-  (use-package flycheck
-    :hook ((text-mode . flycheck-mode)
-	   (gfm-mode . flycheck-mode)
-	   (org-mode .  flycheck-mode)
-	   (markdown-mode .  flycheck-mode))
-    :config
-    (add-to-list 'flycheck-checkers 'proselint)
-    (flycheck-define-checker proselint
-      "A linter for prose."
-      :command ("proselint" source-inplace)
-      :error-patterns
-      ((warning line-start (file-name) ":" line ":" column ": "
-		(id (one-or-more (not (any " "))))
-		(message (one-or-more not-newline)
-			 (zero-or-more "\n" (any " ") (one-or-more not-newline)))
-		line-end))
-      :modes (text-mode markdown-mode gfm-mode org-mode)))
-#+end_src
+  (use-package flymake-proselint
+    :straight t)
 
-**** consult-flycheck.el
-
-- ~consult-flycheck.el~ :: Creates a minibuffer listing the flycheck errors and enables previews.  Quick nice for navigating the prose violations.
-
-#+begin_src emacs-lisp
-  (use-package consult-flycheck
-    :after (consult flycheck)
-    :straight t
-    :bind (:map flycheck-command-map
-		("!" . consult-flycheck)))
+  (add-hook 'text-mode-hook (lambda ()
+			      (flymake-mode)
+			      (flymake-proselint-setup)))
 #+end_src
 
 *** Modes
@@ -1601,10 +1576,9 @@ For awhile, I was trying to use lsp-mode.  It might look a bit nicer, but it was
     :hook (enh-ruby-mode . eglot-ensure)
     :config
     (setq eglot-ignored-server-capabilites (quote (:documentHighlightProvider)))
+    (add-to-list 'eglot-server-programs
+		 `(enh-ruby-mode . ("solargraph" "socket" "--port" :autoport)))
     :straight t)
-
-  (add-to-list 'eglot-server-programs
-	       `(enh-ruby-mode . ("solargraph" "socket" "--port" :autoport)))
 #+end_src
 
 **** lua-mode.el
@@ -4110,7 +4084,7 @@ some additional options.
      ["Jump to"
       ;; ("j a" "Agenda" ibuffer)
       ("j b" "iBuffer" ibuffer)
-      ("j f" "Flycheck" consult-flycheck :if-derived (or markdown-mode org-mode))
+      ;; ("j f" "Flycheck" consult-flycheck :if-derived (or markdown-mode org-mode))
       ("j g" "Global Mark" consult-global-mark)
       ("j i" "Indesk" jf/indesk-jump-to-file :if-non-nil jf/indesk-current-files-on-desk)
       ("j m" "Mark" consult-mark)
