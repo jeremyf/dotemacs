@@ -1023,7 +1023,6 @@ More on these component matchings styles is available at [[https://github.com/mi
 #+begin_src emacs-lisp
   (use-package corfu
     :straight t
-    :hook (lsp-completion-mode . jf/corfu-setup-lsp)
     :demand t
     ;; Optionally use TAB for cycling, default is `corfu-complete'.
     :bind (:map corfu-map
@@ -1059,21 +1058,10 @@ More on these component matchings styles is available at [[https://github.com/mi
     (corfu-preview-current 'insert)       ; Preview current candidate?
     (corfu-preselect-first t)             ; Preselect first candidate?
 
-    ;; Other
-    (lsp-completion-provider :none)       ; Use corfu instead for lsp completions
-
     :init
   ;; Recommended: Enable Corfu globally.
     ;; This is recommended since dabbrev can be used globally (M-/).
-    (corfu-global-mode)
-
-    :config
-    ;; Setup lsp to use corfu for lsp completion
-    (defun jf/corfu-setup-lsp ()
-      "Use orderless completion style with lsp-capf instead of the
-  default lsp-passthrough."
-      (setf (alist-get 'styles (alist-get 'lsp-capf completion-category-defaults))
-	    '(orderless))))
+    (corfu-global-mode))
 #+end_src
 
 ***** Extending corfu.el

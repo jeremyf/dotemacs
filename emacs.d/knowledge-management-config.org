@@ -487,9 +487,6 @@ And with all of that, let’s get into the org-roam configuration.
     (org-roam-db-autosync-mode))
 #+end_src
 
-#+RESULTS:
-: jf/org-roam-node-insert
-
 This function returns the node’s type (e.g., it’s directory).
 
 #+begin_src emacs-lisp
