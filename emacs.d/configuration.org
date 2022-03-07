@@ -246,6 +246,7 @@ bit.  Also enable a few that I find helpful.  (I’ll enable a lot more later).
 In using a literate config, I have a mixture of two types of text: prose and code.  The following ~imenu-literate-emacs-lisp~ was pulled from [[https://www.reddit.com/r/emacs/comments/t6noeb/literate_imenu/][Literate imenu? : emacs]].
 
 #+begin_src emacs-lisp
+  (global-set-key (kbd "s-4") 'imenu-list-minor-mode)
   (use-package imenu-list
     :custom (imenu-list-focus-after-activation t)
     :straight t)
@@ -1211,7 +1212,7 @@ The ~ibuffer-sidebar~ package provides an interesting take on the side panel.
 It shows me what I’ve opened.  I like that.
 
 #+begin_src emacs-lisp
-  (global-set-key (kbd "s-4") 'ibuffer-sidebar-toggle-sidebar)
+  (global-set-key (kbd "s-3") 'ibuffer-sidebar-toggle-sidebar)
   (use-package ibuffer-sidebar
     :straight t
     :commands (ibuffer-sidebar-toggle-sidebar))
