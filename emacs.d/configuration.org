@@ -555,6 +555,9 @@ For that, I’m going to use the lightweight vertico package.
 		       #'consult-completion-in-region
 		     #'completion--in-region)
 		   args)))
+    (setq read-file-name-completion-ignore-case t
+	  read-buffer-completion-ignore-case t
+	  completion-ignore-case t)
     (advice-add #'completing-read-multiple
 		:override #'consult-completing-read-multiple)
     (setq vertico-cycle t))
@@ -1504,7 +1507,7 @@ are major modes others are minor modes.
     :straight t
     :hook (enh-ruby-mode . (lambda () (setq fill-column 100)))
     :hook (enh-ruby-mode . eldoc-mode)
-    :hook (enh-ruby-mode . imenu-create-index-function)
+    :hook (enh-ruby-mode . enh-ruby-imenu-create-index)
     :bind (:map enh-ruby-mode-map ("C-j" . avy-goto-char-timer))
     :mode (("\\(?:\\.rb\\|ru\\|rake\\|thor\\|jbuilder\\|gemspec\\|podspec\\|/\\(?:Gem\\|Rake\\|Cap\\|Thor\\|Vagrant\\|Guard\\|Pod\\)file\\)\\'" . enh-ruby-mode)))
   (add-to-list 'interpreter-mode-alist '("ruby" . enh-ruby-mode))
@@ -4098,9 +4101,10 @@ some additional options.
     ["Org"
      ["Add-Ons"
       ("C-e" "Export to TakeOnRules…" jf/export-org-to-tor :if-derived org-mode)
-      ("C-r" "Ref add…" org-roam-ref-add :if-derived org-mode)
-      ("C-s" "Tag as session report…" jf/org-tag-as-session-report :if-derived org-mode)
-      ("C-t" "Tag add…" org-roam-tag-add :if-derived org-mode)
+      ("r a" "Ref add…" org-roam-ref-add :if-derived org-mode)
+      ("t s" "Tag as session report…" jf/org-tag-as-session-report :if-derived org-mode)
+      ("t a" "Tag add…" org-roam-tag-add :if-derived org-mode)
+      ("t S" "Tag as session Scene…" jf/org-tag-session-scene-with-date :if-derived org-mode)
       ("M-c" "Context set…" jf/org-auto-tags--set-by-context :transient t)
       ("M-s" jf/org-auto-tags--transient :transient t)
       ("M-i" jf/indesk-current-files-on-desk--transient)

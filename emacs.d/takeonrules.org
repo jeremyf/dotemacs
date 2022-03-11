@@ -225,7 +225,7 @@ two concerns:
 	  (when (string-match property (org-element-property :key el)) el))))
 #+end_src
 
-** Jumping to the Blog Markdown File to Org File
+** Jumping from the Blog Markdown File to Org File
 
 Given that I have files in my [[id:1173D588-E239-4B13-BFA6-0C670DCE484A][Hugo]] source directory, I want a way to jump to the corresponding [[id:1D7B007F-C257-412E-B329-3E85AB8BC43E][Org-Mode]] file.
 
@@ -240,4 +240,25 @@ Given that I have files in my [[id:1173D588-E239-4B13-BFA6-0C670DCE484A][Hugo]] 
 	  (if (re-search-forward "\norg_id: \\(.+\\)\n" nil t)
 	      (find-file (org-id-find-id-file (match-string 1)))
 	    (message "Unable to find org_id: in document"))))))
+#+end_src
+
+** Creating a Scene for Session Notes
+
+#+begin_quote
+YOU CAN NOT HAVE A MEANINGFUL CAMPAIGN IF STRICT TIME RECORDS ARE NOT KEPT.
+--- Dungeon Master’s Guide (1979)
+#+end_quote
+
+In [[https://takeonrules.com/2017/04/30/heeding-gygaxs-admonition/][Heeding Gygax's Admonition]] I spent time crafting up a calendar.  For various session notes, I want to start attaching dates to scenes.
+
+#+begin_src emacs-lisp
+  (cl-defun jf/org-tag-session-scene-with-date (date &key (tags '("scene")) (buffer (current-buffer)))
+    "Tag the BUFFER with the TAGS and prompt for the DATE in which the scene occurred."
+    (interactive (list (completing-read "Scene Date: " (jf/org-macro-value-list "scene-date"))))
+    (save-excursion
+      (org-roam-tag-add tags)
+      (beginning-of-buffer)
+      (search-forward "#+FILETAGS:")
+      (next-line)
+      (insert (concat "\n{{{scene-date(" date ")}}}\n"))))
 #+end_src

@@ -686,29 +686,46 @@ I love [[https://github.com/minad][Daniel Mendler]]’s work; let’s test drive
 
   (add-to-list 'org-export-global-macros
 	       '("cite" . "@@html:<cite>@@$1@@html:</cite>@@"))
+
+  (add-to-list 'org-export-global-macros
+	       '("scene-date" . "#+begin_marginnote\nThe scene occurs on @@html:<span class=\"time\">@@$1@@html:</span>@@.\n#+end_marginnote"))
 #+end_src
 
 ** Hugo Specific
 
+The following macros map to my [[https://codeberg.org/takeonrules/takeonrules-hugo-theme/src/branch/main/layouts/shortcodes/glossary.html][Glossary shortcode of my hugo theme]]:
+
+- ~mention~
+- ~abbr~
+- ~abbr-plural~
+- ~linkToGame~
+
 #+begin_src emacs-lisp
+    (add-to-list 'org-export-global-macros
+		 '("mention" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" >}}@@"))
+    (add-to-list 'org-export-global-macros
+		 '("abbr" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" abbr=\"t\" >}}@@"))
   (add-to-list 'org-export-global-macros
-	       '("mention" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" >}}@@"))
-
-  (add-to-list 'org-export-global-macros
-	       '("abbr" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" abbr=\"t\" >}}@@"))
-
-  (add-to-list 'org-export-global-macros
-	       '("abbr-plural" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" abbr=\"t\" plural=\"t\" >}}@@"))
-
-  (add-to-list 'org-export-global-macros
-	       '("idiomatic" . "@@html:<i class=\"dfn\">@@$1@@html:</i>@@"))
-
-  (add-to-list 'org-export-global-macros
-	       '("sidenote" . "@@hugo:{{< sidenote >}}@@$1@@hugo:{{< /sidenote >}}@@"))
-
+		   '("abbr-plural" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" abbr=\"t\" plural=\"t\" >}}@@"))
   (add-to-list 'org-export-global-macros
 	       '("linkToGame" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" abbr=\"t\" >}}@@"))
+#+end_src
 
+I’ve taken to using the i-tag as idiomatic, meaning it’s a defined term (lacking it’s definition).  I don’t want to conflate this with org-modes =/= marker.
+
+#+begin_src emacs-lisp
+(add-to-list 'org-export-global-macros
+		 '("i" . "@@html:<i class=\"dfn\">@@$1@@html:</i>@@"))
+#+end_src
+
+Sometimes I use inline sidenotes, that’s the purpose of this macro.
+
+#+begin_src emacs-lisp
+  (add-to-list 'org-export-global-macros
+		   '("sidenote" . "@@hugo:{{< sidenote >}}@@$1@@hugo:{{< /sidenote >}}@@"))
+#+end_src
+
+#+begin_src emacs-lisp
   (add-to-list 'org-export-global-macros
 	       '("linkToSeries" . "@@hugo:{{< linkToSeries \"@@$1@@hugo:\" >}}@@"))
 #+end_src
@@ -729,6 +746,49 @@ I love [[https://github.com/minad][Daniel Mendler]]’s work; let’s test drive
 	"\" --only-matching --no-filename -r '$1' "
 	dir
 	" | sort | uniq")))))
+#+end_src
+
+** Removing Links
+
+#+begin_src emacs-lisp
+  (defun jf/org-link-delete-link ()
+    "Remove the link part of an org-mode link at point and keep
+  only the description"
+    (interactive)
+    (let ((elem (org-element-context)))
+      (if (eq (car elem) 'link)
+	  (let* ((content-begin (org-element-property :contents-begin elem))
+		 (content-end  (org-element-property :contents-end elem))
+		 (link-begin (org-element-property :begin elem))
+		 (link-end (org-element-property :end elem)))
+	    (if (and content-begin content-end)
+		(let ((content (buffer-substring-no-properties content-begin content-end)))
+		  (delete-region link-begin link-end)
+		  (insert (concat content " "))))))))
+#+end_src
+
+The following function tracks to the following feature request: [[https://github.com/org-roam/org-roam/issues/2119][Allow for `org-roam-buffer`'s Backlinks section to be unique per source · Issue #2119 · org-roam/org-roam]].
+
+/Note: I’ve chosen to overwrite the org-roam function./  Without this function, given my org-roam reference strategy, I have a tremendous number of backlinks.
+
+#+begin_src emacs-lisp
+  (defun org-roam-backlinks-get (node)
+    "Return the backlinks for NODE.  Limit to unique sources."
+    (let ((backlinks (org-roam-db-query
+		      [:select :distinct [source dest (funcall min pos) (funcall min properties)]
+		       :from links
+		       :where (= dest $s1)
+		       :and (= type "id")
+		       :group :by source]
+		      (org-roam-node-id node))))
+      (cl-loop for backlink in backlinks
+	       collect (pcase-let ((`(,source-id ,dest-id ,pos ,properties) backlink))
+			 (org-roam-populate
+			  (org-roam-backlink-create
+			   :source-node (org-roam-node-create :id source-id)
+			   :target-node (org-roam-node-create :id dest-id)
+			   :point pos
+			   :properties properties))))))
 #+end_src
 
 * Conclusion
