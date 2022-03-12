@@ -772,15 +772,39 @@ The following function tracks to the following feature request: [[https://github
 /Note: I’ve chosen to overwrite the org-roam function./  Without this function, given my org-roam reference strategy, I have a tremendous number of backlinks.
 
 #+begin_src emacs-lisp
-  (defun org-roam-backlinks-get (node)
-    "Return the backlinks for NODE.  Limit to unique sources."
-    (let ((backlinks (org-roam-db-query
-		      [:select :distinct [source dest (funcall min pos) (funcall min properties)]
-		       :from links
-		       :where (= dest $s1)
-		       :and (= type "id")
-		       :group :by source]
-		      (org-roam-node-id node))))
+  (setq org-roam-backlinks-section-unique-sources t)
+  (cl-defun org-roam-backlinks-section (node &key (unique org-roam-backlinks-section-unique-sources))
+    "The backlinks section for NODE.
+
+  When UNIQUE is nil, show all positions where references are found.
+  When UNIQUE is t, limit to unique sources."
+    (when-let ((backlinks (seq-sort #'org-roam-backlinks-sort (org-roam-backlinks-get node :unique unique))))
+      (magit-insert-section (org-roam-backlinks)
+	(magit-insert-heading "Backlinks:")
+	(dolist (backlink backlinks)
+	  (org-roam-node-insert-section
+	   :source-node (org-roam-backlink-source-node backlink)
+	   :point (org-roam-backlink-point backlink)
+	   :properties (org-roam-backlink-properties backlink)))
+	(insert ?\n))))
+
+  (cl-defun org-roam-backlinks-get (node &key unique)
+    "Return the backlinks for NODE.
+
+  When UNIQUE is nil, show all positions where references are found.
+  When UNIQUE is t, limit to unique sources."
+    (let* ((sql (if unique
+		    [:select :distinct [source dest pos properties]
+			     :from links
+			     :where (= dest $s1)
+			     :and (= type "id")
+			     :group :by source
+			     :having (funcall min pos)]
+		  [:select [source dest pos properties]
+			   :from links
+			   :where (= dest $s1)
+			   :and (= type "id")]))
+	   (backlinks (org-roam-db-query sql (org-roam-node-id node))))
       (cl-loop for backlink in backlinks
 	       collect (pcase-let ((`(,source-id ,dest-id ,pos ,properties) backlink))
 			 (org-roam-populate
@@ -789,6 +813,12 @@ The following function tracks to the following feature request: [[https://github
 			   :target-node (org-roam-node-create :id dest-id)
 			   :point pos
 			   :properties properties))))))
+
+  (setq org-roam-mode-section-functions
+	(list
+	 #'org-roam-backlinks-section
+	 ;; (lambda (node) (org-roam-backlinks-section node :unique t))
+	 #'org-roam-reflinks-section))
 #+end_src
 
 * Conclusion
