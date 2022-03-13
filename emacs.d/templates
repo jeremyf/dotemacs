@@ -21,3 +21,4 @@ org-mode
 (idiomatic "{{{i(" (p (completing-read "Idiom: " (jf/org-macro-value-list "i"))) ")}}}")
 (lts "{{{linkToSeries(" (p (completing-read "Series: " (jf/tor-series-list)) ) ")}}}")
 (ltg "{{{linkToGame(" (p (completing-read "Game: " (jf/tor-game-list)) ) ")}}}")
+(dl-bwg "- Task ::" n "- Intent ::" n "- Consequences ::" n "- Obstacle ::" n "- Dice ::" n "- Result :: ")
