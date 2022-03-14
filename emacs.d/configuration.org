@@ -1391,16 +1391,58 @@ It shows me what I’ve opened.  I like that.
     :config (global-vi-tilde-fringe-mode))
 #+end_src
 
-**** goggles.el
+**** pulsar.el
 
-- ~goggles.el~ :: Adds a little bit of visual feedback as you delete chunks.
+- ~pulsar.el~ :: A a little bit of visual feedback.  See [[https://protesilaos.com/codelog/2022-03-14-emacs-pulsar-demo/][Emacs: demonstration of pulsar.el | Protesilaos Stavrou]]
 
 #+begin_src emacs-lisp
-  (use-package goggles
-    :straight t
-    :hook ((prog-mode text-mode) . goggles-mode)
-    :diminish 'goggles-mode
-    :config (setq-default goggles-pulse t))
+  (use-package pulsar
+    :straight (pulsar :host gitlab :repo "protesilaos/pulsar")
+    :custom
+    (pulsar-pulse-functions ; Read the doc string for why not `setq'
+     '(recenter-top-bottom
+       move-to-window-line-top-bottom
+       reposition-window
+       bookmark-jump
+       other-window
+       delete-window
+       delete-other-windows
+       forward-page
+       backward-page
+       scroll-up-command
+       scroll-down-command
+       windmove-right
+       windmove-left
+       windmove-up
+       windmove-down
+       windmove-swap-states-right
+       windmove-swap-states-left
+       windmove-swap-states-up
+       windmove-swap-states-down
+       tab-new
+       tab-close
+       tab-next
+       org-next-visible-heading
+       org-previous-visible-heading
+       org-forward-heading-same-level
+       org-backward-heading-same-level
+       outline-backward-same-level
+       outline-forward-same-level
+       outline-next-visible-heading
+       outline-previous-visible-heading
+       ace-window
+       outline-up-heading))
+    :hook
+    (consult-after-jump . pulsar-recenter-top)
+    (consult-after-jump . pulsar-reveal-entry)
+    ;; integration with the built-in `imenu':
+    (imenu-after-jump . pulsar-recenter-top)
+    (imenu-after-jump . pulsar-reveal-entry)
+    :config
+    (pulsar-setup)
+    (setq pulsar-face 'pulsar-magenta
+	  pulsar-delay 0.055)
+    :bind (("C-x l" . pulsar-pulse-line)))
 #+end_src
 
 **** emojify.el
