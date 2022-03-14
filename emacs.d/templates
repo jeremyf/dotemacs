@@ -22,3 +22,4 @@ org-mode
 (lts "{{{linkToSeries(" (p (completing-read "Series: " (jf/tor-series-list)) ) ")}}}")
 (ltg "{{{linkToGame(" (p (completing-read "Game: " (jf/tor-game-list)) ) ")}}}")
 (dl-bwg "- Task ::" n "- Intent ::" n "- Consequences ::" n "- Obstacle ::" n "- Dice ::" n "- Result :: ")
+(date "{{{date(" (p (org-read-date nil nil nil "Date")) ", " p ")}}}")

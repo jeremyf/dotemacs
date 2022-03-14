@@ -772,8 +772,7 @@ The following function tracks to the following feature request: [[https://github
 /Note: I’ve chosen to overwrite the org-roam function./  Without this function, given my org-roam reference strategy, I have a tremendous number of backlinks.
 
 #+begin_src emacs-lisp
-  (setq org-roam-backlinks-section-unique-sources t)
-  (cl-defun org-roam-backlinks-section (node &key (unique org-roam-backlinks-section-unique-sources))
+  (cl-defun org-roam-backlinks-section (node &key (unique nil))
     "The backlinks section for NODE.
 
   When UNIQUE is nil, show all positions where references are found.
@@ -814,11 +813,34 @@ The following function tracks to the following feature request: [[https://github
 			   :point pos
 			   :properties properties))))))
 
+  (defun org-roam-buffer-render-contents ()
+    "Recompute and render the contents of an Org-roam buffer.
+  Assumes that the current buffer is an `org-roam-mode' based
+  buffer."
+    (let ((inhibit-read-only t))
+      (erase-buffer)
+      (org-roam-mode)
+      (setq-local default-directory org-roam-buffer-current-directory)
+      (setq-local org-roam-directory org-roam-buffer-current-directory)
+      (org-roam-buffer-set-header-line-format
+       (org-roam-node-title org-roam-buffer-current-node))
+      (magit-insert-section (org-roam)
+	(magit-insert-heading)
+	(dolist (section-fn org-roam-mode-section-functions)
+	  (pcase section-fn
+	    ((pred functionp)
+	     (funcall section-fn org-roam-buffer-current-node))
+	    (`(,fn . ,args)
+	     (apply fn (cons org-roam-buffer-current-node args)))
+	    (_
+	     (user-error "Invalid `org-roam-mode-section-functions specification.'")))))
+      (run-hooks 'org-roam-buffer-postrender-functions)
+      (goto-char 0)))
+
+
   (setq org-roam-mode-section-functions
-	(list
-	 #'org-roam-backlinks-section
-	 ;; (lambda (node) (org-roam-backlinks-section node :unique t))
-	 #'org-roam-reflinks-section))
+	'((org-roam-backlinks-section :unique t)
+	  (org-roam-reflinks-section)))
 #+end_src
 
 * Conclusion
