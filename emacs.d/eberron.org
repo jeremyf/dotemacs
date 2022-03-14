@@ -24,7 +24,7 @@ The functions of this file build on functions from [[file:configuration.org][Con
      "\n"
      '("| Name             | House               | Stock                 |"
        "|------------------+---------------------+-----------------------|"
-       "| Detection Medani | half-elf            |                       |"
+       "| Detection        | Medani              | half-elf              |"
        "| Finding          | Tharashk            | half-orc,  human      |"
        "| Handling         | Vadalis             | human                 |"
        "| Healing          | Jorasco             | halfling              |"
