@@ -1229,7 +1229,8 @@ It shows me what I’ve opened.  I like that.
 #+begin_src emacs-lisp
   (use-package lin
     :straight (lin :host gitlab :repo "protesilaos/lin")
-    :config (lin-add-to-many-modes))
+    ;; :config (lin-add-to-many-modes))
+    :config (lin-setup))
 #+end_src
 
 **** all-the-icons.el
@@ -1441,7 +1442,7 @@ It shows me what I’ve opened.  I like that.
     :config
     (pulsar-setup)
     (setq pulsar-face 'pulsar-magenta
-	  pulsar-delay 0.055)
+	  pulsar-delay 0.05)
     :bind (("C-x l" . pulsar-pulse-line)))
 #+end_src
 
@@ -2740,6 +2741,7 @@ transient function for that.
 #+begin_src emacs-lisp
   (use-package elpher :straight t)
 #+end_src
+
 *** EWW
 
 - ~eww.el~ :: a plain text browser.  Use this to see just how bad much of the web has become.

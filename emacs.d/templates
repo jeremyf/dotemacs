@@ -8,6 +8,14 @@ emacs-lisp-mode
 
 (lambda "(lambda (" p ")" n> r> ")")
 
+enh-ruby-mode ruby-mode
+
+(db "require \"debug\"; binding.break" n)
+
+web-mode
+
+(db "<% require \"debug\"; binding.break %>" n)
+
 org-mode
 
 (title "#+title: " p n "#+author: Jeremy Friesen" n "#+language: en" n n)
@@ -23,3 +31,4 @@ org-mode
 (ltg "{{{linkToGame(" (p (completing-read "Game: " (jf/tor-game-list)) ) ")}}}")
 (dl-bwg "- Task ::" n "- Intent ::" n "- Consequences ::" n "- Obstacle ::" n "- Dice ::" n "- Result :: ")
 (date "{{{date(" (p (org-read-date nil nil nil "Date")) ", " p ")}}}")
+(faction "* Stat Block" n n "- Name ::" n "- Faction Type ::" n "- Influence ::" n "- Funds ::" n "- Leader ::" n "- Inner Circle ::" n "- Membership ::" n "- Assets ::" n "- Territory ::" n "- Alliances ::" n "- Allegiances ::" n "- Rivals ::" n "- Doctrine ::" n "- Tradition :: ")

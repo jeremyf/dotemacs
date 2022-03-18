@@ -158,6 +158,33 @@ Most role-playing games I play may require a bit of consultation.  The following
        "  Volcanic eruptions, cataclysm ............... +4 Ob"
        "  Seeing horrible magic at work ............... +4 Ob"
        "  Being in the presence of the supernatural ... +5 Ob")))
+
+  (jf/transient-quick-help jf/bwg-qh-test-difficulty
+    :header "BWG Difficulty of Test by Dice Rolled (p41)"
+    :label "Test Difficulty"
+    :body
+    (s-join
+     "\n"
+     '("| Dice | Routine | Difficult | Challenging |
+	|------+---------+-----------+-------------|
+	|   1D | Ob 1    | Ob 1      | Ob 2+       |
+	|   2D | Ob 1    | Ob 2      | Ob 3+       |
+	|   3D | Ob 1-2  | Ob 3      | Ob 4+       |
+	|   4D | Ob 1-2  | Ob 3-4    | Ob 5+       |
+	|   5D | Ob 1-3  | Ob 4-5    | Ob 6+       |
+	|   6D | Ob 1-4  | Ob 5-6    | Ob 7+       |
+	|   7D | Ob 1-4  | Ob 5-7    | Ob 8+       |
+	|   8D | Ob 1-5  | Ob 6-8    | Ob 9+       |
+	|   9D | Ob 1-6  | Ob 7-9    | Ob 10+      |
+	|  10D | Ob 1-7  | Ob 8-10   | Ob 11+      |
+	|  11D | Ob 1-8  | Ob 9-11   | Ob 12+      |
+	|  12D | Ob 1-9  | Ob 10-12  | Ob 13+      |
+	|  13D | Ob 1-10 | Ob 11-13  | Ob 14+      |
+	|  14D | Ob 1-11 | Ob 12-14  | Ob 15+      |
+	|  15D | Ob 1-12 | Ob 13-15  | Ob 16+      |
+	|  16D | Ob 1-13 | Ob 14-16  | Ob 17+      |
+	|  17D | Ob 1-14 | Ob 15-17  | Ob 18+      |
+	|  18D | Ob 1-15 | Ob 16-18  | Ob 19+      |")))
 #+end_src
 
 ** Physical Trauma Gray Scale (PTGS)
@@ -344,6 +371,7 @@ previously defined the suffixes.
      ("e" jf/bwg-qh-expertise-exponent)
      ("p" "PTGS" jf/bwg-qh-ptgs)
      ("s" jf/bwg-qh-steel-test-adjustments)
+     ("t" jf/bwg-qh-test-difficulty)
      ("w" jf/bwg-qh-wises)
      ])
 #+end_src
