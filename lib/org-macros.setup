@@ -1,0 +1,4 @@
+# -*- mode: org; -*-
+
+#+MACRO: epigraph @@hugo:{{< epigraph key="$1" >}}@@
+#+MACRO: blockquote (eval (jf/blockquote-hugo $1))

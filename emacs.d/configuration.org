@@ -2226,6 +2226,12 @@ I have only provisionally adopted this.  I like the idea of abbreviations/snippe
 #+end_src
 
 ** Integrated “Applications”
+*** Terminal Emulation
+
+#+begin_src emacs-lisp
+  (use-package vterm
+    :straight t)
+#+end_src
 *** Variable and Constant Definitions
 
 These are a few variables and cosntants that I use throughout my configuration.
@@ -4144,14 +4150,17 @@ some additional options.
       ]]
     ["Org"
      ["Add-Ons"
-      ("C-e" "Export to TakeOnRules…" jf/export-org-to-tor :if-derived org-mode)
+      ("C-e a" "Add epigraph properties…" jf/org-mode-add-epigraph-keys :if-derived org-mode)
+      ("C-e i" "Add epigraph at point…" jf/org-roam-insert-at-point-epigraph-macro :if-derived org-mode)
       ("r a" "Ref add…" org-roam-ref-add :if-derived org-mode)
       ("t s" "Tag as session report…" jf/org-tag-as-session-report :if-derived org-mode)
       ("t a" "Tag add…" org-roam-tag-add :if-derived org-mode)
-      ("t S" "Tag as session Scene…" jf/org-tag-session-scene-with-date :if-derived org-mode)
+      ("t S" "Tag as session Scene…" jf/org-tag-session-scene-with-date :if-derived org-mode)]
+     ["Contexts"
       ("M-c" "Context set…" jf/org-auto-tags--set-by-context :transient t)
       ("M-s" jf/org-auto-tags--transient :transient t)
       ("M-i" jf/indesk-current-files-on-desk--transient)
+      ("x" "Export to TakeOnRules…" jf/export-org-to-tor :if-derived org-mode)
       ]
      ["Grag Refs"
       ("g e" "Elfeed" jf/menu--org-capture-elfeed-show :if-derived elfeed-show-mode)

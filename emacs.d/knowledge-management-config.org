@@ -435,6 +435,17 @@ For each of those functions, I establish the filter based on the current context
      :templates 'jf/org-roam-templates-context-fn))
 #+end_src
 
+#+begin_src emacs-lisp
+  (defun jf/org-roam-insert-at-point-epigraph-macro (&optional initial-input)
+    "Insert an epigraph macro at point.
+
+  Filter selections to INITIAL-INPUT."
+    (interactive)
+    (let ((node (org-roam-node-read initial-input (lambda (node) (jf/org-roam-filter-context-fn node :tag-list '("epigraphs"))))))
+      (insert (format "\n{{{epigraph(%s, %s)}}}\n"
+		      (org-roam-node-id node) (org-roam-node-title node)))))
+#+end_src
+
 And with all of that, let’s get into the org-roam configuration.
 
 #+begin_src emacs-lisp
@@ -688,12 +699,12 @@ The following macros map to my [[https://codeberg.org/takeonrules/takeonrules-hu
 - ~linkToGame~
 
 #+begin_src emacs-lisp
-    (add-to-list 'org-export-global-macros
-		 '("mention" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" >}}@@"))
-    (add-to-list 'org-export-global-macros
-		 '("abbr" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" abbr=\"t\" >}}@@"))
   (add-to-list 'org-export-global-macros
-		   '("abbr-plural" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" abbr=\"t\" plural=\"t\" >}}@@"))
+	       '("mention" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" >}}@@"))
+  (add-to-list 'org-export-global-macros
+	       '("abbr" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" abbr=\"t\" >}}@@"))
+  (add-to-list 'org-export-global-macros
+	       '("abbr-plural" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" abbr=\"t\" plural=\"t\" >}}@@"))
   (add-to-list 'org-export-global-macros
 	       '("linkToGame" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" abbr=\"t\" >}}@@"))
 #+end_src
@@ -781,6 +792,31 @@ See https://takeonrules.com/2022/01/11/resolving-an-unable-to-resolve-link-error
       (when prefix (org-roam-db-clear-all))
       (org-roam-db-sync)
       (org-roam-update-org-id-locations)))
+#+end_src
+
+** Capturing Epigraphs
+
+For my blogging purposes, I capture epigraphs and blockquotes.  These are treated somewhat differently.
+
+The ~jf/org-mode-add-epigraph-keys~ function seeds the properties for a
+
+#+begin_src emacs-lisp
+  (defun jf/org-mode-add-epigraph-keys ()
+    "Add the epigraph properties to the current org-roam node."
+    (interactive)
+    (save-excursion
+      (org-roam-tag-add '("epigraphs"))
+      (dolist (prop (list
+		     '("AUTHOR_NAME" t)
+		     '("AUTHOR_URL" nil)
+		     '("AUTHOR_KEY" nil)
+		     '("WORK_TITLE" t)
+		     '("WORK_URL" nil)
+		     '("WORK_KEY" nil)
+		     '("POEM" nil)
+		     '("PAGE" nil)
+		     '("TRANSLATOR_NAME" nil)))
+	(org-roam-property-add (car prop) (if (cadr prop) "**REQUIRED**" "")))))
 #+end_src
 
 * Conclusion

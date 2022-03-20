@@ -16,17 +16,30 @@ I want to add a custom org exporter for [[id:C8741E14-55FB-4250-A43B-2CCFB74A7A5
 that I have required ~ox~.
 
 #+BEGIN_SRC emacs-lisp
-  (use-package org
-    :init (require 'ox))
+  (require 'ox)
 
   (use-package ox-hugo
     :straight t
-    :custom (org-hugo-paired-shortcodes "marginnote sidenote"))
+    :custom (org-hugo-paired-shortcodes "marginnote sidenote")
+    :after ox)
 
+  (setq org-hugo-base-dir "~/git/takeonrules.source")
+
+  (defvar jf/org-macros-setup-filename
+    "~/git/takeonrules.source/lib/org-macros.setup"
+    "The path to the file that has inline org macros.")
 
   (with-eval-after-load 'ox-hugo
     (add-to-list 'org-hugo-special-block-type-properties '("sidenote" . (:trim-pre t :trim-post t))))
 #+END_SRC
+
+#+RESULTS:
+| sidenote | :trim-pre | t | :trim-post | t |
+| audio    | :raw      | t |            |   |
+| katex    | :raw      | t |            |   |
+| mark     | :trim-pre | t | :trim-post | t |
+| tikzjax  | :raw      | t |            |   |
+| video    | :raw      | t |            |   |
 
 I use ~org-roam~ for my organization, so I’m assuming I’ll be exporting one
 file at a time.  I have considered using [[https://ox-hugo.scripter.co/][ox-hugo]], but it’s not quite what I’m
@@ -147,9 +160,9 @@ two concerns:
   (cl-defun jf/export-org-to-tor--inject-additional-front-matter (&key org_id subtitle title drawer)
     "Export additional front matter.
 
-  We want to ensure that we export the ORG_ID, SUBTITLE, and TITLE.
-  And add relevant metadata.
-  When DRAWER is not nil, put the front-matter in the drawer."
+    We want to ensure that we export the ORG_ID, SUBTITLE, and TITLE.
+    And add relevant metadata.
+    When DRAWER is not nil, put the front-matter in the drawer."
     (beginning-of-buffer)
     (search-forward-regexp "#\\+HUGO_FRONT_MATTER_FORMAT: yaml")
     (insert (concat
@@ -161,7 +174,9 @@ two concerns:
 	     "\n#+HUGO_CUSTOM_FRONT_MATTER: :layout post"
 	     "\n#+HUGO_CUSTOM_FRONT_MATTER: :licenses '(all-rights-reserved)"
 	     "\n#+HUGO_CUSTOM_FRONT_MATTER: :draft true"
-	     "\n#+HUGO_CUSTOM_FRONT_MATTER: :org_id " org_id))
+	     "\n#+HUGO_CUSTOM_FRONT_MATTER: :org_id " org_id
+	     "\n#+MACRO: " jf/org-macros-setup-filename)
+	    )
     (let ((date (car (org-property-values "SESSION_REPORT_DATE"))))
       (when date
 	(let ((game (car (org-property-values "SESSION_REPORT_GAME")))
@@ -195,7 +210,7 @@ two concerns:
   (cl-defun jf/org-tag-as-session-report (&key (buffer (current-buffer)))
     "Set the current BUFFER as a \"session-report\".
 
-  This involves adding a FILETAG and metadata around the details of the session report."
+    This involves adding a FILETAG and metadata around the details of the session report."
     (interactive)
     (with-current-buffer buffer
       (save-excursion
@@ -218,11 +233,11 @@ two concerns:
   (defun jf/org-global-props (&optional property)
     "Get the plists of global org properties of current buffer."
     (unless property (setq property "PROPERTY"))
-      (org-element-map
-	  (org-element-parse-buffer)
-	  'keyword
-	(lambda (el)
-	  (when (string-match property (org-element-property :key el)) el))))
+    (org-element-map
+	(org-element-parse-buffer)
+	'keyword
+      (lambda (el)
+	(when (string-match property (org-element-property :key el)) el))))
 #+end_src
 
 ** Jumping from the Blog Markdown File to Org File
@@ -262,3 +277,98 @@ In [[https://takeonrules.com/2017/04/30/heeding-gygaxs-admonition/][Heeding Gyga
       (next-line)
       (insert (concat "\n{{{scene-date(" date ")}}}\n"))))
 #+end_src
+
+** Extracting a Blockquote Mechanism
+
+As I’ve moved towards blogging in org-mode, I’ve started capturing more information in ~org-roam~ nodes.  This includes quotes.  My goal is to structure each quote that I can declare it as an epigraph /or/ a blockquote.
+
+These functions with ~./lib/org-macros.setup~.
+
+#+begin_src emacs-lisp
+  (defun jf/blockquote-hugo (node-id)
+    "Export the blockquote for the given NODE-ID"
+    (let ((data (jf/org-mode-extract-body-and-properties node-id)))
+      (concat
+       "\n{{{< blockquote " (jf/hugo-blockquote-attributes-for (plist-get data :properties)) ">}}}\n"
+       (format "%s" (plist-get data :body))
+       "\n{{{< /blockquote >}}}\n")))
+
+  (defun jf/hugo-blockquote-attributes-for (properties)
+    "Map the PROPERTIES to attributes."
+    (seq-mapcat (lambda (element)
+		  (let ((key (car element))
+			(text (cadr element)))
+		    (pcase key
+		      ("ID" (format "orgId=\"%s\" " text))
+		      ("TITLE" (format "cite=\"%s\" " text))
+		      ("CITE_URL" (format "citeUrl=\"%s\" " text))
+		      ("AUTHOR" (format "pre=\"%s\" " text))
+		      ("CITE_POST" (format "post=\"%s\" " text))
+		      (_ ""))))
+		properties))
+
+  (defun jf/org-mode-get-keyword-key-value (kwd)
+    "Map KWD to list."
+    (let ((data (cadr kwd)))
+      (list (plist-get data :key)
+	    (plist-get data :value))))
+
+  (cl-defun jf/org-mode-extract-body-and-properties (node-id)
+    "Extract quotable body and properties from NODE-ID."
+    (with-current-buffer (find-file-noselect (org-id-find-id-file node-id))
+      (list :properties (org-element-map (org-element-parse-buffer 'object)
+			    '(keyword node-property)
+			  #'jf/org-mode-get-keyword-key-value)
+	    :body (jf/org-mode-extract-body-from-current-buffer))))
+
+
+  (defun jf/org-mode-extract-body-from-current-buffer ()
+    "Extract the body from the current org-mode body"
+    (buffer-substring (save-excursion
+			(jf/org-mode-find-point-that-starts-body t)
+			(point))
+		      (org-entry-end-position)))
+
+  (defun jf/org-mode-find-point-that-starts-body (&optional unsafe)
+    "Skip headline, planning line, and all drawers in current entry.
+    If UNSAFE is non-nil, assume point is on headline."
+    (unless unsafe
+      ;; To improve performance in loops (e.g. with `org-map-entries')
+      (org-back-to-heading))
+    (cl-loop for element = (org-element-at-point)
+	     for pos = (pcase element
+			 (`(headline . ,_) (org-element-property :contents-begin element))
+			 (`(,(or 'planning 'property-drawer 'node-property 'keyword 'drawer) . ,_) (org-element-property :end element)))
+	     while pos
+	     do (goto-char pos)))
+#+end_src
+
+Some helper methods for to aid in opening files.
+
+#+begin_src emacs-lisp
+  (defun jf/follow-thing-at-point (fn &rest args)
+    "Lookup org-id for `thing-at-point'.  If it exists, open it.
+
+  Otherwise apply FN with ARGS."
+    (let* ((node-id (format "%s" (thing-at-point 'symbol)))
+	   (node (jf/org-id-find-id-file node-id)))
+      (if node
+	  (find-file node)
+	(apply fn args))))
+
+  (defun jf/org-id-find-id-file (id)
+    "Query the id database for the file in which ID is located.
+
+  Unlike `org-id-find-id-file' this does not fallback to the current file."
+    (unless org-id-locations (org-id-locations-load))
+    (or (and org-id-locations
+	     (hash-table-p org-id-locations)
+	     (gethash id org-id-locations))
+	nil))
+
+  (advice-add #'org-open-at-point :around #'jf/follow-thing-at-point '((name . "wrapper")))
+  (advice-add #'markdown-follow-thing-at-point :around #'jf/follow-thing-at-point '((name . "wrapper")))
+  (advice-add #'xref-find-definitions :around #'jf/follow-thing-at-point '((name . "wrapper")))
+#+end_src
+
+#+RESULTS:
