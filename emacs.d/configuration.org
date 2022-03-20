@@ -4118,7 +4118,7 @@ some additional options.
       ("-t" "TakeOnRules…" jf/menu--tor)
       ]
      ["Jump to"
-      ;; ("j a" "Agenda" ibuffer)
+      ("j a" "Agenda" (lambda () (interactive) (find-file "~/git/org/agenda.org")))
       ("j b" "iBuffer" ibuffer)
       ;; ("j f" "Flycheck" consult-flycheck :if-derived (or markdown-mode org-mode))
       ("j g" "Global Mark" consult-global-mark)
