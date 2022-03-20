@@ -754,77 +754,11 @@ Sometimes I use inline sidenotes, that’s the purpose of this macro.
 		  (insert (concat content " "))))))))
 #+end_src
 
-The following function tracks to the following feature request: [[https://github.com/org-roam/org-roam/issues/2119][Allow for `org-roam-buffer`'s Backlinks section to be unique per source · Issue #2119 · org-roam/org-roam]].
+The following configuration ensures that I render unique links in the backlink section of org-roam nodes.
 
-/Note: I’ve chosen to overwrite the org-roam function./  Without this function, given my org-roam reference strategy, I have a tremendous number of backlinks.
+/[[https://github.com/org-roam/org-roam/blob/master/CHANGELOG.md#221][Org-Roam 2.2.1]] resolves [[https://github.com/org-roam/org-roam/issues/2119][Allow for `org-roam-buffer`'s Backlinks section to be unique per source · Issue #2119 · org-roam/org-roam]]./
 
 #+begin_src emacs-lisp
-  (cl-defun org-roam-backlinks-section (node &key (unique nil))
-    "The backlinks section for NODE.
-
-  When UNIQUE is nil, show all positions where references are found.
-  When UNIQUE is t, limit to unique sources."
-    (when-let ((backlinks (seq-sort #'org-roam-backlinks-sort (org-roam-backlinks-get node :unique unique))))
-      (magit-insert-section (org-roam-backlinks)
-	(magit-insert-heading "Backlinks:")
-	(dolist (backlink backlinks)
-	  (org-roam-node-insert-section
-	   :source-node (org-roam-backlink-source-node backlink)
-	   :point (org-roam-backlink-point backlink)
-	   :properties (org-roam-backlink-properties backlink)))
-	(insert ?\n))))
-
-  (cl-defun org-roam-backlinks-get (node &key unique)
-    "Return the backlinks for NODE.
-
-  When UNIQUE is nil, show all positions where references are found.
-  When UNIQUE is t, limit to unique sources."
-    (let* ((sql (if unique
-		    [:select :distinct [source dest pos properties]
-			     :from links
-			     :where (= dest $s1)
-			     :and (= type "id")
-			     :group :by source
-			     :having (funcall min pos)]
-		  [:select [source dest pos properties]
-			   :from links
-			   :where (= dest $s1)
-			   :and (= type "id")]))
-	   (backlinks (org-roam-db-query sql (org-roam-node-id node))))
-      (cl-loop for backlink in backlinks
-	       collect (pcase-let ((`(,source-id ,dest-id ,pos ,properties) backlink))
-			 (org-roam-populate
-			  (org-roam-backlink-create
-			   :source-node (org-roam-node-create :id source-id)
-			   :target-node (org-roam-node-create :id dest-id)
-			   :point pos
-			   :properties properties))))))
-
-  (defun org-roam-buffer-render-contents ()
-    "Recompute and render the contents of an Org-roam buffer.
-  Assumes that the current buffer is an `org-roam-mode' based
-  buffer."
-    (let ((inhibit-read-only t))
-      (erase-buffer)
-      (org-roam-mode)
-      (setq-local default-directory org-roam-buffer-current-directory)
-      (setq-local org-roam-directory org-roam-buffer-current-directory)
-      (org-roam-buffer-set-header-line-format
-       (org-roam-node-title org-roam-buffer-current-node))
-      (magit-insert-section (org-roam)
-	(magit-insert-heading)
-	(dolist (section-fn org-roam-mode-section-functions)
-	  (pcase section-fn
-	    ((pred functionp)
-	     (funcall section-fn org-roam-buffer-current-node))
-	    (`(,fn . ,args)
-	     (apply fn (cons org-roam-buffer-current-node args)))
-	    (_
-	     (user-error "Invalid `org-roam-mode-section-functions specification.'")))))
-      (run-hooks 'org-roam-buffer-postrender-functions)
-      (goto-char 0)))
-
-
   (setq org-roam-mode-section-functions
 	'((org-roam-backlinks-section :unique t)
 	  (org-roam-reflinks-section)))
