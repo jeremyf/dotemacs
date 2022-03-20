@@ -440,19 +440,6 @@ And with all of that, let’s get into the org-roam configuration.
 #+begin_src emacs-lisp
   (use-package org-roam
     :straight t
-    :config
-    ;; I encountered the following message when attempting to export data:
-    ;;
-    ;; => "org-export-data: Unable to resolve link: EXISTING-PROPERTY-ID"
-    ;;
-    ;; See https://takeonrules.com/2022/01/11/resolving-an-unable-to-resolve-link-error-for-org-mode-in-emacs/ for details
-    (defun jf/force-org-rebuild-cache ()
-      "Call some functions to rebuild the `org-mode' and `org-roam' cache."
-      (interactive)
-      (org-id-update-id-locations)
-      ;; Note: you may need `org-roam-db-clear-all' followed by `org-roam-db-sync'
-      (org-roam-db-sync)
-      (org-roam-update-org-id-locations))
     :custom
     ;; See https://github.com/nobiot/org-transclusion/issues/136
     (org-roam-db-extra-links-exclude-keys '((node-property "ROAM_REFS")))
@@ -841,6 +828,25 @@ The following function tracks to the following feature request: [[https://github
   (setq org-roam-mode-section-functions
 	'((org-roam-backlinks-section :unique t)
 	  (org-roam-reflinks-section)))
+#+end_src
+
+** Syncing the Org Caches
+
+I encountered the following message when attempting to export data:  ~=> "org-export-data: Unable to resolve link: EXISTING-PROPERTY-ID"~
+
+See https://takeonrules.com/2022/01/11/resolving-an-unable-to-resolve-link-error-for-org-mode-in-emacs/ for details
+
+#+begin_src emacs-lisp
+  (defun jf/force-org-rebuild-cache (prefix-arg)
+    "Call some functions to rebuild the `org-mode' and `org-roam' cache.
+
+  When given PREFIX_ARG, clear the org-roam database (via `org-roam-db-clear-all') then sync.  This will slow down the sync."
+    (interactive "P")
+    (let ((prefix (car prefix-arg)))
+      (org-id-update-id-locations)
+      (when prefix (org-roam-db-clear-all))
+      (org-roam-db-sync)
+      (org-roam-update-org-id-locations)))
 #+end_src
 
 * Conclusion
