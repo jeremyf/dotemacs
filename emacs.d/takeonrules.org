@@ -26,7 +26,7 @@ that I have required ~ox~.
   (setq org-hugo-base-dir "~/git/takeonrules.source")
 
   (defvar jf/org-macros-setup-filename
-    "~/git/takeonrules.source/lib/org-macros.setup"
+    "~/git/dotemacs/lib/org-macros.setup"
     "The path to the file that has inline org macros.")
 
   (with-eval-after-load 'ox-hugo
@@ -175,7 +175,7 @@ two concerns:
 	     "\n#+HUGO_CUSTOM_FRONT_MATTER: :licenses '(all-rights-reserved)"
 	     "\n#+HUGO_CUSTOM_FRONT_MATTER: :draft true"
 	     "\n#+HUGO_CUSTOM_FRONT_MATTER: :org_id " org_id
-	     "\n#+MACRO: " jf/org-macros-setup-filename)
+	     "\n#+INCLUDE: " jf/org-macros-setup-filename)
 	    )
     (let ((date (car (org-property-values "SESSION_REPORT_DATE"))))
       (when date
