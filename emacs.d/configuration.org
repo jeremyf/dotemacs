@@ -1049,13 +1049,13 @@ More on these component matchings styles is available at [[https://github.com/mi
     (corfu-auto-prefix 2)
     (corfu-auto-delay 0.25)
 
-    (corfu-min-width 80)
-    (corfu-max-width corfu-min-width)     ; Always have the same width
+    ;; (corfu-min-width 80)
+    ;; (corfu-max-width corfu-min-width)     ; Always have the same width
     (corfu-count 14)
     (corfu-scroll-margin 4)
     (corfu-cycle nil)
 
-    (corfu-echo-documentation nil)        ; Already use corfu-doc
+    ;; (corfu-echo-documentation nil)        ; Already use corfu-doc
     (corfu-separator ?\s)                 ; Necessary for use with orderless
     (corfu-quit-no-match 'separator)
 
@@ -1122,22 +1122,23 @@ More on these component matchings styles is available at [[https://github.com/mi
   (use-package corfu-doc
     ;; NOTE 2022-02-05: At the time of writing, `corfu-doc' is not yet on melpa
     :straight (corfu-doc :type git :host github :repo "galeo/corfu-doc")
-    :after corfu
     :bind (:map corfu-map
 		;; This is a manual toggle for the documentation window.
 		([remap corfu-show-documentation] . corfu-doc-toggle) ; Remap the default doc command
 		;; Scroll in the documentation window
 		("M-n" . corfu-doc-scroll-up)
 		("M-p" . corfu-doc-scroll-down))
+    :hook (corfu-mode . corfu-doc-mode)
     :custom
-    (corfu-doc-delay 0.5)
-    (corfu-doc-max-width 70)
-    (corfu-doc-max-height 20)
+    (corfu-doc-delay 0.1)
+    (corfu-doc-hide-threshold 10)
+    (corfu-doc-max-width 60)
+    (corfu-doc-max-height 10)
 
     ;; NOTE 2022-02-05: I've also set this in the `corfu' use-package to be
     ;; extra-safe that this is set when corfu-doc is loaded. I do not want
     ;; documentation shown in both the echo area and in the `corfu-doc' popup.
-    (corfu-echo-documentation nil)
+    ;; (corfu-echo-documentation nil)
     :config
     ;; NOTE 2022-02-05: This is optional. Enabling the mode means that every corfu
     ;; popup will have corfu-doc already enabled. This isn't desirable for me
@@ -1614,6 +1615,8 @@ For awhile, I was trying to use lsp-mode.  It might look a bit nicer, but it was
     (add-to-list 'eglot-server-programs
 		 `(enh-ruby-mode . ("solargraph" "socket" "--port" :autoport)))
     :straight t)
+
+  (setq completion-category-overrides '((eglot (styles orderless))))
 #+end_src
 
 **** lua-mode.el
