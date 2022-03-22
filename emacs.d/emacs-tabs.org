@@ -1,59 +1,65 @@
+# -*- org-insert-tilde-language: emacs-lisp; -*-
+#+TITLE: Tabs
+
 Show tabs in the current window.  The tab system is something I wrestle with, but I appreciate it’s existence.  These configurations make it easier to use.
 
 #+begin_src emacs-lisp
-  (global-tab-line-mode t)
-  ;; This maps to MacOS's tab switching keys.
-  (global-set-key (kbd "s-{") 'previous-buffer)
-  (global-set-key (kbd "s-}") 'next-buffer)
-#+end_src
+  (use-package centaur-tabs
+    :straight t
+    :commands (centaur-tabs-group-by-projectile-project)
+    :commands (centaur-tabs-group-buffer-groups)
+    :config
+    (setq centaur-tabs-set-icons t
+	  centaur-tabs-enable-ido-completion nil
+	  centaur-tabs-set-modified-marker t)
+    :bind
+    ;; Move by group (e.g. “project”)
+    ("s-[" . centaur-tabs-backward-group)
+    ("s-]" . centaur-tabs-forward-group)
+    ;; Move through the tabs of the group
+    ("s-{" . centaur-tabs-backward-tab)
+    ("s-}" . centaur-tabs-forward-tab)
+    ("s-\\" . centaur-tabs-switch-group)
+    ("M-s-\\" . jf/centaur-tabs-toggle-grouping))
 
-#+begin_src emacs-lisp
-  ;; Cribbed from https://mmk2410.org/2022/02/11/using-emacs-tab-bar-mode/
-  ;;
-  ;; Though reworked to reflect "my" namespace and misnamed functions.
-  (defun jf/tab-bar-switch-or-create (name func)
-    (if (jf/tab-bar-tab-exists name)
-	(tab-bar-switch-to-tab name)
-      (jf/tab-bar-new-tab name func)))
-
-  (defun jf/tab-bar-tab-exists (name)
-    (member name
-	    (mapcar #'(lambda (tab) (alist-get 'name tab))
-		    (tab-bar-tabs))))
-
-  (defun jf/tab-bar-new-tab (name func)
-    (when (eq nil tab-bar-mode)
-      (tab-bar-mode))
-    (tab-bar-new-tab)
-    (tab-bar-rename-tab name)
-    (funcall func))
-
-  (defun jf/tab-bar-run-rss ()
+  (defun jf/centaur-tabs-toggle-grouping ()
     (interactive)
-    (jf/tab-bar-switch-or-create
-     "RSS"
-     #'rss))
+    (if (jf/centaur-tabs-grouping-by-buffer-groups?)
+	(centaur-tabs-group-by-projectile-project)
+      (centaur-tabs-group-buffer-groups)))
 
-  (defun jf/tab-bar-run-agenda ()
-    (interactive)
-    (jf/tab-bar-switch-or-create
-     "Agenda"
-     #'(lambda ()
-	 (org-agenda nil "a"))))
+  (defun jf/centaur-tabs-grouping-by-buffer-groups? ()
+    (eq 'centaur-tabs-buffer-groups centaur-tabs-buffer-groups-function))
 
-  (defun jf/tab-bar-run-daily ()
-    (interactive)
-    (jf/tab-bar-switch-or-create
-     "Daily"
-     #'(lambda ()
-	 (org-roam-dailies-find-today)
-	 (global-tab-line-mode nil))))
+  (centaur-tabs-mode t)
+  ;; (centaur-tabs-headline-match)
 
-  (defun jf/tab-bar-run-forem-code ()
-    (interactive)
-    (jf/tab-bar-switch-or-create
-     "Forem Code"
-     #'(lambda ()
-	 (find-file "~/git/forem/README.md")
-	 (global-tab-line-mode t))))
+
+  (defun centaur-tabs-hide-tab (x)
+    "Do no to show buffer X in tabs."
+    (let ((name (format "%s" x)))
+      (or
+       ;; Current window is not dedicated window.
+       (window-dedicated-p (selected-window))
+
+       ;; Buffer name not match below blacklist.
+       (string-prefix-p "*epc" name)
+       (string-prefix-p "*helm" name)
+       (string-prefix-p "*Helm" name)
+       (string-prefix-p "*Compile-Log*" name)
+       (string-prefix-p "*lsp" name)
+       (string-prefix-p "*company" name)
+       (string-prefix-p "*Flycheck" name)
+       (string-prefix-p "*tramp" name)
+       (string-prefix-p " *Mini" name)
+       (string-prefix-p "*help" name)
+       (string-prefix-p "*straight" name)
+       (string-prefix-p " *temp" name)
+       (string-prefix-p "*Help" name)
+       (string-prefix-p "*mybuf" name)
+
+       ;; Is not magit buffer.
+       (and (string-prefix-p "magit" name)
+	    (not (file-name-extension name)))
+       )))
 #+end_src

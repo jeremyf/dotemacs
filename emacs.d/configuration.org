@@ -4150,7 +4150,12 @@ some additional options.
       ("m t" "Typopunct (*)" typopunct-mode :if-non-nil typopunct-mode)
       ("m o" "MacOS Native Option ( )" jf/toggle-osx-alternate-modifier :if-non-nil ns-alternate-modifier)
       ("m o" "MacOS Native Option (*)" jf/toggle-osx-alternate-modifier :if-nil ns-alternate-modifier)
-      ]]
+      ]
+     ["Tabs"
+      ("C-t" "Group by Projects ( )" jf/centaur-tabs-toggle-grouping :if jf/centaur-tabs-grouping-by-buffer-groups?)
+      ("C-t" "Group by Projects (*)" jf/centaur-tabs-toggle-grouping :if-not jf/centaur-tabs-grouping-by-buffer-groups?)
+      ]
+     ]
     ["Org"
      ["Add-Ons"
       ("C-e a" "Add epigraph properties…" jf/org-mode-add-epigraph-keys :if-derived org-mode)
