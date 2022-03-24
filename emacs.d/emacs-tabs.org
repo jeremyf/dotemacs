@@ -22,6 +22,8 @@ Show tabs in the current window.  The tab system is something I wrestle with, bu
     ("s-\\" . centaur-tabs-switch-group)
     ("M-s-\\" . jf/centaur-tabs-toggle-grouping))
 
+  (centaur-tabs-group-by-projectile-project)
+
   (defun jf/centaur-tabs-toggle-grouping ()
     (interactive)
     (if (jf/centaur-tabs-grouping-by-buffer-groups?)
@@ -50,6 +52,7 @@ Show tabs in the current window.  The tab system is something I wrestle with, bu
        (string-prefix-p "*lsp" name)
        (string-prefix-p "*company" name)
        (string-prefix-p "*Flycheck" name)
+       (string-prefix-p "*Flymake" name)
        (string-prefix-p "*tramp" name)
        (string-prefix-p " *Mini" name)
        (string-prefix-p "*help" name)

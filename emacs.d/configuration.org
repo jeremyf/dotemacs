@@ -1609,7 +1609,12 @@ For awhile, I was trying to use lsp-mode.  It might look a bit nicer, but it was
 
 #+begin_src emacs-lisp
   (use-package eglot
-    :hook ((enh-ruby-mode js-mode) . eglot-ensure)
+    :hook ((css-mode
+	    enh-ruby-mode
+	    html-mode
+	    js-mode
+	    scss-mode
+	    yaml-mode) . eglot-ensure)
     :config
     (setq eglot-ignored-server-capabilites (quote (:documentHighlightProvider)))
     (add-to-list 'eglot-server-programs
