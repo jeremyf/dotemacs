@@ -1,4 +1,3 @@
-
 # -*- org-insert-tilde-language: emacs-lisp; -*-
 #+TITLE: Forem Configuration
 #+AUTHOR: Jeremy Friesen
@@ -269,6 +268,30 @@ describe them.
 As I look at this Dashboard with fresh eyes, I think I may move this concept to
 my ~indesk~ framing; See [[file:configuration.org][Configuration.org]] for details.
 
+** Forem End of Week
+
+Pulling latest template for writing my end of week status report.
+
+#+begin_src emacs-lisp
+  (defvar jf/forem-eow-template "~/git/forem-internal-eng/.github/epic-progress-update.md")
+
+  (cl-defun jf/forem-prepare-end-of-week-status-update (&key (template jf/forem-eow-template))
+    "Create a buffer for writing up an Engineering End of Week Status Update."
+    (interactive)
+    (let* ((body (with-temp-buffer
+		  (insert-file-contents template)
+		  (buffer-string)))
+	   (eow-buffer (get-buffer-create "*EoW Forem Update*")))
+      (switch-to-buffer eow-buffer)
+      (erase-buffer)
+      (markdown-mode)
+      (hammerspoon-edit-minor-mode)
+      (insert body)
+      (beginning-of-buffer)
+      (kill-line)
+      (insert (concat "## " (format-time-string "%Y-%m-%d")))))
+#+end_src
+
 * Forem Menu
 
 Next is my Forem menu; these are the functions to help me navigate various
@@ -283,6 +306,7 @@ System Project 46” in my menu.  When the project ends, I’ll remove that line
   (transient-define-prefix jf/menu--forem ()
     "Menu of Forem related functions."
     [["Transformations"
+      ("C-e" "End of week status report template" jf/forem-prepare-end-of-week-status-update)
       ("C-p" "Tidy pull request" jf/forem-tidy-pull-request :if-non-nil hammerspoon-edit-minor-mode)
       ("C-b" "Create branch from issue" jf/git-branch-create-from-safari :if-non-nil jf/forem-minor-mode)
       ("C-i" "Goto issue for branch" jf/git-github-issue-short-ref :if-non-nil jf/forem-minor-mode)
