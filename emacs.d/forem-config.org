@@ -234,6 +234,30 @@ decision making, and more consistently clear out the clutter to answer the
 specific questions in the checklist.  In other words, this function helps me
 stay focused on the task of writing a meaningful commit message.
 
+** Forem End of Week
+
+Pulling latest template for writing my end of week status report.
+
+#+begin_src emacs-lisp
+  (defvar jf/forem-eow-template "~/git/forem-internal-eng/.github/epic-progress-update.md")
+
+  (cl-defun jf/forem-prepare-end-of-week-status-update (&key (template jf/forem-eow-template))
+    "Create a buffer for writing up an Engineering End of Week Status Update."
+    (interactive)
+    (let* ((body (with-temp-buffer
+		  (insert-file-contents template)
+		  (buffer-string)))
+	   (eow-buffer (get-buffer-create "*EoW Forem Update*")))
+      (switch-to-buffer eow-buffer)
+      (erase-buffer)
+      (markdown-mode)
+      (hammerspoon-edit-minor-mode)
+      (insert body)
+      (beginning-of-buffer)
+      (kill-line)
+      (insert (concat "## " (format-time-string "%Y-%m-%d")))))
+#+end_src
+
 * Dashboard - A Partially Deprecated Function
 
 When I first started at Forem, I had to track a lot of URLs.  And with
@@ -267,30 +291,6 @@ describe them.
 
 As I look at this Dashboard with fresh eyes, I think I may move this concept to
 my ~indesk~ framing; See [[file:configuration.org][Configuration.org]] for details.
-
-** Forem End of Week
-
-Pulling latest template for writing my end of week status report.
-
-#+begin_src emacs-lisp
-  (defvar jf/forem-eow-template "~/git/forem-internal-eng/.github/epic-progress-update.md")
-
-  (cl-defun jf/forem-prepare-end-of-week-status-update (&key (template jf/forem-eow-template))
-    "Create a buffer for writing up an Engineering End of Week Status Update."
-    (interactive)
-    (let* ((body (with-temp-buffer
-		  (insert-file-contents template)
-		  (buffer-string)))
-	   (eow-buffer (get-buffer-create "*EoW Forem Update*")))
-      (switch-to-buffer eow-buffer)
-      (erase-buffer)
-      (markdown-mode)
-      (hammerspoon-edit-minor-mode)
-      (insert body)
-      (beginning-of-buffer)
-      (kill-line)
-      (insert (concat "## " (format-time-string "%Y-%m-%d")))))
-#+end_src
 
 * Forem Menu
 
