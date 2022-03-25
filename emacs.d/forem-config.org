@@ -236,7 +236,7 @@ stay focused on the task of writing a meaningful commit message.
 
 ** Forem End of Week
 
-Pulling latest template for writing my end of week status report.
+Create a buffer, from an existing template, for writing my end of week status report.
 
 #+begin_src emacs-lisp -n
   (defvar jf/forem-eow-template
