@@ -238,16 +238,20 @@ stay focused on the task of writing a meaningful commit message.
 
 Pulling latest template for writing my end of week status report.
 
-#+begin_src emacs-lisp
-  (defvar jf/forem-eow-template "~/git/forem-internal-eng/.github/epic-progress-update.md")
+#+begin_src emacs-lisp -n
+  (defvar jf/forem-eow-template
+    "~/git/forem-internal-eng/.github/epic-progress-update.md"
+    "The location of the template to use for end of week reporting.")
 
   (cl-defun jf/forem-prepare-end-of-week-status-update (&key (template jf/forem-eow-template))
-    "Create a buffer for writing up an Engineering End of Week Status Update."
+    "Create a buffer for writing up an Engineering End of Week Status Update.
+
+  TODO: Consider pulling down the latest version of that template."
     (interactive)
     (let* ((body (with-temp-buffer
 		  (insert-file-contents template)
 		  (buffer-string)))
-	   (eow-buffer (get-buffer-create "*EoW Forem Update*")))
+	   (eow-buffer (get-buffer-create "*Forem EoW Update*")))
       (switch-to-buffer eow-buffer)
       (erase-buffer)
       (markdown-mode)
