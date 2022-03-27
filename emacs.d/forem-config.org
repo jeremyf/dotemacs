@@ -234,9 +234,9 @@ decision making, and more consistently clear out the clutter to answer the
 specific questions in the checklist.  In other words, this function helps me
 stay focused on the task of writing a meaningful commit message.
 
-** Forem End of Week
+** Forem End of Week Status Update
 
-Create a buffer, from an existing template, for writing my end of week status report.
+The following ~emacs-lisp~ creates a buffer, from an existing template, to help kick off writing my end of week status reports.
 
 #+begin_src emacs-lisp -n
   (defvar jf/forem-eow-template
@@ -244,9 +244,7 @@ Create a buffer, from an existing template, for writing my end of week status re
     "The location of the template to use for end of week reporting.")
 
   (cl-defun jf/forem-prepare-end-of-week-status-update (&key (template jf/forem-eow-template))
-    "Create a buffer for writing up an Engineering End of Week Status Update.
-
-  TODO: Consider pulling down the latest version of that template."
+    "Create a buffer for writing up an Engineering End of Week Status Update."
     (interactive)
     (let* ((body (with-temp-buffer
 		  (insert-file-contents template)
@@ -261,6 +259,8 @@ Create a buffer, from an existing template, for writing my end of week status re
       (kill-line)
       (insert (concat "## " (format-time-string "%Y-%m-%d")))))
 #+end_src
+
+The above is an example of automating a task.
 
 * Dashboard - A Partially Deprecated Function
 
