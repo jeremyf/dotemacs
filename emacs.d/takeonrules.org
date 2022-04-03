@@ -33,14 +33,6 @@ that I have required ~ox~.
     (add-to-list 'org-hugo-special-block-type-properties '("sidenote" . (:trim-pre t :trim-post t))))
 #+END_SRC
 
-#+RESULTS:
-| sidenote | :trim-pre | t | :trim-post | t |
-| audio    | :raw      | t |            |   |
-| katex    | :raw      | t |            |   |
-| mark     | :trim-pre | t | :trim-post | t |
-| tikzjax  | :raw      | t |            |   |
-| video    | :raw      | t |            |   |
-
 I use ~org-roam~ for my organization, so I’m assuming I’ll be exporting one
 file at a time.  I have considered using [[https://ox-hugo.scripter.co/][ox-hugo]], but it’s not quite what I’m
 after.  In [[id:23288DD9-9559-4870-A0BE-E01087A8EC5D][Migrating from Hugo to Org]], a private file, I considered what to do.
@@ -50,42 +42,55 @@ the export will have a link to a Not Found resource/
 
 ** Extending the Ox
 
-When I’m exporting an ~org~ file, it likely includes links to files on my
-file-system.  However, in that export, it’s not overly helpful to provide links
-to those personal files.
+When I’m exporting an ~org~ file, it likely includes links to files on my file-system.  However, in that export, it’s not overly helpful to provide links to those personal files.
 
-Instead, I want to leverage [[https://www.orgroam.com/manual.html#Refs-1][org-roam ~ROAM_REFS~ property]].  During export, if the
-link is an ~id~ link, I’ll assume it’s an internal reference.  When that
-internal reference has a ~ROAM_REFS~ property, I’ll use that as the URL.
-Otherwise, I’ll assume I haven’t “exported” that document, and will instead
-render the description (perhaps with an indicator that this is).
+Instead, I want to leverage [[https://www.orgroam.com/manual.html#Refs-1][org-roam ~ROAM_REFS~ property]].  During export, if the link is an ~id~ link, I’ll assume it’s an internal reference.  When that internal reference has a ~ROAM_REFS~ property, I’ll use that as the URL.  Otherwise, I’ll assume I haven’t “exported” that document, and will instead render the description.
+
+In the following ~jf/org-tor-link~, when the given link is an ~ID~ type link, I call my custom link handler (e.g. ~jf/org-md-link-by-id~).  Otherwise, I use the given funtion.
 
 #+begin_src emacs-lisp
   (defun jf/org-tor-link (fn link desc &rest rest)
     "Conditional LINK and DESC rendering for ID-based links.
 
-  Otherwise `apply' the FN with the REST of the parameters."
+    Otherwise `apply' the FN with the REST of the parameters."
     (if (string= "id" (org-element-property :type link))
 	(jf/org-md-link-by-id link desc)
       (apply fn link desc rest)))
 
   (advice-add #'org-md-link :around #'jf/org-tor-link '((name . "wrapper")))
   (advice-add #'org-hugo-link :around #'jf/org-tor-link '((name . "wrapper")))
+#+end_src
 
-  (defun jf/org-md-link-by-id (link desc)
-    "With an \"id\" type LINK render the markdown.
+The ~jf/org-md-link-by-id~ function checks the link to see if the node in ~org-roam~ database has an associated URL.
 
-    DESC is the text of the link."
-    (let* ((filepath (org-id-find-id-file (org-element-property :path link)))
-	   (url (jf/org-file-get-roam-refs filepath)))
-      (if url (format "[%s](%s)" desc url)
-	(format "<span class=\"ref\">%s</span>" desc))))
+When it does, use that URL.
 
+When it does not have a URL, then I assume the node is an internal node and wrap the description in a ~span~ tag.
+
+#+begin_src emacs-lisp
+    (defun jf/org-md-link-by-id (link desc)
+      "With an \"id\" type LINK render the markdown.
+
+    If the node for the given \"id\" has a ROAM_REF, use that as a markdown URL.
+    Otherwise render a span with DESC.
+
+    This prevents links to non-world accessible files."
+      (let* ((filepath (org-id-find-id-file (org-element-property :path link)))
+	     (url (jf/org-file-get-roam-refs filepath)))
+	(if url (format "[%s](%s)" desc url)
+	  (format "<span class=\"ref\">%s</span>" desc))))
+#+end_src
+
+For a given filepath, the ~jf/org-file-get-roam-refs~ finds the first [[https://www.orgroam.com/manual.html#Refs][ROAM_REFS]].  In my implementation, the ROAM_REFS is often one URL for which the ~org-roam~ node is a proxy for that URL.
+
+#+begin_src emacs-lisp
   (cl-defun jf/org-file-get-roam-refs (filepath)
     "Return first ROAM_REFS property in the FILEPATH."
     (with-current-buffer (find-file-noselect filepath)
       (car (org-property-values "ROAM_REFS"))))
 #+end_src
+
+** Wrapping Ox Exporter
 
 While the org export dispatcher is quite nice, I’m going to write
 ~jf/export-org-to-tor~ to handle the export.  That function is responsible for
