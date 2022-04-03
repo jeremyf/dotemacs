@@ -60,6 +60,7 @@ The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~
     (org-babel-do-load-languages 'org-babel-load-languages
 				 (append org-babel-load-languages
 					 '((emacs-lisp . t)
+					   (shell . t)
 					   (plantuml . t)
 					   (ruby . t))))
     ;; Make TAB act as if it were issued from the buffer of the languages's major

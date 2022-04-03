@@ -18,7 +18,8 @@
  '(global-display-line-numbers-mode t)
  '(org-export-backends '(ascii html icalendar latex md odt))
  '(safe-local-variable-values
-   '((org-insert-tilde-language . emacs-lisp)
+   '((org-insert-tilde-language . enh-ruby)
+     (org-insert-tilde-language . emacs-lisp)
      (jf/forem-minor-mode . 1)
      (jf/tor-minor-mode . 1)
      (encoding . utf-8)))

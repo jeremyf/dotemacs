@@ -198,13 +198,12 @@ out but for the most part, you can move along and reference this later.
 				 ;; https://protesilaos.com/emacs/modus-themes
    )
 
-  (setq enable-recursive-minibuffers nil) ;;   I tried enabling this, and found
-					  ;;   myself sometimes lost in a
-					  ;;   labyrinth of minibuffers.  This
-					  ;;   change ensures that there’s only
-					  ;;   one.
+  (setq enable-recursive-minibuffers t)
 
-
+  (use-package recursion-indicator
+    :straight t
+    :config
+    (recursion-indicator-mode))
 
   (global-hl-line-mode)
 
@@ -348,7 +347,9 @@ told it sets things up how I like.
      '((bg-region-accent-subtle . "#304466"))
 
      modus-themes-bold-constructs t
-     modus-themes-completions 'opinionated
+     modus-themes-completions '((matches . (extrabold))
+				(selection . (semibold accented))
+				(popup . (accented intense)))
      modus-themes-diffs nil
      modus-themes-fringes 'intense
      modus-themes-hl-line '(accented intense)
@@ -1441,11 +1442,14 @@ It shows me what I’ve opened.  I like that.
     (imenu-after-jump . pulsar-recenter-top)
     (imenu-after-jump . pulsar-reveal-entry)
     :config
-    (pulsar-setup)
+    (pulsar-global-mode 1)
     (setq pulsar-face 'pulsar-magenta
 	  pulsar-delay 0.05)
     :bind (("C-x l" . pulsar-pulse-line)))
 #+end_src
+
+#+RESULTS:
+: pulsar-pulse-line
 
 **** emojify.el
 
@@ -1613,8 +1617,7 @@ For awhile, I was trying to use lsp-mode.  It might look a bit nicer, but it was
 	    enh-ruby-mode
 	    html-mode
 	    js-mode
-	    scss-mode
-	    yaml-mode) . eglot-ensure)
+	    scss-mode) . eglot-ensure)
     :config
     (setq eglot-ignored-server-capabilites (quote (:documentHighlightProvider)))
     (add-to-list 'eglot-server-programs
@@ -1775,7 +1778,15 @@ without this setting, Emacs will happily render the SVG as an image,
     :straight t
     :hook (enh-ruby-mode . yard-mode))
 #+end_src
-*** Transformations
+*** Utilities
+
+**** ts.el
+
+#+begin_src emacs-lisp
+  (use-package ts
+    :straight t)
+#+end_src
+
 **** titlecase.el
 
 The rules of “titlecase” are confounding.  The ~titlecase.el~ package provides
@@ -2234,12 +2245,7 @@ I have only provisionally adopted this.  I like the idea of abbreviations/snippe
 #+end_src
 
 ** Integrated “Applications”
-*** Terminal Emulation
 
-#+begin_src emacs-lisp
-  (use-package vterm
-    :straight t)
-#+end_src
 *** Variable and Constant Definitions
 
 These are a few variables and cosntants that I use throughout my configuration.
