@@ -688,6 +688,9 @@ I love [[https://github.com/minad][Daniel Mendler]]’s work; let’s test drive
 	       '("cite" . "@@html:<cite>@@$1@@html:</cite>@@"))
 
   (add-to-list 'org-export-global-macros
+	       '("dfn" . "@@html:<dfn>@@$1@@html:</dfn>@@"))
+
+  (add-to-list 'org-export-global-macros
 	       '("scene-date" . "#+begin_marginnote\nThe scene occurs on @@html:<span class=\"time\">@@$1@@html:</span>@@.\n#+end_marginnote"))
 #+end_src
 
