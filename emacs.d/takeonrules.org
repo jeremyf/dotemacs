@@ -42,9 +42,15 @@ the export will have a link to a Not Found resource/
 
 ** Extending the Ox
 
-When I’m exporting an ~org~ file, it likely includes links to files on my file-system.  However, in that export, it’s not overly helpful to provide links to those personal files.
+When I’m exporting an ~org~ file, it likely includes links to nodes in my ~org-roam~ repository; Some of those nodes may be proxies for world-wide web pages and others might have no external proxy.  For example, I have a node for “Org Mode” and a node for “Lord Antonius de Mari”.
 
-Instead, I want to leverage [[https://www.orgroam.com/manual.html#Refs-1][org-roam ~ROAM_REFS~ property]].  During export, if the link is an ~id~ link, I’ll assume it’s an internal reference.  When that internal reference has a ~ROAM_REFS~ property, I’ll use that as the URL.  Otherwise, I’ll assume I haven’t “exported” that document, and will instead render the description.
+In the case of the “Org Mode” node, I have [[https://www.orgroam.com/manual.html#Refs-1][org-roam ~ROAM_REFS~ property]] of ~https://orgmode.org~.  For “Lord Antonius de Mari” there is no ~ROAM_REFS~ property.
+
+In my ~org-mode~ docs, I link to both of those nodes by their internal ID.
+
+During export, when the link is an ~id~ link, I assume it’s an internal reference.  When that internal reference has a ~ROAM_REFS~ property, I use that as the URL.  Otherwise, I assume I haven’t “exported” that document, and will instead render the description.
+
+This means I can treate my internal Personal Knowledge Management system as both private and things I can make public; and I don’t need to worry about exporting broken URLs.
 
 In the following ~jf/org-tor-link~, when the given link is an ~ID~ type link, I call my custom link handler (e.g. ~jf/org-md-link-by-id~).  Otherwise, I use the given funtion.
 
