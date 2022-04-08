@@ -11,6 +11,7 @@ emacs-lisp-mode
 enh-ruby-mode ruby-mode
 
 (db "require \"debug\"; binding.break" n)
+(bench "require \"benchmark\"" n "Benchmark.bmbm do |b|" n "  b.report(\"\") do" n "    # Stuff" n "  end" n "end")
 
 web-mode
 

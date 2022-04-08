@@ -321,6 +321,7 @@ System Project 46” in my menu.  When the project ends, I’ll remove that line
       ("j" "Browse to pro[j]ects…" (lambda () (interactive) (browse-url "https://github.com/orgs/forem/projects/")))
       ("m" "Browse [m]erged Pull Requests…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/pulls?q=is%3Apr+is%3Aclosed")))
       ("p" "Browse to pull requests…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/pulls/")))
+      ("r" "Release runbook in Forem.team" (lambda () (interactive) (browse-url "https://forem.team/product/feature-release-communications-playbook-11h2")))
       ]
      ["Jeremy's Workflow"
       ("a" "Browse Authorization System Project 46" (lambda () (interactive) (browse-url "https://github.com/orgs/forem/projects/46")))
