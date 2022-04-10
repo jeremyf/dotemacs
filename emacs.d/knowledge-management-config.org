@@ -225,6 +225,8 @@ The ~jf/org-roam-capture-templates-plist~ variable defines the possible org-roam
 
 /Note:/ I chose to go with 4 character types to minimize it’s impact on rendering “type” in the search results (4 characters requires less visual space than 10 characters).
 
+As of <2022-04-10 Sun> I am rarely using ~pubs~ simply comingling ~pubs~ and ~main~.  A “pub” is something that has a ~ROAM_REFS~ entry and is in the “mine” sub-directory.
+
 #+begin_src emacs-lisp
   (defvar jf/org-roam-capture-templates-plist
     (list

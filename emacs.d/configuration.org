@@ -1445,7 +1445,15 @@ It shows me what I’ve opened.  I like that.
     (pulsar-global-mode 1)
     (setq pulsar-face 'pulsar-magenta
 	  pulsar-delay 0.05)
-    :bind (("C-x l" . pulsar-pulse-line)))
+    (defun jf/pulse (parg)
+      "Pulse the current line.
+
+  If PARG (given as universal prefix), pulse between `point' and `mark'."
+      (interactive "P")
+      (if (car parg)
+	  (pulsar--pulse nil nil (point) (mark))
+	(pulsar-pulse-line)))
+    :bind (("C-x l" . jf/pulse)))
 #+end_src
 
 #+RESULTS:
