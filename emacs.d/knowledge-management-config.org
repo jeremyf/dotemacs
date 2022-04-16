@@ -513,7 +513,7 @@ This function returns the node’s type (e.g., it’s directory).
 				  :where (= dest $s1)
 				  :and (= type "id")]
 			 (org-roam-node-id node)))))
-      (format "    %4d \xf0c1" count)))
+      (format "    %4d \xf0c1   %s" count (format-time-string "%Y-%m-%d" (org-roam-node-file-mtime node)))))
 #+end_src
 
 ** Leveraging Tag Filtering with Org-Roam CAPF
