@@ -187,8 +187,7 @@ out but for the most part, you can move along and reference this later.
 
    ring-bell-function 'ignore  ;; Stop ringing any bell
 
-   split-width-threshold 100   ;; Most of the times I favor two windows
-			       ;; side-by-side within a frame
+   split-width-threshold 160
 
    vc-follow-symlinks t        ;; Follow symlinks instead of prompting.
 
@@ -3070,8 +3069,6 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
 - ~jf/display-buffer-in-side-window~ :: Creates a sticky side window on the
   right.  Sometimes this is just the right thing for reviewing files.  I don’t
   know when I need it, but when I use it I’m always thankful I have it.
-- ~jf/display-buffer-in-side-window~ :: As ~jf/display-buffer-in-side-window~,
-  but creates a side window on the bottom.
 
 #+begin_src emacs-lisp
   (global-set-key (kbd "C-s-\\") 'jf/display-buffer-in-side-window)
@@ -3085,7 +3082,7 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
 					(no-delete-other-windows . t))))))
 #+end_src
 
-- ~jf/display-buffer-in-side-window~ :: As ~jf/display-buffer-in-side-window~,
+- ~jf/display-buffer-in-bottom-window~ :: As ~jf/display-buffer-in-side-window~,
   but creates a side window on the bottom.
 
 #+begin_src emacs-lisp
