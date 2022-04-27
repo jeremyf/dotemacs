@@ -98,14 +98,14 @@ For a given filepath, the ~jf/org-file-get-roam-refs~ finds the first [[https://
 
 ** Wrapping Ox Exporter
 
-While the org export dispatcher is quite nice, I’m going to write
+While the org export dispatcher is quite nice, I wrote
 ~jf/export-org-to-tor~ to handle the export.  That function is responsible for
 two concerns:
 
 1. Ensuring that I have all of the necessary front-matter.
 2. Performing the export.
 
-/Note: at present my blog assumes Markdown front-matter./
+/Note: at present my blog assumes YAML front-matter./
 
 #+begin_src emacs-lisp
   (cl-defun jf/export-org-to-tor (&key (buffer (current-buffer)))

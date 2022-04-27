@@ -2761,6 +2761,19 @@ transient function for that.
     (blamer-max-commit-message-length 20))
 #+end_src
 
+*** Timer
+
+Powered by ~tmr.el~ to set a timer.
+
+#+begin_src emacs-lisp
+  (use-package tmr
+    :custom (tmr-notify-function #'jf/notifications-notify)
+    :straight (tmr :type git :repo "https://git.sr.ht/~protesilaos/tmr"))
+
+  (defun jf/notifications-notify (title message)
+    (ns-do-applescript (concat "display notification \"" message "\"")))
+#+end_src
+
 *** elpher.el
 
 - ~elpher.el~ :: A Gopher and Gemini client.

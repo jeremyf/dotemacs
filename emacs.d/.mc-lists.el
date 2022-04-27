@@ -54,6 +54,7 @@
       '(
 	ivy-occur-click
 	ivy-switch-buffer
+	org-insert-backtick
 	rspec-toggle-spec-and-target
 	rspec-verify-all
 	swiper
