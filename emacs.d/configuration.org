@@ -4195,14 +4195,15 @@ some additional options.
       ("C-t" "Group by Projects (*)" jf/centaur-tabs-toggle-grouping :if-not jf/centaur-tabs-grouping-by-buffer-groups?)
       ]]
     ["Org"
-     ["Add-Ons"
+     ["Add Metadata"
       ("C-e a" "Add epigraph properties…" jf/org-mode-add-epigraph-keys :if-derived org-mode)
       ("C-e i" "Add epigraph at point…" jf/org-roam-insert-at-point-epigraph-macro :if-derived org-mode)
       ("r a" "Ref add…" org-roam-ref-add :if-derived org-mode)
       ("t s" "Tag as session report…" jf/org-tag-as-session-report :if-derived org-mode)
       ("t a" "Tag add…" org-roam-tag-add :if-derived org-mode)
       ("t S" "Tag as session Scene…" jf/org-tag-session-scene-with-date :if-derived org-mode)]
-     ["Contexts"
+     ["Context"
+      ("s" "Search…" (lambda () (interactive) (consult-ripgrep org-directory)))
       ("M-c" "Context set…" jf/org-auto-tags--set-by-context :transient t)
       ("M-s" jf/org-auto-tags--transient :transient t)
       ("M-i" jf/indesk-current-files-on-desk--transient)
