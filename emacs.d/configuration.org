@@ -2783,7 +2783,7 @@ Powered by ~tmr.el~ to set a timer.
     :straight (tmr :type git :repo "https://git.sr.ht/~protesilaos/tmr"))
 
   (defun jf/notifications-notify (title message)
-    (ns-do-applescript (concat "display notification \"" message "\"")))
+    (ns-do-applescript (concat "display notification \"" message "\" sound name \"Glass\"")))
 #+end_src
 
 *** elpher.el
