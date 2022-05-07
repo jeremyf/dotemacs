@@ -1206,6 +1206,18 @@ More on these component matchings styles is available at [[https://github.com/mi
     :straight t)
 #+end_src
 
+**** link-hint.el
+
+- ~link-hint.el~ :: Jump to a registered link type.
+
+#+begin_src emacs-lisp
+  (use-package link-hint
+    :straight t
+    :bind
+    ("C-c l o" . link-hint-open-link)
+    ("C-c l c" . link-hint-copy-link))
+#+end_src
+
 **** ibuffer-sidebar.el
 
 Prioir to Emacs, I might use a side panel for directory/file navigation.
