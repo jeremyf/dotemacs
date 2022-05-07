@@ -380,6 +380,7 @@ Some helper methods for to aid in opening files.
   (advice-add #'org-open-at-point :around #'jf/follow-thing-at-point '((name . "wrapper")))
   (advice-add #'markdown-follow-thing-at-point :around #'jf/follow-thing-at-point '((name . "wrapper")))
   (advice-add #'xref-find-definitions :around #'jf/follow-thing-at-point '((name . "wrapper")))
+  (advice-add #'org-open-at-point-global :around #'jf/follow-thing-at-point '((name . "wrapper")))
 #+end_src
 
 #+RESULTS:

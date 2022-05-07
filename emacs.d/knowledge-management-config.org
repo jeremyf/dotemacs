@@ -147,12 +147,27 @@ See [[https://kitchingroup.cheme.cmu.edu/blog/2016/06/16/Copy-formatted-org-mode
 	  (shell-command-on-region
 	   (point-min)
 	   (point-max)
-	   "textutil -inputencoding UTF-8 -stdin -format html -convert rtf -stdout | pbcopy"))
+	   "textutil -inputencoding UTF-8 -stdout -stdin -format html -convert rtf | pbcopy"))
 	(kill-buffer buf))))
+
+  ;; http://mbork.pl/2021-05-02_Org-mode_to_Markdown_via_the_clipboard
+  (defun jf/org-copy-region-as-markdown ()
+    "Copy the region (in Org) to the system clipboard as Markdown."
+    (interactive)
+    (if (use-region-p)
+	(let* ((region
+		(buffer-substring-no-properties
+		 (region-beginning)
+		 (region-end)))
+	       (markdown
+		(org-export-string-as region 'md t '(:with-toc nil))))
+	  (gui-set-selection 'CLIPBOARD markdown))))
 
   (use-package htmlize
     :straight t)
 #+end_src
+
+I have found that Slack resists posting rich content, so I often need to open up TextEdit, paste into an empty file, copy the contents, and then paste into Slack.
 
 ** Swapping Tilde and Backtick in Org and More
 
