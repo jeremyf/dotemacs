@@ -461,7 +461,7 @@ For each of those functions, I establish the filter based on the current context
   Filter selections to INITIAL-INPUT."
     (interactive)
     (let ((node (org-roam-node-read initial-input (lambda (node) (jf/org-roam-filter-context-fn node :tag-list '("epigraphs"))))))
-      (insert (format "\n{{{epigraph(%s, %s)}}}\n"
+      (insert (format "\n{{{epigraph(%s,%s)}}}\n"
 		      (org-roam-node-id node) (org-roam-node-title node)))))
 #+end_src
 
