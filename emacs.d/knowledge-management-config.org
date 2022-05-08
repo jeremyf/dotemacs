@@ -257,10 +257,11 @@ As of <2022-04-10 Sun> I am rarely using ~pubs~ simply comingling ~pubs~ and ~ma
 	     :immediate-finish t
 	     :unnarrowed t)
      ;; These are publications of "my thoughts" referencing "other people's thoughts".
-     :pubs '("p" "pubs" plain "%?"
-	     :if-new (file+head "pubs/%<%Y%m%d>---${slug}.org" "#+title: ${title}\n#+FILETAGS:\n")
-	     :immediate-finish t
-	     :unnarrowed t))
+     ;; :pubs '("p" "pubs" plain "%?"
+     ;; 	   :if-new (file+head "pubs/%<%Y%m%d>---${slug}.org" "#+title: ${title}\n#+FILETAGS:\n")
+     ;; 	   :immediate-finish t
+     ;; 	   :unnarrowed t)
+     )
     "Templates to use for `org-roam' capture.")
 #+end_src
 
