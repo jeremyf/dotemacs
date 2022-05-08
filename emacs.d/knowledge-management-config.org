@@ -843,6 +843,33 @@ The ~jf/org-mode-add-epigraph-keys~ function seeds the properties for a
 	(org-roam-property-add (car prop) (if (cadr prop) "**REQUIRED**" "")))))
 #+end_src
 
+** Org Roam “Backlinks” for Tags
+
+This builds on [[https://github.com/org-roam/org-roam/issues/1698][Automatic node linking to tags and TODO states · Issue #1698 · org-roam/org-roam]]
+
+#+begin_src emacs-lisp
+  (defun jf/org-roam-tagged-by-sections (node)
+    "The tagged-by section for NODE.
+
+  Given the node's title and aliases, find all nodes that have a tag with that name."
+    ;; See `org-roam-reflinks-section'
+    (let* ((aliases (org-roam-node-aliases node))
+	   (title (org-roam-node-title node)))))
+
+  ;; (defun org-roam-reflinks-section (node)
+  ;;   "The reflinks section for NODE."
+  ;;   (when-let ((refs (org-roam-node-refs node))
+  ;; 	     (reflinks (seq-sort #'org-roam-reflinks-sort (org-roam-reflinks-get node))))
+  ;;     (magit-insert-section (org-roam-reflinks)
+  ;;       (magit-insert-heading "Reflinks:")
+  ;;       (dolist (reflink reflinks)
+  ;; 	(org-roam-node-insert-section
+  ;; 	 :source-node (org-roam-reflink-source-node reflink)
+  ;; 	 :point (org-roam-reflink-point reflink)
+  ;; 	 :properties (org-roam-reflink-properties reflink)))
+  ;;       (insert ?\n))))
+#+end_src
+
 * Conclusion
 
 This is the core of my note taking engine.  It builds on the idea that I want to reduce the number of decisions I make.  This is extremely important when I’m writing session notes.
