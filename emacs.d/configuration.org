@@ -167,6 +167,8 @@ out but for the most part, you can move along and reference this later.
 
    echo-key-strokes 0.2
 
+   global-mark-ring-max 32
+
    idle-update-delay 1.1       ;; Slow down the UI being updated to improve
 			       ;; performance
 
@@ -758,7 +760,7 @@ What follows is adjustments to emacs settings as they relate to completion.
 	   ("M-g o" . consult-outline)
 	   ("M-g m" . consult-mark)
 	   ("M-g k" . consult-global-mark)
-	   ("C-x C-SPC" . consult-mark)
+	   ("C-x C-SPC" . consult-global-mark)
 	   ("M-g i" . consult-imenu)
 	   ("M-g I" . consult-imenu-multi)
 	   ;; M-s bindings (search-map)
