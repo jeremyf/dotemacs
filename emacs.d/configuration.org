@@ -8,6 +8,7 @@
 #+HUGO_SECTION: posts/2022
 :END:
 #+TITLE: Emacs Configuration
+#+PROPERTY: header-args:emacs-lisp :comments link
 #+AUTHOR: Jeremy Friesen
 #+EMAIL: jeremy@jeremyfriesen.com
 #+STARTUP: showall

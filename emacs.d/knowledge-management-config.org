@@ -5,6 +5,7 @@
 #+EMAIL: jeremy@jeremyfriesen.com
 #+FILETAGS: :takeonrules:
 #+STARTUP: showall
+#+PROPERTY: header-args:emacs-lisp :comments link
 #+OPTIONS: toc:3
 
 By now, with all that I’ve written, it should be evident that knowledge management is both a critical need and something that Emacs must certainly support.

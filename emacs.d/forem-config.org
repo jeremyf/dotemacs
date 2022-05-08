@@ -4,6 +4,7 @@
 #+EMAIL: jeremy@jeremyfriesen.com
 #+STARTUP: showall
 #+OPTIONS: toc:3
+#+PROPERTY: header-args:emacs-lisp :comments link
 
 On <2021-10-04 Mon> I started working at [[https://forem.com][Forem]].  My role involves software
 development and managing people.  I use Emacs to provide some of that
