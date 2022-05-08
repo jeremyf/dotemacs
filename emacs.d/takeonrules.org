@@ -9,6 +9,7 @@
 #+FILETAGS: :takeonrules:
 #+STARTUP: showall
 #+OPTIONS: toc:3
+#+PROPERTY: header-args:emacs-lisp :comments link
 
 * Org Export
 
