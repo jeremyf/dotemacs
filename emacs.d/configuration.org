@@ -296,7 +296,10 @@ Some basic packages to keep things less chatty.
 *Diminish* provides a means of not displaying the :lighter of a minor mode in the modeline.
 
 #+begin_src emacs-lisp
-  (use-package diminish :straight t)
+  (use-package diminish
+    :straight t
+    :diminish 'eldoc-mode
+    :diminish 'abbrev-mode)
 #+end_src
 
 *Gcmh* does garbage collection (GC) when the user is idle.
@@ -1747,6 +1750,7 @@ That’s one of those hot-keys almost burned into soul.
   ;; Waiting on https://github.com/emacs-tree-sitter/elisp-tree-sitter/issues/197 to resolve.
   (use-package tree-sitter
     :straight (tree-sitter :host github :repo "emacs-tree-sitter/elisp-tree-sitter")
+    :diminish 'tree-sitter-mode
     :config
     (add-to-list 'tree-sitter-major-mode-language-alist '(enh-ruby-mode . ruby)))
 
@@ -1798,6 +1802,7 @@ without this setting, Emacs will happily render the SVG as an image,
 #+begin_src emacs-lisp
   (use-package yard-mode
     :straight t
+    :diminish 'yard-mode
     :hook (enh-ruby-mode . yard-mode))
 #+end_src
 *** Utilities
