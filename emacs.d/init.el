@@ -19,6 +19,8 @@
   ;; Load the remainder of the configuration from the Org configuration file.
   (org-babel-load-file (concat user-emacs-directory "configuration.org")))
 
+(load (concat user-emacs-directory "hide-comnt.el") :noerror)
+
 (provide 'init)
 ;;; init.el ends here
 (put 'narrow-to-region 'disabled nil)
