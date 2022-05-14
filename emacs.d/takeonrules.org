@@ -269,6 +269,21 @@ Given that I have files in my [[id:1173D588-E239-4B13-BFA6-0C670DCE484A][Hugo]] 
 	    (message "Unable to find org_id: in document"))))))
 #+end_src
 
+Below is the reciprocal of finding the org file; it’s finding the corresponding file by url.
+
+#+begin_src emacs-lisp
+  (cl-defun jf/jump_to_corresponding_hugo_file (&key (buffer (current-buffer)))
+    "Find the TakeOnRules.com url in the BUFFER and jump to corresponding Hugo file."
+    (interactive)
+    (with-current-buffer buffer
+      (save-excursion
+	(beginning-of-buffer)
+	(save-match-data
+	  (if (re-search-forward "\n:ROAM_REFS:.+\\(https?://takeonrules\.com[^ \n]*\\)" nil t)
+	      (jf/tor-find-hugo-file-by-url (match-string 1))
+	    (message "Unable to find Take on Rules URL in buffer."))))))
+#+end_src
+
 ** Creating a Scene for Session Notes
 
 #+begin_quote
