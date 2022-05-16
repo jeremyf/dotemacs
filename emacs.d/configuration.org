@@ -234,6 +234,7 @@ bit.  Also enable a few that I find helpful.  (I’ll enable a lot more later).
 
 #+begin_src emacs-lisp
   (unbind-key "C-z") ;; `suspend-frame'
+  (unbind-key "C-c o") ;; was bound to open a file externally
   (unbind-key "C-x C-c") ;; was `save-buffers-kill-terminal'
 
   (global-set-key (kbd "<M-delete>") 'kill-word)
@@ -751,7 +752,7 @@ What follows is adjustments to emacs settings as they relate to completion.
 	   ;; Custom M-# bindings for fast register access
 	   ("M-#" . consult-register-load)
 	   ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
-	   ("C-M-#" . consult-register)
+	   ("M-`" . consult-register)
 	   ;; Other custom bindings
 	   ("M-y" . consult-yank-from-kill-ring)                ;; orig. yank-pop
 	   ("<help> a" . consult-apropos)            ;; orig. apropos-command
@@ -765,6 +766,7 @@ What follows is adjustments to emacs settings as they relate to completion.
 	   ("M-g k" . consult-global-mark)
 	   ("C-x C-SPC" . consult-global-mark)
 	   ("M-g i" . consult-imenu)
+	   ("s-2" . consult-imenu)
 	   ("M-g I" . consult-imenu-multi)
 	   ;; M-s bindings (search-map)
 	   ("M-s f" . consult-find)
@@ -780,7 +782,7 @@ What follows is adjustments to emacs settings as they relate to completion.
 	   ;; Customizations that map to ivy
 	   ("s-r" . consult-recent-file) ;; Deprecate
 	   ("C-c r" . consult-recent-file)
-	   ("C-c o" . consult-file-externally)
+	   ;; ("C-c o" . consult-file-externally)
 	   ("C-y" . yank)
 	   ("C-s" . consult-line) ;; I've long favored Swiper mapped to c-s
 	   ;; Isearch integration
