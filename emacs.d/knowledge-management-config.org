@@ -483,13 +483,17 @@ And with all of that, let’s get into the org-roam configuration.
      (lambda (node)
        (org-roam-node-backlinkscount node)))
     (org-roam-capture-templates (jf/org-roam-templates-list :all))
-    :bind (("C-s-f" . jf/org-roam-find-node)
-	   ("C-s-c" . jf/org-roam-capture))
+    :bind (("C-c o f" . jf/org-roam-find-node)
+	   ("C-s-f" . jf/org-roam-find-node)
+	   ("C-s-c" . jf/org-roam-capture)
+	   ("C-c o c" . jf/org-roam-capture)
+	   )
     :bind (:map org-mode-map
 		(("C-s-;" . org-roam-buffer-toggle)
 		 ("s-i" . jf/org-roam-node-insert)
-		 ("C-s-<right>" . org-roam-dailies-find-next-note)
-		 ("C-s-<left>" . org-roam-dailies-find-previous-note)))
+		 ("C-c o i" . jf/org-roam-node-insert)
+		 ("C-s-<right>" . org-roam-dailies-goto-next-note)
+		 ("C-s-<left>" . org-roam-dailies-goto-previous-note)))
     :init
     ;; Help keep the `org-roam-buffer', toggled via `org-roam-buffer-toggle', sticky.
     (add-to-list 'display-buffer-alist
