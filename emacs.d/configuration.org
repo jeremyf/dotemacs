@@ -2353,6 +2353,16 @@ The ~writeroom-mode.el~ package provides some quick adjustments for writing; cre
     :straight t)
 #+end_src
 
+*** Doc View
+
+#+begin_src emacs-lisp
+  (use-package doc-view
+    :straight (doc-view :type built-in)
+    :bind (:map doc-view-mode-map
+		("C-c g" . doc-view-goto-page)))
+#+end_src
+
+
 *** Knowledge Management
 
 I use org-mode and org-roam to help manage content.  Let’s load that rather extensive configuration.
