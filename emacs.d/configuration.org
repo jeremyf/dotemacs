@@ -805,8 +805,10 @@ What follows is adjustments to emacs settings as they relate to completion.
     (setq xref-show-xrefs-function #'consult-xref
 	  xref-show-definitions-function #'consult-xref)
 
-    ;; Updating the default to include "--ignore-case"
-    (setq consult-ripgrep-command "rg --null --line-buffered --color=ansi --max-columns=1000 --ignore-case --no-heading --line-number . -e ARG OPTS")
+    ;; Updating the default to include "--smart-case"
+    ;; Leveraging ripgrep-all https://github.com/phiresky/ripgrep-all
+    (setq consult-ripgrep-command "rga --null --line-buffered --color=ansi --max-columns=1000 --smart-case --no-heading --line-number . -e ARG OPTS")
+    (setq consult-ripgrep-args "rga --null --line-buffered --color=never --max-columns=1000 --path-separator /   --smart-case --no-heading --line-number .")
 
     ;; Configure other variables and modes in the :config section,
     ;; after lazily loading the package.
