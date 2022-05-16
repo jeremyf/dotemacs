@@ -98,7 +98,6 @@ repository.
 	       (slugs (s-split "/" url))
 	       (suffix (format  "%s/%s#%s" (nth 3 slugs) (nth 4 slugs) (nth 6 slugs)))
 	       (slugified-title "issue")
-	       ;; (slugified-title (replace-regexp-in-string "-?\.-issue-[[:digit:]]+.*" "" (jf/tor-convert-text-to-slug title)))
 	       (prefix (format "%s/%s" jf/github-username slugified-title))
 	       (branch-name (concat prefix "---" suffix)))
 	  (message (jf/git-branch-create :branch-name branch-name :directory directory))))))
