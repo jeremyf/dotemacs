@@ -1834,6 +1834,15 @@ without this setting, Emacs will happily render the SVG as an image,
 #+end_src
 *** Utilities
 
+**** edit-indirect.el
+
+The ~edit-indirect.el~ behaves similarly to the amazing ~org-edit-source-code~ but for any regions.  This is particularly nice for markdown “triple back-tick regions” (e.g. =```=).
+
+#+begin_src emacs-lisp
+  (use-package edit-indirect
+    :straight t)
+#+end_src
+
 **** ts.el
 
 #+begin_src emacs-lisp
