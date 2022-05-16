@@ -1244,6 +1244,29 @@ It shows me what I’ve opened.  I like that.
     :commands (ibuffer-sidebar-toggle-sidebar))
 #+end_src
 
+**** Extending the Mark
+
+From [[https://www.masteringemacs.org/article/fixing-mark-commands-transient-mark-mode][Fixing the mark commands in transient mark mode - Mastering Emacs]]:
+
+#+begin_src emacs-lisp
+  (defun jf/mark-without-transient (parg)
+    "Push `point' to `mark-ring' or jump to front of `mark-ring' without activating the region.
+
+  When given Universal PARG jump to the mark.  When not given
+  Universal PARG set the mark.
+
+  Equivalent to \\[set-mark-command] when \\[transient-mark-mode] is disabled"
+    (interactive "P")
+    (if (car parg)
+	(progn
+	  (set-mark-command 1))
+      (progn
+	(push-mark (point) t nil)
+	(message "Pushed mark to ring"))))
+
+  (global-set-key (kbd "C-`") 'jf/mark-without-transient)
+#+end_src
+
 *** Display
 **** lin.el
 
