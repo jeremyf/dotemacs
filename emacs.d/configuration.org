@@ -2479,6 +2479,7 @@ I use org-mode and org-roam to help manage content.  Let’s load that rather ex
 #+begin_src emacs-lisp
   (use-package magit
     :straight t
+    :commands (magit-process-git)
     :init (use-package with-editor :straight t)
 
     ;; Adding format to git-commit-fill-column of 72 as best practice.
@@ -4099,6 +4100,7 @@ some additional options.
       ("-e" "Eberron…" jf/menu--eberron)
       ("-f" "Forem…" jf/menu--forem)
       ("-t" "TakeOnRules…" jf/menu--tor)
+      ("-w" "Register window configuration" window-configuration-to-register)
       ]
      ["Jump to"
       ("j a" "Agenda" (lambda () (interactive) (find-file "~/git/org/agenda.org")))
@@ -4108,6 +4110,7 @@ some additional options.
       ("j h" "Hugo File" jf/jump_to_corresponding_hugo_file :if-derived org-mode)
       ("j m" "Mark" consult-mark)
       ("j o" "Org File" jf/jump_to_corresponding_org_file :if-non-nil jf/tor-minor-mode)
+      ("j p" "Jump in PDF" doc-view-goto-page :if-derived doc-view-mode)
       ]
      ["Dailies"
       ("d p" "Pick a daily" org-roam-dailies-goto-date)
