@@ -689,9 +689,9 @@ First, I’m considering swapping in and out the macros based on export context.
 I love [[https://github.com/minad][Daniel Mendler]]’s work; let’s test drive ~org-modern~.
 
 #+begin_src emacs-lisp
-  ;; (use-package org-modern
-  ;;   :straight (:host github :repo "minad/org-modern")
-  ;;   :hook (org-mode . org-modern-mode))
+  (use-package org-modern
+    :straight (:host github :repo "minad/org-modern")
+    :hook (org-mode . org-modern-mode))
 #+end_src
 
 * Macro Expansion
