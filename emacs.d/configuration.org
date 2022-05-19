@@ -331,6 +331,8 @@ I want to start with a basic look and feel.  First, the choice of primary font.
     I have it sprinkled through too many places.
 
     Alternatives:
+    - \"Iosevka Nerd Font Mono\"
+    - \"Iosevka Term\"
     - \"Monaco\"
     - \"JetBrains Mono\"
     - \"Hack Nerd Font\"")
@@ -2354,7 +2356,7 @@ The ~writeroom-mode.el~ package provides some quick adjustments for writing; cre
 
 #+begin_src emacs-lisp
   (use-package writeroom-mode
-    :config (setq writeroom-width 60)
+    :config (setq writeroom-width 80)
     :straight t)
 #+end_src
 
@@ -4083,6 +4085,7 @@ some additional options.
 
 #+begin_src emacs-lisp
   (global-set-key (kbd "s-1") 'jf/menu)
+  (setq jf/pairing-font-p nil)
   (transient-define-prefix jf/menu ()
     "A context specific \"mega\" menu."
     ;; Todo, can I get this section into a function so I can duplicate it in the jf/menu--tor?
@@ -4126,12 +4129,14 @@ some additional options.
      ["Modes"
       ;; I could write functions for these, but this is concise enough
       ("m h" jf/hammerspoon-toggle-mode  :if-non-nil hammerspoon-edit-minor-mode)
-      ("m i" "Imenu list ( )" imenu-list-minor-mode :if-nil imenu-list-minor-mode)
-      ("m i" "Imenu list (*)" imenu-list-minor-mode :if-non-nil imenu-list-minor-mode)
+      ("m f" "Pairing Font (*)" (lambda () (interactive) (progn (setq jf/pairing-font-p nil) (set-face-attribute 'default nil :family jf/fixed-width-font-name :height 140))) :if-non-nil jf/pairing-font-p)
+      ("m f" "Pairing Font ( )" (lambda () (interactive) (progn (setq jf/pairing-font-p t) (set-face-attribute 'default nil :family jf/fixed-width-font-name :height 200))) :if-nil jf/pairing-font-p)
       ("m t" "Typopunct ( )" typopunct-mode :if-nil typopunct-mode)
       ("m t" "Typopunct (*)" typopunct-mode :if-non-nil typopunct-mode)
       ("m o" "MacOS Native Option ( )" jf/toggle-osx-alternate-modifier :if-non-nil ns-alternate-modifier)
       ("m o" "MacOS Native Option (*)" jf/toggle-osx-alternate-modifier :if-nil ns-alternate-modifier)
+      ("m w" "Writeroom ( )" writeroom-mode :if-nil writeroom-mode)
+      ("m w" "Writeroom (*)" writeroom-mode :if-non-nil writeroom-mode)
       ("C-t" "Group by Projects ( )" jf/centaur-tabs-toggle-grouping :if jf/centaur-tabs-grouping-by-buffer-groups?)
       ("C-t" "Group by Projects (*)" jf/centaur-tabs-toggle-grouping :if-not jf/centaur-tabs-grouping-by-buffer-groups?)
       ]]
