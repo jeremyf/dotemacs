@@ -3946,7 +3946,7 @@ I wrote [[file:eberron.org][some tooling to help wile playing Eberron]].
 
 ** Forem, or Where I Work
 
-Let’s add some [[file:forem.org][Forem tooling]].
+Let’s add some [[file:forem-config.org][Forem tooling]].
 
 #+begin_src emacs-lisp
   (org-babel-load-file
