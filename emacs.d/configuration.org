@@ -221,7 +221,12 @@ out but for the most part, you can move along and reference this later.
   (set-terminal-coding-system 'utf-8)
   (set-keyboard-coding-system 'utf-8)
 
-  (add-hook 'text-mode-hook #'abbrev-mode)
+
+
+  (use-package abbrev
+    :straight (:type built-in)
+    :custom (abbrev-file-name (file-truename "~/git/dotemacs/emacs.d/abbrev_defs"))
+    :hook (text-mode . abbrev-mode))
 
   (add-function :after after-focus-change-function
 		(defun jf/garbage-collect-maybe ()

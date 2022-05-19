@@ -1,1 +1,5 @@
 ;;-*-coding: utf-8;-*-
+(define-abbrev-table 'global-abbrev-table
+  '(
+    ("bc" "because" nil :count 0)
+   ))
