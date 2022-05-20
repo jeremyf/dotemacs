@@ -325,8 +325,8 @@ Some basic packages to keep things less chatty.
 I want to start with a basic look and feel.  First, the choice of primary font.
 
 #+begin_src emacs-lisp
-  (defconst jf/fixed-width-font-name
-    "Hack Nerd Font"
+  (defvar jf/fixed-width-font-name
+    "Iosevka Term"
     "The name of the fixed width font.
     I have it sprinkled through too many places.
 
