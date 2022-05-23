@@ -182,9 +182,11 @@ See [[https://kitchingroup.cheme.cmu.edu/blog/2016/06/16/Copy-formatted-org-mode
 
 #+begin_src emacs-lisp
   (global-set-key (kbd "C-M-s-c") 'jf/formatted-copy-org-to-html)
-  (defun jf/formatted-copy-org-to-html ()
-    "Export region to HTML, and copy it to the clipboard."
-    (interactive)
+  (defun jf/formatted-copy-org-to-html (prefix)
+    "Export region to HTML, and copy it to the clipboard.
+
+  When given the PREFIX arg, paste the content into TextEdit (for future copy)."
+    (interactive "P")
     (save-window-excursion
       (let* ((buf (org-export-to-buffer 'html "*Formatted Copy*" nil nil t t))
 	     (html (with-current-buffer buf (buffer-string))))
@@ -193,7 +195,18 @@ See [[https://kitchingroup.cheme.cmu.edu/blog/2016/06/16/Copy-formatted-org-mode
 	   (point-min)
 	   (point-max)
 	   "textutil -inputencoding UTF-8 -stdout -stdin -format html -convert rtf | pbcopy"))
-	(kill-buffer buf))))
+	(kill-buffer buf)
+	;; Paste into TextEdit
+	(when (car prefix)
+	  (ns-do-applescript
+	   (concat
+	    "tell application \"TextEdit\"\n"
+	    "\tactivate\n"
+	    "\tset myrtf to the clipboard as «class RTF »\n"
+	    "\tset mydoc to make new document\n"
+	    "\tset text of mydoc to myrtf\n"
+	    "end tell")))
+	)))
 
   ;; http://mbork.pl/2021-05-02_Org-mode_to_Markdown_via_the_clipboard
   (defun jf/org-copy-region-as-markdown ()
