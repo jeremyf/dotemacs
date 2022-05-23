@@ -2384,7 +2384,16 @@ The ~writeroom-mode.el~ package provides some quick adjustments for writing; cre
 		("C-c g" . doc-view-goto-page)))
 #+end_src
 
+*** Mastodon
 
+As Twitter becomes a megalomaniac’s obsession, Mastodon becomes even more appealing.
+
+#+begin_src emacs-lisp
+  (use-package mastodon
+    :straight t
+    :config (setq mastodon-instance-url "https://tabletop.social"
+		  mastodon-active-user "takeonrules"))
+#+end_src
 *** Knowledge Management
 
 I use org-mode and org-roam to help manage content.  Let’s load that rather extensive configuration.
