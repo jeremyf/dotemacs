@@ -68,7 +68,8 @@ The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~
     ;; mode.
     :custom (org-src-tab-acts-natively t)
     :bind (:map org-mode-map
-		("C-c l i". jf/org-insert-link-dwim))
+		("C-c l i" . jf/org-insert-link-dwim)
+		("s-2" . consult-org-heading))
     :bind (("C-c l s" . org-store-link)
 	   ("C-c a" . org-agenda)
 	   ("C-c c" . org-capture)
