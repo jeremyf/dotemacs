@@ -611,6 +611,19 @@ minibuffer commands I issued.  These are, by default, in ~\~/.emacs.d/history~.
   (savehist-mode 1)
 #+end_src
 
+Giving a go at ~vertico-posframe~ to render a “pop-up” instead of the minibuffer.
+
+#+begin_src emacs-lisp
+  (use-package vertico-posframe
+    :straight t
+    :config (vertico-posframe-mode 1)
+    (setq vertico-posframe-width 170)
+    (setq vertico-posframe-height nil)
+    (setq vertico-posframe-parameters
+	'((left-fringe . 8)
+	  (right-fringe . 8))))
+#+end_src
+
 Now that I have a list of candidates commands, it would be nice if those
 candidates had some annotations.  Let’s load the ~marginalia~ package.  It
 provides annotations to minibuffer completions, and pairs nicely with Vertico.
