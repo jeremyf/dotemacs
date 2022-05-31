@@ -4082,15 +4082,6 @@ Next up is defining the transient prefixes, as I’m using them “menus.”  Th
 prefixes are the “start of” a command sequence.  In this case, I’m using them
 as menu’s which expose additional actions.
 
-Right away, I’m going to leverage the ~org-menu.el~ package; it leverages
-~transient.el~ for context specific options.
-
-#+begin_src emacs-lisp
-  (use-package org-menu
-    :straight (org-menu :host github :repo "sheijk/org-menu")
-    :bind (:map org-mode-map ("C-c m" . 'org-menu)))
-#+end_src
-
 A menu for my TakeOnRules blogging tasks.
 
 #+begin_src emacs-lisp
