@@ -2721,6 +2721,7 @@
     ("plantiff" "plaintiff" nil :count 1)
     ("plateu" "plateau" nil :count 1)
     ("plausable" "plausible" nil :count 1)
+    ("playes" "players" nil :count 1)
     ("playright" "playwright" nil :count 1)
     ("playwrite" "playwright" nil :count 1)
     ("playwrites" "playwrights" nil :count 1)
