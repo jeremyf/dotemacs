@@ -326,7 +326,7 @@ I want to start with a basic look and feel.  First, the choice of primary font.
 
 #+begin_src emacs-lisp
   (defvar jf/fixed-width-font-name
-    "Iosevka Term"
+    "Hack Nerd Font"
     "The name of the fixed width font.
     I have it sprinkled through too many places.
 
@@ -911,7 +911,8 @@ There’s a macro in here somewhere.
 	       :host gitlab
 	       :repo "OlMon/consult-projectile"
 	       :branch "master")
-    :bind ("s-t" . consult-projectile))
+    :bind ("s-t" . consult-projectile)
+    ("s-p" . consult-projectile))
 #+end_src
 
 /Note:/ The =CMD= + =t= (e.g. ~s-t~ in Emacs) is a carryover from my [[https://macromates.com][Textmate]]
@@ -1562,9 +1563,9 @@ I’m uncertain why I included this, aside from “sure would be nice to have un
   (use-package flymake-proselint
     :straight t)
 
-  (add-hook 'text-mode-hook (lambda ()
-			      (flymake-mode)
-			      (flymake-proselint-setup)))
+  ;; (add-hook 'text-mode-hook (lambda ()
+  ;; 			    (flymake-mode)
+  ;; 			    (flymake-proselint-setup)))
 #+end_src
 
 *** Modes
@@ -4150,8 +4151,10 @@ some additional options.
       ("j m" "Mark" consult-mark)
       ("j o" "Org File" jf/jump_to_corresponding_org_file :if-non-nil jf/tor-minor-mode)
       ("j p" "Jump in PDF" doc-view-goto-page :if-derived doc-view-mode)
+      ("j s" "Jump to Shortdoc" shortdoc-display-group)
       ]
      ["Dailies"
+      ("d c" "Capture a daily note…" org-roam-dailies-capture-date)
       ("d p" "Pick a daily" org-roam-dailies-goto-date)
       ("d t" "Today's daily" org-roam-dailies-goto-today)
       ("d T" "Tomorrow's daily" org-roam-dailies-goto-tomorrow)
@@ -4182,7 +4185,7 @@ some additional options.
      ["Context"
       ("s" "Search…" (lambda () (interactive) (consult-ripgrep org-directory)))
       ("M-c" "Context set…" jf/org-auto-tags--set-by-context :transient t)
-      ("M-s" jf/org-auto-tags--transient :transient t)
+      ("M-t" jf/org-auto-tags--transient :transient t)
       ("x" "Export to TakeOnRules…" jf/export-org-to-tor :if-derived org-mode)
       ]
      ["Grag Refs"

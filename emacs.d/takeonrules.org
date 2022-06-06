@@ -19,6 +19,9 @@ that I have required ~ox~.
 #+BEGIN_SRC emacs-lisp
   (require 'ox)
 
+  (use-package tomelr
+    :straight (tomelr :host github :repo "kaushalmodi/tomelr"))
+
   (use-package ox-hugo
     :straight t
     :custom (org-hugo-paired-shortcodes "marginnote sidenote")
