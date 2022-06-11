@@ -340,7 +340,7 @@ Loosely related is the ~jf/org-auto-tags--current-list~; Contexts are a named se
      (list
       :name "burning-locusts"
       :tags '("burning-locusts"
-	      "rpg"
+	      "rpgs"
 	      "burning-wheel"))
 
      :forem
@@ -353,13 +353,13 @@ Loosely related is the ~jf/org-auto-tags--current-list~; Contexts are a named se
       :name "mistimed-scroll"
       :tags '("eberron"
 	      "mistimed-scroll"
-	      "rpg"
+	      "rpgs"
 	      "burning-wheel"))
      :thel-sector
      (list
       :name "thel-sector"
       :tags '("thel-sector"
-	      "rpg" "swn")))
+	      "rpgs" "swn")))
     "A list of contexts that I regularly write about.")
 
   (defvar jf/org-auto-tags--current-list
