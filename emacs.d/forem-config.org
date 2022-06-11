@@ -318,7 +318,8 @@ System Project 46” in my menu.  When the project ends, I’ll remove that line
   (global-set-key (kbd "C-M-s-f") 'jf/menu--forem)
   (transient-define-prefix jf/menu--forem ()
     "Menu of Forem related functions."
-    [["Forem's Workflow"
+    [
+     ["Forem's Workflow"
       ("i" "All issues…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/issues/")))
       ("I" "My assigned issues…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/issues/assigned/jeremyf")))
       ("M-i" "My created and open issues" (lambda () (interactive) (browse-url "https://github.com/forem/forem/issues/created_by/@me")))
@@ -327,12 +328,12 @@ System Project 46” in my menu.  When the project ends, I’ll remove that line
       ("M" "Browse Jeremy's [M]erged Pull Requests…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/pulls/jeremyf?q=is%3Apr+is%3Aclosed")))
       ("p" "Browse to pull requests…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/pulls/")))
       ("P" "Browse to Jeremy's [P]ull requests…" (lambda () (interactive) (browse-url "https://github.com/forem/forem/pulls/jeremyf")))
-      ""
       ("r" "Release runbook in Forem.team" (lambda () (interactive) (browse-url "https://forem.team/product/feature-release-communications-playbook-11h2")))
+      ("s" "DEV.to SLO Dashboard" (lambda () (interactive) (browse-url "https://app.datadoghq.com/dashboard/hk3-xvy-xj9/dev-slo-dashboard?from_ts=1653655087682&to_ts=1653658687682&live=true")))
       ("n" "Browse Github [N]otifications" (lambda () (interactive) (browse-url "https://github.com/notifications")))
       ]
      ["Jeremy's Projects"
-      ("j a" "Jump to A/B Experiments" (lambda () (interactive) (browse-url "https://dev.to/admin/abtests"))
+      ("j a" "Jump to A/B Experiments" (lambda () (interactive) (browse-url "https://dev.to/admin/abtests")))
       ("j b" "Jump to Blazer" (lambda () (interactive) (browse-url "https://dev.to/admin/blazer")))
       ("j e" "Browse Epics Assigned to Jeremy" (lambda () (interactive) (browse-url "https://github.com/forem/forem-internal-eng/issues/assigned/jeremyf")))
       ("j f" "Feed Experiment Tracking Issues" (lambda () (interactive) (browse-url "https://github.com/forem/forem-internal-eng/issues/453")))
