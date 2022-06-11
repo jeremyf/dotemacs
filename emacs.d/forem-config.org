@@ -87,21 +87,30 @@ repository.
   (defun jf/git-branch-create-from-safari (directory)
     "Create a git branch in project DIRECTORY from Safari url."
     (interactive (list (projectile-completing-read
-			     "Project name: "
-			     projectile-known-projects)))
+			"Project name: "
+			projectile-known-projects)))
     (catch 'not-a-github-repository
       (let* ((link-title-pair (grab-mac-link-safari-1))
-	     (url (car link-title-pair)))
-	(unless (string-match "^https://github\\.com/[[:alpha:]]+/[^/]+/issues?/[[:digit:]]+" url)
-	  (throw 'not-a-github-repository (message "Expected URL \"%s\" to be a Github Issue URL." url)))
-	(let* ((title (cadr link-title-pair))
-	       (slugs (s-split "/" url))
-	       (suffix (format  "%s/%s#%s" (nth 3 slugs) (nth 4 slugs) (nth 6 slugs)))
-	       (slugified-title "issue")
-	       (prefix (format "%s/%s" jf/github-username slugified-title))
-	       (branch-name (concat prefix "---" suffix)))
-	  (message (jf/git-branch-create :branch-name branch-name :directory directory))))))
+	     (url (car link-title-pair))
+	     (title (cadr link-title-pair))
+	     (suffix (jf/github-abbreviation-for :url url))
+	     (slugified-title "issue")
+	     (prefix (format "%s/%s" jf/github-username slugified-title))
+	     (branch-name (concat prefix "---" suffix)))
+	(message (jf/git-branch-create :branch-name branch-name :directory directory)))))
 #+end_src
+
+#+begin_src emacs-lisp
+  (cl-defun jf/github-abbreviation-for (&key url)
+    "Convert the URL to a github abbreviation"
+    (unless (string-match "^https://github\\.com/[^/]+/[^/]+/\\(issues\\|pull\\)/[[:digit:]]+" url)
+      (throw 'not-a-github-repository (message "Expected URL \"%s\" to be a Github Issue or Pull URL." url)))
+    (let ((slugs (split-string url "/")))
+      (format  "%s/%s#%s" (nth 3 slugs) (nth 4 slugs) (nth 6 slugs))))
+#+end_src
+
+#+RESULTS:
+: jf/github-abbreviation-for
 
 - ~jf/git-branch-create~ :: This function manipulates the git repository.  We
   have a valid (enough) directory and a new branch-name, now let’s do the file
