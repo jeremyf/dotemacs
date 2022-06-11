@@ -1686,19 +1686,30 @@ for syntax highlighting and what have you.
 For awhile, I was trying to use lsp-mode.  It might look a bit nicer, but it was a little to “nosy”.  On my read, ~eglot~ leverages many of the built-in APIs of Emacs.
 
 #+begin_src emacs-lisp
-  (use-package eglot
-    :hook ((css-mode
-	    enh-ruby-mode
-	    html-mode
-	    js-mode
-	    scss-mode) . eglot-ensure)
-    :config
-    (setq eglot-ignored-server-capabilites (quote (:documentHighlightProvider)))
-    (add-to-list 'eglot-server-programs
-		 `(enh-ruby-mode . ("solargraph" "socket" "--port" :autoport)))
+  ;; https://github.com/joaotavora/eglot#1-2-3-pitfall
+  (use-package xref
     :straight t)
 
-  (setq completion-category-overrides '((eglot (styles orderless))))
+  (use-package project
+    :straight t)
+
+  (use-package eldoc
+    :straight t)
+
+  (use-package eglot
+      :hook ((css-mode
+	      enh-ruby-mode
+	      yaml-mode
+	      html-mode
+	      js-mode
+	      scss-mode) . eglot-ensure)
+      :config
+      (setq eglot-ignored-server-capabilites (quote (:documentHighlightProvider)))
+      (add-to-list 'eglot-server-programs
+		   `(enh-ruby-mode . ("solargraph" "socket" "--port" :autoport)))
+      :straight t)
+
+    (setq completion-category-overrides '((eglot (styles orderless))))
 #+end_src
 
 **** lua-mode.el
