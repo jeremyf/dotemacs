@@ -1801,6 +1801,14 @@ That’s one of those hot-keys almost burned into soul.
 	  ("C-r" . isearch-backward))
     :config (global-so-long-mode 1))
 #+end_src
+
+**** typescript-mode
+
+#+begin_src emacs-lisp
+  (use-package typescript-mode
+    :straight t)
+#+end_src
+
 **** tree-sitter.el
 
 - ~tree-sitter.el~ :: An incremental parsing library for languages.  See https://tree-sitter.github.io/tree-sitter/.
