@@ -90,12 +90,9 @@ repository.
 			"Project name: "
 			projectile-known-projects)))
     (catch 'not-a-github-repository
-      (let* ((link-title-pair (grab-mac-link-safari-1))
-	     (url (car link-title-pair))
-	     (title (cadr link-title-pair))
+      (let* ((url (jf/tor-prompt-for-url-dwim))
 	     (suffix (jf/github-abbreviation-for :url url))
-	     (slugified-title "issue")
-	     (prefix (format "%s/%s" jf/github-username slugified-title))
+	     (prefix (format "%s/%s" jf/github-username "issue"))
 	     (branch-name (concat prefix "---" suffix)))
 	(message (jf/git-branch-create :branch-name branch-name :directory directory)))))
 #+end_src

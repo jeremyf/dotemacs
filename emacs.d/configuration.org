@@ -3286,8 +3286,10 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
     (read-string "URL: "
 		 (or (thing-at-point-url-at-point)
 		     (let ((car-of-kill-ring (substring-no-properties (car kill-ring))))
-		       (when (string-match url-regexp car-of-kill-ring)
-			 car-of-kill-ring)))))
+		       (if (string-match url-regexp car-of-kill-ring)
+			   car-of-kill-ring
+			 (car (grab-mac-link-safari-1))
+			 )))))
 
   (defun jf/abbreviate-url (url)
     "Abbreviate the given URL; prompt if non-provided."
