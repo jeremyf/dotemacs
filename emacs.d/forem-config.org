@@ -42,133 +42,6 @@ possibilities and holding them lightly.
 
 * Further Automation
 
-** Create a branch from a Github Issue
-
-I want a function that I can call which will walk me through the predictable
-and safe creation of a branch.
-
-My goal is to have the branch name adhear to the following convention:
-
-- :githubUserName/issue---:owner/:repo#:number
-
-Why do this?  First, I want to “entice” myself to use Issue tracking.  This is
-good collaborative form.  Second, with a predictable branch name, I can later
-use Emacs to jump to the corresponding issue.
-
-*** Two Approaches
-
-I can provide a URL/slug or leverage an already open browser.  The URL/slug
-approach might require authentication and token management.  That’s
-troublesome.  The browser path requires that I have an integration with my
-browser; but I won’t need to manage authentication issues, so let’s explore that.
-
-Let’s use the ~grab-mac-link~ package.  I’m certain I’m already including this
-in my [[file:configuration.org][Emacs Configuration]] file, I’m “using” it again, so I’m going to ensure I
-have what I want.
-
-#+begin_src emacs-lisp
-  (use-package grab-mac-link
-    :straight t
-    :commands (grab-mac-link-safari-1))
-#+end_src
-
-*** Implementation
-
-As I think through my approach, I have two concerns, an interactive function to
-gather the data and a function for using that data to manipulate the git
-repository.
-
-- ~jf/git-branch-create-from-safari~ :: This is the function that gathers the
-  data.  It’s responsible for prompting for the correct project, verifying that
-  Safari’s URL is correct, and then calling the non-interactive function
-  ~jf/git-branch-create~.
-
-#+begin_src emacs-lisp
-  (defun jf/git-branch-create-from-safari (directory)
-    "Create a git branch in project DIRECTORY from Safari url."
-    (interactive (list (projectile-completing-read
-			"Project name: "
-			projectile-known-projects)))
-    (catch 'not-a-github-repository
-      (let* ((url (jf/tor-prompt-for-url-dwim))
-	     (suffix (jf/github-abbreviation-for :url url))
-	     (prefix (format "%s/%s" jf/github-username "issue"))
-	     (branch-name (concat prefix "---" suffix)))
-	(message (jf/git-branch-create :branch-name branch-name :directory directory)))))
-#+end_src
-
-#+begin_src emacs-lisp
-  (cl-defun jf/github-abbreviation-for (&key url fallback)
-    "Convert the URL to a github abbreviation"
-    (if (string-match "^https://github\\.com/[^/]+/[^/]+/\\(issues\\|pull\\)/[[:digit:]]+" url)
-	(let ((slugs (split-string url "/")))
-	  (format  "%s/%s#%s" (nth 3 slugs) (nth 4 slugs) (nth 6 slugs)))
-      (if fallback
-	  url
-	(throw 'not-a-github-repository (message "Expected URL \"%s\" to be a Github Issue or Pull URL." url)))))
-#+end_src
-
-- ~jf/git-branch-create~ :: This function manipulates the git repository.  We
-  have a valid (enough) directory and a new branch-name, now let’s do the file
-  system work to ensure we can safely do this work.
-
-#+begin_src emacs-lisp
-  (cl-defun jf/git-branch-create (&key branch-name directory (starting-branch "main"))
-    "Create BRANCH-NAME from STARTING-BRANCH in DIRECTORY.  Ensure clean state."
-    (catch 'dirty-branch
-      (let* ((default-directory directory))
-	(unless (eq 0 (length (shell-command-to-string "git status --porcelain")))
-	  (throw 'dirty-branch
-		 (format
-		  "Repository \"%s\" is dirty repository."
-		  default-directory)))
-
-	(magit-branch-checkout starting-branch)
-
-	(magit-pull-from-upstream "--rebase")
-
-	(unless (eq 0 (length (shell-command-to-string "git status --porcelain")))
-	  (throw 'dirty-branch
-		 (format
-		  "After updating from remote, repository \"%s\" is dirty repository."
-		  default-directory)))
-
-	(magit-branch-create branch-name starting-branch)
-	(magit-branch-checkout branch-name))
-      (format "Created branch on %s" directory)))
-#+end_src
-
-This gets me what I want, and helps frame the next exercise (e.g. “For the
-current branch, open the corresponding issue in the browser”).  It also has me
-thinking that I might want to inject into my commit message a “References
-#:number” line.  That sounds like another function.
-
-#+begin_src emacs-lisp
-  (cl-defun jf/git-github-issue-short-ref (parg &key (url-template "https://github.com/%s/issues/%s" ))
-    "This function will parse the current branch and open the Github issue.
-
-  With no universal PARG, browse to the associated github issue.
-  With universal PARG, insert github short ref.
-
-  Regardless, add the github short ref to the kill ring.
-
-  Plays nicely with `jf/git-branch-create'"
-    (interactive "P")
-    (let* ((prefix (car parg))
-	   (branch (magit-get-current-branch))
-	   (gh-short-ref (cadr (s-split "---" branch)))
-	   (parts (s-split "#" gh-short-ref))
-	   (repo (car parts))
-	   (number (cadr parts))
-	   (url (format url-template repo number)))
-      (kill-new gh-short-ref)
-      (message "\"%s\" added to kill-ring" gh-short-ref)
-      (if (not prefix)
-	  (browse-url url)
-	(insert gh-short-ref))))
-#+end_src
-
-
 ** Tidying a Pull Request
 
 At [[https://forem.com][Forem]] we use a [[https://github.com/forem/forem/blob/main/.github/PULL_REQUEST_TEMPLATE.md][pull request template]] that has lots of instructions for
@@ -345,7 +218,7 @@ System Project 46” in my menu.  When the project ends, I’ll remove that line
      ["Transformations"
       ("C-e" "End of week status report template" jf/forem-prepare-end-of-week-status-update)
       ("C-p" "Tidy pull request" jf/forem-tidy-pull-request :if-non-nil hammerspoon-edit-minor-mode)
-      ("C-b" "Create branch from issue" jf/git-branch-create-from-safari :if-non-nil jf/forem-minor-mode)
+      ("C-b" "Create branch from issue" jf/git-branch-create :if-non-nil jf/forem-minor-mode)
       ("C-i" "Goto issue for branch" jf/git-github-issue-short-ref :if-non-nil jf/forem-minor-mode)
       ]])
 #+end_src

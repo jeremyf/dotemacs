@@ -3278,31 +3278,6 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
     "Convert STRING to appropriate slug."
     (s-replace "'" "" (s-dashed-words (s-downcase string))))
 
-  (cl-defun jf/tor-prompt-for-url-dwim (&key (url-regexp "^https?://"))
-    "Prompt and return a url.
-
-    If the `thing-at-point-url-at-point' use that, otherwise check
-    the `kill-ring' matches the given URL-REGEXP.  And if not that, fallback to link in Safari (via `grab-mac-link-safari-1')"
-    (read-string "URL: "
-		 (or (thing-at-point-url-at-point)
-		     (let ((car-of-kill-ring (substring-no-properties (car kill-ring))))
-		       (if (string-match url-regexp car-of-kill-ring)
-			   car-of-kill-ring
-			 (car (grab-mac-link-safari-1))
-			 )))))
-
-  (defun jf/abbreviate-url (url)
-    "Abbreviate the given URL; prompt if non-provided."
-    (interactive (list (jf/tor-prompt-for-url-dwim)))
-    (let ((abbr (jf/github-abbreviation-for :url url :fallback url)))
-      (if (thing-at-point-url-at-point)
-	  (apply 'replace-string-in-region
-		 (flatten-list
-		  (list url
-			abbr
-			(thing-at-point-bounds-of-url-at-point))))
-	(insert abbr))))
-
   (defun jf/slugify ()
     "Convert the active region or line to a URL friendly slug."
     (interactive)
@@ -4034,6 +4009,13 @@ Let’s add some [[file:forem-config.org][Forem tooling]].
 #+begin_src emacs-lisp
   (org-babel-load-file
    (concat user-emacs-directory "forem-config.org"))
+#+end_src
+
+** Utility Functions
+
+#+begin_src emacs-lisp
+  (org-babel-load-file
+   (concat user-emacs-directory "utility-functions.org"))
 #+end_src
 
 ** Crafting Menus to Help Organize
