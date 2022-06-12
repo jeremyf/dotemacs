@@ -22,14 +22,15 @@ Throughout these functions, I make use of the ~grab-mac-link-safari-1~ function.
 
 Some additional features could be:
 
-- Convert the URL to a Markdown or OrgMode style link.
-- Creating OrgRoam node for an issue, qo that I have a local place to write up any working notes; and reference in my daily journal entries.  However, I'm waiting for [[https://github.com/org-roam/org-roam/issues/2220][some input on a feature request]] before I proceed with a workaround.
-- Jump to my notes for the given branch (created in the above task)
-- Assemble things into a gigantic function to:
+- [ ] When in ~markdown-mode~, convert the URL to a Markdown URL
+- [X] When in ~org-mode~, conver the URL to an OrgMode style link.
+- [ ] Creating OrgRoam node for an issue, qo that I have a local place to write up any working notes; and reference in my daily journal entries.  However, I'm waiting for [[https://github.com/org-roam/org-roam/issues/2220][some input on a feature request]] before I proceed with a workaround.
+- [ ] Jump to my notes for the given branch (created in the above task)
+- [-] Assemble things into a gigantic function to:
 
-  - Create a branch from an issue
-  - Add a Journal entry saying "Started work on /#"
-  - Create an OrgRoam node for that issue (which would then have a back link to my daily journal entry)
+  - [X] Create a branch from an issue
+  - [ ] Add a Journal entry saying "Started work on /#"
+  - [X] Create an OrgRoam node for that issue (which would then have a back link to my daily journal entry)
 
 All of this is to help me better navigate throughout my somewhat normalized workflow.
 
@@ -98,10 +99,27 @@ And why do all of this? To sharpen my tools. Practice extending my text editor t
 	(insert gh-short-ref))))
 #+end_src
 
+- ~jf/org-roam-dailies--add-entry-for-url~ :: Take the URL and write an entry for today.
+
+#+begin_src emacs-lisp
+  (setq org-roam-dailies-capture-templates
+	'(("i" "item" item
+	   "[ ] %?"
+	   :target (file+head "%<%Y-%m-%d>.org"
+			      "#+title: %<%Y-%m-%d>\n#+FILETAGS: :dailies:\n"))))
+
+  (defun jf/org-roam-dailies--add-entry-for-url (url)
+    "Add URL to today's org-roam-dailies entry."
+    (interactive (list (jf/prompt-for-url-dwim)))
+    (let* ((abbr (jf/github-abbreviation-for :url url :fallback t)))
+      (org-roam-dailies-capture-today)
+      (insert (format "Started [[%s][%s]]" url abbr))))
+#+end_src
+
 - ~jf/prompt-for-url-dwim~ :: Not an interactive function, but used as the prompt for an ~interactive~ function.  It will make a few “guesses” on where to look for the URL (at point, kill-ring, given function).
 
 #+begin_src emacs-lisp
-  (cl-defun jf/prompt-for-url-dwim (&key (url-regexp "^https?://") (fn 'grab-mac-link-safari-1))
+  (cl-defun jf/prompt-for-url-dwim (&key (url-regexp "^https?://"))
     "Prompt and return a url.
 
       If the `thing-at-point-url-at-point' use that, otherwise
@@ -113,7 +131,7 @@ And why do all of this? To sharpen my tools. Practice extending my text editor t
 		     (let ((car-of-kill-ring (substring-no-properties (car kill-ring))))
 		       (if (string-match url-regexp car-of-kill-ring)
 			   car-of-kill-ring
-			 (car (apply fn)))))))
+			 (car (grab-mac-link-safari-1)))))))
 #+end_src
 
 * Support Functions
