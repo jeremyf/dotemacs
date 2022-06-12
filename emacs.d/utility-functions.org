@@ -102,12 +102,6 @@ And why do all of this? To sharpen my tools. Practice extending my text editor t
 - ~jf/org-roam-dailies--add-entry-for-url~ :: Take the URL and write an entry for today.
 
 #+begin_src emacs-lisp
-  (setq org-roam-dailies-capture-templates
-	'(("i" "item" item
-	   "[ ] %?"
-	   :target (file+head "%<%Y-%m-%d>.org"
-			      "#+title: %<%Y-%m-%d>\n#+FILETAGS: :dailies:\n"))))
-
   (defun jf/org-roam-dailies--add-entry-for-url (url)
     "Add URL to today's org-roam-dailies entry."
     (interactive (list (jf/prompt-for-url-dwim)))

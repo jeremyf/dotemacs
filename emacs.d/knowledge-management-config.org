@@ -531,6 +531,12 @@ And with all of that, let’s get into the org-roam configuration.
 #+begin_src emacs-lisp
   (use-package org-roam
     :straight t
+    :config
+    (setq org-roam-dailies-capture-templates
+	'(("i" "item" item
+	   "[ ] %?"
+	   :target (file+head "%<%Y-%m-%d>.org"
+			      "#+title: %<%Y-%m-%d>\n#+FILETAGS: :dailies:\n"))))
     :custom
     ;; See https://github.com/nobiot/org-transclusion/issues/136
     (org-roam-db-extra-links-exclude-keys '((node-property "ROAM_REFS")))
