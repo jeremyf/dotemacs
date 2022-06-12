@@ -3282,7 +3282,7 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
     "Prompt and return a url.
 
     If the `thing-at-point-url-at-point' use that, otherwise check
-    the `kill-ring' matches the given URL-REGEXP"
+    the `kill-ring' matches the given URL-REGEXP.  And if not that, fallback to link in Safari (via `grab-mac-link-safari-1')"
     (read-string "URL: "
 		 (or (thing-at-point-url-at-point)
 		     (let ((car-of-kill-ring (substring-no-properties (car kill-ring))))
@@ -3296,7 +3296,11 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
     (interactive (list (jf/tor-prompt-for-url-dwim)))
     (let ((abbr (jf/github-abbreviation-for :url url :fallback url)))
       (if (thing-at-point-url-at-point)
-	  (apply 'replace-string-in-region (flatten-list (list url abbr (thing-at-point-bounds-of-url-at-point))))
+	  (apply 'replace-string-in-region
+		 (flatten-list
+		  (list url
+			abbr
+			(thing-at-point-bounds-of-url-at-point))))
 	(insert abbr))))
 
   (defun jf/slugify ()
@@ -3926,9 +3930,6 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
   ;;
   ;;******************************************************************************
 #+end_src
-
-#+RESULTS:
-: jf/tor-wrap-cite-active-region-dwim
 
 *** Quick Help
 
