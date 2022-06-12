@@ -18,6 +18,23 @@ Throughout these functions, I make use of the ~grab-mac-link-safari-1~ function.
     :commands (grab-mac-link-safari-1))
 #+end_src
 
+* TODO Future Considerations
+
+Some additional features could be:
+
+- Convert the URL to a Markdown or OrgMode style link.
+- Creating OrgRoam node for an issue, qo that I have a local place to write up any working notes; and reference in my daily journal entries.  However, I'm waiting for [[https://github.com/org-roam/org-roam/issues/2220][some input on a feature request]] before I proceed with a workaround.
+- Jump to my notes for the given branch (created in the above task)
+- Assemble things into a gigantic function to:
+
+  - Create a branch from an issue
+  - Add a Journal entry saying "Started work on /#"
+  - Create an OrgRoam node for that issue (which would then have a back link to my daily journal entry)
+
+All of this is to help me better navigate throughout my somewhat normalized workflow.
+
+And why do all of this? To sharpen my tools. Practice extending my text editor to facilitate my ever emerging workflow.
+
 * Interactive Functions
 
 - ~jf/abbreviate-url~ :: For the given URL (or prompted URL), convert that URL into an abbreviation.  A todo item is to replace the URL with a mode appropriate link.
