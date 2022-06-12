@@ -3278,15 +3278,24 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
     "Convert STRING to appropriate slug."
     (s-replace "'" "" (s-dashed-words (s-downcase string))))
 
-  (cl-defun jf/tor-prompt-or-kill-ring-for-url (&key (url-regexp "^https?://"))
+  (cl-defun jf/tor-prompt-for-url-dwim (&key (url-regexp "^https?://"))
     "Prompt and return a url.
 
-  If the `car' of `kill-ring' matches the URL-REGEXP, default the
-  prompt value to the `car' of `kill-ring'."
-    (let ((car-of-kill-ring (substring-no-properties (car kill-ring))))
-      (read-string "URL (optional): "
-		   (when (string-match url-regexp car-of-kill-ring)
-		     car-of-kill-ring))))
+    If the `thing-at-point-url-at-point' use that, otherwise check
+    the `kill-ring' matches the given URL-REGEXP"
+    (read-string "URL: "
+		 (or (thing-at-point-url-at-point)
+		     (let ((car-of-kill-ring (substring-no-properties (car kill-ring))))
+		       (when (string-match url-regexp car-of-kill-ring)
+			 car-of-kill-ring)))))
+
+  (defun jf/abbreviate-url (url)
+    "Abbreviate the given URL; prompt if non-provided."
+    (interactive (list (jf/tor-prompt-for-url-dwim)))
+    (let ((abbr (jf/github-abbreviation-for :url url :fallback url)))
+      (if (thing-at-point-url-at-point)
+	  (apply 'replace-string-in-region (flatten-list (list url abbr (thing-at-point-bounds-of-url-at-point))))
+	(insert abbr))))
 
   (defun jf/slugify ()
     "Convert the active region or line to a URL friendly slug."
@@ -3301,23 +3310,23 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
 	(insert (jf/tor-convert-text-to-slug text)))))
 
   (cl-defun jf/tor-post---create-or-append (&key
-					     title subheading
-					     (tags '("null")) series toc
-					     citeTitle citeURL citeAuthor)
+					    title subheading
+					    (tags '("null")) series toc
+					    citeTitle citeURL citeAuthor)
     "Create or append a post with TITLE.
 
-  The following keys are optional:
+    The following keys are optional:
 
-  :SUBHEADING if you have an active region, use this header.
-  :TAGS one or more tags, as a list or string, to add to the
-	  frontmatter.
-  :SERIES the series to set in the frontmatter.
-  :TOC whether to include a table of contents in the post.
-  :CITETITLE the title of the URL cited (if any)
-  :CITEURL the URL cited (if any)
-  :CITEAUTHOR the author cited (if any)
+    :SUBHEADING if you have an active region, use this header.
+    :TAGS one or more tags, as a list or string, to add to the
+	    frontmatter.
+    :SERIES the series to set in the frontmatter.
+    :TOC whether to include a table of contents in the post.
+    :CITETITLE the title of the URL cited (if any)
+    :CITEURL the URL cited (if any)
+    :CITEAUTHOR the author cited (if any)
 
-  If there's an active region, select that text and place it."
+    If there's an active region, select that text and place it."
     (let* ((default-directory (f-join jf/tor-home-directory
 				      "content" "posts"
 				      (format-time-string "%Y/")))
@@ -3405,8 +3414,8 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
   (defun jf/tor-retitle-post (title)
     "Replace the given buffer's title with the new TITLE.
 
-  This function will: replace the content's title, update the slug,
-  and rename the buffer."
+    This function will: replace the content's title, update the slug,
+    and rename the buffer."
     (interactive "sNew Post's Title: ")
     (let* ((metadataTitle (concat "title: '"
 				  (jf/tor-convert-text-to-post-title title) "'"))
@@ -3456,7 +3465,7 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
   (defun jf/tor-find-hugo-file-by-url (url)
     "Find the associated TakeOnRules.com file for the given URL."
     (interactive (list
-		  (jf/tor-prompt-or-kill-ring-for-url
+		  (jf/tor-promt-for-url-dwim
 		   :url-regexp jf/tor-hostname-regexp)))
     (cond
      ;; Blog post
@@ -3480,12 +3489,12 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
      (t (message "Unable to find post for \"%s\"" url))))
 
   (cl-defun jf/tor-view-blog-post (&key
-				    (hostname jf/tor-hostname-current))
+				   (hostname jf/tor-hostname-current))
     "Browse the url for the HOSTNAME
 
-  The front matter of blog posts contains YAML, with two
-  attributes: slug and date.  Based on the site configuration, the
-  URLs for one of those posts is: hostname/year/month/day/slug"
+    The front matter of blog posts contains YAML, with two
+    attributes: slug and date.  Based on the site configuration, the
+    URLs for one of those posts is: hostname/year/month/day/slug"
     (interactive)
     (let ((slugs))
       (save-excursion
@@ -3509,15 +3518,15 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
   (defun jf/tor-create-post (title)
     "Create and visit a new draft post.  Prompt for a TITLE.
 
-  The file for the blog post conforms to the path schema of posts
-  for TakeOnRules.com."
+    The file for the blog post conforms to the path schema of posts
+    for TakeOnRules.com."
     (interactive "sBlog Post Title: ")
     (jf/tor-post---create-or-append :title title))
 
   (defun jf/tor-tag-post (tags)
     "Apply the TAGS to the current TakeOnRules.com post.
 
-  No effort is made to check if this is a post."
+    No effort is made to check if this is a post."
     (interactive (list (completing-read-multiple "Tags: " (jf/tor-tags-list))))
     (let ((saved-point (point))
 	  (to-insert (concat "\n- " (s-join "\n- " tags))))
@@ -3577,18 +3586,18 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
     (message "Ready to insert a new epigraph"))
 
   (cl-defun jf/tor-post-amplifying-the-blogosphere (subheading
-						     &key
-						     citeTitle
-						     citeURL
-						     citeAuthor)
+						    &key
+						    citeTitle
+						    citeURL
+						    citeAuthor)
     "Create and visit draft post for amplifying the blogosphere.
 
-  If there's an active region, prompt for the :SUBHEADING.  The file
-  for the blog post conforms to the path schema of posts for
-  TakeOnRules.com.
+    If there's an active region, prompt for the :SUBHEADING.  The file
+    for the blog post conforms to the path schema of posts for
+    TakeOnRules.com.
 
-  We'll pass the :CITETITLE, :CITEAUTHOR, and :CITEURL to
-  `jf/tor-post---create-or-append'"
+    We'll pass the :CITETITLE, :CITEAUTHOR, and :CITEURL to
+    `jf/tor-post---create-or-append'"
     (interactive (list (if (use-region-p)
 			   (read-string "Sub-Heading: ")
 			 nil)))
@@ -3607,7 +3616,7 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
   (cl-defun jf/find-file-via-matching (&key prompt matching in)
     "PROMPT for files IN the directory with MATCHING content.
 
-  If `consult--read' is defined, use that.  Otherwise fallback to `completing-read'."
+    If `consult--read' is defined, use that.  Otherwise fallback to `completing-read'."
     (if (fboundp 'consult--read)
 	(consult--read
 	 (consult--with-increased-gc
@@ -3643,13 +3652,13 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
     (find-file filename))
   ;;******************************************************************************
   ;;
-  ;;; END Interactive Non-Wrapping Functions
+    ;;; END Interactive Non-Wrapping Functions
   ;;
   ;;******************************************************************************
 
   ;;******************************************************************************
   ;;
-  ;;; BEGIN Listing functions for TakeOnRules.com data
+    ;;; BEGIN Listing functions for TakeOnRules.com data
   ;;
   ;;******************************************************************************
   (defun jf/tor-tags-list ()
@@ -3681,19 +3690,19 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
     (jf/tor-list-by-key-from-filename :key "Key" :filename "data/licenses.yml"))
   ;;******************************************************************************
   ;;
-  ;;; END Listing functions for TakeOnRules.com data
+    ;;; END Listing functions for TakeOnRules.com data
   ;;
   ;;******************************************************************************
 
   ;;******************************************************************************
   ;;
-  ;;; BEGIN querying and list generation functions
+    ;;; BEGIN querying and list generation functions
   ;;
   ;;******************************************************************************
   (cl-defun jf/tor-list-by-key-from-filename (&key
-					       key
-					       filename
-					       (directory jf/tor-home-directory))
+					      key
+					      filename
+					      (directory jf/tor-home-directory))
     "Build a list of entries of the KEY from the FILENAME in DIRECTORY."
     (split-string-and-unquote
      (shell-command-to-string
@@ -3757,27 +3766,27 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
 	       (replace-regexp-in-string "^#+ +" "" heading))))
   ;;******************************************************************************
   ;;
-  ;;; END querying and list generation functions
+    ;;; END querying and list generation functions
   ;;
   ;;******************************************************************************
 
   ;;******************************************************************************
   ;;
-  ;;; BEGIN Wrapping Functions
+    ;;; BEGIN Wrapping Functions
   ;;
   ;;******************************************************************************
   (cl-defun jf/tor-wrap-with-text (&key before after strategy)
     "Wrap the STRATEGY determined region with the BEFORE and AFTER text.
 
-  Valid STRATEGY options are:
+    Valid STRATEGY options are:
 
-  - :lineOrRegion
-  - :pointOrRegion
-  - :sentenceOrRegion
-  - :wordOrRegion
+    - :lineOrRegion
+    - :pointOrRegion
+    - :sentenceOrRegion
+    - :wordOrRegion
 
-  TODO: I would love create a lookup table for the case statement,
-  as the behavior's well defined."
+    TODO: I would love create a lookup table for the case statement,
+    as the behavior's well defined."
     (pcase strategy
       (:lineOrRegion (pcase-let* ((origin (point))
 				  (`(,begin . ,end)
@@ -3858,15 +3867,15 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
   (defun jf/tor-wrap-link-active-region-dwim (url)
     "Wrap current region (or point) in an A-tag with the given URL.
 
-  For the URL:
+    For the URL:
 
-  - If `car' of `kill-ring' starts with \"http\", then use that as the URL.
-  - Otherwise prompt for a URL.
+    - If `car' of `kill-ring' starts with \"http\", then use that as the URL.
+    - Otherwise prompt for a URL.
 
-  If the URL is an empty string, then send a message.  Else, if we
-  have a non-0 length URL, use the URL and wrap the region in an A
-  tag."
-    (interactive (list (jf/tor-prompt-or-kill-ring-for-url)))
+    If the URL is an empty string, then send a message.  Else, if we
+    have a non-0 length URL, use the URL and wrap the region in an A
+    tag."
+    (interactive (list (jf/tor-promt-for-url-dwim)))
     (if (eq (length url) 0)
 	(message "No URL to use for A-tag creation")
       (jf/tor-wrap-with-text
@@ -3885,15 +3894,15 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
   (defun jf/tor-wrap-cite-active-region-dwim (url)
     "Wrap current region (or point) in a CITE-tag and optional A-tag with URL.
 
-  For the URL:
+    For the URL:
 
-  - If `car' of `kill-ring' starts with \"http\", then use that as the URL.
-  - Otherwise prompt for a URL.
+    - If `car' of `kill-ring' starts with \"http\", then use that as the URL.
+    - Otherwise prompt for a URL.
 
-  If the URL an empty string, then wrap the current region or point
-  in a CITE tag.  Else, if we have a non-0 length URL, wrap it in
-  CITE and A tag."
-    (interactive (list (jf/tor-prompt-or-kill-ring-for-url)))
+    If the URL an empty string, then wrap the current region or point
+    in a CITE tag.  Else, if we have a non-0 length URL, wrap it in
+    CITE and A tag."
+    (interactive (list (jf/tor-promt-for-url-dwim)))
 
     ;; Were we to start writing at the START position, we'd invariably
     ;; change the contents such that the END position was no longer
@@ -3911,10 +3920,13 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
        :strategy :pointOrRegion)))
   ;;******************************************************************************
   ;;
-  ;;; END Wrapping Functions
+    ;;; END Wrapping Functions
   ;;
   ;;******************************************************************************
 #+end_src
+
+#+RESULTS:
+: jf/tor-wrap-cite-active-region-dwim
 
 *** Quick Help
 

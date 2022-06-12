@@ -101,16 +101,15 @@ repository.
 #+end_src
 
 #+begin_src emacs-lisp
-  (cl-defun jf/github-abbreviation-for (&key url)
+  (cl-defun jf/github-abbreviation-for (&key url fallback)
     "Convert the URL to a github abbreviation"
-    (unless (string-match "^https://github\\.com/[^/]+/[^/]+/\\(issues\\|pull\\)/[[:digit:]]+" url)
-      (throw 'not-a-github-repository (message "Expected URL \"%s\" to be a Github Issue or Pull URL." url)))
-    (let ((slugs (split-string url "/")))
-      (format  "%s/%s#%s" (nth 3 slugs) (nth 4 slugs) (nth 6 slugs))))
+    (if (string-match "^https://github\\.com/[^/]+/[^/]+/\\(issues\\|pull\\)/[[:digit:]]+" url)
+	(let ((slugs (split-string url "/")))
+	  (format  "%s/%s#%s" (nth 3 slugs) (nth 4 slugs) (nth 6 slugs)))
+      (if fallback
+	  url
+	(throw 'not-a-github-repository (message "Expected URL \"%s\" to be a Github Issue or Pull URL." url)))))
 #+end_src
-
-#+RESULTS:
-: jf/github-abbreviation-for
 
 - ~jf/git-branch-create~ :: This function manipulates the git repository.  We
   have a valid (enough) directory and a new branch-name, now let’s do the file
