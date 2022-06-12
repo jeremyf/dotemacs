@@ -20,7 +20,23 @@ Throughout these functions, I make use of the ~grab-mac-link-safari-1~ function.
 
 * Interactive Functions
 
-This is the function that gathers the data.  It’s responsible for prompting for the correct project, verifying that Safari’s URL is correct, and then calling the non-interactive function ~jf/git-branch-create~.
+- ~jf/abbreviate-url~ :: For the given URL (or prompted URL), convert that URL into an abbreviation.  A todo item is to replace the URL with a mode appropriate link.
+
+#+begin_src emacs-lisp
+  (defun jf/abbreviate-url (url)
+      "Abbreviate the given URL; prompt if non-provided."
+      (interactive (list (jf/prompt-for-url-dwim)))
+      (let ((abbr (jf/github-abbreviation-for :url url :fallback url)))
+	(if (thing-at-point-url-at-point)
+	    (apply 'replace-string-in-region
+		   (flatten-list
+		    (list url
+			  abbr
+			  (thing-at-point-bounds-of-url-at-point))))
+	  (insert abbr))))
+#+end_src
+
+- ~jf/git-branch-create~ :: This is the function that gathers the data.  It’s responsible for prompting for the correct project, verifying that Safari’s URL is correct, and then calling the non-interactive function ~jf/git-branch-create~.
 
 #+begin_src emacs-lisp
   (defun jf/git-branch-create (directory url)
@@ -36,22 +52,6 @@ This is the function that gathers the data.  It’s responsible for prompting fo
 	     (prefix (format "%s/%s" jf/github-username "issue"))
 	     (branch-name (concat prefix "---" suffix)))
 	(message (jf/git-branch-create- :branch-name branch-name :directory directory)))))
-#+end_src
-
-- ~jf/abbreviate-url~ :: For the given URL (or prompted URL), convert that URL into an abbreviation.  A todo item is to replace the URL with a mode appropriate link.
-
-#+begin_src emacs-lisp
-  (defun jf/abbreviate-url (url)
-      "Abbreviate the given URL; prompt if non-provided."
-      (interactive (list (jf/prompt-for-url-dwim)))
-      (let ((abbr (jf/github-abbreviation-for :url url :fallback url)))
-	(if (thing-at-point-url-at-point)
-	    (apply 'replace-string-in-region
-		   (flatten-list
-		    (list url
-			  abbr
-			  (thing-at-point-bounds-of-url-at-point))))
-	  (insert abbr))))
 #+end_src
 
 - ~jf/git-github-issue-short-ref~ :: Open the current branch’s corresponding issue in Github.  Assumes the branch was constructed in the following format =<github-username>/issues---<owner>/<repo>#<number>=, which is how ~jf/git-branch-create~ does it.
@@ -101,19 +101,6 @@ This is the function that gathers the data.  It’s responsible for prompting fo
 
 * Support Functions
 
-- ~jf/github-abbreviation-for~ :: This function converts a Github URL into it’s abbreviation (e.g. ~<owner>/<repo>#<number>~).  If the given URL is not a Github URL we have a few options:  Fallback to the URL /or/ throw an exception.
-
-#+begin_src emacs-lisp
-  (cl-defun jf/github-abbreviation-for (&key url fallback)
-    "Convert the URL to a github abbreviation"
-    (if (string-match "^https://github\\.com/[^/]+/[^/]+/\\(issues\\|pull\\)/[[:digit:]]+" url)
-	(let ((slugs (split-string url "/")))
-	  (format  "%s/%s#%s" (nth 3 slugs) (nth 4 slugs) (nth 6 slugs)))
-      (if fallback
-	  url
-	(throw 'not-a-github-repository (message "Expected URL \"%s\" to be a Github Issue or Pull URL." url)))))
-#+end_src
-
 - ~jf/git-branch-create-~ :: This function manipulates the git repository.  We have a valid (enough) directory and a new branch-name, now let’s do the file system work to ensure we can safely do this work.
 
 #+begin_src emacs-lisp
@@ -140,4 +127,17 @@ This is the function that gathers the data.  It’s responsible for prompting fo
 	(magit-branch-create branch-name starting-branch)
 	(magit-branch-checkout branch-name))
       (format "Created branch on %s" directory)))
+#+end_src
+
+- ~jf/github-abbreviation-for~ :: This function converts a Github URL into it’s abbreviation (e.g. ~<owner>/<repo>#<number>~).  If the given URL is not a Github URL we have a few options:  Fallback to the URL /or/ throw an exception.
+
+#+begin_src emacs-lisp
+  (cl-defun jf/github-abbreviation-for (&key url fallback)
+    "Convert the URL to a github abbreviation"
+    (if (string-match "^https://github\\.com/[^/]+/[^/]+/\\(issues\\|pull\\)/[[:digit:]]+" url)
+	(let ((slugs (split-string url "/")))
+	  (format  "%s/%s#%s" (nth 3 slugs) (nth 4 slugs) (nth 6 slugs)))
+      (if fallback
+	  url
+	(throw 'not-a-github-repository (message "Expected URL \"%s\" to be a Github Issue or Pull URL." url)))))
 #+end_src
