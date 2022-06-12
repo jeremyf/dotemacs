@@ -4118,6 +4118,7 @@ some additional options.
       ("d p" "Pick a daily" org-roam-dailies-goto-date)
       ("d t" "Today's daily" org-roam-dailies-goto-today)
       ("d T" "Tomorrow's daily" org-roam-dailies-goto-tomorrow)
+      ("d u" "Capture URL as a todo for today…" jf/org-roam-dailies--add-entry-for-url)
       ("d y" "Yesterday's daily" org-roam-dailies-goto-yesterday)
       ]
      ["Modes"

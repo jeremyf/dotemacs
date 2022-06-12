@@ -29,8 +29,8 @@ Some additional features could be:
 - [-] Assemble things into a gigantic function to:
 
   - [X] Create a branch from an issue
-  - [ ] Add a Journal entry saying "Started work on /#"
-  - [X] Create an OrgRoam node for that issue (which would then have a back link to my daily journal entry)
+  - [X] Add a Journal entry saying "Started work on /#"
+  - [ ] Create an OrgRoam node for that issue (which would then have a back link to my daily journal entry)
 
 All of this is to help me better navigate throughout my somewhat normalized workflow.
 
