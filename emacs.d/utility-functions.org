@@ -128,6 +128,25 @@ And why do all of this? To sharpen my tools. Practice extending my text editor t
 			 (car (grab-mac-link-safari-1)))))))
 #+end_src
 
+- ~jf/start-work-on-url~ :: With the given URL, start “working” on it:
+  - Prompt for a URL
+  - Create an ~org-roam~ node for the URL
+
+#+begin_src emacs-lisp
+  (defun jf/start-work-on-url (url)
+    (interactive (list (jf/prompt-for-url-dwim)))
+    (let* ((abbr (jf/github-abbreviation-for :url url :fallback t))
+	   (node (org-roam-ref-read (replace-regexp-in-string "^[[:alpha:]]+:" "" url))))
+      (if node
+	  (message "Node \"%s\" already exists" (org-roam-node-title node))
+	;; Create a node
+	;; Insert ref
+	;; Insert alias (if any)
+	;; Re-find ref
+	;; Capture daily item
+	)))
+#+end_src
+
 * Support Functions
 
 - ~jf/git-branch-create-~ :: This function manipulates the git repository.  We have a valid (enough) directory and a new branch-name, now let’s do the file system work to ensure we can safely do this work.
