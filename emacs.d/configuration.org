@@ -1290,6 +1290,19 @@ From [[https://www.masteringemacs.org/article/fixing-mark-commands-transient-mar
 #+end_src
 
 *** Display
+
+**** highlight-indent-guides.el
+
+- ~highlight-indent-guides.el~ :: provides column highlighting.  Useful when you start seeing too many nested layers.
+
+#+begin_src emacs-lisp
+  (use-package highlight-indent-guides
+    :straight t
+    :custom (highlight-indent-guides-method 'character)
+      (highlight-indent-guides-responsive 'top)
+    :hook (prog-mode . highlight-indent-guides-mode))
+#+end_src
+
 **** lin.el
 
 - ~lin.el~ :: “LIN locally remaps the hl-line face to a style that is optimal for major modes where line selection is the primary mode of interaction.”  In otherwords, ~lin.el~ improves the highlighted line behavior for the competing contexts.
