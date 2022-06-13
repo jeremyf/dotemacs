@@ -136,45 +136,58 @@ And why do all of this? To sharpen my tools. Practice extending my text editor t
   (defun jf/start-work-on-url (url)
     (interactive (list (jf/prompt-for-url-dwim)))
     (let* ((abbr (jf/github-abbreviation-for :url url :fallback t))
+	   ;; The refs do not have their schemes
 	   (node (org-roam-ref-read (replace-regexp-in-string "^[[:alpha:]]+:" "" url))))
       (if node
 	  (message "Node \"%s\" already exists" (org-roam-node-title node))
-	;; Create a node
-	;; Insert ref
-	;; Insert alias (if any)
-	;; Re-find ref
-	;; Capture daily item
-	)))
+	(progn
+	  ;; Create a node
+	  ;; Insert ref
+	  ;; Insert alias (if any)
+	  ;; Re-find ref
+	  ;; Capture daily item
+	  ))))
 #+end_src
 
 * Support Functions
 
-- ~jf/git-branch-create-~ :: This function manipulates the git repository.  We have a valid (enough) directory and a new branch-name, now let’s do the file system work to ensure we can safely do this work.
+- ~jf/auto-create-missing-dirs~ :: Ensure that we create the directories along the path of a new file I’m creating.  See [[https://emacsredux.com/blog/2022/06/12/auto-create-missing-directories/][Auto-create Missing Directories]].
 
 #+begin_src emacs-lisp
-  (cl-defun jf/git-branch-create- (&key branch-name directory (starting-branch "main"))
-    "Create BRANCH-NAME from STARTING-BRANCH in DIRECTORY.  Ensure clean state."
-    (catch 'dirty-branch
-      (let* ((default-directory directory))
-	(unless (eq 0 (length (shell-command-to-string "git status --porcelain")))
-	  (throw 'dirty-branch
-		 (format
-		  "Repository \"%s\" is dirty repository."
-		  default-directory)))
+  (defun jf/auto-create-missing-dirs ()
+    (let ((target-dir (file-name-directory buffer-file-name)))
+      (unless (file-exists-p target-dir)
+	(make-directory target-dir t))))
 
-	(magit-branch-checkout starting-branch)
+  (add-to-list 'find-file-not-found-functions #jf/auto-create-missing-dirs)
+  #+end_src
 
-	(magit-pull-from-upstream "--rebase")
+  - ~jf/git-branch-create-~ :: This function manipulates the git repository.  We have a valid (enough) directory and a new branch-name, now let’s do the file system work to ensure we can safely do this work.
 
-	(unless (eq 0 (length (shell-command-to-string "git status --porcelain")))
-	  (throw 'dirty-branch
-		 (format
-		  "After updating from remote, repository \"%s\" is dirty repository."
-		  default-directory)))
+  ,#+begin_src emacs-lisp
+    (cl-defun jf/git-branch-create- (&key branch-name directory (starting-branch "main"))
+      "Create BRANCH-NAME from STARTING-BRANCH in DIRECTORY.  Ensure clean state."
+      (catch 'dirty-branch
+	(let* ((default-directory directory))
+	  (unless (eq 0 (length (shell-command-to-string "git status --porcelain")))
+	    (throw 'dirty-branch
+		   (format
+		    "Repository \"%s\" is dirty repository."
+		    default-directory)))
 
-	(magit-branch-create branch-name starting-branch)
-	(magit-branch-checkout branch-name))
-      (format "Created branch on %s" directory)))
+	  (magit-branch-checkout starting-branch)
+
+	  (magit-pull-from-upstream "--rebase")
+
+	  (unless (eq 0 (length (shell-command-to-string "git status --porcelain")))
+	    (throw 'dirty-branch
+		   (format
+		    "After updating from remote, repository \"%s\" is dirty repository."
+		    default-directory)))
+
+	  (magit-branch-create branch-name starting-branch)
+	  (magit-branch-checkout branch-name))
+	(format "Created branch on %s" directory)))
 #+end_src
 
 - ~jf/github-abbreviation-for~ :: This function converts a Github URL into it’s abbreviation (e.g. ~<owner>/<repo>#<number>~).  If the given URL is not a Github URL we have a few options:  Fallback to the URL /or/ throw an exception.
