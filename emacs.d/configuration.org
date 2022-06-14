@@ -2667,16 +2667,10 @@ I use org-mode and org-roam to help manage content.  Let’s load that rather ex
 **** libgit.el
 
 - ~libgit.el~ :: Provides bindings to [[https://libgit2.org][libgit2]].  These bindings help improve the speed of ~magit.el~; or so I’m told.
+- ~magit-libgit.el~ :: Connects ~magit.el~ to ~libgit.el~, helping improve the speed of ~magit.el~; or so I’m told.
 
 #+begin_src emacs-lisp
   (use-package libgit :straight t)
-#+end_src
-
-**** magit-libgit.el
-
-- ~libgit.el~ :: Connects ~magit.el~ to ~libgit.el~, helping improve the speed of ~magit.el~; or so I’m told.
-
-#+begin_src emacs-lisp
   (use-package magit-libgit :straight t)
 #+end_src
 
