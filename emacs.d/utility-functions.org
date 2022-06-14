@@ -20,10 +20,12 @@ Throughout these functions, I make use of the ~grab-mac-link-safari-1~ function.
 
 * TODO Future Considerations
 
+I’m thinking about how I often reference Github issues or PRs in branches, other issues, other pull requests, daily notes, internal working, and weekly reports.  I want some tools to quickly help me move through those tasks.
+
 Some additional features could be:
 
 - [ ] When in ~markdown-mode~, convert the URL to a Markdown URL
-- [X] When in ~org-mode~, conver the URL to an OrgMode style link.
+- [X] When in ~org-mode~, convert the  URL to an OrgMode style link (see ~jf/org-insert-link-dwim~).
 - [ ] Creating OrgRoam node for an issue, qo that I have a local place to write up any working notes; and reference in my daily journal entries.  However, I'm waiting for [[https://github.com/org-roam/org-roam/issues/2220][some input on a feature request]] before I proceed with a workaround.
 - [ ] Jump to my notes for the given branch (created in the above task)
 - [-] Assemble things into a gigantic function to:
