@@ -2773,10 +2773,18 @@ Powered by ~tmr.el~ to set a timer.
 #+begin_src emacs-lisp
   (use-package tmr
     :custom (tmr-notify-function #'jf/notifications-notify)
+    (tmr-timer-completed-functions
+    (list #'tmr-print-message-for-completed-timer
+	  #'tmr-sound-play
+	  #'jf/tmr-notification-notify))
     :straight (tmr :type git :repo "https://git.sr.ht/~protesilaos/tmr"))
 
-  (defun jf/notifications-notify (title message)
-    (ns-do-applescript (concat "display notification \"" message "\" sound name \"Glass\"")))
+  ;; My dbus install is not behaving so I'm cheating with a bit of AppleScript
+  (defun jf/tmr-notification-notify (timer)
+    "Dispatch a notification for TIMER."
+    (let ((title "TMR May Ring (Emacs tmr package)")
+	  (body (tmr--long-description-for-completed-timer timer)))
+      (ns-do-applescript (concat "display notification \"" body "\" sound name \"Glass\""))))
 #+end_src
 
 *** elpher.el
