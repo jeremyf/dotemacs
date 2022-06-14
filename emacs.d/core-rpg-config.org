@@ -1,0 +1,157 @@
+# -*- org-insert-tilde-language: emacs-lisp; -*-
+#+TITLE: CORE RPG Configuration
+#+AUTHOR: Jeremy Friesen
+#+EMAIL: jeremy@jeremyfriesen.com
+#+STARTUP: showall
+#+OPTIONS: toc:3
+
+The functions of this file build on functions from [[file:configuration.org][Configuration]].
+
+* Minor Mode for CORE RPG
+
+#+begin_src emacs-lisp
+  (jf/minor-mode-maker :title "CORE RPG"
+		       :abbr "core"
+		       :hooks (list 'org-mode-hook 'markdown-mode-hook))
+#+end_src
+
+* Quick Help Functions
+
+Most role-playing games I play may require a bit of consultation.  The following “quick help” methods are tables that I commonly reference when playing CORE RPGs.
+
+#+begin_src emacs-lisp
+  (jf/transient-quick-help jf/rpg-core-qh-stat-scores
+      :label "Stat Descriptors"
+      :header "CORE Stat Descriptors"
+      :body
+      (s-join
+       "\n"
+       '("1 ... Average"
+	 "2 ... Remarkable"
+	 "3 ... Excellent"
+	 "4 ... Gifted"
+	 "5 ... Prodigy"
+	 "6 ... Apex")))
+
+  (jf/transient-quick-help jf/rpg-core-qh-skill-scores
+      :label "Skill Descriptors"
+      :header "CORE Skill Descriptors"
+      :body
+      (s-join
+       "\n"
+       '("1 ... Trained"
+	 "2 ... Competent"
+	 "3 ... Veteran"
+	 "4 ... Expert"
+	 "5 ... Innovator"
+	 "6 ... Legend")))
+
+  (jf/transient-quick-help jf/rpg-core-qh-item-bonuses
+      :label "Item Bonus Levels"
+      :header "CORE Item Bonus Levels"
+      :body
+      (s-join
+       "\n"
+       '("1 ... Trained"
+	 "2 ... Competent"
+	 "3 ... Veteran"
+	 "4 ... Expert"
+	 "5 ... Innovator"
+	 "6 ... Legend")))
+
+  (jf/transient-quick-help jf/rpg-core-qh-fame-levels
+      :label "Fame Levels"
+      :header "CORE Fame Levels"
+      :body
+      (s-join
+       "\n"
+       '("1 ... Local/Professional"
+	 "2 ... Regional/Subcultural"
+	 "3 ... National/Cultural"
+	 "4 ... International/Global"
+	 "5 ... Historical/Legendary"
+	 "6 ... Mythic Universal")))
+
+  (jf/transient-quick-help jf/rpg-core-qh-difficulty-levels
+      :label "Difficulty Levels (DL)"
+      :header "CORE Difficulty Levels"
+      :body
+      (s-join
+       "\n"
+       '("1 .... No-Brainer"
+	 "2 .... Easy"
+	 "3 .... Challenging"
+	 "4 .... Difficulut"
+	 "5 .... Hard"
+	 "6 .... Very Hard"
+	 "7 .... Unlikely"
+	 "8 .... Ridiculous"
+	 "9 .... Absurd"
+	 "10 ... Insane")))
+
+  (jf/transient-quick-help jf/rpg-core-qh-difficulty-levels
+      :label "Difficulty Levels (DL) (RMSS)"
+      :header "CORE Difficulty Levels (RMSS)"
+      :body
+      (s-join
+       "\n"
+       '("1 .... Routine"
+	 "2 .... Easy"
+	 "3 .... Challenging"
+	 "4 .... Difficult"
+	 "5 .... Hard"
+	 "6 .... Very Hard"
+	 "7 .... Extermely Hard"
+	 "8 .... Sheer Folly"
+	 "9 .... Absurd"
+	 "10 ... Nigh Impossible")))
+
+  (jf/transient-quick-help jf/rpg-core-qh-standard-modifiers
+      :label "Standard Modifiers"
+      :header "CORE Standard Modifiers"
+      :body
+      (s-join
+       "\n"
+       '("+N .... Skill level and items"
+	 "+1 .... Superior position/advantage"
+	 "+1 .... Character development from /Flash of Insight/"
+	 "-1 .... Wounded for 2 or more"
+	 "-1 .... Within skill but not specialty"
+	 "-1 .... Pro kit required but makeshift tools"
+	 "-2 .... Pro kit required but no tools"
+	 "-2 .... Attempting 2 Actions at once")))
+
+  (jf/transient-quick-help jf/rpg-core-qh-hit-locations
+      :label "Hit Locations"
+      :header "CORE Hit Locations; +2 to attacks from above."
+      :body
+      (s-join
+       "\n"
+       '("2 .... Left Leg"
+	 "3 .... Right Leg"
+	 "4 .... Crotch/Abdoment"
+	 "5 .... Left Arm"
+	 "6 .... Right Arm"
+	 "7 .... Belly/Lower Back"
+	 "8 .... Left Shoulder"
+	 "9 .... Right Shoulder"
+	 "10 ... Chest/Upper Back"
+	 "11 ... Neck"
+	 "12 ... Head")))
+
+  (jf/transient-quick-help jf/rpg-core-qh-lifeshaping-events
+    :label "LifeShaping Events"
+    :header "CORE LifeShaping Events (DayTripper)"
+    :body
+    (s-join
+     "\n"
+     '("Belief ......... What the PC Believes"
+       "Concept ........ What Ideas the PC Has"
+       "Duty ........... What the PC Is Obliged to Do"
+       "Goal ........... What the PC Wants to Do"
+       "History ........ What the PC Has Learned in Life"
+       "Mission ........ What the PC’s Orders Are"
+       "Problem ........ Stuff the PC Has Issues With"
+       "Relationship ... People the PC Interacts With"
+       "Thing .......... The PC’s Most Personal Possessions")))
+#+end_src
