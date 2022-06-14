@@ -72,7 +72,7 @@ And why do all of this? To sharpen my tools. Practice extending my text editor t
 	(message (jf/git-branch-create- :branch-name branch-name :directory directory)))))
 #+end_src
 
-- ~jf/git-github-issue-short-ref~ :: Open the current branch’s corresponding issue in Github.  Assumes the branch was constructed in the following format =<github-username>/issues---<owner>/<repo>#<number>=, which is how ~jf/git-branch-create~ does it.
+- ~jf/git-github-issue-short-ref~ :: Open the current branch’s corresponding issue in Github.  Assumes the branch was constructed in the following format =<github-username>/issues---<owner>/<repo>\#<number>=, which is how ~jf/git-branch-create~ does it.
 
 #+begin_src emacs-lisp
   (cl-defun jf/git-github-issue-short-ref (parg &key (url-template "https://github.com/%s/issues/%s" ))
@@ -159,35 +159,35 @@ And why do all of this? To sharpen my tools. Practice extending my text editor t
       (unless (file-exists-p target-dir)
 	(make-directory target-dir t))))
 
-  (add-to-list 'find-file-not-found-functions #jf/auto-create-missing-dirs)
-  #+end_src
+  (add-to-list 'find-file-not-found-functions #'jf/auto-create-missing-dirs)
+#+end_src
 
-  - ~jf/git-branch-create-~ :: This function manipulates the git repository.  We have a valid (enough) directory and a new branch-name, now let’s do the file system work to ensure we can safely do this work.
+- ~jf/git-branch-create-~ :: This function manipulates the git repository.  We have a valid (enough) directory and a new branch-name, now let’s do the file system work to ensure we can safely do this work.
 
-  ,#+begin_src emacs-lisp
-    (cl-defun jf/git-branch-create- (&key branch-name directory (starting-branch "main"))
-      "Create BRANCH-NAME from STARTING-BRANCH in DIRECTORY.  Ensure clean state."
-      (catch 'dirty-branch
-	(let* ((default-directory directory))
-	  (unless (eq 0 (length (shell-command-to-string "git status --porcelain")))
-	    (throw 'dirty-branch
-		   (format
-		    "Repository \"%s\" is dirty repository."
-		    default-directory)))
+#+begin_src emacs-lisp
+  (cl-defun jf/git-branch-create- (&key branch-name directory (starting-branch "main"))
+    "Create BRANCH-NAME from STARTING-BRANCH in DIRECTORY.  Ensure clean state."
+    (catch 'dirty-branch
+      (let* ((default-directory directory))
+	(unless (eq 0 (length (shell-command-to-string "git status --porcelain")))
+	  (throw 'dirty-branch
+		 (format
+		  "Repository \"%s\" is dirty repository."
+		  default-directory)))
 
-	  (magit-branch-checkout starting-branch)
+	(magit-branch-checkout starting-branch)
 
-	  (magit-pull-from-upstream "--rebase")
+	(magit-pull-from-upstream "--rebase")
 
-	  (unless (eq 0 (length (shell-command-to-string "git status --porcelain")))
-	    (throw 'dirty-branch
-		   (format
-		    "After updating from remote, repository \"%s\" is dirty repository."
-		    default-directory)))
+	(unless (eq 0 (length (shell-command-to-string "git status --porcelain")))
+	  (throw 'dirty-branch
+		 (format
+		  "After updating from remote, repository \"%s\" is dirty repository."
+		  default-directory)))
 
-	  (magit-branch-create branch-name starting-branch)
-	  (magit-branch-checkout branch-name))
-	(format "Created branch on %s" directory)))
+	(magit-branch-create branch-name starting-branch)
+	(magit-branch-checkout branch-name))
+      (format "Created branch on %s" directory)))
 #+end_src
 
 - ~jf/github-abbreviation-for~ :: This function converts a Github URL into it’s abbreviation (e.g. ~<owner>/<repo>#<number>~).  If the given URL is not a Github URL we have a few options:  Fallback to the URL /or/ throw an exception.
