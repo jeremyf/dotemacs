@@ -48,11 +48,13 @@ And why do all of this? To sharpen my tools. Practice extending my text editor t
       (interactive (list (jf/prompt-for-url-dwim)))
       (let ((abbr (jf/github-abbreviation-for :url url :fallback url)))
 	(if (thing-at-point-url-at-point)
+	    ;; Replace the URL of the thing at point
 	    (apply 'replace-string-in-region
 		   (flatten-list
 		    (list url
 			  abbr
 			  (thing-at-point-bounds-of-url-at-point))))
+	  ;; Else insert the URL at point
 	  (insert abbr))))
 #+end_src
 
@@ -63,14 +65,18 @@ And why do all of this? To sharpen my tools. Practice extending my text editor t
     "Create a git branch in project DIRECTORY from URL.
 
   Call `jf/prompt-for-url-dwim' if no URL is given."
-    (interactive (list (projectile-completing-read
-			"Project name: "
-			projectile-known-projects)
-		       (jf/prompt-for-url-dwim)))
+    (interactive (list
+		  ;; Prompt for the project's DIRECTORY
+		  (projectile-completing-read
+		   "Project name: "
+		   projectile-known-projects)
+		  ;; Prompt for the URL
+		  (jf/prompt-for-url-dwim)))
     (catch 'not-a-github-repository
       (let* ((suffix (jf/github-abbreviation-for :url url))
 	     (prefix (format "%s/%s" jf/github-username "issue"))
 	     (branch-name (concat prefix "---" suffix)))
+	;; Create the branch and "report" back.
 	(message (jf/git-branch-create- :branch-name branch-name :directory directory)))))
 #+end_src
 
