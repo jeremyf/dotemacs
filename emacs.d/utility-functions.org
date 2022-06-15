@@ -44,7 +44,7 @@ And why do all of this? To sharpen my tools. Practice extending my text editor t
 
 #+begin_src emacs-lisp
   (defun jf/abbreviate-url (url)
-      "Abbreviate the given URL; prompt if non-provided."
+      "Abbreviate the given URL; prompt if not provided."
       (interactive (list (jf/prompt-for-url-dwim)))
       (let ((abbr (jf/github-abbreviation-for :url url :fallback url)))
 	(if (thing-at-point-url-at-point)
