@@ -2653,15 +2653,15 @@ I use org-mode and org-roam to help manage content.  Let’s load that rather ex
   the appended sections.  I live this here as a reminder.
 
 #+begin_src emacs-lisp
-  (use-package forge
-    :after magit
-    :config
-    (setq auth-sources '("~/.authinfo"))
-    (magit-add-section-hook 'magit-status-sections-hook 'forge-insert-authored-pullreqs nil 'append)
-    (magit-add-section-hook 'magit-status-sections-hook 'forge-insert-requested-reviews nil 'append)
-    (magit-add-section-hook 'magit-status-sections-hook 'forge-insert-assigned-issues nil 'append)
-    (magit-add-section-hook 'magit-status-sections-hook 'forge-insert-authored-issues nil 'append)
-    :straight t)
+  ;; (use-package forge
+  ;;   :after magit
+  ;;   :config
+  ;;   (setq auth-sources '("~/.authinfo"))
+  ;;   (magit-add-section-hook 'magit-status-sections-hook 'forge-insert-authored-pullreqs nil 'append)
+  ;;   (magit-add-section-hook 'magit-status-sections-hook 'forge-insert-requested-reviews nil 'append)
+  ;;   (magit-add-section-hook 'magit-status-sections-hook 'forge-insert-assigned-issues nil 'append)
+  ;;   (magit-add-section-hook 'magit-status-sections-hook 'forge-insert-authored-issues nil 'append)
+  ;;   :straight t)
 #+end_src
 
 **** libgit.el
