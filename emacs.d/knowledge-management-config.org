@@ -857,12 +857,12 @@ Sometimes I use inline sidenotes, that’s the purpose of this macro.
   only the description"
     (interactive)
     (let ((elem (org-element-context)))
-      (if (eq (car elem) 'link)
+      (when (eq (car elem) 'link)
 	  (let* ((content-begin (org-element-property :contents-begin elem))
 		 (content-end  (org-element-property :contents-end elem))
 		 (link-begin (org-element-property :begin elem))
 		 (link-end (org-element-property :end elem)))
-	    (if (and content-begin content-end)
+	    (when (and content-begin content-end)
 		(let ((content (buffer-substring-no-properties content-begin content-end)))
 		  (delete-region link-begin link-end)
 		  (insert (concat content " "))))))))
@@ -890,11 +890,10 @@ See https://takeonrules.com/2022/01/11/resolving-an-unable-to-resolve-link-error
 
   When given PREFIX_ARG, clear the org-roam database (via `org-roam-db-clear-all') then sync.  This will slow down the sync."
     (interactive "P")
-    (let ((prefix (car prefix-arg)))
-      (org-id-update-id-locations)
-      (when prefix (org-roam-db-clear-all))
-      (org-roam-db-sync)
-      (org-roam-update-org-id-locations)))
+    (org-id-update-id-locations)
+    (when (car prefix-arg) (org-roam-db-clear-all))
+    (org-roam-db-sync)
+    (org-roam-update-org-id-locations))
 #+end_src
 
 ** Capturing Epigraphs

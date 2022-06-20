@@ -58,6 +58,34 @@ And why do all of this? To sharpen my tools. Practice extending my text editor t
 	  (insert abbr))))
 #+end_src
 
+- ~jf/follow-thing-at-point~ :: This function advices several “at point” functions to find org nodes by their ID.
+
+#+begin_src emacs-lisp
+  (defun jf/follow-thing-at-point (fn &rest args)
+    "Lookup org-id for `thing-at-point'.  If it exists, open it.
+
+  Otherwise apply FN with ARGS."
+    (let* ((node-id (format "%s" (thing-at-point 'symbol)))
+	   (node (jf/org-id-find-id-file node-id)))
+      (if node
+	  (find-file node)
+	(apply fn args))))
+
+  (defun jf/org-id-find-id-file (id)
+    "Query the id database for the file in which ID is located.
+
+  Unlike `org-id-find-id-file' this does not fallback to the current file."
+    (unless org-id-locations (org-id-locations-load))
+    (and org-id-locations
+	     (hash-table-p org-id-locations)
+	     (gethash id org-id-locations)))
+
+  (advice-add #'org-open-at-point :around #'jf/follow-thing-at-point '((name . "wrapper")))
+  (advice-add #'markdown-follow-thing-at-point :around #'jf/follow-thing-at-point '((name . "wrapper")))
+  (advice-add #'xref-find-definitions :around #'jf/follow-thing-at-point '((name . "wrapper")))
+  (advice-add #'org-open-at-point-global :around #'jf/follow-thing-at-point '((name . "wrapper")))
+#+end_src
+
 - ~jf/git-branch-create~ :: This is the function that gathers the data.  It’s responsible for prompting for the correct project, verifying that Safari’s URL is correct, and then calling the non-interactive function ~jf/git-branch-create~.
 
 #+begin_src emacs-lisp

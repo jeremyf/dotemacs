@@ -372,34 +372,3 @@ These functions with ~./lib/org-macros.setup~.
 	     while pos
 	     do (goto-char pos)))
 #+end_src
-
-Some helper methods for to aid in opening files.
-
-#+begin_src emacs-lisp
-  (defun jf/follow-thing-at-point (fn &rest args)
-    "Lookup org-id for `thing-at-point'.  If it exists, open it.
-
-  Otherwise apply FN with ARGS."
-    (let* ((node-id (format "%s" (thing-at-point 'symbol)))
-	   (node (jf/org-id-find-id-file node-id)))
-      (if node
-	  (find-file node)
-	(apply fn args))))
-
-  (defun jf/org-id-find-id-file (id)
-    "Query the id database for the file in which ID is located.
-
-  Unlike `org-id-find-id-file' this does not fallback to the current file."
-    (unless org-id-locations (org-id-locations-load))
-    (or (and org-id-locations
-	     (hash-table-p org-id-locations)
-	     (gethash id org-id-locations))
-	nil))
-
-  (advice-add #'org-open-at-point :around #'jf/follow-thing-at-point '((name . "wrapper")))
-  (advice-add #'markdown-follow-thing-at-point :around #'jf/follow-thing-at-point '((name . "wrapper")))
-  (advice-add #'xref-find-definitions :around #'jf/follow-thing-at-point '((name . "wrapper")))
-  (advice-add #'org-open-at-point-global :around #'jf/follow-thing-at-point '((name . "wrapper")))
-#+end_src
-
-#+RESULTS:
