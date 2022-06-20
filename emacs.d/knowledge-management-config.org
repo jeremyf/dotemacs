@@ -342,7 +342,12 @@ Loosely related is the ~jf/org-auto-tags--current-list~; Contexts are a named se
       :tags '("burning-locusts"
 	      "rpgs"
 	      "burning-wheel"))
-
+     :drinax
+     (list
+      :name "drinax"
+      :tags '("campaigns"
+	      "drinax"
+	      "rpgs"))
      :forem
      (list
       :name "forem"
@@ -521,9 +526,13 @@ For each of those functions, I establish the filter based on the current context
 
   Filter selections to INITIAL-INPUT."
     (interactive)
-    (let ((node (org-roam-node-read initial-input (lambda (node) (jf/org-roam-filter-context-fn node :tag-list '("epigraphs"))))))
+    (let ((node (org-roam-node-read
+		 initial-input
+		 (lambda (node)
+		   (jf/org-roam-filter-context-fn node :tag-list '("epigraphs"))))))
       (insert (format "\n{{{epigraph(%s,%s)}}}\n"
-		      (org-roam-node-id node) (org-roam-node-title node)))))
+		      (org-roam-node-id node)
+		      (org-roam-node-title node)))))
 #+end_src
 
 And with all of that, let’s get into the org-roam configuration.
