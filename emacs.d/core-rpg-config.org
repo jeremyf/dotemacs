@@ -141,7 +141,7 @@ Most role-playing games I play may require a bit of consultation.  The following
 
   (jf/transient-quick-help jf/rpg-core-qh-lifeshaping-events
     :label "LifeShaping Events"
-    :header "CORE LifeShaping Events (DayTripper)"
+    :header "CORE LifeShaping Events (DayTrippers)"
     :body
     (s-join
      "\n"
@@ -154,4 +154,12 @@ Most role-playing games I play may require a bit of consultation.  The following
        "Problem ........ Stuff the PC Has Issues With"
        "Relationship ... People the PC Interacts With"
        "Thing .......... The PC’s Most Personal Possessions")))
+
+  (jf/transient-quick-help jf/rpg-core-qh-help
+    :label "Help"
+    :header "CORE Help (DayTrippers)"
+    :body
+    (s-join
+     "\n"
+     '("Miss 2 or more ... Help gets -1")))
 #+end_src

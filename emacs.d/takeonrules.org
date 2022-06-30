@@ -219,7 +219,7 @@ two concerns:
     (insert (format "#+%s: %s\n" (upcase key) value)))
 
   (defvar jf/tor-session-report-location
-    '("around the table" "via Zoom" "via Discord and Roll20")
+    '("around the table" "via Zoom" "via Discord and Roll20" "via Discord")
     "TakeOnRules session report locations")
 
   (cl-defun jf/org-tag-as-session-report (&key (buffer (current-buffer)))
@@ -231,7 +231,7 @@ two concerns:
       (save-excursion
 	(beginning-of-buffer)
 	(jf/export-org-to-tor--ensure-org-id-property)
-	(org-roam-tag-add '("session-report"))
+	(org-roam-tag-add '("sessions"))
 	(let* ((date (org-read-date nil nil nil "Session Date"))
 	       (game (completing-read "Game: " (jf/tor-game-list)))
 	       (location (completing-read "Location: " jf/tor-session-report-location)))

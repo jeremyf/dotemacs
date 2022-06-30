@@ -517,7 +517,8 @@ For each of those functions, I establish the filter based on the current context
      other-window
      initial-input
      'jf/org-roam-filter-context-fn
-     :templates 'jf/org-roam-templates-context-fn))
+     nil
+     :templates (jf/org-roam-templates-context-fn)))
 #+end_src
 
 #+begin_src emacs-lisp
