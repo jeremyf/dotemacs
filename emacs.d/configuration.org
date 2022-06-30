@@ -192,6 +192,8 @@ out but for the most part, you can move along and reference this later.
 
    split-width-threshold 160
 
+   split-height-threshold 160 * 4
+
    vc-follow-symlinks t        ;; Follow symlinks instead of prompting.
 
    version-control t           ;; Use version numbers on backups
