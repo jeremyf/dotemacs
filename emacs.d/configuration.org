@@ -2406,7 +2406,6 @@ These are a few variables and cosntants that I use throughout my configuration.
 #+begin_src emacs-lisp
   (use-package copilot
     :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
-    :hook (prog-mode . copilot-mode)
     :ensure t)
 
   (defun my/copilot-tab ()
