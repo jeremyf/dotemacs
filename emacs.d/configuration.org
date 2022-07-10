@@ -3422,7 +3422,7 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
   (defun jf/tor-find-hugo-file-by-url (url)
     "Find the associated TakeOnRules.com file for the given URL."
     (interactive (list
-		  (jf/tor-promt-for-url-dwim
+		  (jf/prompt-for-url-dwim
 		   :url-regexp jf/tor-hostname-regexp)))
     (cond
      ;; Blog post
@@ -3832,7 +3832,7 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
     If the URL is an empty string, then send a message.  Else, if we
     have a non-0 length URL, use the URL and wrap the region in an A
     tag."
-    (interactive (list (jf/tor-promt-for-url-dwim)))
+    (interactive (list (jf/prompt-for-url-dwim)))
     (if (eq (length url) 0)
 	(message "No URL to use for A-tag creation")
       (jf/tor-wrap-with-text
@@ -3859,7 +3859,7 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
     If the URL an empty string, then wrap the current region or point
     in a CITE tag.  Else, if we have a non-0 length URL, wrap it in
     CITE and A tag."
-    (interactive (list (jf/tor-promt-for-url-dwim)))
+    (interactive (list (jf/prompt-for-url-dwim)))
 
     ;; Were we to start writing at the START position, we'd invariably
     ;; change the contents such that the END position was no longer
