@@ -2697,7 +2697,8 @@ I use org-mode and org-roam to help manage content.  Let’s load that rather ex
 - ~git-timemachine.el~ :: With the time machine, travel back and forth through a files history.
 
 #+begin_src emacs-lisp
-  (use-package git-timemachine :straight t)
+  (use-package git-timemachine
+    :straight (:host github :repo "emacsmirror/git-timemachine"))
 #+end_src
 
 **** git-gutter-fringe.el
