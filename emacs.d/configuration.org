@@ -1059,47 +1059,47 @@ More on these component matchings styles is available at [[https://github.com/mi
   /Note:/ I may explore [[https://gitlab.com/protesilaos/mct][MCT]] and see how it compares to Corfu.
 
 #+begin_src emacs-lisp
-  (use-package corfu
-    :straight t
-    :demand t
-    ;; Optionally use TAB for cycling, default is `corfu-complete'.
-    :bind (:map corfu-map
-		("<escape>". corfu-quit)
-		("<return>" . corfu-insert)
-		("M-d" . corfu-show-documentation)
-		("M-l" . 'corfu-show-location)
-		("TAB" . corfu-next)
-		([tab] . corfu-next)
-		("S-TAB" . corfu-previous)
-		([backtab] . corfu-previous))
+    (use-package corfu
+      :straight t
+      :demand t
+      ;; Optionally use TAB for cycling, default is `corfu-complete'.
+      :bind (:map corfu-map
+		  ("<escape>". corfu-quit)
+		  ("<return>" . corfu-insert)
+		  ("M-d" . corfu-show-documentation)
+		  ("M-l" . 'corfu-show-location)
+		  ("TAB" . corfu-next)
+		  ([tab] . corfu-next)
+		  ("S-TAB" . corfu-previous)
+		  ([backtab] . corfu-previous))
 
-    :custom
-    ;; Works with `indent-for-tab-command'. Make sure tab doesn't indent when you
-    ;; want to perform completion
-    (tab-always-indent 'complete)
-    (completion-cycle-threshold nil)      ; Always show candidates in menu
+      :custom
+      ;; Works with `indent-for-tab-command'. Make sure tab doesn't indent when you
+      ;; want to perform completion
+      (tab-always-indent 'complete)
+      (completion-cycle-threshold nil)      ; Always show candidates in menu
 
-    (corfu-auto nil)
-    (corfu-auto-prefix 2)
-    (corfu-auto-delay 0.25)
+      (corfu-auto nil)
+      (corfu-auto-prefix 2)
+      (corfu-auto-delay 0.25)
 
-    ;; (corfu-min-width 80)
-    ;; (corfu-max-width corfu-min-width)     ; Always have the same width
-    (corfu-count 14)
-    (corfu-scroll-margin 4)
-    (corfu-cycle nil)
+      ;; (corfu-min-width 80)
+      ;; (corfu-max-width corfu-min-width)     ; Always have the same width
+      (corfu-count 14)
+      (corfu-scroll-margin 4)
+      (corfu-cycle nil)
 
-    ;; (corfu-echo-documentation nil)        ; Already use corfu-doc
-    (corfu-separator ?\s)                 ; Necessary for use with orderless
-    (corfu-quit-no-match 'separator)
+      ;; (corfu-echo-documentation nil)        ; Already use corfu-doc
+      (corfu-separator ?\s)                 ; Necessary for use with orderless
+      (corfu-quit-no-match 'separator)
 
-    (corfu-preview-current 'insert)       ; Preview current candidate?
-    (corfu-preselect-first t)             ; Preselect first candidate?
+      (corfu-preview-current 'insert)       ; Preview current candidate?
+      (corfu-preselect-first t)             ; Preselect first candidate?
 
-    :init
-  ;; Recommended: Enable Corfu globally.
-    ;; This is recommended since dabbrev can be used globally (M-/).
-    (corfu-global-mode))
+      :init
+      ;; Recommended: Enable Corfu globally.
+      ;; This is recommended since dabbrev can be used globally (M-/).
+      (global-corfu-mode))
 #+end_src
 
 ***** Extending corfu.el
