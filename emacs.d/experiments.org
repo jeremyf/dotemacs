@@ -43,3 +43,63 @@ I was reading [[https://blog.meain.io/2022/more-treesitter-emacs/][Playing aroun
 	      (jf/tree-sitter-thing-name 'function-like)
 	      )))
 #+end_src
+
+* Using Eldoc with Magit Asyncrhonously
+
+Note: I tried the following but ended with an error.
+
+https://tsdh.org/posts/2022-07-20-using-eldoc-with-magit-async.html
+
+#+begin_src emacs-lisp
+  (defvar jf/eldoc-git-show-stat--process nil)
+  (defun jf/eldoc-git-show-stat (callback commit)
+    "Compute diffstat for COMMIT asynchronously, then call CALLBACK with it."
+    ;; Kill the possibly still running old process and its buffer.
+    (when (processp jf/eldoc-git-show-stat--process)
+      (let ((buf (process-buffer jf/eldoc-git-show-stat--process)))
+	(when (process-live-p jf/eldoc-git-show-stat--process)
+	  (let (confirm-kill-processes)
+	    (kill-process jf/eldoc-git-show-stat--process)))
+	(when (buffer-live-p buf)
+	  (kill-buffer buf))))
+
+    ;; Spawn a new "git show" process.
+    (let* ((cmd (list "git" "--no-pager" "show"
+		      "--no-color"
+		      ;; Author Name <author@email.com>, <date-and-time>
+		      "--format=format:%an <%ae>, %aD"
+		      "--stat=80"
+		      commit)))
+      ;; An async eldoc-documentation-function must also return a non-nil,
+      ;; non-string result if it's applicable for computing a documentation
+      ;; string, so we set and return the new process here.
+      (setq jf/eldoc-git-show-stat--process
+	    (make-process
+	     :name "eldoc-git-show"
+	     :buffer (generate-new-buffer " *git-show-stat*")
+	     :noquery t
+	     :command cmd
+	     :sentinel (lambda (proc event)
+			 (when (eq (process-status proc) 'exit)
+			   (with-current-buffer (process-buffer proc)
+			     (goto-char (point-min))
+			     (put-text-property (point-min)
+						(line-end-position)
+						'face 'bold)
+			     (funcall callback (buffer-string)))))))))
+
+  (defvar jf/magit-eldoc-last-commit nil)
+  (defun jf/magit-eldoc-for-commit (callback)
+    (let ((commit (magit-commit-at-point)))
+      (when (and commit
+		 (not (equal commit jf/magit-eldoc-last-commit)))
+	(setq jf/magit-eldoc-last-commit commit)
+	(jf/eldoc-git-show-stat callback commit))))
+
+  (defun jf/magit-eldoc-setup ()
+    (add-hook 'eldoc-documentation-functions
+	      #'jf/magit-eldoc-for-commit nil t))
+
+  (add-hook 'magit-status-mode-hook #'jf/magit-eldoc-setup)
+  (add-hook 'magit-log-mode-hook #'jf/magit-eldoc-setup)
+#+end_src
