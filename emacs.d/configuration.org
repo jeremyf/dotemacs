@@ -1645,7 +1645,8 @@ are major modes others are minor modes.
     :hook (enh-ruby-mode . (lambda () (setq fill-column 100)))
     :hook (enh-ruby-mode . eldoc-mode)
     :hook (enh-ruby-mode . enh-ruby-imenu-create-index)
-    :bind (:map enh-ruby-mode-map ("C-j" . avy-goto-char-timer))
+    :bind (:map enh-ruby-mode-map ("C-j" . avy-goto-char-timer)
+				   ("M-h" . enh-ruby-mark-defun))
     :mode (("\\(?:\\.rb\\|ru\\|rake\\|thor\\|jbuilder\\|gemspec\\|podspec\\|/\\(?:Gem\\|Rake\\|Cap\\|Thor\\|Vagrant\\|Guard\\|Pod\\)file\\)\\'" . enh-ruby-mode)))
   (add-to-list 'interpreter-mode-alist '("ruby" . enh-ruby-mode))
 #+end_src
