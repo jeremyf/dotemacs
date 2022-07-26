@@ -1818,6 +1818,14 @@ That’s one of those hot-keys almost burned into soul.
     :config (global-so-long-mode 1))
 #+end_src
 
+**** sql-indent
+
+#+begin_src emacs-lisp
+  (use-package sql-indent
+    :straight t
+    :hook (sql-mode . sqlind-minor-mode))
+#+end_src
+
 **** typescript-mode
 
 #+begin_src emacs-lisp
