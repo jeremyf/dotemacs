@@ -575,8 +575,6 @@ For that, I’m going to use the lightweight vertico package.
     (setq read-file-name-completion-ignore-case t
 	  read-buffer-completion-ignore-case t
 	  completion-ignore-case t)
-    (advice-add #'completing-read-multiple
-		:override #'consult-completing-read-multiple)
     (setq vertico-cycle t))
 #+end_src
 
