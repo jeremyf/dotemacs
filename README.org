@@ -35,10 +35,11 @@ The files and directories:
 
 * The emacs.d Directory
 
-There are two “primary” files to consider in ~./emacs.d~:
+There are three “primary” files to consider in ~./emacs.d~:
 
 - [[file:emacs.d/configuration.org][configuration.org]] :: This file is where I write my Emacs configuration with a [[https://en.wikipedia.org/wiki/Literate_programming][Literate programming]] mindset. (/Note:/ This is a conversion from my past structure, but as I make new functions, I try to approach solutions with a Literate Programming mindset.)
 - [[file:emacs.d/init.el][init.el]] :: The file evaluated when Emacs launches.  Using [[https://orgmode.org/worg/org-contrib/babel/intro.html][Org Babel]], it evaluates the configuration.org file.
+- early-init.el :: The file evaluated early on when Emacs launches.
 
 /At some point, I move the configuration file up to the repository README level; that would mean treating the configuration as my almost entire discourse on how I Emacs./
 
