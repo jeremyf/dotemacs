@@ -2806,6 +2806,7 @@ From https://tsdh.org/posts/2022-08-01-difftastic-diffing-with-magit.html
 #+end_src
 
 #+begin_src emacs-lisp
+  (require 'magit)
   (transient-append-suffix 'magit-dispatch "!"
     '("#" "My Magit Cmds" jf/magit-aux-commands))
 
@@ -2944,7 +2945,7 @@ Powered by ~tmr.el~ to set a timer.
     (list #'tmr-print-message-for-completed-timer
 	  #'tmr-sound-play
 	  #'jf/tmr-notification-notify))
-    :straight (tmr :type git :repo "https://git.sr.ht/~protesilaos/tmr"))
+    :straight (tmr :host nil :type git :repo "https://git.sr.ht/~protesilaos/tmr"))
 
   ;; My dbus install is not behaving so I'm cheating with a bit of AppleScript
   (defun jf/tmr-notification-notify (timer)
