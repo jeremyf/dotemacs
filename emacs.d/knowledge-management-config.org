@@ -296,7 +296,7 @@ The ~jf/org-roam-capture-templates-plist~ variable defines the possible org-roam
 
 - ~refs~ :: References to other people’s thoughts.
 - ~main~ :: My thoughts, still churning, referencing other thoughts.
-- ~pubs~ :: My thoughts, published and ready to share.  Referencing any thoughts I’ve captured (and probably more).
+- ~scientist~ :: Documents specific to scientist work.
 
 /Note:/ I chose to go with 4 character types to minimize it’s impact on rendering “type” in the search results (4 characters requires less visual space than 10 characters).
 
@@ -315,6 +315,11 @@ As of <2022-04-10 Sun> I am rarely using ~pubs~ simply comingling ~pubs~ and ~ma
 				"#+title: ${title}\n#+FILETAGS: ${auto-tags}\n")
 	     :immediate-finish t
 	     :unnarrowed t)
+     :scientist '("s" "scientist" plain "%?"
+		  :if-new (file+head "scientist/%<%Y%m%d>---${slug}.org"
+				     "#+title: ${title}\n#+FILETAGS: :scientist:${auto-tags}\n")
+		  :immediate-finish t
+		  :unnarrowed t)
      ;; These are publications of "my thoughts" referencing "other people's thoughts".
      ;; :pubs '("p" "pubs" plain "%?"
      ;; 	   :if-new (file+head "pubs/%<%Y%m%d>---${slug}.org" "#+title: ${title}\n#+FILETAGS:\n")
@@ -360,6 +365,10 @@ Loosely related is the ~jf/org-auto-tags--current-list~; Contexts are a named se
 	      "mistimed-scroll"
 	      "rpgs"
 	      "burning-wheel"))
+     :scientist
+     (list
+      :name "scientist"
+      :tags '("scientist"))
      :thel-sector
      (list
       :name "thel-sector"
@@ -462,7 +471,9 @@ In other words, when I have set one or more tags, I want to use the templates ap
        A key assumption is that if there's a default tag list, use the
        :main template."
     (if (and tag-list (> (length tag-list) 0))
-	(jf/org-roam-templates-list :main)
+	(if (-contains? tag-list "scientist")
+	    (jf/org-roam-templates-list :scientist)
+	  (jf/org-roam-templates-list :main))
       (jf/org-roam-templates-list :all)))
 
   (cl-defun jf/org-roam-filter-context-fn
