@@ -439,6 +439,48 @@ Next up, let’s load the theme based on my operating system’s settings
       (load-theme 'modus-operandi)))
 #+end_src
 
+*** Icons
+
+- ~all-the-icons.el~ :: Provides a nice set of reference icons.  The various
+  ~jf/all-with--with-~ functions give access to the icons of the named set.
+
+#+begin_src emacs-lisp
+  ;; Useful for referential icons.
+  (use-package all-the-icons
+    :straight t
+    :config
+    (cl-defmacro jf/all-the-icons--with(&key name)
+      (let ((defun-fn (intern (concat "jf/all-the-icons--with-" name)))
+	    (icon-fn (intern (concat "all-the-icons-" name)))
+	    (docstring (concat "Displays an ICON from `all-the-icons-" name "'.")))
+	`(defun ,defun-fn (icon str &optional height v-adjust)
+	   ,docstring
+	   (s-concat (,icon-fn
+		      icon
+		      :v-adjust (or v-adjust 0)
+		      :height (or height 1))
+		     " " str))))
+    (jf/all-the-icons--with :name "faicon")
+    (jf/all-the-icons--with :name "material")
+    (jf/all-the-icons--with :name "octicon")
+    (jf/all-the-icons--with :name "alltheicon"))
+#+end_src
+
+**** all-the-icons-dired.el
+
+- ~all-the-icons-dired.el~ :: Incorporates file icons with file listings of
+  dired.  /Note/: On 2021-04-11 I was getting the following error with this
+  package: "*ERROR*: Symbol's value as variable is void: file"
+
+#+begin_src emacs-lisp
+  (use-package all-the-icons-dired
+    :straight t
+    :after all-the-icons
+    :hook (dired-mode . all-the-icons-dired-mode))
+#+end_src
+
+*** Tabs
+
 #+begin_src emacs-lisp
   (org-babel-load-file
    (concat user-emacs-directory "emacs-tabs.org"))
@@ -1312,46 +1354,6 @@ From [[https://www.masteringemacs.org/article/fixing-mark-commands-transient-mar
     :straight (lin :host gitlab :repo "protesilaos/lin")
     ;; :config (lin-add-to-many-modes))
     :config (lin-setup))
-#+end_src
-
-**** all-the-icons.el
-
-- ~all-the-icons.el~ :: Provides a nice set of reference icons.  The various
-  ~jf/all-with--with-~ functions give access to the icons of the named set.
-
-#+begin_src emacs-lisp
-  ;; Useful for referential icons.
-  (use-package all-the-icons
-    :straight t
-    :config
-    (cl-defmacro jf/all-the-icons--with(&key name)
-      (let ((defun-fn (intern (concat "jf/all-the-icons--with-" name)))
-	    (icon-fn (intern (concat "all-the-icons-" name)))
-	    (docstring (concat "Displays an ICON from `all-the-icons-" name "'.")))
-	`(defun ,defun-fn (icon str &optional height v-adjust)
-	   ,docstring
-	   (s-concat (,icon-fn
-		      icon
-		      :v-adjust (or v-adjust 0)
-		      :height (or height 1))
-		     " " str))))
-    (jf/all-the-icons--with :name "faicon")
-    (jf/all-the-icons--with :name "material")
-    (jf/all-the-icons--with :name "octicon")
-    (jf/all-the-icons--with :name "alltheicon"))
-#+end_src
-
-**** all-the-icons-dired.el
-
-- ~all-the-icons-dired.el~ :: Incorporates file icons with file listings of
-  dired.  /Note/: On 2021-04-11 I was getting the following error with this
-  package: "*ERROR*: Symbol's value as variable is void: file"
-
-#+begin_src emacs-lisp
-  (use-package all-the-icons-dired
-    :straight t
-    :after all-the-icons
-    :hook (dired-mode . all-the-icons-dired-mode))
 #+end_src
 
 **** spaceline.el
