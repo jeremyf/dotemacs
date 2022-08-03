@@ -3,25 +3,24 @@
 
 Show tabs in the current window.  The tab system is something I wrestle with, but I appreciate it’s existence.  These configurations make it easier to use.
 
+* Awesome Tabs
+
 #+begin_src emacs-lisp
-  (use-package centaur-tabs
+  (use-package awesome-tab
     :straight t
-    :commands (centaur-tabs-group-by-projectile-project)
-    :commands (centaur-tabs-group-buffer-groups)
+    :custom
+    ;; When set via custom this ensures that it shows tabs.  When set via config,
+    ;; the awesome-tab-mode is “active” but there are no tabs; I need to toggle
+    ;; it off then on to see the tabs.
+    (awesome-tab-mode t)
     :config
-    (setq
-     centaur-tabs-set-icons t
-     centaur-tabs-set-modified-marker t
-     centaur-tabs-enable-ido-completion nil
-     uniquify-separator "/"
-     uniquify-buffer-name-style 'forward)
+    (defun awesome-tab-buffer-groups ()
+      "`awesome-tab-buffer-groups' control buffers' group rules.
 
-    (defun centaur-tabs-buffer-groups ()
-      "`centaur-tabs-buffer-groups' control buffers' group rules.
+  Group awesome-tab with mode  if buffer is derived from `eshell-mode' `emacs-lisp-mode' `dired-mode' `org-mode' `magit-mode'.
 
-  Group centaur-tabs with mode if buffer is derived from `eshell-mode' `emacs-lisp-mode' `dired-mode' `org-mode' `magit-mode'.
   All buffer name start with * will group to \"Emacs\".
-  Other buffer group by `centaur-tabs-get-group-name' with project name."
+  Other buffer group by `awesome-tab-get-group-name' with project name."
       (list
        (cond
 	;; ((not (eq (file-remote-p (buffer-file-name)) nil))
@@ -55,33 +54,101 @@ Show tabs in the current window.  The tab system is something I wrestle with, bu
 			    diary-mode))
 	 "OrgMode")
 	(t
-	 (centaur-tabs-get-group-name (current-buffer))))))
+	 (awesome-tab-get-group-name (current-buffer))))))
+  :bind
+      ("s-[" . awesome-tab-backward-group)
+      ("s-]" . awesome-tab-forward-group)
+      ;; Move through the tabs of the group
+      ("s-{" . awesome-tab-backward-tab)
+      ("s-}" . awesome-tab-forward-tab)
+      ("s-;" . awesome-tab-ace-jump)
+      ("s-\\" . awesome-tab-switch-group))
 
-    ;; :hook
-    ;; (dashboard-mode . centaur-tabs-local-mode)
-    ;; (term-mode . centaur-tabs-local-mode)
-    ;; (calendar-mode . centaur-tabs-local-mode)
-    ;; (org-agenda-mode . centaur-tabs-local-mode)
-    ;; (helpful-mode . centaur-tabs-local-mode)
-    :bind
-    ("s-[" . centaur-tabs-backward-group)
-    ("s-]" . centaur-tabs-forward-group)
-    ;; Move through the tabs of the group
-    ("s-{" . centaur-tabs-backward-tab)
-    ("s-}" . centaur-tabs-forward-tab)
-    ("s-\\" . centaur-tabs-switch-group)
-    ("M-s-\\" . jf/centaur-tabs-toggle-grouping))
+#+end_src
 
-  (centaur-tabs-group-by-projectile-project)
+* Centaur Tabs
 
-  (defun jf/centaur-tabs-toggle-grouping ()
-    (interactive)
-    (if (jf/centaur-tabs-grouping-by-buffer-groups?)
-	(centaur-tabs-group-by-projectile-project)
-      (centaur-tabs-group-buffer-groups)))
+As <2022-08-03 Wed> I encountered problems in which the tabs were of the wrong colors.  I didn’t want to fight that.
 
-  (defun jf/centaur-tabs-grouping-by-buffer-groups? ()
-    (eq 'centaur-tabs-buffer-groups centaur-tabs-buffer-groups-function))
+#+begin_src emacs-lisp
+  ;; (use-package centaur-tabs
+  ;;   :straight t
+  ;;   :commands (centaur-tabs-group-by-projectile-project)
+  ;;   :commands (centaur-tabs-group-buffer-groups)
+  ;;   :config
+  ;;   (setq
+  ;;    centaur-tabs-set-icons t
+  ;;    centaur-tabs-set-modified-marker t
+  ;;    centaur-tabs-enable-ido-completion nil
+  ;;    uniquify-separator "/"
+  ;;    uniquify-buffer-name-style 'forward)
 
-  (centaur-tabs-mode t)
+  ;;   (defun centaur-tabs-buffer-groups ()
+  ;;     "`centaur-tabs-buffer-groups' control buffers' group rules.
+
+  ;; Group centaur-tabs with mode if buffer is derived from `eshell-mode' `emacs-lisp-mode' `dired-mode' `org-mode' `magit-mode'.
+  ;; All buffer name start with * will group to \"Emacs\".
+  ;; Other buffer group by `centaur-tabs-get-group-name' with project name."
+  ;;     (list
+  ;;      (cond
+  ;;       ;; ((not (eq (file-remote-p (buffer-file-name)) nil))
+  ;;       ;; "Remote")
+  ;;       ((or (string-equal "*" (substring (buffer-name) 0 1))
+  ;; 	   (memq major-mode '(magit-process-mode
+  ;; 			      magit-status-mode
+  ;; 			      magit-diff-mode
+  ;; 			      magit-log-mode
+  ;; 			      magit-file-mode
+  ;; 			      magit-blob-mode
+  ;; 			      magit-blame-mode
+  ;; 			      )))
+  ;;        "Emacs")
+  ;;       ((derived-mode-p 'prog-mode)
+  ;;        "Programming")
+  ;;       ((derived-mode-p 'dired-mode)
+  ;;        "Dired")
+  ;;       ((memq major-mode '(helpful-mode
+  ;; 			  help-mode))
+  ;;        "Help")
+  ;;       ((memq major-mode '(org-mode
+  ;; 			  org-agenda-clockreport-mode
+  ;; 			  org-src-mode
+  ;; 			  org-agenda-mode
+  ;; 			  org-beamer-mode
+  ;; 			  org-indent-mode
+  ;; 			  org-bullets-mode
+  ;; 			  org-cdlatex-mode
+  ;; 			  org-agenda-log-mode
+  ;; 			  diary-mode))
+  ;;        "OrgMode")
+  ;;       (t
+  ;;        (centaur-tabs-get-group-name (current-buffer))))))
+
+  ;;   ;; :hook
+  ;;   ;; (dashboard-mode . centaur-tabs-local-mode)
+  ;;   ;; (term-mode . centaur-tabs-local-mode)
+  ;;   ;; (calendar-mode . centaur-tabs-local-mode)
+  ;;   ;; (org-agenda-mode . centaur-tabs-local-mode)
+  ;;   ;; (helpful-mode . centaur-tabs-local-mode)
+  ;;   :bind
+  ;;   ("s-[" . centaur-tabs-backward-group)
+  ;;   ("s-]" . centaur-tabs-forward-group)
+  ;;   ;; Move through the tabs of the group
+  ;;   ("s-{" . centaur-tabs-backward-tab)
+  ;;   ("s-}" . centaur-tabs-forward-tab)
+  ;;   ("s-\\" . centaur-tabs-switch-group)
+  ;;   ("M-s-\\" . jf/centaur-tabs-toggle-grouping))
+
+  ;; (centaur-tabs-group-by-projectile-project)
+
+  ;; (defun jf/centaur-tabs-toggle-grouping ()
+  ;;   (interactive)
+  ;;   (if (jf/centaur-tabs-grouping-by-buffer-groups?)
+  ;;       (centaur-tabs-group-by-projectile-project)
+  ;;     (centaur-tabs-group-buffer-groups)))
+
+  ;; (defun jf/centaur-tabs-grouping-by-buffer-groups? ()
+  ;;   (eq 'centaur-tabs-buffer-groups centaur-tabs-buffer-groups-function))
+
+  ;; (centaur-tabs-mode t)
 #+end_src

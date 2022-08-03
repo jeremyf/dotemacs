@@ -4318,8 +4318,6 @@ some additional options.
       ("m o" "MacOS Native Option (*)" jf/toggle-osx-alternate-modifier :if-nil ns-alternate-modifier)
       ("m w" "Writeroom ( )" writeroom-mode :if-nil writeroom-mode)
       ("m w" "Writeroom (*)" writeroom-mode :if-non-nil writeroom-mode)
-      ("C-t" "Group by Projects ( )" jf/centaur-tabs-toggle-grouping :if jf/centaur-tabs-grouping-by-buffer-groups?)
-      ("C-t" "Group by Projects (*)" jf/centaur-tabs-toggle-grouping :if-not jf/centaur-tabs-grouping-by-buffer-groups?)
       ]]
     ["Org"
      ["Add Metadata"
