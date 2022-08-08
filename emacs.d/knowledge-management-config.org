@@ -562,6 +562,10 @@ And with all of that, let’s get into the org-roam configuration.
     ;; See https://github.com/nobiot/org-transclusion/issues/136
     (org-roam-db-extra-links-exclude-keys '((node-property "ROAM_REFS")))
     (org-roam-directory (file-truename "~/git/org"))
+    (org-roam-dailies-directory
+     (if (file-exists-p (file-truename "~/git/org/scientist/dailies/.keep"))
+	 "scientist/dailies/"
+       "dailies"))
     (org-roam-node-display-template
      (concat "${type:7} "
 	     " ${title:80} "
