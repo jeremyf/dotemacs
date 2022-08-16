@@ -53,6 +53,7 @@
 (setq mc/cmds-to-run-once
       '(
 	centaur-tabs-forward-tab
+	consult-projectile
 	ivy-occur-click
 	ivy-switch-buffer
 	org-insert-backtick

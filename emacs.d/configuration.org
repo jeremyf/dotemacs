@@ -2400,6 +2400,7 @@ These are a few variables and cosntants that I use throughout my configuration.
   (defvar jf/data-directories
     (list
      jf/tor-home-directory
+    "~/git/org/scientist/"
      "~/git/takeonrules.source/themes/hugo-tufte"
      "~/git/burning_wheel_lifepaths/"
      "~/git/emacs-bookmarks"
@@ -2674,8 +2675,6 @@ I use org-mode and org-roam to help manage content.  Let’s load that rather ex
 #+end_src
 
 ***** Magit Difftastic
-
-* Magit Difftastic
 
 From https://tsdh.org/posts/2022-08-01-difftastic-diffing-with-magit.html
 
@@ -4283,7 +4282,7 @@ some additional options.
     [["Contexts"
       ("-b" "Burning Wheel…"  jf/menu--bwg)
       ("-e" "Eberron…" jf/menu--eberron)
-      ("-f" "Forem…" jf/menu--forem)
+      ;; ("-f" "Forem…" jf/menu--forem)
       ("-t" "TakeOnRules…" jf/menu--tor)
       ("-w" "Register window configuration" window-configuration-to-register)
       ]
