@@ -19,17 +19,33 @@ Oh ~org-mode~, one of the “why you should use Emacs” packages.  It’s a set
 A bit of pre-amble.  I maintain a list of data directories, each might have “relevant to org-mode” files.  The ~jf/org-agenda-files~ reads the file system to gather sources for ~org-mode~ agenda.
 
 #+begin_src emacs-lisp
+  (defun is-work-machine? ()
+    "Am I working on my machine"
+    (file-exists-p (file-truename "~/git/org/scientist/dailies/.keep")))
+
+  (defvar jf/primary-agenda-filename-for-machine
+    (if (is-work-machine?)
+	"~/git/org/scientist/agenda.org"
+      "~/git/org/agenda.org"))
+
   (cl-defun jf/org-agenda-files (&key
-				  (paths jf/data-directories)
-				  (basenames '("agenda.org")))
+				 (paths jf/data-directories)
+				 (basenames '("agenda.org")))
     "Return the list of filenames where BASENAMES exists in PATHS."
     ;; I want to include my configuration file in my agenda querying.
     (setq returning-list '("~/git/dotemacs/emacs.d/configuration.org"))
     (dolist (path paths)
       (dolist (basename basenames)
 	(when (f-exists-p (f-join path basename))
-	    (add-to-list 'returning-list (f-join path basename)))))
+	  (add-to-list 'returning-list (f-join path basename)))))
     returning-list)
+
+  (cl-defun jf/org-goto-clock-or-agenda ()
+    "Goto the current clock if one exists; otherwise the agenda file"
+    (interactive)
+    (if (when (and (fboundp 'org-clocking-p) (org-clocking-p))
+	  (org-clock-goto)
+	  (find-file jf/primary-agenda-filename-for-machine))))
 #+end_src
 
 The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~ which introduces my more generalized note taking system.
@@ -54,9 +70,14 @@ The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~
     (setq org-capture-templates
 	  '(("@"
 	     "All Todo"
-	     entry (file "~/git/org/agenda.org")
+	     entry (file jf/primary-agenda-filename-for-machine)
 	     "* TODO %?\n  %i\n  %a"
-	     :empty-lines-before 1)))
+	     :empty-lines-before 1)
+	    ("t" "Timesheet"
+	     entry (file+olp+datetree jf/primary-agenda-filename-for-machine)
+	     "* %?"
+	     :empty-lines-before 1
+	     :clock-in 1)))
 
 
     (setq org-latex-default-class "jf/article")
@@ -109,6 +130,7 @@ The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~
     ;; Make TAB act as if it were issued from the buffer of the languages's major
     ;; mode.
     :custom (org-src-tab-acts-natively t)
+    (org-clock-clocktable-default-properties '(:maxlevel 4 :link t))
     :bind (:map org-mode-map
 		("C-c l i" . jf/org-insert-link-dwim)
 		("s-2" . consult-org-heading))
@@ -562,10 +584,7 @@ And with all of that, let’s get into the org-roam configuration.
     ;; See https://github.com/nobiot/org-transclusion/issues/136
     (org-roam-db-extra-links-exclude-keys '((node-property "ROAM_REFS")))
     (org-roam-directory (file-truename "~/git/org"))
-    (org-roam-dailies-directory
-     (if (file-exists-p (file-truename "~/git/org/scientist/dailies/.keep"))
-	 "scientist/dailies/"
-       "dailies"))
+    (org-roam-dailies-directory (if (is-work-machine?) "scientist/dailies/" "dailies"))
     (org-roam-node-display-template
      (concat "${type:7} "
 	     " ${title:80} "
@@ -782,6 +801,7 @@ I love [[https://github.com/minad][Daniel Mendler]]’s work; let’s test drive
 #+begin_src emacs-lisp
   (use-package org-modern
     :straight (:host github :repo "minad/org-modern")
+    :custom (org-modern-star '("◉" "○" "◈" "◇" "•"))
     :hook (org-mode . org-modern-mode))
 #+end_src
 

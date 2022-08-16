@@ -190,9 +190,9 @@ out but for the most part, you can move along and reference this later.
 
    ring-bell-function 'ignore  ;; Stop ringing any bell
 
-   split-width-threshold 160
+   split-width-threshold nil ;; 160 * 8
 
-   split-height-threshold 160 * 4
+   split-height-threshold nil ;; 160 * 8
 
    vc-follow-symlinks t        ;; Follow symlinks instead of prompting.
 
@@ -4287,7 +4287,7 @@ some additional options.
       ("-w" "Register window configuration" window-configuration-to-register)
       ]
      ["Jump to"
-      ("j a" "Agenda" (lambda () (interactive) (find-file "~/git/org/agenda.org")))
+      ("j a" "Agenda" jf/org-goto-clock-or-agenda)
       ("j b" "iBuffer" ibuffer)
       ;; ("j f" "Flycheck" consult-flycheck :if-derived (or markdown-mode org-mode))
       ("j g" "Global Mark" consult-global-mark)
