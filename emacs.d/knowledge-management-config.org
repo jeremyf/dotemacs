@@ -43,9 +43,9 @@ A bit of pre-amble.  I maintain a list of data directories, each might have “r
   (cl-defun jf/org-goto-clock-or-agenda ()
     "Goto the current clock if one exists; otherwise the agenda file"
     (interactive)
-    (if (when (and (fboundp 'org-clocking-p) (org-clocking-p))
-	  (org-clock-goto)
-	  (find-file jf/primary-agenda-filename-for-machine))))
+    (if (when (and (fboundp 'org-clocking-p) (org-clocking-p)) t)
+	(org-clock-goto)
+      (find-file jf/primary-agenda-filename-for-machine)))
 #+end_src
 
 The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~ which introduces my more generalized note taking system.
