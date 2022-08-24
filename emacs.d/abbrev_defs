@@ -385,7 +385,7 @@
     ("areodynamics" "aerodynamics" nil :count 1)
     ("argubly" "arguably" nil :count 1)
     ("arguement" "argument" nil :count 1)
-    ("arguements" "arguments" nil :count 1)
+    ("arguements" "arguments" nil :count 2)
     ("arised" "arose" nil :count 1)
     ("arival" "arrival" nil :count 1)
     ("armamant" "armament" nil :count 1)
@@ -4086,5 +4086,10 @@
     ("ytou" "you" nil :count 1)
     ("yuo" "you" nil :count 1)
     ("zeebra" "zebra" nil :count 1)
+   ))
+
+(define-abbrev-table 'org-mode-abbrev-table
+  '(
+    ("consulting" "consluting" nil :count 2)
    ))
 
