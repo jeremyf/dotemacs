@@ -45,7 +45,10 @@ A bit of pre-amble.  I maintain a list of data directories, each might have “r
     (interactive)
     (if (when (and (fboundp 'org-clocking-p) (org-clocking-p)) t)
 	(org-clock-goto)
-      (find-file jf/primary-agenda-filename-for-machine)))
+      (progn
+	(find-file jf/primary-agenda-filename-for-machine)
+	(end-of-buffer)))
+    (pulsar--pulse))
 #+end_src
 
 The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~ which introduces my more generalized note taking system.
