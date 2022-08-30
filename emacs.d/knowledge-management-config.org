@@ -94,6 +94,7 @@ The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~
 	     :tree-type month)
 	    ("T" "Task"
 	     plain (file+function jf/primary-agenda-filename-for-machine jf/org-mode-find-project-node)
+	     ;; The five ***** is due to the assumptive depth of the projects and tasks.
 	     "***** TODO %? :task:"
 	     :empty-lines-before 1
 	     :empty-lines-after 1
@@ -101,19 +102,17 @@ The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~
 	    ))
 
     ;; Inspiration from https://gist.github.com/webbj74/0ab881ed0ce61153a82e
-    (cl-defun jf/org-mode-find-project-node ()
+    (cl-defun jf/org-mode-find-project-node (&key (project (jf/org-mode-project-prompt)))
       "Find and position the cursor at the end of the given PROJECT."
       (with-current-buffer (find-file-noselect jf/primary-agenda-filename-for-machine)
-	(let* ((title (jf/org-mode-project-prompt))
-	       (position (org-element-map (org-element-parse-buffer) 'headline
+	(goto-char (or (org-element-map (org-element-parse-buffer) 'headline
 			       (lambda (hl)
 				 (and (= (org-element-property :level hl) 4)
 				      (member "project" (org-element-property :tags hl))
-				      (string= title (plist-get (cadr hl) :raw-value))
+				      (string= project (plist-get (cadr hl) :raw-value))
 				      (org-element-property :end hl)))
-			       nil t)))
-	       (if position (goto-char position)
-		 (end-of-buffer)))))
+			       nil t)
+		       (point-max)))))
 
 
     (defun jf/org-mode-project-prompt ()
