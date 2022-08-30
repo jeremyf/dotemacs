@@ -67,6 +67,7 @@ The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~
 				     "/captured-notes.org")
 	     org-todo-keywords '((sequence
 				  "TODO"
+				  "IN-PROGRESS"
 				  "WAITING"
 				  "|"
 				  "DONE")))
@@ -93,9 +94,11 @@ The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~
 	     :empty-lines-after 1
 	     :tree-type month)
 	    ("T" "Task"
+	     ;; I tried this as a node, but that created headaches.  Instead I'm
+	     ;; making the assumption about project/task depth.
 	     plain (file+function jf/primary-agenda-filename-for-machine jf/org-mode-find-project-node)
 	     ;; The five ***** is due to the assumptive depth of the projects and tasks.
-	     "***** TODO %? :task:"
+	     "***** %? :task:"
 	     :empty-lines-before 1
 	     :empty-lines-after 1
 	     :clock-in 1)
@@ -109,6 +112,9 @@ The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~
 			       (lambda (hl)
 				 (and (= (org-element-property :level hl) 4)
 				      (member "project" (org-element-property :tags hl))
+				      ;; I can't use the :title attribute as it's
+				      ;; more complicated structure; this gets me
+				      ;; the raw string.
 				      (string= project (plist-get (cadr hl) :raw-value))
 				      (org-element-property :end hl)))
 			       nil t)
@@ -212,7 +218,7 @@ The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~
 #+end_src
 
 #+RESULTS:
-: /opt/homebrew/Cellar/plantuml/1.2022.3/libexec/plantuml.jar
+: /opt/homebrew/Cellar/plantuml/1.2022.6/libexec/plantuml.jar
 
 I cribbed the following function from [[https://xenodium.com/emacs-dwim-do-what-i-mean/][Emacs DWIM: do what ✨I✨ mean]].
 
