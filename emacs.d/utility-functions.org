@@ -102,7 +102,7 @@ And why do all of this? To sharpen my tools. Practice extending my text editor t
 		  (jf/prompt-for-url-dwim)))
     (catch 'not-a-github-repository
       (let* ((suffix (jf/github-abbreviation-for :url url))
-	     (prefix (format "%s/%s" jf/github-username "issue"))
+	     (prefix (format "%s---%s" jf/github-username "issue"))
 	     (branch-name (concat prefix "---" suffix)))
 	;; Create the branch and "report" back.
 	(message (jf/git-branch-create- :branch-name branch-name :directory directory)))))
