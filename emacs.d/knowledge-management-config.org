@@ -77,11 +77,8 @@ The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~
 	     entry (file jf/primary-agenda-filename-for-machine)
 	     "* TODO %?\n  %i\n  %a"
 	     :empty-lines-before 1)
-	    ("l" "Learning Time"
-	     entry (file+olp+datetree jf/primary-agenda-filename-for-machine)
-	     "* Learning Time   :nonbillable: \n%?"
-	     :empty-lines-before 1
-	     :clock-in 1)
+	    ;; Needed for the first project of the day; to ensure the datetree is
+	    ;; properly generated.
 	    ("p" "Project"
 	     entry (file+olp+datetree jf/primary-agenda-filename-for-machine)
 	     "* %(jf/org-mode-project-prompt) :project:\n\n%?"
@@ -188,7 +185,7 @@ The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~
     ;; Make TAB act as if it were issued from the buffer of the languages's major
     ;; mode.
     :custom (org-src-tab-acts-natively t)
-    (org-clock-clocktable-default-properties '(:maxlevel 3 :link t :tags t))
+    (org-clock-clocktable-default-properties '(:maxlevel 5 :link t :tags t))
     :bind (:map org-mode-map
 		("C-c l i" . jf/org-insert-link-dwim)
 		("s-2" . consult-org-heading))
