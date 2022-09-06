@@ -1537,9 +1537,6 @@ From [[https://www.masteringemacs.org/article/fixing-mark-commands-transient-mar
     :bind (("C-x l" . jf/pulse)))
 #+end_src
 
-#+RESULTS:
-: pulsar-pulse-line
-
 **** emojify.el
 
 - ~emojify.el~ :: Ensure rendering of correct emoji’s.
@@ -1607,6 +1604,12 @@ are major modes others are minor modes.
 
 #+begin_src emacs-lisp
   (use-package csv-mode :straight t)
+#+end_src
+
+**** dockerfile-mode
+
+#+begin_src emacs-lisp
+  (use-package dockerfile-mode :straight t)
 #+end_src
 
 **** emmet-mode.el
@@ -4297,14 +4300,14 @@ some additional options.
       ("j p" "Jump in PDF" doc-view-goto-page :if-derived doc-view-mode)
       ("j s" "Jump to Shortdoc" shortdoc-display-group)
       ]
-     ["Dailies"
-      ("d c" "Capture a daily note…" org-roam-dailies-capture-date)
-      ("d p" "Pick a daily" org-roam-dailies-goto-date)
-      ("d t" "Today's daily" org-roam-dailies-goto-today)
-      ("d T" "Tomorrow's daily" org-roam-dailies-goto-tomorrow)
-      ("d u" "Capture URL as a todo for today…" jf/org-roam-dailies--add-entry-for-url)
-      ("d y" "Yesterday's daily" org-roam-dailies-goto-yesterday)
-      ]
+     ;; ["Dailies"
+     ;;  ("d c" "Capture a daily note…" org-roam-dailies-capture-date)
+     ;;  ("d p" "Pick a daily" org-roam-dailies-goto-date)
+     ;;  ("d t" "Today's daily" org-roam-dailies-goto-today)
+     ;;  ("d T" "Tomorrow's daily" org-roam-dailies-goto-tomorrow)
+     ;;  ("d u" "Capture URL as a todo for today…" jf/org-roam-dailies--add-entry-for-url)
+     ;;  ("d y" "Yesterday's daily" org-roam-dailies-goto-yesterday)
+     ;;  ]
      ["Modes"
       ("C-n" "MacOS Night Shift" (lambda () (interactive) (shell-command "nightlight on")))
       ("m c" "Copilot ( )" copilot-mode :if-nil copilot-mode)

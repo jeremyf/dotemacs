@@ -43,6 +43,7 @@ A bit of pre-amble.  I maintain a list of data directories, each might have “r
   (cl-defun jf/org-goto-clock-or-agenda ()
     "Goto the current clock if one exists; otherwise the agenda file"
     (interactive)
+    (require 'pulsar)
     (if (when (and (fboundp 'org-clocking-p) (org-clocking-p)) t)
 	(org-clock-goto)
       (progn
@@ -75,7 +76,7 @@ The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~
 	  '(("@"
 	     "All Todo"
 	     entry (file jf/primary-agenda-filename-for-machine)
-	     "* TODO %?\n  %i\n  %a"
+	     "* %?\n  %i\n  %a"
 	     :empty-lines-before 1)
 	    ;; Needed for the first project of the day; to ensure the datetree is
 	    ;; properly generated.
@@ -89,7 +90,7 @@ The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~
 	     ;; making the assumption about project/task depth.
 	     plain (file+function jf/primary-agenda-filename-for-machine jf/org-mode-find-project-node)
 	     ;; The five ***** is due to the assumptive depth of the projects and tasks.
-	     "***** TODO %? :task:\n\n"
+	     "***** %? :task:\n\n"
 	     :empty-lines-before 1
 	     :empty-lines-after 1)
 	    ))
@@ -97,29 +98,41 @@ The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~
     ;; Inspiration from https://gist.github.com/webbj74/0ab881ed0ce61153a82e
     (cl-defun jf/org-mode-find-project-node (&key
 					     (project (jf/org-mode-project-prompt))
+					     ;; The `file+olp+datetree` directive creates a headline like “2022-09-03 Saturday”.
 					     (within_headline (format-time-string "%Y-%m-%d %A")))
       "Find and position the cursor at the end of
   the given PROJECT WITHIN_HEADLINE."
+      ;; We need to be using the right agenda file.
       (with-current-buffer (find-file-noselect jf/primary-agenda-filename-for-machine)
-	(let ((existing-position (org-element-map (org-element-parse-buffer) 'headline
-			       (lambda (hl)
-				 (and (=(org-element-property :level hl) 4)
-				      ;; The element must have an ancestor with a headline of today
-				      (string= within_headline (plist-get (cadr (car (org-element-lineage hl))) :raw-value))
-				      ;; (ancestor-must-be-today hl)
-				      (member "project" (org-element-property :tags hl))
-				      ;; I can't use the :title attribute as it's
-				      ;; more complicated structure; this gets me
-				      ;; the raw string.
-				      (string= project (plist-get (cadr hl) :raw-value))
-				      (org-element-property :end hl)))
-			       nil t)))
+	(let ((existing-position (org-element-map
+				     (org-element-parse-buffer)
+				     'headline
+				   ;; Finds the end position of:
+				   ;; - a level 4 headline
+				   ;; - that is tagged as a :project:
+				   ;; - is titled as the given project
+				   ;; - and is within the given headline
+				   (lambda (hl)
+				     (and (=(org-element-property :level hl) 4)
+					  ;; I can't use the :title attribute as it is a
+					  ;; more complicated structure; this gets me
+					  ;; the raw string.
+					  (string= project (plist-get (cadr hl) :raw-value))
+					  (member "project" (org-element-property :tags hl))
+					  ;; The element must have an ancestor with a headline of today
+					  (string= within_headline
+						   (plist-get
+						    ;; I want the raw title, no styling nor tags
+						    (cadr (car (org-element-lineage hl))) :raw-value))
+					  (org-element-property :end hl)))
+				   nil t)))
 	  (if existing-position
+	      ;; Go to the existing position for this project
 	      (goto-char existing-position)
 	    (progn
+	      ;; Go to the end of the file and append the project to the end
 	      (end-of-buffer)
 	      (insert (concat "\n**** " project " :project:\n\n")))))))
-
 
     (defun jf/org-mode-project-prompt ()
       "Prompt for project based on existing projects in agenda file.
@@ -131,9 +144,10 @@ The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~
        (sort
 	(-distinct
 	 (org-map-entries
-	  (lambda () (org-element-property :title (org-element-at-point)))
-	  (concat "+LEVEL=4+project") 'agenda))
-	#'string<)))
+	  (lambda ()
+	    (org-element-property :title (org-element-at-point)))
+	  "+LEVEL=4+project" 'agenda)
+	 ) #'string<)))
 
     (setq org-latex-default-class "jf/article")
 
