@@ -95,13 +95,39 @@ The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~
 	     :empty-lines-after 1)
 	    ))
 
+    (cl-defun jf/org-mode-stand-up (&key (within_headline (format-time-string "%Y-%m-%d %A")))
+      "Copy to the kill ring the project tasks WITHIN_HEADLINE.
+
+  NOTE: This follows the convention that projects are on headline 4 and
+  tasks within projects are headline 5."
+      (interactive)
+      (with-current-buffer (find-file-noselect jf/primary-agenda-filename-for-machine)
+	(save-excursion
+	  (kill-new
+	   (s-trim
+	    (s-join
+	     "\n"
+	     (org-element-map
+		 (org-element-parse-buffer)
+		 'headline
+	       (lambda (hl)
+		 (when (member
+			within_headline
+			(mapcar
+			 (lambda (ancestor) (plist-get (cadr ancestor) :raw-value))
+			 (org-element-lineage hl)))
+		   (if (=(org-element-property :level hl) 4)
+		       (concat "\n" (plist-get (cadr hl) :raw-value))
+		     (concat "- " (plist-get (cadr hl) :raw-value)))))
+	       )))))))
+
     ;; Inspiration from https://gist.github.com/webbj74/0ab881ed0ce61153a82e
     (cl-defun jf/org-mode-find-project-node (&key
 					     (project (jf/org-mode-project-prompt))
 					     ;; The `file+olp+datetree` directive creates a headline like “2022-09-03 Saturday”.
 					     (within_headline (format-time-string "%Y-%m-%d %A")))
       "Find and position the cursor at the end of
-  the given PROJECT WITHIN_HEADLINE."
+      the given PROJECT WITHIN_HEADLINE."
       ;; We need to be using the right agenda file.
       (with-current-buffer (find-file-noselect jf/primary-agenda-filename-for-machine)
 	(let ((existing-position (org-element-map
@@ -132,13 +158,13 @@ The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~
 	    (progn
 	      ;; Go to the end of the file and append the project to the end
 	      (end-of-buffer)
-	      (insert (concat "\n**** " project " :project:\n\n")))))))
+	      (insert (concat "\n\n**** " project " :project:\n\n")))))))
 
     (defun jf/org-mode-project-prompt ()
       "Prompt for project based on existing projects in agenda file.
 
-  Note: I tried this as interactive, but the capture templates
-  insist that it should not be interactive."
+      Note: I tried this as interactive, but the capture templates
+      insist that it should not be interactive."
       (completing-read
        "Project: "
        (sort

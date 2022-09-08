@@ -4332,12 +4332,13 @@ some additional options.
       ("t a" "Tag add…" org-roam-tag-add :if-derived org-mode)
       ("t S" "Tag as session Scene…" jf/org-tag-session-scene-with-date :if-derived org-mode)]
      ["Context"
+      ("C-s" "Copy Stand-up" (jf/org-mode-project-prompt))
       ("s" "Search…" (lambda () (interactive) (consult-ripgrep org-directory)))
       ("M-c" "Context set…" jf/org-auto-tags--set-by-context :transient t)
       ("M-t" jf/org-auto-tags--transient :transient t)
       ("x" "Export to TakeOnRules…" jf/export-org-to-tor :if-derived org-mode)
       ]
-     ["Grag Refs"
+     ["Grab Refs"
       ("g e" "Elfeed" jf/menu--org-capture-elfeed-show :if-derived elfeed-show-mode)
       ("g f" "Firefox" jf/menu--org-capture-firefox)
       ("g s" "Safari" jf/menu--org-capture-safari)
