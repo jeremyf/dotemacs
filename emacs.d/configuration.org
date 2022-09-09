@@ -1275,8 +1275,8 @@ More on these component matchings styles is available at [[https://github.com/mi
 
 #+begin_src emacs-lisp
   (use-package avy
-    :bind (("C-j" . avy-goto-char-timer))
-    :bind (:map org-mode-map ("C-j" . avy-goto-char-timer))
+    :bind (("C-j" . jf/org-goto-clock-or-agenda))
+    :bind (:map org-mode-map ("C-j" . jf/org-goto-clock-or-agenda))
     :straight t)
 #+end_src
 
@@ -1603,7 +1603,9 @@ are major modes others are minor modes.
 **** csv-mode.el
 
 #+begin_src emacs-lisp
-  (use-package csv-mode :straight t)
+  (use-package csv-mode :straight t
+    ;; Always enter CSV mode in align mode; makes it easier to read.
+    :hook (csv-mode . csv-align-mode))
 #+end_src
 
 **** dockerfile-mode
@@ -1648,7 +1650,7 @@ are major modes others are minor modes.
     :hook (enh-ruby-mode . (lambda () (setq fill-column 100)))
     :hook (enh-ruby-mode . eldoc-mode)
     :hook (enh-ruby-mode . enh-ruby-imenu-create-index)
-    :bind (:map enh-ruby-mode-map ("C-j" . avy-goto-char-timer)
+    :bind (:map enh-ruby-mode-map ("C-j" . jf/org-goto-clock-or-agenda)
 				   ("M-h" . enh-ruby-mark-defun))
     :mode (("\\(?:\\.rb\\|ru\\|rake\\|thor\\|jbuilder\\|gemspec\\|podspec\\|/\\(?:Gem\\|Rake\\|Cap\\|Thor\\|Vagrant\\|Guard\\|Pod\\)file\\)\\'" . enh-ruby-mode)))
   (add-to-list 'interpreter-mode-alist '("ruby" . enh-ruby-mode))
@@ -4332,10 +4334,10 @@ some additional options.
       ("t a" "Tag add…" org-roam-tag-add :if-derived org-mode)
       ("t S" "Tag as session Scene…" jf/org-tag-session-scene-with-date :if-derived org-mode)]
      ["Context"
-      ("C-s" "Copy Stand-up" (jf/org-mode-project-prompt))
       ("s" "Search…" (lambda () (interactive) (consult-ripgrep org-directory)))
       ("M-c" "Context set…" jf/org-auto-tags--set-by-context :transient t)
       ("M-t" jf/org-auto-tags--transient :transient t)
+      ("u" "Copy Stand-up to Kill Ring" jf/org-mode-agenda-to-stand-up-summary)
       ("x" "Export to TakeOnRules…" jf/export-org-to-tor :if-derived org-mode)
       ]
      ["Grab Refs"

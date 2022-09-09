@@ -82,98 +82,18 @@ The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~
 	    ;; properly generated.
 	    ("p" "Project"
 	     entry (file+olp+datetree jf/primary-agenda-filename-for-machine)
-	     "* %(jf/org-mode-project-prompt) :project:\n\n%?"
+	     "* %(jf/org-mode-agenda-project-prompt) :project:\n\n%?"
 	     :empty-lines-before 1
 	     :empty-lines-after 1)
 	    ("t" "Task"
 	     ;; I tried this as a node, but that created headaches.  Instead I'm
 	     ;; making the assumption about project/task depth.
-	     plain (file+function jf/primary-agenda-filename-for-machine jf/org-mode-find-project-node)
+	     plain (file+function jf/primary-agenda-filename-for-machine jf/org-mode-agenda-find-project-node)
 	     ;; The five ***** is due to the assumptive depth of the projects and tasks.
 	     "***** %? :task:\n\n"
 	     :empty-lines-before 1
 	     :empty-lines-after 1)
 	    ))
-
-    (cl-defun jf/org-mode-stand-up (&key (within_headline (format-time-string "%Y-%m-%d %A")))
-      "Copy to the kill ring the project tasks WITHIN_HEADLINE.
-
-  NOTE: This follows the convention that projects are on headline 4 and
-  tasks within projects are headline 5."
-      (interactive)
-      (with-current-buffer (find-file-noselect jf/primary-agenda-filename-for-machine)
-	(save-excursion
-	  (kill-new
-	   (s-trim
-	    (s-join
-	     "\n"
-	     (org-element-map
-		 (org-element-parse-buffer)
-		 'headline
-	       (lambda (hl)
-		 (when (member
-			within_headline
-			(mapcar
-			 (lambda (ancestor) (plist-get (cadr ancestor) :raw-value))
-			 (org-element-lineage hl)))
-		   (if (=(org-element-property :level hl) 4)
-		       (concat "\n" (plist-get (cadr hl) :raw-value))
-		     (concat "- " (plist-get (cadr hl) :raw-value)))))
-	       )))))))
-
-    ;; Inspiration from https://gist.github.com/webbj74/0ab881ed0ce61153a82e
-    (cl-defun jf/org-mode-find-project-node (&key
-					     (project (jf/org-mode-project-prompt))
-					     ;; The `file+olp+datetree` directive creates a headline like “2022-09-03 Saturday”.
-					     (within_headline (format-time-string "%Y-%m-%d %A")))
-      "Find and position the cursor at the end of
-      the given PROJECT WITHIN_HEADLINE."
-      ;; We need to be using the right agenda file.
-      (with-current-buffer (find-file-noselect jf/primary-agenda-filename-for-machine)
-	(let ((existing-position (org-element-map
-				     (org-element-parse-buffer)
-				     'headline
-				   ;; Finds the end position of:
-				   ;; - a level 4 headline
-				   ;; - that is tagged as a :project:
-				   ;; - is titled as the given project
-				   ;; - and is within the given headline
-				   (lambda (hl)
-				     (and (=(org-element-property :level hl) 4)
-					  ;; I can't use the :title attribute as it is a
-					  ;; more complicated structure; this gets me
-					  ;; the raw string.
-					  (string= project (plist-get (cadr hl) :raw-value))
-					  (member "project" (org-element-property :tags hl))
-					  ;; The element must have an ancestor with a headline of today
-					  (string= within_headline
-						   (plist-get
-						    ;; I want the raw title, no styling nor tags
-						    (cadr (car (org-element-lineage hl))) :raw-value))
-					  (org-element-property :end hl)))
-				   nil t)))
-	  (if existing-position
-	      ;; Go to the existing position for this project
-	      (goto-char existing-position)
-	    (progn
-	      ;; Go to the end of the file and append the project to the end
-	      (end-of-buffer)
-	      (insert (concat "\n\n**** " project " :project:\n\n")))))))
-
-    (defun jf/org-mode-project-prompt ()
-      "Prompt for project based on existing projects in agenda file.
-
-      Note: I tried this as interactive, but the capture templates
-      insist that it should not be interactive."
-      (completing-read
-       "Project: "
-       (sort
-	(-distinct
-	 (org-map-entries
-	  (lambda ()
-	    (org-element-property :title (org-element-at-point)))
-	  "+LEVEL=4+project" 'agenda)
-	 ) #'string<)))
 
     (setq org-latex-default-class "jf/article")
 
@@ -257,38 +177,135 @@ The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~
   (setq org-plantuml-jar-path (concat (string-trim (shell-command-to-string "brew-path plantuml")) "/libexec/plantuml.jar"))
 #+end_src
 
-#+RESULTS:
-: /opt/homebrew/Cellar/plantuml/1.2022.6/libexec/plantuml.jar
-
 I cribbed the following function from [[https://xenodium.com/emacs-dwim-do-what-i-mean/][Emacs DWIM: do what ✨I✨ mean]].
 
 #+begin_src emacs-lisp
   (defun jf/org-insert-link-dwim ()
-	"Like `org-insert-link' but with personal dwim preferences."
-	(interactive)
-	(let* ((point-in-link (org-in-regexp org-link-any-re 1))
-	       (clipboard-url (when (string-match-p "^http" (current-kill 0))
-				(current-kill 0)))
-	       (region-content (when (region-active-p)
-				 (buffer-substring-no-properties (region-beginning)
-								 (region-end)))))
-	  (cond ((and region-content clipboard-url (not point-in-link))
-		 (delete-region (region-beginning) (region-end))
-		 (insert (org-make-link-string clipboard-url region-content)))
-		((and clipboard-url (not point-in-link))
-		 (insert (org-make-link-string
-			  clipboard-url
-			  (read-string "Title: "
-				       (with-current-buffer (url-retrieve-synchronously clipboard-url)
-					 (dom-text (car
-						    (dom-by-tag (libxml-parse-html-region
-								 (point-min)
-								 (point-max))
-								'title))))))))
-		(t
-		 (call-interactively 'org-insert-link)))))
+    "Like `org-insert-link' but with personal dwim preferences."
+    (interactive)
+    (let* ((point-in-link (org-in-regexp org-link-any-re 1))
+	   (clipboard-url (when (string-match-p "^http" (current-kill 0))
+			    (current-kill 0)))
+	   (region-content (when (region-active-p)
+			     (buffer-substring-no-properties (region-beginning)
+							     (region-end)))))
+      (cond ((and region-content clipboard-url (not point-in-link))
+	     (delete-region (region-beginning) (region-end))
+	     (insert (org-make-link-string clipboard-url region-content)))
+	    ((and clipboard-url (not point-in-link))
+	     (insert (org-make-link-string
+		      clipboard-url
+		      (read-string "Title: "
+				   (with-current-buffer (url-retrieve-synchronously clipboard-url)
+				     (dom-text (car
+						(dom-by-tag (libxml-parse-html-region
+							     (point-min)
+							     (point-max))
+							    'title))))))))
+	    (t
+	     (call-interactively 'org-insert-link)))))
 #+end_src
 
+** Time Tracking
+
+I wrote about this in [[https://takeonrules.com/2022/09/06/org-mode-capture-templates-and-time-tracking/][Org Mode Capture Templates and Time Tracking // Take on Rules]].  But to summarize, I work on several different projects each day; helping folks get unstuck.  I also need to track and record my time.
+
+The following three functions help me provide structure for time tracking and note taking:
+
+- =jf/org-mode-agenda-project-prompt=
+- =jf/org-mode-agenda-find-project-node=
+- =jf/org-mode-agenda-to-stand-up-summary=
+
+I want to re-use existing project names but also allow for new ones, and =jf/org-mode-agenda-project-prompt= queries my agenda file for the projects I’ve already recorded time towards.
+
+#+begin_src emacs-lisp
+  (defun jf/org-mode-agenda-project-prompt ()
+    "Prompt for project based on existing projects in agenda file.
+
+      Note: I tried this as interactive, but the capture templates
+      insist that it should not be interactive."
+    (completing-read
+     "Project: "
+     (sort
+      (-distinct
+       (org-map-entries
+	(lambda ()
+	  (org-element-property :title (org-element-at-point)))
+	"+LEVEL=4+project" 'agenda)
+       ) #'string<)))
+#+end_src
+
+When I jump to a new task for the day, I want to position that task within the prompted project.  Inspiration for =jf/org-mode-agenda-find-project-node= comes from https://gist.github.com/webbj74/0ab881ed0ce61153a82e.
+
+#+begin_src emacs-lisp
+  (cl-defun jf/org-mode-agenda-find-project-node (&key
+					   (project (jf/org-mode-agenda-project-prompt))
+					   ;; The `file+olp+datetree` directive creates a headline like “2022-09-03 Saturday”.
+					   (within_headline (format-time-string "%Y-%m-%d %A")))
+    "Find and position the cursor at the end of
+    the given PROJECT WITHIN_HEADLINE."
+    ;; We need to be using the right agenda file.
+    (with-current-buffer (find-file-noselect jf/primary-agenda-filename-for-machine)
+      (let ((existing-position (org-element-map
+				   (org-element-parse-buffer)
+				   'headline
+				 ;; Finds the end position of:
+				 ;; - a level 4 headline
+				 ;; - that is tagged as a :project:
+				 ;; - is titled as the given project
+				 ;; - and is within the given headline
+				 (lambda (hl)
+				   (and (=(org-element-property :level hl) 4)
+					;; I can't use the :title attribute as it is a
+					;; more complicated structure; this gets me
+					;; the raw string.
+					(string= project (plist-get (cadr hl) :raw-value))
+					(member "project" (org-element-property :tags hl))
+					;; The element must have an ancestor with a headline of today
+					(string= within_headline
+						 (plist-get
+						  ;; I want the raw title, no styling nor tags
+						  (cadr (car (org-element-lineage hl))) :raw-value))
+					(org-element-property :end hl)))
+				 nil t)))
+	(if existing-position
+	    ;; Go to the existing position for this project
+	    (goto-char existing-position)
+	  (progn
+	    ;; Go to the end of the file and append the project to the end
+	    (end-of-buffer)
+	    (insert (concat "\n\n**** " project " :project:\n\n")))))))
+#+end_src
+
+The =jf/org-mode-agenda-to-stand-up-summary= function takes my notes for the day and formats them for a summary report.
+
+#+begin_src emacs-lisp
+  (cl-defun jf/org-mode-agenda-to-stand-up-summary (&key (within_headline (format-time-string "%Y-%m-%d %A")))
+    "Copy to the kill ring the project tasks WITHIN_HEADLINE.
+
+  NOTE: This follows the convention that projects are on headline 4 and
+  tasks within projects are headline 5."
+    (interactive)
+    (with-current-buffer (find-file-noselect jf/primary-agenda-filename-for-machine)
+      (save-excursion
+	(kill-new
+	 (s-trim
+	  (s-join
+	   "\n"
+	   (org-element-map
+	       (org-element-parse-buffer)
+	       'headline
+	     (lambda (hl)
+	       (when (member
+		      within_headline
+		      (mapcar
+		       (lambda (ancestor) (plist-get (cadr ancestor) :raw-value))
+		       (org-element-lineage hl)))
+		 (if (=(org-element-property :level hl) 4)
+		     (concat "\n" (plist-get (cadr hl) :raw-value))
+		   (concat "- " (plist-get (cadr hl) :raw-value)))))
+	     )))))))
+#+end_src
 ** Copy Org and Paste in Rich Text Format
 
 Org Mode has built-in capabilities for exporting to HTML (and other languages).  The following function does just a bit more.  It converts the org region to HTML and sends it to the clipboard as an RTF datatype.
@@ -671,10 +688,10 @@ And with all of that, let’s get into the org-roam configuration.
     :straight t
     :config
     (setq org-roam-dailies-capture-templates
-	'(("i" "item" item
-	   "[ ] %?"
-	   :target (file+head "%<%Y-%m-%d>.org"
-			      "#+title: %<%Y-%m-%d>\n#+FILETAGS: :dailies:\n"))))
+	  '(("i" "item" item
+	     "[ ] %?"
+	     :target (file+head "%<%Y-%m-%d>.org"
+				"#+title: %<%Y-%m-%d>\n#+FILETAGS: :dailies:\n"))))
     :custom
     ;; See https://github.com/nobiot/org-transclusion/issues/136
     (org-roam-db-extra-links-exclude-keys '((node-property "ROAM_REFS")))
@@ -788,17 +805,17 @@ The ~org-roam-ui~ package provides a graphical representation of the graph of ~o
 #+begin_src emacs-lisp
   (use-package org-roam-ui
     :straight
-      (:host github :repo "org-roam/org-roam-ui" :branch "main" :files ("*.el" "out"))
-      :after org-roam
-  ;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
-  ;;         a hookable mode anymore, you're advised to pick something yourself
-  ;;         if you don't care about startup time, use
-  ;;  :hook (after-init . org-roam-ui-mode)
-      :config
-      (setq org-roam-ui-sync-theme t
-	    org-roam-ui-follow t
-	    org-roam-ui-update-on-save t
-	    org-roam-ui-open-on-start t))
+    (:host github :repo "org-roam/org-roam-ui" :branch "main" :files ("*.el" "out"))
+    :after org-roam
+    ;;         normally we'd recommend hooking orui after org-roam, but since org-roam does not have
+    ;;         a hookable mode anymore, you're advised to pick something yourself
+    ;;         if you don't care about startup time, use
+    ;;  :hook (after-init . org-roam-ui-mode)
+    :config
+    (setq org-roam-ui-sync-theme t
+	  org-roam-ui-follow t
+	  org-roam-ui-update-on-save t
+	  org-roam-ui-open-on-start t))
 #+end_src
 
 All told, the past experience when running [[https://takeonrules.com/series/new-vistas-in-the-thel-sector/][New Vistas in the Thel Sector // Take on Rules]] informed how I thought about my note taking.
@@ -946,15 +963,15 @@ The following macros map to my [[https://codeberg.org/takeonrules/takeonrules-hu
 I’ve taken to using the i-tag as idiomatic, meaning it’s a defined term (lacking it’s definition).  I don’t want to conflate this with org-modes =/= marker.
 
 #+begin_src emacs-lisp
-(add-to-list 'org-export-global-macros
-		 '("i" . "@@html:<i class=\"dfn\">@@$1@@html:</i>@@"))
+  (add-to-list 'org-export-global-macros
+	       '("i" . "@@html:<i class=\"dfn\">@@$1@@html:</i>@@"))
 #+end_src
 
 Sometimes I use inline sidenotes, that’s the purpose of this macro.
 
 #+begin_src emacs-lisp
   (add-to-list 'org-export-global-macros
-		   '("sidenote" . "@@hugo:{{< sidenote >}}@@$1@@hugo:{{< /sidenote >}}@@"))
+	       '("sidenote" . "@@hugo:{{< sidenote >}}@@$1@@hugo:{{< /sidenote >}}@@"))
 #+end_src
 
 #+begin_src emacs-lisp
