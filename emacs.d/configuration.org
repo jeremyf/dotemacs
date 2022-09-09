@@ -371,6 +371,7 @@ told it sets things up how I like.
      modus-themes-hl-line '(accented intense)
      modus-themes-intense-markup t
      modus-themes-links '(faint background)
+     modus-themes-subtle-line-numbers t
      modus-themes-mixed-fonts t
      modus-themes-mode-line '(accented 3d)
      modus-themes-org-blocks 'gray-background
@@ -385,7 +386,7 @@ told it sets things up how I like.
      modus-themes-headings
      '((1 . (variable-pitch light 1.6))
        (2 . (overline semibold 1.4))
-       (3 . (monochrome overline 1.2))
+       (3 . (monochrome overline 1.2 background))
        (4 . (overline 1.1))
        (t . (rainbow 1.05)))))
 #+end_src

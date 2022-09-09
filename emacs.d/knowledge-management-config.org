@@ -67,6 +67,7 @@ The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~
     :straight (org :type built-in)
     :hook (org-mode . turn-on-visual-line-mode)
     :config (setq
+	     org-export-with-sub-superscripts nil
 	     org-directory (file-truename "~/git/org")
 	     org-agenda-files (jf/org-agenda-files
 			       :paths jf/data-directories
@@ -98,9 +99,7 @@ The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~
 	     ;; making the assumption about project/task depth.
 	     plain (file+function jf/primary-agenda-filename-for-machine jf/org-mode-agenda-find-project-node)
 	     ;; The five ***** is due to the assumptive depth of the projects and tasks.
-	     "***** %? :task:\n\n"
-	     :empty-lines-before 1
-	     :empty-lines-after 1)
+	     "***** %? :task:\n\n")
 	    ))
 
     (setq org-latex-default-class "jf/article")
