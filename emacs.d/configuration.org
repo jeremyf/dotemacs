@@ -1276,8 +1276,7 @@ More on these component matchings styles is available at [[https://github.com/mi
 
 #+begin_src emacs-lisp
   (use-package avy
-    :bind (("C-j" . jf/org-goto-clock-or-agenda))
-    :bind (:map org-mode-map ("C-j" . jf/org-goto-clock-or-agenda))
+    :bind (("C-c j" . avy-goto-char))
     :straight t)
 #+end_src
 

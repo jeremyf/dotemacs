@@ -41,23 +41,18 @@ A bit of pre-amble.  I maintain a list of data directories, each might have “r
     returning-list)
 
 
-  (cl-defun jf/org-goto-clock-or-agenda (prefix-arg)
-    "Goto the current clock if one exists; otherwise the agenda file.
-
-  If PREFIX_ARG is given jump to the headline for the day"
-    (interactive "P")
+  (cl-defun jf/org-goto-clock-or-agenda ()
+    "Goto the current clock if one exists; otherwise today's agenda heading."
+    (interactive)
     (require 'pulsar)
-    (if (car prefix-arg)
-	(progn
-	  (find-file jf/primary-agenda-filename-for-machine)
-	  (beginning-of-buffer)
-	  (search-forward (format-time-string "%Y-%m-%d %A")))
-      (if (when (and (fboundp 'org-clocking-p) (org-clocking-p)) t)
-	  (org-clock-goto)
-	(progn
-	  (find-file jf/primary-agenda-filename-for-machine)
-	  (end-of-buffer))))
-      (pulsar--pulse))
+    (if (when (and (fboundp 'org-clocking-p) (org-clocking-p)) t)
+	(org-clock-goto)
+      (progn
+	(find-file jf/primary-agenda-filename-for-machine)
+	(beginning-of-buffer)
+	(search-forward (format-time-string "%Y-%m-%d %A"))
+	(outline-show-branches)))
+    (pulsar--pulse))
 #+end_src
 
 The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~ which introduces my more generalized note taking system.
@@ -66,6 +61,8 @@ The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~
   (use-package org
     :straight (org :type built-in)
     :hook (org-mode . turn-on-visual-line-mode)
+    :bind ("C-j" . jf/org-goto-clock-or-agenda)
+    :bind (:map org-mode-map ("C-j" . jf/org-goto-clock-or-agenda))
     :config (setq
 	     org-export-with-sub-superscripts nil
 	     org-directory (file-truename "~/git/org")
