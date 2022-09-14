@@ -1352,8 +1352,8 @@ From [[https://www.masteringemacs.org/article/fixing-mark-commands-transient-mar
 #+begin_src emacs-lisp
   (use-package lin
     :straight (lin :host gitlab :repo "protesilaos/lin")
-    ;; :config (lin-add-to-many-modes))
-    :config (lin-setup))
+    :config (lin-global-mode 1)
+    (setq lin-face 'lin-blue))
 #+end_src
 
 **** spaceline.el
@@ -1650,7 +1650,7 @@ are major modes others are minor modes.
     :hook (enh-ruby-mode . (lambda () (setq fill-column 100)))
     :hook (enh-ruby-mode . eldoc-mode)
     :hook (enh-ruby-mode . enh-ruby-imenu-create-index)
-    :bind (:map enh-ruby-mode-map ("C-j" . jf/org-goto-clock-or-agenda)
+    :bind (:map enh-ruby-mode-map ("C-j" . jf/jump-to-agenda-or-mark)
 				   ("M-h" . enh-ruby-mark-defun))
     :mode (("\\(?:\\.rb\\|ru\\|rake\\|thor\\|jbuilder\\|gemspec\\|podspec\\|/\\(?:Gem\\|Rake\\|Cap\\|Thor\\|Vagrant\\|Guard\\|Pod\\)file\\)\\'" . enh-ruby-mode)))
   (add-to-list 'interpreter-mode-alist '("ruby" . enh-ruby-mode))
@@ -2957,9 +2957,12 @@ Powered by ~tmr.el~ to set a timer.
   (defun jf/tmr-notification-notify (timer)
     "Dispatch a notification for TIMER."
     (let ((title "TMR May Ring (Emacs tmr package)")
-	  (body (tmr--long-description-for-completed-timer timer)))
-      (ns-do-applescript (concat "display notification \"" body "\" sound name \"Glass\""))))
+	  (description (tmr--timer-description timer)))
+      (ns-do-applescript (concat "display notification \"" description "\" sound name \"Glass\""))))
 #+end_src
+
+#+RESULTS:
+: jf/tmr-notification-notify
 
 *** elpher.el
 
@@ -4292,7 +4295,7 @@ some additional options.
       ("-w" "Register window configuration" window-configuration-to-register)
       ]
      ["Jump to"
-      ("j a" "Agenda" jf/org-goto-clock-or-agenda)
+      ("j a" "Agenda" jf/jump-to-agenda-or-mark)
       ("j b" "iBuffer" ibuffer)
       ;; ("j f" "Flycheck" consult-flycheck :if-derived (or markdown-mode org-mode))
       ("j g" "Global Mark" consult-global-mark)
@@ -4334,11 +4337,14 @@ some additional options.
       ("t a" "Tag add…" org-roam-tag-add :if-derived org-mode)
       ("t S" "Tag as session Scene…" jf/org-tag-session-scene-with-date :if-derived org-mode)]
      ["Context"
-      ("s" "Search…" (lambda () (interactive) (consult-ripgrep org-directory)))
       ("M-c" "Context set…" jf/org-auto-tags--set-by-context :transient t)
       ("M-t" jf/org-auto-tags--transient :transient t)
-      ("u" "Copy Stand-up to Kill Ring" jf/org-mode-agenda-to-stand-up-summary)
       ("x" "Export to TakeOnRules…" jf/export-org-to-tor :if-derived org-mode)
+      ]
+     ["Tasks"
+      ("s" "Search…" (lambda () (interactive) (consult-ripgrep org-directory)))
+      ("t" "Start a timer…" tmr-with-description)
+      ("u" "Copy stand-up to kill ring" jf/org-mode-agenda-to-stand-up-summary)
       ]
      ["Grab Refs"
       ("g e" "Elfeed" jf/menu--org-capture-elfeed-show :if-derived elfeed-show-mode)

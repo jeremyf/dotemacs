@@ -40,18 +40,21 @@ A bit of pre-amble.  I maintain a list of data directories, each might have “r
 	  (add-to-list 'returning-list (f-join path basename)))))
     returning-list)
 
-
-  (cl-defun jf/org-goto-clock-or-agenda ()
-    "Goto the current clock if one exists; otherwise today's agenda heading."
+  (cl-defun jf/jump-to-agenda-or-mark ()
+    "Jump to and from current agenda item to mark."
     (interactive)
-    (require 'pulsar)
-    (if (when (and (fboundp 'org-clocking-p) (org-clocking-p)) t)
-	(org-clock-goto)
+    (if (string= (buffer-file-name) (file-truename jf/primary-agenda-filename-for-machine))
+	(call-interactively #'org-mark-ring-goto)
       (progn
-	(find-file jf/primary-agenda-filename-for-machine)
-	(beginning-of-buffer)
-	(search-forward (format-time-string "%Y-%m-%d %A"))
-	(outline-show-branches)))
+	(org-mark-ring-push)
+	(if (when (and (fboundp 'org-clocking-p) (org-clocking-p)) t)
+	    (org-clock-goto)
+	  (progn
+	    (find-file jf/primary-agenda-filename-for-machine)
+	    (end-of-buffer)
+	    (search-backward (format-time-string "%Y-%m-%d %A"))
+	    (outline-show-branches)))))
+    (require 'pulsar)
     (pulsar--pulse))
 #+end_src
 
@@ -61,8 +64,8 @@ The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~
   (use-package org
     :straight (org :type built-in)
     :hook (org-mode . turn-on-visual-line-mode)
-    :bind ("C-j" . jf/org-goto-clock-or-agenda)
-    :bind (:map org-mode-map ("C-j" . jf/org-goto-clock-or-agenda))
+    :bind ("C-j" . jf/jump-to-agenda-or-mark)
+    :bind (:map org-mode-map ("C-j" . jf/jump-to-agenda-or-mark))
     :config (setq
 	     org-export-with-sub-superscripts nil
 	     org-directory (file-truename "~/git/org")
@@ -90,6 +93,7 @@ The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~
 	     entry (file+olp+datetree jf/primary-agenda-filename-for-machine)
 	     "* %(jf/org-mode-agenda-project-prompt) :project:\n\n%?"
 	     :empty-lines-before 1
+	     :immediate-finish t
 	     :empty-lines-after 1)
 	    ("t" "Task"
 	     ;; I tried this as a node, but that created headaches.  Instead I'm
@@ -284,12 +288,17 @@ When I jump to a new task for the day, I want to position that task within the p
 The =jf/org-mode-agenda-to-stand-up-summary= function takes my notes for the day and formats them for a summary report.
 
 #+begin_src emacs-lisp
-  (cl-defun jf/org-mode-agenda-to-stand-up-summary (&key (within_headline (format-time-string "%Y-%m-%d %A")))
+  (cl-defun jf/org-mode-agenda-to-stand-up-summary (prefix-arg
+						    &key
+						    (within_headline (format-time-string "%Y-%m-%d %A")))
     "Copy to the kill ring the project tasks WITHIN_HEADLINE.
+
+  When given PREFIX_ARG, open a temporary buffer and yank the
+  report into that buffer.
 
   NOTE: This follows the convention that projects are on headline 4 and
   tasks within projects are headline 5."
-    (interactive)
+    (interactive "P")
     (with-current-buffer (find-file-noselect jf/primary-agenda-filename-for-machine)
       (save-excursion
 	(kill-new
@@ -308,7 +317,10 @@ The =jf/org-mode-agenda-to-stand-up-summary= function takes my notes for the day
 		 (if (=(org-element-property :level hl) 4)
 		     (concat "\n" (plist-get (cadr hl) :raw-value))
 		   (concat "- " (plist-get (cadr hl) :raw-value)))))
-	     )))))))
+	     ))))
+	(when (car prefix-arg)
+	  (jf/create-scratch-buffer)
+	  (yank)))))
 #+end_src
 
 ** Copy Org and Paste in Rich Text Format
