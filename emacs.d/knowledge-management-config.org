@@ -40,23 +40,25 @@ A bit of pre-amble.  I maintain a list of data directories, each might have “r
 	  (add-to-list 'returning-list (f-join path basename)))))
     returning-list)
 
-  (cl-defun jf/jump-to-agenda-or-mark ()
-    "Jump to and from current agenda item to mark."
-    (interactive)
-    (if (string= (buffer-file-name) (file-truename jf/primary-agenda-filename-for-machine))
-	(call-interactively #'org-mark-ring-goto)
-      (progn
-	(org-mark-ring-push)
-	(if (when (and (fboundp 'org-clocking-p) (org-clocking-p)) t)
-	    (org-clock-goto)
-	  (progn
-	    (find-file jf/primary-agenda-filename-for-machine)
-	    (end-of-buffer)
-	    (search-backward (format-time-string "%Y-%m-%d %A"))
-	    (outline-show-branches)))))
+  (cl-defun jf/jump-to-agenda-or-mark (prefix-arg)
+    "Jump to and from current agenda item to mark.
+
+  With PREFIX_ARG go to beginning of today's headline."
+    (interactive "P")
+    (if (car prefix-arg)
+	;; Jump to where we would put a project were we to capture it.
+	(org-capture-goto-target "p")
+      (if (string= (buffer-file-name) (file-truename jf/primary-agenda-filename-for-machine))
+	  (call-interactively #'consult-global-mark)
+	(progn
+	  (call-interactively #'set-mark-command)
+	  (if (when (and (fboundp 'org-clocking-p) (org-clocking-p)) t)
+	      (org-clock-goto)
+	    ;; Jump to where we would put a project were we to capture it.
+	    (org-capture-goto-target "p")))))
     (require 'pulsar)
     (pulsar--pulse))
-#+end_src
+    #+end_src
 
 The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~ which introduces my more generalized note taking system.
 
@@ -321,6 +323,18 @@ The =jf/org-mode-agenda-to-stand-up-summary= function takes my notes for the day
 	(when (car prefix-arg)
 	  (jf/create-scratch-buffer)
 	  (yank)))))
+#+end_src
+
+I’m responsible for tracking my work time.  I want a way to quickly see what that is for the current week.
+
+#+begin_src emacs-lisp
+  (cl-defun jf/org-mode-weekly-report ()
+    "Jump to my weekly time tracker."
+    (interactive)
+    (find-file jf/primary-agenda-filename-for-machine)
+    (require 'pulsar)
+    (pulsar--pulse)
+    (org-clock-report 4))
 #+end_src
 
 ** Copy Org and Paste in Rich Text Format
