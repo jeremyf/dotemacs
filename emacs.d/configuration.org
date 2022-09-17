@@ -3281,6 +3281,7 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
     (let ((display-buffer-mark-dedicated t))
       (display-buffer-in-side-window buffer
 				     '((side . right)
+				       (window-width . 80)
 				       (window-parameters
 					(no-delete-other-windows . t))))))
 #+end_src
@@ -3296,6 +3297,7 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
     (let ((display-buffer-mark-dedicated t))
       (display-buffer-in-side-window buffer
 				     '((side . bottom)
+				       
 				       (window-parameters
 					(no-delete-other-windows . t))))))
 #+end_src
