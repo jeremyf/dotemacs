@@ -3196,15 +3196,15 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
 #+end_src
 
 #+begin_src emacs-lisp
-  (global-set-key (kbd "C-w") 'jf/kill-region-or-backward-word)
-  (global-set-key (kbd "M-DEL") 'jf/kill-region-or-backward-word)
+  (global-set-key (kbd "C-w") 'jf/delete-region-or-backward-word)
+  (global-set-key (kbd "M-DEL") 'jf/delete-region-or-backward-word)
   (global-set-key (kbd "<C-M-backspace>") 'backward-kill-paragraph)
-  (defun jf/kill-region-or-backward-word (&optional arg)
-    "Kill selected region otherwise kill backwards the ARG number of words."
+  (defun jf/delete-region-or-backward-word (&optional arg)
+    "Delete selected region otherwise delete backwards the ARG number of words."
     (interactive "p")
     (if (region-active-p)
-	(kill-region (region-beginning) (region-end))
-      (backward-kill-word arg)))
+	(delete-region (region-beginning) (region-end))
+      (sp-backward-delete-word arg)))
 #+end_src
 
 - ~jf/kill-line-org-region~ :: Wedding two methods together: ~kill-region~ and
@@ -3294,8 +3294,8 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
     (with-current-buffer buffer-name
       (insert body)
       (goto-char (or position (point-min)))
-      (if mode (funcall mode) (special-mode))
       (not-modified)
+      (if mode (funcall mode) (special-mode))
       (when read-only
 	(progn (read-only-mode) (local-set-key (kbd "q") 'kill-buffer-and-window)))
       (let ((display-buffer-mark-dedicated t))
