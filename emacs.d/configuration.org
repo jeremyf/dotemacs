@@ -3269,34 +3269,46 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
     (delete-duplicate-lines beg end reverse adjacent keep-blanks interactive))
 #+end_src
 
-- ~jf/display-buffer-in-side-window~ :: Creates a sticky side window on the
-  right.  Sometimes this is just the right thing for reviewing files.  I don’t
-  know when I need it, but when I use it I’m always thankful I have it.
+- ~jf/display-buffer-in-side-window~ :: Creates a sticky side window.  Sometimes this is just the right thing for reviewing files.  I don’t know when I need it, but when I use it I’m always thankful I have it.
 
 #+begin_src emacs-lisp
   (global-set-key (kbd "C-s-\\") 'jf/display-dedicated-buffer-in-side-window)
-  (cl-defun jf/display-buffer-in-side-window (prefix-arg &optional (buffer (current-buffer)))
-    "Display BUFFER in dedicated window.
+  (cl-defun jf/display-dedicated-buffer-in-side-window (&key (buffer (current-buffer)))
+    "Display the given BUFFER in a dedicated sidebar."
+    (interactive)
+    (with-current-buffer buffer
+      (jf/sidebar--build
+       :buffer-name (concat "*Sidebar*")
+       :position (point)
+       :read-only t
+       :body (buffer-string)
+       :mode major-mode)))
 
-  Without the PREFIX_ARG open window on right.  With a PREFIX_ARG open it on the bottom."
-    (interactive "P")
-    (let ((display-buffer-mark-dedicated t))
-      (display-buffer-in-side-window
-       buffer
-       (if (car prefix-arg)
-	   '((side . bottom)
-	     (window-parameters
-	      (mode-line-format . none)
-	      (tab-line-format . none)
-	      (header-line-format . none)
-	      (no-delete-other-windows . t)))
-	 '((side . right)
-	   (window-width . 80)
-	   (window-parameters
-	    (mode-line-format . none)
-	    (tab-line-format . none)
-	    (header-line-format . none)
-	    (no-delete-other-windows . t)))))))
+  (cl-defun jf/sidebar--build (&key buffer-name body (read-only nil) (position nil) (mode nil))
+    "Build the sidebar from the given buffer attributes.
+
+  Create the BUFFER_NAME with the given BODY and move to the given
+  POSITION and toggle on the MODE.  Then set the buffer to READ_ONLY."
+    (interactive)
+    (get-buffer-create buffer-name)
+    (with-current-buffer buffer-name
+      (insert body)
+      (goto-char (or position (point-min)))
+      (if mode (funcall mode) (special-mode))
+      (not-modified)
+      (when read-only
+	(progn (read-only-mode) (local-set-key (kbd "q") 'kill-buffer-and-window)))
+      (let ((display-buffer-mark-dedicated t))
+	(pop-to-buffer buffer-name '((display-buffer-in-side-window)
+				     (side . right)
+				     (window-width 72)
+				     (window-parameters
+				      (tab-line-format . none)
+				      (mode-line-format . none)
+				      (no-delete-other-windows . t))))
+	(message "Created *Sidebar*\nq - Remove Window")
+	(require 'pulsar)
+	(pulsar--pulse))))
 #+end_src
 
 - ~jf/move-file~ :: Sometimes I want to move, without renaming, a file.  This
@@ -4057,7 +4069,7 @@ I want to reference.
 	(not-modified)
 	(read-only-mode)
 	(special-mode)
-	(local-set-key (kbd "q") 'kill-buffer-and-window))
+	(local-set-key (kbd "q") 'kill-buffer-and-winow))
       (pop-to-buffer qh-buff '((display-buffer-below-selected)
 			       (window-parameters . ((no-other-window . nil)))
 			       (window-height . fit-window-to-buffer)))
