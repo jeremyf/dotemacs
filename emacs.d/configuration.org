@@ -1384,7 +1384,7 @@ From [[https://www.masteringemacs.org/article/fixing-mark-commands-transient-mar
 #+begin_src emacs-lisp
   (use-package popper
     :straight t
-    :bind (("C-`" . jf/popper))
+    ;; :bind (("C-`" . jf/popper))
     :config
     (defun jf/popper (prefix_arg)
       "Call `popper-cycle', but with PREFIX_ARG invoke a less common popper method.
@@ -1534,7 +1534,7 @@ From [[https://www.masteringemacs.org/article/fixing-mark-commands-transient-mar
       (if (car parg)
 	  (pulsar--pulse nil nil (point) (mark))
 	(pulsar-pulse-line)))
-    :bind (("C-x l" . jf/pulse)))
+    :bind (("C-l" . jf/pulse)))
 #+end_src
 
 **** emojify.el
@@ -3297,7 +3297,7 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
       (not-modified)
       (if mode (funcall mode) (special-mode))
       (when read-only
-	(progn (read-only-mode) (local-set-key (kbd "q") 'kill-buffer-and-window)))
+	(progn (read-only-mode) (local-set-key (kbd "s-w") 'kill-buffer-and-window)))
       (let ((display-buffer-mark-dedicated t))
 	(pop-to-buffer buffer-name '((display-buffer-in-side-window)
 				     (side . right)
