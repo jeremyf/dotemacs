@@ -543,12 +543,16 @@ introspect Emacs.
 
 #+begin_src emacs-lisp
   (use-package which-key
+    :straight t
     :diminish 'which-key-mode
+    :custom
+    (which-key-side-window-max-width 70)
+    (which-key-min-column-description-width 50)
+    (which-key-max-description-length 50)
     :config
     (which-key-mode)
     (which-key-setup-side-window-right)
-    (which-key-show-major-mode)
-    :straight t)
+    (which-key-show-major-mode))
 #+end_src
 
 Related to this, when I’m in a buffer, I want to know what I can do.  The
