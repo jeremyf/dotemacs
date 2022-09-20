@@ -17,6 +17,7 @@
 	hungry-delete-backward
 	hungry-delete-forward
 	indent-for-tab-command
+	jf/delete-region-or-backward-word
 	jf/kill-line-or-region
 	jf/kill-region-or-backward-word
 	kill-visual-line
@@ -36,6 +37,7 @@
 	org-self-insert-command
 	org-todo
 	org-yank
+	ruby-interpolation-insert
 	sp-backward-delete-char
 	string-inflection-all-cycle
 	typopunct-insert-ellipsis-or-middot

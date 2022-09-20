@@ -4383,6 +4383,7 @@ some additional options.
       ("s" "Search…" (lambda () (interactive) (consult-ripgrep org-directory)))
       ("t" "Start a timer…" tmr-with-description)
       ("u" "Copy stand-up to kill ring" jf/org-mode-agenda-to-stand-up-summary)
+      ("w" "Weekly hours report" jf/org-mode-weekly-report)
       ]
      ["Grab Refs"
       ("g e" "Elfeed" jf/menu--org-capture-elfeed-show :if-derived elfeed-show-mode)
