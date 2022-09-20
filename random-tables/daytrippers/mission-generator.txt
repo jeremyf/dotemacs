@@ -1,0 +1,18 @@
+;main
+[mission-generator.mission-type]
+
+;mission-type
+10, Exploration via [mission-generator.node-type-exploration-rescue]
+5, Emergency/Rescue via [mission-generator.node-type-exploration-rescue]
+6, Sightseeing/Tourism
+9, Survey/Fact-Finding
+3, Acquisition/Trade
+3, Politics/Diplomacy
+
+;node-type-exploration-rescue
+1, Multiversal Chao
+9, Unknown Planet
+11, Dream World
+9, Alternate Earth
+3, Time Travel
+3, Known Planet
