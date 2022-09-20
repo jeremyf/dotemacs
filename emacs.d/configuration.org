@@ -1379,6 +1379,19 @@ From [[https://www.masteringemacs.org/article/fixing-mark-commands-transient-mar
   ;;  :config (spaceline-all-the-icons-theme))
 #+end_src
 
+**** fill-column-indicator.el
+
+- =fill-column-indicator= :: Adding fill-column mode.
+
+#+begin_src emacs-lisp
+  (use-package fill-column-indicator
+    :straight t
+    :config
+    :hook (prog-mode . turn-on-fci-mode)
+    (setq fci-rule-width 1))
+#+end_src
+
+
 **** popper.el
 
 - ~popper.el~ :: Treat some types of windows as popups (e.g., something easier

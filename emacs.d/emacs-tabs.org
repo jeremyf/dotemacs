@@ -66,3 +66,13 @@ Show tabs in the current window.  The tab system is something I wrestle with, bu
       ("s-\\" . awesome-tab-switch-group))
 
 #+end_src
+
+I learned about =eyebrowse.el= from https://github.com/frostyx/dotfiles/blob/master/.emacs.d/frostyx.org#eyebrowse-1.  I’m curious to explore this window manager.
+
+#+begin_src emacs-lisp
+  (use-package eyebrowse
+    :straight t
+    :config
+    (eyebrowse-mode t)
+    (eyebrowse-setup-opinionated-keys))
+#+end_src
