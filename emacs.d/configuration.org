@@ -1387,7 +1387,7 @@ From [[https://www.masteringemacs.org/article/fixing-mark-commands-transient-mar
   (use-package fill-column-indicator
     :straight t
     :config
-    :hook (prog-mode . turn-on-fci-mode)
+;;    :hook (prog-mode . turn-on-fci-mode)
     (setq fci-rule-width 1))
 #+end_src
 
@@ -1935,6 +1935,16 @@ The ~edit-indirect.el~ behaves similarly to the amazing ~org-edit-source-code~ b
 #+begin_src emacs-lisp
   (use-package ts
     :straight t)
+#+end_src
+
+**** Custom Dictionary
+
+This follows from http://mbork.pl/2017-01-14_I'm_now_using_the_right_dictionary
+
+#+begin_src emacs-lisp
+  (use-package sdcv-mode
+    :straight (sdcv-mode :type git :host github :repo "gucong/emacs-sdcv")
+    :bind ("C-c C-'" . sdcv-search))
 #+end_src
 
 **** titlecase.el
