@@ -337,6 +337,27 @@ I’m responsible for tracking my work time.  I want a way to quickly see what t
     (org-clock-report 4))
 #+end_src
 
+#+begin_src emacs-lisp
+  (defun jf/org-mode-end-of-month-report ()
+    "Generate an end of month report from projects and tasks."
+    (interactive)
+    (message
+     "%s"
+     (s-join
+      "\n"
+      (org-element-map
+	  (org-element-parse-buffer)
+	  'headline
+	(lambda (hl)
+	  (pcase (org-element-property :level hl)
+	    (3 (concat "--------------------------------------------------------------------------------\n"
+		       (plist-get (cadr hl) :raw-value)
+		       "\n--------------------------------------------------------------------------------"))
+	    (4 (concat "\n" (format "%s" (/ (org-clock-sum) 60.0)) "\t" (plist-get (cadr hl) :raw-value)))
+	    (5 (concat "- " (plist-get (cadr hl) :raw-value)))))))))
+#+end_src
+
+
 ** Copy Org and Paste in Rich Text Format
 
 Org Mode has built-in capabilities for exporting to HTML (and other languages).  The following function does just a bit more.  It converts the org region to HTML and sends it to the clipboard as an RTF datatype.
