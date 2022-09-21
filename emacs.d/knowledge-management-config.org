@@ -357,6 +357,31 @@ I’m responsible for tracking my work time.  I want a way to quickly see what t
 	    (5 (concat "- " (plist-get (cadr hl) :raw-value)))))))))
 #+end_src
 
+Another task at end of month is to transcribing my agenda’s timesheet to entries in our time tracking software.  From the day’s project link in the =org-clock-report=, I want to copy the headlines of each of the tasks.  I fill out my time sheets one day at a time.
+
+#+begin_src emacs-lisp
+  (defun jf/org-mode-tasks-for-project-and-day ()
+    "Function to help report time for Scientist.com
+
+  Assumes that I'm on a :project: headline.
+
+  - Sum the hours (in decimal form) for the tasks.
+  - Create a list of the tasks.
+  - Write this information to the message buffer.
+  - Then move to the next heading level.
+  "
+    (interactive)
+    (let ((project (plist-get (cadr (org-element-at-point)) :raw-value))
+	  (tasks (s-join "\n" (org-with-wide-buffer
+			       (when (org-goto-first-child)
+				 (cl-loop collect (concat "- " (org-no-properties (org-get-heading t t)))
+					  while (outline-get-next-sibling))))))
+	  (time (/ (org-clock-sum-current-item) 60.0)))
+      (kill-new tasks)
+      (kill-new (format "%s" time))
+      (message "Project: %s\nHours: %s\nTasks:\n%s" project time tasks)
+      (call-interactively #'org-forward-heading-same-level)))
+#+end_src
 
 ** Copy Org and Paste in Rich Text Format
 
