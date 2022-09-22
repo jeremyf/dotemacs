@@ -232,6 +232,15 @@ I cribbed the following function from [[https://xenodium.com/emacs-dwim-do-what-
 	     (call-interactively 'org-insert-link)))))
 #+end_src
 
+** Org-QL
+
+Including a useful package for querying Org-Mode.
+
+#+begin_src emacs-lisp
+  (use-package org-ql
+      :straight t)
+#+end_src
+
 ** Time Tracking
 
 I wrote about this in [[https://takeonrules.com/2022/09/06/org-mode-capture-templates-and-time-tracking/][Org Mode Capture Templates and Time Tracking // Take on Rules]].  But to summarize, I work on several different projects each day; helping folks get unstuck.  I also need to track and record my time.
