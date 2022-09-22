@@ -20,9 +20,12 @@ On <2020-05-25> I wrote [[https://takeonrules.com/2020/05/25/principles-of-my-te
 a new text editor, and wanted to ensure that I knew what I was looking for.
 You know, “begin with the end in mind.”[fn:8]
 
-When I first dove in, I looked into [[https://github.com/hlissner/doom-emacs][Doom]] and [[https://www.spacemacs.org][Spacemacs]].  However, in doing that
-I got ahead of myself.  So I started with an empty ~init.el~ and walked through
-the tutorial.
+I did not realize how inadequate I was in thinking about my text editor; but
+that is a different tale.
+
+When I first dove into Emacs, I looked into [[https://github.com/hlissner/doom-emacs][Doom]] and [[https://www.spacemacs.org][Spacemacs]].  However, in
+doing that I got ahead of myself.  So I started with an empty ~init.el~ and
+walked through the tutorial.
 
 From that point forward, I committed to use Emacs as is and when I knew I
 needed something, I’d look into how to do it.  The result?  A configuration
@@ -91,8 +94,7 @@ As we get started in Emacs, I want to make sure I have the basics lined up.
 *** Package Management
 
 I have chosen to adopt ~straight.el~ for my package management.  The fact that
-it rather seamlessly works with ~use-package~ has help me keep my code more
-organized.
+it seamlessly works with ~use-package~ has help me keep my code more organized.
 
 #+begin_src emacs-lisp
   ;; https://www.reddit.com/r/emacs/comments/mtb05k/emacs_init_time_decreased_65_after_i_realized_the/
@@ -133,9 +135,9 @@ out but for the most part, you can move along and reference this later.
   (defconst jf/silence-loading-log t
     "When t log to stdout load messages from this configuration.
 
-    In a previous iteration, I loaded lots of separate '*.el' files.
-    This flag allowed me to more easily troubleshoot those load
-    attempts.")
+      In a previous iteration, I loaded lots of separate '*.el' files.
+      This flag allowed me to more easily troubleshoot those load
+      attempts.")
 
   (defconst jf/github-username "jeremyf"
     "My username on github.")
@@ -170,7 +172,7 @@ out but for the most part, you can move along and reference this later.
    global-mark-ring-max 32
 
    idle-update-delay 1.1       ;; Slow down the UI being updated to improve
-			       ;; performance
+   ;; performance
 
    indent-tabs-mode nil        ;; Ensure tabs are expanded, not inserted
 
@@ -199,15 +201,17 @@ out but for the most part, you can move along and reference this later.
    version-control t           ;; Use version numbers on backups
 
    x-underline-at-descent-line t ;; Recommendation from
-				 ;; https://protesilaos.com/emacs/modus-themes
+   ;; https://protesilaos.com/emacs/modus-themes
    )
 
+  ;; I vascilate between yes and no; but invariably find myself stuck in a
+  ;; recursed buffer.
   (setq enable-recursive-minibuffers nil)
 
-  (use-package recursion-indicator
-    :straight t
-    :config
-    (recursion-indicator-mode))
+  ;; (use-package recursion-indicator
+  ;;   :straight t
+  ;;   :config
+  ;;   (recursion-indicator-mode))
 
   (global-hl-line-mode)
 
@@ -222,13 +226,6 @@ out but for the most part, you can move along and reference this later.
   (set-default-coding-systems 'utf-8)
   (set-terminal-coding-system 'utf-8)
   (set-keyboard-coding-system 'utf-8)
-
-
-
-  (use-package abbrev
-    :straight (:type built-in)
-    :custom (abbrev-file-name (file-truename "~/git/dotemacs/emacs.d/abbrev_defs"))
-    :hook (text-mode . abbrev-mode))
 
   (add-function :after after-focus-change-function
 		(defun jf/garbage-collect-maybe ()
@@ -298,6 +295,15 @@ In using a literate config, I have a mixture of two types of text: prose and cod
 	(org-edit-special))))
 
   (global-set-key (kbd "C-s-2") 'imenu-literate)
+#+end_src
+
+The =abbrev= package is simple and powerful, providing an auto-correct that I configure.  No more “teh” in my text.
+
+#+begin_src emacs-lisp
+  (use-package abbrev
+    :straight (:type built-in)
+    :custom (abbrev-file-name (file-truename "~/git/dotemacs/emacs.d/abbrev_defs"))
+    :hook (text-mode . abbrev-mode))
 #+end_src
 
 Some basic packages to keep things less chatty.
@@ -373,7 +379,7 @@ told it sets things up how I like.
      modus-themes-links '(faint background)
      modus-themes-subtle-line-numbers t
      modus-themes-mixed-fonts t
-     modus-themes-mode-line '(accented 3d)
+     modus-themes-mode-line '(accented moody)
      modus-themes-org-blocks 'gray-background
      modus-themes-paren-match '(bold intense)
      modus-themes-prompts '(intense accented)
@@ -451,6 +457,7 @@ Next up, let’s load the theme based on my operating system’s settings
     :straight t
     :config
     (cl-defmacro jf/all-the-icons--with(&key name)
+      "A macro to provide functions for icon names."
       (let ((defun-fn (intern (concat "jf/all-the-icons--with-" name)))
 	    (icon-fn (intern (concat "all-the-icons-" name)))
 	    (docstring (concat "Displays an ICON from `all-the-icons-" name "'.")))
@@ -664,7 +671,7 @@ Giving a go at ~vertico-posframe~ to render a “pop-up” instead of the minibu
 #+begin_src emacs-lisp
   ;; (use-package vertico-posframe
   ;;   :straight t
-  ;;   :config (vertico-posframe-mode 1)
+  ;;   :config (vertico-posframe-mode t)
   ;;   (setq vertico-posframe-width 170)
   ;;   (setq vertico-posframe-height nil)
   ;;   (setq vertico-posframe-parameters
@@ -792,14 +799,9 @@ What follows is adjustments to emacs settings as they relate to completion.
 
 **** consult.el
 
-- ~consult.el~ :: “Consult provides practical commands based on the Emacs
-  completion function [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Minibuffer-Completion.html][completing-read]].”  I had previously used [[https://github.com/abo-abo/swiper][Ivy, Counsel,
-  and Swiper]], but appreciate the design principles of Consult, namely “Consult
-  fits well into existing setups and it helps you to create a full completion
-  environment out of small and independent components.”[fn:2]
+- ~consult.el~ :: “Consult provides practical commands based on the Emacs completion function [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Minibuffer-Completion.html][completing-read]].”  I had previously used [[https://github.com/abo-abo/swiper][Ivy, Counsel, and Swiper]], but appreciate the design principles of Consult, namely “Consult fits well into existing setups and it helps you to create a full completion environment out of small and independent components.”[fn:2]
 
-  With ~consult.el~ I’m able to bring in other components that focus on doing
-  their “one thing” really well.
+With ~consult.el~ I’m able to bring in other components that focus on doing their “one thing” really well.
 
 #+begin_src emacs-lisp
   (use-package consult
@@ -943,6 +945,7 @@ There’s a macro in here somewhere.
 	   ("C-x C-d" . consult-dir)
 	   ("C-x C-j" . consult-dir-jump-file)))
 #+end_src
+
 ***** consult-projectile.el
 
 - ~consult-projectile.el~ :: package provides a function I use everyday: ~M-x
@@ -1097,11 +1100,9 @@ More on these component matchings styles is available at [[https://github.com/mi
 
 **** corfu.el
 
-- ~corfu.el~ :: An alternative to the ubiquitous [[https://github.com/company-mode/company-mode][Company]]; In [[https://takeonrules.com/2022/01/17/switching-from-company-to-corfu-for-emacs-completion/][Switching from
-  Company to Corfu for Emacs Completion]] I further explain my adoption of Corfu.
-  See https://github.com/minad/corfu for more details on Corfu.
+- ~corfu.el~ :: An alternative to the ubiquitous [[https://github.com/company-mode/company-mode][Company]]; In [[https://takeonrules.com/2022/01/17/switching-from-company-to-corfu-for-emacs-completion/][Switching from Company to Corfu for Emacs Completion]] I further explain my adoption of Corfu.  See https://github.com/minad/corfu for more details on Corfu.
 
-  /Note:/ I may explore [[https://gitlab.com/protesilaos/mct][MCT]] and see how it compares to Corfu.
+/Note:/ I may explore [[https://gitlab.com/protesilaos/mct][MCT]] and see how it compares to Corfu.
 
 #+begin_src emacs-lisp
     (use-package corfu
@@ -1368,7 +1369,7 @@ From [[https://www.masteringemacs.org/article/fixing-mark-commands-transient-mar
   (use-package fill-column-indicator
     :straight t
     :config
-;;    :hook (prog-mode . turn-on-fci-mode)
+   ;; :hook (prog-mode . fci-mode)
     (setq fci-rule-width 1))
 #+end_src
 
@@ -2864,17 +2865,19 @@ From https://tsdh.org/posts/2022-08-01-difftastic-diffing-with-magit.html
     :straight (:host github :repo "emacsmirror/git-timemachine"))
 #+end_src
 
-**** git-gutter-fringe.el
+**** git-gutter.el
 
-- ~git-gutter-fringe.el~ :: Show the current git state in the gutter.  As you
-  edit a line in a file track by git, the fringe’s indicators change to reflect
-  if this is a modification, addition, or deletion.
+- ~git-gutter.el~ :: Show the current git state in the gutter.  As you edit a line in a file track by git, the indicators change to reflect if this is a modification, addition, or deletion.
 
 #+begin_src emacs-lisp
-  (use-package git-gutter-fringe
-    :straight (git-gutter-fringe :type git :host github :repo "emacsorphanage/git-gutter-fringe")
+  (use-package git-gutter
+    :straight t
     :diminish 'git-gutter-mode
-    :config (global-git-gutter-mode 't)
+    :custom (git-gutter:update-interval 0.25)
+    :bind ("C-x g =" . git-gutter:popup-hunk)
+    ("C-x g p" . git-gutter:previous-hunk)
+    ("C-x g n" . git-gutter:next-hunk)
+    :config (global-git-gutter-mode +1)
     (setq git-gutter:modified-sign "Δ"
 	  git-gutter:added-sign "+"
 	  git-gutter:deleted-sign "-"))
@@ -3316,8 +3319,11 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
 				      (no-delete-other-windows . t))))
 	(message "Created *Sidebar*\nq - Remove Window")
 	(require 'pulsar)
-	(pulsar--pulse))))
+	(pulsar-pulse-line))))
 #+end_src
+
+#+RESULTS:
+: jf/sidebar--build
 
 - ~jf/move-file~ :: Sometimes I want to move, without renaming, a file.  This
   function helps make that easy.

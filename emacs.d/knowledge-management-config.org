@@ -57,7 +57,7 @@ A bit of pre-amble.  I maintain a list of data directories, each might have “r
 	    ;; Jump to where we would put a project were we to capture it.
 	    (org-capture-goto-target "p")))))
     (require 'pulsar)
-    (pulsar--pulse))
+    (pulsar-pulse-line))
     #+end_src
 
 The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~ which introduces my more generalized note taking system.
@@ -333,7 +333,7 @@ I’m responsible for tracking my work time.  I want a way to quickly see what t
     (interactive)
     (find-file jf/primary-agenda-filename-for-machine)
     (require 'pulsar)
-    (pulsar--pulse)
+    (pulsar-pulse-line)
     (org-clock-report 4))
 #+end_src
 
