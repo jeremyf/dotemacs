@@ -77,7 +77,9 @@ The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~
 	     org-default-notes-file (concat
 				     org-directory
 				     "/captured-notes.org")
-	     org-todo-keywords '((sequence
+	     org-todo-keywords '((sequence "BLOCKED" "|" "UNBLOCKED")
+				 (sequence "TO-MERGE" "|" "MERGED")
+				 (sequence
 				  "TODO"
 				  "IN-PROGRESS"
 				  "WAITING"
@@ -89,6 +91,20 @@ The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~
 	     entry (file jf/primary-agenda-filename-for-machine)
 	     "* %?\n  %i\n  %a"
 	     :empty-lines-before 1)
+	    ("b" "Blocker"
+	     plain (file+function jf/primary-agenda-filename-for-machine jf/org-mode-agenda-find-project-node)
+	     "***** BLOCKED %^{Describe the blocker}? :blocker:"
+	     :empty-lines-before 1
+	     :immediate-finish t
+	     :empty-lines-after 1
+	     )
+	    ("m" "Merge Request"
+	     plain (file+function jf/primary-agenda-filename-for-machine jf/org-mode-agenda-find-project-node)
+	     "***** TO-MERGE %^{URL of Merge Request}? :mr:"
+	     :empty-lines-before 1
+	     :immediate-finish t
+	     :empty-lines-after 1
+	     )
 	    ;; Needed for the first project of the day; to ensure the datetree is
 	    ;; properly generated.
 	    ("p" "Project"
