@@ -88,20 +88,18 @@ The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~
     (setq org-capture-templates
 	  '(("@"
 	     "All Todo"
-	     entry (file jf/primary-agenda-filename-for-machine)
-	     "* %?\n  %i\n  %a"
+	     entry (file+olp jf/primary-agenda-filename-for-machine "General Todo Items")
+	     "* TODO %?\n  %i\n  %a"
 	     :empty-lines-before 1)
 	    ("b" "Blocker"
-	     plain (file+function jf/primary-agenda-filename-for-machine jf/org-mode-agenda-find-project-node)
+	     plain (file+function jf/primary-agenda-filename-for-machine jf/org-mode-agenda-find-blocked-node)
 	     "***** BLOCKED %^{Describe the blocker}? :blocker:"
-	     :empty-lines-before 1
 	     :immediate-finish t
 	     :empty-lines-after 1
 	     )
 	    ("m" "Merge Request"
-	     plain (file+function jf/primary-agenda-filename-for-machine jf/org-mode-agenda-find-project-node)
-	     "***** TO-MERGE %^{URL of Merge Request}? :mr:"
-	     :empty-lines-before 1
+	     plain (file+function jf/primary-agenda-filename-for-machine jf/org-mode-agenda-findq-merge-request-node)
+	     "***** TO-MERGE %^{URL of Merge Request}? :mergerequest:"q
 	     :immediate-finish t
 	     :empty-lines-after 1
 	     )
@@ -232,15 +230,6 @@ I cribbed the following function from [[https://xenodium.com/emacs-dwim-do-what-
 	     (call-interactively 'org-insert-link)))))
 #+end_src
 
-** Org-QL
-
-Including a useful package for querying Org-Mode.
-
-#+begin_src emacs-lisp
-  (use-package org-ql
-      :straight t)
-#+end_src
-
 ** Time Tracking
 
 I wrote about this in [[https://takeonrules.com/2022/09/06/org-mode-capture-templates-and-time-tracking/][Org Mode Capture Templates and Time Tracking // Take on Rules]].  But to summarize, I work on several different projects each day; helping folks get unstuck.  I also need to track and record my time.
@@ -274,11 +263,12 @@ When I jump to a new task for the day, I want to position that task within the p
 
 #+begin_src emacs-lisp
   (cl-defun jf/org-mode-agenda-find-project-node (&key
-					   (project (jf/org-mode-agenda-project-prompt))
-					   ;; The `file+olp+datetree` directive creates a headline like “2022-09-03 Saturday”.
-					   (within_headline (format-time-string "%Y-%m-%d %A")))
+						  (tag "project")
+						  (project (jf/org-mode-agenda-project-prompt))
+						  ;; The `file+olp+datetree` directive creates a headline like “2022-09-03 Saturday”.
+						  (within_headline (format-time-string "%Y-%m-%d %A")))
     "Find and position the cursor at the end of
-    the given PROJECT WITHIN_HEADLINE."
+      the given PROJECT WITHIN_HEADLINE."
     ;; We need to be using the right agenda file.
     (with-current-buffer (find-file-noselect jf/primary-agenda-filename-for-machine)
       (let ((existing-position (org-element-map
@@ -309,7 +299,14 @@ When I jump to a new task for the day, I want to position that task within the p
 	  (progn
 	    ;; Go to the end of the file and append the project to the end
 	    (end-of-buffer)
-	    (insert (concat "\n\n**** " project " :project:\n\n")))))))
+	    (insert (concat "\n\n**** " project " :" tag ":\n\n")))))))
+  (cl-defun jf/org-mode-agenda-find-blocked-node ()
+    "Add a blocker node to today."
+    (jf/org-mode-agenda-find-project-node :tag "blockers" :project (concat "Blockers for " (format-time-string "%Y-%m-%d"))))
+
+  (cl-defun jf/org-mode-agenda-find-merge-request-node ()
+    "Add a mergerequest node to today."
+    (jf/org-mode-agenda-find-project-node :tag "mergerequest" :project (concat "Merge Requests for " (format-time-string "%Y-%m-%d"))))
 #+end_src
 
 The =jf/org-mode-agenda-to-stand-up-summary= function takes my notes for the day and formats them for a summary report.
@@ -345,7 +342,7 @@ The =jf/org-mode-agenda-to-stand-up-summary= function takes my notes for the day
 		     (concat "\n" (plist-get (cadr hl) :raw-value))
 		   (concat "- " (plist-get (cadr hl) :raw-value)))))
 	     ))))
-	(when (car prefix-arg)
+	(unless (car prefix-arg)
 	  (jf/create-scratch-buffer)
 	  (yank)))))
 #+end_src
