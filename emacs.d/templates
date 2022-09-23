@@ -34,3 +34,4 @@ org-mode
 (sn "{{{sidenote(" p ")}}}")
 (src "#+begin_src " p n> r> n> "#+end_src")
 (title "#+title: " p n "#+author: Jeremy Friesen" n "#+language: en" n n)
+(uml "#+begin_src plantuml" n> "@startuml" n> "!theme amiga" n> n> "@enduml" n> "#+end_src")
