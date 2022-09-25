@@ -112,10 +112,14 @@ two concerns:
 /Note: at present my blog assumes YAML front-matter./
 
 #+begin_src emacs-lisp
+  (defcustom jf/exporting-org-to-tor nil
+    "True while performing the export of org file to Take on Rules")
+
   (cl-defun jf/export-org-to-tor (&key (buffer (current-buffer)))
     "Export current org buffer for TakeOnRules post."
     (interactive)
     ;; Ensure that we have an ID property.
+    (setq jf/exporting-org-to-tor t)
     (with-current-buffer buffer
       (save-excursion
 	(let* ((org_id (jf/export-org-to-tor--ensure-org-id-property))
@@ -152,7 +156,8 @@ two concerns:
 	  ;; Write metadata
 	  (save-buffer)
 	  (unless org-transclusion-mode (org-transclusion-mode))
-	  (org-open-file (org-hugo-export-wim-to-md nil nil t))))))
+	  (org-open-file (org-hugo-export-wim-to-md nil nil t)))))
+    (setq jf/exporting-org-to-tor nil))
 
   (defun jf/export-org-to-tor--ensure-org-id-property ()
     "Ensure the current buffer has an ID property."
