@@ -1193,7 +1193,7 @@ This builds on [[https://github.com/org-roam/org-roam/issues/1698][Automatic nod
 
 - =abbr= :: Create an abbreviation.
 - =abbr-plural=  :: Create an pluralized abbreviation.
-- =glossary= :: Create a general link/reference to an Org-Roam node as a glossary entry.  See [[http://takeonrules.com/site-map/glossary/][Glossary of Terms for Take on Rules]]
+- =glossary= :: Create a general link/reference to an Org-Roam node as a glossary entry.  See [[http://takeonrules.com/site-map/glossary/][Glossary of Terms for Take on Rules]].
 
 *** Adding =abbr:= link type
 

@@ -4368,7 +4368,7 @@ some additional options.
       ]
      ["Tasks"
       ("s" "Search…" (lambda () (interactive) (consult-ripgrep org-directory)))
-      ("t" "Start a timer…" tmr-with-description)
+      ("C-t" "Start a timer…" tmr-with-description)
       ("u" "Copy stand-up to kill ring" jf/org-mode-agenda-to-stand-up-summary)
       ("w" "Weekly hours report" jf/org-mode-weekly-report)
       ]
