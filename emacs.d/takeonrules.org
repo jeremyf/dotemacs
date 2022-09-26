@@ -24,7 +24,7 @@ that I have required ~ox~.
 
   (use-package ox-hugo
     :straight t
-    :custom (org-hugo-paired-shortcodes "marginnote sidenote")
+    :custom (org-hugo-paired-shortcodes "marginnote sidenote poem")
     :after ox)
 
   (setq org-hugo-base-dir "~/git/takeonrules.source")
