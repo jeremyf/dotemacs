@@ -1078,6 +1078,32 @@ Sometimes I use inline sidenotes, that’s the purpose of this macro.
 	       '("linkToSeries" . "@@hugo:{{< linkToSeries \"@@$1@@hugo:\" >}}@@"))
 #+end_src
 
+** Some Org-Roam Helper Functions
+
+Moving between Org-Roam and Org-Mode nodes I often need to retrieve a property from the Org-Mode structure; something that isn’t “native” for Org-Roam.  The following helps navigate that.
+
+#+begin_src emacs-lisp
+  (cl-defun jf/org-roam-node-get-org-mode-property (&key node properties property)
+    "Retrieve the org-mode's PROPERTY from an org-roam NODE's PROPERTIES."
+    (alist-get property (or properties (org-roam-node-properties node)) nil nil #'string=))
+#+end_src
+
+And given that I’m planning to add new link types, I want a means of extracting the world-facing URL for
+
+#+begin_src emacs-lisp
+  (cl-defun jf/org-roam-external-url-for (&key node (scheme "http"))
+    "Return an external URL for the given NODE and SCHEME.
+
+  Note, I use the `org-roam-node-properties' instead of
+  `org-roam-node-refs' because the latter strips the scheme."
+    (seq-find (lambda (el) (s-starts-with? scheme el))
+	      (split-string
+	       (format
+		"%s"
+		(jf/org-roam-node-get-org-mode-property :node node :property "ROAM_REFS"))
+	       " ")))
+#+end_src
+
 ** Listing Function
 
 #+begin_src emacs-lisp
@@ -1199,7 +1225,6 @@ This builds on [[https://github.com/org-roam/org-roam/issues/1698][Automatic nod
 
 - =abbr= :: Create an abbreviation.
 - =abbr-plural=  :: Create an pluralized abbreviation.
-- =glossary= :: Create a general link/reference to an Org-Roam node as a glossary entry.  See [[http://takeonrules.com/site-map/glossary/][Glossary of Terms for Take on Rules]].
 
 *** Adding =abbr:= link type
 
@@ -1286,53 +1311,6 @@ As of <2022-09-24 Sat>, the above does not create an Org-Roam backlink.  The sim
 		     (format "{{< glossary key=\"%s\" abbr=\"t\" plural=\"t\" >}}" key)
 		   (format "<abbr title=\"%s\">%s</abbr>" title key)))
 	    (_ (format "%s (%s)" title key))))))
-#+end_src
-
-
-*** Adding the =cite:= link type
-
-#+begin_src emacs-lisp
-  (org-link-set-parameters "cite"
-			   :complete (lambda (&optional parg) (jf/org-link-complete-link-for
-							       parg
-							       :scheme "cite"
-							       :property "GLOSSARY_KEY"))
-			   :export #'jf/org-cite-link-export-link
-			   :follow #'jf/org-mode-link-follow-link)
-
-  (cl-defun jf/org-cite-link-export-link (id description format protocol &key (use_hugo_shortcode jf/exporting-org-to-tor))
-    "Export a LINK with DESCRIPTION for the given PROTOCOL and FORMAT.
-
-      FORMAT is an Org export backend. We will discard the given DESCRIPTION.  PROTOCOL is ignored."
-    (if-let ((node (org-roam-node-from-id id)))
-	(let* ((properties (org-roam-node-properties node))
-	       (key (alist-get "GLOSSARY_KEY" properties nil nil #'string=))
-	       (title (org-roam-node-title node)))
-	  (pcase format
-	    (`html (if use_hugo_shortcode
-		       (format "{{< glossary key=\"%s\" >}}" key)
-		     (if-let (url (jf/org-roam-external-url-for :node node))
-			 (format "<cite><a href=\"%s\">%s</a></cite>" url title)
-		       (format "<cite>%s</cite>" title))))
-	    (`md (if use_hugo_shortcode
-		       (format "{{< glossary key=\"%s\" >}}" key)
-		     (if-let (url (jf/org-roam-external-url-for :node node))
-			 (format "<cite><a href=\"%s\">%s</a></cite>" url title)
-		       (format "<cite>%s</cite>" title))))
-	    (_ (format "%s" title))))))
-#+end_src
-
-#+begin_src emacs-lisp
-  (cl-defun jf/org-roam-external-url-for (&key node)
-    "Return an external URL for the given NODE.
-
-  Note, I use the `org-roam-node-properties' instead of
-  `org-roam-node-refs' because the latter strips the scheme."
-    (seq-find (lambda (el) (s-starts-with? "http" el))
-	      (split-string (format "%s" (alist-get "ROAM_REFS"
-				       (org-roam-node-properties node)
-				       nil nil #'string=))
-			    " ")))
 #+end_src
 
 * Conclusion

@@ -85,10 +85,24 @@ When it does not have a URL, then I assume the node is an internal node and wrap
   Otherwise render a span with DESC.
 
   This prevents links to non-world accessible files."
-    (let* ((node (org-roam-node-from-id (org-element-property :path link)))
-	   (url (jf/org-roam-external-url-for :node node)))
-      (if url (format "[%s](%s)" desc url)
-	(format "<span class=\"ref\">%s</span>" desc))))
+    (let* ((node (org-roam-node-from-id (org-element-property :path link))))
+      (or (jf/org-md-render-link-for :node node :desc desc)
+	  (format "<span class=\"ref\">%s</span>" desc))))
+
+  (cl-defun jf/org-md-render-link-for (&key node desc)
+    (when-let (url (jf/org-roam-external-url-for :node node))
+      (let ((key (jf/org-roam-node-get-org-mode-property :node node :property "GLOSSARY_KEY")))
+	(cond
+	 ((jf/org-roam-node-get-org-mode-property :node node :property "OFFER")
+	  (format "{{< glossary key=\"%s\" >}}" key))
+	 ((jf/org-roam-node-get-org-mode-property :node node :property "SAME_AS")
+	  (format "{{< glossary key=\"%s\" link=\"sameAs\" >}}" key))
+	 (t (format "[%s](%s)" desc url))))))
+
+  ;;; For testing:
+  ;;
+  ;; (message "%s" (jf/org-md-render-link-for :node (org-roam-node-from-id "FC017488-D8EC-43DE-A35D-4D10A87B6A0D") :desc "Burning Wheel Gold"))
+  ;; (message "%s" (jf/org-md-render-link-for :node (org-roam-node-from-id "86F3E44F-AA0E-4B08-B0D8-30A764B4CD13") :desc "Org Roam"))
 #+end_src
 
 ** Wrapping Ox Exporter
