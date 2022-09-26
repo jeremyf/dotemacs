@@ -1329,10 +1329,10 @@ As of <2022-09-24 Sat>, the above does not create an Org-Roam backlink.  The sim
   Note, I use the `org-roam-node-properties' instead of
   `org-roam-node-refs' because the latter strips the scheme."
     (seq-find (lambda (el) (s-starts-with? "http" el))
-	      (split-string (alist-get "ROAM_REFS"
+	      (split-string (format "%s" (alist-get "ROAM_REFS"
 				       (org-roam-node-properties node)
-				       nil nil #'string=) " ")
-	      nil))
+				       nil nil #'string=))
+			    " ")))
 #+end_src
 
 * Conclusion
