@@ -78,26 +78,17 @@ When it does, use that URL.
 When it does not have a URL, then I assume the node is an internal node and wrap the description in a ~span~ tag.
 
 #+begin_src emacs-lisp
-    (defun jf/org-md-link-by-id (link desc)
-      "With an \"id\" type LINK render the markdown.
+  (defun jf/org-md-link-by-id (link desc)
+    "With an \"id\" type LINK render the markdown.
 
-    If the node for the given \"id\" has a ROAM_REF, use that as a markdown URL.
-    Otherwise render a span with DESC.
+  If the node for the given \"id\" has a ROAM_REF, use that as a markdown URL.
+  Otherwise render a span with DESC.
 
-    This prevents links to non-world accessible files."
-      (let* ((filepath (org-id-find-id-file (org-element-property :path link)))
-	     (url (jf/org-file-get-roam-refs filepath)))
-	(if url (format "[%s](%s)" desc url)
-	  (format "<span class=\"ref\">%s</span>" desc))))
-#+end_src
-
-For a given filepath, the ~jf/org-file-get-roam-refs~ finds the first [[https://www.orgroam.com/manual.html#Refs][ROAM_REFS]].  In my implementation, the ROAM_REFS is often one URL for which the ~org-roam~ node is a proxy for that URL.
-
-#+begin_src emacs-lisp
-  (cl-defun jf/org-file-get-roam-refs (filepath)
-    "Return first ROAM_REFS property in the FILEPATH."
-    (with-current-buffer (find-file-noselect filepath)
-      (car (org-property-values "ROAM_REFS"))))
+  This prevents links to non-world accessible files."
+    (let* ((node (org-roam-node-from-id (org-element-property :path link)))
+	   (url (car (org-roam-node-refs node))))
+      (if url (format "[%s](%s)" desc url)
+	(format "<span class=\"ref\">%s</span>" desc))))
 #+end_src
 
 ** Wrapping Ox Exporter
