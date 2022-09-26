@@ -366,17 +366,17 @@ I’m responsible for tracking my work time.  I want a way to quickly see what t
     (message
      "%s"
      (s-join
-      "\n"
+      ""
       (org-element-map
 	  (org-element-parse-buffer)
 	  'headline
 	(lambda (hl)
 	  (pcase (org-element-property :level hl)
-	    (3 (concat "--------------------------------------------------------------------------------\n"
+	    (3 (concat "\n--------------------------------------------------------------------------------\n"
 		       (plist-get (cadr hl) :raw-value)
 		       "\n--------------------------------------------------------------------------------"))
 	    (4 (concat "\n" (format "%s" (/ (org-clock-sum) 60.0)) "\t" (plist-get (cadr hl) :raw-value)))
-	    (5 (concat "- " (plist-get (cadr hl) :raw-value)))))))))
+	    (5 (concat "\n- " (plist-get (cadr hl) :raw-value)))))))))
 #+end_src
 
 Another task at end of month is to transcribing my agenda’s timesheet to entries in our time tracking software.  From the day’s project link in the =org-clock-report=, I want to copy the headlines of each of the tasks.  I fill out my time sheets one day at a time.
