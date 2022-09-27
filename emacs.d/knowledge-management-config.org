@@ -1272,10 +1272,7 @@ This builds on [[https://github.com/org-roam/org-roam/issues/1698][Automatic nod
 
   (defun jf/org-mode-link-follow-link (id)
     "Navigate link to find ID and open the `org-roam-node`."
-    (if-let ((node (org-roam-node-from-id id)))
-	(progn
-	  (org-mark-ring-push)
-	  '(org-roam-node-visit node nil 'force))))
+    (org-roam-node-visit (org-roam-node-from-id id) nil 'force))
 #+end_src
 
 For example the following will resolve as an =abbr= link: =[[abbr:86F3E44F-AA0E-4B08-B0D8-30A764B4CD13][Org-Roam]]=
