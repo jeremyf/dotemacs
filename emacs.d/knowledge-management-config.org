@@ -1083,6 +1083,7 @@ Sometimes I use inline sidenotes, that’s the purpose of this macro.
 Moving between Org-Roam and Org-Mode nodes I often need to retrieve a property from the Org-Mode structure; something that isn’t “native” for Org-Roam.  The following helps navigate that.
 
 #+begin_src emacs-lisp
+  ;; TODO look to cl-defmethod above to see about adding this to the data structure
   (cl-defun jf/org-roam-node-get-org-mode-property (&key node properties property)
     "Retrieve the org-mode's PROPERTY from an org-roam NODE's PROPERTIES."
     (alist-get property (or properties (org-roam-node-properties node)) nil nil #'string=))
@@ -1091,6 +1092,7 @@ Moving between Org-Roam and Org-Mode nodes I often need to retrieve a property f
 And given that I’m planning to add new link types, I want a means of extracting the world-facing URL for
 
 #+begin_src emacs-lisp
+  ;; TODO look to cl-defmethod above to see about adding this to the data structure
   (cl-defun jf/org-roam-external-url-for (&key node (scheme "http"))
     "Return an external URL for the given NODE and SCHEME.
 

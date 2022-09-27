@@ -86,10 +86,13 @@ When it does not have a URL, then I assume the node is an internal node and wrap
 
   This prevents links to non-world accessible files."
     (let* ((node (org-roam-node-from-id (org-element-property :path link))))
-      (or (jf/org-md-render-link-for :node node :desc desc)
+      (or (jf/org-markdown-export-format-link-for :node node :desc desc)
 	  (format "<span class=\"ref\">%s</span>" desc))))
 
-  (cl-defun jf/org-md-render-link-for (&key node desc)
+  (cl-defun jf/org-markdown-export-format-link-for (&key node desc)
+    "Return a \"link\" text based on the given NODE and DESC.
+
+  This relates to my glossary.html Hugo short-code."
     (when-let (url (jf/org-roam-external-url-for :node node))
       (let ((key (jf/org-roam-node-get-org-mode-property :node node :property "GLOSSARY_KEY")))
 	(cond
@@ -101,8 +104,8 @@ When it does not have a URL, then I assume the node is an internal node and wrap
 
   ;;; For testing:
   ;;
-  ;; (message "%s" (jf/org-md-render-link-for :node (org-roam-node-from-id "FC017488-D8EC-43DE-A35D-4D10A87B6A0D") :desc "Burning Wheel Gold"))
-  ;; (message "%s" (jf/org-md-render-link-for :node (org-roam-node-from-id "86F3E44F-AA0E-4B08-B0D8-30A764B4CD13") :desc "Org Roam"))
+  ;; (message "%s" (jf/org-markdown-export-format-link-for :node (org-roam-node-from-id "FC017488-D8EC-43DE-A35D-4D10A87B6A0D") :desc "Burning Wheel Gold"))
+  ;; (message "%s" (jf/org-markdown-export-format-link-for :node (org-roam-node-from-id "86F3E44F-AA0E-4B08-B0D8-30A764B4CD13") :desc "Org Roam"))
 #+end_src
 
 ** Wrapping Ox Exporter
