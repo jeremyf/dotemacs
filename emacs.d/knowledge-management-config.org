@@ -285,7 +285,7 @@ When I jump to a new task for the day, I want to position that task within the p
 					;; more complicated structure; this gets me
 					;; the raw string.
 					(string= project (plist-get (cadr hl) :raw-value))
-					(member "project" (org-element-property :tags hl))
+					(member tag (org-element-property :tags hl))
 					;; The element must have an ancestor with a headline of today
 					(string= within_headline
 						 (plist-get
@@ -306,7 +306,7 @@ When I jump to a new task for the day, I want to position that task within the p
 
   (cl-defun jf/org-mode-agenda-find-merge-request-node ()
     "Add a mergerequest node to today."
-    (jf/org-mode-agenda-find-project-node :tag "mergerequest" :project (concat "Merge Requests for " (format-time-string "%Y-%m-%d"))))
+    (jf/org-mode-agenda-find-project-node :tag "mergerequests" :project (concat "Merge Requests for " (format-time-string "%Y-%m-%d"))))
 #+end_src
 
 The =jf/org-mode-agenda-to-stand-up-summary= function takes my notes for the day and formats them for a summary report.
