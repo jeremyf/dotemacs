@@ -98,8 +98,8 @@ The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~
 	     :empty-lines-after 1
 	     )
 	    ("m" "Merge Request"
-	     plain (file+function jf/primary-agenda-filename-for-machine jf/org-mode-agenda-findq-merge-request-node)
-	     "***** TO-MERGE %^{URL of Merge Request}? :mergerequest:"q
+	     plain (file+function jf/primary-agenda-filename-for-machine jf/org-mode-agenda-find-merge-request-node)
+	     "***** TO-MERGE %^{URL of Merge Request} :mergerequest:"
 	     :immediate-finish t
 	     :empty-lines-after 1
 	     )
