@@ -258,7 +258,7 @@ In using a literate config, I have a mixture of two types of text: prose and cod
   (use-package imenu-list
     :custom (imenu-list-focus-after-activation t)
     (imenu-list-size 0.4)
-    :bind ("s-4" . 'imenu-list-minor-mode)
+    :bind ("s-4" . 'imenu-list-smart-toggle)
     :bind (:map imenu-list-major-mode-map ("o" . 'imenu-list-goto-entry))
     :straight t)
 
