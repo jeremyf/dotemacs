@@ -797,6 +797,7 @@ And with all of that, let’s get into the org-roam configuration.
     (org-roam-directory (file-truename "~/git/org"))
     (org-roam-dailies-directory (if (is-work-machine?) "scientist/dailies/" "dailies"))
     (org-roam-node-display-template
+     ;; Adding the "type" to this filter adds notably memory usage.  Consider caching this value?
      (concat "${type:7} "
 	     " ${title:80} "
 	     (propertize "${tags:50}" 'face 'org-tag)))
@@ -855,6 +856,9 @@ This function returns the node’s type (e.g., it’s directory).
 				  :where (= dest $s1)
 				  :and (= type "id")]
 			 (org-roam-node-id node)))))
+      ;;; The following includes the "type"; this becomes a non-filtering element.  But shows as an annotation.
+      ;; (format "    %4d \xf0c1   %s  [%s]" count (format-time-string "%Y-%m-%d" (org-roam-node-file-mtime node)) (org-roam-node-type node))))
+      ;;; The following does not include the "type"; this assumes that the type is part of the filterable columns.
       (format "    %4d \xf0c1   %s" count (format-time-string "%Y-%m-%d" (org-roam-node-file-mtime node)))))
 #+end_src
 
