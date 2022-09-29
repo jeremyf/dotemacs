@@ -96,12 +96,14 @@ The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~
 	     plain (file+function jf/primary-agenda-filename-for-machine jf/org-mode-agenda-find-blocked-node)
 	     "***** BLOCKED %^{Describe the blocker}? :blocker:"
 	     :immediate-finish t
+	     :jump-to-captured t
 	     :empty-lines-after 1
 	     )
 	    ("m" "Merge Request"
 	     plain (file+function jf/primary-agenda-filename-for-machine jf/org-mode-agenda-find-merge-request-node)
 	     "***** TO-MERGE %^{URL of Merge Request} :mergerequest:"
 	     :immediate-finish t
+	     :jump-to-captured t
 	     :empty-lines-after 1
 	     )
 	    ;; Needed for the first project of the day; to ensure the datetree is
@@ -117,8 +119,9 @@ The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~
 	     ;; making the assumption about project/task depth.
 	     plain (file+function jf/primary-agenda-filename-for-machine jf/org-mode-agenda-find-project-node)
 	     ;; The five ***** is due to the assumptive depth of the projects and tasks.
-	     "***** %? :task:\n\n")
-	    ))
+	     "***** %? :task:\n\n"
+	     :jump-to-captured t
+	     :clock-in t)))
 
     (setq org-latex-default-class "jf/article")
 
