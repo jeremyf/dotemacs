@@ -206,7 +206,7 @@ out but for the most part, you can move along and reference this later.
 
   ;; I vascilate between yes and no; but invariably find myself stuck in a
   ;; recursed buffer.
-  (setq enable-recursive-minibuffers nil)
+  (setq enable-recursive-minibuffers t)
 
   ;; (use-package recursion-indicator
   ;;   :straight t
