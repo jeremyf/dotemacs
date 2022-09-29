@@ -316,37 +316,37 @@ When I jump to a new task for the day, I want to position that task within the p
 The =jf/org-mode-agenda-to-stand-up-summary= function takes my notes for the day and formats them for a summary report.
 
 #+begin_src emacs-lisp
-  (cl-defun jf/org-mode-agenda-to-stand-up-summary (prefix-arg
-						    &key
-						    (within_headline (format-time-string "%Y-%m-%d %A")))
-    "Copy to the kill ring the project tasks WITHIN_HEADLINE.
+  (defun jf/org-mode-agenda-to-stand-up-summary (prefix-arg)
+    "Copy to the kill ring the day's summary.
 
-  When given PREFIX_ARG, open a temporary buffer and yank the
-  report into that buffer.
+  When given PREFIX-ARG, prompt for the day of interest.
 
   NOTE: This follows the convention that projects are on headline 4 and
   tasks within projects are headline 5."
     (interactive "P")
     (with-current-buffer (find-file-noselect jf/primary-agenda-filename-for-machine)
       (save-excursion
-	(kill-new
-	 (s-trim
-	  (s-join
-	   "\n"
-	   (org-element-map
-	       (org-element-parse-buffer)
-	       'headline
-	     (lambda (hl)
-	       (when (member
-		      within_headline
-		      (mapcar
-		       (lambda (ancestor) (plist-get (cadr ancestor) :raw-value))
-		       (org-element-lineage hl)))
-		 (if (=(org-element-property :level hl) 4)
-		     (concat "\n" (plist-get (cadr hl) :raw-value))
-		   (concat "- " (plist-get (cadr hl) :raw-value)))))
-	     ))))
-	(unless (car prefix-arg)
+	(let ((within_headline
+	       ;; Use the CCYY-MM-DD Dayname format and prompt for a date if PREFIX-ARG given.
+	       (format-time-string "%Y-%m-%d %A"
+				   (when (car prefix-arg) (org-read-date nil t nil "Pick a day:" )))))
+	  (kill-new
+	   (s-trim
+	    (s-join
+	     "\n"
+	     (org-element-map
+		 (org-element-parse-buffer)
+		 'headline
+	       (lambda (hl)
+		 (when (member
+			within_headline
+			(mapcar
+			 (lambda (ancestor) (plist-get (cadr ancestor) :raw-value))
+			 (org-element-lineage hl)))
+		   (if (=(org-element-property :level hl) 4)
+		       (concat "\n" (plist-get (cadr hl) :raw-value))
+		     (concat "- " (plist-get (cadr hl) :raw-value)))))
+	       ))))
 	  (jf/create-scratch-buffer)
 	  (yank)))))
 #+end_src
