@@ -256,6 +256,9 @@ In using a literate config, I have a mixture of two types of text: prose and cod
   (global-set-key (kbd "s-4") 'imenu-list-minor-mode)
   (use-package imenu-list
     :custom (imenu-list-focus-after-activation t)
+    (imenu-list-size 0.4)
+    :bind ("s-4" . 'imenu-list-minor-mode)
+    :bind (:map imenu-list-major-mode-map ("o" . 'imenu-list-goto-entry))
     :straight t)
 
   (defvar imenu-literate-modes-alist
@@ -2474,6 +2477,7 @@ As Twitter becomes a megalomaniac’s obsession, Mastodon becomes even more appe
     :config (setq mastodon-instance-url "https://tabletop.social"
 		  mastodon-active-user "takeonrules"))
 #+end_src
+
 *** Knowledge Management
 
 I use org-mode and org-roam to help manage content.  Let’s load that rather extensive configuration.
