@@ -1715,7 +1715,11 @@ For awhile, I was trying to use lsp-mode.  It might look a bit nicer, but it was
 
   (use-package eldoc
     :straight t)
+#+end_src
 
+**** eglot.el
+
+#+begin_src emacs-lisp
   (use-package eglot
       :hook ((css-mode
 	      enh-ruby-mode
@@ -4322,7 +4326,6 @@ some additional options.
      ["Jump to"
       ("j a" "Agenda" jf/jump-to-agenda-or-mark)
       ("j b" "iBuffer" ibuffer)
-      ;; ("j f" "Flycheck" consult-flycheck :if-derived (or markdown-mode org-mode))
       ("j g" "Global Mark" consult-global-mark)
       ("j h" "Hugo File" jf/jump_to_corresponding_hugo_file :if-derived org-mode)
       ("j m" "Mark" consult-mark)
