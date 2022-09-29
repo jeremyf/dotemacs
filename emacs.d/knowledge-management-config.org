@@ -331,22 +331,23 @@ The =jf/org-mode-agenda-to-stand-up-summary= function takes my notes for the day
 	       (format-time-string "%Y-%m-%d %A"
 				   (when (car prefix-arg) (org-read-date nil t nil "Pick a day:" )))))
 	  (kill-new
-	   (s-trim
-	    (s-join
-	     "\n"
-	     (org-element-map
-		 (org-element-parse-buffer)
-		 'headline
-	       (lambda (hl)
-		 (when (member
-			within_headline
-			(mapcar
-			 (lambda (ancestor) (plist-get (cadr ancestor) :raw-value))
-			 (org-element-lineage hl)))
-		   (if (=(org-element-property :level hl) 4)
-		       (concat "\n" (plist-get (cadr hl) :raw-value))
-		     (concat "- " (plist-get (cadr hl) :raw-value)))))
-	       ))))
+	   (concat "*Summary of " within_headline "*\n\n"
+		   (s-trim
+		    (s-join
+		     "\n"
+		     (org-element-map
+			 (org-element-parse-buffer)
+			 'headline
+		       (lambda (hl)
+			 (when (member
+				within_headline
+				(mapcar
+				 (lambda (ancestor) (plist-get (cadr ancestor) :raw-value))
+				 (org-element-lineage hl)))
+			   (if (=(org-element-property :level hl) 4)
+			       (concat "\n" (plist-get (cadr hl) :raw-value))
+			     (concat "- " (plist-get (cadr hl) :raw-value)))))
+		       )))))
 	  (jf/create-scratch-buffer)
 	  (yank)))))
 #+end_src
