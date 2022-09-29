@@ -2885,7 +2885,7 @@ From https://tsdh.org/posts/2022-08-01-difftastic-diffing-with-magit.html
     :bind ("C-x g =" . git-gutter:popup-hunk)
     ("C-x g p" . git-gutter:previous-hunk)
     ("C-x g n" . git-gutter:next-hunk)
-    :config (global-git-gutter-mode +1)
+    :init (global-git-gutter-mode t)
     (setq git-gutter:modified-sign "Δ"
 	  git-gutter:added-sign "+"
 	  git-gutter:deleted-sign "-"))
