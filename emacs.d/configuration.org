@@ -228,6 +228,10 @@ out but for the most part, you can move along and reference this later.
   (set-terminal-coding-system 'utf-8)
   (set-keyboard-coding-system 'utf-8)
 
+  ;; Trying out right command as hyper; I rarely use it and figure why not try
+  ;; something else.
+  (setq mac-right-command-modifier 'hyper)
+
   (add-function :after after-focus-change-function
 		(defun jf/garbage-collect-maybe ()
 		  (unless (frame-focus-state)
@@ -1617,6 +1621,25 @@ are major modes others are minor modes.
   (use-package dockerfile-mode :straight t)
 #+end_src
 
+**** eglot.el
+
+#+begin_src emacs-lisp
+  (use-package eglot
+      :hook ((css-mode
+	      enh-ruby-mode
+	      yaml-mode
+	      html-mode
+	      js-mode
+	      scss-mode) . eglot-ensure)
+      :config
+      (setq eglot-ignored-server-capabilites (quote (:documentHighlightProvider)))
+      (add-to-list 'eglot-server-programs
+		   `(enh-ruby-mode . ("solargraph" "socket" "--port" :autoport)))
+      :straight t)
+
+    (setq completion-category-overrides '((eglot (styles orderless))))
+#+end_src
+
 **** emmet-mode.el
 
 - ~emmet-mode.el~ :: I’ve only scratched the surface of this.  Namely when I
@@ -1719,25 +1742,6 @@ For awhile, I was trying to use lsp-mode.  It might look a bit nicer, but it was
 
   (use-package eldoc
     :straight t)
-#+end_src
-
-**** eglot.el
-
-#+begin_src emacs-lisp
-  (use-package eglot
-      :hook ((css-mode
-	      enh-ruby-mode
-	      yaml-mode
-	      html-mode
-	      js-mode
-	      scss-mode) . eglot-ensure)
-      :config
-      (setq eglot-ignored-server-capabilites (quote (:documentHighlightProvider)))
-      (add-to-list 'eglot-server-programs
-		   `(enh-ruby-mode . ("solargraph" "socket" "--port" :autoport)))
-      :straight t)
-
-    (setq completion-category-overrides '((eglot (styles orderless))))
 #+end_src
 
 **** lua-mode.el
@@ -1922,6 +1926,8 @@ The ~edit-indirect.el~ behaves similarly to the amazing ~org-edit-source-code~ b
 
 **** ts.el
 
+A timestamp library.
+
 #+begin_src emacs-lisp
   (use-package ts
     :straight t)
@@ -1948,6 +1954,7 @@ quasi-opinionated compromise.
     :straight (titlecase :host github :repo "duckwork/titlecase.el")
     :custom (titlecase-style 'wikipedia))
 #+end_src
+
 **** fill-sentences-correctly.el
 
 - ~fill-sentences-correctly.el~ :: After using Emacs for awhile, with it’s
@@ -2431,22 +2438,6 @@ These are a few variables and cosntants that I use throughout my configuration.
      "~/git/org/"
      "~/git/org/archive")
     "Relevant data directories for my day to day work.")
-#+end_src
-
-*** Co-Pilot
-
-#+begin_src emacs-lisp
-  (use-package copilot
-    :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
-    :ensure t)
-
-  (defun my/copilot-tab ()
-    (interactive)
-    (or (copilot-accept-completion)
-	(indent-for-tab-command)))
-
-  (with-eval-after-load 'copilot
-    (define-key copilot-mode-map (kbd "s-/") #'my/copilot-tab))
 #+end_src
 
 *** Writeroom
@@ -2960,7 +2951,7 @@ From https://tsdh.org/posts/2022-08-01-difftastic-diffing-with-magit.html
     (blamer-max-commit-message-length 20))
 #+end_src
 
-*** Timer
+*** tmr.el
 
 Powered by ~tmr.el~ to set a timer.
 
@@ -3087,6 +3078,7 @@ edit it in Emacs, and paste it back into the Application.
 #+end_src
 
 ** Connective Tissue and Oddities
+
 *** Functions
 
 The following chunk of allows me to take multiple filenames passed via the
@@ -4171,21 +4163,15 @@ I wrote [[file:eberron.org][some tooling to help wile playing Eberron]].
    (concat user-emacs-directory "eberron.org"))
 #+end_src
 
-** Forem, or Where I Work
-
-Let’s add some [[file:forem-config.org][Forem tooling]].
-
-#+begin_src emacs-lisp
-  (org-babel-load-file
-   (concat user-emacs-directory "forem-config.org"))
-#+end_src
-
 ** Utility Functions
 
 #+begin_src emacs-lisp
   (org-babel-load-file
    (concat user-emacs-directory "utility-functions.org"))
 #+end_src
+
+#+RESULTS:
+: Loaded ~/.emacs.d/utility-functions.el
 
 ** Crafting Menus to Help Organize
 
