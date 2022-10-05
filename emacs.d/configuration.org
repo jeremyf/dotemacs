@@ -214,6 +214,7 @@ out but for the most part, you can move along and reference this later.
   ;;   (recursion-indicator-mode))
 
   (global-hl-line-mode)
+  (setq ns-right-command-modifier 'hyper)
 
   ;; When you open Emacs, grab all the space on the screen
   (add-to-list 'initial-frame-alist '(fullscreen . maximized))
