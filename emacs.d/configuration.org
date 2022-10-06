@@ -1753,7 +1753,8 @@ For awhile, I was trying to use lsp-mode.  It might look a bit nicer, but it was
 #+begin_src emacs-lisp
   ;; https://github.com/joaotavora/eglot#1-2-3-pitfall
   (use-package xref
-    :straight t)
+    :straight t
+    :custom (xref-search-program 'ripgrep))
 
   (use-package project
     :straight t)
