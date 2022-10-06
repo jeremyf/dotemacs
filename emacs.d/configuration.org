@@ -135,9 +135,9 @@ out but for the most part, you can move along and reference this later.
   (defconst jf/silence-loading-log t
     "When t log to stdout load messages from this configuration.
 
-      In a previous iteration, I loaded lots of separate '*.el' files.
-      This flag allowed me to more easily troubleshoot those load
-      attempts.")
+       In a previous iteration, I loaded lots of separate '*.el' files.
+       This flag allowed me to more easily troubleshoot those load
+       attempts.")
 
   (defconst jf/github-username "jeremyf"
     "My username on github.")
@@ -192,6 +192,8 @@ out but for the most part, you can move along and reference this later.
 
    ring-bell-function 'ignore  ;; Stop ringing any bell
 
+   switch-to-buffer-obey-display-actions t ;; https://www.masteringemacs.org/article/demystifying-emacs-window-manager
+
    split-width-threshold nil ;; 160 * 8
 
    split-height-threshold nil ;; 160 * 8
@@ -207,14 +209,16 @@ out but for the most part, you can move along and reference this later.
   ;; I vascilate between yes and no; but invariably find myself stuck in a
   ;; recursed buffer.
   (setq enable-recursive-minibuffers t)
+  (use-package recursion-indicator
+    :straight t
+    :config
+    (recursion-indicator-mode))
 
-  ;; (use-package recursion-indicator
-  ;;   :straight t
-  ;;   :config
-  ;;   (recursion-indicator-mode))
 
   (global-hl-line-mode)
   (setq ns-right-command-modifier 'hyper)
+
+  ;; (global-hl-line-mode)
 
   ;; When you open Emacs, grab all the space on the screen
   (add-to-list 'initial-frame-alist '(fullscreen . maximized))
@@ -262,6 +266,7 @@ In using a literate config, I have a mixture of two types of text: prose and cod
   (use-package imenu-list
     :custom (imenu-list-focus-after-activation t)
     (imenu-list-size 0.4)
+    (imenu-list-position 'right)
     :bind ("s-4" . 'imenu-list-smart-toggle)
     :bind (:map imenu-list-major-mode-map ("o" . 'imenu-list-goto-entry))
     :straight t)
@@ -532,6 +537,8 @@ hard requirement for packages I’ll later introduce.
       "Return a `transient' compliant list to apply to different transients."
       ["Help"
        ""
+       ("Q" "Kill Helpful Buffers" helpful-kill-buffers)
+       ""
        ("b" "Bindings" embark-bindings)
        ("c" "Command" helpful-command)
        ("f" "Function (interactive)" helpful-callable)
@@ -543,7 +550,8 @@ hard requirement for packages I’ll later introduce.
        ("." "Thing at point" helpful-at-point)
        ("t" "Text properties" describe-text-properties)
        ("v" "Variable" helpful-variable)])
-    :bind ("C-s-h" . jf/helpful-menu))
+    :bind ("H-h" . jf/helpful-menu)
+    ("C-s-h" . jf/helpful-menu))
 #+end_src
 
 With the above, I can now type ~C-s-h~ to bring up my helpful menu, and begin
@@ -581,6 +589,7 @@ Emacs.  /It provides more, but we’ll get to that later./
     (("C-." . embark-act)       ;; pick some comfortable binding
      ("M-." . embark-dwim)
      ("C-s-e" . embark-export)
+     ("H-e" . embark-export)
      ("C-h b" . embark-bindings))
     :init
     ;; Optionally replace the key help with a completing-read interface
@@ -1315,9 +1324,12 @@ The ~ibuffer-sidebar~ package provides an interesting take on the side panel.
 It shows me what I’ve opened.  I like that.
 
 #+begin_src emacs-lisp
-  (global-set-key (kbd "s-3") 'ibuffer-sidebar-toggle-sidebar)
   (use-package ibuffer-sidebar
     :straight t
+    ;; Width of 52 characters...like recommended git titles.
+    :custom (ibuffer-sidebar-width 52)
+    (ibuffer-sidebar-display-alist '((side . right) (slot . 1)))
+    :bind ("s-3" . ibuffer-sidebar-toggle-sidebar)
     :commands (ibuffer-sidebar-toggle-sidebar))
 #+end_src
 
@@ -2853,7 +2865,7 @@ From https://tsdh.org/posts/2022-08-01-difftastic-diffing-with-magit.html
 
 #+begin_src emacs-lisp
   (use-package libgit :straight t)
-  (use-package magit-libgit :straight t)
+  ;;(use-package magit-libgit :straight t)
 #+end_src
 
 **** git-timemachine.el
@@ -4334,8 +4346,6 @@ some additional options.
      ;;  ]
      ["Modes"
       ("C-n" "MacOS Night Shift" (lambda () (interactive) (shell-command "nightlight on")))
-      ("m c" "Copilot ( )" copilot-mode :if-nil copilot-mode)
-      ("m c" "Copilot (*)" copilot-mode :if-non-nil copilot-mode)
       ;; I could write functions for these, but this is concise enough
       ("m h" jf/hammerspoon-toggle-mode  :if-non-nil hammerspoon-edit-minor-mode)
       ("m f" "Pairing Font (*)" (lambda () (interactive) (progn (setq jf/pairing-font-p nil) (set-face-attribute 'default nil :family jf/fixed-width-font-name :height 140))) :if-non-nil jf/pairing-font-p)
