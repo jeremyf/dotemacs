@@ -979,7 +979,13 @@ There’s a macro in here somewhere.
 	       :host gitlab
 	       :repo "OlMon/consult-projectile"
 	       :branch "master")
-    :bind ("s-t" . consult-projectile)
+    :bind
+    ;;; This overwrite `ns-open-file-using-panel'; the operating system's "Finder"
+    ("s-o" . consult-projectile)
+    ;;; I have long had Cmd+t mapped to opening project files; however, I'm
+    ;;; noticing the way I'm typing this and it is feeling wrong.  So now I won't
+    ;;; have that way open.
+    ("s-t" . consult-projectile)
     ("s-p" . consult-projectile))
 #+end_src
 
@@ -1776,7 +1782,7 @@ For awhile, I was trying to use lsp-mode.  It might look a bit nicer, but it was
     :mode (("README\\.md\\'" . gfm-mode)
 	   ("\\.md\\'" . markdown-mode)
 	   ("\\.markdown\\'" . markdown-mode))
-    :init (setq markdown-command "/usr/local/bin/pandoc"))
+    :init (setq markdown-command "/opt/homebrew/bin/pandoc"))
 #+end_src
 
 **** plantuml-mode.el

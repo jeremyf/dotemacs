@@ -132,7 +132,10 @@ The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~
 					   (shell . t)
 					   (plantuml . t)
 					   (ruby . t))))
-    :init (require 'ox)
+    :init
+    (add-to-list 'org-structure-template-alist '("M" . "marginnote"))
+    (add-to-list 'org-structure-template-alist '("S" . "sidenote"))
+    (require 'ox)
     ;; I grabbed from the following LaTeX class from
     ;; https://www.reddit.com/r/emacs/comments/3zcr43/nooborgmode_custom_latexpdf_export_custom_style/.
     ;; I’m trash with LaTeX, but like the layout thusfar.
