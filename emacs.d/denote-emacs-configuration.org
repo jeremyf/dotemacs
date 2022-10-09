@@ -1,0 +1,564 @@
+#+title:      Denote Emacs Configuration
+#+date:       [2022-10-09 Sun 09:05]
+#+filetags:   :emacs:programming:
+#+identifier: 20221009T090515
+
+#+SUBTITLE: A Literate Configuration
+
+I wrote about [[id:05E6CA75-FCB3-44C5-955C-DA41614D3A4E][Exploring the Denote Emacs Package]] and [[id:7DF50246-B0AA-41C4-B986-E6DB305E653E][Migration Plan for Org-Roam Notes to Denote]]; this is now my configuration for using [[id:B659BD7E-30F9-4049-87ED-C47224399B7D][Denote]].  This sits orthogonal to my data migration of notes into Denote paradigm.
+
+#+begin_marginnote
+I’m writing the data migration scripts in [[denote:20220926T204604][Ruby]]; I’m more fluent in that language and found it just a easier to conceptualize the migration.  As of [[date:2022-10-03][October 3rd]], I have completed a test migration of my glossary.
+#+end_marginnote
+
+** Configuration
+
+This base configuration gets me started using Denote.
+
+#+begin_src emacs-lisp
+  (setq jf/denote-subdirectories '("general"))
+  (use-package denote
+    ;; I want to point to cutting edge development; there's already features I
+    ;; want that have been added since v1.0.0
+    :straight (denote :host nil :type git :repo "https://git.sr.ht/~protesilaos/denote")
+    :commands (denote-directory denote-file-prompt denote--title-prompt)
+    :bind ("H-f" . 'jf/denote-find-file)
+    :hook (dired-mode . denote-dired-mode)
+    :custom ((denote-directory (expand-file-name "denote" org-directory)
+			       ;; These are the minimum viable prompts for notes
+			       (denote-prompts '(title keywords))
+			       ;; I love ‘org-mode format; reading ahead I'm setting this
+			       (denote-file-type 'org)
+			       ;; And `org-read-date' is an amazing bit of tech
+			       (denote-date-prompt-denote-date-prompt-use-org-read-date t)))
+    :config
+    (cl-defun jf/denote-org-property-from-id (&key identifier property)
+      "Given an IDENTIFIER and PROPERTY return it's value or nil.
+
+  Return nil when:
+
+  - is not a denote file
+  - IDENTIFIER leads to a non `org-mode' file
+  - PROPERTY does not exist on the file"
+      (when-let ((filename (denote-get-path-by-id identifier)))
+	(when (string= (file-name-extension filename) "org")
+	  (with-current-buffer (find-file-noselect filename)
+	    (cadar (org-collect-keywords (list property)))))))
+
+    (cl-defun jf/denote-org-properties-from-id (&key identifier properties)
+      "Given an IDENTIFIER and PROPERTIES list return an a-list of values.
+
+  Return nil when:
+
+  - is not a denote file
+  - IDENTIFIER leads to a non `org-mode' file
+  - PROPERTY does not exist on the file"
+      (when-let ((filename (denote-get-path-by-id identifier)))
+	(when (string= (file-name-extension filename) "org")
+	  (with-current-buffer (find-file-noselect filename)
+	    (org-collect-keywords properties)))))
+    )
+  ;;; Testing jf/denote-org-property-from-id
+  ;; (message "%s" (jf/denote-org-property-from-id :identifier "20220930T215235"
+  ;; 					      :property "ABBR"))
+  ;;; Testing jf/denote-org-properties-from-id
+  ;; (message "%s" (jf/denote-org-properties-from-id :identifier "20220930T215235"
+  ;; 					      :properties '("TITLE" "ABBR")))
+#+end_src
+
+I’m not looking at active silo-ing and want to be able to search specifically from the top-level and all subdirectories.
+
+#+begin_src emacs-lisp
+  (defun jf/denote-link (target &optional id-only)
+    "Create link to TARGET note in variable `denote-directory'.
+  With optional ID-ONLY, such as a universal prefix
+  argument (\\[universal-argument]), insert links with just the
+  identifier and no further description.  In this case, the link
+  format is always [[denote:IDENTIFIER]]."
+    (interactive (list (jf/denote-file-prompt) current-prefix-arg))
+    (let ((beg (point)))
+      (insert
+       (denote-link--format-link
+	target
+	(denote-link--file-type-format (buffer-file-name) id-only)))
+      (unless (derived-mode-p 'org-mode)
+	(make-button beg (point) 'type 'denote-link-button))))
+
+  (defun jf/denote-file-prompt ()
+	"An override of the provided denote-file-prompt."
+	(let ((all-files (mapcan
+			  (lambda (sub-dir)
+			    ;; TODO omit ignores
+			    (project--files-in-directory (f-join (denote-directory) sub-dir) nil))
+			  ;; TODO leverage a domain list
+			 jf/denote-subdirectories)))
+	  (funcall project-read-file-name-function
+			    "Find file" all-files nil 'file-name-history)))
+#+end_src
+
+From this configuration, I’ll build out my interactions.
+
+*** Foundational Functions for my Denote Interaction
+
+In [[id:B659BD7E-30F9-4049-87ED-C47224399B7D][Denote]]’s documentation for [[https://protesilaos.com/emacs/denote#h:887bdced-9686-4e80-906f-789e407f2e8f][Convenience commands for note creation]], they locally bind the =denote-prompts= variable then call =denote=; in [[https://protesilaos.com/emacs/denote#h:15719799-a5ff-4e9a-9f10-4ca03ef8f6c5][Maintain separate directories for notes]] they mention having silos of information by using =.dir-locals.el= to cordon off different /domains/.  See the [[*Domains][Domains]] section of this file for more infromation.
+
+And while I might want to do that for my /domains/ I have the use case of wanting to link to a Glossary item from other domains.
+
+I envision the =jf/denote-find-file= as the anchor for my general file finding, and then using a local binding of =denote-directory= to provide an initial narrowing default.
+
+It doesn’t take much to see a macro emerging for these local bindings; find all sub-directories of the directory defiend by the =denote-directory= variable.  For each of those directories make an interactive function of the form =jf/denote-find-file--domain=.  That interactive function would locally bind =denote-directory= to =”denote-directory/domain”=.
+
+Alternatively, as I create each domain’s create function, I also create the finder function.
+
+
+#+begin_src emacs-lisp
+  (defun jf/denote-find-file ()
+    "Find file in the current `denote-directory'."
+    (interactive)
+    (require 'consult-projectile)
+    (require 'denote)
+    (consult-projectile--file (denote-directory)))
+
+  (cl-defmacro jf/denote-create-functions-for (&key domain prefix (create-fn nil))
+    "A macro to create functions for the given DOMAIN.
+
+  The PREFIX is the bind-key prefix to use.
+
+  Creates:
+
+  - Wrapping function of `jf/denote-find-file' that narrows results
+  to the given DOMAIN.
+  - Create linking function for DOMAIN.
+  - Add the domain to the `jf/denote-subdirectories'."
+    (let ((finder-fn (intern (concat "jf/denote-find-file--" domain)))
+	  (finder-docstring (concat "Find file in \""
+				    domain
+				    "\" subdirectory of `denote-directory'."))
+	  (default-create-fn (unless create-fn
+			       (intern (concat "jf/denote-create--" domain))))
+	  (default-create-docstring (unless create-fn
+				      (concat "Create denote in \""
+					      domain
+					      "\" subdirectory of `denote-directory'.")))
+	  (inserter-fn (intern (concat "jf/denote-link--" domain)))
+	  (inserter-docstring (concat "Link to denote in \""
+				      domain
+				      "\" subdirectory of `denote-directory'.")))
+      `(progn
+	 (add-to-list 'jf/denote-subdirectories ,domain)
+	 (unless ,create-fn
+	   (defun ,default-create-fn ()
+	     ,default-create-docstring
+	     (interactive)
+	     (let ((denote-directory (f-join (denote-directory) ,domain)))
+	       (call-interactively #'denote))))
+	 (bind-key (format "H-d c %s" ,prefix) (or ,create-fn ',default-create-fn))
+	 (bind-key (format "H-d f %s" ,prefix) ',finder-fn)
+	 (defun ,finder-fn ()
+	   ,finder-docstring
+	   (interactive)
+	   (let ((denote-directory (f-join (denote-directory) ,domain)))
+	     (call-interactively #'jf/denote-find-file)))
+	 (bind-key (format "H-d i %s" ,prefix) ',inserter-fn)
+	 (defun ,inserter-fn ()
+	   ,inserter-docstring
+	   (interactive)
+	   (let ((denote-directory (f-join (denote-directory) ,domain)))
+	     (call-interactively #'denote-link)))
+	 )))
+#+end_src
+
+** Domains
+
+In [[id:7DF50246-B0AA-41C4-B986-E6DB305E653E][Migration Plan for Org-Roam Notes to Denote]] I talked about data structures and starting articulating some domains.
+
+#+begin_marginnote
+From Webster’s 1913 Dictionary: /Domain/: The territory over which dominion or authority is exerted; the possessions of a sovereign or commonwealth, or the like. Also used figuratively.
+
+And the Mathematical concept of /Domain/: The domain of a function is the set of its possible inputs, i.e., the set of input values where for which the function is defined.
+#+end_marginnote
+
+As of <2022-10-02 Sun>, my denote finding implementation leverages =consult-projectile--file=.  This populates the mini-buffer with entries of the following format: =domain/identifier--multi-word-title_tag1_tag2.org=.  The domain is a subdirectory of my =denote-directory=.
+
+I have the domains following:
+
+- Blog Post :: Something I share with the world.
+- Dailies :: An anchor for any time references.
+- Employer :: More specifically, [[https://scientist.com][Scientist.com]].
+- Epigraph :: A quote that I found interesting.
+- Glossary :: A term/concept I reference.
+- People :: Similar to a glossary but for notes regarding people.
+
+*** Blog Post
+
+When I start writing a note, I am uncertain if it will be a /Blog Post/.  However, once I publish something I /think/ it makes sense to transfer the note into the /Blog Post/ domain.  By treating a /Blog Post/ as a domain it will be visually chunked at the beginning of the line (e.g. the subdirectory).
+
+Alternatively I could add the “blog-post” keyword/tag to the note.  The primary benefit would be that something I post to my blog could be of another domain.
+
+What might those other domains be?
+
+I don’t think I need linger on this for too long, as I can easily migrate.  The foundational element is the =identifier=; which is dynamically queried.
+
+*** Dailies
+
+While writing this document, I began envisioning replacing my [[id:1D7B007F-C257-412E-B329-3E85AB8BC43E][Org-Mode]] date macro with a =date= Org-Mode link protocol.  The benefits are:
+
+1. Replacing the kludge of a macro with something that works easier with exports.
+2. I would be creating a node that could provide a backlink.
+
+None of this requires [[id:B659BD7E-30F9-4049-87ED-C47224399B7D][Denote]] but which builds on some of my musings; namely should I have a monthly timesheet in [[id:B659BD7E-30F9-4049-87ED-C47224399B7D][Denote]].  And the answer appears to be yes.
+
+#+begin_src emacs-lisp
+  (jf/denote-create-functions-for :domain "dailies" :prefix "d")
+#+end_src
+
+I want to continue using my timesheets as a single document; this makes both time reporting and personal timetracking easier.
+
+*** Employer
+
+There are certain employer specific notes that I keep; timesheets being a distinct one.  I don’t envision a problem linking to other domains; a Scientist.com note could and would likely link to/reference a Glossary entry.
+
+The primary advantage is that I can easily segement my git repositories for employer and not-employer.
+
+I need a current timesheet function; this would help me jump to my time sheet and capture appropriate tasks, projects, merge requests and blockers.
+
+I also want my =org-agenda-files= to include:
+
+- personal agenda
+- work agenda (on work machine)
+- this month and last month’s time sheet
+
+I’m okay with restarting [[denote:20220926T203507][Emacs]] each month.
+
+#+begin_src emacs-lisp
+(jf/denote-create-functions-for :domain "scientist" :prefix "s")
+#+end_src
+
+*** Epigraph
+
+As mentioned, I collect phrases and like to reference them as epigraphs in my posts.
+
+Something in the /Epigraph/ domain has the following properties:
+
+- AUTHOR_NAME (required) :: The name of the author
+- AUTHOR_URL :: Where can you “find” this author?
+- AUTHOR_KEY :: The GLOSSARY_KEY for the given author
+- WORK_TITLE (required) :: What’s the title of the work?
+- WORK_URL :: Where can you “get” this work?
+- WORK_KEY :: The GLOSSARY_KEY for the given work
+- POEM :: Indicates if this is a poem (or not)
+- PAGE :: The page in which this passage appears in the given work.
+- TRANSLATOR_NAME :: The name of the translator
+
+As part of my blog build scripts, I lookup the =KEY= properties in the Glossary and write the names and URL.
+#+begin_sidenote
+With all of the changes I’ve made, I need to see if I’m still looking up the =KEY= properties when I build the script.
+#+end_sidenote
+
+#+begin_src emacs-lisp
+  (cl-defun jf/denote-create-epigraph (&key
+				       (body (read-from-minibuffer "Epigraph Text: "))
+				       ;; Todo prompt for Author Name
+				       (author_name (read-from-minibuffer "Author Name: "))
+				       ;; Todo prompt for Work Title
+				       (work_title (read-from-minibuffer "Work Title: "))
+				       (nth-words 8))
+    "Create an epigraph from the given BODY, AUTHOR_NAME, and WORK TITLE.
+
+  Default the note’s title to the first NTH-WORDS of the BODY."
+    (interactive)
+    (let* ((body-as-list (s-split-words body))
+	   (title (s-join " " (if (> (length body-as-list) nth-words)
+				  (subseq body-as-list 0 nth-words)
+				body-as-list)))
+	   (template (concat
+		      "#+AUTHOR_NAME: " author_name "\n"
+		      "#+AUTHOR_URL:\n"
+		      "#+AUTHOR_KEY:\n"
+		      "#+WORK_TITLE: " work_title "\n"
+		      "#+WORK_URL:\n"
+		      "#+WORK_KEY:\n"
+		      "#+POEM:\n"
+		      "#+PAGE:\n"
+		      "#+TRANSLATOR_NAME:\n")))
+      (denote title
+	      nil
+	      'org
+	      (f-join (denote-directory) "epigraphs")
+	      nil
+	      template)))
+
+  (jf/denote-create-functions-for :domain "epigraphs" :prefix "e" :create-fn 'jf/denote-create-epigraph)
+#+end_src
+
+*** Glossary
+
+We’ll store glossary entries in the “glossary” subdirectory of =denote-directory=.
+
+An entry in the glossary requires a =KEY= property.  This =KEY= is used as the entry point for [[https://github.com/jeremyf/takeonrules-hugo-theme/blob/main/layouts/shortcodes/glossary.html][my blogging =glossary.html= shortcode]].
+
+All other properties, aside from =TITLE=, are optional.  In my writing there are two ways I directly refer to a glossary entry, when I:
+
+- Reference a Game
+- Use an Abbreviation
+
+I might create two or three glossary entries at a time; so the easiest approach is to include all of the properties with minimal prompting.
+
+#+begin_src emacs-lisp
+  (cl-defun jf/denote-create-glossary-entry
+      (&key
+       (title (read-from-minibuffer "Name the Entry: "))
+       (is-a-game (yes-or-no-p "Is this a game?"))
+       (abbr (read-from-minibuffer "Abbreviation (empty to skip): ")))
+    "Create a `denote' entry for the given TITLE and ABBR.
+
+  And if this IS-A-GAME then amend accordingly.
+
+  NOTE: At present there is no consideration for uniqueness."
+    (interactive)
+    (let* ((key (downcase (denote-sluggify (if (s-present? abbr) abbr title))))
+	   (template (concat "#+GLOSSARY_KEY: " key "\n"
+			     "#+ABBR:" (when (s-present? abbr) (concat " " abbr)) "\n"
+			     "#+CONTENT_DISCLAIMER:\n" ;; TODO: Include a prompt of existing disclaimers
+			     '			   "#+DESCRIPTION:\n"
+			     (when is-a-game "#+GAME: " key "\n")
+			     "#+ITEMID:\n"
+			     "#+ITEMTYPE:\n"
+			     "#+MENTION_AS:\n"
+			     "#+OFFER:\n"
+			     "#+PLURAL_ABBR:\n"
+			     "#+PLURAL_TITLE:\n"
+			     "#+SAME_AS:\n"
+			     "#+TAG:\n" ;; TODO: Assert uniqueness
+			     "#+VERBOSE_TITLE:\n"))
+	   (keywords (list)))
+      ;; Add both "abbr" and the abbr to the keywords; both help in searching results
+      (when (s-present? abbr)
+	(progn (add-to-list 'keywords "abbr") (add-to-list 'keywords abbr)))
+      (when is-a-game (add-to-list 'keywords "game"))
+      (denote title
+	      keywords
+	      'org
+	      (f-join (denote-directory) "glossary")
+	      nil
+	      template)))
+
+  (jf/denote-create-functions-for :domain "glossary" :prefix "g" :create-fn 'jf/denote-create-glossary-entry)
+  ;;; Testing jf/denote-org-property-from-id
+  ;; (message "%s" (jf/denote-org-property-from-id :id "20220930T215235"
+  ;; 					      :property "ABBR"))
+#+end_src
+
+This builds from [[id:B22E2A14-D02B-432A-8D49-A94848C90187][On Storing Glossary Terms in Org Roam Nodes]].
+
+*** People
+
+I do write notes about people I interact with.  Technically I have glossary entries for people.  But those entries are for folks I don’t interact with.
+
+#+begin_src emacs-lisp
+(jf/denote-create-functions-for :domain "people" :prefix "p")
+#+end_src
+
+** Custom Hyperlinks
+
+I have two custom hyperlinks to consider:
+
+- Abbrevations (and their Plural)
+- Date entries
+
+*** Abbreviations (and their Plural)
+
+#+begin_marginnote
+{{{date(2022-09-26,Earlier)}}} I wrote about [[id:B22E2A14-D02B-432A-8D49-A94848C90187][On Storing Glossary Terms in Org Roam Nodes]].  This builds from and supplants that prior work.
+#+end_marginnote
+
+As part of my writing I use of abbreviations.  I try to always provide the abbreviation’s title when I first introduce the abbrevation.  For most of those abbreviations I reference something in [[https://takeonrules.com/site-map/glossary/][my glossary]].
+
+When I export to [[https://takeonrules.com/][my blog]], I want those abbreviations to leverage what I have in my local glossary.  I expand those abbreviatinos to use the [[https://developer.mozilla.org/en-US/docs/Web/HTML/Element/abbr#defining_an_abbreviation][ABBR-element]].  I do this via my [[https://github.com/jeremyf/takeonrules-hugo-theme/blob/main/layouts/shortcodes/glossary.html][glossary.html shortcode]].
+
+Below is the code that adds the =abbr= and =abbr-plural= link type into [[https://orgmode.org/manual/Handling-Links.html][Org-Mode’s link handler]]; for more information checkout the documentation on [[https://orgmode.org/manual/Adding-Hyperlink-Types.html][Adding Hyperlink Types]].
+
+**** Building the Complete Functionality
+
+First up is the functionality for completion.  Given that I have both =abbr= and =abbr-plural= link schemes, I’m going to create a generic function.
+
+#+begin_marginnote
+I prefer named parameters over positional parameters.  Which is why most of my Lisp functions leverage the =cl-defun= macro.
+#+end_marginnote
+
+The =jf/org-link-complete-link-for= function will pre-populate a search.  In the case of =abbr= and =abbr-plural= all entries will be in the =./glossary= subdirectory and have the keyword =_abbr=.
+
+#+begin_src emacs-lisp
+  (cl-defun jf/org-link-complete-link-for (parg &key scheme keyword subdirectory)
+    "Prompt for a SCHEME compatible `denote' with KEYWORD in the given SUBDIRECTORY.
+
+  Returns a string of format: \"SCHEME:<id>\" where <id> is
+  an `denote' identifier."
+    (concat scheme
+	    ":"
+	    (let ((denote-directory (if subdirectory
+					(f-join (denote-directory)
+						(concat subdirectory "/"))
+				      (denote-directory))))
+	      ;; This leverages a post v1.0.0 parameter of Denote
+	      ;; See https://git.sr.ht/~protesilaos/denote/commit/c6c3fc95c66ba093a266c775f411c0c8615c14c7
+	      (denote-file-prompt (concat "_" keyword "*")))))
+#+end_src
+
+The above implementation assumes a post v1.0.0 implementation of Denote.  As of {{{date(2022-10-07,October 7th)}}} this is not part of a released version but is part of the =main= branch.
+
+I was preparing to send a suggestion for that feature when I noticed the change; it is always reassuring to see folks recommend functions that are identical to what you were going to suggest.
+
+**** Building the Export Functionality
+
+Next is the export functionality.  There are many similarities between =abbr= and =abbr-plural=; what follows is the general function.
+
+#+begin_src emacs-lisp
+  (cl-defun jf/denote-link-ol-link-with-property (link description format protocol
+						       &key
+						       property-name
+						       additional-hugo-parameters
+						       (use_hugo_shortcode jf/exporting-org-to-tor))
+    "Export a LINK with DESCRIPTION for the given PROTOCOL and FORMAT.
+
+  FORMAT is an Org export backend. We will discard the given
+  DESCRIPTION.  PROTOCOL is ignored."
+    (let* ((prop-list (jf/denote-org-properties-from-id
+		       :identifier link
+		       :properties (list "TITLE" property-name  "GLOSSARY_KEY")))
+	   (title (alist-get "TITLE" prop-list nil nil #'string=))
+	   ' (property (alist-get property-name prop-list nil nil #'string=))
+	   (key (alist-get "GLOSSARY_KEY" prop-list property nil #'string=))
+	   (cond
+	    ((or (eq format 'html)
+		 (eq format 'md))
+	     (if use_hugo_shortcode
+		 (format "{{< glossary key=\"%s\" %s >}}"
+			 property
+			 additional-hugo-parameters)
+	       (format "<abbr title=\"%s\">%s</abbr>"
+		       title
+		       property))
+	     (_ (format "%s (%s)"
+			title
+			property)))))))
+#+end_src
+
+**** Registering the Link Types
+
+With the above preliminaries, here are the two parameter types and their configurations.
+
+#+begin_src emacs-lisp
+  (org-link-set-parameters "abbr"
+			   :complete (lambda (&optional parg) (jf/org-link-complete-link-for
+							       parg
+							       :scheme "abbr"
+							       :keyword "abbr"
+							       :subdirectory "glossary"))
+			   :export (lambda (link description format protocol)
+				     (jf/denote-link-ol-link-with-property link description format protocol
+									   :property-name "ABBR"
+									   :additional-hugo-parameters "abbr=\"t\""))
+			   :face #'denote-faces-link
+			   :follow #'denote-link-ol-follow
+  ;;; I'm unclear if/how I want to proceed with this
+			   ;; :store (lambda (jf/org-link-store-link-for :scheme "abbr"))
+			   )
+
+  (org-link-set-parameters "abbr-plural"
+			   :complete (lambda (&optional parg) (jf/org-link-complete-link-for
+							       parg
+							       :scheme "abbr-plural"
+							       :keyword "abbr_plural"
+							       :subdirectory "glossary"))
+			   :export (lambda (link description format protocol)
+				     (jf/denote-link-ol-link-with-property link description format protocol
+									   :property-name "ABBR_PLURAL"
+									   :additional-hugo-parameters "abbr=\"t\" plural=\"t\""))
+			   :face #'denote-faces-link
+			   :follow #'denote-link-ol-follow
+  ;;; I'm unclear if/how I want to proceed with this
+			   ;; :store (lambda (jf/org-link-store-link-for :scheme "abbr-plural"))
+			   )
+#+end_src
+
+**** COMMENT Deprecated
+
+The following are previous incarnations, now deprecated.
+
+#+begin_example emacs-lisp
+  ;; Deprecate for general functions declared later one.
+  (cl-defun jf/org-abbr-plural-link-export-link (link description format protocol
+  &key (use_hugo_shortcode jf/exporting-org-to-tor))
+  "Export a LINK with DESCRIPTION for the given PROTOCOL and FORMAT.
+
+  FORMAT is an Org export backend. We will discard the given DESCRIPTION.  PROTOCOL is ignored."
+  (let* ((prop-list (jf/denote-org-properties-from-id :identifier link :properties '("TITLE" "ABBR" "GLOSSARY_KEY")))
+  (title (alist-get "TITLE" prop-list nil nil #'string=))
+  (property (alist-get "ABBR_PLURAL" prop-list nil nil #'string=))
+  (key (alist-get "GLOSSARY_KEY" prop-list property nil #'string=))
+  (cond
+  ((or (eq format 'html)
+  (eq format 'md))
+  (if use_hugo_shortcode
+  (format "{{< glossary key=\"%s\" abbr=\"t\" >}}" property)
+  (format "<abbr title=\"%s\">%s</abbr>" title property))
+  (_ (format "%s (%s)" title property)))))))
+
+  ;; Deprecate for general functions declared later one.
+  (cl-defun jf/org-abbr-plural-link-export-link (link description format protocol
+  &key (use_hugo_shortcode jf/exporting-org-to-tor))
+  "Export a LINK with DESCRIPTION for the given PROTOCOL and FORMAT.
+
+  FORMAT is an Org export backend. We will discard the given DESCRIPTION.  PROTOCOL is ignored."
+  (let* ((prop-list (jf/denote-org-properties-from-id :identifier link :properties '("TITLE" "ABBR" "GLOSSARY_KEY")))
+  (title (alist-get "TITLE" prop-list nil nil #'string=))
+  (property (alist-get "ABBR_PLURAL" prop-list nil nil #'string=))
+  (key (alist-get "GLOSSARY_KEY" prop-list property nil #'string=))
+  (cond
+  ((or (eq format 'html)
+  (eq format 'md))
+  (if use_hugo_shortcode
+  (format "{{< glossary key=\"%s\" abbr=\"t\" plural=\"t\" >}}" property)
+  (format "<abbr title=\"%s\">%s</abbr>" title property))
+  (_ (format "%s (%s)" title property)))))))
+#+end_example
+
+*** Date Entries
+
+I want to register the =date= scheme for Org-Mode links.
+
+#+begin_src emacs-lisp
+  (org-link-set-parameters "date"
+			   :complete #'jf/denote-link-complete-date
+			   :export #'jf/denote-link-export-date
+			   :face #'denote-faces-link
+			   :follow #'jf/denote-link-follow-date
+			   ;; :store (lambda (jf/org-link-store-link-for :scheme "abbr"))
+			   )
+
+  (cl-defun jf/denote-link-complete-date (&optional parg)
+    "Prompt for the given DATE.
+
+  While we are prompting for a year, month, and day; a reminder
+  that this is intended to be conformant with the TIME element.
+  But for my typical use I write these as either years; years and
+  months; and most often year, month, and days."
+    (format "date:%s" (org-read-date)))
+
+  (cl-defun jf/denote-link-export-date (link description format protocol)
+    "Export a date for the given LINK, DESCRIPTION, FORMAT, and PROTOCOL."
+    (cond
+     ((or (eq format 'html)
+	  (eq format 'md))
+      (format "<time datetime=\"%s\">%s</time>" link description))
+     (_ (format "%s (%s)" descirption link))))
+
+
+  (cl-defun jf/denote-link-follow-date (date &optional parg)
+    (message "TODO, implement link for %s" date))
+#+end_src
+
+** Conclusion
+
+I wrote this configuration with the intention of publishing to my blog.  I have locally tested things, a bit, but have not incorporated it into [[id:4E720715-3D6E-467E-8943-B9F2518B7494][my dotemacs]].  That is a future concern.

@@ -2496,6 +2496,11 @@ I use org-mode and org-roam to help manage content.  Let’s load that rather ex
 #+begin_src emacs-lisp
   (org-babel-load-file
    (concat user-emacs-directory "knowledge-management-config.org"))
+
+  (org-babel-load-file
+   (concat user-emacs-directory "denote-emacs-configuration.org"))
+#+end_src
+
 #+end_src
 
 *** org-d20.el

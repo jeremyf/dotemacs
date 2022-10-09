@@ -1324,6 +1324,7 @@ As of <2022-09-24 Sat>, the above does not create an Org-Roam backlink.  The sim
 	    (_ (format "%s (%s)" title key))))))
 #+end_src
 
+
 * Conclusion
 
 This is the core of my note taking engine.  It builds on the idea that I want to reduce the number of decisions I make.  This is extremely important when I’m writing session notes.

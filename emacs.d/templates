@@ -19,8 +19,8 @@ web-mode
 
 org-mode
 
-(abbr "[[" (p (jf/org-link-complete-link-for nil :scheme "abbr" :property "ABBR")) "][" (p "Des") "]]")
-(abbr-plural "{{{abbr-plural(" (p (completing-read "Glossary: " (jf/tor-glossary-key-list))) ")}}}")
+;; (abbr "[[" (p (jf/org-link-complete-link-for nil :scheme "abbr" :property "ABBR")) "][" (p "Des") "]]")
+;; (abbr-plural "{{{abbr-plural(" (p (completing-read "Glossary: " (jf/tor-glossary-key-list))) ")}}}")
 (date "{{{date(" (p (org-read-date nil nil nil "Date")) "," p ")}}}")
 (dl-bwg "- Task ::" n "- Intent ::" n "- Consequences ::" n "- Obstacle ::" n "- Dice ::" n "- Result :: ")
 (faction "* Stat Block" n n "- Name ::" n "- Faction Type ::" n "- Influence ::" n "- Funds ::" n "- Leader ::" n "- Inner Circle ::" n "- Membership ::" n "- Assets ::" n "- Territory ::" n "- Alliances ::" n "- Allegiances ::" n "- Rivals ::" n "- Doctrine ::" n "- Tradition :: ")
