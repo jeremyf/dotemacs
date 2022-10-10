@@ -199,6 +199,10 @@ What might those other domains be?
 
 I don’t think I need linger on this for too long, as I can easily migrate.  The foundational element is the =identifier=; which is dynamically queried.
 
+#+begin_src emacs-lisp
+  (jf/denote-create-functions-for :domain "blog-posts" :prefix "b")
+#+end_src
+
 *** Dailies
 
 While writing this document, I began envisioning replacing my [[id:1D7B007F-C257-412E-B329-3E85AB8BC43E][Org-Mode]] date macro with a =date= Org-Mode link protocol.  The benefits are:
@@ -426,22 +430,21 @@ Next is the export functionality.  There are many similarities between =abbr= an
     (let* ((prop-list (jf/denote-org-properties-from-id
 		       :identifier link
 		       :properties (list "TITLE" property-name  "GLOSSARY_KEY")))
-	   (title (alist-get "TITLE" prop-list nil nil #'string=))
-	   ' (property (alist-get property-name prop-list nil nil #'string=))
-	   (key (alist-get "GLOSSARY_KEY" prop-list property nil #'string=))
+	   (title (car (alist-get "TITLE" prop-list nil nil #'string=)))
+	   (property (car (alist-get property-name prop-list nil nil #'string=)))
+	   (key (car (alist-get "GLOSSARY_KEY" prop-list property nil #'string=))))
 	   (cond
-	    ((or (eq format 'html)
-		 (eq format 'md))
+	    ((or (eq format 'html) (eq format 'md))
 	     (if use_hugo_shortcode
 		 (format "{{< glossary key=\"%s\" %s >}}"
 			 property
 			 additional-hugo-parameters)
 	       (format "<abbr title=\"%s\">%s</abbr>"
 		       title
-		       property))
-	     (_ (format "%s (%s)"
+		       property)))
+	     (t (format "%s (%s)"
 			title
-			property)))))))
+			property)))))
 #+end_src
 
 **** Registering the Link Types
@@ -557,6 +560,30 @@ I want to register the =date= scheme for Org-Mode links.
 
   (cl-defun jf/denote-link-follow-date (date &optional parg)
     (message "TODO, implement link for %s" date))
+#+end_src
+
+** Export Function
+
+The below function over-writes the denote export logic.  It works in a specific case but will need further revision.
+
+#+begin_src emacs-lisp
+  (defun denote-link-ol-export (link description format)
+    "Export a `denote:' link from Org files.
+  The LINK, DESCRIPTION, and FORMAT are handled by the export
+  backend."
+    (let* ((path-id (denote-link--ol-resolve-link-to-target link :path-id))
+	   (title (jf/denote-org-property-from-id :identifier link :property "TITLE"))
+	   (urls (jf/denote-org-property-from-id :identifier link :property "ROAM_ALIASES"))
+	   (path (file-name-nondirectory (car path-id)))
+	   (desc (or description title))
+	   (url (if urls (car (s-split " " urls t)) (format "%s.%s" (file-name-sans-extension path) format))))
+      (cond
+       ((eq format 'html) (format "<a target=\"_blank\" href=\"%s\">%s</a>" url desc))
+       ((or (eq format 'latex) (eq format 'beamer)) (format "\\href{%s}{%s}" (replace-regexp-in-string "[\\{}$%&_#~^]" "\\\\\\&" path) desc))
+       ((eq format 'texinfo) (format "@uref{%s,%s}" path desc))
+       ((eq format 'ascii) (format "[%s] <denote:%s>" desc path)) ; NOTE 2022-06-16: May be tweaked further
+       ((eq format 'md) (format "[%s](%s)" desc url))
+       (t path))))
 #+end_src
 
 ** Conclusion
