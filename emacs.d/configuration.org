@@ -2656,6 +2656,7 @@ I use org-mode and org-roam to help manage content.  Let’s load that rather ex
     ;; (defadvice magit-mode-quit-window (after magit-restore-screen activate)
     ;;   (jump-to-register :magit-fullscreen))
     :config
+    ;; (use-package libgit :straight t)
     (remove-hook 'magit-status-sections-hook 'magit-insert-tags-header)
     (defun jf/magit-browse-pull-request ()
       "In `magit-log-mode' open the associated pull request
@@ -2868,16 +2869,6 @@ From https://tsdh.org/posts/2022-08-01-difftastic-diffing-with-magit.html
   ;;   (magit-add-section-hook 'magit-status-sections-hook 'forge-insert-assigned-issues nil 'append)
   ;;   (magit-add-section-hook 'magit-status-sections-hook 'forge-insert-authored-issues nil 'append)
   ;;   :straight t)
-#+end_src
-
-**** libgit.el
-
-- ~libgit.el~ :: Provides bindings to [[https://libgit2.org][libgit2]].  These bindings help improve the speed of ~magit.el~; or so I’m told.
-- ~magit-libgit.el~ :: Connects ~magit.el~ to ~libgit.el~, helping improve the speed of ~magit.el~; or so I’m told.
-
-#+begin_src emacs-lisp
-  (use-package libgit :straight t)
-  ;;(use-package magit-libgit :straight t)
 #+end_src
 
 **** git-timemachine.el
