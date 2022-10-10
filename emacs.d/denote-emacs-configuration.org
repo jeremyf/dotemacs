@@ -16,13 +16,13 @@ I’m writing the data migration scripts in [[denote:20220926T204604][Ruby]]; I�
 This base configuration gets me started using Denote.
 
 #+begin_src emacs-lisp
-  (setq jf/denote-subdirectories '("general"))
   (use-package denote
     ;; I want to point to cutting edge development; there's already features I
     ;; want that have been added since v1.0.0
     :straight (denote :host nil :type git :repo "https://git.sr.ht/~protesilaos/denote")
-    :commands (denote-directory denote-file-prompt denote--title-prompt)
+    :commands (denote-directory denote-file-prompt denote--title-prompt denote-get-path-by-id)
     :bind ("H-f" . 'jf/denote-find-file)
+    ("H-i" . 'jf/denote-link)
     :hook (dired-mode . denote-dired-mode)
     :custom ((denote-directory (expand-file-name "denote" org-directory)
 			       ;; These are the minimum viable prompts for notes
@@ -30,33 +30,33 @@ This base configuration gets me started using Denote.
 			       ;; I love ‘org-mode format; reading ahead I'm setting this
 			       (denote-file-type 'org)
 			       ;; And `org-read-date' is an amazing bit of tech
-			       (denote-date-prompt-denote-date-prompt-use-org-read-date t)))
-    :config
-    (cl-defun jf/denote-org-property-from-id (&key identifier property)
-      "Given an IDENTIFIER and PROPERTY return it's value or nil.
+			       (denote-date-prompt-denote-date-prompt-use-org-read-date t))))
+
+  (cl-defun jf/denote-org-property-from-id (&key identifier property)
+    "Given an IDENTIFIER and PROPERTY return it's value or nil.
 
   Return nil when:
 
   - is not a denote file
   - IDENTIFIER leads to a non `org-mode' file
   - PROPERTY does not exist on the file"
-      (when-let ((filename (denote-get-path-by-id identifier)))
-	(when (string= (file-name-extension filename) "org")
-	  (with-current-buffer (find-file-noselect filename)
-	    (cadar (org-collect-keywords (list property)))))))
+    (when-let ((filename (denote-get-path-by-id identifier)))
+      (when (string= (file-name-extension filename) "org")
+	(with-current-buffer (find-file-noselect filename)
+	  (cadar (org-collect-keywords (list property)))))))
 
-    (cl-defun jf/denote-org-properties-from-id (&key identifier properties)
-      "Given an IDENTIFIER and PROPERTIES list return an a-list of values.
+  (cl-defun jf/denote-org-properties-from-id (&key identifier properties)
+    "Given an IDENTIFIER and PROPERTIES list return an a-list of values.
 
   Return nil when:
 
   - is not a denote file
   - IDENTIFIER leads to a non `org-mode' file
   - PROPERTY does not exist on the file"
-      (when-let ((filename (denote-get-path-by-id identifier)))
-	(when (string= (file-name-extension filename) "org")
-	  (with-current-buffer (find-file-noselect filename)
-	    (org-collect-keywords properties)))))
+    (when-let ((filename (denote-get-path-by-id identifier)))
+      (when (string= (file-name-extension filename) "org")
+	(with-current-buffer (find-file-noselect filename)
+	  (org-collect-keywords properties))))
     )
   ;;; Testing jf/denote-org-property-from-id
   ;; (message "%s" (jf/denote-org-property-from-id :identifier "20220930T215235"
@@ -112,6 +112,7 @@ Alternatively, as I create each domain’s create function, I also create the fi
 
 
 #+begin_src emacs-lisp
+  (setq jf/denote-subdirectories '("main"))
   (defun jf/denote-find-file ()
     "Find file in the current `denote-directory'."
     (interactive)
@@ -122,14 +123,14 @@ Alternatively, as I create each domain’s create function, I also create the fi
   (cl-defmacro jf/denote-create-functions-for (&key domain prefix (create-fn nil))
     "A macro to create functions for the given DOMAIN.
 
-  The PREFIX is the bind-key prefix to use.
+      The PREFIX is the bind-key prefix to use.
 
-  Creates:
+      Creates:
 
-  - Wrapping function of `jf/denote-find-file' that narrows results
-  to the given DOMAIN.
-  - Create linking function for DOMAIN.
-  - Add the domain to the `jf/denote-subdirectories'."
+      - Wrapping function of `jf/denote-find-file' that narrows results
+      to the given DOMAIN.
+      - Create linking function for DOMAIN.
+      - Add the domain to the `jf/denote-subdirectories'."
     (let ((finder-fn (intern (concat "jf/denote-find-file--" domain)))
 	  (finder-docstring (concat "Find file in \""
 				    domain
@@ -406,8 +407,11 @@ The =jf/org-link-complete-link-for= function will pre-populate a search.  In the
 				      (denote-directory))))
 	      ;; This leverages a post v1.0.0 parameter of Denote
 	      ;; See https://git.sr.ht/~protesilaos/denote/commit/c6c3fc95c66ba093a266c775f411c0c8615c14c7
-	      (denote-file-prompt (concat "_" keyword "*")))))
+	      (denote-retrieve-filename-identifier (denote-file-prompt (concat "_" keyword "*"))))))
 #+end_src
+
+#+RESULTS:
+: jf/org-link-complete-link-for
 
 The above implementation assumes a post v1.0.0 implementation of Denote.  As of {{{date(2022-10-07,October 7th)}}} this is not part of a released version but is part of the =main= branch.
 
@@ -472,11 +476,11 @@ With the above preliminaries, here are the two parameter types and their configu
 			   :complete (lambda (&optional parg) (jf/org-link-complete-link-for
 							       parg
 							       :scheme "abbr-plural"
-							       :keyword "abbr_plural"
+							       :keyword "plural_abbr"
 							       :subdirectory "glossary"))
 			   :export (lambda (link description format protocol)
 				     (jf/denote-link-ol-link-with-property link description format protocol
-									   :property-name "ABBR_PLURAL"
+									   :property-name "PLURAL_ABBR"
 									   :additional-hugo-parameters "abbr=\"t\" plural=\"t\""))
 			   :face #'denote-faces-link
 			   :follow #'denote-link-ol-follow
@@ -497,8 +501,8 @@ The following are previous incarnations, now deprecated.
 
   FORMAT is an Org export backend. We will discard the given DESCRIPTION.  PROTOCOL is ignored."
   (let* ((prop-list (jf/denote-org-properties-from-id :identifier link :properties '("TITLE" "ABBR" "GLOSSARY_KEY")))
-  (title (alist-get "TITLE" prop-list nil nil #'string=))
-  (property (alist-get "ABBR_PLURAL" prop-list nil nil #'string=))
+  (title (alist-get "PLURAL_TITLE" prop-list nil nil #'string=))
+  (property (alist-get "PLURAL_ABBR" prop-list nil nil #'string=))
   (key (alist-get "GLOSSARY_KEY" prop-list property nil #'string=))
   (cond
   ((or (eq format 'html)
@@ -516,7 +520,7 @@ The following are previous incarnations, now deprecated.
   FORMAT is an Org export backend. We will discard the given DESCRIPTION.  PROTOCOL is ignored."
   (let* ((prop-list (jf/denote-org-properties-from-id :identifier link :properties '("TITLE" "ABBR" "GLOSSARY_KEY")))
   (title (alist-get "TITLE" prop-list nil nil #'string=))
-  (property (alist-get "ABBR_PLURAL" prop-list nil nil #'string=))
+  (property (alist-get "PLURAL_ABBR" prop-list nil nil #'string=))
   (key (alist-get "GLOSSARY_KEY" prop-list property nil #'string=))
   (cond
   ((or (eq format 'html)
@@ -567,7 +571,7 @@ I want to register the =date= scheme for Org-Mode links.
 The below function over-writes the denote export logic.  It works in a specific case but will need further revision.
 
 #+begin_src emacs-lisp
-  (defun denote-link-ol-export (link description format)
+  (defun jf/denote-link-ol-export (link description format)
     "Export a `denote:' link from Org files.
   The LINK, DESCRIPTION, and FORMAT are handled by the export
   backend."
@@ -584,6 +588,8 @@ The below function over-writes the denote export logic.  It works in a specific 
        ((eq format 'ascii) (format "[%s] <denote:%s>" desc path)) ; NOTE 2022-06-16: May be tweaked further
        ((eq format 'md) (format "[%s](%s)" desc url))
        (t path))))
+
+  (advice-add #'denote-link-ol-export :override #'jf/denote-link-ol-export '((name . "wrapper")))
 #+end_src
 
 ** Conclusion
