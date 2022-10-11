@@ -568,7 +568,7 @@ I want to register the =date= scheme for Org-Mode links.
 
 ** Export Function
 
-The below function over-writes the denote export logic.  It works in a specific case but will need further revision.
+The below function over-writes the denote export logic.  It works in a specific case but will likely require further tweaks.
 
 #+begin_src emacs-lisp
   (defun jf/denote-link-ol-export (link description format)
@@ -594,4 +594,4 @@ The below function over-writes the denote export logic.  It works in a specific 
 
 ** Conclusion
 
-I wrote this configuration with the intention of publishing to my blog.  I have locally tested things, a bit, but have not incorporated it into [[id:4E720715-3D6E-467E-8943-B9F2518B7494][my dotemacs]].  That is a future concern.
+I wrote this configuration with the intention of publishing to my blog.  I have locally tested things and incorporated it into [[id:4E720715-3D6E-467E-8943-B9F2518B7494][my dotemacs]].
