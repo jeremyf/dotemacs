@@ -69,21 +69,22 @@ This base configuration gets me started using Denote.
 I’m not looking at active silo-ing and want to be able to search specifically from the top-level and all subdirectories.
 
 #+begin_src emacs-lisp
-  (defun jf/denote-file-prompt ()
+  (defun jf/denote-file-prompt (fn &optional initial-dir)
     "An override of the provided denote-file-prompt."
-    (let* ((vc-dirs-ignores (mapcar
-			     (lambda (dir)
-			       (concat dir "/"))
-			     vc-directory-exclusion-list))
-	   (all-files (mapcan
-		       (lambda (sub-dir)
-			 ;; TODO omit ignores
-			 (project--files-in-directory (f-join (denote-directory) sub-dir) vc-dirs-ignores))
-		       ;; TODO leverage a domain list
-		       jf/denote-subdirectories)))
-      (funcall project-read-file-name-function
-	       "Find file" all-files nil 'file-name-history)))
-  (advice-add #'denote-file-prompt :override #'jf/denote-file-prompt '((name . "wrapper")))
+    (if initial-dir
+	(funcall fn initial-dir)
+      (let* ((vc-dirs-ignores (mapcar
+			       (lambda (dir)
+				 (concat dir "/"))
+			       vc-directory-exclusion-list))
+	     (all-files (mapcan
+			 (lambda (sub-dir)
+			   (project--files-in-directory (f-join (denote-directory) sub-dir) vc-dirs-ignores))
+			 jf/denote-subdirectories)))
+	(funcall project-read-file-name-function
+		 "Find file" all-files nil 'file-name-history))))
+
+  (advice-add #'denote-file-prompt :around #'jf/denote-file-prompt '((name . "wrapper")))
 #+end_src
 
 From this configuration, I’ll build out my interactions.
@@ -406,7 +407,7 @@ The =jf/org-link-complete-link-for= function will pre-populate a search.  In the
 				      (denote-directory))))
 	      ;; This leverages a post v1.0.0 parameter of Denote
 	      ;; See https://git.sr.ht/~protesilaos/denote/commit/c6c3fc95c66ba093a266c775f411c0c8615c14c7
-	      (denote-retrieve-filename-identifier (denote-file-prompt (concat "_" keyword "*"))))))
+	      (denote-retrieve-filename-identifier (denote-file-prompt (concat " _" keyword "*"))))))
 #+end_src
 
 #+RESULTS:
@@ -558,7 +559,7 @@ I want to register the =date= scheme for Org-Mode links.
      ((or (eq format 'html)
 	  (eq format 'md))
       (format "<time datetime=\"%s\">%s</time>" link description))
-     (_ (format "%s (%s)" descirption link))))
+     (t (format "%s (%s)" description link))))
 
 
   (cl-defun jf/denote-link-follow-date (date &optional parg)
