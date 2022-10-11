@@ -348,12 +348,14 @@ I want to start with a basic look and feel.  First, the choice of primary font.
 
 #+begin_src emacs-lisp
   (defvar jf/fixed-width-font-name
-    "Hack Nerd Font"
+    "Iosevka Comfy Motion Fixed"
     "The name of the fixed width font.
     I have it sprinkled through too many places.
 
     Alternatives:
     - \"Iosevka Nerd Font Mono\"
+    - \"Iosevka Comfy Wide Fixed\"
+    - \"Iosevka Comfy Motion Fixed\"
     - \"Iosevka Term\"
     - \"Monaco\"
     - \"JetBrains Mono\"
@@ -419,7 +421,7 @@ between toggles.
 #+begin_src emacs-lisp
   (set-face-attribute 'default nil
 		      :family jf/fixed-width-font-name
-		      :height 140)
+		      :height 150)
   (set-face-attribute 'variable-pitch nil
 		      :family "ETBembo"
 		      :height 1.1)

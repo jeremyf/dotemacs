@@ -24,14 +24,27 @@ This base configuration gets me started using Denote.
     :bind ("H-f" . 'jf/denote-find-file)
     ("H-i" . 'denote-link)
     :hook (dired-mode . denote-dired-mode)
-    :custom ((denote-directory (expand-file-name "denote" org-directory)
-			       ;; These are the minimum viable prompts for notes
-			       (denote-prompts '(title keywords))
-			       ;; I love ‘org-mode format; reading ahead I'm setting this
-			       (denote-file-type 'org)
-			       ;; And `org-read-date' is an amazing bit of tech
-			       (denote-date-prompt-denote-date-prompt-use-org-read-date t))))
+    :custom ((denote-directory (expand-file-name "denote" org-directory))
+	     ;; These are the minimum viable prompts for notes
+	     (denote-prompts '(title keywords))
+	     ;; I love ‘org-mode format; reading ahead I'm setting this
+	     (denote-file-type 'org)
+	     ;; TODO - this is inferred from my glossary, but as of <2022-10-11
+	     ;; Tue> does not update when I add to the glossary.
+	     (denote-known-keywords (jf/calculated-list-of-denote-known-keywords
+				     :from (expand-file-name "denote/glossary" org-directory)))
+	     ;; Explicitly ensuring that tags can be multi-word (e.g. two or more
+	     ;; words joined with a dash).  Given that I export these tags, they
+	     ;; should be accessible to screen-readers.  And without the dashes
+	     ;; they are a garbled word salad.
+	     (denote-allow-multi-word-keywords t)
+	     ;; And `org-read-date' is an amazing bit of tech
+	     (denote-date-prompt-denote-date-prompt-use-org-read-date t)))
+#+end_src
 
+The following functions help me retrieve Org-Mode properties from the given Denote ID.
+
+#+begin_src emacs-lisp
   (cl-defun jf/denote-org-property-from-id (&key identifier property)
     "Given an IDENTIFIER and PROPERTY return it's value or nil.
 
@@ -347,6 +360,25 @@ I might create two or three glossary entries at a time; so the easiest approach 
 #+end_src
 
 This builds from [[id:B22E2A14-D02B-432A-8D49-A94848C90187][On Storing Glossary Terms in Org Roam Nodes]].
+
+Further, I want to use the =TAG= property as the controlled vocabulary for =denote-known-keywords=.  The following function creates a list of those tags.
+
+#+begin_src emacs-lisp
+  (cl-defun jf/calculated-list-of-denote-known-keywords (&key from)
+    "Return a list of known keywords."
+    (split-string-and-unquote
+     (shell-command-to-string
+      (concat
+       "rg \"#\\+TAG:\\s([\\w-]+)\" "
+       from
+       " --only-matching"
+       " --no-filename "
+       " --replace '$1'"))
+     "\n"))
+
+  ;;; This should return a list
+  ;; (message "%s" (jf/calculated-list-of-denote-known-keywords :from "~/git/org/denote/glossary"))
+#+end_src
 
 *** Melange
 
