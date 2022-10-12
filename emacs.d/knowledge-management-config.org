@@ -961,13 +961,6 @@ These tie into my the context and auto-tags.
      :props '(:immediate-finish nil)
      :templates (jf/org-roam-templates-list :refs)))
 
-  (cl-defun jf/menu--org-capture-elfeed-show (&key (entry elfeed-show-entry))
-    "Create an `org-roam-node' from elfeed ENTRY."
-    (interactive)
-    (let ((url (elfeed-entry-link entry))
-	  (title (elfeed-entry-title entry)))
-      (jf/org-roam-capture-ref :url url :title title)))
-
   (defun jf/menu--org-capture-firefox ()
     "Create an `org-roam-node' from Firefox page.
 

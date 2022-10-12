@@ -638,6 +638,7 @@ I want to register the =date= scheme for Org-Mode links.
 
 
   (cl-defun jf/denote-link-follow-date (date &optional parg)
+    "Follow the given DATE; uncertain what that means."
     (message "TODO, implement link for %s" date))
 #+end_src
 
@@ -666,8 +667,7 @@ The below function over-writes the denote export logic.  It works in a specific 
   (advice-add #'denote-link-ol-export :override #'jf/denote-link-ol-export '((name . "wrapper")))
 #+end_src
 
-
-  #+begin_src emacs-lisp
+#+begin_src emacs-lisp
     (defun jf/denote-export-url-from-id (identifier)
       (when-let ((filename (denote-get-path-by-id identifier)))
 	(when (string= (file-name-extension filename) "org")
@@ -690,6 +690,22 @@ The below function over-writes the denote export logic.  It works in a specific 
     ;;(message "%s" (jf/denote-export-url-from-id "20221009T120712"))
   #+end_src
 
+** Additional Tooling
+
+#+begin_src emacs-lisp
+  (cl-defun jf/menu--org-capture-elfeed-show (&key (entry elfeed-show-entry))
+    "Create a `denote' from ENTRY."
+    (interactive)
+    (let* ((url (elfeed-entry-link entry))
+	   (title (elfeed-entry-title entry))
+	   (template (concat "#+ROAM_REFS: " url "\n")))
+      (denote title
+	      '("rss")
+	      'org
+	      (f-join (denote-directory) "melange")
+	      nil
+	      template)))
+#+end_src
 
 ** Conclusion
 
