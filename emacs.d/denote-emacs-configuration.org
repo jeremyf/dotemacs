@@ -194,6 +194,7 @@ I have the domains following:
 - Glossary :: A term/concept I reference.
 - Melange :: “A mixture, a medley”; also an homage to Frank Herbert’s “Dune”
 - People :: Similar to a glossary but for notes regarding people.
+- Series :: Conceptual grouping of blog posts.
 
 *** Blog Post
 
@@ -396,6 +397,14 @@ I do write notes about people I interact with.  Technically I have glossary entr
 (jf/denote-create-functions-for :domain "people" :prefix "p")
 #+end_src
 
+*** Series
+
+On my site I write [[https://takeonrules.com/series/][series of related articles]].  I track this data in a [[abbr:20221009T115621][YAML]] file; I’d like to treat this data similar to my glossary.
+
+#+begin_src emacs-lisp
+  (jf/denote-create-functions-for :domain "series" :prefix "r")
+#+end_src
+
 ** Custom Hyperlinks
 
 I have two custom hyperlinks to consider:
@@ -406,7 +415,7 @@ I have two custom hyperlinks to consider:
 *** Abbreviations (and their Plural)
 
 #+begin_marginnote
-{{{date(2022-09-26,Earlier)}}} I wrote about [[id:B22E2A14-D02B-432A-8D49-A94848C90187][On Storing Glossary Terms in Org Roam Nodes]].  This builds from and supplants that prior work.
+[[date:2022-09-26][Earlier]] I wrote about [[id:B22E2A14-D02B-432A-8D49-A94848C90187][On Storing Glossary Terms in Org Roam Nodes]].  This builds from and supplants that prior work.
 #+end_marginnote
 
 As part of my writing I use of abbreviations.  I try to always provide the abbreviation’s title when I first introduce the abbrevation.  For most of those abbreviations I reference something in [[https://takeonrules.com/site-map/glossary/][my glossary]].
