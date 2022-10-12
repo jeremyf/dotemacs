@@ -642,7 +642,7 @@ I want to register the =date= scheme for Org-Mode links.
     (message "TODO, implement link for %s" date))
 #+end_src
 
-** COMMENT Export Function
+** Export Function
 
 The below function over-writes the denote export logic.  It works in a specific case but will likely require further tweaks.
 
@@ -657,7 +657,7 @@ The below function over-writes the denote export logic.  It works in a specific 
 	   (url (or (jf/denote-export-url-from-id link) (format "%s.%s" (file-name-sans-extension path) format)))
 	   (desc (or description title)))
       (cond
-       ((eq format 'html) (format "<a target=\"_blank\" href=\"%s\">%s</a>" url desc))
+       ((eq format 'html) (format "<a href=\"%s\">%s</a>" url desc))
        ((or (eq format 'latex) (eq format 'beamer)) (format "\\href{%s}{%s}" (replace-regexp-in-string "[\\{}$%&_#~^]" "\\\\\\&" path) desc))
        ((eq format 'texinfo) (format "@uref{%s,%s}" path desc))
        ((eq format 'ascii) (format "[%s] <denote:%s>" desc path)) ; NOTE 2022-06-16: May be tweaked further
@@ -668,26 +668,26 @@ The below function over-writes the denote export logic.  It works in a specific 
 #+end_src
 
 #+begin_src emacs-lisp
-    (defun jf/denote-export-url-from-id (identifier)
-      (when-let ((filename (denote-get-path-by-id identifier)))
-	(when (string= (file-name-extension filename) "org")
-	  (with-current-buffer (find-file-noselect filename)
-	    (let* ((props-plist (jf/org-global-props-as-plist :props-regexp "\\(OFFER\\|ROAM_REFS\\|SAME_AS\\)")))
-	      (cond
-	       ;; Favor affiliate links
-	       ((lax-plist-get props-plist "OFFER"))
-	       ((when-let ((refs (lax-plist-get props-plist "ROAM_REFS")))
-		  (first (s-split " " refs t))))
-	       ((lax-plist-get props-plist "SAME_AS"))))))))
+  (defun jf/denote-export-url-from-id (identifier)
+    (when-let ((filename (denote-get-path-by-id identifier)))
+      (when (string= (file-name-extension filename) "org")
+	(with-current-buffer (find-file-noselect filename)
+	  (let* ((props-plist (jf/org-global-props-as-plist :props-regexp "\\(OFFER\\|ROAM_REFS\\|SAME_AS\\)")))
+	    (cond
+	     ;; Favor affiliate links
+	     ((lax-plist-get props-plist "OFFER"))
+	     ((when-let ((refs (lax-plist-get props-plist "ROAM_REFS")))
+		(first (s-split " " refs t))))
+	     ((lax-plist-get props-plist "SAME_AS"))))))))
 
-    ;;; Should be: https://www.worldcat.org/title/dune/oclc/1241164333/editions?referer=di&editionsView=true
-    ;; (message "%s" (jf/denote-export-url-from-id "20221009T115949"))
-    ;;; Should be https://samvera.org
-    ;; (message "%s" (jf/denote-export-url-from-id "20221009T120341"))
-    ;;; Should be https://en.wikipedia.org/wiki/Jira_(software)
-    ;; (message "%s" (jf/denote-export-url-from-id "20221009T120152"))
-    ;;; Should be nil
-    ;;(message "%s" (jf/denote-export-url-from-id "20221009T120712"))
+  ;;; Should be: https://www.worldcat.org/title/dune/oclc/1241164333/editions?referer=di&editionsView=true
+  ;; (message "%s" (jf/denote-export-url-from-id "20221009T115949"))
+  ;;; Should be https://samvera.org
+  ;; (message "%s" (jf/denote-export-url-from-id "20221009T120341"))
+  ;;; Should be https://en.wikipedia.org/wiki/Jira_(software)
+  ;; (message "%s" (jf/denote-export-url-from-id "20221009T120152"))
+  ;;; Should be nil
+  ;;(message "%s" (jf/denote-export-url-from-id "20221009T120712"))
   #+end_src
 
 ** Additional Tooling
