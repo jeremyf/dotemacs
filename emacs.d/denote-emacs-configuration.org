@@ -402,7 +402,22 @@ I do write notes about people I interact with.  Technically I have glossary entr
 On my site I write [[https://takeonrules.com/series/][series of related articles]].  I track this data in a [[abbr:20221009T115621][YAML]] file; I’d like to treat this data similar to my glossary.
 
 #+begin_src emacs-lisp
-  (jf/denote-create-functions-for :domain "series" :prefix "r")
+  (cl-defun jf/denote-create-series-entry
+      (&key
+       (title (read-from-minibuffer "Name the Series: ")))
+    "Create a `denote' entry for the given TITLE."
+    (interactive)
+    (let* ((key (downcase (denote-sluggify title)))
+	   (template (concat "#+SERIES_KEY: " key "\n"
+			     "#+HIGHLIGHT: true\n")))
+      (denote title
+	      nil
+	      'org
+	      (f-join (denote-directory) "series")
+	      nil
+	      template)))
+
+  (jf/denote-create-functions-for :domain "series" :prefix "r" :create-fn 'jf/denote-create-series-entry)
 #+end_src
 
 ** Custom Hyperlinks
