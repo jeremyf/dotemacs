@@ -9,6 +9,8 @@ I wrote about [[id:05E6CA75-FCB3-44C5-955C-DA41614D3A4E][Exploring the Denote Em
 
 #+begin_marginnote
 I’m writing the data migration scripts in [[denote:20220926T204604][Ruby]]; I’m more fluent in that language and found it just a easier to conceptualize the migration.  As of [[date:2022-10-03][October 3rd]], I have completed a test migration of my glossary.
+
+As of [[date:2022-10-11][Tuesday, October 11th]] I have written several yet to publish programming posts.  I’m planning to publish those at my next convenience.
 #+end_marginnote
 
 ** Configuration
@@ -40,6 +42,19 @@ This base configuration gets me started using Denote.
 	     (denote-allow-multi-word-keywords t)
 	     ;; And `org-read-date' is an amazing bit of tech
 	     (denote-date-prompt-denote-date-prompt-use-org-read-date t)))
+#+end_src
+
+Let’s add another way at looking up files.
+
+#+begin_src emacs-lisp
+  (use-package consult-notes
+    :straight (:type git :host github :repo "mclear-tools/consult-notes")
+    :bind
+    ("H-d s" . 'consult-notes-search-in-all-notes)
+    :commands (consult-notes
+	       consult-notes-search-in-all-notes))
+
+  (setq consult-notes-sources (list))
 #+end_src
 
 The following functions help me retrieve Org-Mode properties from the given Denote ID.
@@ -124,47 +139,52 @@ Alternatively, as I create each domain’s create function, I also create the fi
     (require 'denote)
     (consult-projectile--file (denote-directory)))
 
-  (cl-defmacro jf/denote-create-functions-for (&key domain prefix (create-fn nil))
+  (cl-defmacro jf/denote-create-functions-for (&key domain key (create-fn nil))
     "A macro to create functions for the given DOMAIN.
 
-      The PREFIX is the bind-key prefix to use.
+	The KEY is the ASCII value of the binding key.
 
-      Creates:
+	Creates:
 
-      - Wrapping function of `jf/denote-find-file' that narrows results
-      to the given DOMAIN.
-      - Create linking function for DOMAIN.
-      - Add the domain to the `jf/denote-subdirectories'."
-    (let ((finder-fn (intern (concat "jf/denote-find-file--" domain)))
-	  (finder-docstring (concat "Find file in \""
-				    domain
-				    "\" subdirectory of `denote-directory'."))
-	  (default-create-fn (unless create-fn
-			       (intern (concat "jf/denote-create--" domain))))
-	  (default-create-docstring (unless create-fn
-				      (concat "Create denote in \""
-					      domain
-					      "\" subdirectory of `denote-directory'.")))
-	  (inserter-fn (intern (concat "jf/denote-link--" domain)))
-	  (inserter-docstring (concat "Link to denote in \""
-				      domain
-				      "\" subdirectory of `denote-directory'.")))
+	- Wrapping function of `jf/denote-find-file' that narrows results
+	to the given DOMAIN.
+	- Create linking function for DOMAIN.
+	- Add the domain to the `jf/denote-subdirectories'.
+	- Adds DOMAIN to `consult-notes-sources'."
+    (let* ((finder-fn (intern (concat "jf/denote-find-file--" domain)))
+	   (subdirectory (f-join "~/git/org/denote" domain))
+	   (finder-docstring (concat "Find file in \""
+				     domain
+				     "\" subdirectory of `denote-directory'."))
+	   (default-create-fn (unless create-fn
+				(intern (concat "jf/denote-create--" domain))))
+	   (default-create-docstring (unless create-fn
+				       (concat "Create denote in \""
+					       domain
+					       "\" subdirectory of `denote-directory'.")))
+	   (inserter-fn (intern (concat "jf/denote-link--" domain)))
+	   (inserter-docstring (concat "Link to denote in \""
+				       domain
+				       "\" subdirectory of `denote-directory'.")))
+
       `(progn
 	 (add-to-list 'jf/denote-subdirectories ,domain)
+	 (when (boundp 'consult-notes-sources)
+	   (add-to-list 'consult-notes-sources '(,domain ,key ,subdirectory)))
 	 (unless ,create-fn
 	   (defun ,default-create-fn ()
 	     ,default-create-docstring
 	     (interactive)
 	     (let ((denote-directory (f-join (denote-directory) ,domain)))
 	       (call-interactively #'denote))))
-	 (bind-key (format "H-d c %s" ,prefix) (or ,create-fn ',default-create-fn))
-	 (bind-key (format "H-d f %s" ,prefix) ',finder-fn)
+	 (bind-key (format "H-d c %c" ,key) (or ,create-fn ',default-create-fn))
+	 (bind-key (format "H-d f %c" ,key) ',finder-fn)
 	 (defun ,finder-fn ()
 	   ,finder-docstring
 	   (interactive)
 	   (let ((denote-directory (f-join (denote-directory) ,domain)))
 	     (call-interactively #'jf/denote-find-file)))
-	 (bind-key (format "H-d i %s" ,prefix) ',inserter-fn)
+	 (bind-key (format "H-d i %c" ,key) ',inserter-fn)
 	 (defun ,inserter-fn ()
 	   ,inserter-docstring
 	   (interactive)
@@ -207,7 +227,7 @@ What might those other domains be?
 I don’t think I need linger on this for too long, as I can easily migrate.  The foundational element is the =identifier=; which is dynamically queried.
 
 #+begin_src emacs-lisp
-  (jf/denote-create-functions-for :domain "blog-posts" :prefix "b")
+  (jf/denote-create-functions-for :domain "blog-posts" :key ?b)
 #+end_src
 
 *** Dailies
@@ -220,7 +240,7 @@ While writing this document, I began envisioning replacing my [[id:1D7B007F-C257
 None of this requires [[id:B659BD7E-30F9-4049-87ED-C47224399B7D][Denote]] but which builds on some of my musings; namely should I have a monthly timesheet in [[id:B659BD7E-30F9-4049-87ED-C47224399B7D][Denote]].  And the answer appears to be yes.
 
 #+begin_src emacs-lisp
-  (jf/denote-create-functions-for :domain "dailies" :prefix "d")
+  (jf/denote-create-functions-for :domain "dailies" :key ?d)
 #+end_src
 
 I want to continue using my timesheets as a single document; this makes both time reporting and personal timetracking easier.
@@ -242,7 +262,7 @@ I also want my =org-agenda-files= to include:
 I’m okay with restarting [[denote:20220926T203507][Emacs]] each month.
 
 #+begin_src emacs-lisp
-(jf/denote-create-functions-for :domain "scientist" :prefix "s")
+  (jf/denote-create-functions-for :domain "scientist" :key ?s)
 #+end_src
 
 *** Epigraph
@@ -299,7 +319,7 @@ With all of the changes I’ve made, I need to see if I’m still looking up the
 	      nil
 	      template)))
 
-  (jf/denote-create-functions-for :domain "epigraphs" :prefix "e" :create-fn 'jf/denote-create-epigraph)
+  (jf/denote-create-functions-for :domain "epigraphs" :key ?e :create-fn 'jf/denote-create-epigraph)
 #+end_src
 
 *** Glossary
@@ -354,7 +374,7 @@ I might create two or three glossary entries at a time; so the easiest approach 
 	      nil
 	      template)))
 
-  (jf/denote-create-functions-for :domain "glossary" :prefix "g" :create-fn 'jf/denote-create-glossary-entry)
+  (jf/denote-create-functions-for :domain "glossary" :key ?g :create-fn 'jf/denote-create-glossary-entry)
   ;;; Testing jf/denote-org-property-from-id
   ;; (message "%s" (jf/denote-org-property-from-id :id "20220930T215235"
   ;; 					      :property "ABBR"))
@@ -386,7 +406,7 @@ Further, I want to use the =TAG= property as the controlled vocabulary for =deno
 Things that don’t belong elsewhere belong here.
 
 #+begin_src emacs-lisp
-(jf/denote-create-functions-for :domain "melange" :prefix "m")
+  (jf/denote-create-functions-for :domain "melange" :key ?m)
 #+end_src
 
 *** People
@@ -394,7 +414,7 @@ Things that don’t belong elsewhere belong here.
 I do write notes about people I interact with.  Technically I have glossary entries for people.  But those entries are for folks I don’t interact with.
 
 #+begin_src emacs-lisp
-(jf/denote-create-functions-for :domain "people" :prefix "p")
+  (jf/denote-create-functions-for :domain "people" :key ?p)
 #+end_src
 
 *** Series
@@ -417,7 +437,7 @@ On my site I write [[https://takeonrules.com/series/][series of related articles
 	      nil
 	      template)))
 
-  (jf/denote-create-functions-for :domain "series" :prefix "r" :create-fn 'jf/denote-create-series-entry)
+  (jf/denote-create-functions-for :domain "series" :key ?r :create-fn 'jf/denote-create-series-entry)
 #+end_src
 
 ** Custom Hyperlinks
