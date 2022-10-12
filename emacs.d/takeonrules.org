@@ -37,12 +37,7 @@ that I have required ~ox~.
     (add-to-list 'org-hugo-special-block-type-properties '("sidenote" . (:trim-pre t :trim-post t))))
 #+END_SRC
 
-I use ~org-roam~ for my organization, so I’m assuming I’ll be exporting one
-file at a time.  I have considered using [[https://ox-hugo.scripter.co/][ox-hugo]], but it’s not quite what I’m
-after.  In [[id:23288DD9-9559-4870-A0BE-E01087A8EC5D][Migrating from Hugo to Org]], a private file, I considered what to do.
-/Note: When I use org’s export for this file, there shouldn’t be a link for
-Migrating from Hugo to Org.  However, those of you reading this file outside of
-the export will have a link to a Not Found resource/
+I use ~org-roam~ for my organization, so I’m assuming I’ll be exporting one file at a time.  I have considered using [[https://ox-hugo.scripter.co/][ox-hugo]], but it’s not quite what I’m after.  In [[id:23288DD9-9559-4870-A0BE-E01087A8EC5D][Migrating from Hugo to Org]], a private file, I considered what to do.  /Note: When I use org’s export for this file, there shouldn’t be a link for Migrating from Hugo to Org.  However, those of you reading this file outside of the export will have a link to a Not Found resource/
 
 ** Extending the Ox
 
@@ -130,67 +125,40 @@ two concerns:
     (setq jf/exporting-org-to-tor t)
     (with-current-buffer buffer
       (save-excursion
-	(let* ((org_id (jf/export-org-to-tor--ensure-org-id-property))
-	       (drawer (jf/export-org-to-tor--ensure-drawer "HUGO"))
-	       (export-global-plist (jf/org-global-props-as-plist))
-	       ;; Note this will be added after the :PROPERTIES::END:
+	(let* ((export-global-plist (jf/org-global-props-as-plist))
 	       (section (jf/export-org-to-tor--global-buffer-prop-ensure
 			 :key "HUGO_SECTION"
 			 :plist export-global-plist
-			 :drawer drawer
 			 :default (format-time-string "posts/%Y")))
 	       (base_dir (jf/export-org-to-tor--global-buffer-prop-ensure
 			  :key "HUGO_BASE_DIR"
 			  :plist export-global-plist
-			  :drawer drawer
 			  :default "~/git/takeonrules.source"))
 	       (format (jf/export-org-to-tor--global-buffer-prop-ensure
 			:key "HUGO_FRONT_MATTER_FORMAT"
 			:plist export-global-plist
-			:drawer drawer
 			:default "yaml"))
 	       (subtitle (jf/export-org-to-tor--global-buffer-prop-ensure
 			  :key "SUBTITLE"
 			  :plist export-global-plist))
-	       (title (jf/export-org-to-tor--global-buffer-prop-ensure
-		       :key "TITLE"
-		       :plist export-global-plist)))
+	       (title (lax-plist-get export-global-plist "TITLE"))
+	       (identifier (lax-plist-get export-global-plist "IDENTIFIER")))
 	  (save-buffer)
 	  (jf/export-org-to-tor--inject-additional-front-matter
 	   :subtitle subtitle
 	   :title title
-	   :org_id org_id
-	   :drawer drawer)
+	   :identifier identifier)
 	  ;; Write metadata
 	  (save-buffer)
 	  (unless org-transclusion-mode (org-transclusion-mode))
 	  (org-open-file (org-hugo-export-wim-to-md nil nil t)))))
     (setq jf/exporting-org-to-tor nil))
 
-  (defun jf/export-org-to-tor--ensure-org-id-property ()
-    "Ensure the current buffer has an ID property."
-    (beginning-of-buffer)
-    (org-id-get-create))
-
-  (defun jf/export-org-to-tor--ensure-drawer (name)
-    "Ensure that a top-level drawer with the given NAME."
-    (beginning-of-buffer)
-    (if (search-forward-regexp
-	 (format ":%s:\n\\(.\\|\n\\)+?:END:\n" (upcase name))
-	 nil t)
-	(upcase name)
-      (progn
-	(beginning-of-buffer)
-	(search-forward-regexp ":PROPERTIES:\n\\(.\\|\n\\)+?:END:\n")
-	(insert (format ":%s:\n:END:\n" (upcase name)))
-	(upcase name))))
-
-  (cl-defun jf/export-org-to-tor--inject-additional-front-matter (&key org_id subtitle title drawer)
+  (cl-defun jf/export-org-to-tor--inject-additional-front-matter (&key identifier subtitle title)
     "Export additional front matter.
 
-    We want to ensure that we export the ORG_ID, SUBTITLE, and TITLE.
-    And add relevant metadata.
-    When DRAWER is not nil, put the front-matter in the drawer."
+    We want to ensure that we export the IDENTIFIER, SUBTITLE, and TITLE.
+    And add relevant metadata."
     (beginning-of-buffer)
     (search-forward-regexp "#\\+HUGO_FRONT_MATTER_FORMAT: yaml")
     (insert (concat
@@ -202,7 +170,7 @@ two concerns:
 	     "\n#+HUGO_CUSTOM_FRONT_MATTER: :layout post"
 	     "\n#+HUGO_CUSTOM_FRONT_MATTER: :licenses '(all-rights-reserved)"
 	     "\n#+HUGO_CUSTOM_FRONT_MATTER: :draft true"
-	     "\n#+HUGO_CUSTOM_FRONT_MATTER: :org_id " org_id
+	     "\n#+HUGO_CUSTOM_FRONT_MATTER: :org_id " identifier
 	     "\n#+INCLUDE: " jf/org-macros-setup-filename)
 	    )
     (let ((date (car (org-property-values "SESSION_REPORT_DATE"))))
@@ -214,22 +182,18 @@ two concerns:
 	    "\n#+HUGO_CUSTOM_FRONT_MATTER: :sessionReport '((date . \"%s\") (game . \"%s\") (location . \"%s\"))"
 	    date game location))))))
 
-  (cl-defun jf/export-org-to-tor--global-buffer-prop-ensure (&key key plist (default nil) drawer)
+  (cl-defun jf/export-org-to-tor--global-buffer-prop-ensure (&key key plist (default nil))
     "Ensure the current buffer has the given KEY in the global PLIST, if not set the DEFAULT or prompt for it."
     (let ((value (lax-plist-get plist key)))
       (if value value
 	(jf/export-org-to-tor--global-buffer-prop-set
 	 :key key
-	 :drawer drawer
 	 :value (or default (read-from-minibuffer (format "%s: " key)))))))
 
-  (cl-defun jf/export-org-to-tor--global-buffer-prop-set (&key key value drawer)
+  (cl-defun jf/export-org-to-tor--global-buffer-prop-set (&key key value)
     "Set the global property named KEY to the VALUE for the current buffer"
-    (beginning-of-buffer)
-    (if drawer
-	(search-forward-regexp (format "^:%s:\n" drawer))
-      (search-forward-regexp ":PROPERTIES:\n\\(.\\|\n\\)+?:END:\n"))
-    (insert (format "#+%s: %s\n" (upcase key) value)))
+    (goto-line 5)
+    (insert (format "\n#+%s: %s" (upcase key) value)))
 
   (defvar jf/tor-session-report-location
     '("around the table" "via Zoom" "via Discord and Roll20" "via Discord")
@@ -240,23 +204,24 @@ two concerns:
 
     This involves adding a FILETAG and metadata around the details of the session report."
     (interactive)
-    (with-current-buffer buffer
-      (save-excursion
-	(beginning-of-buffer)
-	(jf/export-org-to-tor--ensure-org-id-property)
-	(org-roam-tag-add '("sessions"))
-	(let* ((date (org-read-date nil nil nil "Session Date"))
-	       (game (completing-read "Game: " (jf/tor-game-list)))
-	       (location (completing-read "Location: " jf/tor-session-report-location)))
-	  (org-set-property "SESSION_REPORT_DATE" date)
-	  (org-set-property "SESSION_REPORT_GAME" game)
-	  (org-set-property "SESSION_REPORT_LOCATION" location)))))
+    (message "TODO: Adjust for Denote methodology")
+    ;; (with-current-buffer buffer
+    ;;   (save-excursion
+    ;;     (beginning-of-buffer)
+    ;;     (org-roam-tag-add '("sessions"))
+    ;;     (let* ((date (org-read-date nil nil nil "Session Date"))
+    ;; 	     (game (completing-read "Game: " (jf/tor-game-list)))
+    ;; 	     (location (completing-read "Location: " jf/tor-session-report-location)))
+    ;; 	(org-set-property "SESSION_REPORT_DATE" date)
+    ;; 	(org-set-property "SESSION_REPORT_GAME" game)
+    ;; 	(org-set-property "SESSION_REPORT_LOCATION" location))))
+    )
 
   (defun jf/org-global-props-as-plist ()
     (-flatten (mapcar (lambda (prop)
 			(list (org-element-property :key prop)
 			      (org-element-property :value prop)))
-		      (jf/org-global-props "\\(FILETAGS\\|HUGO_FRONT_MATTER_FORMAT\\|HUGO_SECTION\\|HUGO_BASE_DIR\\|TITLE\\|SUBTITLE\\)"))))
+		      (jf/org-global-props "\\(IDENTIFIER\\|FILETAGS\\|HUGO_FRONT_MATTER_FORMAT\\|HUGO_SECTION\\|HUGO_BASE_DIR\\|TITLE\\|SUBTITLE\\)"))))
 
   (defun jf/org-global-props (&optional property)
     "Get the plists of global org properties of current buffer."
@@ -267,6 +232,9 @@ two concerns:
       (lambda (el)
 	(when (string-match property (org-element-property :key el)) el))))
 #+end_src
+
+#+RESULTS:
+: jf/org-global-props
 
 ** Jumping from the Blog Markdown File to Org File
 
