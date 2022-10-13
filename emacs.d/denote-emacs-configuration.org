@@ -211,9 +211,9 @@ I have the domains following:
 - Employer :: More specifically, [[https://scientist.com][Scientist.com]].
 - Epigraph :: A quote that I found interesting.
 - Glossary :: A term/concept I reference.
+- Indices :: A place to put the indices for referencing other documents; my various [[http://takeonrules.com/series/][Series]] would each make a great index.  As would the page Series.
 - Melange :: “A mixture, a medley”; also an homage to Frank Herbert’s “Dune”
 - People :: Similar to a glossary but for notes regarding people.
-- Series :: Conceptual grouping of blog posts.
 
 *** Blog Post
 
@@ -318,7 +318,9 @@ With all of the changes I’ve made, I need to see if I’m still looking up the
 	      nil
 	      template)))
 
-  (jf/denote-create-functions-for :domain "epigraphs" :key ?e :create-fn 'jf/denote-create-epigraph)
+  (jf/denote-create-functions-for :domain "epigraphs"
+				  :key ?e
+				  :create-fn 'jf/denote-create-epigraph)
 #+end_src
 
 *** Glossary
@@ -416,27 +418,29 @@ I do write notes about people I interact with.  Technically I have glossary entr
   (jf/denote-create-functions-for :domain "people" :key ?p)
 #+end_src
 
-*** Series
+*** Indices
 
 On my site I write [[https://takeonrules.com/series/][series of related articles]].  I track this data in a [[abbr:20221009T115621][YAML]] file; I’d like to treat this data similar to my glossary.
 
 #+begin_src emacs-lisp
-  (cl-defun jf/denote-create-series-entry
-      (&key
-       (title (read-from-minibuffer "Name the Series: ")))
-    "Create a `denote' entry for the given TITLE."
+  (cl-defun jf/denote-create-indices-entry (&key
+					    (title (read-from-minibuffer "Name the Index: "))
+					    (is-a-series (yes-or-no-p "Is this a Take on Rules Series?")))
+    "Create a `denote' index entry for the given TITLE."
     (interactive)
-    (let* ((key (downcase (denote-sluggify title)))
-	   (template (concat "#+SERIES_KEY: " key "\n"
-			     "#+HIGHLIGHT: true\n")))
+    (let* ((keywords (list))
+	   (template (concat (when (s-present? is-a-series)
+			       "#+HIGHLIGHT: true\n"))))
+      (when (s-present? is-a-series)
+	(add-to-list 'keywords "series"))
       (denote title
 	      nil
 	      'org
-	      (f-join (denote-directory) "series")
+	      (f-join (denote-directory) "indices")
 	      nil
 	      template)))
 
-  (jf/denote-create-functions-for :domain "series" :key ?r :create-fn 'jf/denote-create-series-entry)
+  (jf/denote-create-functions-for :domain "indices" :key ?i :create-fn 'jf/denote-create-indices-entry)
 #+end_src
 
 ** Custom Hyperlinks
@@ -469,24 +473,21 @@ I prefer named parameters over positional parameters.  Which is why most of my L
 The =jf/org-link-complete-link-for= function will pre-populate a search.  In the case of =abbr= and =abbr-plural= all entries will be in the =./glossary= subdirectory and have the keyword =_abbr=.
 
 #+begin_src emacs-lisp
-  (cl-defun jf/org-link-complete-link-for (parg &key scheme keyword subdirectory)
-    "Prompt for a SCHEME compatible `denote' with KEYWORD in the given SUBDIRECTORY.
+  (cl-defun jf/org-link-complete-link-for (parg &key scheme filter subdirectory)
+    "Prompt for a SCHEME compatible `denote' with filename FILTER in the given SUBDIRECTORY.
 
   Returns a string of format: \"SCHEME:<id>\" where <id> is
   an `denote' identifier."
-    (concat scheme
-	    ":"
-	    (let ((denote-directory (if subdirectory
-					(f-join (denote-directory)
-						(concat subdirectory "/"))
-				      (denote-directory))))
-	      ;; This leverages a post v1.0.0 parameter of Denote
-	      ;; See https://git.sr.ht/~protesilaos/denote/commit/c6c3fc95c66ba093a266c775f411c0c8615c14c7
-	      (denote-retrieve-filename-identifier (denote-file-prompt (concat " _" keyword "*"))))))
+    (let* ((denote-directory (if subdirectory
+				 (f-join (denote-directory)
+					 (concat subdirectory "/"))
+			       (denote-directory))))
+      ;; This leverages a post v1.0.0 parameter of Denote
+      ;; See https://git.sr.ht/~protesilaos/denote/commit/c6c3fc95c66ba093a266c775f411c0c8615c14c7
+      (concat scheme
+	      ":"
+	      (denote-retrieve-filename-identifier (denote-file-prompt filter)))))
 #+end_src
-
-#+RESULTS:
-: jf/org-link-complete-link-for
 
 The above implementation assumes a post v1.0.0 implementation of Denote.  As of {{{date(2022-10-07,October 7th)}}} this is not part of a released version but is part of the =main= branch.
 
@@ -535,7 +536,7 @@ With the above preliminaries, here are the two parameter types and their configu
 			   :complete (lambda (&optional parg) (jf/org-link-complete-link-for
 							       parg
 							       :scheme "abbr"
-							       :keyword "abbr"
+							       :filter "_abbr*"
 							       :subdirectory "glossary"))
 			   :export (lambda (link description format protocol)
 				     (jf/denote-link-ol-link-with-property link description format protocol
@@ -551,7 +552,7 @@ With the above preliminaries, here are the two parameter types and their configu
 			   :complete (lambda (&optional parg) (jf/org-link-complete-link-for
 							       parg
 							       :scheme "abbr-plural"
-							       :keyword "plural_abbr"
+							       :filter "_plural_abbr*"
 							       :subdirectory "glossary"))
 			   :export (lambda (link description format protocol)
 				     (jf/denote-link-ol-link-with-property link description format protocol
@@ -563,48 +564,6 @@ With the above preliminaries, here are the two parameter types and their configu
 			   ;; :store (lambda (jf/org-link-store-link-for :scheme "abbr-plural"))
 			   )
 #+end_src
-
-**** COMMENT Deprecated
-
-The following are previous incarnations, now deprecated.
-
-#+begin_example emacs-lisp
-  ;; Deprecate for general functions declared later one.
-  (cl-defun jf/org-abbr-plural-link-export-link (link description format protocol
-  &key (use_hugo_shortcode jf/exporting-org-to-tor))
-  "Export a LINK with DESCRIPTION for the given PROTOCOL and FORMAT.
-
-  FORMAT is an Org export backend. We will discard the given DESCRIPTION.  PROTOCOL is ignored."
-  (let* ((prop-list (jf/denote-org-properties-from-id :identifier link :properties '("TITLE" "ABBR" "GLOSSARY_KEY")))
-  (title (alist-get "PLURAL_TITLE" prop-list nil nil #'string=))
-  (property (alist-get "PLURAL_ABBR" prop-list nil nil #'string=))
-  (key (alist-get "GLOSSARY_KEY" prop-list property nil #'string=))
-  (cond
-  ((or (eq format 'html)
-  (eq format 'md))
-  (if use_hugo_shortcode
-  (format "{{< glossary key=\"%s\" abbr=\"t\" >}}" property)
-  (format "<abbr title=\"%s\">%s</abbr>" title property))
-  (_ (format "%s (%s)" title property)))))))
-
-  ;; Deprecate for general functions declared later one.
-  (cl-defun jf/org-abbr-plural-link-export-link (link description format protocol
-  &key (use_hugo_shortcode jf/exporting-org-to-tor))
-  "Export a LINK with DESCRIPTION for the given PROTOCOL and FORMAT.
-
-  FORMAT is an Org export backend. We will discard the given DESCRIPTION.  PROTOCOL is ignored."
-  (let* ((prop-list (jf/denote-org-properties-from-id :identifier link :properties '("TITLE" "ABBR" "GLOSSARY_KEY")))
-  (title (alist-get "TITLE" prop-list nil nil #'string=))
-  (property (alist-get "PLURAL_ABBR" prop-list nil nil #'string=))
-  (key (alist-get "GLOSSARY_KEY" prop-list property nil #'string=))
-  (cond
-  ((or (eq format 'html)
-  (eq format 'md))
-  (if use_hugo_shortcode
-  (format "{{< glossary key=\"%s\" abbr=\"t\" plural=\"t\" >}}" property)
-  (format "<abbr title=\"%s\">%s</abbr>" title property))
-  (_ (format "%s (%s)" title property)))))))
-#+end_example
 
 *** Date Entries
 
@@ -641,6 +600,46 @@ I want to register the =date= scheme for Org-Mode links.
     "Follow the given DATE; uncertain what that means."
     (message "TODO, implement link for %s" date))
 #+end_src
+
+*** Epigraph Entries
+
+
+
+#+begin_src emacs-lisp
+  (cl-defun jf/denote-link-ol-link-with-property (link description format protocol
+						       &key
+						       property-name
+						       additional-hugo-parameters
+						       (use_hugo_shortcode jf/exporting-org-to-tor))
+    "Export a LINK with DESCRIPTION for the given PROTOCOL and FORMAT.
+
+  FORMAT is an Org export backend. We will discard the given
+  DESCRIPTION.  PROTOCOL is ignored."
+    (let* ((cond
+	    ((or (eq format 'html) (eq format 'md))
+	     (if use_hugo_shortcode
+		 (format "{{< epigraph key=\"%s\" >}}" key)
+	       (format "<blockquote>%s</blockquote>" quote)))
+	     (t (format "%s" quote))))))
+
+  (org-link-set-parameters "epigraph"
+			   :complete (lambda (&optional parg) (jf/org-link-complete-link-for
+							       parg
+							       :scheme "epigraph"
+							       :filter ""
+							       :subdirectory "epigraphs"))
+			   :export (lambda (link description format protocol)
+				     (jf/denote-link-ol-epigraph-link-with-property link description format protocol
+										    :property-name "ABBR"
+										    :additional-hugo-parameters "abbr=\"t\""))
+			   :face #'denote-faces-link
+			   :follow #'denote-link-ol-follow
+  ;;; I'm unclear if/how I want to proceed with this
+			   ;; :store (lambda (jf/org-link-store-link-for :scheme "abbr"))
+			   )
+#+end_src
+
+
 
 ** Export Function
 

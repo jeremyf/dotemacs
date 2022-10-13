@@ -45,9 +45,9 @@ There are three “primary” files to consider in ~./emacs.d~:
 
 * Digging Further into emacs.d
 
-I’m starting to disassemble the large singular configuration file.  At present the org files I have are as follows:
+I’m starting to disassemble the large singular configuration file.  As of t present the org files I have are as follows:
 
-- configuration.org :: I wrote about that above.
+- [[file:emacs.d/configuration.org][configuration.org]] :: I wrote about that above.
 - [[file:emacs.d/burning-wheel-emacs-config.org][burning-wheel-emacs-config.org]] :: This contains specific utilities that I use when playing Burning Wheel.  It’s a prototype for how I might think about other games; looking at you “Stars without Number” and “Worlds without Number.”
-- [[file:emacs.d/forem-config.org][forem-config.org]] :: These are functions that help me do my day job.
+- [[file:emacs.d/denote-emacs-configuration.org][denote-emacs-configuration.org]] :: This contains my [[https://protesilaos.com/emacs/denote][Denote]] configuration, tuned to Org-Mode.
 - [[file:emacs.d/random-tables.org][random-tables.org]] :: Some random tables mixed with further thoughts about random tables.
