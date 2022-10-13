@@ -590,8 +590,7 @@ I want to register the =date= scheme for Org-Mode links.
   (cl-defun jf/denote-link-export-date (link description format protocol)
     "Export a date for the given LINK, DESCRIPTION, FORMAT, and PROTOCOL."
     (cond
-     ((or (eq format 'html)
-	  (eq format 'md))
+     ((or (eq format 'html) (eq format 'md))
       (format "<time datetime=\"%s\">%s</time>" link description))
      (t (format "%s (%s)" description link))))
 
@@ -606,7 +605,7 @@ I want to register the =date= scheme for Org-Mode links.
 I want to be able to link and export my epigraph entries.  For now, I'm going to focus on the HTML and Markdown version; as most often when I include an epigraph it is for my blog posts.
 
 #+begin_src emacs-lisp
-  (cl-defun jf/denote-link-ol-link-with-property (link description format protocol
+  (cl-defun jf/denote-link-ol-epigraph-link-with-property (link description format protocol
 						       &key
 						       property-name
 						       additional-hugo-parameters
@@ -617,13 +616,11 @@ I want to be able to link and export my epigraph entries.  For now, I'm going to
   TODO: Consider how to expand beyond blog support."
     (let* ((prop-list (jf/denote-org-properties-from-id
 			 :identifier link
-			 :properties (list "TITLE" property-name  "GLOSSARY_KEY")))
+			 :properties (list "TITLE" property-name  "GLOSSARY_KEY"))))
 	   (cond
-	    ((or (eq format 'html) (eq format 'md))
-	     (when use_hugo_shortcode
-	       (format "{{< epigraph key=\"%s\" >}}" link)))
-	    (t nil))
-	       (format "<blockquote>%s</blockquote>" quote))))
+	    ((and use_hugo_shortcode (or (eq format 'html) (eq format 'md)))
+	     (format "{{< epigraph key=\"%s\" >}}" link))
+	    (t nil))))
 
   (org-link-set-parameters "epigraph"
 			   :complete (lambda (&optional parg) (jf/org-link-complete-link-for

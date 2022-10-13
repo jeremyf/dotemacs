@@ -95,7 +95,7 @@ The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~
 	     :empty-lines-before 1)
 	    ("b" "Blocker"
 	     plain (file+function jf/primary-agenda-filename-for-machine jf/org-mode-agenda-find-blocked-node)
-	     "***** BLOCKED %^{Describe the blocker}? :blocker:"
+	     "***** BLOCKED %^{Describe the blocker} :blocker:"
 	     :immediate-finish t
 	     :jump-to-captured t
 	     :empty-lines-after 1
