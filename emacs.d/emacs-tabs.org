@@ -3,25 +3,33 @@
 
 Show tabs in the current window.  The tab system is something I wrestle with, but I appreciate it’s existence.  These configurations make it easier to use.
 
-* Awesome Tabs
+* Centaur Tabs
+
++As <2022-08-03 Wed> I encountered problems in which the tabs were of the wrong colors.  I didn’t want to fight that.+
+
+Welcome back Centaur Tabs!  In v2.5.0 of the =modus-themes=, Prot removed support for Centaur Tabs.  In v2.7.0, after upstream changes in =centaur-tabs=, he restored support.  See [[https://git.sr.ht/~protesilaos/modus-themes/tree/main/item/CHANGELOG.org][=modus-themes= Changelog]] for details.
+
+Why the return?  For the amazing =centaur-tabs-switch-group=.
 
 #+begin_src emacs-lisp
-  (use-package awesome-tab
-    :after (all-the-icons)
+  (use-package centaur-tabs
     :straight t
-    :custom
-    ;; When set via custom this ensures that it shows tabs.  When set via config,
-    ;; the awesome-tab-mode is “active” but there are no tabs; I need to toggle
-    ;; it off then on to see the tabs.
-    (awesome-tab-mode t)
+    :commands (centaur-tabs-group-by-projectile-project)
+    :commands (centaur-tabs-group-buffer-groups)
     :config
-    (defun awesome-tab-buffer-groups ()
-      "`awesome-tab-buffer-groups' control buffers' group rules.
+    (setq
+     centaur-tabs-set-icons t
+     centaur-tabs-set-modified-marker t
+     centaur-tabs-enable-ido-completion nil
+     uniquify-separator "/"
+     uniquify-buffer-name-style 'forward)
 
-  Group awesome-tab with mode  if buffer is derived from `eshell-mode' `emacs-lisp-mode' `dired-mode' `org-mode' `magit-mode'.
+    (defun centaur-tabs-buffer-groups ()
+      "`centaur-tabs-buffer-groups' control buffers' group rules.
 
+  Group centaur-tabs with mode if buffer is derived from `eshell-mode' `emacs-lisp-mode' `dired-mode' `org-mode' `magit-mode'.
   All buffer name start with * will group to \"Emacs\".
-  Other buffer group by `awesome-tab-get-group-name' with project name."
+  Other buffer group by `centaur-tabs-get-group-name' with project name."
       (list
        (cond
 	;; ((not (eq (file-remote-p (buffer-file-name)) nil))
@@ -55,33 +63,33 @@ Show tabs in the current window.  The tab system is something I wrestle with, bu
 			    diary-mode))
 	 "OrgMode")
 	(t
-	 (awesome-tab-get-group-name (current-buffer))))))
-  :bind
-      ("s-[" . awesome-tab-backward-group)
-      ("s-]" . awesome-tab-forward-group)
-      ;; Move through the tabs of the group
-      ("s-{" . awesome-tab-backward-tab)
-      ("s-}" . awesome-tab-forward-tab)
-      ("s-;" . awesome-tab-ace-jump)
-      ("s-\\" . awesome-tab-switch-group))
+	 (centaur-tabs-get-group-name (current-buffer))))))
 
-#+end_src
+    ;; :hook
+    ;; (dashboard-mode . centaur-tabs-local-mode)
+    ;; (term-mode . centaur-tabs-local-mode)
+    ;; (calendar-mode . centaur-tabs-local-mode)
+    ;; (org-agenda-mode . centaur-tabs-local-mode)
+    ;; (helpful-mode . centaur-tabs-local-mode)
+    :bind
+    ("s-[" . centaur-tabs-backward-group)
+    ("s-]" . centaur-tabs-forward-group)
+    ;; Move through the tabs of the group
+    ("s-{" . centaur-tabs-backward-tab)
+    ("s-}" . centaur-tabs-forward-tab)
+    ("s-\\" . centaur-tabs-switch-group)
+    ("M-s-\\" . jf/centaur-tabs-toggle-grouping))
 
-I learned about =eyebrowse.el= from https://github.com/frostyx/dotfiles/blob/master/.emacs.d/frostyx.org#eyebrowse-1.  I’m curious to explore this window manager.
+  (centaur-tabs-group-by-projectile-project)
 
-#+begin_src emacs-lisp
-  (use-package eyebrowse
-    :straight t
-    :config
-    (eyebrowse-mode t)
-    :bind (("M-0" . eyebrowse-switch-to-window-config-0)
-	   ("M-1" . eyebrowse-switch-to-window-config-1)
-	   ("M-2" . eyebrowse-switch-to-window-config-2)
-	   ("M-3" . eyebrowse-switch-to-window-config-3)
-	   ("M-4" . eyebrowse-switch-to-window-config-4)
-	   ("M-5" . eyebrowse-switch-to-window-config-5)
-	   ("M-6" . eyebrowse-switch-to-window-config-6)
-	   ("M-7" . eyebrowse-switch-to-window-config-7)
-	   ("M-8" . eyebrowse-switch-to-window-config-8)
-	   ("M-9" . eyebrowse-switch-to-window-config-9)))
+  (defun jf/centaur-tabs-toggle-grouping ()
+    (interactive)
+    (if (jf/centaur-tabs-grouping-by-buffer-groups?)
+	(centaur-tabs-group-by-projectile-project)
+      (centaur-tabs-group-buffer-groups)))
+
+  (defun jf/centaur-tabs-grouping-by-buffer-groups? ()
+    (eq 'centaur-tabs-buffer-groups centaur-tabs-buffer-groups-function))
+
+  (centaur-tabs-mode t)
 #+end_src
