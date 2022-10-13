@@ -2709,10 +2709,12 @@ I use org-mode and org-roam to help manage content.  Let’s load that rather ex
 		       buffer-file-name
 		       " | rg \"^summary\"")))))
 	(jf/open-pull-request-for :summary summary)))
-    :bind (("s-7" . magit-status))
-    ;; In other situations I bind s-6 to `git-messenger:popup-message'
-    :bind (:map magit-log-mode-map ("s-6" . 'jf/magit-browse-pull-request))
-    :hook ((with-editor-post-finish-hook . magit-status)))
+    :bind (("s-7" . magit-status)
+	   ("C-x g f" . magit-file-dispatch)
+	   ("C-x g d" . magit-dispatch))
+  ;; In other situations I bind s-6 to `git-messenger:popup-message'
+  :bind (:map magit-log-mode-map ("s-6" . 'jf/magit-browse-pull-request))
+  :hook ((with-editor-post-finish-hook . magit-status)))
 #+end_src
 
 ***** Magit Difftastic
