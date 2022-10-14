@@ -70,8 +70,10 @@ The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~
     :bind (:map org-mode-map ("C-j" . jf/jump-to-agenda-or-mark))
     :custom (org-use-speed-commands t)
     :config (setq
+	     org-use-fast-todo-selection 'expert
 	     org-imenu-depth 3
 	     org-export-with-sub-superscripts nil
+	     org-agenda-log-mode-items '(clock)
 	     org-directory (file-truename "~/git/org")
 	     org-agenda-files (jf/org-agenda-files
 			       :paths jf/data-directories
@@ -79,14 +81,9 @@ The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~
 	     org-default-notes-file (concat
 				     org-directory
 				     "/captured-notes.org")
-	     org-todo-keywords '((sequence "BLOCKED" "|" "UNBLOCKED")
-				 (sequence "TO-MERGE" "|" "MERGED")
-				 (sequence
-				  "TODO"
-				  "IN-PROGRESS"
-				  "WAITING"
-				  "|"
-				  "DONE")))
+	     org-log-done 'time
+	     org-todo-keywords '((type "TODO(t)" "IN-PROGRESS(i!)" "BLOCKED(b@/!)" "|" "DONE(d!)" "CANCELLED(c@)"))
+	     )
     (setq org-capture-templates
 	  '(("@"
 	     "All Todo"
@@ -102,7 +99,7 @@ The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~
 	     )
 	    ("m" "Merge Request"
 	     plain (file+function jf/primary-agenda-filename-for-machine jf/org-mode-agenda-find-merge-request-node)
-	     "***** TO-MERGE %^{URL of Merge Request} :mergerequest:"
+	     "***** IN-PROGRESS %^{URL of Merge Request} :mergerequest:"
 	     :immediate-finish t
 	     :jump-to-captured t
 	     :empty-lines-after 1
@@ -120,7 +117,7 @@ The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~
 	     ;; making the assumption about project/task depth.
 	     plain (file+function jf/primary-agenda-filename-for-machine jf/org-mode-agenda-find-project-node)
 	     ;; The five ***** is due to the assumptive depth of the projects and tasks.
-	     "***** %^{Describe the task} :task:\n\n"
+	     "***** TODO %^{Describe the task} :task:\n\n"
 	     :jump-to-captured t
 	     :immediate-finish t
 	     :clock-in t)))
