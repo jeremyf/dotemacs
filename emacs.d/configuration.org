@@ -1150,7 +1150,7 @@ More on these component matchings styles is available at [[https://github.com/mi
       (tab-always-indent 'complete)
       (completion-cycle-threshold nil)      ; Always show candidates in menu
 
-      (corfu-auto nil)
+      (corfu-auto t)
       (corfu-auto-prefix 2)
       (corfu-auto-delay 0.25)
 
@@ -1262,16 +1262,18 @@ More on these component matchings styles is available at [[https://github.com/mi
 #+begin_src emacs-lisp
   (use-package cape
     :straight t
-    :bind (("C-c p p" . completion-at-point)
-	   ("C-c p d" . cape-dabbrev)
+    :init (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+    (add-to-list 'completion-at-point-functions #'cape-file)
+    :bind (("C-c p d" . cape-dabbrev)
 	   ("C-c p f" . cape-file)
 	   ("C-c p s" . cape-symbol)
 	   ("C-c p i" . cape-ispell)))
 
+
   ;; Use Company backends as Capfs.
-  (setq-local completion-at-point-functions
-    (mapcar #'cape-company-to-capf
-      (list #'company-files #'company-ispell #'company-dabbrev)))
+  ;; (setq-local completion-at-point-functions
+  ;; 	    (mapcar #'cape-company-to-capf
+  ;; 		    (list #'company-files #'company-ispell #'company-dabbrev)))
 #+end_src
 
 **** yasnippet.el

@@ -66,6 +66,7 @@ The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~
   (use-package org
     :straight (org :type built-in)
     :hook (org-mode . turn-on-visual-line-mode)
+    (org-mode . jf/org-completion-at-point-functions)
     :bind ("C-j" . jf/jump-to-agenda-or-mark)
     :bind (:map org-mode-map ("C-j" . jf/jump-to-agenda-or-mark))
     :custom (org-use-speed-commands t)
@@ -207,6 +208,36 @@ The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~
   (setq org-plantuml-jar-path (concat (string-trim (shell-command-to-string "brew-path plantuml")) "/libexec/plantuml.jar"))
 #+end_src
 
+These are the list of completion at point functions I want for Org-Mode.
+
+#+begin_src emacs-lisp
+  (defun jf/org-completion-at-point-functions ()
+    (setq-local completion-at-point-functions
+		(list (cape-super-capf
+		       #'tempel-expand
+		       #'org-completion-symbols
+		       #'cape-dabbrev
+		       #'cape-file
+		       #'cape-dict
+		       #'cape-ispell
+		       #'cape-keyword
+		       #'cape-history
+		       #'elisp-completion-at-point))))
+
+  ;; From https://oremacs.com/2017/10/04/completion-at-point/
+  (defun org-completion-symbols ()
+    (when (looking-back "=[a-zA-Z]+")
+      (let (cands)
+	(save-match-data
+	  (save-excursion
+	    (goto-char (point-min))
+	    (while (re-search-forward "=\\([a-zA-Z]+\\)=" nil t)
+	      (cl-pushnew
+	       (match-string-no-properties 0) cands :test 'equal))
+	    cands))
+	(when cands
+	  (list (match-beginning 0) (match-end 0) cands)))))
+#+end_src
 I cribbed the following function from [[https://xenodium.com/emacs-dwim-do-what-i-mean/][Emacs DWIM: do what ✨I✨ mean]].
 
 #+begin_src emacs-lisp
