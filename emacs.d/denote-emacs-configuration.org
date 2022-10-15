@@ -697,22 +697,30 @@ As of <2022-10-14 Fri>, a future consideration is to move away from ROAM_REFS.  
   ;;(message "%s" (jf/denote-export-url-from-id "20221009T120712"))
   #+end_src
 
+I export notes to my blog.  And when I publish I want to connect the published URL to the note.
+
 #+begin_src emacs-lisp
   (defun jf/associate-blog-post-url-with-identifier (url identifier)
     "Associate given URL with the `denote' IDENTIFIER."
     (let* ((filename (denote-get-path-by-id identifier))
 	   (buffer (find-file-noselect filename)))
-      (with-current-buffer buffer)
-      (jf/export-org-to-tor--global-buffer-prop-ensure
+      (with-current-buffer buffer
+	(jf/export-org-to-tor--global-buffer-prop-ensure
 			    :key "ROAM_REFS"
-			    :plist (jf/org-global-props-as-plist "ROAM_REFS")
-			    :default url)))
+			    :plist (jf/org-global-props-as-plist :props-regexp "ROAM_REFS")
+			    :default url)
+	(save-buffer))))
+
+  ;;; Used as test.
+  ;; (jf/associate-blog-post-url-with-identifier "https://takeonrules.com/2022/10/12/analysis-and-preliminary-work-for-importing-functionality-from-another-project/"
+  ;; 					    "20221011T083525")
 #+end_src
 
 ** Additional Tooling
 
 *** Capture URL and Title
 
+I want to capture entries from various applications.
 
 #+begin_src emacs-lisp
   (defun jf/menu--org-capture-firefox ()
