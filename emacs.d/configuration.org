@@ -2148,6 +2148,14 @@ quasi-opinionated compromise.
 	   ([C-s-up] . move-text-up)))
 #+end_src
 
+**** string-inflection.el
+
+#+begin_src emacs-lisp
+  (use-package string-inflection
+    :straight t)
+#+end_src
+
+
 **** tempel.el
 
 I have only provisionally adopted this.  I like the idea of abbreviations/snippets using emacs-lisp.  This is a “to be determined” package.
@@ -4343,14 +4351,6 @@ some additional options.
       ("j p" "Jump in PDF" doc-view-goto-page :if-derived doc-view-mode)
       ("j s" "Jump to Shortdoc" shortdoc-display-group)
       ]
-     ;; ["Dailies"
-     ;;  ("d c" "Capture a daily note…" org-roam-dailies-capture-date)
-     ;;  ("d p" "Pick a daily" org-roam-dailies-goto-date)
-     ;;  ("d t" "Today's daily" org-roam-dailies-goto-today)
-     ;;  ("d T" "Tomorrow's daily" org-roam-dailies-goto-tomorrow)
-     ;;  ("d u" "Capture URL as a todo for today…" jf/org-roam-dailies--add-entry-for-url)
-     ;;  ("d y" "Yesterday's daily" org-roam-dailies-goto-yesterday)
-     ;;  ]
      ["Modes"
       ("C-n" "MacOS Night Shift" (lambda () (interactive) (shell-command "nightlight on")))
       ;; I could write functions for these, but this is concise enough
@@ -4365,23 +4365,25 @@ some additional options.
       ("m w" "Writeroom (*)" writeroom-mode :if-non-nil writeroom-mode)
       ]]
     ["Org"
-     ["Add Metadata"
-      ("C-e a" "Add epigraph properties…" jf/org-mode-add-epigraph-keys :if-derived org-mode)
-      ("C-e i" "Add epigraph at point…" jf/org-roam-insert-at-point-epigraph-macro :if-derived org-mode)
-      ("r a" "Ref add…" org-roam-ref-add :if-derived org-mode)
-      ("t s" "Tag as session report…" jf/org-tag-as-session-report :if-derived org-mode)
-      ("t a" "Tag add…" org-roam-tag-add :if-derived org-mode)
-      ("t S" "Tag as session Scene…" jf/org-tag-session-scene-with-date :if-derived org-mode)]
-     ["Context"
-      ("M-c" "Context set…" jf/org-auto-tags--set-by-context :transient t)
-      ("M-t" jf/org-auto-tags--transient :transient t)
-      ("x" "Export to TakeOnRules…" jf/export-org-to-tor :if-derived org-mode)
-      ]
+
+     ;; ["Add Metadata"
+     ;; ("C-e a" "Add epigraph properties…" jf/org-mode-add-epigraph-keys :if-derived org-mode)
+     ;; ("C-e i" "Add epigraph at point…" jf/org-roam-insert-at-point-epigraph-macro :if-derived org-mode)
+     ;; ("r a" "Ref add…" org-roam-ref-add :if-derived org-mode)
+     ;; ("t s" "Tag as session report…" jf/org-tag-as-session-report :if-derived org-mode)
+     ;; ("t a" "Tag add…" org-roam-tag-add :if-derived org-mode)
+     ;; ("t S" "Tag as session Scene…" jf/org-tag-session-scene-with-date :if-derived org-mode)]
+     ;; ["Context"
+     ;; ("M-c" "Context set…" jf/org-auto-tags--set-by-context :transient t)
+     ;; ("M-t" jf/org-auto-tags--transient :transient t)
+     ;; ]
      ["Tasks"
-      ("s" "Search…" (lambda () (interactive) (consult-ripgrep org-directory)))
+      ("s" "Search note content…" (lambda () (interactive) (consult-notes-search-in-all-notes)))
+      ("S" "Search note filename…" (lambda () (interactive) (consult-notes)))
       ("C-t" "Start a timer…" tmr-with-description)
       ("u" "Copy stand-up to kill ring" jf/org-mode-agenda-to-stand-up-summary)
       ("w" "Weekly hours report" jf/org-mode-weekly-report)
+      ("x" "Export to TakeOnRules…" jf/export-org-to-tor :if-derived org-mode)
       ]
      ["Grab Refs"
       ("g e" "Elfeed" jf/menu--org-capture-elfeed-show :if-derived elfeed-show-mode)

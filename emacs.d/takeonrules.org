@@ -249,7 +249,7 @@ Given that I have files in my [[id:1173D588-E239-4B13-BFA6-0C670DCE484A][Hugo]] 
 	(beginning-of-buffer)
 	(save-match-data
 	  (if (re-search-forward "\norg_id: \\(.+\\)\n" nil t)
-	      (find-file (org-id-find-id-file (match-string 1)))
+	      (find-file (denote-get-path-by-id (match-string 1)))
 	    (message "Unable to find org_id: in document"))))))
 #+end_src
 

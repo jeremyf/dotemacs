@@ -509,7 +509,7 @@ Now when I type =~~~=, I get a source block.  And I can even default that block 
       (call-interactively #'org-self-insert-command)))
 #+end_src
 
-* Org-Roam
+* COMMENT Org-Roam
 
 This is my third iteration on an ~org-roam~.  It's goal is to address use-cases that I've encountered while moving more of my note-taking with ~org-roam~.
 
@@ -1081,7 +1081,7 @@ Sometimes I use inline sidenotes, that’s the purpose of this macro.
 	       '("linkToSeries" . "@@hugo:{{< linkToSeries \"@@$1@@hugo:\" >}}@@"))
 #+end_src
 
-** Some Org-Roam Helper Functions
+** COMMENT Some Org-Roam Helper Functions
 
 Moving between Org-Roam and Org-Mode nodes I often need to retrieve a property from the Org-Mode structure; something that isn’t “native” for Org-Roam.  The following helps navigate that.
 
@@ -1174,7 +1174,7 @@ See https://takeonrules.com/2022/01/11/resolving-an-unable-to-resolve-link-error
     (org-roam-update-org-id-locations))
 #+end_src
 
-** Capturing Epigraphs
+** COMMENT Capturing Epigraphs
 
 For my blogging purposes, I capture epigraphs and blockquotes.  These are treated somewhat differently.
 
@@ -1199,7 +1199,7 @@ The ~jf/org-mode-add-epigraph-keys~ function seeds the properties for a
 	(org-roam-property-add (car prop) (if (cadr prop) "**REQUIRED**" "")))))
 #+end_src
 
-** Org Roam “Backlinks” for Tags
+** COMMENT Org Roam “Backlinks” for Tags
 
 This builds on [[https://github.com/org-roam/org-roam/issues/1698][Automatic node linking to tags and TODO states · Issue #1698 · org-roam/org-roam]]
 

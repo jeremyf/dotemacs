@@ -51,6 +51,7 @@ Let’s add another way at looking up files.
     :straight (:type git :host github :repo "mclear-tools/consult-notes")
     :bind
     ("H-d s" . 'consult-notes-search-in-all-notes)
+    ("H-d f RET" . 'consult-notes)
     :commands (consult-notes
 	       consult-notes-search-in-all-notes))
 
@@ -664,8 +665,17 @@ The below function over-writes the denote export logic.  It works in a specific 
   (advice-add #'denote-link-ol-export :override #'jf/denote-link-ol-export '((name . "wrapper")))
 #+end_src
 
+When I link to glossary entries, I want to use their URLs.  I have several different fields that could have the “export url”:
+
+- OFFER :: The URL which you can “get” the item (e.g. purchase the game, find where to check it out at a library)
+- ROAM_REFS :: In past incarnations, I would add a ROAM_REFS to the Org-Roam node that was my “local” blog post.
+- SAME_AS :: This could be the primary URL; however due to past implementations, I was extracting the SAME_AS URL from the ITEMID; which was typically the Wikidata URL.
+
+As of <2022-10-14 Fri>, a future consideration is to move away from ROAM_REFS.  I would likely move that entry to the SAME_AS node.
+
 #+begin_src emacs-lisp
   (defun jf/denote-export-url-from-id (identifier)
+    "Return the appropriate url for the given `denote' identifier."
     (when-let ((filename (denote-get-path-by-id identifier)))
       (when (string= (file-name-extension filename) "org")
 	(with-current-buffer (find-file-noselect filename)
@@ -687,21 +697,64 @@ The below function over-writes the denote export logic.  It works in a specific 
   ;;(message "%s" (jf/denote-export-url-from-id "20221009T120712"))
   #+end_src
 
+#+begin_src emacs-lisp
+  (defun jf/associate-blog-post-url-with-identifier (url identifier)
+    "Associate given URL with the `denote' IDENTIFIER."
+    (let* ((filename (denote-get-path-by-id identifier))
+	   (buffer (find-file-noselect filename)))
+      (with-current-buffer buffer)
+      (jf/export-org-to-tor--global-buffer-prop-ensure
+			    :key "ROAM_REFS"
+			    :plist (jf/org-global-props-as-plist "ROAM_REFS")
+			    :default url)))
+#+end_src
+
 ** Additional Tooling
 
+*** Capture URL and Title
+
+
 #+begin_src emacs-lisp
+  (defun jf/menu--org-capture-firefox ()
+    "Create an `denote' entry from Firefox page."
+    (interactive)
+    (require 'grab-mac-link)
+    (let* ((link-title-pair (grab-mac-link-firefox-1))
+	   (url (car link-title-pair))
+	   (title (cadr link-title-pair)))
+      (jf/denote-capture-reference :url url :title title)))
+
+  (defun jf/menu--org-capture-safari ()
+    "Create an `denote' entry from Safari page."
+    (interactive)
+    (require 'grab-mac-link)
+    (let* ((link-title-pair (grab-mac-link-safari-1))
+	   (url (car link-title-pair))
+	   (title (cadr link-title-pair)))
+      (jf/denote-capture-reference :url url :title title)))
+
+  (defun jf/menu--org-capture-eww ()
+    "Create an `denote' entry from `eww' data."
+    (interactive)
+    (let* ((url (plist-get eww-data :url))
+	   (title (plist-get eww-data :title)))
+      (jf/denote-capture-reference :url url :title title)))
+
   (cl-defun jf/menu--org-capture-elfeed-show (&key (entry elfeed-show-entry))
-    "Create a `denote' from ENTRY."
+    "Create a `denote' from `elfeed' ENTRY."
     (interactive)
     (let* ((url (elfeed-entry-link entry))
-	   (title (elfeed-entry-title entry))
-	   (template (concat "#+ROAM_REFS: " url "\n")))
-      (denote title
-	      '("rss")
-	      'org
-	      (f-join (denote-directory) "melange")
-	      nil
-	      template)))
+	   (title (elfeed-entry-title entry)))
+      (jf/denote-capture-reference :url url :title title)))
+
+  (cl-defun jf/denote-capture-reference (&key title url keywords (subdirectory "melange"))
+    "Create a `denote' entry for the TITLE and URL."
+    (denote title
+	    keywords
+	    'org
+	    (f-join (denote-directory) subdirectory)
+	    nil
+	    (template (concat "#+ROAM_REFS: " url "\n"))))
 #+end_src
 
 ** Conclusion
