@@ -13,7 +13,8 @@
 ;; best advice I read online is to double the GC threshold until you
 ;; don't feel improvements. My value is (setq gc-cons-threshold
 ;; 8000000) ;; ~8MB
-(setq gc-cons-threshold most-positive-fixnum)
+(setq gc-cons-threshold most-positive-fixnum
+      gc-cons-percentage 0.6)
 
 ;; From straight.el, "Users of Emacs versions >= 27 will want to add
 ;; the following:"

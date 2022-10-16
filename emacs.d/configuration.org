@@ -122,6 +122,33 @@ it seamlessly works with ~use-package~ has help me keep my code more organized.
   (straight-use-package 'use-package)
 #+end_src
 
+*** Native Compilation
+
+From [[https://xenodium.com/trying-out-gccemacs-on-macos/][Trying out gccemacs on macOS]]
+
+#+begin_src emacs-lisp
+  (use-package exec-path-from-shell
+    :straight t
+    :config
+    (exec-path-from-shell-initialize)
+    (if (and (fboundp 'native-comp-available-p)
+	     (native-comp-available-p))
+	(progn
+	  (message "Native comp is available")
+	  ;; Using Emacs.app/Contents/MacOS/bin since it was compiled with
+	  ;; ./configure --prefix="$PWD/nextstep/Emacs.app/Contents/MacOS"
+	  (add-to-list 'exec-path (concat invocation-directory "bin") t)
+	  (setenv "LIBRARY_PATH" (concat (getenv "LIBRARY_PATH")
+					 (when (getenv "LIBRARY_PATH")
+					   ":")
+					 ;; This is where Homebrew puts gcc libraries.
+					 (car (file-expand-wildcards
+						"/opt/homebrew/lib/gcc/*"))))
+	  ;; Only set after LIBRARY_PATH can find gcc libraries.
+	  (setq comp-deferred-compilation t))
+      (message "Native comp is *not* available")))
+#+end_src
+
 *** Preliminary Configuration
 
 These are some general configurations that I’ve slowly accumulated.  There’s
@@ -347,6 +374,7 @@ Some basic packages to keep things less chatty.
 I want to start with a basic look and feel.  First, the choice of primary font.
 
 #+begin_src emacs-lisp
+  (mapc #'disable-theme custom-enabled-themes)
   (defvar jf/fixed-width-font-name
     "Iosevka Comfy Motion Fixed"
     "The name of the fixed width font.
@@ -411,6 +439,27 @@ told it sets things up how I like.
        (4 . (overline 1.1))
        (t . (rainbow 1.05)))))
 #+end_src
+
+#+begin_example emacs-lisp
+  (use-package ef-themes
+    :straight t
+    :config (setq
+	     ef-themes-to-toggle '(ef-summer ef-winter)
+	     ef-themes-headings ; read the manual's entry or the doc string
+	     '((0 . (variable-pitch light 1.9))
+	       (1 . (variable-pitch light 1.8))
+	       (2 . (variable-pitch regular 1.7))
+	       (3 . (variable-pitch regular 1.6))
+	       (4 . (variable-pitch regular 1.5))
+	       (5 . (variable-pitch 1.4)) ; absence of weight means `bold'
+	       (6 . (variable-pitch 1.3))
+	       (7 . (variable-pitch 1.2))
+	       (t . (variable-pitch 1.1)))
+	     ef-themes-mixed-fonts t
+	     ef-themes-variable-pitch-ui t))
+
+  (ef-themes-select 'ef-summer)
+#+end_example
 
 With a quick bit of testing, it appears that the following ~set-face-attribute~
 declarations should be made after the theme declarations.  When the following
@@ -705,6 +754,7 @@ provides annotations to minibuffer completions, and pairs nicely with Vertico.
 #+begin_src emacs-lisp
   (use-package marginalia
     :straight t
+    :config (setq marginalia-max-relative-age 0) ;; Set absolute value
     ;; /Note:/ The declaration of `marginalia-mode' must be in the :init
     ;; section.This ensures that it is enabled right away.  It also forces the
     ;; loading of the package.
@@ -718,6 +768,7 @@ provides annotations to minibuffer completions, and pairs nicely with Vertico.
 - ~projectile.el~ :: this package provides convenient organization and commands to run over projects.
 
 #+begin_src emacs-lisp
+  ;; Convenient organization and commands
   (use-package projectile
     :straight t
     :diminish 'projectile-mode
@@ -736,9 +787,10 @@ When I start writing functions, there’s a few packages I want to consider.
 - ~keychain-environment.el~ :: Load keychain environment variables
 
 #+begin_src emacs-lisp
+  ;; Load keychain environment
   (use-package keychain-environment
-    :straight t
-    :config (keychain-refresh-environment))
+      :straight t
+      :config (keychain-refresh-environment))
 #+end_src
 
 - ~dash.el~ :: A modern list API for Emacs. No 'cl required.  (See https://github.com/magnars/dash.el/)
@@ -1030,16 +1082,16 @@ entirely muscle memory.
    I use this sequence at least once a day.
 
 #+begin_src emacs-lisp
-(use-package wgrep
-    :after (embark-consult ripgrep)
-    :straight t
-    :bind (:map wgrep-mode-map
-		;; Added keybinding to echo Magit behavior
-		("C-c C-c" . save-buffer)
-		:map grep-mode-map
-		("e" . wgrep-change-to-wgrep-mode)
-		:map ripgrep-search-mode-map
-		("e" . wgrep-change-to-wgrep-mode)))
+  (use-package wgrep
+      :after (embark-consult ripgrep)
+      :straight t
+      :bind (:map wgrep-mode-map
+		  ;; Added keybinding to echo Magit behavior
+		  ("C-c C-c" . wgrep-finish-edit)
+		  :map grep-mode-map
+		  ("e" . wgrep-change-to-wgrep-mode)
+		  :map ripgrep-search-mode-map
+		  ("e" . wgrep-change-to-wgrep-mode)))
 #+end_src
 
 **** orderless.el
@@ -1130,47 +1182,47 @@ More on these component matchings styles is available at [[https://github.com/mi
 /Note:/ I may explore [[https://gitlab.com/protesilaos/mct][MCT]] and see how it compares to Corfu.
 
 #+begin_src emacs-lisp
-    (use-package corfu
-      :straight t
-      :demand t
-      ;; Optionally use TAB for cycling, default is `corfu-complete'.
-      :bind (:map corfu-map
-		  ("<escape>". corfu-quit)
-		  ("<return>" . corfu-insert)
-		  ("M-d" . corfu-show-documentation)
-		  ("M-l" . 'corfu-show-location)
-		  ("TAB" . corfu-next)
-		  ([tab] . corfu-next)
-		  ("S-TAB" . corfu-previous)
-		  ([backtab] . corfu-previous))
+  (use-package corfu
+    :straight t
+    :demand t
+    ;; Optionally use TAB for cycling, default is `corfu-complete'.
+    :bind (:map corfu-map
+		("<escape>". corfu-quit)
+		("<return>" . corfu-insert)
+		("M-d" . corfu-show-documentation)
+		("M-l" . 'corfu-show-location)
+		("TAB" . corfu-next)
+		([tab] . corfu-next)
+		("S-TAB" . corfu-previous)
+		([backtab] . corfu-previous))
 
-      :custom
-      ;; Works with `indent-for-tab-command'. Make sure tab doesn't indent when you
-      ;; want to perform completion
-      (tab-always-indent 'complete)
-      (completion-cycle-threshold nil)      ; Always show candidates in menu
+    :custom
+    ;; Works with `indent-for-tab-command'. Make sure tab doesn't indent when you
+    ;; want to perform completion
+    (tab-always-indent 'complete)
+    (completion-cycle-threshold nil)      ; Always show candidates in menu
 
-      (corfu-auto t)
-      (corfu-auto-prefix 2)
-      (corfu-auto-delay 0.25)
+    (corfu-auto nil)
+    (corfu-auto-prefix 2)
+    (corfu-auto-delay 0.25)
 
-      ;; (corfu-min-width 80)
-      ;; (corfu-max-width corfu-min-width)     ; Always have the same width
-      (corfu-count 14)
-      (corfu-scroll-margin 4)
-      (corfu-cycle nil)
+    ;; (corfu-min-width 80)
+    ;; (corfu-max-width corfu-min-width)     ; Always have the same width
+    (corfu-count 14)
+    (corfu-scroll-margin 4)
+    (corfu-cycle nil)
 
-      ;; (corfu-echo-documentation nil)        ; Already use corfu-doc
-      (corfu-separator ?\s)                 ; Necessary for use with orderless
-      (corfu-quit-no-match 'separator)
+    ;; (corfu-echo-documentation nil)        ; Already use corfu-doc
+    (corfu-separator ?\s)                 ; Necessary for use with orderless
+    (corfu-quit-no-match 'separator)
 
-      (corfu-preview-current 'insert)       ; Preview current candidate?
-      (corfu-preselect-first t)             ; Preselect first candidate?
+    (corfu-preview-current 'insert)       ; Preview current candidate?
+    (corfu-preselect-first t)             ; Preselect first candidate?
 
-      :init
-      ;; Recommended: Enable Corfu globally.
-      ;; This is recommended since dabbrev can be used globally (M-/).
-      (global-corfu-mode))
+    :init
+    ;; Recommended: Enable Corfu globally.
+    ;; This is recommended since dabbrev can be used globally (M-/).
+    (global-corfu-mode))
 #+end_src
 
 ***** Extending corfu.el
@@ -1434,6 +1486,10 @@ From [[https://www.masteringemacs.org/article/fixing-mark-commands-transient-mar
 	    help-mode
 	    compilation-mode
 	    "^\\*helpful.*\\*$"))
+    (setq popper-window-height (lambda (win)
+				 (fit-window-to-buffer
+				  win
+				  (floor (frame-height) 3))))
     (popper-mode +1)
     (popper-echo-mode +1))
 
@@ -1758,7 +1814,9 @@ For awhile, I was trying to use lsp-mode.  It might look a bit nicer, but it was
   ;; https://github.com/joaotavora/eglot#1-2-3-pitfall
   (use-package xref
     :straight t
-    :custom (xref-search-program 'ripgrep))
+    :custom
+    (xref-file-name-display 'project-relative)
+    (xref-search-program 'ripgrep))
 
   (use-package project
     :straight t)

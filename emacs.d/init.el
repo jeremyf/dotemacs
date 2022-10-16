@@ -21,6 +21,12 @@
 
 (load (concat user-emacs-directory "hide-comnt.el") :noerror)
 
+(find-file jf/primary-agenda-filename-for-machine)
+(server-start)
+
+(setq gc-cons-threshold 16777216
+      gc-cons-percentage 0.1)
+
 (provide 'init)
 ;;; init.el ends here
 (put 'narrow-to-region 'disabled nil)

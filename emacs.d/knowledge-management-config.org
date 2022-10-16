@@ -45,7 +45,7 @@ A bit of pre-amble.  I maintain a list of data directories, each might have “r
 
   With PREFIX_ARG go to beginning of today's headline."
     (interactive "P")
-    (require 'org)
+    (require 'org-capture)
     (if (car prefix-arg)
 	;; Jump to where we would put a project were we to capture it.
 	(org-capture-goto-target "p")
@@ -63,7 +63,9 @@ A bit of pre-amble.  I maintain a list of data directories, each might have “r
 
 The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~ which introduces my more generalized note taking system.
 
+
 #+begin_src emacs-lisp
+  (bind-key "C-j" 'jf/jump-to-agenda-or-mark)
   (use-package org
     :straight (org :type built-in)
     :hook (org-mode . turn-on-visual-line-mode)
@@ -143,32 +145,32 @@ The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~
     (add-to-list 'org-latex-classes
 		 '("jf/article"
 		   "\\documentclass[11pt,a4paper]{article}
-  \\usepackage[utf8]{inputenc}
-  \\usepackage[T1]{fontenc}
-  \\usepackage{fixltx2e}
-  \\usepackage{graphicx}
-  \\usepackage{longtable}
-  \\usepackage{float}
-  \\usepackage{wrapfig}
-  \\usepackage{rotating}
-  \\usepackage[normalem]{ulem}
-  \\usepackage{amsmath}
-  \\usepackage{textcomp}
-  \\usepackage{marvosym}
-  \\usepackage{wasysym}
-  \\usepackage{amssymb}
-  \\usepackage{hyperref}
-  \\usepackage{mathpazo}
-  \\usepackage{xcolor}
-  \\usepackage{enumerate}
-  \\definecolor{bg}{rgb}{0.95,0.95,0.95}
-  \\tolerance=1000
-	[NO-DEFAULT-PACKAGES]
-	[PACKAGES]
-	[EXTRA]
+    \\usepackage[utf8]{inputenc}
+    \\usepackage[T1]{fontenc}
+    \\usepackage{fixltx2e}
+    \\usepackage{graphicx}
+    \\usepackage{longtable}
+    \\usepackage{float}
+    \\usepackage{wrapfig}
+    \\usepackage{rotating}
+    \\usepackage[normalem]{ulem}
+    \\usepackage{amsmath}
+    \\usepackage{textcomp}
+    \\usepackage{marvosym}
+    \\usepackage{wasysym}
+    \\usepackage{amssymb}
+    \\usepackage{hyperref}
+    \\usepackage{mathpazo}
+    \\usepackage{xcolor}
+    \\usepackage{enumerate}
+    \\definecolor{bg}{rgb}{0.95,0.95,0.95}
+    \\tolerance=1000
+	  [NO-DEFAULT-PACKAGES]
+	  [PACKAGES]
+	  [EXTRA]
 
-  \\linespread{1.1}
-  \\hypersetup{pdfborder=0 0 0}"
+    \\linespread{1.1}
+    \\hypersetup{pdfborder=0 0 0}"
 		   ("\\section{%s}" . "\\section*{%s}")
 		   ("\\subsection{%s}" . "\\subsection*{%s}")
 		   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")

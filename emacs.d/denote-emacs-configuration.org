@@ -31,8 +31,6 @@ This base configuration gets me started using Denote.
 	     (denote-prompts '(title keywords))
 	     ;; I love ‘org-mode format; reading ahead I'm setting this
 	     (denote-file-type 'org)
-	     ;; TODO - this is inferred from my glossary, but as of <2022-10-11
-	     ;; Tue> does not update when I add to the glossary.
 	     (denote-known-keywords (jf/calculated-list-of-denote-known-keywords
 				     :from (expand-file-name "denote/glossary" org-directory)))
 	     ;; Explicitly ensuring that tags can be multi-word (e.g. two or more
@@ -513,12 +511,12 @@ Next is the export functionality.  There are many similarities between =abbr= an
 		       :properties (list "TITLE" property-name  "GLOSSARY_KEY")))
 	   (title (car (alist-get "TITLE" prop-list nil nil #'string=)))
 	   (property (car (alist-get property-name prop-list nil nil #'string=)))
-	   (key (car (alist-get "GLOSSARY_KEY" prop-list property nil #'string=))))
+	   (key (car (alist-get "GLOSSARY_KEY" prop-list nil nil #'string=))))
 	   (cond
 	    ((or (eq format 'html) (eq format 'md))
 	     (if use_hugo_shortcode
 		 (format "{{< glossary key=\"%s\" %s >}}"
-			 property
+			 key
 			 additional-hugo-parameters)
 	       (format "<abbr title=\"%s\">%s</abbr>"
 		       title
@@ -537,7 +535,7 @@ With the above preliminaries, here are the two parameter types and their configu
 			   :complete (lambda (&optional parg) (jf/org-link-complete-link-for
 							       parg
 							       :scheme "abbr"
-							       :filter "_abbr*"
+							       :filter " _abbr*"
 							       :subdirectory "glossary"))
 			   :export (lambda (link description format protocol)
 				     (jf/denote-link-ol-link-with-property link description format protocol
@@ -553,7 +551,7 @@ With the above preliminaries, here are the two parameter types and their configu
 			   :complete (lambda (&optional parg) (jf/org-link-complete-link-for
 							       parg
 							       :scheme "abbr-plural"
-							       :filter "_plural_abbr*"
+							       :filter " _plural_abbr*"
 							       :subdirectory "glossary"))
 			   :export (lambda (link description format protocol)
 				     (jf/denote-link-ol-link-with-property link description format protocol
