@@ -4171,7 +4171,7 @@ I want to reference.
 	(not-modified)
 	(read-only-mode)
 	(special-mode)
-	(local-set-key (kbd "q") 'kill-buffer-and-winow))
+	(local-set-key (kbd "q") 'kill-buffer-and-window))
       (pop-to-buffer qh-buff '((display-buffer-below-selected)
 			       (window-parameters . ((no-other-window . nil)))
 			       (window-height . fit-window-to-buffer)))
