@@ -45,9 +45,19 @@ There are three “primary” files to consider in ~./emacs.d~:
 
 * Digging Further into emacs.d
 
-I’m starting to disassemble the large singular configuration file.  As of t present the org files I have are as follows:
+I’m starting to disassemble the large singular configuration file.  As of <2022-10-16 Sun> the org files I have are as follows:
 
-- [[file:emacs.d/configuration.org][configuration.org]] :: I wrote about that above.
 - [[file:emacs.d/burning-wheel-emacs-config.org][burning-wheel-emacs-config.org]] :: This contains specific utilities that I use when playing Burning Wheel.  It’s a prototype for how I might think about other games; looking at you “Stars without Number” and “Worlds without Number.”
-- [[file:emacs.d/denote-emacs-configuration.org][denote-emacs-configuration.org]] :: This contains my [[https://protesilaos.com/emacs/denote][Denote]] configuration, tuned to Org-Mode.
-- [[file:emacs.d/random-tables.org][random-tables.org]] :: Some random tables mixed with further thoughts about random tables.
+- [[file:emacs.d/configuration.org][configuration.org]] :: I wrote about that above; it is responsible for loading all of the other =org= files in emacs.d
+- [[file:emacs.d/core-rpg-config.org][core-rpg-config.org]] :: Similar in concept to burning-wheel-emacs-config.org.
+- [[file:emacs.d/denote-emacs-configuration.org][denote-emacs-configuration.org]] :: This contains my [[https://protesilaos.com/emacs/denote][Denote]] configuration tuned to Org-Mode.  This should be moved into my knowledge-management-config.
+- [[file:emacs.d/eberron.org][eberron.org]] ::  Similar in concept to burning-wheel-emacs-config.org.
+- [[file:emacs.d/emacs-tabs.org][emacs-tabs.org]] :: Because of a long-standing now resolved bug in Centaur Tabs related to Modus-Themes, I sequestered the tabs into their own file.
+- [[file:emacs.d/experiments.org][experiments.org]] :: A scratch place that I don’t load but where I can write and consider new functionality.
+- [[file:emacs.d/forem-config.org][forem-config.org]] :: The functions I wrote for my work at a previous job.
+- [[file:emacs.d/indesk.org][indesk.org]] :: A thought experiment regarding Org Mode and PDFs
+- [[file:emacs.d/keyboard-macros-config.org][keyboard-macros-config.org]] :: I place where I write and store keyboard macros; I don’t often use this.
+- [[file:emacs.d/knowledge-management-config.org][knowledge-management-config.org]] :: My Org-Mode configuration; with extensive yet now previous Org-Roam functions.
+- [[file:emacs.d/random-tables.org][random-tables.org]] :: I play TTRPGs (when I’m not fiddling with Emacs).  This is a place I’m considering developing random tables.
+- [[file:emacs.d/takeonrules.org][takeonrules.org]] :: Some of the functions for my export to TakeOnRules.com
+- [[file:emacs.d/utility-functions.org][utility-functions.org]] :: Some odd utility functions that didn’t quite belong anywhere.
