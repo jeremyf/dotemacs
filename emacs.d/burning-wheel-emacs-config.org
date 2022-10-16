@@ -252,7 +252,7 @@ Next up is a function for calculating a Black or Gray PTGS.  This is not clean n
 
     Where SCALE is a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
     (jf/quick-help
-     :header "BWG PTGS (p98, p546)"
+     :header (concat "BWG PTGS (p98, p546) Forte:" forte ", Power: " power (when round-up " (Rounded up)"))
      :body (format (concat
 		    "Su %s; Li %s; Mi %s; Se %s; Tr %s; Mo %s"
 		    "\n\nForte: %s\nPower: %s"
