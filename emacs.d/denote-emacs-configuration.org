@@ -638,27 +638,36 @@ I want to be able to link and export my epigraph entries.  For now, I'm going to
 			   )
 #+end_src
 
-** Export Function
+** TODO Export Function
 
 The below function over-writes the denote export logic.  It works in a specific case but will likely require further tweaks.
 
 #+begin_src emacs-lisp
-  (defun jf/denote-link-ol-export (link description format)
+  (cl-defun jf/denote-link-ol-export (link description format
+					   &key (use_hugo_shortcode jf/exporting-org-to-tor))
     "Export a `denote:' link from Org files.
-  The LINK, DESCRIPTION, and FORMAT are handled by the export
-  backend."
+    The LINK, DESCRIPTION, and FORMAT are handled by the export
+    backend.
+
+  TODO: I need to handle the case where I'm exporting MD or HTML
+  and linking an item that doesn't have a URL.  This is the case
+  for leveraging using my shortcode:
+
+  {{< glossary key=\"GLOSSARY_KEY\" >}}."
     (let* ((path-id (denote-link--ol-resolve-link-to-target link :path-id))
 	   (title (jf/denote-org-property-from-id :identifier link :property "TITLE"))
 	   (path (file-name-nondirectory (car path-id)))
-	   (url (or (jf/denote-export-url-from-id link) (format "%s.%s" (file-name-sans-extension path) format)))
+	   (url (jf/denote-export-url-from-id link))
 	   (desc (or description title)))
-      (cond
-       ((eq format 'html) (format "<a href=\"%s\">%s</a>" url desc))
-       ((or (eq format 'latex) (eq format 'beamer)) (format "\\href{%s}{%s}" (replace-regexp-in-string "[\\{}$%&_#~^]" "\\\\\\&" path) desc))
-       ((eq format 'texinfo) (format "@uref{%s,%s}" path desc))
-       ((eq format 'ascii) (format "[%s] <denote:%s>" desc path)) ; NOTE 2022-06-16: May be tweaked further
-       ((eq format 'md) (format "[%s](%s)" desc url))
-       (t path))))
+      (if url
+	  (cond
+	   ((eq format 'html) (format "<a href=\"%s\">%s</a>" url desc))
+	   ((or (eq format 'latex) (eq format 'beamer)) (format "\\href{%s}{%s}" (replace-regexp-in-string "[\\{}$%&_#~^]" "\\\\\\&" path) desc))
+	   ((eq format 'texinfo) (format "@uref{%s,%s}" path desc))
+	   ((eq format 'ascii) (format "[%s] <denote:%s>" desc path)) ; NOTE 2022-06-16: May be tweaked further
+	   ((eq format 'md) (format "[%s](%s)" desc url))
+	   (t path))
+	desc)))
 
   (advice-add #'denote-link-ol-export :override #'jf/denote-link-ol-export '((name . "wrapper")))
 #+end_src
