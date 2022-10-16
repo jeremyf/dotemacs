@@ -189,15 +189,9 @@ Most role-playing games I play may require a bit of consultation.  The following
 
 ** Physical Trauma Gray Scale (PTGS)
 
-When running Burning Wheel Gold, on occassion I need to establish the PTGS for
-a creature or person.
+When running Burning Wheel Gold, on occassion I need to establish the PTGS for a creature or person.
 
-Yes, I could’ve written out ~(0 "B1" "B2" "B3" "B4" "B5" "B6" "B7" "B8" "B9"
-"B10" "B11" "B12" "B13" "B14" "B15" "B16" "G1" "G2" "G3" "G4" "G5" "G6" "G7"
-"G8" "G9" "G10" "G11" "G12" "G13" "G14" "G15" "G16" "W1" "W2" "W3" "W4" "W5"
-"W6" "W7" "W8" "W9" "W10" "W11" "W12" "W13" "W14" "W15" "W16")~ faster than the
-following constant, but I wanted to learn a bit of emacs-lisp, so I chose to
-write the following.[fn:1]
+Yes, I could’ve written out ~(0 "B1" "B2" "B3" "B4" "B5" "B6" "B7" "B8" "B9" "B10" "B11" "B12" "B13" "B14" "B15" "B16" "G1" "G2" "G3" "G4" "G5" "G6" "G7" "G8" "G9" "G10" "G11" "G12" "G13" "G14" "G15" "G16" "W1" "W2" "W3" "W4" "W5" "W6" "W7" "W8" "W9" "W10" "W11" "W12" "W13" "W14" "W15" "W16")~ faster than the following constant, but I wanted to learn a bit of emacs-lisp, so I chose to write the following.[fn:1]
 
 #+begin_src emacs-lisp
   (defconst jf/bwg-mortal-wounds-scale
@@ -215,8 +209,7 @@ write the following.[fn:1]
     "The BWG Physical Tolerance Grayscale (from B1 to W16).")
 #+end_src
 
-Next up is a function for calculating a Black or Gray PTGS.  This is not clean nor
-elegant, but it works.
+Next up is a function for calculating a Black or Gray PTGS.  This is not clean nor elegant, but it works.
 
 #+begin_src emacs-lisp
   (defun jf/bwg-qh-ptgs (forte power &optional round-up)
@@ -263,7 +256,7 @@ elegant, but it works.
      :body (format (concat
 		    "Su %s; Li %s; Mi %s; Se %s; Tr %s; Mo %s"
 		    "\n\nForte: %s\nPower: %s"
-		    (when round-up "\n(Rounded up)"))
+		    (when round-up "\n(Rounded up)") "\n")
 		   (nth (nth 0 scale) jf/bwg-mortal-wounds-scale)
 		   (nth (nth 1 scale) jf/bwg-mortal-wounds-scale)
 		   (nth (nth 2 scale) jf/bwg-mortal-wounds-scale)
@@ -274,9 +267,7 @@ elegant, but it works.
 		   (upcase power))))
 #+end_src
 
-On page 98 of “Burning Wheel Gold Revised”, we have instructions for
-calculating PTGS for most characters.  Page 546 overlays those instructions
-with additional instructions for calculating Gray-shaded attributes.
+On page 98 of “Burning Wheel Gold Revised”, we have instructions for calculating PTGS for most characters.  Page 546 overlays those instructions with additional instructions for calculating Gray-shaded attributes.
 
 #+begin_src emacs-lisp
   (cl-defun jf/bwg-qh-ptgs--shade-black (forte power &optional round-up &key (add 0))
@@ -320,22 +311,13 @@ with additional instructions for calculating Gray-shaded attributes.
 
 ** Lifepath Browser
 
-While running (or playing) a game of Burning Wheel, it can be useful to have
-access to character lifepaths.  These can give you insight into a quick NPC.
+While running (or playing) a game of Burning Wheel, it can be useful to have access to character lifepaths.  These can give you insight into a quick NPC.
 
-I have transformed and edited the [[http://charred-black.herokuapp.com/#/][Charred - The Burning Wheel Gold Character
-Burner]] data into individual YAML files that sit on my local machine.  I also
-created a bit of [[https://gohugo.io/][Hugo]] code to render lifepaths from those YAML files.  You can
-see an example at [[https://takeonrules.com/2018/10/10/burning-wheel-lifepaths-inspired-by-warhammer-fantasy/][Burning Wheel Lifepaths Inspired by Warhammer Fantasy]].
+I have transformed and edited the [[http://charred-black.herokuapp.com/#/][Charred - The Burning Wheel Gold Character Burner]] data into individual YAML files that sit on my local machine.  I also created a bit of [[https://gohugo.io/][Hugo]] code to render lifepaths from those YAML files.  You can see an example at [[https://takeonrules.com/2018/10/10/burning-wheel-lifepaths-inspired-by-warhammer-fantasy/][Burning Wheel Lifepaths Inspired by Warhammer Fantasy]].
 
-I’m thinking what would be useful to create a searchable index of those
-lifepaths.  For now, I’ll search based on the stock, setting, and lifepath name
-(all of which happen to be in the pathname of the YAML file).
+I’m thinking what would be useful to create a searchable index of those lifepaths.  For now, I’ll search based on the stock, setting, and lifepath name (all of which happen to be in the pathname of the YAML file).
 
-But instead of hopping to the YAML file, I’d like to jump to the spot on an
-HTML page with that information.  This way when I “find” a lifepath, I can see
-what other lifepaths are of comparable station (a common need when testing
-Circles).
+But instead of hopping to the YAML file, I’d like to jump to the spot on an HTML page with that information.  This way when I “find” a lifepath, I can see what other lifepaths are of comparable station (a common need when testing Circles).
 
 - [ ] I need a “stable” HTML files with all lifepaths.  Each lifepath should
   have a unique DOM ID.
@@ -357,8 +339,7 @@ Circles).
 
 * Menu
 
-The following menu is for quick help while playing Burning Wheel games.  I
-previously defined the suffixes.
+The following menu is for quick help while playing Burning Wheel games.  I previously defined the suffixes.
 
 #+begin_src emacs-lisp
   (global-set-key (kbd "C-M-s-b") 'jf/menu--bwg)
@@ -378,6 +359,4 @@ previously defined the suffixes.
 
 * Footnotes
 
-[fn:1] I copyied that text string from the introspected variable.  Because if I
-wasn't going to write it the first time, I sure wasn't going to do it if I had
-already stored that value in a constant.
+[fn:1] I copyied that text string from the introspected variable.  Because if I wasn't going to write it the first time, I sure wasn't going to do it if I had already stored that value in a constant.
