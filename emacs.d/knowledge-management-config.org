@@ -72,6 +72,7 @@ The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~
     :bind ("C-j" . jf/jump-to-agenda-or-mark)
     :bind (:map org-mode-map ("C-j" . jf/jump-to-agenda-or-mark))
     :custom (org-use-speed-commands t)
+    (org-time-stamp-rounding-minutes '(0 15))
     :config (setq
 	     org-use-fast-todo-selection 'expert
 	     org-imenu-depth 3
