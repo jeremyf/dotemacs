@@ -40,27 +40,27 @@ And why do all of this? To sharpen my tools. Practice extending my text editor t
 
 * Interactive Functions
 
-- ~jf/abbreviate-url~ :: For the given URL (or prompted URL), convert that URL into an abbreviation.  A todo item is to replace the URL with a mode appropriate link.
-
 #+begin_src emacs-lisp
+  ;; For the given URL (or prompted URL), convert that URL into an abbreviation.
+  ;; A todo item is to replace the URL with a mode appropriate link.
   (defun jf/abbreviate-url (url)
-      "Abbreviate the given URL; prompt if not provided."
-      (interactive (list (jf/prompt-for-url-dwim)))
-      (let ((abbr (jf/github-abbreviation-for :url url :fallback url)))
-	(if (thing-at-point-url-at-point)
-	    ;; Replace the URL of the thing at point
-	    (apply 'replace-string-in-region
-		   (flatten-list
-		    (list url
-			  abbr
-			  (thing-at-point-bounds-of-url-at-point))))
-	  ;; Else insert the URL at point
-	  (insert abbr))))
+    "Abbreviate the given URL; prompt if not provided."
+    (interactive (list (jf/prompt-for-url-dwim)))
+    (let ((abbr (jf/github-abbreviation-for :url url :fallback url)))
+      (if (thing-at-point-url-at-point)
+	  ;; Replace the URL of the thing at point
+	  (apply 'replace-string-in-region
+		 (flatten-list
+		  (list url
+			abbr
+			(thing-at-point-bounds-of-url-at-point))))
+	;; Else insert the URL at point
+	(insert abbr))))
 #+end_src
 
-- ~jf/follow-thing-at-point~ :: This function advices several “at point” functions to find org nodes by their ID.
-
 #+begin_src emacs-lisp
+  ;; This function advices several “at point” functions to find org nodes by
+  ;; their ID.
   (defun jf/follow-thing-at-point (fn &rest args)
     "Lookup org-id for `thing-at-point'.  If it exists, open it.
 
@@ -86,8 +86,6 @@ And why do all of this? To sharpen my tools. Practice extending my text editor t
   (advice-add #'org-open-at-point-global :around #'jf/follow-thing-at-point '((name . "wrapper")))
 #+end_src
 
-- ~jf/git-branch-create~ :: This is the function that gathers the data.  It’s responsible for prompting for the correct project, verifying that Safari’s URL is correct, and then calling the non-interactive function ~jf/git-branch-create~.
-
 #+begin_src emacs-lisp
   (defun jf/git-branch-create (directory url)
     "Create a git branch in project DIRECTORY from URL.
@@ -107,8 +105,6 @@ And why do all of this? To sharpen my tools. Practice extending my text editor t
 	;; Create the branch and "report" back.
 	(message (jf/git-branch-create- :branch-name branch-name :directory directory)))))
 #+end_src
-
-- ~jf/git-github-issue-short-ref~ :: Open the current branch’s corresponding issue in Github.  Assumes the branch was constructed in the following format =<github-username>/issues---<owner>/<repo>\#<number>=, which is how ~jf/git-branch-create~ does it.
 
 #+begin_src emacs-lisp
   (cl-defun jf/git-github-issue-short-ref (parg &key (url-template "https://github.com/%s/issues/%s" ))
@@ -135,9 +131,8 @@ And why do all of this? To sharpen my tools. Practice extending my text editor t
 	(insert gh-short-ref))))
 #+end_src
 
-- ~jf/org-roam-dailies--add-entry-for-url~ :: Take the URL and write an entry for today.
-
 #+begin_src emacs-lisp
+  ;; Take the URL and write an entry for today.
   (defun jf/org-roam-dailies--add-entry-for-url (url)
     "Add URL to today's org-roam-dailies entry."
     (interactive (list (jf/prompt-for-url-dwim)))
@@ -146,9 +141,10 @@ And why do all of this? To sharpen my tools. Practice extending my text editor t
       (insert (format "Started [[%s][%s]]" url abbr))))
 #+end_src
 
-- ~jf/prompt-for-url-dwim~ :: Not an interactive function, but used as the prompt for an ~interactive~ function.  It will make a few “guesses” on where to look for the URL (at point, kill-ring, given function).
-
 #+begin_src emacs-lisp
+  ;; Not an interactive function, but used as the prompt for an `interactive'
+  ;; function.  It will make a few “guesses” on where to look for the URL (at
+  ;; point, kill-ring, given function).
   (cl-defun jf/prompt-for-url-dwim (&key (url-regexp "^https?://"))
     "Prompt and return a url.
 
@@ -187,9 +183,10 @@ And why do all of this? To sharpen my tools. Practice extending my text editor t
 
 * Support Functions
 
-- ~jf/auto-create-missing-dirs~ :: Ensure that we create the directories along the path of a new file I’m creating.  See [[https://emacsredux.com/blog/2022/06/12/auto-create-missing-directories/][Auto-create Missing Directories]].
-
 #+begin_src emacs-lisp
+  ;; Ensure that we create the directories along the path of a new file I’m
+  ;; creating.  See
+  ;; https://emacsredux.com/blog/2022/06/12/auto-create-missing-directories/
   (defun jf/auto-create-missing-dirs ()
     (let ((target-dir (file-name-directory buffer-file-name)))
       (unless (file-exists-p target-dir)
@@ -198,9 +195,10 @@ And why do all of this? To sharpen my tools. Practice extending my text editor t
   (add-to-list 'find-file-not-found-functions #'jf/auto-create-missing-dirs)
 #+end_src
 
-- ~jf/git-branch-create-~ :: This function manipulates the git repository.  We have a valid (enough) directory and a new branch-name, now let’s do the file system work to ensure we can safely do this work.
-
 #+begin_src emacs-lisp
+  ;; This function manipulates the git repository.  We have a valid (enough)
+  ;; directory and a new branch-name, now let’s do the file system work to ensure
+  ;; we can safely do this work.
   (cl-defun jf/git-branch-create- (&key branch-name directory (starting-branch "main"))
     "Create BRANCH-NAME from STARTING-BRANCH in DIRECTORY.  Ensure clean state."
     (catch 'dirty-branch
@@ -226,9 +224,10 @@ And why do all of this? To sharpen my tools. Practice extending my text editor t
       (format "Created branch on %s" directory)))
 #+end_src
 
-- ~jf/github-abbreviation-for~ :: This function converts a Github URL into it’s abbreviation (e.g. ~<owner>/<repo>#<number>~).  If the given URL is not a Github URL we have a few options:  Fallback to the URL /or/ throw an exception.
-
 #+begin_src emacs-lisp
+  ;; This function converts a Github URL into it’s abbreviation
+  ;; (e.g. ~<owner>/<repo>#<number>~).  If the given URL is not a Github URL we
+  ;; have a few options: Fallback to the URL /or/ throw an exception.
   (cl-defun jf/github-abbreviation-for (&key url fallback)
     "Convert the URL to a github abbreviation"
     (if (string-match "^https://github\\.com/[^/]+/[^/]+/\\(issues\\|pull\\)/[[:digit:]]+" url)

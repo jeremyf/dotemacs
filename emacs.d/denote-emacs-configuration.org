@@ -56,15 +56,15 @@ Let’s add another way at looking up files.
   (setq consult-notes-sources (list))
 #+end_src
 
-The following functions help me retrieve Org-Mode properties from the given Denote ID.
-
 #+begin_src emacs-lisp
+  ;; The following functions help me retrieve Org-Mode properties from the given
+  ;; Denote ID.
   (cl-defun jf/denote-org-property-from-id (&key identifier property)
     "Given an IDENTIFIER and PROPERTY return it's value or nil.
 
   Return nil when:
 
-  - is not a denote file
+  - is not a `denote' file
   - IDENTIFIER leads to a non `org-mode' file
   - PROPERTY does not exist on the file"
     (when-let ((filename (denote-get-path-by-id identifier)))
@@ -92,9 +92,9 @@ The following functions help me retrieve Org-Mode properties from the given Deno
   ;; 					      :properties '("TITLE" "ABBR")))
 #+end_src
 
-I’m not looking at active silo-ing and want to be able to search specifically from the top-level and all subdirectories.
-
 #+begin_src emacs-lisp
+  ;; I’m not looking at active silo-ing and want to be able to search
+  ;; specifically from the top-level and all subdirectories.
   (defun jf/denote-file-prompt (fn &optional initial-dir)
     "An override of the provided denote-file-prompt."
     (if initial-dir
@@ -126,7 +126,6 @@ I envision the =jf/denote-find-file= as the anchor for my general file finding, 
 It doesn’t take much to see a macro emerging for these local bindings; find all sub-directories of the directory defiend by the =denote-directory= variable.  For each of those directories make an interactive function of the form =jf/denote-find-file--domain=.  That interactive function would locally bind =denote-directory= to =”denote-directory/domain”=.
 
 Alternatively, as I create each domain’s create function, I also create the finder function.
-
 
 #+begin_src emacs-lisp
   (setq jf/denote-subdirectories (list))

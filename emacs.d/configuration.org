@@ -1770,20 +1770,17 @@ syntax highlighting that makes reading ~Go-lang~ tolerable.
 
 **** json-reformat.el
 
-- ~json-reformat.el~ :: Because JSON can be quite ugly, I want something to help tidy it up.
-
 #+begin_src emacs-lisp
+  ;; Because JSON can be quite ugly, I want something to help tidy it up.
   (use-package json-reformat
     :straight t
     :after json-mode
     :init (setq json-reformat:indent-width 2))
 
-#+end_src
-
-
-For awhile, I was trying to use lsp-mode.  It might look a bit nicer, but it was a little to “nosy”.  On my read, ~eglot~ leverages many of the built-in APIs of Emacs.
-
-#+begin_src emacs-lisp
+  ;; For awhile, I was trying to use lsp-mode.  It might look a bit nicer, but it
+  ;; was a little to “nosy”.  On my read, ~eglot~ leverages many of the built-in
+  ;; APIs of Emacs.
+  ;;
   ;; https://github.com/joaotavora/eglot#1-2-3-pitfall
   (use-package xref
     :straight t
@@ -1823,9 +1820,10 @@ For awhile, I was trying to use lsp-mode.  It might look a bit nicer, but it was
 
 **** plantuml-mode.el
 
-- ~plantuml-mode.el~ :: A mode for working with PlantUML.  See https://plantuml.com.
+- ~plantuml-mode.el~ ::
 
 #+begin_src emacs-lisp
+  ;; A mode for working with PlantUML.  See https://plantuml.com
   (use-package plantuml-mode
     :config (setq plantuml-executable-path (concat (getenv "HB_PATH") "/bin/plantuml")
 		  plantuml-default-exec-mode 'executable
@@ -1989,9 +1987,8 @@ A timestamp library.
 
 **** Custom Dictionary
 
-This follows from http://mbork.pl/2017-01-14_I'm_now_using_the_right_dictionary
-
 #+begin_src emacs-lisp
+  ;; This follows from http://mbork.pl/2017-01-14_I'm_now_using_the_right_dictionary
   (use-package sdcv-mode
     :straight (sdcv-mode :type git :host github :repo "gucong/emacs-sdcv")
     :bind ("C-c C-'" . sdcv-search))
@@ -1999,11 +1996,10 @@ This follows from http://mbork.pl/2017-01-14_I'm_now_using_the_right_dictionary
 
 **** titlecase.el
 
-The rules of “titlecase” are confounding.  The ~titlecase.el~ package provides
-numerous ways to cast a string to “titlecase.”  I chose wikipedia style as a
-quasi-opinionated compromise.
-
 #+begin_src emacs-lisp
+  ;; The rules of “titlecase” are confounding.  The ~titlecase.el~ package
+  ;; provides numerous ways to cast a string to “titlecase.”  I chose wikipedia
+  ;; style as a quasi-opinionated compromise.
   (use-package titlecase
     :straight (titlecase :host github :repo "duckwork/titlecase.el")
     :custom (titlecase-style 'wikipedia))
@@ -2011,12 +2007,13 @@ quasi-opinionated compromise.
 
 **** fill-sentences-correctly.el
 
-- ~fill-sentences-correctly.el~ :: After using Emacs for awhile, with it’s
-  sentence navigation, I’ve come to strongly favor two spaces after a period.
-  The ~fill-sentences-correctly-mode~ ensures that ~fill-paragraph~
-  (e.g. ~M-q~) preserves two spaces.
+- ~fill-sentences-correctly.el~ ::
 
 #+BEGIN_src emacs-lisp
+  ;; After using Emacs for awhile, with it’s sentence navigation, I’ve come to
+  ;; strongly favor two spaces after a period.  The
+  ;; `fill-sentences-correctly-mode' ensures that `fill-paragraph' (e.g. M-q)
+  ;; preserves two spaces.
   (use-package fill-sentences-correctly
     :straight (fill-sentences-correctly :host github :repo "duckwork/fill-sentences-correctly.el")
     :hook (fundamental-mode . fill-sentences-correctly-mode))
@@ -2032,20 +2029,18 @@ quasi-opinionated compromise.
 
 **** math-at-point.el
 
-- ~math-at-point.el~ :: Calculate math functions at point and message result in
-  minibuffer.  See https://github.com/shankar2k/math-at-point.
-
 #+begin_src emacs-lisp
+  ;; Calculate math functions at point and message result in minibuffer.  See
+  ;; https://github.com/shankar2k/math-at-point.
   (use-package math-at-point
-    :straight (math-at-point :type git :host github :repo "shankar2k/math-at-point")
-    :bind ("C-c =" . math-at-point))
+      :straight (math-at-point :type git :host github :repo "shankar2k/math-at-point")
+      :bind ("C-c =" . math-at-point))
 #+end_src
 
 **** hippie-exp.el
 
-- ~hippie-exp.el~ :: Using Hippie expand, I toggle through words already referenced.
-
 #+begin_src emacs-lisp
+  ;; Using Hippie expand, I toggle through words already referenced.
   (use-package hippie-exp
     :straight t
     :config
@@ -2067,14 +2062,15 @@ quasi-opinionated compromise.
 
 **** expand-region.el
 
-- ~expand-region.el~ :: a simple package that does two related things really
-  well; expands and contracts the current region.  I use this all the time.
-
-  In writing, with the cursor at point, when I expand it selects the word.  The
-  next expand the sentence, then paragraph, then page.  In programming it
-  leverages sexp.
+- ~expand-region.el~ ::
 
 #+begin_src emacs-lisp
+  ;; A simple package that does two related things really well; expands and
+  ;; contracts the current region.  I use this all the time.
+  ;;
+  ;; In writing, with the cursor at point, when I expand it selects the word.
+  ;; The next expand the sentence, then paragraph, then page.  In programming it
+  ;; leverages sexp.
   (use-package expand-region
     :straight t
     :bind (("C-=" . er/expand-region)
@@ -2083,34 +2079,33 @@ quasi-opinionated compromise.
 
 **** multiple-cursors.el
 
-- ~multiple-cursors.el~ :: Allow Emacs to work with multiple cursors.  See
-  https://melpa.org/#/multiple-cursors.
-
 #+begin_src emacs-lisp
+  ;; Allow Emacs to work with multiple cursors.  See
+  ;; https://melpa.org/#/multiple-cursors
   (use-package multiple-cursors
-    :bind (("C-M-SPC" . set-rectangular-region-anchor)
-	   ("C->" . mc/mark-next-like-this)
-	   ("C-<" . mc/mark-previous-like-this)
-	   ("C-s-<mouse-1>" . mc/add-cursor-on-click)
-	   ("C-c C->" . mc/mark-all-like-this)
-	   ("C-c C-SPC" . mc/edit-lines)) ;; CTRL+CMD+c
-    :straight t)
+      :bind (("C-M-SPC" . set-rectangular-region-anchor)
+	     ("C->" . mc/mark-next-like-this)
+	     ("C-<" . mc/mark-previous-like-this)
+	     ("C-s-<mouse-1>" . mc/add-cursor-on-click)
+	     ("C-c C->" . mc/mark-all-like-this)
+	     ("C-c C-SPC" . mc/edit-lines)) ;; CTRL+CMD+c
+      :straight t)
 #+end_src
 
 **** iedit.el
 
-- ~iedit.el~ :: ~C-;~ to select current symbol and all matches; Then edit at
-  multiple points.
+- ~iedit.el~ ::
 
 #+begin_src emacs-lisp
+  ;; Type \"C-;\" to select current symbol and all matches; Then edit at multiple
+  ;; points.
   (use-package iedit :straight t)
 #+end_src
 
 **** crux.el
 
-- ~crux.el~ :: A mix of a few odd and useful functions.
-
 #+begin_src emacs-lisp
+  ;; A mix of a few odd and useful functions.
   (use-package crux
     :straight t
     :bind (("C-a" . crux-move-beginning-of-line)
@@ -2122,10 +2117,9 @@ quasi-opinionated compromise.
 
 **** ethan-wspace.el
 
-- ~ethan-wspace-mode.el~ :: Whitespace hygene package.  The author's
-  documentation and commentary echoes my sentiments.
-
 #+begin_src emacs-lisp
+  ;; Whitespace hygene package.  The author's documentation and commentary echoes
+  ;; my sentiments.
   (use-package ethan-wspace
     :straight t
     :hook (before-save . delete-trailing-whitespace)
@@ -2135,9 +2129,8 @@ quasi-opinionated compromise.
 
 **** unfill.el
 
-- ~unfill.el~ :: Provides the reverse of ~fill-paragraph~, and a toggle fill and unfill.
-
 #+begin_src emacs-lisp
+  ;; Provides the reverse of ~fill-paragraph~, and a toggle fill and unfill.
   (use-package unfill
     :bind ("M-q" . unfill-toggle)
     :straight t)
@@ -2145,10 +2138,8 @@ quasi-opinionated compromise.
 
 **** undo-tree.el
 
-- ~undo-tree.el~ :: Provides a UI for undo trees.  I'm not certain what I want
-  to do with this.
-
 #+begin_src emacs-lisp
+  ;; Provides a UI for undo trees.  I'm not certain what I want to do with this.
   (use-package undo-tree
     :diminish
     :bind (("C-z" . undo)
@@ -2156,25 +2147,22 @@ quasi-opinionated compromise.
     :config
     (global-undo-tree-mode +1)
     (unbind-key "M-_" undo-tree-map))
-
 #+end_src
 
 **** hungry-delete.el
 
-- ~hungry-delete.el~ :: Delete multiple spaces in one delete stroke.
-
 #+begin_src emacs-lisp
+  ;; Delete multiple spaces in one delete stroke.
   (use-package hungry-delete
-    :straight t
-    :diminish 'hungry-delete-mode
-    :config (global-hungry-delete-mode))
+      :straight t
+      :diminish 'hungry-delete-mode
+      :config (global-hungry-delete-mode))
 #+end_src
 
 **** move-text.el
 
-- ~move-text.el~ :: A simple package ability to move lines up and down.
-
 #+begin_src emacs-lisp
+  ;; A simple package ability to move lines up and down.
   (use-package move-text
     :straight t
     :bind (([C-s-down] . move-text-down)
@@ -2190,8 +2178,6 @@ quasi-opinionated compromise.
 
 
 **** tempel.el
-
-I have only provisionally adopted this.  I like the idea of abbreviations/snippets using emacs-lisp.  This is a “to be determined” package.
 
 #+begin_src emacs-lisp
   (use-package tempel
@@ -2228,32 +2214,31 @@ I have only provisionally adopted this.  I like the idea of abbreviations/snippe
 
 **** whole-line-or-region.el
 
-- ~whole-line-or-region.el~ :: From the package commentary, “This minor mode
-  allows functions to operate on the current line if they would normally
-  operate on a region and region is currently undefined.”  I’ve used this for
-  awhile and believe it’s not baked into my assumptions regarding how I
-  navigate Emacs.
+- ~whole-line-or-region.el~ ::
 
 #+begin_src emacs-lisp
+  ;; From the package commentary, “This minor mode allows functions to operate on
+  ;; the current line if they would normally operate on a region and region is
+  ;; currently undefined.”  I’ve used this for awhile and believe it’s not baked
+  ;; into my assumptions regarding how I navigate Emacs.
   (use-package whole-line-or-region
-      :straight t
-      :diminish 'whole-line-or-region-local-mode
-      :config (whole-line-or-region-global-mode))
+    :straight t
+    :diminish 'whole-line-or-region-local-mode
+    :config (whole-line-or-region-global-mode))
 #+end_src
 
 **** smartparens.el
 
-- ~smartparens.el~ :: provides some “intelligent” treatment of parentheses.  I’ve been using this for awhile, so I assume it’s baked into my memory.
-
 #+begin_src emacs-lisp
+  ;; provides some “intelligent” treatment of parentheses.  I’ve been using this
+  ;; for awhile, so I assume it’s baked into my memory.
   (use-package smartparens :straight t)
 #+end_src
 
 **** grab-mac-link.el
 
-- ~grab-mac-link.el~ :: Grab a link from a variety of MacOS applications.
-
 #+begin_src emacs-lisp
+  ;; Grab a link from a variety of MacOS applications.
   (use-package grab-mac-link
     :straight t
     ;; Ensuring we load these, as I'll need them later.
@@ -2273,9 +2258,9 @@ I have only provisionally adopted this.  I like the idea of abbreviations/snippe
 
 **** org-mac-link.el
 
-- ~org-mac-link.el~ :: Similar to ~grab-mac-link.el~ this specifically grabs a link and inserts in ~org-mode~ format.
-
 #+begin_src emacs-lisp
+  ;; Similar to `grab-mac-link' this specifically grabs a link and inserts in
+  ;; `org-mode' format.
   (use-package org-mac-link
     :straight (org-mac-link :type git :host github :repo "jeremyf/org-mac-link")
     :bind (:map org-mode-map (("C-c g" . org-mac-grab-link))))
@@ -2503,9 +2488,9 @@ These are a few variables and cosntants that I use throughout my configuration.
 
 *** Writeroom
 
-The ~writeroom-mode.el~ package provides some quick adjustments for writing; creating a “distractions free” buffer.
-
 #+begin_src emacs-lisp
+  ;; Provides some quick adjustments for writing; creating a “distractions free”
+  ;; buffer.
   (use-package writeroom-mode
     :config (setq writeroom-width 80)
     :straight t)
@@ -2522,9 +2507,9 @@ The ~writeroom-mode.el~ package provides some quick adjustments for writing; cre
 
 *** Mastodon
 
-As Twitter becomes a megalomaniac’s obsession, Mastodon becomes even more appealing.
-
 #+begin_src emacs-lisp
+  ;; As Twitter becomes a megalomaniac’s obsession, Mastodon becomes even more
+  ;; appealing.
   (use-package mastodon
     :straight t
     :config (setq mastodon-instance-url "https://tabletop.social"
@@ -2545,9 +2530,8 @@ I use org-mode and org-roam to help manage content.  Let’s load that rather ex
 
 *** org-d20.el
 
-- ~org-d20.el~ :: I’m really only using this for the ~org-d20--roll~ function.
-
 #+begin_src emacs-lisp
+  ;; I’m really only using this for the ~org-d20--roll~ function.
   (use-package org-d20
     :after org
     :bind  (("C-s-r" . jf/roll-expression-dwim))
@@ -2568,11 +2552,11 @@ I use org-mode and org-roam to help manage content.  Let’s load that rather ex
 
 **** elfeed.el
 
-- ~elfeed.el~ :: An Emacs RSS reader.  I’ve used Google Reader, Feedly,
-  Inoreader, and Newsboat.  I wrote about [[https://takeonrules.com/2020/04/12/switching-from-inoreader-to-newsboat-for-rss-reader/][Switching from Inoreader to Newsboat
-  for RSS Reader]], and the principles apply for Elfeed.
-
 #+begin_src emacs-lisp
+  ;; An Emacs RSS reader.  I’ve used Google Reader, Feedly, Inoreader, and
+  ;; Newsboat.  I wrote about
+  ;; https://takeonrules.com/2020/04/12/switching-from-inoreader-to-newsboat-for-rss-reader/,
+  ;; and the principles apply for Elfeed.
   (use-package elfeed
     :straight t
     :after org
@@ -2621,10 +2605,10 @@ I use org-mode and org-roam to help manage content.  Let’s load that rather ex
 
 **** elfeed-org.el
 
-- ~elfeed-org.el~ :: a package for maintaining and organizating my RSS
-  subscriptions in ~org-mode~ format.
+- ~elfeed-org.el~ ::
 
 #+begin_src emacs-lisp
+  ;; Maintaining my RSS subscriptions in `org-mode' format.
   (use-package elfeed-org
     :straight t
     :after elfeed
@@ -2756,9 +2740,8 @@ I use org-mode and org-roam to help manage content.  Let’s load that rather ex
 
 ***** Magit Difftastic
 
-From https://tsdh.org/posts/2022-08-01-difftastic-diffing-with-magit.html
-
 #+begin_src emacs-lisp
+  ;; From https://tsdh.org/posts/2022-08-01-difftastic-diffing-with-magit.html
   (defun jf/magit--with-difftastic (buffer command)
     "Run COMMAND with GIT_EXTERNAL_DIFF=difft then show result in BUFFER."
     (let ((process-environment
@@ -2894,38 +2877,20 @@ From https://tsdh.org/posts/2022-08-01-difftastic-diffing-with-magit.html
   (define-key magit-status-mode-map (kbd "#") #'jf/magit-aux-commands)
 #+end_src
 
-**** forge.el
-
-- ~forge.el~ :: Additional interactions interactions with [[https://en.wikipedia.org/wiki/Forge_(software)][Git forge]].  Right
-  now, I’ve commented out most things, as I wasn’t figuring out how to refresh
-  the appended sections.  I live this here as a reminder.
-
-#+begin_src emacs-lisp
-  ;; (use-package forge
-  ;;   :after magit
-  ;;   :config
-  ;;   (setq auth-sources '("~/.authinfo"))
-  ;;   (magit-add-section-hook 'magit-status-sections-hook 'forge-insert-authored-pullreqs nil 'append)
-  ;;   (magit-add-section-hook 'magit-status-sections-hook 'forge-insert-requested-reviews nil 'append)
-  ;;   (magit-add-section-hook 'magit-status-sections-hook 'forge-insert-assigned-issues nil 'append)
-  ;;   (magit-add-section-hook 'magit-status-sections-hook 'forge-insert-authored-issues nil 'append)
-  ;;   :straight t)
-#+end_src
-
 **** git-timemachine.el
 
-- ~git-timemachine.el~ :: With the time machine, travel back and forth through a files history.
-
 #+begin_src emacs-lisp
+  ;; With the time machine, travel back and forth through a files history.
   (use-package git-timemachine
     :straight (:host github :repo "emacsmirror/git-timemachine"))
 #+end_src
 
 **** git-gutter.el
 
-- ~git-gutter.el~ :: Show the current git state in the gutter.  As you edit a line in a file track by git, the indicators change to reflect if this is a modification, addition, or deletion.
-
 #+begin_src emacs-lisp
+  ;; Show the current git state in the gutter.  As you edit a line in a file
+  ;; track by git, the indicators change to reflect if this is a modification,
+  ;; addition, or deletion.
   (use-package git-gutter
     :straight t
     :diminish 'git-gutter-mode
@@ -2941,13 +2906,11 @@ From https://tsdh.org/posts/2022-08-01-difftastic-diffing-with-magit.html
 
 **** git-link.el
 
-- ~git-link.el~ :: Type ~M-x git-link~ and the function pushes the Git forge
-  URL to the kill ring; I’ve configured the URL to use the SHA of the commit of
-  the line on which I called ~git-link()~.  This is helpful for sharing links
-  with other folks.  I use this /all of the time./ See
-  https://github.com/sshaw/git-link.
-
 #+begin_src emacs-lisp
+  ;; Type ~M-x git-link~ and the function pushes the Git forge URL to the kill
+  ;; ring; I’ve configured the URL to use the SHA of the commit of the line on
+  ;; which I called `git-link'.  This is helpful for sharing links with other
+  ;; folks.  I use this /all of the time./ See https://github.com/sshaw/git-link.
   (use-package git-link
     :config
     (defun jf/git-browse-to-repository (remote)
@@ -2961,11 +2924,12 @@ From https://tsdh.org/posts/2022-08-01-difftastic-diffing-with-magit.html
 
 **** git-messenger.el
 
-- ~git-messenger.el~ :: Sometimes I want to see more ~git~ information
-  regarding the current line.  ~git-messenger.el~ provides a popup that shows
-  the information and provides some additional options.
+- ~git-messenger.el~ ::
 
 #+begin_src emacs-lisp
+  ;; Sometimes I want to see more ~git~ information regarding the current line.
+  ;; `git-messenger' provides a popup that shows the information and provides
+  ;; some additional options.
   (use-package git-messenger
     :config (setq git-messenger:show-detail t)
     (defun jf/git-messenger-popup ()
@@ -2989,11 +2953,11 @@ From https://tsdh.org/posts/2022-08-01-difftastic-diffing-with-magit.html
 
 **** blamer.el
 
-- ~blamer.el~ :: When working in code, I want different ways to view the
-  metadata around the code.  ~blammer.el~ adds a quick annotation to the
-  current line; When did the last person touch this and what was the message.
-
 #+begin_src emacs-lisp
+  ;; When working in code, I want different ways to view the metadata around the
+  ;; code.  This adds a quick annotation to the current line; When did the last
+  ;; person touch this and what was the message.  It's most useful aspect is
+  ;; seeing multiple lines without relying on the blame.
   (use-package blamer
     :straight (blamer :host github :repo "Artawower/blamer.el")
     :custom
@@ -3009,9 +2973,8 @@ From https://tsdh.org/posts/2022-08-01-difftastic-diffing-with-magit.html
 
 *** tmr.el
 
-Powered by ~tmr.el~ to set a timer.
-
 #+begin_src emacs-lisp
+  ;; Set some timers.
   (use-package tmr
     ;; My dbus install is not behaving so I'm cheating with a bit of AppleScript
     :config (defun jf/tmr-notification-notify (timer)
@@ -3030,9 +2993,8 @@ Powered by ~tmr.el~ to set a timer.
 
 *** EWW
 
-- ~eww.el~ :: a plain text browser.  Use this to see just how bad much of the web has become.
-
 #+begin_src emacs-lisp
+  ;; A plain text browser.  Use this to see just how bad much of the web has become.
   (use-package eww
     :straight t
     :config
@@ -3156,17 +3118,16 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
   (add-hook 'server-visit-hook 'server-visit-hook-custom-find)
 #+end_src
 
-- ~jf/toggle-osx-alternate-modifier~ :: I like having MacOS’s native Option (e.g. =⌥=) modifier available.  But using
-that default in Emacs would be a significant hinderance.
-
-The following function facilitates a best of both worlds.  By default, I want Option to be ~M-~
-in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
-(e.g., =¨=), I can use MacOS’s native functions to type =⌥= + =u=.
-
 #+begin_src emacs-lisp
+  ;; The following function facilitates a best of both worlds.  By default, I
+  ;; want Option to be Meta (e.g. \"M-\") in Emacs.  However, I can toggle that
+  ;; setting.  That way if I need an umlaut (e.g., \"¨\"), I can use MacOS’s
+  ;; native functions to type \"⌥\" + \"u\".
+  ;;
+  ;; I like having MacOS’s native Option (e.g. =⌥=) modifier available.  But
+  ;; using that default in Emacs would be a significant hinderance.
   (defun jf/toggle-osx-alternate-modifier ()
-    "Toggle native OS-X Option modifier
-    setting (e.g. ns-alternate-modifier)."
+    "Toggle native OS-X Option modifier setting (e.g. `ns-alternate-modifier')."
     (interactive)
     (if ns-alternate-modifier
 	(progn (setq ns-alternate-modifier nil)
@@ -3175,10 +3136,10 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
 	     (message "Disabling OX X native Option modifier (e.g. Option as Meta)"))))
 #+end_src
 
-- ~jf/eval-region-dwim~ :: I try to get quick feedback when writing emacs-lisp;
-  the ~jf/eval-region-dwim~ binds a mnemonic key sequence to an extend ~eval-region~.
-
 #+begin_src emacs-lisp
+  ;; I try to get quick feedback when writing emacs-lisp; the
+  ;; `jf/eval-region-dwim' binds a mnemonic key sequence to an extend
+  ;; `eval-region'.
   (define-key emacs-lisp-mode-map (kbd "C-c C-c") 'jf/eval-region-dwim)
   (defun jf/eval-region-dwim ()
     "When region is active, evaluate it and kill the mark. Else,
@@ -3194,9 +3155,8 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
       (setq-local deactivate-mark t)))
 #+end_src
 
-- ~jf/reader-visual~ :: A little bit of RSS beautification.
-
 #+begin_src emacs-lisp
+  ;; A little bit of RSS beautification.
   (defun jf/reader-visual ()
     "A method to turn on visual line mode and adjust text scale."
     (text-scale-set 2)
@@ -3233,9 +3193,8 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
 		 (recenter))))))
 #+end_src
 
-- ~jf/org-insert-immediate-active-timestamp~ :: Insert an active timestamp, with a few options.
-
 #+begin_src emacs-lisp
+  ;; Insert an active timestamp, with a few options.
   (global-set-key (kbd "s-5") 'jf/org-insert-immediate-active-timestamp)
   (defun jf/org-insert-immediate-active-timestamp (parg)
     "Insert an active date for today.
@@ -3262,24 +3221,20 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
       (sp-backward-delete-word arg)))
 #+end_src
 
-- ~jf/kill-line-org-region~ :: Wedding two methods together: ~kill-region~ and
-  ~kill-line~.
-
 #+begin_src emacs-lisp
+  ;; Wedding two methods together: `kill-region' and `kill-line'.
   (global-set-key (kbd "C-k") 'jf/kill-line-or-region)
-  (defun jf/kill-line-or-region (&optional ARG)
-    "Kill the selected region otherwise kill the ARG number of lines."
+  (defun jf/kill-line-or-region (&optional parg)
+    "Kill the selected region otherwise kill the PARG number of lines."
     (interactive "P")
     (if (use-region-p)
 	(kill-region (region-beginning) (region-end))
-      (kill-line ARG)))
+      (kill-line parg)))
 #+end_src
 
-- ~jf/nab-file-name-to-clipboard~ :: There are plenty of times where I want the
-  file name.  This command helps me get either it’s full path, or it’s base
-  name.
-
 #+begin_src emacs-lisp
+  ;; There are plenty of times where I want the file name.  This command helps me
+  ;; get either it’s full path, or it’s base name.
   (global-set-key (kbd "C-c n") 'jf/nab-file-name-to-clipboard)
   (defun jf/nab-file-name-to-clipboard (parg)
     "Nab, I mean copy, the current buffer file name to the clipboard.
@@ -3304,30 +3259,27 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
 	(message "Copied buffer file name '%s' to the clipboard." filename))))
 #+end_src
 
-- ~jf/sort-unique-lines~ :: A simple combination of two functions ~sort-lines~
-  and ~delete-duplicate-lines~.
-
 #+begin_src emacs-lisp
+  ;; A simple combination of two functions `sort-lines'
+  ;; and `delete-duplicate-lines'.
   (defun jf/sort-unique-lines (reverse beg end &optional adjacent keep-blanks interactive)
     "Sort lines and delete duplicates.
 
-      By default the sort is lexigraphically ascending.  To sort as
-      descending set REVERSE to non-nil.  Specify BEG and END for the
-      bounds of sorting.  By default, this is the selected region.
+  By default the sort is lexigraphically ascending.  To sort as
+  descending set REVERSE to non-nil.  Specify BEG and END for the
+  bounds of sorting.  By default, this is the selected region.
 
-      I've included ADJACENT, KEEP-BLANKS, and INTERACTIVE so I can
-      echo the method signature of `'delete-duplicate-lines`"
-    ;; This is a common function that I've used in other text editors.
-    ;; It's a simple stitch together of sort-lines and
-    ;; delete-duplicate-lines.
+  I've included ADJACENT, KEEP-BLANKS, and INTERACTIVE so I can
+  echo the method signature of `'delete-duplicate-lines`"
     (interactive "P\nr")
     (sort-lines reverse beg end)
     (delete-duplicate-lines beg end reverse adjacent keep-blanks interactive))
 #+end_src
 
-- ~jf/display-buffer-in-side-window~ :: Creates a sticky side window.  Sometimes this is just the right thing for reviewing files.  I don’t know when I need it, but when I use it I’m always thankful I have it.
-
 #+begin_src emacs-lisp
+  ;; Creates a sticky side window.  Sometimes this is just the right thing for
+  ;; reviewing files.  I don’t know when I need it, but when I use it I’m always
+  ;; thankful I have it.
   (global-set-key (kbd "C-s-\\") 'jf/display-dedicated-buffer-in-side-window)
   (cl-defun jf/display-dedicated-buffer-in-side-window (&key (buffer (current-buffer)))
     "Display the given BUFFER in a dedicated sidebar."
@@ -3367,10 +3319,9 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
 	(pulsar-pulse-line))))
 #+end_src
 
-- ~jf/move-file~ :: Sometimes I want to move, without renaming, a file.  This
-  function helps make that easy.
-
 #+begin_src emacs-lisp
+  ;; Sometimes I want to move, without renaming, a file.  This function helps
+  ;; make that easy.
   (global-set-key (kbd "C-x m") 'jf/move-file)
   (defun jf/move-file (target-directory)
     "Write this file to TARGET-DIRECTORY, and delete old one."
@@ -3382,9 +3333,8 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
       (kill-current-buffer)))
 #+end_src
 
-- ~jf/copy-snippet-deindented~ :: From [[http://mbork.pl/2022-05-23_Copying_code_snippets][Marcin Borkowski: 2022-05-23 Copying code snippets]]
-
 #+begin_src emacs-lisp
+  ;; From http://mbork.pl/2022-05-23_Copying_code_snippets
   (defun jf/copy-snippet-deindented (begin end)
     "Copy region, between BEGIN and END, untabifying and removing indentation."
     (interactive "r")
@@ -3398,14 +3348,13 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
 	(kill-new (buffer-string)))))
 #+end_src
 
-- ~jf/duplicate-current-line-or-lines-of-region~ :: Sometimes I just want to
-  duplicate an area without copy and paste.  This helps that process.  It’s not
-  as smart as TextMate’s equivalent function, but it’s close enough.
-
 #+begin_src emacs-lisp
+  ;; Sometimes I just want to duplicate an area without copy and paste.  This
+  ;; helps that process.  It’s not as smart as TextMate’s equivalent function,
+  ;; but it’s close enough.
   (global-set-key (kbd "C-M-d") 'jf/duplicate-current-line-or-lines-of-region)
   (global-set-key (kbd "C-c d") 'jf/duplicate-current-line-or-lines-of-region)
-  (defun jf/duplicate-current-line-or-lines-of-region (arg)
+  (defun jf/duplicate-current-line-or-lines-of-region (parg)
     "Duplicate ARG times current line or the lines of the current region."
     (interactive "p")
     (if (use-region-p)
@@ -3421,18 +3370,16 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
 		 (beg (point))
 		 (region
 		  (buffer-substring-no-properties beg end)))
-	    (dotimes (_i arg)
+	    (dotimes (_i parg)
 	      (goto-char end)
 	      (insert region)
 	      (setq end (point)))))
-      (crux-duplicate-current-line-or-region arg)))
-
+      (crux-duplicate-current-line-or-region parg)))
 #+end_src
 
-- ~jf/create-scratch-buffer~ :: A simple wrapper around scratch, that helps
-  name it and sets the major mode to ~org-mode~.
-
 #+begin_src emacs-lisp
+  ;; A simple wrapper around scratch, that helps name it and sets the major mode
+  ;; to `org-mode'.
   (global-set-key (kbd "<f12>") 'jf/create-scratch-buffer)
   (cl-defun jf/create-scratch-buffer (&key (mode 'org-mode))
     "Quickly open a scratch buffer and enable the given MODE."

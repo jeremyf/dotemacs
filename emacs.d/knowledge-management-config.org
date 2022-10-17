@@ -64,7 +64,6 @@ A bit of pre-amble.  I maintain a list of data directories, each might have “r
 
 The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~ which introduces my more generalized note taking system.
 
-
 #+begin_src emacs-lisp
   (use-package org
     :straight (org :type built-in)
@@ -100,7 +99,10 @@ The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~
 	     :immediate-finish t
 	     :jump-to-captured t
 	     :empty-lines-after 1)
-
+	    ("c" "Contents to Current Clocked Task"
+	     plain (clock)
+	     "%i%?"
+	     :empty-lines 1)
 	    ("m" "Merge Request"
 	     plain (file+function jf/primary-agenda-filename-for-machine jf/org-mode-agenda-find-merge-request-node)
 	     "***** IN-PROGRESS %^{URL of Merge Request} :mergerequest:"
@@ -125,12 +127,6 @@ The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~
 	     :jump-to-captured t
 	     :immediate-finish t
 	     :clock-in t)))
-
-    (add-to-list 'org-capture-templates
-		 `("c" "Contents to Current Clocked Task"
-		   plain (clock)
-		   "%i%?"
-		   :empty-lines 1))
 
     (bind-key "s-8" 'jf/capture-region-contents-with-metadata)
     (defun jf/capture-region-contents-with-metadata (start end parg)
@@ -299,7 +295,6 @@ These are the list of completion at point functions I want for Org-Mode.
 	(when cands
 	  (list (match-beginning 0) (match-end 0) cands)))))
 #+end_src
-I cribbed the following function from [[https://xenodium.com/emacs-dwim-do-what-i-mean/][Emacs DWIM: do what ✨I✨ mean]].
 
 #+begin_src emacs-lisp
   ;; Cribbed from https://xenodium.com/emacs-dwim-do-what-i-mean/
@@ -412,11 +407,10 @@ I want to re-use existing project names but also allow for new ones, and =jf/org
 					  :project (concat "Merge Requests for " (format-time-string "%Y-%m-%d"))))
 #+end_src
 
-The =jf/org-mode-agenda-to-stand-up-summary= function takes my notes for the day and formats them for a summary report.
-
 #+begin_src emacs-lisp
-  (defun jf/org-mode-agenda-to-stand-up-summary (prefix-arg)
-    "Copy to the kill ring the day's summary.
+  ;; Takes my notes for the day and formats them for a summary report.
+  (defun jf/org-mode-agenda-to-stand'-up-summary (parg)
+    "Copy to the kill ring the day's time-tracked summary.
 
   When given PREFIX-ARG, prompt for the day of interest.
 
@@ -428,7 +422,7 @@ The =jf/org-mode-agenda-to-stand-up-summary= function takes my notes for the day
 	(let ((within_headline
 	       ;; Use the CCYY-MM-DD Dayname format and prompt for a date if PREFIX-ARG given.
 	       (format-time-string "%Y-%m-%d %A"
-				   (when (car prefix-arg) (org-read-date nil t nil "Pick a day:" )))))
+				   (when (car parg) (org-read-date nil t nil "Pick a day:" )))))
 	  (kill-new
 	   (concat "*Summary of " within_headline "*\n\n"
 		   (s-trim
@@ -451,9 +445,10 @@ The =jf/org-mode-agenda-to-stand-up-summary= function takes my notes for the day
 	  (yank)))))
 #+end_src
 
-I’m responsible for tracking my work time.  I want a way to quickly see what that is for the current week.
-
 #+begin_src emacs-lisp
+  ;; I’m responsible for tracking my work time.  I want a way to quickly see what
+  ;; that is for the current week.
+  ;;
   ;; A utility function providing an overrview
   (cl-defun jf/org-mode-weekly-report ()
     "Jump to my weekly time tracker.
@@ -497,15 +492,22 @@ I’m responsible for tracking my work time.  I want a way to quickly see what t
 
 ** Copy Org and Paste in Rich Text Format
 
-Org Mode has built-in capabilities for exporting to HTML (and other languages).  The following function does just a bit more.  It converts the org region to HTML and sends it to the clipboard as an RTF datatype.
 
-Why is that nice?  As an RTF datatype, the paste receiver better handles the HTML (e.g., I can more readily paste into an Email and it pastes as expected).
-
-See [[https://kitchingroup.cheme.cmu.edu/blog/2016/06/16/Copy-formatted-org-mode-text-from-Emacs-to-other-applications/][Copy formatted org-mode text from Emacs to other applications]] for more details.  One addition I made was to add the ~-inputencoding UTF-8~ switch.  Without it, I would end up with some weird characters from odd smartquote handling.
-
-/Note:/ For this to work, I needed to permit my =\~/bin/emacsclient= iin the Security & Privacy > Accessibility system preference.  /At least I think that’s what got things working./
 
 #+begin_src emacs-lisp
+  ;; Org Mode has built-in capabilities for exporting to HTML (and other
+  ;; languages).  The following function does just a bit more.  It converts the
+  ;; org region to HTML and sends it to the clipboard as an RTF datatype.
+  ;;
+  ;; Why is that nice?  As an RTF datatype, the paste receiver better handles the
+  ;; HTML (e.g., I can more readily paste into an Email and it pastes as
+  ;; expected).
+  ;;
+  ;; See
+  ;; https://kitchingroup.cheme.cmu.edu/blog/2016/06/16/Copy-formatted-org-mode-text-from-Emacs-to-other-applications/
+  ;; for more details.  One addition I made was to add the ~-inputencoding UTF-8~
+  ;; switch.  Without it, I would end up with some weird characters from odd
+  ;; smartquote handling.
   (use-package htmlize
     :straight t
     :bind ("C-M-s-c" . jf/formatted-copy-org-to-html)
@@ -513,6 +515,9 @@ See [[https://kitchingroup.cheme.cmu.edu/blog/2016/06/16/Copy-formatted-org-mode
     ;; The following functions build on both org and the htmlize package.  I
     ;; define them as part of the config because without the package these won't
     ;; work.
+    ;;
+    ;; For this to work, I needed to permit my \"~/bin/emacsclient\" in the Security
+    ;; & Privacy > Accessibility system preference.
     ;;
     ;; http://mbork.pl/2021-05-02_Org-mode_to_Markdown_via_the_clipboard
     (defun jf/org-copy-region-as-markdown ()
@@ -555,6 +560,9 @@ See [[https://kitchingroup.cheme.cmu.edu/blog/2016/06/16/Copy-formatted-org-mode
 	  )))
     )
 #+end_src
+
+#+RESULTS:
+: jf/formatted-copy-org-to-html
 
 I have found that Slack resists posting rich content, so I often need to open up TextEdit, paste into an empty file, copy the contents, and then paste into Slack.
 
