@@ -143,17 +143,11 @@ The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~
 	    (kill-new text)
 	  (org-capture-string (concat "-----\n" text) "c"))))
 
+    ;; With Heavy inspiration from http://www.howardism.org/Technical/Emacs/capturing-content.html
     (defun jf/region-contents-get-with-metadata (start end)
       "Get the region contents between START and END and return an `org-mode' formatted string."
-      (if (project-current)
-	  (jf/region-contents-get-with-metadata--for-project start end)
-	(concat "#+BEGIN_EXAMPLE\n"
-		(buffer-substring-no-properties start end)
-		"\n#+END_EXAMPLE")))
-
-    ;; With Heavy inspiration from http://www.howardism.org/Technical/Emacs/capturing-content.html
-    (defun jf/region-contents-get-with-metadata--for-project (start end)
-      "Return the project content from the region between START and END."
+      (require 'magit)
+      (require 'git-link)
       (let* ((file-name (buffer-file-name (current-buffer)))
 	     (org-src-mode (replace-regexp-in-string
 			    "-mode"
@@ -164,9 +158,10 @@ The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~
 	     (code-snippet (buffer-substring-no-properties start end))
 	     (file-base (file-name-nondirectory file-name))
 	     (line-number (line-number-at-pos (region-beginning)))
-	     (remote-link (progn
-			    (call-interactively 'git-link)
-			    (car kill-ring)))
+	     (remote-link (when (magit-list-remotes)
+			    (progn
+			      (call-interactively 'git-link)
+			      (car kill-ring))))
 	     (initial-txt (if (null func-name)
 			      (format "From [[file:%s::%s][%s]]:"
 				      file-name
@@ -178,12 +173,11 @@ The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~
 				    line-number
 				    file-base))))
 	(format (concat "\n- Local :: %s"
-			"\n- Remote :: %s"
+			(when remote-link (format "\n- Remote :: %s" remote-link))
 			"\n\n#+BEGIN_%s %s"
 			"\n%s"
 			"\n#+END_%s\n")
 		initial-txt
-		remote-link
 		type
 		org-src-mode
 		code-snippet

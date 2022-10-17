@@ -643,7 +643,7 @@ I want to be able to link and export my epigraph entries.  For now, I'm going to
 The below function over-writes the denote export logic.  It works in a specific case but will likely require further tweaks.
 
 #+begin_src emacs-lisp
-  (cl-defun jf/denote-link-ol-export (link description format
+  (cl-defun jf/denote-link-ol-export (link description format protocol
 					   &key (use_hugo_shortcode jf/exporting-org-to-tor))
     "Export a `denote:' link from Org files.
     The LINK, DESCRIPTION, and FORMAT are handled by the export
