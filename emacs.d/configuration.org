@@ -4404,6 +4404,7 @@ some additional options.
      ;; ("M-t" jf/org-auto-tags--transient :transient t)
      ;; ]
      ["Tasks"
+      ("c" "Capture region to clock…" (lambda (b e p) (interactive "r\nP") (jf/capture-region-contents-with-metadata b e p)))
       ("s" "Search note content…" (lambda () (interactive) (consult-notes-search-in-all-notes)))
       ("S" "Search note filename…" (lambda () (interactive) (consult-notes)))
       ("C-t" "Start a timer…" tmr-with-description)
@@ -4418,16 +4419,6 @@ some additional options.
       ("g w" "Eww" jf/menu--org-capture-eww :if-derived eww-mode)
       ]
      ])
-#+end_src
-
-#+begin_src emacs-lisp
-  (autoload 'org-buffer-list "org")
-  (defvar org-buffer-source
-    `(:name     "Org"
-		:narrow   ?o
-		:category buffer
-		:state    ,#'consult--buffer-state
-		:items    ,(lambda () (mapcar #'buffer-name (org-buffer-list)))))
 #+end_src
 
 * Footnotes
