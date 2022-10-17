@@ -721,6 +721,18 @@ I can use ~jf/org-auto-tags--set~ to create an ad hoc context, or perhaps a "yet
        "Tag(s): " (org-roam-tag-completions))))
     (setq jf/org-auto-tags--current-list tags))
 
+  (transient-define-suffix jf/org-auto-tags--transient (tags)
+    "Set the TAGS from minibuffer read"
+    :description '(lambda ()
+		    (concat
+		     "Org Tags: "
+		     (propertize
+		      (format "%s" jf/org-auto-tags--current-list)
+		      'face 'transient-argument)))
+    (interactive
+     (list (completing-read-multiple "Tag(s): " (org-roam-tag-completions))))
+    (setq jf/org-auto-tags--current-list tags))
+
   (cl-defun jf/org-context-list-completing-read
       (&key
        (context-plist

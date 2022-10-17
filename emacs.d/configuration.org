@@ -3023,19 +3023,18 @@ Powered by ~tmr.el~ to set a timer.
 
 #+begin_src emacs-lisp
   (use-package tmr
+    ;; My dbus install is not behaving so I'm cheating with a bit of AppleScript
+    :config (defun jf/tmr-notification-notify (timer)
+	      "Dispatch a notification for TIMER."
+	      (let ((title "TMR May Ring (Emacs tmr package)")
+		    (description (tmr--timer-description timer)))
+		(ns-do-applescript (concat "display notification \"" description "\" sound name \"Glass\""))))
     :custom (tmr-notify-function #'jf/notifications-notify)
     (tmr-timer-completed-functions
-    (list #'tmr-print-message-for-completed-timer
-	  #'tmr-sound-play
-	  #'jf/tmr-notification-notify))
+     (list #'tmr-print-message-for-completed-timer
+	   #'tmr-sound-play
+	   #'jf/tmr-notification-notify))
     :straight (tmr :host nil :type git :repo "https://git.sr.ht/~protesilaos/tmr"))
-
-  ;; My dbus install is not behaving so I'm cheating with a bit of AppleScript
-  (defun jf/tmr-notification-notify (timer)
-    "Dispatch a notification for TIMER."
-    (let ((title "TMR May Ring (Emacs tmr package)")
-	  (description (tmr--timer-description timer)))
-      (ns-do-applescript (concat "display notification \"" description "\" sound name \"Glass\""))))
 #+end_src
 
 
@@ -3377,9 +3376,6 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
 	(require 'pulsar)
 	(pulsar-pulse-line))))
 #+end_src
-
-#+RESULTS:
-: jf/sidebar--build
 
 - ~jf/move-file~ :: Sometimes I want to move, without renaming, a file.  This
   function helps make that easy.
@@ -4248,25 +4244,6 @@ to write some transient suffixes to.  As you’ll see later, you don’t need to
 use the ~transient-define-suffix~ for adding a function to a transient prefix,
 but a suffix can provide a description.
 
-- ~jf/org-auto-tags--transient~ :: provides a description and a function.  The
-description is dynamic (hence the ~lambda~); it shows the tags that are
-currently set in ~jf/org-auto-tags--transient~.  The function prompts me to
-adjust those tags and store them in the aforementioned variable.
-
-#+begin_src emacs-lisp
-  (transient-define-suffix jf/org-auto-tags--transient (tags)
-    "Set the TAGS from minibuffer read"
-    :description '(lambda ()
-		    (concat
-		     "Org Tags: "
-		     (propertize
-		      (format "%s" jf/org-auto-tags--current-list)
-		      'face 'transient-argument)))
-    (interactive
-     (list (completing-read-multiple "Tag(s): " (org-roam-tag-completions))))
-    (setq jf/org-auto-tags--current-list tags))
-#+end_src
-
 - ~jf/hammerspoon-toggle-mode~ :: this suffix provides a dynamic description of
   the current major mode for a ~hammerspoon-edit-minor-mode~ buffer.  And the
   prefix’s function toggles that mode.
@@ -4341,8 +4318,10 @@ Finally the main menu that connects all of the above together, and provides
 some additional options.
 
 #+begin_src emacs-lisp
+  (defvar jf/pairing-font-p
+    nil
+    "A non-nil means we're in a pairing font situation")
   (global-set-key (kbd "s-1") 'jf/menu)
-  (setq jf/pairing-font-p nil)
   (transient-define-prefix jf/menu ()
     "A context specific \"mega\" menu."
     ;; Todo, can I get this section into a function so I can duplicate it in the jf/menu--tor?
