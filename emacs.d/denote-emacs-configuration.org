@@ -761,14 +761,18 @@ I want to capture entries from various applications.
 	   (title (elfeed-entry-title entry)))
       (jf/denote-capture-reference :url url :title title)))
 
-  (cl-defun jf/denote-capture-reference (&key title url keywords (subdirectory "melange"))
+  (cl-defun jf/denote-capture-reference (&key
+					 title
+					 url
+					 (keywords (denote-keywords-prompt))
+					 (subdirectory "melange"))
     "Create a `denote' entry for the TITLE and URL."
     (denote title
 	    keywords
 	    'org
 	    (f-join (denote-directory) subdirectory)
 	    nil
-	    (template (concat "#+ROAM_REFS: " url "\n"))))
+	    (concat "#+ROAM_REFS: " url "\n")))
 #+end_src
 
 ** Conclusion

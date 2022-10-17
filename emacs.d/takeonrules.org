@@ -62,8 +62,9 @@ In the following ~jf/org-tor-link~, when the given link is an ~ID~ type link, I 
 	(jf/org-md-link-by-id link desc)
       (apply fn link desc rest)))
 
-  (advice-add #'org-md-link :around #'jf/org-tor-link '((name . "wrapper")))
-  (advice-add #'org-hugo-link :around #'jf/org-tor-link '((name . "wrapper")))
+  ;;; Removed as I'm no longer using `org-roam'
+  ;; (advice-add #'org-md-link :around #'jf/org-tor-link '((name . "wrapper")))
+  ;; (advice-add #'org-hugo-link :around #'jf/org-tor-link '((name . "wrapper")))
 #+end_src
 
 The ~jf/org-md-link-by-id~ function checks the link to see if the node in ~org-roam~ database has an associated URL.

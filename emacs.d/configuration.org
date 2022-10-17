@@ -87,16 +87,17 @@ elsewhere, I attempt to give credit to the source.
 
 As we get started in Emacs, I want to make sure I have the basics lined up.
 
-- Package Management
-- Preliminary Configuration
+- Core Configuration
 - Basic Theming
 
-*** Package Management
-
-I have chosen to adopt ~straight.el~ for my package management.  The fact that
-it seamlessly works with ~use-package~ has help me keep my code more organized.
+*** Core Configuration
 
 #+begin_src emacs-lisp
+  ;;; BEGIN Core Configuration
+  ;; I have chosen to adopt \"straight.el\" for my package management.  The fact
+  ;; that it seamlessly works with `use-package' has help me keep my code more
+  ;; organized.
+  ;;
   ;; https://www.reddit.com/r/emacs/comments/mtb05k/emacs_init_time_decreased_65_after_i_realized_the/
   (setq straight-check-for-modifications '(check-on-save find-when-checking))
 
@@ -120,13 +121,7 @@ it seamlessly works with ~use-package~ has help me keep my code more organized.
 
   (setq straight-repository-branch "develop")
   (straight-use-package 'use-package)
-#+end_src
 
-*** Native Compilation
-
-From [[https://xenodium.com/trying-out-gccemacs-on-macos/][Trying out gccemacs on macOS]]
-
-#+begin_src emacs-lisp
   ;; https://xenodium.com/trying-out-gccemacs-on-macos/
   (use-package exec-path-from-shell
     :straight t
@@ -148,15 +143,12 @@ From [[https://xenodium.com/trying-out-gccemacs-on-macos/][Trying out gccemacs o
 	  ;; Only set after LIBRARY_PATH can find gcc libraries.
 	  (setq comp-deferred-compilation t))
       (message "Native comp is *not* available")))
-#+end_src
 
-*** Preliminary Configuration
+  ;; These are some general configurations that I’ve slowly accumulated.  There’s
+  ;; inline documentation in most cases.  There might be little bits worth
+  ;; teasing out but for the most part, you can move along and reference this
+  ;; later.
 
-These are some general configurations that I’ve slowly accumulated.  There’s
-inline documentation in most cases.  There might be little bits worth teasing
-out but for the most part, you can move along and reference this later.
-
-#+begin_src emacs-lisp
   (setq user-full-name "Jeremy Friesen"
 	user-mail-address "jeremy@jeremyfriesen.com")
 
@@ -220,7 +212,7 @@ out but for the most part, you can move along and reference this later.
 
    ring-bell-function 'ignore  ;; Stop ringing any bell
 
-   switch-to-buffer-obey-display-actions t ;; https://www.masteringemacs.org/article/demystifying-emacs-window-manager
+   ;; switch-to-buffer-obey-display-actions t ;; https://www.masteringemacs.org/article/demystifying-emacs-window-manager
 
    split-width-threshold nil ;; 160 * 8
 
@@ -263,12 +255,10 @@ out but for the most part, you can move along and reference this later.
 		(defun jf/garbage-collect-maybe ()
 		  (unless (frame-focus-state)
 		    (garbage-collect))))
-#+end_src
 
-And I’m going to disable a few key bindings.  These were always messing me up a
-bit.  Also enable a few that I find helpful.  (I’ll enable a lot more later).
-
-#+begin_src emacs-lisp
+  ;; And I’m going to disable a few key bindings.  These were always messing me
+  ;; up a bit.  Also enable a few that I find helpful.  (I’ll enable a lot more
+  ;; later).
   (unbind-key "C-z") ;; `suspend-frame'
   (unbind-key "C-c o") ;; was bound to open a file externally
   (unbind-key "C-x C-c") ;; was `save-buffers-kill-terminal'
@@ -280,9 +270,27 @@ bit.  Also enable a few that I find helpful.  (I’ll enable a lot more later).
   (global-set-key (kbd "s-w") 'kill-current-buffer)
   (global-set-key (kbd "C-x C-b") 'ibuffer)
   (global-set-key (kbd "M-RET") 'newline-and-indent)
+
+  ;; provides a means of not displaying the :lighter of a minor mode in the
+  ;; modeline.
+  (use-package diminish
+    :straight t
+    :diminish 'eldoc-mode
+    :diminish 'abbrev-mode)
+
+  ;; *Gcmh* does garbage collection (GC) when the user is idle.
+  (use-package gcmh
+    :straight t
+    :diminish 'gcmh-mode
+    :init
+    (setq gcmh-idle-delay 5
+	  gcmh-high-cons-threshold (* 16 1024 1024))  ; 16mb
+    :config (gcmh-mode))
+  ;;; END Core Configuration
 #+end_src
 
-In using a literate config, I have a mixture of two types of text: prose and code.  The following ~imenu-literate-emacs-lisp~ was pulled from [[https://www.reddit.com/r/emacs/comments/t6noeb/literate_imenu/][Literate imenu? : emacs]].
+#+RESULTS:
+: t
 
 #+begin_src emacs-lisp
   (global-set-key (kbd "s-4") 'imenu-list-minor-mode)
@@ -293,76 +301,17 @@ In using a literate config, I have a mixture of two types of text: prose and cod
     :bind ("s-4" . 'imenu-list-smart-toggle)
     :bind (:map imenu-list-major-mode-map ("o" . 'imenu-list-goto-entry))
     :straight t)
-
-  (defvar imenu-literate-modes-alist
-    '((lisp-mode . (:expressions lisp-imenu-generic-expression))
-      (emacs-lisp-mode . (:expressions lisp-imenu-generic-expression))))
-
-  (defvar imenu-literate-current-mode nil)
-
-  (defun imenu-literate-set-mode ()
-    (interactive)
-    (let ((mode (intern
-		 (completing-read "Imenu literate mode: "
-				  (mapcar #'car imenu-literate-modes-alist)))))
-      (setq-local imenu-literate-current-mode mode)))
-
-  (defun imenu-literate (src-edit?)
-    "Imenu of expressions in a literate file.
-
-    When provided SRC-EDIT? via the Universal Parameter
-    prefix (e.g. C-u), open the selected imenu subject using
-    `org-edit-special'."
-    (interactive "P")
-    (unless imenu-literate-current-mode (imenu-literate-set-mode))
-    (let* ((pair (or (alist-get imenu-literate-current-mode
-				imenu-literate-modes-alist)
-		     (error "Mode %s not found!" imenu-literate-current-mode)))
-	   (expressions (getf pair :expressions))
-	   (index-function (getf pair :index-function
-				 #'imenu-default-create-index-function))
-	   ;;
-	   (imenu-generic-expression (eval expressions))
-	   (imenu-create-index-function index-function))
-      (imenu-list-update-safe)
-      (imenu-list-refresh)
-      (call-interactively #'imenu)
-      (when src-edit?
-	(org-edit-special))))
-
-  (global-set-key (kbd "C-s-2") 'imenu-literate)
 #+end_src
 
-The =abbrev= package is simple and powerful, providing an auto-correct that I configure.  No more “teh” in my text.
-
 #+begin_src emacs-lisp
-  (use-package abbrev
-    :straight (:type built-in)
-    :custom (abbrev-file-name (file-truename "~/git/dotemacs/emacs.d/abbrev_defs"))
-    :hook (text-mode . abbrev-mode))
+
 #+end_src
 
-Some basic packages to keep things less chatty.
-
-*Diminish* provides a means of not displaying the :lighter of a minor mode in the modeline.
-
 #+begin_src emacs-lisp
-  (use-package diminish
-    :straight t
-    :diminish 'eldoc-mode
-    :diminish 'abbrev-mode)
 #+end_src
 
-*Gcmh* does garbage collection (GC) when the user is idle.
-
 #+begin_src emacs-lisp
-  (use-package gcmh
-    :straight t
-    :diminish 'gcmh-mode
-    :init
-    (setq gcmh-idle-delay 5
-	  gcmh-high-cons-threshold (* 16 1024 1024))  ; 16mb
-    :config (gcmh-mode))
+
 #+end_src
 
 *** Basic Theming
@@ -466,7 +415,7 @@ between toggles.
 #+begin_src emacs-lisp
   (set-face-attribute 'default nil
 		      :family jf/fixed-width-font-name
-		      :height 150)
+		      :height 155)
   (set-face-attribute 'variable-pitch nil
 		      :family "ETBembo"
 		      :height 1.1)
@@ -2037,9 +1986,16 @@ A timestamp library.
       :bind ("C-c =" . math-at-point))
 #+end_src
 
-**** hippie-exp.el
+**** Expansion Options
 
 #+begin_src emacs-lisp
+  ;; The =abbrev= package is simple and powerful, providing an auto-correct that
+  ;; I configure.  No more “teh” in my text.
+  (use-package abbrev
+    :straight (:type built-in)
+    :custom (abbrev-file-name (file-truename "~/git/dotemacs/emacs.d/abbrev_defs"))
+    :hook (text-mode . abbrev-mode))
+
   ;; Using Hippie expand, I toggle through words already referenced.
   (use-package hippie-exp
     :straight t
@@ -2090,13 +2046,7 @@ A timestamp library.
 	     ("C-c C->" . mc/mark-all-like-this)
 	     ("C-c C-SPC" . mc/edit-lines)) ;; CTRL+CMD+c
       :straight t)
-#+end_src
 
-**** iedit.el
-
-- ~iedit.el~ ::
-
-#+begin_src emacs-lisp
   ;; Type \"C-;\" to select current symbol and all matches; Then edit at multiple
   ;; points.
   (use-package iedit :straight t)
@@ -2503,6 +2453,12 @@ These are a few variables and cosntants that I use throughout my configuration.
     :straight (doc-view :type built-in)
     :bind (:map doc-view-mode-map
 		("C-c g" . doc-view-goto-page)))
+
+  (use-package esxml :straight t)
+
+  (use-package "nov.el" :straight t
+    :config (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
+    :custom (nov-text-width 80))
 #+end_src
 
 *** Mastodon

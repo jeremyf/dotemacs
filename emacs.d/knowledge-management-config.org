@@ -410,7 +410,7 @@ I want to re-use existing project names but also allow for new ones, and =jf/org
 
 #+begin_src emacs-lisp
   ;; Takes my notes for the day and formats them for a summary report.
-  (defun jf/org-mode-agenda-to-stand'-up-summary (parg)
+  (defun jf/org-mode-agenda-to-stand-up-summary (parg)
     "Copy to the kill ring the day's time-tracked summary.
 
   When given PREFIX-ARG, prompt for the day of interest.
@@ -492,8 +492,6 @@ I want to re-use existing project names but also allow for new ones, and =jf/org
 #+end_src
 
 ** Copy Org and Paste in Rich Text Format
-
-
 
 #+begin_src emacs-lisp
   ;; Org Mode has built-in capabilities for exporting to HTML (and other
