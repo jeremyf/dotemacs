@@ -127,6 +127,7 @@ it seamlessly works with ~use-package~ has help me keep my code more organized.
 From [[https://xenodium.com/trying-out-gccemacs-on-macos/][Trying out gccemacs on macOS]]
 
 #+begin_src emacs-lisp
+  ;; https://xenodium.com/trying-out-gccemacs-on-macos/
   (use-package exec-path-from-shell
     :straight t
     :config
@@ -143,7 +144,7 @@ From [[https://xenodium.com/trying-out-gccemacs-on-macos/][Trying out gccemacs o
 					   ":")
 					 ;; This is where Homebrew puts gcc libraries.
 					 (car (file-expand-wildcards
-						"/opt/homebrew/lib/gcc/*"))))
+					       "/opt/homebrew/lib/gcc/*"))))
 	  ;; Only set after LIBRARY_PATH can find gcc libraries.
 	  (setq comp-deferred-compilation t))
       (message "Native comp is *not* available")))
@@ -231,6 +232,8 @@ out but for the most part, you can move along and reference this later.
 
    x-underline-at-descent-line t ;; Recommendation from
    ;; https://protesilaos.com/emacs/modus-themes
+
+   ns-right-command-modifier 'hyper ;; Exposing one additional modifier key.
    )
 
   ;; I vascilate between yes and no; but invariably find myself stuck in a
@@ -243,9 +246,6 @@ out but for the most part, you can move along and reference this later.
 
 
   (global-hl-line-mode)
-  (setq ns-right-command-modifier 'hyper)
-
-  ;; (global-hl-line-mode)
 
   ;; When you open Emacs, grab all the space on the screen
   (add-to-list 'initial-frame-alist '(fullscreen . maximized))
@@ -258,10 +258,6 @@ out but for the most part, you can move along and reference this later.
   (set-default-coding-systems 'utf-8)
   (set-terminal-coding-system 'utf-8)
   (set-keyboard-coding-system 'utf-8)
-
-  ;; Trying out right command as hyper; I rarely use it and figure why not try
-  ;; something else.
-  (setq mac-right-command-modifier 'hyper)
 
   (add-function :after after-focus-change-function
 		(defun jf/garbage-collect-maybe ()
@@ -789,8 +785,8 @@ When I start writing functions, there’s a few packages I want to consider.
 #+begin_src emacs-lisp
   ;; Load keychain environment
   (use-package keychain-environment
-      :straight t
-      :config (keychain-refresh-environment))
+    :straight t
+    :config (keychain-refresh-environment))
 #+end_src
 
 - ~dash.el~ :: A modern list API for Emacs. No 'cl required.  (See https://github.com/magnars/dash.el/)
@@ -989,8 +985,8 @@ There’s a macro in here somewhere.
   DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
     (interactive "P")
     (let ((initial (list (or given-initial
-		    (when (use-region-p)
-		      (buffer-substring (region-beginning) (region-end)))))))
+			     (when (use-region-p)
+			       (buffer-substring (region-beginning) (region-end)))))))
       (apply consult-fn dir initial)))
 
   (advice-add #'consult-line
@@ -1083,15 +1079,15 @@ entirely muscle memory.
 
 #+begin_src emacs-lisp
   (use-package wgrep
-      :after (embark-consult ripgrep)
-      :straight t
-      :bind (:map wgrep-mode-map
-		  ;; Added keybinding to echo Magit behavior
-		  ("C-c C-c" . wgrep-finish-edit)
-		  :map grep-mode-map
-		  ("e" . wgrep-change-to-wgrep-mode)
-		  :map ripgrep-search-mode-map
-		  ("e" . wgrep-change-to-wgrep-mode)))
+    :after (embark-consult ripgrep)
+    :straight t
+    :bind (:map wgrep-mode-map
+		;; Added keybinding to echo Magit behavior
+		("C-c C-c" . wgrep-finish-edit)
+		:map grep-mode-map
+		("e" . wgrep-change-to-wgrep-mode)
+		:map ripgrep-search-mode-map
+		("e" . wgrep-change-to-wgrep-mode)))
 #+end_src
 
 **** orderless.el
@@ -1428,7 +1424,7 @@ From [[https://www.masteringemacs.org/article/fixing-mark-commands-transient-mar
   (use-package highlight-indent-guides
     :straight t
     :custom (highlight-indent-guides-method 'character)
-      (highlight-indent-guides-responsive 'top)
+    (highlight-indent-guides-responsive 'top)
     :hook (prog-mode . highlight-indent-guides-mode))
 #+end_src
 
@@ -1451,7 +1447,7 @@ From [[https://www.masteringemacs.org/article/fixing-mark-commands-transient-mar
   (use-package fill-column-indicator
     :straight t
     :config
-   ;; :hook (prog-mode . fci-mode)
+    ;; :hook (prog-mode . fci-mode)
     (setq fci-rule-width 1))
 #+end_src
 
@@ -1466,18 +1462,6 @@ From [[https://www.masteringemacs.org/article/fixing-mark-commands-transient-mar
   (use-package popper
     :straight t
     ;; :bind (("C-`" . jf/popper))
-    :config
-    (defun jf/popper (prefix_arg)
-      "Call `popper-cycle', but with PREFIX_ARG invoke a less common popper method.
-
-  With one PREFIX_ARG, `popper-toggle-latest'.
-  With two (or more) PREFIX_ARG `popper-toggle-type'."
-      (interactive "P")
-      (let ((prefix (car prefix_arg)))
-	(cond
-	 ((not prefix)  (popper-cycle))
-	 ((= prefix 4)  (popper-toggle-latest))
-	 (t (popper-toggle-type)))))
     :init
     (setq popper-reference-buffers
 	  '("\\*Messages\\*"
@@ -1492,7 +1476,6 @@ From [[https://www.masteringemacs.org/article/fixing-mark-commands-transient-mar
 				  (floor (frame-height) 3))))
     (popper-mode +1)
     (popper-echo-mode +1))
-
 #+end_src
 
 **** shackle.el
@@ -2223,6 +2206,7 @@ I have only provisionally adopted this.  I like the idea of abbreviations/snippe
 #+begin_src emacs-lisp
   (use-package tempel
     :straight (tempel :host github :repo "minad/tempel")
+    :custom (tempel-path "~/git/dotemacs/emacs.d/template")
     :bind (("M-+" . tempel-complete) ;; Alternative tempel-expand
 	   ("M-*" . tempel-insert))
 
@@ -2258,13 +2242,13 @@ I have only provisionally adopted this.  I like the idea of abbreviations/snippe
   allows functions to operate on the current line if they would normally
   operate on a region and region is currently undefined.”  I’ve used this for
   awhile and believe it’s not baked into my assumptions regarding how I
-  navigation Emacs.
+  navigate Emacs.
 
 #+begin_src emacs-lisp
   (use-package whole-line-or-region
-    :straight t
-    :diminish 'whole-line-or-region-local-mode
-    :config (whole-line-or-region-global-mode))
+      :straight t
+      :diminish 'whole-line-or-region-local-mode
+      :config (whole-line-or-region-global-mode))
 #+end_src
 
 **** smartparens.el
@@ -2291,17 +2275,15 @@ I have only provisionally adopted this.  I like the idea of abbreviations/snippe
       (format "<cite><a href=\"%s\" class=\"u-url p-name\" rel=\"cite\">%s</a></cite>" url name))
     ;; The function advice to override the default behavior
 
-    (advice-add
-     'grab-mac-link-make-html-link
-     :override
-     'jf/grab-mac-link-make-html-link
-     '((name . "jnf")))
+    (advice-add 'grab-mac-link-make-html-link
+		:override 'jf/grab-mac-link-make-html-link
+		'((name . "jnf")))
     :bind (("C-c g" . grab-mac-link)))
 #+end_src
 
 **** org-mac-link.el
 
-- ~org-mac-link.el~ :: Similar to ~grab-mac-link.el~ this specifically grabs a link and insersts in ~org-mode~ format.
+- ~org-mac-link.el~ :: Similar to ~grab-mac-link.el~ this specifically grabs a link and inserts in ~org-mode~ format.
 
 #+begin_src emacs-lisp
   (use-package org-mac-link
@@ -2571,8 +2553,6 @@ I use org-mode and org-roam to help manage content.  Let’s load that rather ex
    (concat user-emacs-directory "denote-emacs-configuration.org"))
 #+end_src
 
-#+end_src
-
 *** org-d20.el
 
 - ~org-d20.el~ :: I’m really only using this for the ~org-d20--roll~ function.
@@ -2609,8 +2589,7 @@ I use org-mode and org-roam to help manage content.  Let’s load that rather ex
     :hook ((elfeed-show-mode . jf/reader-visual))
     :config
     (setq-default elfeed-search-filter "@2-days-ago +unread ")
-    :bind (
-	   (:map elfeed-search-mode-map
+    :bind ((:map elfeed-search-mode-map
 		 ("q" . jf/elfeed-save-db-and-bury))))
 
   ;;write to disk when quiting
@@ -3059,16 +3038,6 @@ Powered by ~tmr.el~ to set a timer.
       (ns-do-applescript (concat "display notification \"" description "\" sound name \"Glass\""))))
 #+end_src
 
-#+RESULTS:
-: jf/tmr-notification-notify
-
-*** elpher.el
-
-- ~elpher.el~ :: A Gopher and Gemini client.
-
-#+begin_src emacs-lisp
-  (use-package elpher :straight t)
-#+end_src
 
 *** EWW
 
@@ -3245,9 +3214,8 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
     (turn-on-visual-line-mode))
 #+end_src
 
-- ~jf/scroll-down-half-page~ :: See https://www.reddit.com/r/emacs/comments/r7l3ar/how_do_you_scroll_half_a_page/
-
 #+begin_src emacs-lisp
+  ;; See https://www.reddit.com/r/emacs/comments/r7l3ar/how_do_you_scroll_half_a_page/
   (global-set-key (kbd "M-n") 'jf/scroll-down-half-page)
   (defun jf/scroll-down-half-page ()
     "Scroll down half a page while keeping the cursor centered"
@@ -3261,9 +3229,8 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
 		 (recenter))))))
 #+end_src
 
-- ~jf/scroll-up-half-page~ :: See https://www.reddit.com/r/emacs/comments/r7l3ar/how_do_you_scroll_half_a_page/
-
 #+begin_src emacs-lisp
+  ;; See https://www.reddit.com/r/emacs/comments/r7l3ar/how_do_you_scroll_half_a_page/
   (global-set-key (kbd "M-p") 'jf/scroll-up-half-page)
   (defun jf/scroll-up-half-page ()
     "Scroll up half a page while keeping the cursor centered"
@@ -3354,12 +3321,13 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
 #+begin_src emacs-lisp
   (defun jf/sort-unique-lines (reverse beg end &optional adjacent keep-blanks interactive)
     "Sort lines and delete duplicates.
-    By default the sort is lexigraphically ascending.  To sort as
-    descending set REVERSE to non-nil.  Specify BEG and END for the
-    bounds of sorting.  By default, this is the selected region.
 
-    I've included ADJACENT, KEEP-BLANKS, and INTERACTIVE so I can
-    echo the method signature of `'delete-duplicate-lines`"
+      By default the sort is lexigraphically ascending.  To sort as
+      descending set REVERSE to non-nil.  Specify BEG and END for the
+      bounds of sorting.  By default, this is the selected region.
+
+      I've included ADJACENT, KEEP-BLANKS, and INTERACTIVE so I can
+      echo the method signature of `'delete-duplicate-lines`"
     ;; This is a common function that I've used in other text editors.
     ;; It's a simple stitch together of sort-lines and
     ;; delete-duplicate-lines.
@@ -4156,53 +4124,45 @@ in Emacs.  However, I can toggle that setting.  That way if I need an umlaut
 
 *** Quick Help
 
-The following ~jf/transient-quick-help~ macro helps generate “help menus” that
-I want to reference.
-
 #+begin_src emacs-lisp
+  ;;; Quick Help
   (cl-defun jf/quick-help (&key header body)
     "Create a help window with HEADER and BODY."
     (let ((qh-buff (concat "*Quick Help: " header "*")))
       (progn (or (get-buffer qh-buff)
-	  (progn (get-buffer-create qh-buff)
-		 (with-current-buffer qh-buff
-		   (insert (concat "**" header "**\n" body))
-		   (goto-char (point-min))
-		   (not-modified)
-		   (read-only-mode)
-		   (special-mode)
-		   (local-set-key (kbd "q") 'kill-buffer-and-window))))
-	  (pop-to-buffer qh-buff '((display-buffer-below-selected)
-				   ;; When sizing the buffer, if tab-line-format is
-				   ;; active then that "line" is not counted in
-				   ;; calculating the fit-to-window-buffer value.
-				   ;; Which means that the buffer flows into the
-				   ;; mode-line.
-				   (window-parameters . ((tab-line-format . none)
-							 (no-other-window . nil)))
-				   (window-height . fit-window-to-buffer)))
-	  (message "q - Remove Window"))))
+		 (progn (get-buffer-create qh-buff)
+			(with-current-buffer qh-buff
+			  (insert (concat "**" header "**\n" body))
+			  (goto-char (point-min))
+			  (not-modified)
+			  (read-only-mode)
+			  (special-mode)
+			  (local-set-key (kbd "q") 'kill-buffer-and-window))))
+	     (pop-to-buffer qh-buff '((display-buffer-below-selected)
+				      ;; When sizing the buffer, if tab-line-format is
+				      ;; active then that "line" is not counted in
+				      ;; calculating the fit-to-window-buffer value.
+				      ;; Which means that the buffer flows into the
+				      ;; mode-line.
+				      (window-parameters . ((tab-line-format . none)
+							    (no-other-window . nil)))
+				      (window-height . fit-window-to-buffer)))
+	     (message "q - Remove Window"))))
 
-    (cl-defmacro jf/transient-quick-help (name &key header label body)
-      "Macro for creating callable functions that display help.
+  (cl-defmacro jf/transient-quick-help (name &key header label body)
+    "Macro for creating callable functions that display help.
 
-      NAME is name of function,
-      LABEL is label for the menu
-      HEADER is name of buffer, and TEXT is displayed."
-      (declare (indent defun))
-      `(progn
-	 (transient-define-suffix ,name nil
-	   ,header
-	   :description ,label
-	   (interactive)
-	   (jf/quick-help :header ,header :body ,body))))
+	NAME is name of function,
+	LABEL is label for the menu
+	HEADER is name of buffer, and TEXT is displayed."
+    (declare (indent defun))
+    `(progn
+       (transient-define-suffix ,name nil
+	 ,header
+	 :description ,label
+	 (interactive)
+	 (jf/quick-help :header ,header :body ,body))))
 #+end_src
-
-#+RESULTS:
-: jf/transient-quick-help
-
-/Note:/ It might make sense to extract the quick help to files, but for now
-this was the least effort.
 
 *** Keyboard Macros
 
@@ -4265,9 +4225,6 @@ I wrote [[file:eberron.org][some tooling to help wile playing Eberron]].
   (org-babel-load-file
    (concat user-emacs-directory "utility-functions.org"))
 #+end_src
-
-#+RESULTS:
-: Loaded ~/.emacs.d/utility-functions.el
 
 ** Crafting Menus to Help Organize
 
