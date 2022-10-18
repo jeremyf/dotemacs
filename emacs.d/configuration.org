@@ -797,58 +797,44 @@ What follows is adjustments to emacs settings as they relate to completion.
     :config
 
     (autoload 'projectile-project-root "projectile")
-    (setq consult-project-root-function #'projectile-project-root))
-#+end_src
+    (setq consult-project-root-function #'projectile-project-root)
 
-***** Advising Functions
-
-I wrote some advising functions to wrap around ~consult-line~ and
-~consult-ripgrep~.  These wrapping functions use the active region as the
-initial text or an empty string if there’s no active region.
-
-There’s a macro in here somewhere.
-
-#+begin_src emacs-lisp
-  (defun jf/consult-first-param-is-initial-text (consult-fn &rest rest)
-    "Advising function around CONSULT-FN.
+    (defun jf/consult-first-param-is-initial-text (consult-fn &rest rest)
+      "Advising function around CONSULT-FN.
 
   The CONSULT-FN's first parameter should be the initial text.
 
   When there's an active region, use that as the first parameter
   for CONSULT-FN.  Otherwise, use an empty string the first
   parameter.  This function handles the REST of the parameters."
-    (interactive)
-    (apply consult-fn
-	   (when (use-region-p)
-	     (buffer-substring
-	      (region-beginning) (region-end)))
-	   rest))
+      (interactive)
+      (apply consult-fn
+	     (when (use-region-p)
+	       (buffer-substring
+		(region-beginning) (region-end)))
+	     rest))
 
-  (defun jf/consult-ripgrep-wrapper (consult-fn &optional dir given-initial)
-    "Advising function around CONSULT-FN.
+    (defun jf/consult-ripgrep-wrapper (consult-fn &optional dir given-initial)
+      "Advising function around CONSULT-FN.
 
   DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
-    (interactive "P")
-    (let ((initial (list (or given-initial
-			     (when (use-region-p)
-			       (buffer-substring (region-beginning) (region-end)))))))
-      (apply consult-fn dir initial)))
+      (interactive "P")
+      (let ((initial (list (or given-initial
+			       (when (use-region-p)
+				 (buffer-substring (region-beginning) (region-end)))))))
+	(apply consult-fn dir initial)))
 
-  (advice-add #'consult-line
-	      :around #'jf/consult-first-param-is-initial-text
-	      '((name . "wrapper")))
-  (advice-add #'consult-ripgrep
-	      :around #'jf/consult-ripgrep-wrapper
-	      '((name . "wrapper")))
-#+end_src
-***** consult-dir.el
-
-- ~consult-dir.el~ :: This package helps ease traveling across directories by
-  providing directory candidates related to current buffers, bookmarks, and
-  projects.  Further, like other ~consult.el~ functions, you can use narrowing
-  keys.  See https://github.com/karthink/consult-dir.
-
-#+begin_src emacs-lisp
+    (advice-add #'consult-line
+		:around #'jf/consult-first-param-is-initial-text
+		'((name . "wrapper")))
+    (advice-add #'consult-ripgrep
+		:around #'jf/consult-ripgrep-wrapper
+		'((name . "wrapper")))
+    )
+  ;; This package helps ease traveling across directories by providing directory
+  ;; candidates related to current buffers, bookmarks, and projects.  Further,
+  ;; like other ~consult.el~ functions, you can use narrowing keys.  See
+  ;; https://github.com/karthink/consult-dir.
   (use-package consult-dir
     :straight t
     :after (consult)
@@ -856,17 +842,12 @@ There’s a macro in here somewhere.
 	   :map minibuffer-local-completion-map
 	   ("C-x C-d" . consult-dir)
 	   ("C-x C-j" . consult-dir-jump-file)))
-#+end_src
 
-***** consult-projectile.el
-
-- ~consult-projectile.el~ :: package provides a function I use everyday: ~M-x
-  consult-projectile~.  When I invoke ~consult-projectile~, I have the file
-  completion for the current project.  I can also type =b= + =SPACE= to narrow
-  my initial search to open buffers in the project.  Or =p= + =space= to narrow
-  to other projects; and then select a file within that project.
-
-#+begin_src emacs-lisp
+  ;; package provides a function I use everyday: ~M-x consult-projectile~.  When
+  ;; I invoke ~consult-projectile~, I have the file completion for the current
+  ;; project.  I can also type =b= + =SPACE= to narrow my initial search to open
+  ;; buffers in the project.  Or =p= + =space= to narrow to other projects; and
+  ;; then select a file within that project.
   (use-package consult-projectile
     :commands (consult-projectile)
     :straight (consult-projectile
@@ -882,18 +863,9 @@ There’s a macro in here somewhere.
     ;;; have that way open.
     ("s-t" . consult-projectile)
     ("s-p" . consult-projectile))
-#+end_src
 
-/Note:/ The =CMD= + =t= (e.g. ~s-t~ in Emacs) is a carryover from my [[https://macromates.com][Textmate]]
-and [[https://www.sublimetext.com/][Sublime Text]] days.  More than any other key combination, that one is
-entirely muscle memory.
-
-**** embark-consult.el
-
-- ~embark-consult.el~ :: I use ~embark.el~ and ~consult.el~, let’s add a little
-  bit more connective tissue.
-
-#+begin_src emacs-lisp
+  ;; I use ~embark.el~ and ~consult.el~, let’s add a little bit more connective
+  ;;  tissue.
   (use-package embark-consult
     :straight t
     :after (embark consult)
