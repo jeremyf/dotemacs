@@ -62,8 +62,6 @@ A bit of pre-amble.  I maintain a list of data directories, each might have “r
     (pulsar-pulse-line))
     #+end_src
 
-The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~ which introduces my more generalized note taking system.
-
 #+begin_src emacs-lisp
   (use-package org
     :straight (org :type built-in)
@@ -86,7 +84,7 @@ The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~
 				     org-directory
 				     "/captured-notes.org")
 	     org-log-done 'time
-	     org-todo-keywords '((type "TODO(t)" "IN-PROGRESS(i!)" "BLOCKED(b@/!)" "|" "DONE(d!)" "CANCELLED(c@)"))
+	     org-todo-keywords '((type "TODO(t)" "IN-PROGRESS(i!)" "BLOCKED(b@/!)" "IN-REVIEW (r!)" "|" "DONE(d!)" "CANCELLED(c@)"))
 	     )
     (setq org-capture-templates
 	  '(("@"
@@ -266,9 +264,9 @@ The rudimentary configuration of my ~org-mode~.  Later, I write about ~org-roam~
   (setq org-plantuml-jar-path (concat (string-trim (shell-command-to-string "brew-path plantuml")) "/libexec/plantuml.jar"))
 #+end_src
 
-These are the list of completion at point functions I want for Org-Mode.
 
 #+begin_src emacs-lisp
+  ;; These are the list of completion at point functions I want for Org-Mode.
   (defun jf/org-completion-at-point-functions ()
     (setq-local completion-at-point-functions
 		(list (cape-super-capf
