@@ -54,6 +54,23 @@ This means I can treate my internal Personal Knowledge Management system as both
 In the following ~jf/org-tor-link~, when the given link is an ~ID~ type link, I call my custom link handler (e.g. ~jf/org-md-link-by-id~).  Otherwise, I use the given funtion.
 
 #+begin_src emacs-lisp
+  (defun jf/org-html-verse-block (_verse-block contents info)
+    "Transcode a VERSE-BLOCK element from Org to HTML.
+  CONTENTS is verse block contents.  INFO is a plist holding
+  contextual information."
+    (format "<section class=\"verse\">\n%s</section>"
+	    ;; Replace leading white spaces with non-breaking spaces.
+	    (replace-regexp-in-string
+	     "^[ \t]+" (lambda (m) (org-html--make-string (length m) "&#xa0;"))
+	     ;; Replace each newline character with line break.  Also
+	     ;; remove any trailing "br" close-tag so as to avoid
+	     ;; duplicates.
+	     (let* ((br (org-html-close-tag "br" nil info))
+		    (re (format "\\(?:%s\\)?[ \t]*\n" (regexp-quote br))))
+	       (replace-regexp-in-string re (concat br "\n") contents)))))
+#+end_src
+
+#+begin_src emacs-lisp
   (defun jf/org-tor-link (fn link desc &rest rest)
     "Conditional LINK and DESC rendering for ID-based links.
 

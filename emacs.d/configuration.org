@@ -289,30 +289,6 @@ As we get started in Emacs, I want to make sure I have the basics lined up.
   ;;; END Core Configuration
 #+end_src
 
-#+RESULTS:
-: t
-
-#+begin_src emacs-lisp
-  (global-set-key (kbd "s-4") 'imenu-list-minor-mode)
-  (use-package imenu-list
-    :custom (imenu-list-focus-after-activation t)
-    (imenu-list-size 0.4)
-    (imenu-list-position 'right)
-    :bind ("s-4" . 'imenu-list-smart-toggle)
-    :bind (:map imenu-list-major-mode-map ("o" . 'imenu-list-goto-entry))
-    :straight t)
-#+end_src
-
-#+begin_src emacs-lisp
-
-#+end_src
-
-#+begin_src emacs-lisp
-#+end_src
-
-#+begin_src emacs-lisp
-
-#+end_src
 
 *** Basic Theming
 
@@ -323,29 +299,28 @@ I want to start with a basic look and feel.  First, the choice of primary font.
   (defvar jf/fixed-width-font-name
     "Iosevka Comfy Motion Fixed"
     "The name of the fixed width font.
-    I have it sprinkled through too many places.
+      I have it sprinkled through too many places.
 
-    Alternatives:
-    - \"Iosevka Nerd Font Mono\"
-    - \"Iosevka Comfy Wide Fixed\"
-    - \"Iosevka Comfy Motion Fixed\"
-    - \"Iosevka Term\"
-    - \"Monaco\"
-    - \"JetBrains Mono\"
-    - \"Hack Nerd Font\"")
+      Alternatives:
+      - \"Iosevka Nerd Font Mono\"
+      - \"Iosevka Comfy Wide Fixed\"
+      - \"Iosevka Comfy Motion Fixed\"
+      - \"Iosevka Term\"
+      - \"Monaco\"
+      - \"JetBrains Mono\"
+      - \"Hack Nerd Font\"")
 
   (set-frame-font jf/fixed-width-font-name)
-#+end_src
 
-And now the theme.  I’ve chosen the modus themes (e.g. ~modus-vivendi~ and
-~modus-operandi~).  They provide a light and dark theme with a focus on visual
-accessibility.
+  ;; And now the theme.  I’ve chosen the modus themes (e.g. ~modus-vivendi~ and
+  ;; ~modus-operandi~).  They provide a light and dark theme with a focus on visual
+  ;; accessibility.
 
-I love [[http://protesilaos.com][Prot]]’s attention to detail with the modus themes.  Here’s my
-configuration for these two sibling themes.  There’s a bit of chatter, but all
-told it sets things up how I like.
+  ;; I love [[http://protesilaos.com][Prot]]’s attention to detail with the modus themes.  Here’s my
+  ;; configuration for these two sibling themes.  There’s a bit of chatter, but all
+  ;; told it sets things up how I like.
 
-#+begin_src emacs-lisp
+
   (use-package modus-themes
     ;; :straight (modus-themes :type built-in)
     :straight (:type git :host gitlab :repo "protesilaos/modus-themes" :branch "main")
@@ -383,36 +358,13 @@ told it sets things up how I like.
        (3 . (monochrome overline 1.2 background))
        (4 . (overline 1.1))
        (t . (rainbow 1.05)))))
-#+end_src
+  (modus-themes-load-themes)
 
-#+begin_example emacs-lisp
-  (use-package ef-themes
-    :straight t
-    :config (setq
-	     ef-themes-to-toggle '(ef-summer ef-winter)
-	     ef-themes-headings ; read the manual's entry or the doc string
-	     '((0 . (variable-pitch light 1.9))
-	       (1 . (variable-pitch light 1.8))
-	       (2 . (variable-pitch regular 1.7))
-	       (3 . (variable-pitch regular 1.6))
-	       (4 . (variable-pitch regular 1.5))
-	       (5 . (variable-pitch 1.4)) ; absence of weight means `bold'
-	       (6 . (variable-pitch 1.3))
-	       (7 . (variable-pitch 1.2))
-	       (t . (variable-pitch 1.1)))
-	     ef-themes-mixed-fonts t
-	     ef-themes-variable-pitch-ui t))
-
-  (ef-themes-select 'ef-summer)
-#+end_example
-
-With a quick bit of testing, it appears that the following ~set-face-attribute~
-declarations should be made after the theme declarations.  When the following
-statements were declared before the themes, and I toggled my theme, the font
-changed to something unexpected.  With them declared after, I keep the fonts
-between toggles.
-
-#+begin_src emacs-lisp
+  ;; With a quick bit of testing, it appears that the following
+  ;; `set-face-attribute' declarations should be made after the theme
+  ;; declarations.  When the following statements were declared before the
+  ;; themes, and I toggled my theme, the font changed to something unexpected.
+  ;; With them declared after, I keep the fonts between toggles.
   (set-face-attribute 'default nil
 		      :family jf/fixed-width-font-name
 		      :height 155)
@@ -422,13 +374,7 @@ between toggles.
   (set-face-attribute 'fixed-pitch nil
 		      :family jf/fixed-width-font-name
 		      :height 1.0)
-#+end_src
 
-Next up, let’s load the theme based on my operating system’s settings
-(e.g. Light or Dark mode).  /Note:/ I could just start with ~(load-theme
-‘modus-operandi)~ but figure I’ll add a little bit of “nice to have up front.
-
-#+begin_src emacs-lisp
   (if (eq system-type 'darwin)
       (progn
 	(defun jf/dark ()
@@ -441,26 +387,19 @@ Next up, let’s load the theme based on my operating system’s settings
 	(defun jf/emacs-theme-by-osx-appearance ()
 	  "Set theme based on OSX apperance state."
 	  (if (equal "Dark" (substring (shell-command-to-string "defaults read -g AppleInterfaceStyle") 0 4))
-	      (load-theme 'modus-vivendi)
-	    (load-theme 'modus-operandi)))
+	      (modus-themes-load-vivendi)
+	    (modus-themes-load-operandi)))
 	;; And load the appropriate theme
 	(jf/emacs-theme-by-osx-appearance))
     (progn
       (defun modus-themes-toggle ()
 	"Toggle between `modus-operandi' and `modus-vivendi' themes."
 	(interactive)
-	(if (eq (car custom-enabled-themes) 'modus-operandi)
-	    (load-theme 'modus-vivendi)
-	  (load-theme 'modus-operandi)))
-      (load-theme 'modus-operandi)))
-#+end_src
+	(if (eq (car custom-enabled-themes) 'modus-vivendi)
+	    (modus-themes-load-vivendi)
+	  (modus-themes-load-operandi)))
+      (modus-themes-load-operandi)))
 
-*** Icons
-
-- ~all-the-icons.el~ :: Provides a nice set of reference icons.  The various
-  ~jf/all-with--with-~ functions give access to the icons of the named set.
-
-#+begin_src emacs-lisp
   ;; Useful for referential icons.
   (use-package all-the-icons
     :straight t
@@ -481,15 +420,10 @@ Next up, let’s load the theme based on my operating system’s settings
     (jf/all-the-icons--with :name "material")
     (jf/all-the-icons--with :name "octicon")
     (jf/all-the-icons--with :name "alltheicon"))
-#+end_src
 
-**** all-the-icons-dired.el
-
-- ~all-the-icons-dired.el~ :: Incorporates file icons with file listings of
-  dired.  /Note/: On 2021-04-11 I was getting the following error with this
-  package: "*ERROR*: Symbol's value as variable is void: file"
-
-#+begin_src emacs-lisp
+  ;; Incorporates file icons with file listings of dired.  /Note/: On 2021-04-11
+  ;; I was getting the following error with this package: "*ERROR*: Symbol's
+  ;; value as variable is void: file"
   (use-package all-the-icons-dired
     :straight t
     :after all-the-icons
@@ -548,19 +482,7 @@ hard requirement for packages I’ll later introduce.
        ("v" "Variable" helpful-variable)])
     :bind ("H-h" . jf/helpful-menu)
     ("C-s-h" . jf/helpful-menu))
-#+end_src
 
-With the above, I can now type ~C-s-h~ to bring up my helpful menu, and begin
-exploring.
-
-Emacs has lots of keybindings and many of them chain together several keys.  As
-I’m learning those keys, I might remember the first prefix.
-
-When I type the first key of a sequence and wait, ~which-key~ pops up a menu of
-candidate functions and the keys to invoke each of them.  Another way to
-introspect Emacs.
-
-#+begin_src emacs-lisp
   (use-package which-key
     :straight t
     :diminish 'which-key-mode
@@ -736,43 +658,25 @@ When I start writing functions, there’s a few packages I want to consider.
   (use-package keychain-environment
     :straight t
     :config (keychain-refresh-environment))
-#+end_src
 
-- ~dash.el~ :: A modern list API for Emacs. No 'cl required.  (See https://github.com/magnars/dash.el/)
-
-#+begin_src emacs-lisp
+  ;; A modern list API for Emacs. No 'cl required.  (See https://github.com/magnars/dash.el/)
   (use-package dash :straight t)
-#+end_src
 
-- ~f.el~ :: A modern API for working with files and directories in Emacs. (See https://github.com/rejeep/f.el/)
-
-#+begin_src emacs-lisp
+  ;; A modern API for working with files and directories in Emacs. (See https://github.com/rejeep/f.el/)
   (use-package f :straight t)
-#+end_src
 
-- ~s.el~ :: The long lost Emacs string manipulation library.  (See https://github.com/magnars/s.el/)
-
-#+begin_src emacs-lisp
+  ;; The long lost Emacs string manipulation library.  (See https://github.com/magnars/s.el/)
   (use-package s :straight t)
-#+end_src
 
-- ~editorconfig.el~ :: “EditorConfig helps maintain consistent coding styles
-  for multiple developers working on the same project across various editors
-  and IDEs.”  See https://editorconfig.org/#overview for more details.
-
-#+begin_src emacs-lisp
+  ;; “EditorConfig helps maintain consistent coding styles for multiple
+  ;; developers working on the same project across various editors and IDEs.”
+  ;; See https://editorconfig.org/#overview for more details.
   (use-package editorconfig
     :straight t
     :diminish editorconfig-mode
     :config
     (editorconfig-mode 1))
-#+end_src
 
-- ~rigprep.el~ :: For many years, I’ve used “The Silver Searcher”, or ~ag~ on
-  the command line.[fn:6].  However, [[https://github.com/BurntSushi/ripgrep][ripgrep]] provides even faster searching,
-  with an almost identical parameter list.
-
-#+begin_src emacs-lisp
   (use-package rg
     :config (rg-enable-menu)
     ;; :init (setq ripgrep-arguments "--ignore-case")
@@ -811,15 +715,7 @@ What follows is adjustments to emacs settings as they relate to completion.
     (setq minibuffer-prompt-properties
 	  '(read-only t cursor-intangible t face minibuffer-prompt))
     (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode))
-#+end_src
 
-**** consult.el
-
-- ~consult.el~ :: “Consult provides practical commands based on the Emacs completion function [[https://www.gnu.org/software/emacs/manual/html_node/elisp/Minibuffer-Completion.html][completing-read]].”  I had previously used [[https://github.com/abo-abo/swiper][Ivy, Counsel, and Swiper]], but appreciate the design principles of Consult, namely “Consult fits well into existing setups and it helps you to create a full completion environment out of small and independent components.”[fn:2]
-
-With ~consult.el~ I’m able to bring in other components that focus on doing their “one thing” really well.
-
-#+begin_src emacs-lisp
   (use-package consult
     :straight t
     ;; Replace bindings. Lazily loaded due by `use-package'.
@@ -1331,6 +1227,14 @@ The ~ibuffer-sidebar~ package provides an interesting take on the side panel.
 It shows me what I’ve opened.  I like that.
 
 #+begin_src emacs-lisp
+  (use-package imenu-list
+    :custom (imenu-list-focus-after-activation t)
+    (imenu-list-size 0.4)
+    (imenu-list-position 'right)
+    :bind ("s-4" . 'imenu-list-smart-toggle)
+    :bind (:map imenu-list-major-mode-map ("o" . 'imenu-list-goto-entry))
+    :straight t)
+
   (use-package ibuffer-sidebar
     :straight t
     ;; Width of 52 characters...like recommended git titles.

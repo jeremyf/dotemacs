@@ -84,7 +84,7 @@ A bit of pre-amble.  I maintain a list of data directories, each might have “r
 				     org-directory
 				     "/captured-notes.org")
 	     org-log-done 'time
-	     org-todo-keywords '((type "TODO(t)" "IN-PROGRESS(i!)" "BLOCKED(b@/!)" "IN-REVIEW (r!)" "|" "DONE(d!)" "CANCELLED(c@)"))
+	     org-todo-keywords '((type "TODO(t)" "IN-PROGRESS(i!)" "BLOCKED(b@/!)" "IN-REVIEW(r!)" "|" "DONE(d!)" "CANCELLED(c@)"))
 	     )
     (setq org-capture-templates
 	  '(("@"
@@ -393,6 +393,16 @@ I want to re-use existing project names but also allow for new ones, and =jf/org
 	  (progn
 	    ;; Go to the end of the file and append the project to the end
 	    (end-of-buffer)
+	    ;; Ensure we have a headline for the given day
+	    (unless (org-element-map
+			(org-element-parse-buffer)
+			'headline
+		      (lambda (hl)
+			(string= within_headline
+				 (plist-get
+				  ;; I want the raw title, no styling nor tags
+				  (cadr (car (org-element-lineage hl))) :raw-value))))
+	      (insert (concat "\n\n*** "within_headline)))
 	    (insert (concat "\n\n**** " project " :" tag ":\n\n")))))))
 
   (cl-defun jf/org-mode-agenda-find-blocked-node ()
