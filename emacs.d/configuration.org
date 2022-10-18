@@ -565,60 +565,19 @@ For that, I’m going to use the lightweight vertico package.
 	  read-buffer-completion-ignore-case t
 	  completion-ignore-case t)
     (setq vertico-cycle t))
-#+end_src
 
-Further more, I’m going to enable a few extensions.
-
-The ~vertico-indexed.elc~ extension adds a visual indicator of each candidate’s
-index.  Further, I can type ~C-<num> ENT~ and select that candidate.  Often
-it’s just as easy to navigate via ~TAB~ or ~C-n~ / ~C-p~ but the visual
-indicator is a nice bit of polish.
-
-#+begin_src emacs-lisp
   (load "~/.emacs.d/straight/build/vertico/extensions/vertico-indexed.elc"
 	nil
 	jf/silence-loading-log)
   (vertico-indexed-mode)
-#+end_src
 
-The ~vertico-repeat.elc~ extension does one simple thing: it remembers and
-gives quick access to the last command you entered in the “minibuffer.”  This
-can be super userful if I built up a complicated ~consult-ripgrep~.
-
-#+begin_src emacs-lisp
   (load "~/.emacs.d/straight/build/vertico/extensions/vertico-repeat.elc"
 	nil
 	jf/silence-loading-log)
   (global-set-key (kbd "M-r") #'vertico-repeat)
   (add-hook 'minibuffer-setup-hook #'vertico-repeat-save)
-#+end_src
-
-Related to, but independent of ~vertico-repeat.elc~ is enabling
-~savehist-mode~.  With that enabled, I have access to a few dozen of the last
-minibuffer commands I issued.  These are, by default, in ~\~/.emacs.d/history~.
-
-#+begin_src emacs-lisp
   (savehist-mode 1)
-#+end_src
 
-Giving a go at ~vertico-posframe~ to render a “pop-up” instead of the minibuffer.
-
-#+begin_src emacs-lisp
-  ;; (use-package vertico-posframe
-  ;;   :straight t
-  ;;   :config (vertico-posframe-mode t)
-  ;;   (setq vertico-posframe-width 170)
-  ;;   (setq vertico-posframe-height nil)
-  ;;   (setq vertico-posframe-parameters
-  ;;       '((left-fringe . 8)
-  ;; 	(right-fringe . 8))))
-#+end_src
-
-Now that I have a list of candidates commands, it would be nice if those
-candidates had some annotations.  Let’s load the ~marginalia~ package.  It
-provides annotations to minibuffer completions, and pairs nicely with Vertico.
-
-#+begin_src emacs-lisp
   (use-package marginalia
     :straight t
     :config (setq marginalia-max-relative-age 0) ;; Set absolute value
@@ -626,7 +585,7 @@ provides annotations to minibuffer completions, and pairs nicely with Vertico.
     ;; section.This ensures that it is enabled right away.  It also forces the
     ;; loading of the package.
     :init (marginalia-mode))
-#+end_src
+    #+end_src
 
 ** Writing, Coding, Computering
 
@@ -654,6 +613,8 @@ When I start writing functions, there’s a few packages I want to consider.
 - ~keychain-environment.el~ :: Load keychain environment variables
 
 #+begin_src emacs-lisp
+  ;;; Support packages
+
   ;; Load keychain environment
   (use-package keychain-environment
     :straight t
@@ -864,6 +825,11 @@ What follows is adjustments to emacs settings as they relate to completion.
     ("s-t" . consult-projectile)
     ("s-p" . consult-projectile))
 
+  (use-package consult-yasnippet
+    :straight t
+    :after (consult yasnippet)
+    :bind ("C-c y" . consult-yasnippet))
+
   ;; I use ~embark.el~ and ~consult.el~, let’s add a little bit more connective
   ;;  tissue.
   (use-package embark-consult
@@ -876,25 +842,133 @@ What follows is adjustments to emacs settings as they relate to completion.
 
     (embark-collect-mode . consult-preview-at-point-mode)
     (embark-collect-mode . embark-consult-preview-minor-mode))
+
+  (use-package corfu
+    :straight t
+    :demand t
+    ;; Optionally use TAB for cycling, default is `corfu-complete'.
+    :bind (:map corfu-map
+		("M-m" . corfu-move-to-minibuffer)
+		("<escape>". corfu-quit)
+		("<return>" . corfu-insert)
+		("M-d" . corfu-show-documentation)
+		("M-l" . 'corfu-show-location)
+		("TAB" . corfu-next)
+		([tab] . corfu-next)
+		("S-TAB" . corfu-previous)
+		([backtab] . corfu-previous))
+
+    :custom
+    ;; Works with `indent-for-tab-command'. Make sure tab doesn't indent when you
+    ;; want to perform completion
+    (tab-always-indent 'complete)
+    (completion-cycle-threshold nil)      ; Always show candidates in menu
+
+    (corfu-auto nil)
+    (corfu-auto-prefix 2)
+    (corfu-auto-delay 0.25)
+
+    ;; (corfu-min-width 80)
+    ;; (corfu-max-width corfu-min-width)     ; Always have the same width
+    (corfu-count 14)
+    (corfu-scroll-margin 4)
+    (corfu-cycle nil)
+
+    ;; (corfu-echo-documentation nil)        ; Already use corfu-doc
+    (corfu-separator ?\s)                 ; Necessary for use with orderless
+    (corfu-quit-no-match 'separator)
+
+    (corfu-preview-current 'insert)       ; Preview current candidate?
+    (corfu-preselect-first t)             ; Preselect first candidate?
+    :config
+    (defun corfu-move-to-minibuffer ()
+    "Move \"popup\" completion candidates to minibuffer.
+
+  Useful if you want a more robust view into the recommend candidates."
+    (interactive)
+    (let (completion-cycle-threshold completion-cycling)
+      (apply #'consult-completion-in-region completion-in-region--data)))
+
+    :init
+    ;; Recommended: Enable Corfu globally.
+    ;; This is recommended since dabbrev can be used globally (M-/).
+    (global-corfu-mode))
+
+  (use-package kind-icon
+    :straight t
+    :after corfu
+    :custom
+    (kind-icon-use-icons t)
+    (kind-icon-default-face 'corfu-default) ; Have background color be the same as `corfu' face background
+    (kind-icon-blend-background nil)  ; Use midpoint color between foreground and background colors ("blended")?
+    (kind-icon-blend-frac 0.08)
+
+    ;; NOTE 2022-02-05: `kind-icon' depends `svg-lib' which creates a cache
+    ;; directory that defaults to the `user-emacs-directory'. Here, I change that
+    ;; directory to a location appropriate to `no-littering' conventions, a
+    ;; package which moves directories of other packages to sane locations.
+    ;; (svg-lib-icons-dir (no-littering-expand-var-file-name "svg-lib/cache/")) ; Change cache dir
+    :config
+    (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter) ; Enable `kind-icon'
+
+    ;; Add hook to reset cache so the icon colors match my theme
+    ;; NOTE 2022-02-05: This is a hook which resets the cache whenever I switch
+    ;; the theme using my custom defined command for switching themes. If I don't
+    ;; do this, then the backgound color will remain the same, meaning it will not
+    ;; match the background color corresponding to the current theme. Important
+    ;; since I have a light theme and dark theme I switch between. This has no
+    ;; function unless you use something similar
+    (add-hook 'kb/themes-hooks #'(lambda () (interactive) (kind-icon-reset-cache))))
+
+  (use-package corfu-doc
+    ;; NOTE 2022-02-05: At the time of writing, `corfu-doc' is not yet on melpa
+    :straight (corfu-doc :type git :host github :repo "galeo/corfu-doc")
+    :bind (:map corfu-map
+		;; This is a manual toggle for the documentation window.
+		([remap corfu-show-documentation] . corfu-doc-toggle) ; Remap the default doc command
+		;; Scroll in the documentation window
+		("M-n" . corfu-doc-scroll-up)
+		("M-p" . corfu-doc-scroll-down))
+    :hook (corfu-mode . corfu-doc-mode)
+    :custom
+    (corfu-doc-delay 0.1)
+    (corfu-doc-hide-threshold 10)
+    (corfu-doc-max-width 60)
+    (corfu-doc-max-height 10)
+
+    ;; NOTE 2022-02-05: I've also set this in the `corfu' use-package to be
+    ;; extra-safe that this is set when corfu-doc is loaded. I do not want
+    ;; documentation shown in both the echo area and in the `corfu-doc' popup.
+    ;; (corfu-echo-documentation nil)
+    :config
+    ;; NOTE 2022-02-05: This is optional. Enabling the mode means that every corfu
+    ;; popup will have corfu-doc already enabled. This isn't desirable for me
+    ;; since (i) most of the time I do not need to see the documentation and (ii)
+    ;; when scrolling through many candidates, corfu-doc makes the corfu popup
+    ;; considerably laggy when there are many candidates. Instead, I rely on
+    ;; manual toggling via `corfu-doc-toggle'.
+    (corfu-doc-mode))
 #+end_src
 
 **** wgrep.el
 
-- ~wgrep.el~ :: “Edit a grep buffer and apply those changes to the file
-  buffer.”  In other words, after “searching” for something, sending the
-  results to a buffer (via ~embark-export~ or such thing), you can edit that
-  search results buffer and propogate the changes to the locations of the
-  elements that matched the search.
+- ~wgrep.el~ ::
 
-1.  Call ~consult-ripgrep~ (via ~C-c f~) to search for something.
-2.  Call ~embark-export~ (via ~C-s-e~) to export to a grep buffer.
-3.  Call ~wgrep-change-to-wgrep-mode~ (via ~e~ or ~C-c C-p~)
-4.  Edit the grep buffer as you would anywhere else.
-5.  Save (via ~C-x C-s~) or Cancel (via ~C-c C-k~).
 
    I use this sequence at least once a day.
 
 #+begin_src emacs-lisp
+  ;; “Edit a grep buffer and apply those changes to the file buffer.”  In other
+  ;; words, after “searching” for something, sending the results to a buffer
+  ;; (via `embark-export' or such thing), you can edit that search results
+  ;; buffer and propogate the changes to the locations of the elements that
+  ;; matched the search.
+  ;;
+  ;;   1.  Call `consult-ripgrep' (via ~C-c f~) to search for something.
+  ;;   2.  Call `embark-export' (via ~C-s-e~) to export to a grep buffer.
+  ;;   3.  Call `wgrep-change-to-wgrep-mode' (via ~e~ or ~C-c C-p~)
+  ;;   4.  Edit the grep buffer as you would anywhere else.
+  ;;   5.  Save (via ~C-x C-s~) or Cancel (via ~C-c C-k~).
   (use-package wgrep
     :after (embark-consult ripgrep)
     :straight t
@@ -907,33 +981,28 @@ What follows is adjustments to emacs settings as they relate to completion.
 		("e" . wgrep-change-to-wgrep-mode)))
 #+end_src
 
-**** orderless.el
-
-The [[https://github.com/minad/orderless][orderless]] package provides completion tooling for non-strict word order.  I
-spent considerable time reading through the [[https://github.com/minad/consult/wiki][Orderless section of Consult’s
-wiki]].
-
-As configured the orderless completion recognizes the following “switches”:
-
-- Flex (~\~~) :: Just start typing characters and you’ll get matches that have
-  those characters
-- File Extension (~\.ext~) :: Match files with this extension.
-- Regexp ~^.$~ :: Use some regular expression syntax
-  - ~^~ matching beginning
-  - ~.~ any ol’ character
-  - ~$~ matching ending
-- Initialism (~`~) :: In ~M-x~ when I typed ~`pl~ the ~previous-line~ function
-  was a top match.  The initialism switch “explodes” the characters and says
-  match methods who’s words start with those characters.
-- Not Literal ~!~ :: Exclude candidates that match the literal
-  (e.g. ~!previous~ won’t show ~previous-line~ in the ~M-x~ completion).
-- Literal ~=~ :: No “fuzzy buziness”, just match exactly what I typed.
-
-There is another case (e.g. ~%~ character fold) that I don’t yet understand.
-
-More on these component matchings styles is available at [[https://github.com/minad/orderless#component-matching-styles][github.com/minad/orderless]].
-
 #+begin_src emacs-lisp
+  ;; The https://github.com/minad/orderless package provides completion tooling
+  ;; for non-strict word order.  I spent considerable time reading through the
+  ;; https://github.com/minad/consult/wiki
+  ;;
+  ;; As configured the orderless completion recognizes the following “switches”:
+  ;;
+  ;; - Flex (~\~~) :: Just start typing characters and you’ll get matches that have
+  ;;   those characters
+  ;; - File Extension (~\.ext~) :: Match files with this extension.
+  ;; - Regexp ~^.$~ :: Use some regular expression syntax
+  ;;   - ~^~ matching beginning
+  ;;   - ~.~ any ol’ character
+  ;;   - ~$~ matching ending
+  ;; - Initialism (~`~) :: In ~M-x~ when I typed ~`pl~ the ~previous-line~ function
+  ;;   was a top match.  The initialism switch “explodes” the characters and says
+  ;;   match methods who’s words start with those characters.
+  ;; - Not Literal ~!~ :: Exclude candidates that match the literal
+  ;;   (e.g. ~!previous~ won’t show ~previous-line~ in the ~M-x~ completion).
+  ;; - Literal ~=~ :: No “fuzzy buziness”, just match exactly what I typed.
+  ;;
+  ;; There is another case (e.g. ~%~ character fold) that I don’t yet understand.
   (use-package orderless
     :straight t
     :config
@@ -988,137 +1057,6 @@ More on these component matchings styles is available at [[https://github.com/mi
 	  orderless-style-dispatchers '(+orderless-dispatch)))
 #+end_src
 
-**** corfu.el
-
-- ~corfu.el~ :: An alternative to the ubiquitous [[https://github.com/company-mode/company-mode][Company]]; In [[https://takeonrules.com/2022/01/17/switching-from-company-to-corfu-for-emacs-completion/][Switching from Company to Corfu for Emacs Completion]] I further explain my adoption of Corfu.  See https://github.com/minad/corfu for more details on Corfu.
-
-/Note:/ I may explore [[https://gitlab.com/protesilaos/mct][MCT]] and see how it compares to Corfu.
-
-#+begin_src emacs-lisp
-  (use-package corfu
-    :straight t
-    :demand t
-    ;; Optionally use TAB for cycling, default is `corfu-complete'.
-    :bind (:map corfu-map
-		("<escape>". corfu-quit)
-		("<return>" . corfu-insert)
-		("M-d" . corfu-show-documentation)
-		("M-l" . 'corfu-show-location)
-		("TAB" . corfu-next)
-		([tab] . corfu-next)
-		("S-TAB" . corfu-previous)
-		([backtab] . corfu-previous))
-
-    :custom
-    ;; Works with `indent-for-tab-command'. Make sure tab doesn't indent when you
-    ;; want to perform completion
-    (tab-always-indent 'complete)
-    (completion-cycle-threshold nil)      ; Always show candidates in menu
-
-    (corfu-auto nil)
-    (corfu-auto-prefix 2)
-    (corfu-auto-delay 0.25)
-
-    ;; (corfu-min-width 80)
-    ;; (corfu-max-width corfu-min-width)     ; Always have the same width
-    (corfu-count 14)
-    (corfu-scroll-margin 4)
-    (corfu-cycle nil)
-
-    ;; (corfu-echo-documentation nil)        ; Already use corfu-doc
-    (corfu-separator ?\s)                 ; Necessary for use with orderless
-    (corfu-quit-no-match 'separator)
-
-    (corfu-preview-current 'insert)       ; Preview current candidate?
-    (corfu-preselect-first t)             ; Preselect first candidate?
-
-    :init
-    ;; Recommended: Enable Corfu globally.
-    ;; This is recommended since dabbrev can be used globally (M-/).
-    (global-corfu-mode))
-#+end_src
-
-***** Extending corfu.el
-
-- ~corfu-move-to-minibuffer~ :: The completion at point “popup” can sometimes
-  be a little cryptic or terse.  The ~corfu-move-to-minibuffer~ provides a
-  means of moving the “popup” candidates to the minibuffer for further
-  inspection.
-
-#+begin_src emacs-lisp
-  (defun corfu-move-to-minibuffer ()
-    "Move \"popup\" completion candidates to minibuffer.
-
-  Useful if you want a more robust view into the recommend candidates."
-    (interactive)
-    (let (completion-cycle-threshold completion-cycling)
-      (apply #'consult-completion-in-region completion-in-region--data)))
-  (define-key corfu-map "\M-m" #'corfu-move-to-minibuffer)
-#+end_src
-
-- ~kind-icons~ :: From [[https://kristofferbalintona.me/posts/corfu-kind-icon-and-corfu-doc/][Corfu, Kind-icon, and Corfu-doc | Kristoffer Balintona]]
-
-#+begin_src emacs-lisp
-  (use-package kind-icon
-    :straight t
-    :after corfu
-    :custom
-    (kind-icon-use-icons t)
-    (kind-icon-default-face 'corfu-default) ; Have background color be the same as `corfu' face background
-    (kind-icon-blend-background nil)  ; Use midpoint color between foreground and background colors ("blended")?
-    (kind-icon-blend-frac 0.08)
-
-    ;; NOTE 2022-02-05: `kind-icon' depends `svg-lib' which creates a cache
-    ;; directory that defaults to the `user-emacs-directory'. Here, I change that
-    ;; directory to a location appropriate to `no-littering' conventions, a
-    ;; package which moves directories of other packages to sane locations.
-    ;; (svg-lib-icons-dir (no-littering-expand-var-file-name "svg-lib/cache/")) ; Change cache dir
-    :config
-    (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter) ; Enable `kind-icon'
-
-    ;; Add hook to reset cache so the icon colors match my theme
-    ;; NOTE 2022-02-05: This is a hook which resets the cache whenever I switch
-    ;; the theme using my custom defined command for switching themes. If I don't
-    ;; do this, then the backgound color will remain the same, meaning it will not
-    ;; match the background color corresponding to the current theme. Important
-    ;; since I have a light theme and dark theme I switch between. This has no
-    ;; function unless you use something similar
-    (add-hook 'kb/themes-hooks #'(lambda () (interactive) (kind-icon-reset-cache))))
-#+end_src
-
-- ~corfu-doc~ :: From [[https://kristofferbalintona.me/posts/corfu-kind-icon-and-corfu-doc/][Corfu, Kind-icon, and Corfu-doc | Kristoffer Balintona]]
-
-#+begin_src emacs-lisp
-  (use-package corfu-doc
-    ;; NOTE 2022-02-05: At the time of writing, `corfu-doc' is not yet on melpa
-    :straight (corfu-doc :type git :host github :repo "galeo/corfu-doc")
-    :bind (:map corfu-map
-		;; This is a manual toggle for the documentation window.
-		([remap corfu-show-documentation] . corfu-doc-toggle) ; Remap the default doc command
-		;; Scroll in the documentation window
-		("M-n" . corfu-doc-scroll-up)
-		("M-p" . corfu-doc-scroll-down))
-    :hook (corfu-mode . corfu-doc-mode)
-    :custom
-    (corfu-doc-delay 0.1)
-    (corfu-doc-hide-threshold 10)
-    (corfu-doc-max-width 60)
-    (corfu-doc-max-height 10)
-
-    ;; NOTE 2022-02-05: I've also set this in the `corfu' use-package to be
-    ;; extra-safe that this is set when corfu-doc is loaded. I do not want
-    ;; documentation shown in both the echo area and in the `corfu-doc' popup.
-    ;; (corfu-echo-documentation nil)
-    :config
-    ;; NOTE 2022-02-05: This is optional. Enabling the mode means that every corfu
-    ;; popup will have corfu-doc already enabled. This isn't desirable for me
-    ;; since (i) most of the time I do not need to see the documentation and (ii)
-    ;; when scrolling through many candidates, corfu-doc makes the corfu popup
-    ;; considerably laggy when there are many candidates. Instead, I rely on
-    ;; manual toggling via `corfu-doc-toggle'.
-    (corfu-doc-mode))
-#+end_src
-
 **** cape.el
 
 - ~cape.el~ :: provides several Completion At Point Extensions (Capfs).  I like
@@ -1155,50 +1093,25 @@ More on these component matchings styles is available at [[https://github.com/mi
     (setq yas-snippet-dirs '("~/git/dotemacs/snippets"))
     (yas-global-mode 1))
 #+end_src
-**** consult-yasnippet.el
-
-- ~consult-yasnippet.el~ :: A bit of integration with ~consult.el~ and ~yasnippet.el~.
-
-#+begin_src emacs-lisp
-  (use-package consult-yasnippet
-    :straight t
-    :after (consult yasnippet)
-    :bind ("C-c y" . consult-yasnippet))
-#+end_src
 
 *** Navigation
 **** avy.el
 
-- ~avy.el~ :: That letter is the beginning of a word.  Narrow results from there.
-
 #+begin_src emacs-lisp
+  ;;; Navigation
+  ;;
+  ;; Pick a letter, avy finds all words with that at the beginning of it.  Narrow
+  ;; results from there.
   (use-package avy
     :bind (("C-c j" . avy-goto-char))
     :straight t)
-#+end_src
 
-**** link-hint.el
-
-- ~link-hint.el~ :: Jump to a registered link type.
-
-#+begin_src emacs-lisp
   (use-package link-hint
     :straight t
     :bind
     ("C-c l o" . link-hint-open-link)
     ("C-c l c" . link-hint-copy-link))
-#+end_src
 
-**** ibuffer-sidebar.el
-
-Prioir to Emacs, I might use a side panel for directory/file navigation.
-However, that’s something I just don’t use in Emacs.  Instead, I’m thinking
-about buffers.
-
-The ~ibuffer-sidebar~ package provides an interesting take on the side panel.
-It shows me what I’ve opened.  I like that.
-
-#+begin_src emacs-lisp
   (use-package imenu-list
     :custom (imenu-list-focus-after-activation t)
     (imenu-list-size 0.4)
@@ -1218,57 +1131,28 @@ It shows me what I’ve opened.  I like that.
 
 **** Extending the Mark
 
-From [[https://www.masteringemacs.org/article/fixing-mark-commands-transient-mark-mode][Fixing the mark commands in transient mark mode - Mastering Emacs]]:
-
-#+begin_src emacs-lisp
-  (global-set-key (kbd "C-`") 'jf/mark-without-transient)
-  (defun jf/mark-without-transient (parg)
-    "Push `point' to `mark-ring' or jump to front of `mark-ring' without activating the region.
-
-  When given Universal PARG jump to the mark.  When not given
-  Universal PARG set the mark.
-
-  Equivalent to \\[set-mark-command] when \\[transient-mark-mode] is disabled"
-    (interactive "P")
-    (if (car parg)
-	(progn
-	  (set-mark-command 1))
-      (progn
-	(push-mark (point) t nil)
-	(message "Pushed mark to ring"))))
-
-#+end_src
-
 *** Display
 
 **** highlight-indent-guides.el
 
-- ~highlight-indent-guides.el~ :: provides column highlighting.  Useful when you start seeing too many nested layers.
-
 #+begin_src emacs-lisp
+  ;; provides column highlighting.  Useful when you start seeing too many nested
+  ;; layers.
   (use-package highlight-indent-guides
     :straight t
     :custom (highlight-indent-guides-method 'character)
     (highlight-indent-guides-responsive 'top)
     :hook (prog-mode . highlight-indent-guides-mode))
-#+end_src
 
-**** lin.el
-
-- ~lin.el~ :: “LIN locally remaps the hl-line face to a style that is optimal for major modes where line selection is the primary mode of interaction.”  In otherwords, ~lin.el~ improves the highlighted line behavior for the competing contexts.
-
-#+begin_src emacs-lisp
+  ;;  “LIN locally remaps the hl-line face to a style that is optimal for major
+  ;;  modes where line selection is the primary mode of interaction.”  In
+  ;;  otherwords, ~lin.el~ improves the highlighted line behavior for the
+  ;;  competing contexts.
   (use-package lin
     :straight (lin :host gitlab :repo "protesilaos/lin")
     :config (lin-global-mode 1)
     (setq lin-face 'lin-blue))
-#+end_src
 
-**** fill-column-indicator.el
-
-- =fill-column-indicator= :: Adding fill-column mode.
-
-#+begin_src emacs-lisp
   (use-package fill-column-indicator
     :straight t
     :config
@@ -1329,39 +1213,23 @@ From [[https://www.masteringemacs.org/article/fixing-mark-commands-transient-mar
     :bind (("M-o" . ace-window)))
 #+end_src
 
-**** buffer-move.el
-
-- ~buffer-move.el~ :: From [[https://github.com/lukhas/buffer-move][lukhas/buffer-move]], this package helps me quickly
-  move a window elsewhre.  As of <2022-02-01 Tue>, I don’t often use this
-  command.  Consider it “on notice” for removal.
-
-#+begin_src emacs-lisp
-  (use-package buffer-move
-    :straight t
-    :bind ("<C-s-f12>" . buf-move))
-#+end_src
-
 **** Folding
 
 #+begin_src emacs-lisp
-  (use-package yafolding
-    :straight t)
 #+end_src
 
 **** rainbow-delimiters.el
 
-- ~rainbow-delimiters.el~ :: A quick and useful visual queue for paranthesis.
-
 #+begin_src emacs-lisp
+  (use-package yafolding :straight t)
+
+  ;; A quick and useful visual queue for paranthesis.
   (use-package rainbow-delimiters
     :straight t
     :hook ((fundamental-mode) . rainbow-delimiters-mode))
-#+end_src
 
-**** vi-tilde-fringe.el
-- ~vi-tilde-fringt.el~ :: Show tilde (e.g. ~\~~) on empty trailing lines.  This is a feature ported from [[https://en.wikipedia.org/wiki/Vi][vi]].
-
-#+begin_src emacs-lisp
+  ;; Show tilde (e.g. ~\~~) on empty trailing lines.  This is a feature ported
+  ;; from https://en.wikipedia.org/wiki/Vi
   (use-package vi-tilde-fringe
     :straight t
     :diminish 'vi-tilde-fringe-mode
@@ -1370,45 +1238,12 @@ From [[https://www.masteringemacs.org/article/fixing-mark-commands-transient-mar
 
 **** pulsar.el
 
-- ~pulsar.el~ :: A a little bit of visual feedback.  See [[https://protesilaos.com/codelog/2022-03-14-emacs-pulsar-demo/][Emacs: demonstration of pulsar.el | Protesilaos Stavrou]]
+- ~pulsar.el~ ::
 
 #+begin_src emacs-lisp
+  ;; A little bit of visual feedback.  See https://protesilaos.com/codelog/2022-03-14-emacs-pulsar-demo/
   (use-package pulsar
     :straight (pulsar :host gitlab :repo "protesilaos/pulsar")
-    :custom
-    (pulsar-pulse-functions ; Read the doc string for why not `setq'
-     '(recenter-top-bottom
-       move-to-window-line-top-bottom
-       reposition-window
-       bookmark-jump
-       other-window
-       delete-window
-       delete-other-windows
-       forward-page
-       backward-page
-       scroll-up-command
-       scroll-down-command
-       windmove-right
-       windmove-left
-       windmove-up
-       windmove-down
-       windmove-swap-states-right
-       windmove-swap-states-left
-       windmove-swap-states-up
-       windmove-swap-states-down
-       tab-new
-       tab-close
-       tab-next
-       org-next-visible-heading
-       org-previous-visible-heading
-       org-forward-heading-same-level
-       org-backward-heading-same-level
-       outline-backward-same-level
-       outline-forward-same-level
-       outline-next-visible-heading
-       outline-previous-visible-heading
-       ace-window
-       outline-up-heading))
     :hook
     (consult-after-jump . pulsar-recenter-top)
     (consult-after-jump . pulsar-reveal-entry)
@@ -1428,13 +1263,7 @@ From [[https://www.masteringemacs.org/article/fixing-mark-commands-transient-mar
 	  (pulsar--pulse nil nil (point) (mark))
 	(pulsar-pulse-line)))
     :bind (("C-l" . jf/pulse)))
-#+end_src
 
-**** emojify.el
-
-- ~emojify.el~ :: Ensure rendering of correct emoji’s.
-
-#+begin_src emacs-lisp
   (use-package emojify
     :straight t
     :config
@@ -1491,19 +1320,11 @@ are major modes others are minor modes.
 #+begin_src emacs-lisp
   (use-package bundler
     :straight (bundler :type git :host github :repo "endofunky/bundler.el"))
-#+end_src
 
-**** csv-mode.el
-
-#+begin_src emacs-lisp
   (use-package csv-mode :straight t
     ;; Always enter CSV mode in align mode; makes it easier to read.
     :hook (csv-mode . csv-align-mode))
-#+end_src
 
-**** dockerfile-mode
-
-#+begin_src emacs-lisp
   (use-package dockerfile-mode :straight t)
 #+end_src
 
