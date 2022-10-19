@@ -103,3 +103,69 @@ https://tsdh.org/posts/2022-07-20-using-eldoc-with-magit-async.html
   (add-hook 'magit-status-mode-hook #'jf/magit-eldoc-setup)
   (add-hook 'magit-log-mode-hook #'jf/magit-eldoc-setup)
 #+end_src
+
+** Logos
+
+For presentation I want to turn off:
+
+- display-line-numbers-mode
+- vi-tilde-fringe-mode
+- git-gutter-mode
+- centaur-tabs-mode
+- =(setq-local org-hide-emphasis-markers t)=
+I also want to set the buffer to read-only.
+
+For forward movement I want the following key combinations:
+
+- =SPACE=
+- =C-n=
+- =<right>=
+- =<down>=
+
+For backward movement I want the following key combinations:
+
+- =DEL=
+- =C-p=
+- =<left>=
+- =<up>=
+
+#+begin_src emacs-lisp
+  (use-package logos
+    :straight t
+    :config (use-package olivetti
+	      :straight t
+	      :custom
+	      (olivetti-body-width 0.7)
+	      (olivetti-minimum-body-width 80)
+	      (olivetti-recall-visual-line-mode-entry-state t))
+    (let ((map global-map))
+      (define-key map [remap narrow-to-region] #'logos-narrow-dwim)
+      (define-key map [remap forward-page] #'logos-forward-page-dwim)
+      (define-key map [remap backward-page] #'logos-backward-page-dwim)
+      (define-key map (kbd "<f9>") #'logos-focus-mode))
+    (setq logos-outlines-are-pages t)
+    (setq-default logos-hide-cursor nil
+		  logos-hide-mode-line t
+		  logos-hide-buffer-boundaries t
+		  logos-hide-fringe t
+		  logos-variable-pitch nil
+		  logos-buffer-read-only nil
+		  logos-scroll-lock nil
+		  logos-olivetti t
+		  logos-outline-regexp-alist
+		  `((emacs-lisp-mode . "^;;;+ ")
+		    (org-mode . "^\\*+ +")
+		    (markdown-mode . "^\\#+ +"))))
+
+  (defun logos--reveal-entry ()
+  "Reveal Org or Outline entry."
+  (cond
+   ((and (eq major-mode 'org-mode)
+	 (org-at-heading-p))
+    (org-show-subtree))
+   ((or (eq major-mode 'outline-mode)
+	(bound-and-true-p outline-minor-mode))
+    (outline-show-subtree))))
+  (add-hook 'logos-page-motion-hook #'logos--reveal-entry)
+
+#+end_src
