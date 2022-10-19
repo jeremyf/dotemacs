@@ -72,6 +72,8 @@ A bit of pre-amble.  I maintain a list of data directories, each might have “r
     :custom (org-use-speed-commands t)
     (org-time-stamp-rounding-minutes '(0 15))
     :config (setq
+	     org-insert-heading-respect-content t
+	     org-catch-invisible-edits 'show-and-error
 	     org-use-fast-todo-selection 'expert
 	     org-imenu-depth 3
 	     org-export-with-sub-superscripts nil
