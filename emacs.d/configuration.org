@@ -494,13 +494,7 @@ hard requirement for packages I’ll later introduce.
     (which-key-mode)
     (which-key-setup-side-window-right)
     (which-key-show-major-mode))
-#+end_src
 
-Related to this, when I’m in a buffer, I want to know what I can do.  The
-~embark~ package provides the missing context menu (e.g. “right click”) for
-Emacs.  /It provides more, but we’ll get to that later./
-
-#+begin_src emacs-lisp
   (use-package embark
     :straight t
     :bind
@@ -1170,7 +1164,6 @@ What follows is adjustments to emacs settings as they relate to completion.
 #+begin_src emacs-lisp
   (use-package popper
     :straight t
-    ;; :bind (("C-`" . jf/popper))
     :init
     (setq popper-reference-buffers
 	  '("\\*Messages\\*"
@@ -1185,13 +1178,8 @@ What follows is adjustments to emacs settings as they relate to completion.
 				  (floor (frame-height) 3))))
     (popper-mode +1)
     (popper-echo-mode +1))
-#+end_src
 
-**** shackle.el
-
-- ~shackle.el~ :: Enforce rules for popups.  See https://depp.brause.cc/shackle/.
-
-#+begin_src emacs-lisp
+  ;; Enforce rules for popups.  See https://depp.brause.cc/shackle/.
   (use-package shackle
     :straight t
     :custom
@@ -1234,13 +1222,7 @@ What follows is adjustments to emacs settings as they relate to completion.
     :straight t
     :diminish 'vi-tilde-fringe-mode
     :config (global-vi-tilde-fringe-mode))
-#+end_src
 
-**** pulsar.el
-
-- ~pulsar.el~ ::
-
-#+begin_src emacs-lisp
   ;; A little bit of visual feedback.  See https://protesilaos.com/codelog/2022-03-14-emacs-pulsar-demo/
   (use-package pulsar
     :straight (pulsar :host gitlab :repo "protesilaos/pulsar")
@@ -1439,22 +1421,11 @@ syntax highlighting that makes reading ~Go-lang~ tolerable.
 
   (use-package eldoc
     :straight t)
-#+end_src
 
-**** lua-mode.el
-
-- ~lua-mode.el~ :: For working with [[https://www.hammerspoon.org][Hammerspoon]]; which provides me the
-  wonderful [[https://github.com/dmgerman/editWithEmacs.spoon/][edit with Emacs]].
-
-#+begin_src emacs-lisp
+  ;; For working with https://www.hammerspoon.org; which provides me the
+  ;; wonderful https://github.com/dmgerman/editWithEmacs.spoon/
   (use-package lua-mode :straight t)
-#+end_src
 
-**** markdown-mode.el
-
-- ~markdown-mode.el~ :: Oh ubiquitous Markdown.
-
-#+begin_src emacs-lisp
   (use-package markdown-mode
     :straight t
     :hook ((markdown-mode . turn-on-visual-line-mode))
@@ -1462,13 +1433,7 @@ syntax highlighting that makes reading ~Go-lang~ tolerable.
 	   ("\\.md\\'" . markdown-mode)
 	   ("\\.markdown\\'" . markdown-mode))
     :init (setq markdown-command "/opt/homebrew/bin/pandoc"))
-#+end_src
 
-**** plantuml-mode.el
-
-- ~plantuml-mode.el~ ::
-
-#+begin_src emacs-lisp
   ;; A mode for working with PlantUML.  See https://plantuml.com
   (use-package plantuml-mode
     :config (setq plantuml-executable-path (concat (getenv "HB_PATH") "/bin/plantuml")
@@ -1901,11 +1866,7 @@ A timestamp library.
 		:override 'jf/grab-mac-link-make-html-link
 		'((name . "jnf")))
     :bind (("C-c g" . grab-mac-link)))
-#+end_src
 
-**** org-mac-link.el
-
-#+begin_src emacs-lisp
   ;; Similar to `grab-mac-link' this specifically grabs a link and inserts in
   ;; `org-mode' format.
   (use-package org-mac-link
@@ -2747,9 +2708,10 @@ emacsclient and open those files in windows within the same frame.
 You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/main/bin/git-edit][git-edit]] command line tool.
 
 #+begin_src emacs-lisp
+  ;;; Connective Tissue and oddity functions:
   (defvar server-visit-files-custom-find:buffer-count
     "A counter for assisting with opening multiple files via a single
-  client call.")
+    client call.")
   (defadvice server-visit-files
       (around server-visit-files-custom-find
 	      activate compile)
@@ -2769,9 +2731,7 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
     (setq server-visit-files-custom-find:buffer-count
 	  (1+ server-visit-files-custom-find:buffer-count)))
   (add-hook 'server-visit-hook 'server-visit-hook-custom-find)
-#+end_src
 
-#+begin_src emacs-lisp
   ;; The following function facilitates a best of both worlds.  By default, I
   ;; want Option to be Meta (e.g. \"M-\") in Emacs.  However, I can toggle that
   ;; setting.  That way if I need an umlaut (e.g., \"¨\"), I can use MacOS’s
@@ -2787,16 +2747,14 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
 	       (message "Enabling OS X native Option modifier"))
       (progn (setq ns-alternate-modifier 'meta)
 	     (message "Disabling OX X native Option modifier (e.g. Option as Meta)"))))
-#+end_src
 
-#+begin_src emacs-lisp
   ;; I try to get quick feedback when writing emacs-lisp; the
   ;; `jf/eval-region-dwim' binds a mnemonic key sequence to an extend
   ;; `eval-region'.
   (define-key emacs-lisp-mode-map (kbd "C-c C-c") 'jf/eval-region-dwim)
   (defun jf/eval-region-dwim ()
     "When region is active, evaluate it and kill the mark. Else,
-    evaluate the whole buffer."
+      evaluate the whole buffer."
     (interactive)
     (if (not (region-active-p))
 	(progn
@@ -2806,17 +2764,13 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
 	(message "Evaluating region...")
 	(eval-region (region-beginning) (region-end)))
       (setq-local deactivate-mark t)))
-#+end_src
 
-#+begin_src emacs-lisp
   ;; A little bit of RSS beautification.
   (defun jf/reader-visual ()
     "A method to turn on visual line mode and adjust text scale."
     (text-scale-set 2)
     (turn-on-visual-line-mode))
-#+end_src
 
-#+begin_src emacs-lisp
   ;; See https://www.reddit.com/r/emacs/comments/r7l3ar/how_do_you_scroll_half_a_page/
   (global-set-key (kbd "M-n") 'jf/scroll-down-half-page)
   (defun jf/scroll-down-half-page ()
@@ -2829,9 +2783,7 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
 	    (t (progn
 		 (move-to-window-line -1)
 		 (recenter))))))
-#+end_src
 
-#+begin_src emacs-lisp
   ;; See https://www.reddit.com/r/emacs/comments/r7l3ar/how_do_you_scroll_half_a_page/
   (global-set-key (kbd "M-p") 'jf/scroll-up-half-page)
   (defun jf/scroll-up-half-page ()
@@ -2860,9 +2812,7 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
        ((not prefix)  (org-insert-time-stamp nil nil nil))
        ((= prefix 4)  (org-insert-time-stamp nil t nil))
        ((= prefix 16) (org-insert-time-stamp (org-read-date nil t nil "Date") nil nil)))))
-#+end_src
 
-#+begin_src emacs-lisp
   (global-set-key (kbd "C-w") 'jf/delete-region-or-backward-word)
   (global-set-key (kbd "M-DEL") 'jf/delete-region-or-backward-word)
   (global-set-key (kbd "<C-M-backspace>") 'backward-kill-paragraph)
@@ -2872,9 +2822,7 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
     (if (region-active-p)
 	(delete-region (region-beginning) (region-end))
       (sp-backward-delete-word arg)))
-#+end_src
 
-#+begin_src emacs-lisp
   ;; Wedding two methods together: `kill-region' and `kill-line'.
   (global-set-key (kbd "C-k") 'jf/kill-line-or-region)
   (defun jf/kill-line-or-region (&optional parg)
@@ -2883,9 +2831,7 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
     (if (use-region-p)
 	(kill-region (region-beginning) (region-end))
       (kill-line parg)))
-#+end_src
 
-#+begin_src emacs-lisp
   ;; There are plenty of times where I want the file name.  This command helps me
   ;; get either it’s full path, or it’s base name.
   (global-set-key (kbd "C-c n") 'jf/nab-file-name-to-clipboard)
@@ -2910,9 +2856,7 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
       (when filename
 	(kill-new filename)
 	(message "Copied buffer file name '%s' to the clipboard." filename))))
-#+end_src
 
-#+begin_src emacs-lisp
   ;; A simple combination of two functions `sort-lines'
   ;; and `delete-duplicate-lines'.
   (defun jf/sort-unique-lines (reverse beg end &optional adjacent keep-blanks interactive)
@@ -2927,9 +2871,7 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
     (interactive "P\nr")
     (sort-lines reverse beg end)
     (delete-duplicate-lines beg end reverse adjacent keep-blanks interactive))
-#+end_src
 
-#+begin_src emacs-lisp
   ;; Creates a sticky side window.  Sometimes this is just the right thing for
   ;; reviewing files.  I don’t know when I need it, but when I use it I’m always
   ;; thankful I have it.
@@ -2970,9 +2912,7 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
 	(message "Created *Sidebar*\nq - Remove Window")
 	(require 'pulsar)
 	(pulsar-pulse-line))))
-#+end_src
 
-#+begin_src emacs-lisp
   ;; Sometimes I want to move, without renaming, a file.  This function helps
   ;; make that easy.
   (global-set-key (kbd "C-x m") 'jf/move-file)
@@ -2984,9 +2924,7 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
       (save-buffer)
       (rename-file source target)
       (kill-current-buffer)))
-#+end_src
 
-#+begin_src emacs-lisp
   ;; From http://mbork.pl/2022-05-23_Copying_code_snippets
   (defun jf/copy-snippet-deindented (begin end)
     "Copy region, between BEGIN and END, untabifying and removing indentation."
@@ -2999,9 +2937,7 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
 	(untabify (point-min) (point-max))
 	(org-do-remove-indentation)
 	(kill-new (buffer-string)))))
-#+end_src
 
-#+begin_src emacs-lisp
   ;; Sometimes I just want to duplicate an area without copy and paste.  This
   ;; helps that process.  It’s not as smart as TextMate’s equivalent function,
   ;; but it’s close enough.
@@ -3028,9 +2964,7 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
 	      (insert region)
 	      (setq end (point)))))
       (crux-duplicate-current-line-or-region parg)))
-#+end_src
 
-#+begin_src emacs-lisp
   ;; A simple wrapper around scratch, that helps name it and sets the major mode
   ;; to `org-mode'.
   (global-set-key (kbd "<f12>") 'jf/create-scratch-buffer)
