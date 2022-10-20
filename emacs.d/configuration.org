@@ -296,21 +296,43 @@ I want to start with a basic look and feel.  First, the choice of primary font.
 
 #+begin_src emacs-lisp
   (mapc #'disable-theme custom-enabled-themes)
-  (defvar jf/fixed-width-font-name
-    "Iosevka Comfy Motion Fixed"
-    "The name of the fixed width font.
-      I have it sprinkled through too many places.
-
-      Alternatives:
-      - \"Iosevka Nerd Font Mono\"
-      - \"Iosevka Comfy Wide Fixed\"
-      - \"Iosevka Comfy Motion Fixed\"
-      - \"Iosevka Term\"
-      - \"Monaco\"
-      - \"JetBrains Mono\"
-      - \"Hack Nerd Font\"")
-
-  (set-frame-font jf/fixed-width-font-name)
+  (use-package fontaine
+    :straight t
+    :config
+    (setq fontaine-presets
+	  '((small
+	     :default-height 110)
+	    (regular
+	     :default-height 155)
+	    (presentation
+	     :default-weight semilight
+	     :default-height 220
+	     :bold-weight extrabold)
+	    (reading
+	     :default-family "ETBembo"
+	     :default-height 180)
+	    (t
+	     ;; I keep all properties for didactic purposes, but most can be
+	     ;; omitted.  See the fontaine manual for the technicalities:
+	     ;; <https://protesilaos.com/emacs/fontaine>.
+	     :default-family "Iosevka Comfy Motion Fixed"
+	     :default-weight regular
+	     :default-height 155
+	     :fixed-pitch-family nil ; falls back to :default-family
+	     :fixed-pitch-weight nil ; falls back to :default-weight
+	     :fixed-pitch-height 1.0
+	     :fixed-pitch-serif-family nil ; falls back to :default-family
+	     :fixed-pitch-serif-weight nil ; falls back to :default-weight
+	     :fixed-pitch-serif-height 1.0
+	     :variable-pitch-family "ETBembo"
+	     :variable-pitch-weight nil
+	     :variable-pitch-height 1.0
+	     :bold-family nil ; use whatever the underlying face has
+	     :bold-weight bold
+	     :italic-family nil
+	     :italic-slant italic
+	     :line-spacing nil))))
+  (fontaine-set-preset 'regular)
 
   ;; And now the theme.  I’ve chosen the modus themes (e.g. ~modus-vivendi~ and
   ;; ~modus-operandi~).  They provide a light and dark theme with a focus on visual
@@ -359,21 +381,6 @@ I want to start with a basic look and feel.  First, the choice of primary font.
        (4 . (overline 1.1))
        (t . (rainbow 1.05)))))
   (modus-themes-load-themes)
-
-  ;; With a quick bit of testing, it appears that the following
-  ;; `set-face-attribute' declarations should be made after the theme
-  ;; declarations.  When the following statements were declared before the
-  ;; themes, and I toggled my theme, the font changed to something unexpected.
-  ;; With them declared after, I keep the fonts between toggles.
-  (set-face-attribute 'default nil
-		      :family jf/fixed-width-font-name
-		      :height 155)
-  (set-face-attribute 'variable-pitch nil
-		      :family "ETBembo"
-		      :height 1.1)
-  (set-face-attribute 'fixed-pitch nil
-		      :family jf/fixed-width-font-name
-		      :height 1.0)
 
   (if (eq system-type 'darwin)
       (progn
@@ -3699,7 +3706,7 @@ contexual minor modes.  My intention is to build out even more functions on
 those modes.
 
 #+begin_src emacs-lisp
-  (cl-defmacro jf/minor-mode-maker (&key title abbr hooks)
+  (cl-defmacro jf/minor-mode-maker (&key title abbr hooks keymap)
     "A macro to declare a minor mode.
 
   Use TITLE to derive the docstring.
@@ -3711,14 +3718,16 @@ those modes.
       `(progn
 	 (define-minor-mode ,mode-name
 	   ,docstring
+	   :init-value nil
 	   :global nil
+	   :keymap ,keymap
 	   :lighter ,lighter)
 	 (when ,hooks
 	   (-each ,hooks (lambda(hook) (add-hook hook (lambda () (,mode-name)))))))))
 
 
   (jf/minor-mode-maker :title "Take on Rules"
-			:abbr "tor")
+		       :abbr "tor")
 #+end_src
 
 ** Burning Wheel
@@ -3884,8 +3893,6 @@ some additional options.
       ("C-n" "MacOS Night Shift" (lambda () (interactive) (shell-command "nightlight on")))
       ;; I could write functions for these, but this is concise enough
       ("m h" jf/hammerspoon-toggle-mode  :if-non-nil hammerspoon-edit-minor-mode)
-      ("m f" "Pairing Font (*)" (lambda () (interactive) (progn (setq jf/pairing-font-p nil) (set-face-attribute 'default nil :family jf/fixed-width-font-name :height 140))) :if-non-nil jf/pairing-font-p)
-      ("m f" "Pairing Font ( )" (lambda () (interactive) (progn (setq jf/pairing-font-p t) (set-face-attribute 'default nil :family jf/fixed-width-font-name :height 200))) :if-nil jf/pairing-font-p)
       ("m t" "Typopunct ( )" typopunct-mode :if-nil typopunct-mode)
       ("m t" "Typopunct (*)" typopunct-mode :if-non-nil typopunct-mode)
       ("m o" "MacOS Native Option ( )" jf/toggle-osx-alternate-modifier :if-non-nil ns-alternate-modifier)

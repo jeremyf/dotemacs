@@ -115,20 +115,6 @@ For presentation I want to turn off:
 - =(setq-local org-hide-emphasis-markers t)=
 I also want to set the buffer to read-only.
 
-For forward movement I want the following key combinations:
-
-- =SPACE=
-- =C-n=
-- =<right>=
-- =<down>=
-
-For backward movement I want the following key combinations:
-
-- =DEL=
-- =C-p=
-- =<left>=
-- =<up>=
-
 #+begin_src emacs-lisp
   (use-package logos
     :straight t
@@ -143,12 +129,17 @@ For backward movement I want the following key combinations:
       (define-key map [remap forward-page] #'logos-forward-page-dwim)
       (define-key map [remap backward-page] #'logos-backward-page-dwim)
       (define-key map (kbd "<f9>") #'logos-focus-mode))
+    ;; This is not the correct map; but it’s close to what I want.
+    (let ((map logos-focus-mode-map))
+      (define-key map [remap next-line] #'logos-forward-page-dwim)
+      (define-key map [remap next-line] #'logos-forward-page-dwim)
+      (define-key map [remap previous-line] #'logos-backward-page-dwim))
     (setq logos-outlines-are-pages t)
-    (setq-default logos-hide-cursor nil
+    (setq-default logos-hide-cursor t
 		  logos-hide-mode-line t
 		  logos-hide-buffer-boundaries t
 		  logos-hide-fringe t
-		  logos-variable-pitch nil
+		  logos-variable-pitch t
 		  logos-buffer-read-only nil
 		  logos-scroll-lock nil
 		  logos-olivetti t
@@ -158,14 +149,104 @@ For backward movement I want the following key combinations:
 		    (markdown-mode . "^\\#+ +"))))
 
   (defun logos--reveal-entry ()
-  "Reveal Org or Outline entry."
-  (cond
-   ((and (eq major-mode 'org-mode)
-	 (org-at-heading-p))
-    (org-show-subtree))
-   ((or (eq major-mode 'outline-mode)
-	(bound-and-true-p outline-minor-mode))
-    (outline-show-subtree))))
+    "Reveal Org or Outline entry."
+    (cond
+     ((and (eq major-mode 'org-mode)
+	   (org-at-heading-p))
+      (org-show-subtree))
+     ((or (eq major-mode 'outline-mode)
+	  (bound-and-true-p outline-minor-mode))
+      (outline-show-subtree))))
   (add-hook 'logos-page-motion-hook #'logos--reveal-entry)
-
 #+end_src
+
+Presentation logic for Logos
+
+#+begin_src emacs-lisp
+  (defvar jf/lp-minor-mode-map (let ((map (make-sparse-keymap)))
+				 (define-key map (kbd "]") #'logos-forward-page-dwim)
+				 (define-key map (kbd "RET") #'logos-forward-page-dwim)
+				 (define-key map (kbd "SPC") #'logos-forward-page-dwim)
+				 (define-key map (kbd "<right>") #'logos-forward-page-dwim)
+				 (define-key map (kbd "<down>") #'logos-forward-page-dwim)
+				 (define-key map (kbd "C-n") #'logos-forward-page-dwim)
+				 (define-key map (kbd "[") #'logos-backward-page-dwim)
+				 (define-key map (kbd "DEL") #'logos-backward-page-dwim)
+				 (define-key map (kbd "<left>") #'logos-backward-page-dwim)
+				 (define-key map (kbd "<up>") #'logos-backward-page-dwim)
+				 (define-key map (kbd "C-p") #'logos-backward-page-dwim)
+				 map))
+  (jf/minor-mode-maker :title "Logos Presenter"
+		       :abbr "LP"
+		       :keymap jf/lp-minor-mode-map)
+
+  (defcustom jf/lp-minor-mode-on-hook
+    (lambda ()
+      (call-interactively 'logos-narrow-dwim)
+      (fontaine-set-preset 'presentation)
+      (read-only-mode 1)
+      (logos-focus-mode 1)
+      (setq-local  org-hide-emphasis-markers t)
+      (display-line-numbers-mode -1)
+      (vi-tilde-fringe-mode -1)
+      (git-gutter-mode -1)
+      (centaur-tabs-mode -1))
+    "Hook when `jf/lp-minor-mode' activated."
+    :type 'hook)
+
+  (defcustom jf/lp-minor-mode-off-hook
+    (lambda ()
+      (call-interactively 'widen)
+      (fontaine-set-preset 'regular)
+      (read-only-mode -1)
+      (logos-focus-mode -1)
+      (setq-local  org-hide-emphasis-markers nil)
+      (display-line-numbers-mode t)
+      (vi-tilde-fringe-mode t)
+      (git-gutter-mode t)
+      (centaur-tabs-mode t))
+    "Hook when `jf/lp-minor-mode' deactivated."
+    :type 'hook)
+#+end_src
+
+#+begin_src emacs-lisp
+  (use-package fontaine
+    :straight t
+    :config
+    (setq fontaine-presets
+	'((small
+	   :default-height 110)
+	  (regular
+	   :default-height 155)
+	  (presentation
+	   :default-weight semilight
+	   :default-height 220
+	   :bold-weight extrabold)
+	  (reading
+	   :default-family "ETBembo"
+	   :default-height 180)
+	  (t
+	   ;; I keep all properties for didactic purposes, but most can be
+	   ;; omitted.  See the fontaine manual for the technicalities:
+	   ;; <https://protesilaos.com/emacs/fontaine>.
+	   :default-family "Iosevka Comfy Motion Fixed"
+	   :default-weight regular
+	   :default-height 155
+	   :fixed-pitch-family nil ; falls back to :default-family
+	   :fixed-pitch-weight nil ; falls back to :default-weight
+	   :fixed-pitch-height 1.0
+	   :fixed-pitch-serif-family nil ; falls back to :default-family
+	   :fixed-pitch-serif-weight nil ; falls back to :default-weight
+	   :fixed-pitch-serif-height 1.0
+	   :variable-pitch-family "ETBembo"
+	   :variable-pitch-weight nil
+	   :variable-pitch-height 1.0
+	   :bold-family nil ; use whatever the underlying face has
+	   :bold-weight bold
+	   :italic-family nil
+	   :italic-slant italic
+	   :line-spacing nil))))
+  (fontaine-set-preset 'regular)
+#+end_src
+
+#+RESULTS:
