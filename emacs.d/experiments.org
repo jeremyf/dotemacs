@@ -148,7 +148,7 @@ https://tsdh.org/posts/2022-07-20-using-eldoc-with-magit-async.html
       (outline-show-subtree))))
   (add-hook 'logos-page-motion-hook #'logos--reveal-entry)
 
-    ;;; Presentation mode leveraging logos
+  ;;; Presentation mode leveraging logos
   (defvar jf/lp-minor-mode-map (let ((map (make-sparse-keymap)))
 				 (define-key map (kbd "]") #'logos-forward-page-dwim)
 				 (define-key map (kbd "RET") #'logos-forward-page-dwim)

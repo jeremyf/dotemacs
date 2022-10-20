@@ -312,9 +312,7 @@ I want to start with a basic look and feel.  First, the choice of primary font.
 	     :default-family "ETBembo"
 	     :default-height 180)
 	    (t
-	     ;; I keep all properties for didactic purposes, but most can be
-	     ;; omitted.  See the fontaine manual for the technicalities:
-	     ;; <https://protesilaos.com/emacs/fontaine>.
+	     ;; Following Prot’s example, keeping these for for didactic purposes.
 	     :default-family "Iosevka Comfy Motion Fixed"
 	     :default-weight regular
 	     :default-height 155
