@@ -1078,7 +1078,7 @@ What follows is adjustments to emacs settings as they relate to completion.
 
   (use-package tempel
     :straight (tempel :host github :repo "minad/tempel")
-    :custom (tempel-path "~/git/dotemacs/template")
+    :custom (tempel-path "~/git/dotemacs/templates")
     :bind (("M-+" . tempel-complete) ;; Alternative tempel-expand
 	   ("M-*" . tempel-insert))
 
@@ -1345,8 +1345,6 @@ are major modes others are minor modes.
 				   ("M-h" . enh-ruby-mark-defun))
     :mode (("\\(?:\\.rb\\|ru\\|rake\\|thor\\|jbuilder\\|gemspec\\|podspec\\|/\\(?:Gem\\|Rake\\|Cap\\|Thor\\|Vagrant\\|Guard\\|Pod\\)file\\)\\'" . enh-ruby-mode)))
   (add-to-list 'interpreter-mode-alist '("ruby" . enh-ruby-mode))
-
-  (use-package git-modes :straight t)
 #+end_src
 
 **** go-mode.el
@@ -1412,20 +1410,7 @@ syntax highlighting that makes reading ~Go-lang~ tolerable.
 		  org-plantuml-exec-mode 'executable)
     :mode (("\\.plantuml\\'" . plantuml-mode))
     :straight t)
-#+end_src
 
-**** rspec-mode.el
-
-- ~rspec-mode.el~ :: [[http://rspec.info][RSpec]] is my Ruby testing framework of choice.  As I’ve
-  been doing much more extensive Ruby coding, I’ve been using a lot of:
-
-  - ~rspec-toggle-spec-and-target~ :: Jump between spec and target;
-    ~spec/models/user_spec.rb~ and ~app/models/user.rb~ respectively.
-  - ~rspec-verify~ :: Run ~rspec~ for the current file; either the spec or the
-    spec associated with the target.
-  - ~rspec-verify-single~ :: Run ~rspec~ for the current line.
-
-#+begin_src emacs-lisp
   (use-package rspec-mode
     :straight t
     ;; Ensure that we’re loading enh-ruby-mode before we do any rspec loading.
@@ -1436,27 +1421,13 @@ syntax highlighting that makes reading ~Go-lang~ tolerable.
     :diminish 'rspec-mode)
 
   (eval-after-load 'rspec-mode '(rspec-install-snippets))
-#+end_src
 
-/Note:/ The =CMD= + =.= is a carryover from my [[https://macromates.com][Textmate]] and [[https://www.sublimetext.com/][Sublime Text]] days.
-That’s one of those hot-keys almost burned into soul.
-**** ruby-interpolation.el
-
-- ~ruby-interpolation.el~ :: A simple package to expand ~#~ to ~#{<cursor>}~.
-
-#+begin_src emacs-lisp
   ;; Nice and simple package for string interpolation.
   (use-package ruby-interpolation
     :straight t
     :diminish 'ruby-interpolation-mode
     :hook (enh-ruby-mode . ruby-interpolation-mode))
-#+end_src
 
-**** so-long.el
-
-- ~so-long.el~ :: Really long files or long lines can cause problems for Emacs.  This mode helps with that.
-
-#+begin_src emacs-lisp
   (use-package so-long
     :defer t
     :straight t
@@ -1465,28 +1436,14 @@ That’s one of those hot-keys almost burned into soul.
 	  ("C-s" . isearch-forward)
 	  ("C-r" . isearch-backward))
     :config (global-so-long-mode 1))
-#+end_src
 
-**** sql-indent
-
-#+begin_src emacs-lisp
   (use-package sql-indent
     :straight t
     :hook (sql-mode . sqlind-minor-mode))
-#+end_src
 
-**** typescript-mode
-
-#+begin_src emacs-lisp
   (use-package typescript-mode
     :straight t)
-#+end_src
 
-**** tree-sitter.el
-
-- ~tree-sitter.el~ :: An incremental parsing library for languages.  See https://tree-sitter.github.io/tree-sitter/.
-
-#+begin_src emacs-lisp
   ;; See https://github.com/emacs-tree-sitter/elisp-tree-sitter
   ;; Waiting on https://github.com/emacs-tree-sitter/elisp-tree-sitter/issues/197 to resolve.
   (use-package tree-sitter
@@ -1500,17 +1457,7 @@ That’s one of those hot-keys almost burned into soul.
 
   (use-package tree-sitter-langs
     :straight t)
-#+end_src
 
-
-  - Fringe
-  - Modes
-
-**** web-mode.el
-
-- ~web-mode.el~ :: Some configurations for web development.
-
-#+begin_src emacs-lisp
   (use-package web-mode
     :straight t
     :config (setq web-mode-markup-indent-offset 2
@@ -1518,35 +1465,23 @@ That’s one of those hot-keys almost burned into soul.
 		  web-mode-code-indent-offset 2))
   (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
-#+end_src
 
-Sometimes I want to edit svg files.  Often times if I open them directly in
-Emacs, I want to edit them.  This setting helps with that default.  /Note:/
-without this setting, Emacs will happily render the SVG as an image,
-
-#+begin_src emacs-lisp
   (add-to-list `auto-mode-alist '("\\.svg\\'" . xml-mode))
-#+end_src
 
-**** yaml-mode.el
-
-- ~yaml-mode.el~ :: Visual parsing for yaml.
-
-#+begin_src emacs-lisp
   (use-package yaml-mode :straight t)
-#+end_src
 
-**** yard-mode.el
-
-- ~yard-mode.el~ :: When writing Ruby documentation, I favor YARD syntax.  See https://yardoc.org fore more details.
-
-#+begin_src emacs-lisp
   (use-package yard-mode
     :straight t
     :diminish 'yard-mode
     :hook (enh-ruby-mode . yard-mode))
+
+  ;; This follows from http://mbork.pl/2017-01-14_I'm_now_using_the_right_dictionary
+  (use-package sdcv-mode
+    :straight (sdcv-mode :type git :host github :repo "gucong/emacs-sdcv")
+    :bind ("C-c C-'" . sdcv-search))
 #+end_src
 *** Utilities
+
 
 **** edit-indirect.el
 
@@ -1569,10 +1504,7 @@ A timestamp library.
 **** Custom Dictionary
 
 #+begin_src emacs-lisp
-  ;; This follows from http://mbork.pl/2017-01-14_I'm_now_using_the_right_dictionary
-  (use-package sdcv-mode
-    :straight (sdcv-mode :type git :host github :repo "gucong/emacs-sdcv")
-    :bind ("C-c C-'" . sdcv-search))
+
 #+end_src
 
 **** titlecase.el
@@ -2064,16 +1996,6 @@ These are a few variables and cosntants that I use throughout my configuration.
     "Relevant data directories for my day to day work.")
 #+end_src
 
-*** Writeroom
-
-#+begin_src emacs-lisp
-  ;; Provides some quick adjustments for writing; creating a “distractions free”
-  ;; buffer.
-  (use-package writeroom-mode
-    :config (setq writeroom-width 80)
-    :straight t)
-#+end_src
-
 *** Doc View
 
 #+begin_src emacs-lisp
@@ -2184,14 +2106,7 @@ I use org-mode and org-roam to help manage content.  Let’s load that rather ex
   (eval-after-load 'elfeed-search
     '(define-key elfeed-search-mode-map (kbd "M-RET") (elfeed-search-show-entry-pre)))
   ;; End https://karthinks.com/blog/lazy-elfeed/
-#+end_src
 
-
-**** elfeed-org.el
-
-- ~elfeed-org.el~ ::
-
-#+begin_src emacs-lisp
   ;; Maintaining my RSS subscriptions in `org-mode' format.
   (use-package elfeed-org
     :straight t
@@ -2203,6 +2118,7 @@ I use org-mode and org-roam to help manage content.  Let’s load that rather ex
 *** Source Control
 
 #+begin_src emacs-lisp
+  (use-package git-modes :straight t)
   (use-package magit
     :straight t
     :commands (magit-process-git)
@@ -2255,12 +2171,12 @@ I use org-mode and org-roam to help manage content.  Let’s load that rather ex
     (remove-hook 'magit-status-sections-hook 'magit-insert-tags-header)
     (defun jf/magit-browse-pull-request ()
       "In `magit-log-mode' open the associated pull request
-  at point.
+    at point.
 
-  Assumes that the commit log title ends in the PR #, which
-  is the case when you use the Squash and Merge strategy.
+    Assumes that the commit log title ends in the PR #, which
+    is the case when you use the Squash and Merge strategy.
 
-  This implementation is dependent on `magit' and `s'."
+    This implementation is dependent on `magit' and `s'."
       (interactive)
       (let* ((beg (line-beginning-position))
 	     (end (line-end-position))
@@ -2278,7 +2194,7 @@ I use org-mode and org-roam to help manage content.  Let’s load that rather ex
     (cl-defun jf/open-pull-request-for (&key summary)
       "Given the SUMMARY open the related pull request.
 
-  This method assumes you're using Github's Squash and Strategy."
+    This method assumes you're using Github's Squash and Strategy."
       (let ((remote-url (jf/git-current-remote-url)))
 	(save-match-data
 	  (and (string-match "(\\#\\([0-9]+\\))$" summary)
@@ -2305,9 +2221,9 @@ I use org-mode and org-roam to help manage content.  Let’s load that rather ex
     :bind (("s-7" . magit-status)
 	   ("C-x g f" . magit-file-dispatch)
 	   ("C-x g d" . magit-dispatch))
-  ;; In other situations I bind s-6 to `git-messenger:popup-message'
-  :bind (:map magit-log-mode-map ("s-6" . 'jf/magit-browse-pull-request))
-  :hook ((with-editor-post-finish-hook . magit-status)))
+    ;; In other situations I bind s-6 to `git-messenger:popup-message'
+    :bind (:map magit-log-mode-map ("s-6" . 'jf/magit-browse-pull-request))
+    :hook ((with-editor-post-finish-hook . magit-status)))
 
   ;; COMMENTED OUT FOR FUTURE REFERENCE
   ;; (transient-define-prefix jf/magit-aux-commands ()
@@ -2363,9 +2279,9 @@ I use org-mode and org-roam to help manage content.  Let’s load that rather ex
     (defun jf/git-messenger-popup ()
       "Open `git-messenger' or github PR.
 
-  With universal argument, open the github PR for current line.
+    With universal argument, open the github PR for current line.
 
-  Without universal argument, open `git-messenger'."
+    Without universal argument, open `git-messenger'."
       (interactive)
       (if (equal current-prefix-arg nil) ; no C-u
 	  (git-messenger:popup-message)
@@ -2796,702 +2712,10 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
 #+end_src
 
 
-#+begin_src emacs-lisp
-  ;;******************************************************************************
-  ;;
-  ;;; BEGIN Non-Interactive Utility Functions
-  ;;
-  ;;******************************************************************************
-  (cl-defun jf/convert-text-to-key (text &key (length 5))
-    "Convert the given TEXT to an epigraph key.
-
-  The LENGTH is how many words to use for the key."
-    (let ((list-of-words (s-split-words text)))
-      (if (> (length list-of-words) length)
-	  (upcase (s-join "-" (subseq list-of-words 0 length)))
-	"")))
-
-  (defun jf/tor-convert-text-to-post-title (title)
-    "Convert TITLE to correct format."
-    (message "Titleizing...")
-    (replace-regexp-in-string
-     ;; Replace "Hello World" with “Hello World”
-     "\"\\([^\"]+\\)\""
-     "“\\1”"
-     (s-replace "'" "’" title)))
-
-  (defun jf/tor-convert-text-to-slug (&optional string)
-    "Convert STRING to appropriate slug."
-    (s-replace "'" "" (s-dashed-words (s-downcase string))))
-
-  (defun jf/slugify ()
-    "Convert the active region or line to a URL friendly slug."
-    (interactive)
-    (let* ((range (if (region-active-p)
-		      (list (region-beginning) (region-end))
-		    (list (point-at-bol) (point-at-eol))))
-	   (text (buffer-substring-no-properties (car range) (cadr range))))
-      (save-excursion
-	(delete-region (car range) (cadr range))
-	(goto-char (car range))
-	(insert (jf/tor-convert-text-to-slug text)))))
-
-  (cl-defun jf/tor-post---create-or-append (&key
-					    title subheading
-					    (tags '("null")) series toc
-					    citeTitle citeURL citeAuthor)
-    "Create or append a post with TITLE.
-
-    The following keys are optional:
-
-    :SUBHEADING if you have an active region, use this header.
-    :TAGS one or more tags, as a list or string, to add to the
-	    frontmatter.
-    :SERIES the series to set in the frontmatter.
-    :TOC whether to include a table of contents in the post.
-    :CITETITLE the title of the URL cited (if any)
-    :CITEURL the URL cited (if any)
-    :CITEAUTHOR the author cited (if any)
-
-    If there's an active region, select that text and place it."
-    (let* ((default-directory (f-join jf/tor-home-directory
-				      "content" "posts"
-				      (format-time-string "%Y/")))
-
-	   (slug (jf/tor-convert-text-to-slug title))
-	   (fpath (expand-file-name
-		   (concat default-directory slug ".md"))))
-      ;; If the file does not exist, create the file with the proper
-      ;; frontmatter.
-      (if (not (file-exists-p fpath))
-	  (write-region
-	   (concat "---"
-		   "\ndate: " (format-time-string "%Y-%m-%d %H:%M:%S %z")
-		   "\ndraft: true"
-		   "\nlayout: post"
-		   "\nlicenses:\n- all-rights-reserved"
-		   "\nslug: " (format "%s" slug)
-		   "\ntitle: '" (jf/tor-convert-text-to-post-title title) "'"
-		   "\ntype: post"
-		   (when series (concat "\nseries: " series))
-		   (when toc (concat "\ntoc: true"))
-		   "\ntags:"
-		   (if tags
-		       (concat (mapconcat
-				(lambda (tag) (concat "\n- " tag))
-				(flatten-tree tags) ""))
-		     "\n- null")
-		   "\n---\n")
-	   nil fpath))
-      ;; If we have an active region, append that region's content to
-      ;; the given file.
-      (if (use-region-p)
-	  (write-region
-	   (concat
-	    (if subheading
-		(concat "\n## " subheading "\n")
-	      (when citeTitle (concat "\n## " citeTitle "\n")))
-	    (when citeURL (concat
-			   "\n{{< blockquote"
-			   (when citeAuthor
-			     (concat " pre=\"" citeAuthor "\""))
-			   " cite=\"" citeTitle
-			   "\" cite_url=\"" citeURL "\" >}}\n"))
-	    (buffer-substring (region-beginning) (region-end))
-	    (when citeURL "\n{{< /blockquote >}}"))
-	   nil fpath t)
-	;; Without an active region, if we have a citeURL insert a link
-	;; to it.
-	(when citeURL
-	  (write-region
-	   (concat
-	    "\n<cite><a href=\"" citeURL
-	    "\" class=\"u-url p-name\" rel=\"cite\">"
-	    (or (citeTitle) (citeURL)) "</a></cite>\n")
-	   nil fpath t)))
-      ;; Finally open that file for editing.
-      (find-file fpath)
-      (end-of-buffer)))
-  ;;******************************************************************************
-  ;;
-  ;;; END Non-Interactive Utility Functions
-  ;;
-  ;;******************************************************************************
-
-  ;;******************************************************************************
-  ;;
-  ;;; BEGIN Interactive Non-Wrapping Functions
-  ;;
-  ;;******************************************************************************
-  (cl-defun jf/tor-toggle-hugo-server (&key
-					(directory jf/tor-home-directory)
-					(buffer-name "*Hugo Server*"))
-    "This will start or stop a Hugo server in the given DIRECTORY for TakeOnRules.com.
-
-  The BUFFER-NAME is where we'll run the Hugo process."
-    (interactive)
-    (if (get-buffer buffer-name)
-	(progn
-	  (kill-buffer buffer-name)
-	  (message (concat "Stopping Hugo in \"" buffer-name "\" buffer…")))
-      (let* ((default-directory directory))
-	(start-process "hugo-server" buffer-name "hugo" "server" "-D")
-	(message (concat "Starting Hugo in \"" buffer-name "\" buffer…")))))
-
-  (defun jf/tor-retitle-post (title)
-    "Replace the given buffer's title with the new TITLE.
-
-    This function will: replace the content's title, update the slug,
-    and rename the buffer."
-    (interactive "sNew Post's Title: ")
-    (let* ((metadataTitle (concat "title: '"
-				  (jf/tor-convert-text-to-post-title title) "'"))
-	   (slug (jf/tor-convert-text-to-slug title))
-	   (metadataSlug (concat "slug: " slug))
-	   (filename (buffer-file-name))
-	   (new-filename (concat (file-name-directory filename)
-				 slug ".md")))
-
-      ;; Replace the title metadata entry
-      (goto-char (point-min))
-      (while (search-forward-regexp "^title:.*$" nil t)
-	(replace-match metadataTitle))
-
-      ;; Replace the slug metadata entry
-      (goto-char (point-min))
-      (while (search-forward-regexp "^slug:.*$" nil t)
-	(replace-match metadataSlug))
-
-      ;; Need to save before we rename the buffer
-      (save-buffer)
-
-      ;; Rename the buffer, accounting for version control
-      (cond
-       ((vc-backend filename)
-	(vc-rename-file filename new-filename))
-       (t
-	(rename-file filename new-filename t)
-	(set-visited-file-name new-filename t t)))
-
-      ;; Report filename change
-      (message "Renamed %s -> %s" filename new-filename)))
-
-  (defvar jf/tor-hostname-regexp
-    "^https?://takeonrules\.com"
-    "A regular expression for checking if it's TakeOnRules.com.")
-
-  (defvar jf/tor-hugo-regexp-for-post-path
-    (concat jf/tor-hostname-regexp
-	    "/[0-9]\\{4\\}/[0-9]\\{2\\}/[0-9]\\{2\\}/\\([^/]+\\)/?$")
-    "A regular expression for matching blog posts.")
-
-  (defvar jf/tor-hugo-regexp-for-pages-path
-    (concat jf/tor-hostname-regexp "/\\([^z-a]*[^/]\\)/?$")
-    "A regular expression for matching pages.")
-
-  (defun jf/tor-find-hugo-file-by-url (url)
-    "Find the associated TakeOnRules.com file for the given URL."
-    (interactive (list
-		  (jf/prompt-for-url-dwim
-		   :url-regexp jf/tor-hostname-regexp)))
-    (cond
-     ;; Blog post
-     ((string-match jf/tor-hugo-regexp-for-post-path url)
-      (let* ((slug (match-string-no-properties 1 url))
-	     (filename (car
-			(jf/list-filenames-with-file-text
-			 :matching (concat "^slug: " slug "$")
-			 :in "content"))))
-	(find-file (f-join jf/tor-home-directory "content" filename))))
-     ;; Pages
-     ((string-match jf/tor-hugo-regexp-for-pages-path url)
-      (let* ((permalink (match-string-no-properties 1 url))
-	     (filename (car
-			(jf/list-filenames-with-file-text
-			 :matching (concat "^permalink: ['\\\"]?/?"
-					   permalink "/?['\\\"]?$")
-			 :in "content"))))
-	(find-file (f-join jf/tor-home-directory "content" filename))))
-     ;; No match found
-     (t (message "Unable to find post for \"%s\"" url))))
-
-  (cl-defun jf/tor-view-blog-post (&key
-				   (hostname jf/tor-hostname-current))
-    "Browse the url for the HOSTNAME
-
-    The front matter of blog posts contains YAML, with two
-    attributes: slug and date.  Based on the site configuration, the
-    URLs for one of those posts is: hostname/year/month/day/slug"
-    (interactive)
-    (let ((slugs))
-      (save-excursion
-	;; Remember we are making a list and pushing to the beginning of
-	;; the list.  Hence we start with the last slug in mind.
-	(goto-char 1)
-	(re-search-forward "^slug: \\(.*\\)$" nil t)
-	(push (match-string 1) slugs)
-	(goto-char 1)
-	(re-search-forward
-	 "^date: \\([[:digit:]]+\\)-\\([[:digit:]]+\\)-\\([[:digit:]]+\\) "
-	 nil t)
-	;; Then move to day, month, then year.
-	(push (match-string 3) slugs)
-	(push (match-string 2) slugs)
-	(push (match-string 1) slugs)
-	;; And finally the host name.
-	(push hostname slugs))
-      (browse-url (format "%s" (s-join "/" slugs)))))
-
-  (defun jf/tor-create-post (title)
-    "Create and visit a new draft post.  Prompt for a TITLE.
-
-    The file for the blog post conforms to the path schema of posts
-    for TakeOnRules.com."
-    (interactive "sBlog Post Title: ")
-    (jf/tor-post---create-or-append :title title))
-
-  (defun jf/tor-tag-post (tags)
-    "Apply the TAGS to the current TakeOnRules.com post.
-
-    No effort is made to check if this is a post."
-    (interactive (list (completing-read-multiple "Tags: " (jf/tor-tags-list))))
-    (let ((saved-point (point))
-	  (to-insert (concat "\n- " (s-join "\n- " tags))))
-      (replace-regexp "^tags:$" (concat "tags:" to-insert) nil 0 (point-max))
-      (goto-char (+ saved-point (length to-insert)))))
-
-  (defun jf/tor-insert-glossary-key (key)
-    "Insert the KEY at point."
-    (interactive (list (completing-read "Key: " (jf/tor-glossary-key-list))))
-    (insert key))
-
-  (defun jf/tor-find-changelog-and-insert-entry ()
-    "Find TakeOnRules glossary and begin entering a changelog entry."
-    (interactive)
-    (find-file (f-join jf/tor-home-directory "data" "changelog.yml"))
-    ;; The changelog is structured in date descending order.  The first
-    ;; line is the YAML preamble indicating a data object (e.g. "---")
-    (beginning-of-buffer)
-    (end-of-line)
-    (insert (concat "\n- date: "
-		    (format-time-string "%Y-%m-%d")
-		    "\n  entries:\n    - ")))
-
-  (defun jf/tor-find-series-and-insert-entry (title)
-    "Find TakeOnRules series and add an entry with TITLE."
-    (interactive "sSeries Entry's Title: ")
-    (find-file (f-join jf/tor-home-directory "data" "series.yml"))
-    (let ((key (downcase (s-dashed-words title))))
-      (end-of-buffer)
-      (insert (concat
-	       (if (looking-at-p "^$") "" "\n")
-	       "- title: " title
-	       "\n  key: " key))))
-
-  (defun jf/tor-find-glossary-and-insert-entry (title)
-    "Find TakeOnRules glossary and add an entry with TITLE."
-    (interactive "sGlossary Entry's Title: ")
-    (find-file (f-join jf/tor-home-directory "data" "glossary.yml"))
-    (let ((key (upcase (s-dashed-words title))))
-      (end-of-buffer)
-      (insert (concat
-	       (if (looking-at-p "^$") "" "\n")
-	       "- title: " title
-	       "\n  key: " key))))
-
-  (defun jf/tor-insert-epigraph-entry ()
-    "Prompt for a new a new data/epigraphs.yml entry."
-    (interactive)
-    (find-file (f-join jf/tor-home-directory "data" "epigraphs.yml"))
-    (end-of-buffer)
-    (insert (concat
-	     (if (looking-at-p "^$") "" "\n")
-	     "epi"))
-    (end-of-buffer)
-    "Assumes that the 'epi' is the correct expansion for the snippet."
-    (yas-expand)
-    (message "Ready to insert a new epigraph"))
-
-  (cl-defun jf/tor-post-amplifying-the-blogosphere (subheading
-						    &key
-						    citeTitle
-						    citeURL
-						    citeAuthor)
-    "Create and visit draft post for amplifying the blogosphere.
-
-    If there's an active region, prompt for the :SUBHEADING.  The file
-    for the blog post conforms to the path schema of posts for
-    TakeOnRules.com.
-
-    We'll pass the :CITETITLE, :CITEAUTHOR, and :CITEURL to
-    `jf/tor-post---create-or-append'"
-    (interactive (list (if (use-region-p)
-			   (read-string "Sub-Heading: ")
-			 nil)))
-    (jf/tor-post---create-or-append
-     :title (format-time-string "Amplifying the Blogosphere (v%Y-%m-%d)")
-     :toc "true"
-     :subheading subheading
-     :series "amplifying-the-blogosphere"
-     :tags "response to other blogs"
-     :citeTitle citeTitle
-     :citeURL citeURL
-     :citeAuthor citeAuthor))
-
-  ;; Note: I needed to use `fboundp' because if I invoked this functions
-  ;; before other consult functions I got a method void error.
-  (cl-defun jf/find-file-via-matching (&key prompt matching in)
-    "PROMPT for files IN the directory with MATCHING content.
-
-    If `consult--read' is defined, use that.  Otherwise fallback to `completing-read'."
-    (if (fboundp 'consult--read)
-	(consult--read
-	 (consult--with-increased-gc
-	  (jf/list-full-filenames-with-file-text :matching matching :in in))
-	 :prompt prompt
-	 :sort nil
-	 :require-match t
-	 :category 'file
-	 :history 'file-name-history
-	 :state (consult--file-preview))
-      (list (completing-read
-	     prompt
-	     (jf/list-filenames-with-file-text
-	      :matching matching
-	      :in in)))))
-
-  (defun jf/tor-find-file-draft (filename)
-    "Find a draft FILENAME in the TakeOnRules content directory."
-    (interactive
-     (list (jf/find-file-via-matching
-	    :prompt "Draft filename: "
-	    :matching "^draft: true"
-	    :in (f-join jf/tor-home-directory "content"))))
-    (find-file filename))
-
-  (defun jf/tor-find-file (filename)
-    "Find a FILENAME in the TakeOnRules content directory."
-    (interactive
-     (list (jf/find-file-via-matching
-	    :prompt "Filename: "
-	    :matching "^title:"
-	    :in (f-join jf/tor-home-directory "content"))))
-    (find-file filename))
-  ;;******************************************************************************
-  ;;
-    ;;; END Interactive Non-Wrapping Functions
-  ;;
-  ;;******************************************************************************
-
-  ;;******************************************************************************
-  ;;
-    ;;; BEGIN Listing functions for TakeOnRules.com data
-  ;;
-  ;;******************************************************************************
-  (defun jf/tor-tags-list ()
-    "Return a list of tags from TakeOnRules.com."
-    (jf/tor-list-by-key-from-filename :key "tag" :filename "data/glossary.yml"))
-
-  (defun jf/tor-epigraph-list ()
-    "Return a list of epigraph keys from TakeOnRules.com."
-    (jf/tor-list-by-key-from-filename :key "key" :filename "data/epigraphs.yml"))
-
-  (defun jf/tor-game-list ()
-    "Return a list of games from TakeOnRules.com."
-    (jf/tor-list-by-key-from-filename :key "game" :filename "data/glossary.yml"))
-
-  (defun jf/tor-glossary-title-list ()
-    "Return a list of titles from TakeOnRules.com."
-    (jf/tor-list-by-key-from-filename :key "title" :filename "data/glossary.yml"))
-
-  (defun jf/tor-glossary-key-list ()
-    "Return a list of keys from TakeOnRules.com glossary."
-    (jf/tor-list-by-key-from-filename :key "key" :filename "data/glossary.yml"))
-
-  (defun jf/tor-series-list ()
-    "Return a list of series from TakeOnRules.com."
-    (jf/tor-list-by-key-from-filename :key "key" :filename "data/series.yml"))
-
-  (defun jf/tor-licenses-list ()
-    "Return a list of available licenses for TakeOnRules.com."
-    (jf/tor-list-by-key-from-filename :key "Key" :filename "data/licenses.yml"))
-  ;;******************************************************************************
-  ;;
-    ;;; END Listing functions for TakeOnRules.com data
-  ;;
-  ;;******************************************************************************
-
-  ;;******************************************************************************
-  ;;
-    ;;; BEGIN querying and list generation functions
-  ;;
-  ;;******************************************************************************
-  (cl-defun jf/tor-list-by-key-from-filename (&key
-					      key
-					      filename
-					      (directory jf/tor-home-directory))
-    "Build a list of entries of the KEY from the FILENAME in DIRECTORY."
-    (split-string-and-unquote
-     (shell-command-to-string
-      (concat
-       "rg \"^[- ] " key ": .*$\" "
-       (f-join directory filename)
-       " --only-matching --no-filename | sed 's/^[ -] " key ": //' | sort | tr '\n' '@'"))
-     "@"))
-
-  (cl-defun jf/list-filenames-with-file-text (&key matching in)
-    "Build a list of filenames MATCHING the pattern IN the given directory."
-    (let ((default-directory (f-join jf/tor-home-directory in)))
-      (split-string-and-unquote
-       (shell-command-to-string
-	(concat
-	 "rg \""
-	 matching "\" --only-matching --files-with-matches --sortr modified"
-	 "| tr '\n' '@'"))
-       "@")))
-
-  (cl-defun jf/list-full-filenames-with-file-text (&key matching in)
-    "Build a list of filenames MATCHING the pattern IN the given directory."
-    (split-string-and-unquote
-     (shell-command-to-string
-      (concat
-       "rg \""
-       matching "\" " in " --only-matching --files-with-matches --sortr modified"
-       "| tr '\n' '@'"))
-     "@"))
-
-  (defun jf/tor-page-relative-pathname-list ()
-    "Return a list of pages for TakeOnRules.com."
-    (jf/list-filenames-with-file-text :matching "^title: " :in "content"))
-
-  (defun jf/tor-asset-relative-pathname-list ()
-    "Return a list of image filenames for TakeOnRules.com."
-    (let ((default-directory (f-join jf/tor-home-directory "assets" "images")))
-      (split-string-and-unquote
-       (shell-command-to-string "ls"))))
-
-  (defun jf/matches-in-buffer (regexp &optional buffer)
-    "Return a list of matches of REGEXP in BUFFER or the current buffer if not given."
-    (let ((matches))
-      (save-match-data
-	(save-excursion
-	  (with-current-buffer (or buffer (current-buffer))
-	    (save-restriction
-	      (widen)
-	      (goto-char 1)
-	      (while (search-forward-regexp regexp nil t 1)
-		(push (match-string 0) matches)))))
-	matches)))
-
-  (defun jf/kill-new-markdown-heading-as-slug (heading)
-    "Push onto the `kill-ring' a slugified version of HEADING."
-    (interactive
-     (list (completing-read
-	    "Heading: "
-	    (jf/matches-in-buffer "^#+ +.*$"))))
-    (kill-new (jf/tor-convert-text-to-slug
-	       (replace-regexp-in-string "^#+ +" "" heading))))
-  ;;******************************************************************************
-  ;;
-    ;;; END querying and list generation functions
-  ;;
-  ;;******************************************************************************
-
-  ;;******************************************************************************
-  ;;
-    ;;; BEGIN Wrapping Functions
-  ;;
-  ;;******************************************************************************
-  (cl-defun jf/tor-wrap-with-text (&key before after strategy)
-    "Wrap the STRATEGY determined region with the BEFORE and AFTER text.
-
-    Valid STRATEGY options are:
-
-    - :lineOrRegion
-    - :pointOrRegion
-    - :sentenceOrRegion
-    - :wordOrRegion
-
-    TODO: I would love create a lookup table for the case statement,
-    as the behavior's well defined."
-    (pcase strategy
-      (:lineOrRegion (pcase-let* ((origin (point))
-				  (`(,begin . ,end)
-				   (crux-get-positions-of-line-or-region)))
-		       (goto-char end)
-		       (insert after)
-		       (goto-char begin)
-		       (insert before)))
-      (:sentenceOrRegion (let* ((begin (if (use-region-p)
-					   (region-beginning)
-					 (car (bounds-of-thing-at-point 'sentence))))
-				(end (if (use-region-p)
-					 (region-end)
-				       (cdr (bounds-of-thing-at-point 'sentence)))))
-			   (goto-char end)
-			   (insert after)
-			   (goto-char begin)
-			   (insert before)))
-      (:pointOrRegion (let* ((begin (if (use-region-p) (region-beginning) (point)))
-			     (end (if (use-region-p) (region-end) (point))))
-			(goto-char end)
-			(insert after)
-			(goto-char begin)
-			(insert before)))
-      (:wordOrRegion (let* ((begin (if (use-region-p)
-				       (region-beginning)
-				     (car (bounds-of-thing-at-point 'word))))
-			    (end (if (use-region-p)
-				     (region-end)
-				   (cdr (bounds-of-thing-at-point 'word)))))
-		       (goto-char end)
-		       (insert after)
-		       (goto-char begin)
-		       (insert before)))
-      ))
-
-  (defun jf/tor-wrap-in-html-tag (tag &optional attributes)
-    "Wrap the word or region with the given TAG with optional ATTRIBUTES."
-    (interactive "sHTML Tag: \nsAttributes (optional): ")
-    (jf/tor-wrap-with-text
-     :before (concat "<" tag (if (s-blank? attributes)
-				 ""
-			       (concat " " attributes)) ">")
-     :after (concat "</" tag ">")
-     :strategy :wordOrRegion))
-
-  (defun jf/tor-wrap-in-poem ()
-    "Wrap the point or region as a poem."
-    (interactive)
-    (jf/tor-wrap-with-text
-     :before "<pre class=\"poem\">\n"
-     :after "\n</pre>"
-     :strategy :pointOrRegion))
-
-  (defun jf/tor-wrap-date (date)
-    "Wrap the point or region with the given DATE."
-    (interactive (list (org-read-date nil nil nil "Date")))
-    (jf/tor-wrap-in-html-tag
-     "time"
-     (concat "datetime=\"" date "\" title=\"" date "\"")))
-
-  (defun jf/tor-wrap-as-marginnote-dwim ()
-    "Wrap the line or current region as a marginnote Hugo shortcode."
-    (interactive)
-    (jf/tor-wrap-with-text
-     :before "{{< marginnote >}}\n"
-     :after "\n{{< /marginnote >}}"
-     :strategy :lineOrRegion))
-
-  (defun jf/tor-wrap-as-sidenote-dwim ()
-    "Wrap the line or current region as a sidenote Hugo shortcode."
-    (interactive)
-    (jf/tor-wrap-with-text
-     :before "{{< sidenote >}}"
-     :after "{{< /sidenote >}}"
-     :strategy :sentenceOrRegion))
-
-  (defun jf/tor-wrap-link-active-region-dwim (url)
-    "Wrap current region (or point) in an A-tag with the given URL.
-
-    For the URL:
-
-    - If `car' of `kill-ring' starts with \"http\", then use that as the URL.
-    - Otherwise prompt for a URL.
-
-    If the URL is an empty string, then send a message.  Else, if we
-    have a non-0 length URL, use the URL and wrap the region in an A
-    tag."
-    (interactive (list (jf/prompt-for-url-dwim)))
-    (if (eq (length url) 0)
-	(message "No URL to use for A-tag creation")
-      (jf/tor-wrap-with-text
-       :before (concat "<a href=\"" url "\">")
-       :after "</a>"
-       :strategy :pointOrRegion)))
-
-  (defun jf/tor-wrap-as-pseudo-dfn ()
-    "Wrap current region (or word) in an I-tag with a DFN dom class."
-    (interactive)
-    (jf/tor-wrap-with-text
-     :before "<i class=\"dfn\">"
-     :after "</i>"
-     :strategy :wordOrRegion))
-
-  (defun jf/tor-wrap-cite-active-region-dwim (url)
-    "Wrap current region (or point) in a CITE-tag and optional A-tag with URL.
-
-    For the URL:
-
-    - If `car' of `kill-ring' starts with \"http\", then use that as the URL.
-    - Otherwise prompt for a URL.
-
-    If the URL an empty string, then wrap the current region or point
-    in a CITE tag.  Else, if we have a non-0 length URL, wrap it in
-    CITE and A tag."
-    (interactive (list (jf/prompt-for-url-dwim)))
-
-    ;; Were we to start writing at the START position, we'd invariably
-    ;; change the contents such that the END position was no longer
-    ;; accurate.  So instead, we append at the END position, hop back to
-    ;; the START position and append to the START position.
-    (if (eq (length url) 0)
-	(jf/tor-wrap-with-text
-	 :before "<cite>"
-	 :after "</cite >"
-	 :strategy :pointOrRegion)
-      (jf/tor-wrap-with-text
-       :before (concat "<cite><a href=\"" url
-		       "\" class=\"u-url p-name\" rel=\"cite\">")
-       :after "</a></cite>"
-       :strategy :pointOrRegion)))
-  ;;******************************************************************************
-  ;;
-    ;;; END Wrapping Functions
-  ;;
-  ;;******************************************************************************
-#+end_src
-
 *** Quick Help
 
 #+begin_src emacs-lisp
-  ;;; Quick Help
-  (cl-defun jf/quick-help (&key header body)
-    "Create a help window with HEADER and BODY."
-    (let ((qh-buff (concat "*Quick Help: " header "*")))
-      (progn (or (get-buffer qh-buff)
-		 (progn (get-buffer-create qh-buff)
-			(with-current-buffer qh-buff
-			  (insert (concat "**" header "**\n" body))
-			  (goto-char (point-min))
-			  (not-modified)
-			  (read-only-mode)
-			  (special-mode)
-			  (local-set-key (kbd "q") 'kill-buffer-and-window))))
-	     (pop-to-buffer qh-buff '((display-buffer-below-selected)
-				      ;; When sizing the buffer, if tab-line-format is
-				      ;; active then that "line" is not counted in
-				      ;; calculating the fit-to-window-buffer value.
-				      ;; Which means that the buffer flows into the
-				      ;; mode-line.
-				      (window-parameters . ((tab-line-format . none)
-							    (no-other-window . nil)))
-				      (window-height . fit-window-to-buffer)))
-	     (message "q - Remove Window"))))
-
-  (cl-defmacro jf/transient-quick-help (name &key header label body)
-    "Macro for creating callable functions that display help.
-
-	NAME is name of function,
-	LABEL is label for the menu
-	HEADER is name of buffer, and TEXT is displayed."
-    (declare (indent defun))
-    `(progn
-       (transient-define-suffix ,name nil
-	 ,header
-	 :description ,label
-	 (interactive)
-	 (jf/quick-help :header ,header :body ,body))))
+  (require 'jf-quick-help)
 #+end_src
 
 *** Keyboard Macros
@@ -3679,8 +2903,6 @@ but a suffix can provide a description.
       ("m t" "Typopunct (*)" typopunct-mode :if-non-nil typopunct-mode)
       ("m o" "MacOS Native Option ( )" jf/toggle-osx-alternate-modifier :if-non-nil ns-alternate-modifier)
       ("m o" "MacOS Native Option (*)" jf/toggle-osx-alternate-modifier :if-nil ns-alternate-modifier)
-      ("m w" "Writeroom ( )" writeroom-mode :if-nil writeroom-mode)
-      ("m w" "Writeroom (*)" writeroom-mode :if-non-nil writeroom-mode)
       ]]
     ["Org"
 

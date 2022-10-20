@@ -159,27 +159,27 @@ A bit of pre-amble.  I maintain a list of data directories, each might have “r
 			    (progn
 			      (call-interactively 'git-link)
 			      (car kill-ring))))
-	     (initial-txt (if (null func-name)
-			      (format "From [[file:%s::%s][%s]]:"
-				      file-name
-				      line-number
-				      file-base)
-			    (format "From ~%s~ (in [[file:%s::%s][%s]]):"
-				    func-name
-				    file-name
-				    line-number
-				    file-base))))
-	(format (concat "\n- Local :: %s"
-			(when remote-link (format "\n- Remote :: %s" remote-link))
-			"\n\n#+BEGIN_%s %s"
+	     (local-link (if (null func-name)
+			     (format "From [[file:%s::%s][%s]]:"
+				     file-name
+				     line-number
+				     file-base)
+			   (format "From ~%s~ (in [[file:%s::%s][%s]]):"
+				   func-name
+				   file-name
+				   line-number
+				   file-base))))
+	(format (concat "\n#+BEGIN_%s %s"
 			"\n%s"
-			"\n#+END_%s\n")
-		initial-txt
+			"\n#+END_%s\n"
+			"\n- Local :: %s"
+			(when remote-link
+			  (format "\n- Remote :: [[%s][%s]]" remote-link (or func-name file-name))))
 		type
 		org-src-mode
 		code-snippet
-		type)))
-
+		type
+		local-link)))
 
     (setq org-latex-default-class "jf/article")
 

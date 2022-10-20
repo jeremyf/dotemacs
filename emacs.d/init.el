@@ -9,6 +9,7 @@
 ;;
 ;;; CODE:
 
+(add-to-list 'load-path "~/git/dotemacs/emacs.d")
 (setq custom-file (concat user-emacs-directory "custom.el"))
 (load custom-file :noerror)
 
