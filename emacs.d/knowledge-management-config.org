@@ -16,17 +16,29 @@ Another “killer feature” of Emacs is org-mode and it’s constellation of pa
 
 Oh ~org-mode~, one of the “why you should use Emacs” packages.  It’s a set of organizational tools that allow for progressive adoption.  You can start writing in ~org-mode~ syntax and leave it at that.  From there you can delve further into the ~org-mode~ ecosystem.
 
-A bit of pre-amble.  I maintain a list of data directories, each might have “relevant to org-mode” files.  The ~jf/org-agenda-files~ reads the file system to gather sources for ~org-mode~ agenda.
-
 #+begin_src emacs-lisp
+  ;;; Pre-amble to prepare for `org-mode'
+
+  ;; I maintain a list of data directories, each might have “relevant to
+  ;; org-mode” files.  The `jf/org-agenda-files' reads the file system to gather
+  ;; sources for `org-mode' agenda.
   (defun is-work-machine? ()
     "Am I working on my machine"
-    (file-exists-p (file-truename "~/git/org/scientist/dailies/.keep")))
+    (file-exists-p (file-truename "~/git/org/scientist/.keep")))
 
   (defvar jf/primary-agenda-filename-for-machine
     (if (is-work-machine?)
 	"~/git/org/scientist/agenda.org"
       "~/git/org/agenda.org"))
+
+  (defconst jf/data-directories
+    (list
+     jf/tor-home-directory
+     "~/git/org/scientist/"
+     "~/git/dotzshrc/"
+     "~/git/dotemacs/"
+     "~/git/org/")
+    "Relevant data directories for my day to day work.")
 
   (cl-defun jf/org-agenda-files (&key
 				 (paths jf/data-directories)
@@ -39,30 +51,7 @@ A bit of pre-amble.  I maintain a list of data directories, each might have “r
 	(when (f-exists-p (f-join path basename))
 	  (add-to-list 'returning-list (f-join path basename)))))
     returning-list)
-
-  (bind-key "C-j" 'jf/jump-to-agenda-or-mark)
-  (cl-defun jf/jump-to-agenda-or-mark (prefix-arg)
-    "Jump to and from current agenda item to mark.
-
-  With PREFIX_ARG go to beginning of today's headline."
-    (interactive "P")
-    (require 'org-capture)
-    (if (car prefix-arg)
-	;; Jump to where we would put a project were we to capture it.
-	(org-capture-goto-target "p")
-      (if (string= (buffer-file-name) (file-truename jf/primary-agenda-filename-for-machine))
-	  (call-interactively #'consult-global-mark)
-	(progn
-	  (call-interactively #'set-mark-command)
-	  (if (when (and (fboundp 'org-clocking-p) (org-clocking-p)) t)
-	      (org-clock-goto)
-	    ;; Jump to where we would put a project were we to capture it.
-	    (org-capture-goto-target "p")))))
-    (require 'pulsar)
-    (pulsar-pulse-line))
-    #+end_src
-
-#+begin_src emacs-lisp
+      ;;; Begin Org Mode (all it's glory)
   (use-package org
     :straight (org :type built-in)
     :hook (org-mode . turn-on-visual-line-mode)
@@ -71,23 +60,55 @@ A bit of pre-amble.  I maintain a list of data directories, each might have “r
     :bind (:map org-mode-map ("C-j" . jf/jump-to-agenda-or-mark))
     :custom (org-use-speed-commands t)
     (org-time-stamp-rounding-minutes '(0 15))
-    :config (setq
-	     org-insert-heading-respect-content t
-	     org-catch-invisible-edits 'show-and-error
-	     org-use-fast-todo-selection 'expert
-	     org-imenu-depth 3
-	     org-export-with-sub-superscripts nil
-	     org-agenda-log-mode-items '(clock)
-	     org-directory (file-truename "~/git/org")
-	     org-agenda-files (jf/org-agenda-files
-			       :paths jf/data-directories
-			       :basenames '("agenda.org"))
-	     org-default-notes-file (concat
-				     org-directory
-				     "/captured-notes.org")
-	     org-log-done 'time
-	     org-todo-keywords '((type "TODO(t)" "IN-PROGRESS(i!)" "BLOCKED(b@/!)" "IN-REVIEW(r!)" "|" "DONE(d!)" "CANCELLED(c@)"))
-	     )
+    :config
+    ;; From https://oremacs.com/2017/10/04/completion-at-point/
+    (defun jf/org-completion-symbols ()
+      "Look for \"=word=\" and allow completion of things like \"=wo\"."
+      (when (looking-back "=[a-zA-Z]+")
+	(let (cands)
+	  (save-match-data
+	    (save-excursion
+	      (goto-char (point-min))
+	      (while (re-search-forward "=\\([a-zA-Z]+\\)=" nil t)
+		(cl-pushnew
+		 (match-string-no-properties 0) cands :test 'equal))
+	      cands))
+	  (when cands
+	    (list (match-beginning 0) (match-end 0) cands)))))
+    (defun jf/org-completion-at-point-functions ()
+      "The `completion-at-point-functions' I envision using for `org-mode'."
+      (setq-local completion-at-point-functions
+		  (list (cape-super-capf
+			 #'tempel-expand
+			 #'jf/org-completion-symbols
+			 #'cape-dabbrev
+			 #'cape-file
+			 #'cape-dict
+			 #'cape-ispell
+			 #'cape-keyword
+			 #'cape-history
+			 #'elisp-completion-at-point))))
+    (defun jf/org-confirm-babel-evaluate (lang body) nil)
+    (setq org-confirm-babel-evaluate #'jf/org-confirm-babel-evaluate
+	  ;; I'd prefer to use the executable, but that doe not appear to be the
+	  ;; implementation of org-babel.
+	  org-plantuml-jar-path (concat (string-trim (shell-command-to-string "brew-path plantuml")) "/libexec/plantuml.jar")
+	  org-insert-heading-respect-content t
+	  org-catch-invisible-edits 'show-and-error
+	  org-use-fast-todo-selection 'expert
+	  org-imenu-depth 3
+	  org-export-with-sub-superscripts nil
+	  org-agenda-log-mode-items '(clock)
+	  org-directory (file-truename "~/git/org")
+	  org-agenda-files (jf/org-agenda-files
+			    :paths jf/data-directories
+			    :basenames '("agenda.org"))
+	  org-default-notes-file (concat
+				  org-directory
+				  "/captured-notes.org")
+	  org-log-done 'time
+	  org-todo-keywords '((type "TODO(t)" "IN-PROGRESS(i!)" "BLOCKED(b@/!)" "IN-REVIEW(r!)" "|" "DONE(d!)" "DELEGATED(g@/!)" "CANCELLED(c@)"))
+	  )
     (setq org-capture-templates
 	  '(("@"
 	     "All Todo"
@@ -133,7 +154,7 @@ A bit of pre-amble.  I maintain a list of data directories, each might have “r
     (defun jf/capture-region-contents-with-metadata (start end parg)
       "Write selected text between START and END to currently clocked `org-mode' entry.
 
-  With PARG kill the content instead."
+      With PARG kill the content instead."
       (interactive "r\nP")
       (let ((text (jf/region-contents-get-with-metadata start end)))
 	(if (car parg)
@@ -199,32 +220,32 @@ A bit of pre-amble.  I maintain a list of data directories, each might have “r
     (add-to-list 'org-latex-classes
 		 '("jf/article"
 		   "\\documentclass[11pt,a4paper]{article}
-	  \\usepackage[utf8]{inputenc}
-	  \\usepackage[T1]{fontenc}
-	  \\usepackage{fixltx2e}
-	  \\usepackage{graphicx}
-	  \\usepackage{longtable}
-	  \\usepackage{float}
-	  \\usepackage{wrapfig}
-	  \\usepackage{rotating}
-	  \\usepackage[normalem]{ulem}
-	  \\usepackage{amsmath}
-	  \\usepackage{textcomp}
-	  \\usepackage{marvosym}
-	  \\usepackage{wasysym}
-	  \\usepackage{amssymb}
-	  \\usepackage{hyperref}
-	  \\usepackage{mathpazo}
-	  \\usepackage{xcolor}
-	  \\usepackage{enumerate}
-	  \\definecolor{bg}{rgb}{0.95,0.95,0.95}
-	  \\tolerance=1000
-		[NO-DEFAULT-PACKAGES]
-		[PACKAGES]
-		[EXTRA]
+	      \\usepackage[utf8]{inputenc}
+	      \\usepackage[T1]{fontenc}
+	      \\usepackage{fixltx2e}
+	      \\usepackage{graphicx}
+	      \\usepackage{longtable}
+	      \\usepackage{float}
+	      \\usepackage{wrapfig}
+	      \\usepackage{rotating}
+	      \\usepackage[normalem]{ulem}
+	      \\usepackage{amsmath}
+	      \\usepackage{textcomp}
+	      \\usepackage{marvosym}
+	      \\usepackage{wasysym}
+	      \\usepackage{amssymb}
+	      \\usepackage{hyperref}
+	      \\usepackage{mathpazo}
+	      \\usepackage{xcolor}
+	      \\usepackage{enumerate}
+	      \\definecolor{bg}{rgb}{0.95,0.95,0.95}
+	      \\tolerance=1000
+		    [NO-DEFAULT-PACKAGES]
+		    [PACKAGES]
+		    [EXTRA]
 
-	  \\linespread{1.1}
-	  \\hypersetup{pdfborder=0 0 0}"
+	      \\linespread{1.1}
+	      \\hypersetup{pdfborder=0 0 0}"
 		   ("\\section{%s}" . "\\section*{%s}")
 		   ("\\subsection{%s}" . "\\subsection*{%s}")
 		   ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
@@ -243,66 +264,12 @@ A bit of pre-amble.  I maintain a list of data directories, each might have “r
 	   ("C-c c" . org-capture)
 	   ("C-s-t" . org-toggle-link-display)))
 
-  (defun my-org-confirm-babel-evaluate (lang body) nil)
-  (setq org-confirm-babel-evaluate #'my-org-confirm-babel-evaluate)
-
-  ;; To make Org mode take care of versioning of attachments for you,
-  ;; add the following to your Emacs config:
-  (require 'org-attach-git)
-
-  ;; See
-  ;; https://www.reddit.com/r/orgmode/comments/i6hl8b/image_preview_size_in_org_mode/
-  ;; for further discussion
-  ;;
-  ;; One consideration is that the below setq should be called as part
-  ;; of the `org-toggle-inline-images`.  <2020-11-14 Sat 12:09>: I
-  ;; commented out the lines below as it created a very small image
-  ;; (about the size of one character).  (setq org-image-actual-width
-  ;; (truncate (* (window-pixel-width) 0.8)))
-
-
-  ;; I'd prefer to use the executable, but that doe not appear to be the
-  ;; implementation of org-babel.
-  (setq org-plantuml-jar-path (concat (string-trim (shell-command-to-string "brew-path plantuml")) "/libexec/plantuml.jar"))
-#+end_src
-
-
-#+begin_src emacs-lisp
-  ;; These are the list of completion at point functions I want for Org-Mode.
-  (defun jf/org-completion-at-point-functions ()
-    (setq-local completion-at-point-functions
-		(list (cape-super-capf
-		       #'tempel-expand
-		       #'org-completion-symbols
-		       #'cape-dabbrev
-		       #'cape-file
-		       #'cape-dict
-		       #'cape-ispell
-		       #'cape-keyword
-		       #'cape-history
-		       #'elisp-completion-at-point))))
-
-  ;; From https://oremacs.com/2017/10/04/completion-at-point/
-  (defun org-completion-symbols ()
-    (when (looking-back "=[a-zA-Z]+")
-      (let (cands)
-	(save-match-data
-	  (save-excursion
-	    (goto-char (point-min))
-	    (while (re-search-forward "=\\([a-zA-Z]+\\)=" nil t)
-	      (cl-pushnew
-	       (match-string-no-properties 0) cands :test 'equal))
-	    cands))
-	(when cands
-	  (list (match-beginning 0) (match-end 0) cands)))))
-#+end_src
-
-#+begin_src emacs-lisp
+  ;;; Additionally Functionality for Org Mode
   ;; Cribbed from https://xenodium.com/emacs-dwim-do-what-i-mean/
   (defun jf/org-insert-link-dwim (parg &rest args)
     "Like `org-insert-link' but with personal dwim preferences.
 
-  With PARG, skip personal dwim preferences."
+    With PARG, skip personal dwim preferences."
     (interactive "P")
     (let* ((point-in-link (org-in-regexp org-link-any-re 1))
 	   (clipboard-url (when (string-match-p "^http" (current-kill 0))
@@ -328,21 +295,30 @@ A bit of pre-amble.  I maintain a list of data directories, each might have “r
 						       'title))))))))
        (t
 	(call-interactively 'org-insert-link)))))
-#+end_src
 
-** Time Tracking
+  ;;; Org Mode time tracking and task tracking adjustments
 
-I wrote about this in [[https://takeonrules.com/2022/09/06/org-mode-capture-templates-and-time-tracking/][Org Mode Capture Templates and Time Tracking // Take on Rules]].  But to summarize, I work on several different projects each day; helping folks get unstuck.  I also need to track and record my time.
+  ;; I work on several different projects each day; helping folks get unstuck.  I also need to track and record my time.
+  (bind-key "C-j" 'jf/jump-to-agenda-or-mark)
+  (cl-defun jf/jump-to-agenda-or-mark (prefix-arg)
+    "Jump to and from current agenda item to mark.
 
-The following three functions help me provide structure for time tracking and note taking:
-
-- =jf/org-mode-agenda-project-prompt=
-- =jf/org-mode-agenda-find-project-node=
-- =jf/org-mode-agenda-to-stand-up-summary=
-
-I want to re-use existing project names but also allow for new ones, and =jf/org-mode-agenda-project-prompt= queries my agenda file for the projects I’ve already recorded time towards.
-
-#+begin_src emacs-lisp
+    With PREFIX_ARG go to beginning of today's headline."
+    (interactive "P")
+    (require 'org-capture)
+    (if (car prefix-arg)
+	;; Jump to where we would put a project were we to capture it.
+	(org-capture-goto-target "p")
+      (if (string= (buffer-file-name) (file-truename jf/primary-agenda-filename-for-machine))
+	  (call-interactively #'consult-global-mark)
+	(progn
+	  (call-interactively #'set-mark-command)
+	  (if (when (and (fboundp 'org-clocking-p) (org-clocking-p)) t)
+	      (org-clock-goto)
+	    ;; Jump to where we would put a project were we to capture it.
+	    (org-capture-goto-target "p")))))
+    (require 'pulsar)
+    (pulsar-pulse-line))
   (defun jf/org-mode-agenda-project-prompt ()
     "Prompt for project based on existing projects in agenda file.
 
@@ -357,9 +333,7 @@ I want to re-use existing project names but also allow for new ones, and =jf/org
 	  (org-element-property :title (org-element-at-point)))
 	"+LEVEL=4+project" 'agenda)
        ) #'string<)))
-#+end_src
 
-#+begin_src emacs-lisp
   ;; When I jump to a new task for the day, I want to position that task within
   ;; the prompted project.  Inspiration from
   ;; https://gist.github.com/webbj74/0ab881ed0ce61153a82e.
@@ -421,9 +395,7 @@ I want to re-use existing project names but also allow for new ones, and =jf/org
     "Add a mergerequest node to today."
     (jf/org-mode-agenda-find-project-node :tag "mergerequests"
 					  :project (concat "Merge Requests for " (format-time-string "%Y-%m-%d"))))
-#+end_src
 
-#+begin_src emacs-lisp
   ;; Takes my notes for the day and formats them for a summary report.
   (defun jf/org-mode-agenda-to-stand-up-summary (parg)
     "Copy to the kill ring the day's time-tracked summary.
@@ -459,9 +431,7 @@ I want to re-use existing project names but also allow for new ones, and =jf/org
 		       )))))
 	  (jf/create-scratch-buffer)
 	  (yank)))))
-#+end_src
 
-#+begin_src emacs-lisp
   ;; I’m responsible for tracking my work time.  I want a way to quickly see what
   ;; that is for the current week.
   ;;
@@ -476,10 +446,7 @@ I want to re-use existing project names but also allow for new ones, and =jf/org
     (require 'pulsar)
     (pulsar-pulse-line)
     (org-clock-report 4))
-#+end_src
 
-
-#+begin_src emacs-lisp
   ;; Another task at end of month is to transcribing my agenda’s timesheet to
   ;; entries in our time tracking software.  From the day’s project link in the
   ;; =org-clock-report=, I want to copy the headlines of each of the tasks.  I
@@ -504,11 +471,9 @@ I want to re-use existing project names but also allow for new ones, and =jf/org
 	   (output (format "Project: %s\nHours: %s\nTasks:\n%s" project hours tasks)))
       (kill-new tasks)
       (message output)))
-#+end_src
 
-** Copy Org and Paste in Rich Text Format
+  ;;; Extra Org Mode Export Function(s)
 
-#+begin_src emacs-lisp
   ;; Org Mode has built-in capabilities for exporting to HTML (and other
   ;; languages).  The following function does just a bit more.  It converts the
   ;; org region to HTML and sends it to the clipboard as an RTF datatype.
@@ -547,6 +512,7 @@ I want to re-use existing project names but also allow for new ones, and =jf/org
 		  (org-export-string-as region 'md t '(:with-toc nil))))
 	    (gui-set-selection 'CLIPBOARD markdown))))
 
+    ;; I have found that Slack resists posting rich content, so I often need to open up TextEdit, paste into an empty file, copy the contents, and then paste into Slack.
     (defun jf/formatted-copy-org-to-html (prefix)
       "Export region to HTML, and copy it to the clipboard.
 
@@ -573,22 +539,7 @@ I want to re-use existing project names but also allow for new ones, and =jf/org
 	      "end tell")))
 	  )))
     )
-#+end_src
 
-#+RESULTS:
-: jf/formatted-copy-org-to-html
-
-I have found that Slack resists posting rich content, so I often need to open up TextEdit, paste into an empty file, copy the contents, and then paste into Slack.
-
-** Swapping Tilde and Backtick in Org and More
-
-I jump between Markdown and Org Mode with some frequency.  In many cases I prefer Org Mode.  Except when it comes to code declaration.  The tilde (e.g., =~=) is cumbersome compared to the backtick (e.g., =`=).
-
-What follows came from [[http://mbork.pl/2022-01-17_Making_code_snippets_in_Org-mode_easier_to_type][Marcin Borkowski: 2022-01-17 Making code snippets in Org-mode easier to type]].
-
-Now when I type =~~~=, I get a source block.  And I can even default that block to a specific language (via ~org-insert-tilde-language~).
-
-#+begin_src emacs-lisp
   (define-key org-mode-map (kbd "~") #'org-insert-backtick)
   (defun org-insert-backtick ()
     "Insert a backtick using `org-self-insert-command'."
@@ -619,6 +570,104 @@ Now when I type =~~~=, I get a source block.  And I can even default that block 
 		 (org-edit-special)))
       (setq last-command-event ?~)
       (call-interactively #'org-self-insert-command)))
+
+  ;; In
+  ;; https://takeonrules.com/2022/02/26/note-taking-with-org-roam-and-transclusion/,
+  ;; I wrote about ~org-transclusion~.  The quick version, ~org-transclusion~
+  ;; allows you to include text from one file into another.  This allows for
+  ;; document composition.
+  (use-package org-transclusion
+    :straight t
+    :init (setq org-transclusion-exclude-elements '(property-drawer keyword)))
+
+
+  ;; I love the work of Daniel Mendler (https://github.com/minad).
+  ;; This package gives a bit of visual chrome to org files.
+  (use-package org-modern
+    :straight (:host github :repo "minad/org-modern")
+    :custom (org-modern-star '("◉" "○" "◈" "◇" "•"))
+    :hook (org-mode . org-modern-mode))
+
+
+  ;;; Org Export and Composition Functionality
+
+  (setq org-export-global-macros (list))
+  (use-package ox
+    :straight (ox :type built-in)
+    :config
+    (add-to-list 'org-export-global-macros
+		 '("kbd" . "@@html:<kbd>@@$1@@html:</kbd>@@"))
+
+    (add-to-list 'org-export-global-macros
+		 '("date" . "@@html:<time datetime=\"$1\">@@$2@@html:</time>@@"))
+
+    (add-to-list 'org-export-global-macros
+		 '("cite" . "@@html:<cite>@@$1@@html:</cite>@@"))
+
+    (add-to-list 'org-export-global-macros
+		 '("dfn" . "@@html:<dfn>@@$1@@html:</dfn>@@"))
+
+    (add-to-list 'org-export-global-macros
+		 '("scene-date" . "#+begin_marginnote\nThe scene occurs on @@html:<span class=\"time\">@@$1@@html:</span>@@.\n#+end_marginnote")))
+
+  (add-to-list 'org-export-global-macros
+	       '("mention" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" >}}@@"))
+  (add-to-list 'org-export-global-macros
+	       '("abbr" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" abbr=\"t\" >}}@@"))
+  (add-to-list 'org-export-global-macros
+	       '("abbr-plural" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" abbr=\"t\" plural=\"t\" >}}@@"))
+  (add-to-list 'org-export-global-macros
+	       '("linkToGame" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" abbr=\"t\" >}}@@"))
+  (add-to-list 'org-export-global-macros
+	       '("i" . "@@html:<i class=\"dfn\">@@$1@@html:</i>@@"))
+
+  (add-to-list 'org-export-global-macros
+	       '("sidenote" . "@@hugo:{{< sidenote >}}@@$1@@hugo:{{< /sidenote >}}@@"))
+
+  (add-to-list 'org-export-global-macros
+	       '("linkToSeries" . "@@hugo:{{< linkToSeries \"@@$1@@hugo:\" >}}@@"))'
+
+  (cl-defun jf/org-macro-value-list (macro-name &key (dir org-directory))
+    "List the unique inner text of all uses of MACRO-NAME in given DIR."
+    (s-split
+     "\n"
+     (s-trim
+      (shell-command-to-string
+       (concat
+	"rg \"\\{\\{\\{"
+	macro-name
+	"\\((.+?)\\)\\}\\}\\}"
+	"\" --only-matching --no-filename -r '$1' "
+	dir
+	" | sort | uniq")))))
+
+
+  (defun jf/org-link-delete-link ()
+    "Remove the link part of an org-mode link at point and keep
+  only the description"
+    (interactive)
+    (let ((elem (org-element-context)))
+      (when (eq (car elem) 'link)
+	  (let* ((content-begin (org-element-property :contents-begin elem))
+		 (content-end  (org-element-property :contents-end elem))
+		 (link-begin (org-element-property :begin elem))
+		 (link-end (org-element-property :end elem)))
+	    (when (and content-begin content-end)
+		(let ((content (buffer-substring-no-properties content-begin content-end)))
+		  (delete-region link-begin link-end)
+		  (insert (concat content " "))))))))
+
+  (defun jf/force-org-rebuild-cache (prefix-arg)
+    "Call some functions to rebuild the applicable `org-mode' and `org-roam' cache(s).
+
+  When given PREFIX_ARG, clear the org-roam database (via `org-roam-db-clear-all') then sync.  This will slow down the sync."
+    (interactive "P")
+    (org-id-update-id-locations)
+    (when (fboundp 'org-roam-db-clear-all)
+      (progn
+	(when (car prefix-arg) (org-roam-db-clear-all))
+	(org-roam-db-sync)
+	(org-roam-update-org-id-locations))))
 #+end_src
 
 * COMMENT Org-Roam
@@ -1120,98 +1169,6 @@ Reading https://sqrtminusone.xyz/configs/emacs/#managing-tables, I learned about
 Reading [[https://systemcrafters.net/build-a-second-brain-in-emacs/5-org-roam-hacks/#build-your-org-agenda-from-org-roam-notes][5 Org Roam Hacks for Better Productivity in Emacs - System Crafters]], I learned about how to incorporate ~org-roam~ docs into my agenda.
 
 
-* Org Transclusions
-
-In [[https://takeonrules.com/2022/02/26/note-taking-with-org-roam-and-transclusion/][Note Taking with Org Roam and Transclusion]], I wrote about ~org-transclusion~.  The quick version, ~org-transclusion~ allows you to include text from one file into another.  This allows for document composition.
-
-#+begin_src emacs-lisp
-  (use-package org-transclusion
-    :straight t
-    :init (setq org-transclusion-exclude-elements '(property-drawer keyword)))
-#+end_src
-
-#+begin_src emacs-lisp
-  (setq org-export-global-macros (list))
-#+end_src
-
-First, I’m considering swapping in and out the macros based on export context.  But I’m getting ahead of myself.
-
-* Org Modern
-
-#+begin_src emacs-lisp
-  ;; I love the work of Daniel Mendler (https://github.com/minad).
-  ;; This package gives a bit of visual chrome to org files.
-  (use-package org-modern
-      :straight (:host github :repo "minad/org-modern")
-      :custom (org-modern-star '("◉" "○" "◈" "◇" "•"))
-      :hook (org-mode . org-modern-mode))
-#+end_src
-
-* Macro Expansion
-
-~org-mode~ provides macro expansion.  Here’s I’m declaring a few “global macros”.
-
-** General
-:
-#+begin_src emacs-lisp
-  (use-package ox
-    :straight (ox :type built-in)
-    :config
-    (add-to-list 'org-export-global-macros
-		 '("kbd" . "@@html:<kbd>@@$1@@html:</kbd>@@"))
-
-    (add-to-list 'org-export-global-macros
-		 '("date" . "@@html:<time datetime=\"$1\">@@$2@@html:</time>@@"))
-
-    (add-to-list 'org-export-global-macros
-		 '("cite" . "@@html:<cite>@@$1@@html:</cite>@@"))
-
-    (add-to-list 'org-export-global-macros
-		 '("dfn" . "@@html:<dfn>@@$1@@html:</dfn>@@"))
-
-    (add-to-list 'org-export-global-macros
-		 '("scene-date" . "#+begin_marginnote\nThe scene occurs on @@html:<span class=\"time\">@@$1@@html:</span>@@.\n#+end_marginnote")))
-#+end_src
-
-** Hugo Specific
-
-The following macros map to my [[https://codeberg.org/takeonrules/takeonrules-hugo-theme/src/branch/main/layouts/shortcodes/glossary.html][Glossary shortcode of my hugo theme]]:
-
-- ~mention~
-- ~abbr~
-- ~abbr-plural~
-- ~linkToGame~
-
-#+begin_src emacs-lisp
-  (add-to-list 'org-export-global-macros
-	       '("mention" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" >}}@@"))
-  (add-to-list 'org-export-global-macros
-	       '("abbr" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" abbr=\"t\" >}}@@"))
-  (add-to-list 'org-export-global-macros
-	       '("abbr-plural" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" abbr=\"t\" plural=\"t\" >}}@@"))
-  (add-to-list 'org-export-global-macros
-	       '("linkToGame" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" abbr=\"t\" >}}@@"))
-#+end_src
-
-I’ve taken to using the i-tag as idiomatic, meaning it’s a defined term (lacking it’s definition).  I don’t want to conflate this with org-modes =/= marker.
-
-#+begin_src emacs-lisp
-  (add-to-list 'org-export-global-macros
-	       '("i" . "@@html:<i class=\"dfn\">@@$1@@html:</i>@@"))
-#+end_src
-
-Sometimes I use inline sidenotes, that’s the purpose of this macro.
-
-#+begin_src emacs-lisp
-  (add-to-list 'org-export-global-macros
-	       '("sidenote" . "@@hugo:{{< sidenote >}}@@$1@@hugo:{{< /sidenote >}}@@"))
-#+end_src
-
-#+begin_src emacs-lisp
-  (add-to-list 'org-export-global-macros
-	       '("linkToSeries" . "@@hugo:{{< linkToSeries \"@@$1@@hugo:\" >}}@@"))
-#+end_src
-
 ** COMMENT Some Org-Roam Helper Functions
 
 Moving between Org-Roam and Org-Mode nodes I often need to retrieve a property from the Org-Mode structure; something that isn’t “native” for Org-Roam.  The following helps navigate that.
@@ -1238,63 +1195,6 @@ And given that I’m planning to add new link types, I want a means of extractin
 		"%s"
 		(jf/org-roam-node-get-org-mode-property :node node :property "ROAM_REFS"))
 	       " ")))
-#+end_src
-
-** Listing Function
-
-#+begin_src emacs-lisp
-  (cl-defun jf/org-macro-value-list (macro-name &key (dir org-directory))
-    "List the unique inner text of all uses of MACRO-NAME in given DIR."
-    (s-split
-     "\n"
-     (s-trim
-      (shell-command-to-string
-       (concat
-	"rg \"\\{\\{\\{"
-	macro-name
-	"\\((.+?)\\)\\}\\}\\}"
-	"\" --only-matching --no-filename -r '$1' "
-	dir
-	" | sort | uniq")))))
-#+end_src
-
-** Removing Links
-
-#+begin_src emacs-lisp
-  (defun jf/org-link-delete-link ()
-    "Remove the link part of an org-mode link at point and keep
-  only the description"
-    (interactive)
-    (let ((elem (org-element-context)))
-      (when (eq (car elem) 'link)
-	  (let* ((content-begin (org-element-property :contents-begin elem))
-		 (content-end  (org-element-property :contents-end elem))
-		 (link-begin (org-element-property :begin elem))
-		 (link-end (org-element-property :end elem)))
-	    (when (and content-begin content-end)
-		(let ((content (buffer-substring-no-properties content-begin content-end)))
-		  (delete-region link-begin link-end)
-		  (insert (concat content " "))))))))
-#+end_src
-
-** Syncing the Org Caches
-
-I encountered the following message when attempting to export data:  ~=> "org-export-data: Unable to resolve link: EXISTING-PROPERTY-ID"~
-
-See https://takeonrules.com/2022/01/11/resolving-an-unable-to-resolve-link-error-for-org-mode-in-emacs/ for details
-
-#+begin_src emacs-lisp
-  (defun jf/force-org-rebuild-cache (prefix-arg)
-    "Call some functions to rebuild the applicable `org-mode' and `org-roam' cache(s).
-
-  When given PREFIX_ARG, clear the org-roam database (via `org-roam-db-clear-all') then sync.  This will slow down the sync."
-    (interactive "P")
-    (org-id-update-id-locations)
-    (when (fboundp 'org-roam-db-clear-all)
-      (progn
-	(when (car prefix-arg) (org-roam-db-clear-all))
-	(org-roam-db-sync)
-	(org-roam-update-org-id-locations))))
 #+end_src
 
 ** COMMENT Capturing Epigraphs
