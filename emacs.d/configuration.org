@@ -1197,30 +1197,13 @@ What follows is adjustments to emacs settings as they relate to completion.
     :custom
     (shackle-rules '((compilation-mode :noselect t))
 		   shackle-default-rule '(:select t)))
-#+end_src
 
-#+RESULTS:
-
-/Note:/ How does this related to ~popper.el~?
-
-**** ace-window.el
-
-- ~ace-window.el~ :: A window manager for emacs, allowing fast toggles between
-  windows as well as opening or moving those windows.  See
-  https://github.com/abo-abo/ace-window for more details.
-
-#+begin_src emacs-lisp
   (use-package ace-window
-    :straight t
-    :bind (("M-o" . ace-window)))
+      :straight t
+      :bind (("M-o" . ace-window)))
 #+end_src
 
 **** Folding
-
-#+begin_src emacs-lisp
-#+end_src
-
-**** rainbow-delimiters.el
 
 #+begin_src emacs-lisp
   (use-package yafolding :straight t)
