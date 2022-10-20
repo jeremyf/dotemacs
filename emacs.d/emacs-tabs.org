@@ -16,6 +16,9 @@ Why the return?  For the amazing =centaur-tabs-switch-group=.
     :straight t
     :commands (centaur-tabs-group-by-projectile-project)
     :commands (centaur-tabs-group-buffer-groups)
+    :hook (dired-mode . centaur-tabs-local-mode)
+    (helpful-mode . centaur-tabs-local-mode)
+    (org-agenda-mode . centaur-tabs-local-mode)
     :config
     (setq
      centaur-tabs-set-icons t

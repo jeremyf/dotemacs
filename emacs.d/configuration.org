@@ -336,9 +336,9 @@ I want to start with a basic look and feel.  First, the choice of primary font.
   ;; ~modus-operandi~).  They provide a light and dark theme with a focus on visual
   ;; accessibility.
 
-  ;; I love [[http://protesilaos.com][Prot]]’s attention to detail with the modus themes.  Here’s my
-  ;; configuration for these two sibling themes.  There’s a bit of chatter, but all
-  ;; told it sets things up how I like.
+  ;; I love [[http://protesilaos.com][Prot]]’s attention to detail with the modus
+  ;; themes.  Here’s my configuration for these two sibling themes.  There’s a
+  ;; bit of chatter, but all told it sets things up how I like.
 
 
   (use-package modus-themes
@@ -524,68 +524,6 @@ hard requirement for packages I’ll later introduce.
 		   (window-parameters (mode-line-format . none)))))
 #+end_src
 
-When I call ~embark-act~ (via ~C-.~) I get a buffer listing the actions I can
-take on the target.  A contextual menu if you will.
-
-There’s also the ~embark-dwim~ (I map that to ~M-.~).  Given a target, the
-place at point, when I call ~embark-dwim~ it takes an applicable action.  For a
-URL, it will open that URL in the configured browser.
-
-As a tangent, let’s think in terms of “pairs”.  A target and an action.
-
-With ~embark-export~ I can gather a group of targets (via ~embark-export~) and
-sthen take actions on them.  I write more about this later as it relates to
-~wgrep~.
-
-Embark helps me know what actions are available, but I may want a broader
-context.
-
-Another mechanism for taking an action is ~M-x~ (or
-~execute-extended-command~).  When I type ~M-x~, I’m prompted to provide the
-name of a function.
-
-It would instead of typing ~[TAB]~, I could see a list of candidate functions.
-For that, I’m going to use the lightweight vertico package.
-
-#+begin_src emacs-lisp
-  (use-package vertico
-    :straight t
-    :config
-    (vertico-mode)
-    ;; Use `consult-completion-in-region' if Vertico is enabled.
-    ;; Otherwise use the default `completion--in-region' function.
-    (setq completion-in-region-function
-	  (lambda (&rest args)
-	    (apply (if vertico-mode
-		       #'consult-completion-in-region
-		     #'completion--in-region)
-		   args)))
-    (setq read-file-name-completion-ignore-case t
-	  read-buffer-completion-ignore-case t
-	  completion-ignore-case t)
-    (setq vertico-cycle t))
-
-  (load "~/.emacs.d/straight/build/vertico/extensions/vertico-indexed.elc"
-	nil
-	jf/silence-loading-log)
-  (vertico-indexed-mode)
-
-  (load "~/.emacs.d/straight/build/vertico/extensions/vertico-repeat.elc"
-	nil
-	jf/silence-loading-log)
-  (global-set-key (kbd "M-r") #'vertico-repeat)
-  (add-hook 'minibuffer-setup-hook #'vertico-repeat-save)
-  (savehist-mode 1)
-
-  (use-package marginalia
-    :straight t
-    :config (setq marginalia-max-relative-age 0) ;; Set absolute value
-    ;; /Note:/ The declaration of `marginalia-mode' must be in the :init
-    ;; section.This ensures that it is enabled right away.  It also forces the
-    ;; loading of the package.
-    :init (marginalia-mode))
-    #+end_src
-
 ** Writing, Coding, Computering
 
 *** Projects
@@ -675,6 +613,43 @@ What follows is adjustments to emacs settings as they relate to completion.
     (setq minibuffer-prompt-properties
 	  '(read-only t cursor-intangible t face minibuffer-prompt))
     (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode))
+
+  (use-package vertico
+    :straight t
+    :config
+    (vertico-mode)
+    ;; Use `consult-completion-in-region' if Vertico is enabled.
+    ;; Otherwise use the default `completion--in-region' function.
+    (setq completion-in-region-function
+	  (lambda (&rest args)
+	    (apply (if vertico-mode
+		       #'consult-completion-in-region
+		     #'completion--in-region)
+		   args)))
+    (setq read-file-name-completion-ignore-case t
+	  read-buffer-completion-ignore-case t
+	  completion-ignore-case t)
+    (setq vertico-cycle t))
+
+  (load "~/.emacs.d/straight/build/vertico/extensions/vertico-indexed.elc"
+	nil
+	jf/silence-loading-log)
+  (vertico-indexed-mode)
+
+  (load "~/.emacs.d/straight/build/vertico/extensions/vertico-repeat.elc"
+	nil
+	jf/silence-loading-log)
+  (global-set-key (kbd "M-r") #'vertico-repeat)
+  (add-hook 'minibuffer-setup-hook #'vertico-repeat-save)
+  (savehist-mode 1)
+
+  (use-package marginalia
+    :straight t
+    :config (setq marginalia-max-relative-age 0) ;; Set absolute value
+    ;; /Note:/ The declaration of `marginalia-mode' must be in the :init
+    ;; section.This ensures that it is enabled right away.  It also forces the
+    ;; loading of the package.
+    :init (marginalia-mode))
 
   (use-package consult
     :straight t
@@ -1091,6 +1066,37 @@ What follows is adjustments to emacs settings as they relate to completion.
     :init
     (setq yas-snippet-dirs '("~/git/dotemacs/snippets"))
     (yas-global-mode 1))
+
+  (use-package tempel
+    :straight (tempel :host github :repo "minad/tempel")
+    :custom (tempel-path "~/git/dotemacs/template")
+    :bind (("M-+" . tempel-complete) ;; Alternative tempel-expand
+	   ("M-*" . tempel-insert))
+
+    :init
+
+    ;; Setup completion at point
+    (defun tempel-setup-capf ()
+      ;; Add the Tempel Capf to `completion-at-point-functions'. `tempel-expand'
+      ;; only triggers on exact matches. Alternatively use `tempel-complete' if
+      ;; you want to see all matches, but then Tempel will probably trigger too
+      ;; often when you don't expect it.
+      ;; NOTE: We add `tempel-expand' *before* the main programming mode Capf,
+      ;; such that it will be tried first.
+      (setq-local completion-at-point-functions
+		  (cons #'tempel-expand
+			completion-at-point-functions)))
+
+    (add-hook 'prog-mode-hook 'tempel-setup-capf)
+    (add-hook 'text-mode-hook 'tempel-setup-capf)
+
+    ;; Optionally make the Tempel templates available to Abbrev,
+    ;; either locally or globally. `expand-abbrev' is bound to C-x '.
+    ;; (add-hook 'prog-mode-hook #'tempel-abbrev-mode)
+    ;; (tempel-global-abbrev-mode)
+    )
+
+  (tempel-key "C-c i" idiomatic org-mode-map)
 #+end_src
 
 *** Navigation
@@ -1169,14 +1175,15 @@ What follows is adjustments to emacs settings as they relate to completion.
 #+begin_src emacs-lisp
   (use-package popper
     :straight t
-    :init
-    (setq popper-reference-buffers
-	  '("\\*Messages\\*"
-	    "Output\\*$"
-	    "\\*Async Shell Command\\*"
-	    help-mode
-	    compilation-mode
-	    "^\\*helpful.*\\*$"))
+    :custom
+    (popper-reference-buffers
+      '("\\*Messages\\*"
+	"Output\\*$"
+	"^\\*Org Select"
+	"\\*Async Shell Command\\*"
+	help-mode
+	compilation-mode
+	"^\\*helpful.*\\*$"))
     (setq popper-window-height (lambda (win)
 				 (fit-window-to-buffer
 				  win
@@ -1191,6 +1198,8 @@ What follows is adjustments to emacs settings as they relate to completion.
     (shackle-rules '((compilation-mode :noselect t))
 		   shackle-default-rule '(:select t)))
 #+end_src
+
+#+RESULTS:
 
 /Note:/ How does this related to ~popper.el~?
 
