@@ -106,15 +106,6 @@ https://tsdh.org/posts/2022-07-20-using-eldoc-with-magit-async.html
 
 ** Logos
 
-For presentation I want to turn off:
-
-- display-line-numbers-mode
-- vi-tilde-fringe-mode
-- git-gutter-mode
-- centaur-tabs-mode
-- =(setq-local org-hide-emphasis-markers t)=
-I also want to set the buffer to read-only.
-
 #+begin_src emacs-lisp
   (use-package logos
     :straight t
@@ -127,11 +118,9 @@ I also want to set the buffer to read-only.
     (let ((map global-map))
       (define-key map [remap narrow-to-region] #'logos-narrow-dwim)
       (define-key map [remap forward-page] #'logos-forward-page-dwim)
-      (define-key map [remap backward-page] #'logos-backward-page-dwim)
-      (define-key map (kbd "<f9>") #'logos-focus-mode))
+      (define-key map [remap backward-page] #'logos-backward-page-dwim))
     ;; This is not the correct map; but it’s close to what I want.
     (let ((map logos-focus-mode-map))
-      (define-key map [remap next-line] #'logos-forward-page-dwim)
       (define-key map [remap next-line] #'logos-forward-page-dwim)
       (define-key map [remap previous-line] #'logos-backward-page-dwim))
     (setq logos-outlines-are-pages t)
@@ -140,7 +129,7 @@ I also want to set the buffer to read-only.
 		  logos-hide-buffer-boundaries t
 		  logos-hide-fringe t
 		  logos-variable-pitch t
-		  logos-buffer-read-only nil
+		  logos-buffer-read-only t
 		  logos-scroll-lock nil
 		  logos-olivetti t
 		  logos-outline-regexp-alist
@@ -158,11 +147,8 @@ I also want to set the buffer to read-only.
 	  (bound-and-true-p outline-minor-mode))
       (outline-show-subtree))))
   (add-hook 'logos-page-motion-hook #'logos--reveal-entry)
-#+end_src
 
-Presentation logic for Logos
-
-#+begin_src emacs-lisp
+    ;;; Presentation mode leveraging logos
   (defvar jf/lp-minor-mode-map (let ((map (make-sparse-keymap)))
 				 (define-key map (kbd "]") #'logos-forward-page-dwim)
 				 (define-key map (kbd "RET") #'logos-forward-page-dwim)
@@ -176,6 +162,7 @@ Presentation logic for Logos
 				 (define-key map (kbd "<up>") #'logos-backward-page-dwim)
 				 (define-key map (kbd "C-p") #'logos-backward-page-dwim)
 				 map))
+
   (jf/minor-mode-maker :title "Logos Presenter"
 		       :abbr "LP"
 		       :keymap jf/lp-minor-mode-map)
@@ -208,45 +195,3 @@ Presentation logic for Logos
     "Hook when `jf/lp-minor-mode' deactivated."
     :type 'hook)
 #+end_src
-
-#+begin_src emacs-lisp
-  (use-package fontaine
-    :straight t
-    :config
-    (setq fontaine-presets
-	'((small
-	   :default-height 110)
-	  (regular
-	   :default-height 155)
-	  (presentation
-	   :default-weight semilight
-	   :default-height 220
-	   :bold-weight extrabold)
-	  (reading
-	   :default-family "ETBembo"
-	   :default-height 180)
-	  (t
-	   ;; I keep all properties for didactic purposes, but most can be
-	   ;; omitted.  See the fontaine manual for the technicalities:
-	   ;; <https://protesilaos.com/emacs/fontaine>.
-	   :default-family "Iosevka Comfy Motion Fixed"
-	   :default-weight regular
-	   :default-height 155
-	   :fixed-pitch-family nil ; falls back to :default-family
-	   :fixed-pitch-weight nil ; falls back to :default-weight
-	   :fixed-pitch-height 1.0
-	   :fixed-pitch-serif-family nil ; falls back to :default-family
-	   :fixed-pitch-serif-weight nil ; falls back to :default-weight
-	   :fixed-pitch-serif-height 1.0
-	   :variable-pitch-family "ETBembo"
-	   :variable-pitch-weight nil
-	   :variable-pitch-height 1.0
-	   :bold-family nil ; use whatever the underlying face has
-	   :bold-weight bold
-	   :italic-family nil
-	   :italic-slant italic
-	   :line-spacing nil))))
-  (fontaine-set-preset 'regular)
-#+end_src
-
-#+RESULTS:
