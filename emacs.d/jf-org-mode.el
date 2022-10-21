@@ -659,5 +659,57 @@ When given PREFIX_ARG, clear the org-roam database (via `org-roam-db-clear-all')
       (org-roam-db-sync)
       (org-roam-update-org-id-locations))))
 
+;; I want a function that I can “send forward a task”
+
+;; Throughout my work week, I’m writing TODO items.  I find myself carrying
+;; them forward from a previous day.  What I would like to do is from a
+;; =:task:= headline:
+;;
+;; - Using =org-id-get-create= drop an identifier on the current task; we’ll save that.
+;; - Create a new task for today and in the source task’s project; same headline, status, and tags.
+;; - Using =org-id-get-create=, create and save the new identifier.
+;; - On the new task:
+;;   - Insert a link to the previous task with text “Carried forward from <DATE>” where date is the date of the previous task.
+;;   - Insert the previous task’s content.
+;;   - Save the buffer
+;;   - Start a clock
+;; - On the previous task:
+;;   - Remove the status tag
+;;   - Replace the now copied content with “Carried forward to <DATE>” where date is the date of the new task.
+;; (cl-defun jf/org-carry-forward-task (from-task to-headline)
+;;   "Carry the FROM-TASK forward to the TO-HEADLINE.
+
+;; The FROM-TASK is an `org-entry'; the TO-HEADLINE is a string that
+;; matches the 3rd-level date headline (e.g. \"CCYY-MM-DD
+;; DayOfWeek\")."
+;;   (interactive (list (jf/org-task-at-point) (jf/org-prompt-for-headline)))
+;;   (jf/org-extract-new-entry from-task)
+;;   (message "%s" from-task))
+
+;; (defun jf/org-extract-new-entry (from-task)
+;;   "The entry is of the form:
+
+;; - Headline
+;; - Metadata
+;; - Content
+
+;; The metadata is property drawers and such."
+;;   (let ((text (buffer-substring-no-properties
+;; 	       (org-element-property :begin from-task)
+;; 	       (org-element-property :end from-task))))
+;;     (org-id-get-create)
+;;     (org-todo "")
+;;     text))
+
+;; (defun jf/org-task-at-point ()
+;;   "Retrieve the task at point, assigning an :ID:."
+;;   (save-excursion
+;;     (org-back-to-heading)
+;;     (org-element-at-point)))
+
+;; (defun jf/org-prompt-for-headline ()
+;;   "Prompt for headline"
+;;   (format-time-string "%Y-%m-%d %A"))
+
 (provide 'jf-org-mode)
 ;;; jf-org-mode.el ends here
