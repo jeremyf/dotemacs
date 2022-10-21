@@ -136,10 +136,12 @@ Oh ~org-mode~, one of the “why you should use Emacs” packages.  It’s a set
 	    ;; properly generated.
 	    ("p" "Project"
 	     entry (file+olp+datetree jf/primary-agenda-filename-for-machine)
-	     "* %(jf/org-mode-agenda-project-prompt) :project:\n\n%?"
+	     "* %(jf/org-mode-agenda-project-prompt) :project:\n\n"
 	     :empty-lines-before 1
+	     :time-prompt t
 	     :immediate-finish t
 	     :empty-lines-after 1)
+	    ("P" "")
 	    ("t" "Task"
 	     ;; I tried this as a node, but that created headaches.  Instead I'm
 	     ;; making the assumption about project/task depth.
@@ -648,14 +650,14 @@ Oh ~org-mode~, one of the “why you should use Emacs” packages.  It’s a set
     (interactive)
     (let ((elem (org-element-context)))
       (when (eq (car elem) 'link)
-	  (let* ((content-begin (org-element-property :contents-begin elem))
-		 (content-end  (org-element-property :contents-end elem))
-		 (link-begin (org-element-property :begin elem))
-		 (link-end (org-element-property :end elem)))
-	    (when (and content-begin content-end)
-		(let ((content (buffer-substring-no-properties content-begin content-end)))
-		  (delete-region link-begin link-end)
-		  (insert (concat content " "))))))))
+	(let* ((content-begin (org-element-property :contents-begin elem))
+	       (content-end  (org-element-property :contents-end elem))
+	       (link-begin (org-element-property :begin elem))
+	       (link-end (org-element-property :end elem)))
+	  (when (and content-begin content-end)
+	    (let ((content (buffer-substring-no-properties content-begin content-end)))
+	      (delete-region link-begin link-end)
+	      (insert (concat content " "))))))))
 
   (defun jf/force-org-rebuild-cache (prefix-arg)
     "Call some functions to rebuild the applicable `org-mode' and `org-roam' cache(s).
@@ -669,6 +671,9 @@ Oh ~org-mode~, one of the “why you should use Emacs” packages.  It’s a set
 	(org-roam-db-sync)
 	(org-roam-update-org-id-locations))))
 #+end_src
+
+#+RESULTS:
+: jf/force-org-rebuild-cache
 
 * COMMENT Org-Roam
 

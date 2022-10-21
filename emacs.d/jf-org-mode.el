@@ -51,34 +51,6 @@
   :custom (org-use-speed-commands t)
   (org-time-stamp-rounding-minutes '(0 15))
   :config
-  ;; From https://oremacs.com/2017/10/04/completion-at-point/
-  (defun jf/org-completion-symbols ()
-    "Look for \"=word=\" and allow completion of things like \"=wo\"."
-    (when (looking-back "=[a-zA-Z]+")
-      (let (cands)
-	(save-match-data
-	  (save-excursion
-	    (goto-char (point-min))
-	    (while (re-search-forward "=\\([a-zA-Z]+\\)=" nil t)
-	      (cl-pushnew
-	       (match-string-no-properties 0) cands :test 'equal))
-	    cands))
-	(when cands
-	  (list (match-beginning 0) (match-end 0) cands)))))
-  (defun jf/org-completion-at-point-functions ()
-    "The `completion-at-point-functions' I envision using for `org-mode'."
-    (setq-local completion-at-point-functions
-		(list (cape-super-capf
-		       #'tempel-expand
-		       #'jf/org-completion-symbols
-		       #'cape-dabbrev
-		       #'cape-file
-		       #'cape-dict
-		       #'cape-ispell
-		       #'cape-keyword
-		       #'cape-history
-		       #'elisp-completion-at-point))))
-  (defun jf/org-confirm-babel-evaluate (lang body) nil)
   (setq org-confirm-babel-evaluate #'jf/org-confirm-babel-evaluate
 	;; I'd prefer to use the executable, but that doe not appear to be the
 	;; implementation of org-babel.
@@ -115,6 +87,12 @@
 	   plain (clock)
 	   "%i%?"
 	   :empty-lines 1)
+	  ("d" "Day with plain entry"
+	   plain (file+olp+datetree jf/primary-agenda-filename-for-machine)
+	   "%i"
+	   :empty-lines 1
+	   :time-prompt t
+	   :immediate-finish t)
 	  ("m" "Merge Request"
 	   plain (file+function jf/primary-agenda-filename-for-machine jf/org-mode-agenda-find-merge-request-node)
 	   "***** IN-PROGRESS %^{URL of Merge Request} :mergerequest:"
@@ -140,57 +118,6 @@
 	   :immediate-finish t
 	   :clock-in t)))
 
-  (bind-key "s-8" 'jf/capture-region-contents-with-metadata)
-  (defun jf/capture-region-contents-with-metadata (start end parg)
-    "Write selected text between START and END to currently clocked `org-mode' entry.
-
-    With PARG kill the content instead."
-    (interactive "r\nP")
-    (let ((text (jf/region-contents-get-with-metadata start end)))
-      (if (car parg)
-	  (kill-new text)
-	(org-capture-string (concat "-----\n" text) "c"))))
-
-  ;; With Heavy inspiration from http://www.howardism.org/Technical/Emacs/capturing-content.html
-  (defun jf/region-contents-get-with-metadata (start end)
-    "Get the region contents between START and END and return an `org-mode' formatted string."
-    (require 'magit)
-    (require 'git-link)
-    (let* ((file-name (buffer-file-name (current-buffer)))
-	   (org-src-mode (replace-regexp-in-string
-			  "-mode"
-			  ""
-			  (format "%s" major-mode)))
-	   (func-name (which-function))
-	   (type (if (derived-mode-p 'prog-mode) "SRC" "EXAMPLE"))
-	   (code-snippet (buffer-substring-no-properties start end))
-	   (file-base (file-name-nondirectory file-name))
-	   (line-number (line-number-at-pos (region-beginning)))
-	   (remote-link (when (magit-list-remotes)
-			  (progn
-			    (call-interactively 'git-link)
-			    (car kill-ring))))
-	   (local-link (if (null func-name)
-			   (format "From [[file:%s::%s][%s]]:"
-				   file-name
-				   line-number
-				   file-base)
-			 (format "From ~%s~ (in [[file:%s::%s][%s]]):"
-				 func-name
-				 file-name
-				 line-number
-				 file-base))))
-      (format (concat "\n#+BEGIN_%s %s"
-		      "\n%s"
-		      "\n#+END_%s\n"
-		      "\n- Local :: %s"
-		      (when remote-link
-			(format "\n- Remote :: [[%s][%s]]" remote-link (or func-name file-name))))
-	      type
-	      org-src-mode
-	      code-snippet
-	      type
-	      local-link)))
 
   (setq org-latex-default-class "jf/article")
 
@@ -253,6 +180,84 @@
 	 ("C-c a" . org-agenda)
 	 ("C-c c" . org-capture)
 	 ("C-s-t" . org-toggle-link-display)))
+
+;; From https://oremacs.com/2017/10/04/completion-at-point/
+(defun jf/org-completion-symbols ()
+  "Look for \"=word=\" and allow completion of things like \"=wo\"."
+  (when (looking-back "=[a-zA-Z]+")
+    (let (cands)
+      (save-match-data
+	(save-excursion
+	  (goto-char (point-min))
+	  (while (re-search-forward "=\\([a-zA-Z]+\\)=" nil t)
+	    (cl-pushnew
+	     (match-string-no-properties 0) cands :test 'equal))
+	  cands))
+      (when cands
+	(list (match-beginning 0) (match-end 0) cands)))))
+(defun jf/org-completion-at-point-functions ()
+  "The `completion-at-point-functions' I envision using for `org-mode'."
+  (setq-local completion-at-point-functions
+	      (list (cape-super-capf
+		     #'tempel-expand
+		     #'jf/org-completion-symbols
+		     #'cape-dabbrev
+		     #'cape-file
+		     #'cape-keyword
+		     #'cape-history
+		     #'elisp-completion-at-point))))
+(defun jf/org-confirm-babel-evaluate (lang body) nil)
+(bind-key "s-8" 'jf/capture-region-contents-with-metadata)
+(defun jf/capture-region-contents-with-metadata (start end parg)
+  "Write selected text between START and END to currently clocked `org-mode' entry.
+
+    With PARG kill the content instead."
+  (interactive "r\nP")
+  (let ((text (jf/region-contents-get-with-metadata start end)))
+    (if (car parg)
+	(kill-new text)
+      (org-capture-string (concat "-----\n" text) "c"))))
+
+;; With Heavy inspiration from http://www.howardism.org/Technical/Emacs/capturing-content.html
+(defun jf/region-contents-get-with-metadata (start end)
+  "Get the region contents between START and END and return an `org-mode' formatted string."
+  (require 'magit)
+  (require 'git-link)
+  (let* ((file-name (buffer-file-name (current-buffer)))
+	 (org-src-mode (replace-regexp-in-string
+			"-mode"
+			""
+			(format "%s" major-mode)))
+	 (func-name (which-function))
+	 (type (if (derived-mode-p 'prog-mode) "SRC" "EXAMPLE"))
+	 (code-snippet (buffer-substring-no-properties start end))
+	 (file-base (file-name-nondirectory file-name))
+	 (line-number (line-number-at-pos (region-beginning)))
+	 (remote-link (when (magit-list-remotes)
+			(progn
+			  (call-interactively 'git-link)
+			  (car kill-ring))))
+	 (local-link (if (null func-name)
+			 (format "From [[file:%s::%s][%s]]:"
+				 file-name
+				 line-number
+				 file-base)
+		       (format "From ~%s~ (in [[file:%s::%s][%s]]):"
+			       func-name
+			       file-name
+			       line-number
+			       file-base))))
+    (format (concat "\n#+BEGIN_%s %s"
+		    "\n%s"
+		    "\n#+END_%s\n"
+		    "\n- Local :: %s"
+		    (when remote-link
+		      (format "\n- Remote :: [[%s][%s]]" remote-link (or func-name file-name))))
+	    type
+	    org-src-mode
+	    code-snippet
+	    type
+	    local-link)))
 
 ;;; Additionally Functionality for Org Mode
 ;; Cribbed from https://xenodium.com/emacs-dwim-do-what-i-mean/
@@ -638,14 +643,14 @@ only the description"
   (interactive)
   (let ((elem (org-element-context)))
     (when (eq (car elem) 'link)
-	(let* ((content-begin (org-element-property :contents-begin elem))
-	       (content-end  (org-element-property :contents-end elem))
-	       (link-begin (org-element-property :begin elem))
-	       (link-end (org-element-property :end elem)))
-	  (when (and content-begin content-end)
-	      (let ((content (buffer-substring-no-properties content-begin content-end)))
-		(delete-region link-begin link-end)
-		(insert (concat content " "))))))))
+      (let* ((content-begin (org-element-property :contents-begin elem))
+	     (content-end  (org-element-property :contents-end elem))
+	     (link-begin (org-element-property :begin elem))
+	     (link-end (org-element-property :end elem)))
+	(when (and content-begin content-end)
+	  (let ((content (buffer-substring-no-properties content-begin content-end)))
+	    (delete-region link-begin link-end)
+	    (insert (concat content " "))))))))
 
 (defun jf/force-org-rebuild-cache (prefix-arg)
   "Call some functions to rebuild the applicable `org-mode' and `org-roam' cache(s).
@@ -701,15 +706,65 @@ When given PREFIX_ARG, clear the org-roam database (via `org-roam-db-clear-all')
 ;;     (org-todo "")
 ;;     text))
 
-;; (defun jf/org-task-at-point ()
-;;   "Retrieve the task at point, assigning an :ID:."
-;;   (save-excursion
-;;     (org-back-to-heading)
-;;     (org-element-at-point)))
-
 ;; (defun jf/org-prompt-for-headline ()
 ;;   "Prompt for headline"
 ;;   (format-time-string "%Y-%m-%d %A"))
 
+(cl-defun jf/org-carry-forward-task ()
+  "Carry the FROM-TASK forward to the TO-HEADLINE.
+
+The FROM-TASK is an `org-entry'; the TO-HEADLINE is a string that
+matches the 3rd-level date headline (e.g. \"CCYY-MM-DD
+DayOfWeek\")."
+  (interactive)
+  (save-excursion
+    (let* ((day-project-task (jf/org-get-day-and-project-and-task-at-point))
+	   (from-day (plist-get day-project-task :day))
+	   (from-project (plist-get day-project-task :project))
+	   (from-task (plist-get day-project-task :task)))
+      (org-capture-string (format "%s %s :%s:\n\n%s %s %s :%s:"
+				  (s-repeat (org-element-property :level from-project) "*")
+				  (org-element-property :title from-project)
+				  (s-join ":" (org-element-property :tags from-project))
+				  (s-repeat (org-element-property :level from-task) "*")
+				  (org-element-property :todo-keyword from-task)
+				  (org-element-property :title from-task)
+				  (s-join ":" (org-element-property :tags from-task)))
+			  "d")
+      (goto-char (org-element-property :begin from-task))
+      (call-interactively 'org-todo))))
+
+(defun jf/org-get-day-and-project-and-task-at-point ()
+  "Return a plist of :day, :project, and :task for element at point."
+  ;; This is not a bullet proof means of finding the current task.  We'll need
+  ;; to work on it.
+  (let* ((task (progn
+		 (org-back-to-heading)
+		 (org-element-at-point)))
+	 (project (progn
+		    (org-up-heading-safe)
+		    (org-element-at-point)))
+	 (day (progn
+		(org-up-heading-safe)
+		    (org-element-at-point))))
+    (list :project project :task task :day )))
+
+;; (defun jf/org-prompt-for-and-create-day-as-headline ()
+;;   "2022-10-21 Friday"
+;;   (let* ((text "2022-10-21 Friday")
+;; 	 (headline (org-element-map
+;; 		       (org-element-parse-buffer)
+;; 		       'headline
+;; 		     (lambda (hl)
+;; 		       (string= text
+;; 				(plist-get
+;; 				 ;; I want the raw title, no styling nor tags
+;; 				 (cadr (car (org-element-lineage hl))) :raw-value)))
+;; 		     nil t)))
+;;     (if headline
+;; 	headline
+;;       (progn
+;; 	(end-of-buffer)
+;; 	(insert (concat "\n\n*** " day-headline))))))
 (provide 'jf-org-mode)
 ;;; jf-org-mode.el ends here
