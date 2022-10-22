@@ -15,14 +15,23 @@
 ;; To enter presentation mode: "M-x jf/lp-minor-mode"
 
 ;;; Code:
+
+(use-package esxml :straight t)
+
+(use-package "nov.el" :straight t
+  :config (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
+  :custom (nov-text-width 80))
+
+(use-package olivetti
+  :straight t
+  :custom
+  (olivetti-body-width 0.6)
+  (olivetti-minimum-body-width 80)
+  (olivetti-recall-visual-line-mode-entry-state t))
+
 (use-package logos
   :straight t
-  :config (use-package olivetti
-	    :straight t
-	    :custom
-	    (olivetti-body-width 0.7)
-	    (olivetti-minimum-body-width 80)
-	    (olivetti-recall-visual-line-mode-entry-state t))
+  :config
   (let ((map global-map))
     (define-key map [remap narrow-to-region] #'logos-narrow-dwim)
     (define-key map [remap forward-page] #'logos-forward-page-dwim)
@@ -58,17 +67,10 @@
 
 ;;; Presentation mode leveraging logos
 (defvar jf/lp-minor-mode-map (let ((map (make-sparse-keymap)))
-			       (define-key map (kbd "]") #'logos-forward-page-dwim)
-			       (define-key map (kbd "RET") #'logos-forward-page-dwim)
-			       (define-key map (kbd "SPC") #'logos-forward-page-dwim)
-			       (define-key map (kbd "<right>") #'logos-forward-page-dwim)
-			       (define-key map (kbd "<down>") #'logos-forward-page-dwim)
-			       (define-key map (kbd "C-n") #'logos-forward-page-dwim)
-			       (define-key map (kbd "[") #'logos-backward-page-dwim)
-			       (define-key map (kbd "DEL") #'logos-backward-page-dwim)
-			       (define-key map (kbd "<left>") #'logos-backward-page-dwim)
-			       (define-key map (kbd "<up>") #'logos-backward-page-dwim)
-			       (define-key map (kbd "C-p") #'logos-backward-page-dwim)
+			       (dolist (key `("]" "RET" "SPC" "<right>" "<down>" "n" "C-n"))
+				       (define-key map (kbd key) #'logos-forward-page-dwim))
+			       (dolist (key `("[" "DEL" "<left>" "<up>" "C-p" "p"))
+				       (define-key map (kbd key) #'logos-backward-page-dwim))
 			       map))
 
 (jf/minor-mode-maker :title "Logos Presenter"
@@ -80,12 +82,13 @@
     (call-interactively 'logos-narrow-dwim)
     (setq-local  org-hide-emphasis-markers t)
     (read-only-mode 1)
-    (display-line-numbers-mode -1)
-    (when (fboundp 'fontaine-set-preset) (fontaine-set-preset 'presentation))
+    (display-line-numbers-mode nil)
+    (org-indent-mode -1)
+    (when (fboundp 'fontaine-set-preset) (fontaine-set-preset 'presenting))
     (when (fboundp 'logos-focus-mode) (logos-focus-mode 1))
     (when (fboundp 'vi-tilde-fringe-mode) (vi-tilde-fringe-mode -1))
     (when (fboundp 'git-gutter-mode) (git-gutter-mode -1))
-    (when (fboundp 'centaur-tabs-mode) (centaur-tabs-mode -1)))
+    (when (fboundp 'centaur-tabs-local-mode) (centaur-tabs-local-mode -1)))
   "Hook when `jf/lp-minor-mode' activated."
   :type 'hook)
 
@@ -96,62 +99,14 @@
     (read-only-mode -1)
     (logos-focus-mode -1)
     (display-line-numbers-mode t)
-    (when (fboundp 'fontaine-set-preset) (fontaine-set-preset 'regular))
+    (org-indent-mode t)
+    (when (fboundp 'fontaine-set-preset) (fontaine-set-preset 'default))
     (when (fboundp 'vi-tilde-fringe-mode) (vi-tilde-fringe-mode t))
     (when (fboundp 'git-gutter-mode) (git-gutter-mode t))
-    (when (fboundp 'centaur-tabs-mode) (centaur-tabs-mode t)))
+    (when (fboundp 'centaur-tabs-local-mode) (centaur-tabs-local-mode t)))
   "Hook when `jf/lp-minor-mode' deactivated."
   :type 'hook)
 
-;;; jf-quick-help.el --- Simple focus mode and extras -*- lexical-binding: t -*-
-
-;; Copyright (C) 2022  Jeremy Friesen
-;; Author: Jeremy Friesen <jeremy@jeremyfriesen.com>
-
-;; This file is NOT part of GNU Emacs.
-;; Package-Requires: ((transient "0.3.7") (emacs "25.1"))
-
-;;; Commentary:
-;;
-;; This package provides a simple way to register quick help function.
-
-;;; Code
-(cl-defun jf/quick-help (&key header body)
-  "Create a help window with HEADER and BODY."
-  (let ((qh-buff (concat "*Quick Help: " header "*")))
-    (progn (or (get-buffer qh-buff)
-	       (progn (get-buffer-create qh-buff)
-		      (with-current-buffer qh-buff
-			(insert (concat "**" header "**\n" body))
-			(goto-char (point-min))
-			(not-modified)
-			(read-only-mode)
-			(special-mode)
-			(local-set-key (kbd "q") 'kill-buffer-and-window))))
-	   (pop-to-buffer qh-buff '((display-buffer-below-selected)
-				    ;; When sizing the buffer, if tab-line-format is
-				    ;; active then that "line" is not counted in
-				    ;; calculating the fit-to-window-buffer value.
-				    ;; Which means that the buffer flows into the
-				    ;; mode-line.  So turn it off for this buffer.
-				    (window-parameters . ((tab-line-format . none)
-							  (no-other-window . nil)))
-				    (window-height . fit-window-to-buffer)))
-	   (message "q - Remove Window"))))
-
-(cl-defmacro jf/transient-quick-help (name &key header label body)
-  "Macro for creating callable functions that display help.
-
-      NAME is name of function,
-      LABEL is label for the menu
-      HEADER is name of buffer, and TEXT is displayed."
-  (declare (indent defun))
-  `(progn
-     (transient-define-suffix ,name nil
-       ,header
-       :description ,label
-       (interactive)
-       (jf/quick-help :header ,header :body ,body))))
 
 (provide 'jf-presentation-and-focus)
 ;;; jf-presentation-and-focus.el ends here

@@ -231,20 +231,25 @@
 			""
 			(format "%s" major-mode)))
 	 (func-name (which-function))
-	 (type (if (derived-mode-p 'prog-mode) "SRC" "EXAMPLE"))
+	 (type (cond
+		((eq major-mode 'nov-mode) "QUOTE")
+		((derived-mode-p 'prog-mode) "SRC")
+		(t "SRC" "EXAMPLE")))
 	 (code-snippet (buffer-substring-no-properties start end))
-	 (file-base (file-name-nondirectory file-name))
+	 (file-base (if file-name
+			(file-name-nondirectory file-name)
+		      (format "%s" (current-buffer))))
 	 (line-number (line-number-at-pos (region-beginning)))
 	 (remote-link (when (magit-list-remotes)
 			(progn
 			  (call-interactively 'git-link)
 			  (car kill-ring))))
 	 (local-link (if (null func-name)
-			 (format "From [[file:%s::%s][%s]]:"
+			 (format "From [[file:%s::%s][%s]]"
 				 file-name
 				 line-number
 				 file-base)
-		       (format "From ~%s~ (in [[file:%s::%s][%s]]):"
+		       (format "From ~%s~ (in [[file:%s::%s][%s]])"
 			       func-name
 			       file-name
 			       line-number
@@ -253,7 +258,7 @@
 		    "\n%s"
 		    "\n#+END_%s\n"
 		    "\n- Local :: %s"
-		    (when remote-link
+		    (when (and remote-link file-name)
 		      (format "\n- Remote :: [[%s][%s]]" remote-link (or func-name file-name))))
 	    type
 	    org-src-mode
@@ -748,7 +753,7 @@ DayOfWeek\")."
 		    (org-element-at-point)))
 	 (day (progn
 		(org-up-heading-safe)
-		    (org-element-at-point))))
+		(org-element-at-point))))
     (list :project project :task task :day )))
 
 (provide 'jf-org-mode)

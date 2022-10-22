@@ -319,37 +319,40 @@ I want to start with a basic look and feel.  First, the choice of primary font.
     :straight t
     :config
     (setq fontaine-presets
-	  '((small
-	     :default-height 110)
-	    (regular
-	     :default-height 155)
-	    (presentation
-	     :default-weight semilight
-	     :default-height 220
-	     :bold-weight extrabold)
-	    (reading
-	     :default-family "ETBembo"
-	     :default-height 180)
-	    (t
-	     ;; Following Prot’s example, keeping these for for didactic purposes.
-	     :default-family "Iosevka Comfy Motion Fixed"
-	     :default-weight regular
-	     :default-height 155
-	     :fixed-pitch-family nil ; falls back to :default-family
-	     :fixed-pitch-weight nil ; falls back to :default-weight
-	     :fixed-pitch-height 1.0
-	     :fixed-pitch-serif-family nil ; falls back to :default-family
-	     :fixed-pitch-serif-weight nil ; falls back to :default-weight
-	     :fixed-pitch-serif-height 1.0
-	     :variable-pitch-family "ETBembo"
-	     :variable-pitch-weight nil
-	     :variable-pitch-height 1.0
-	     :bold-family nil ; use whatever the underlying face has
-	     :bold-weight bold
-	     :italic-family nil
-	     :italic-slant italic
-	     :line-spacing nil))))
-  (fontaine-set-preset 'regular)
+          '((small
+             :default-height 110)
+            (default
+             :default-height 155)
+            (coding
+             :default-height 155)
+            (presenting
+             :default-weight semilight
+             :default-height 220
+             :bold-weight extrabold)
+            (reading
+             :default-weight semilight
+             :default-height 220
+             :bold-weight extrabold)
+            (t
+             ;; Following Prot’s example, keeping these for for didactic purposes.
+             :default-family "Iosevka Comfy Motion Fixed"
+             :default-weight regular
+             :default-height 155
+             :fixed-pitch-family nil ; falls back to :default-family
+             :fixed-pitch-weight nil ; falls back to :default-weight
+             :fixed-pitch-height 1.0
+             :fixed-pitch-serif-family nil ; falls back to :default-family
+             :fixed-pitch-serif-weight nil ; falls back to :default-weight
+             :fixed-pitch-serif-height 1.0
+             :variable-pitch-family "ETBembo"
+             :variable-pitch-weight nil
+             :variable-pitch-height 1.0
+             :bold-family nil ; use whatever the underlying face has
+             :bold-weight bold
+             :italic-family nil
+             :italic-slant italic
+             :line-spacing nil))))
+  (fontaine-set-preset 'default)
 
   ;; And now the theme.  I’ve chosen the modus themes (e.g. ~modus-vivendi~ and
   ;; ~modus-operandi~).  They provide a light and dark theme with a focus on visual
@@ -1942,13 +1945,7 @@ These are a few variables and cosntants that I use throughout my configuration.
   (use-package doc-view
     :straight (doc-view :type built-in)
     :bind (:map doc-view-mode-map
-		("C-c g" . doc-view-goto-page)))
-
-  (use-package esxml :straight t)
-
-  (use-package "nov.el" :straight t
-    :config (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
-    :custom (nov-text-width 80))
+                ("C-c g" . doc-view-goto-page)))
 #+end_src
 
 *** Mastodon
