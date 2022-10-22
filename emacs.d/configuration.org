@@ -950,40 +950,7 @@ What follows is adjustments to emacs settings as they relate to completion.
     ;; considerably laggy when there are many candidates. Instead, I rely on
     ;; manual toggling via `corfu-doc-toggle'.
     (corfu-doc-mode))
-#+end_src
 
-**** wgrep.el
-
-- ~wgrep.el~ ::
-
-
-   I use this sequence at least once a day.
-
-#+begin_src emacs-lisp
-  ;; “Edit a grep buffer and apply those changes to the file buffer.”  In other
-  ;; words, after “searching” for something, sending the results to a buffer
-  ;; (via `embark-export' or such thing), you can edit that search results
-  ;; buffer and propogate the changes to the locations of the elements that
-  ;; matched the search.
-  ;;
-  ;;   1.  Call `consult-ripgrep' (via ~C-c f~) to search for something.
-  ;;   2.  Call `embark-export' (via ~C-s-e~) to export to a grep buffer.
-  ;;   3.  Call `wgrep-change-to-wgrep-mode' (via ~e~ or ~C-c C-p~)
-  ;;   4.  Edit the grep buffer as you would anywhere else.
-  ;;   5.  Save (via ~C-x C-s~) or Cancel (via ~C-c C-k~).
-  (use-package wgrep
-    :after (embark-consult ripgrep)
-    :straight t
-    :bind (:map wgrep-mode-map
-		;; Added keybinding to echo Magit behavior
-		("C-c C-c" . wgrep-finish-edit)
-		:map grep-mode-map
-		("e" . wgrep-change-to-wgrep-mode)
-		:map ripgrep-search-mode-map
-		("e" . wgrep-change-to-wgrep-mode)))
-#+end_src
-
-#+begin_src emacs-lisp
   ;; The https://github.com/minad/orderless package provides completion tooling
   ;; for non-strict word order.  I spent considerable time reading through the
   ;; https://github.com/minad/consult/wiki
@@ -1057,14 +1024,7 @@ What follows is adjustments to emacs settings as they relate to completion.
 					  (symbol (styles +orderless-with-initialism)))
 	  orderless-component-separator #'orderless-escapable-split-on-space ;; allow escaping space with backslash!
 	  orderless-style-dispatchers '(+orderless-dispatch)))
-#+end_src
 
-**** cape.el
-
-- ~cape.el~ :: provides several Completion At Point Extensions (Capfs).  I like
-  having a Capf for spelling and files.
-
-#+begin_src emacs-lisp
   (use-package cape
     :straight t
     :init (add-to-list 'completion-at-point-functions #'cape-dabbrev)
@@ -1073,12 +1033,37 @@ What follows is adjustments to emacs settings as they relate to completion.
 	   ("C-c p f" . cape-file)
 	   ("C-c p s" . cape-symbol)
 	   ("C-c p i" . cape-ispell)))
+#+end_src
+
+**** wgrep.el
+
+- ~wgrep.el~ ::
 
 
-  ;; Use Company backends as Capfs.
-  ;; (setq-local completion-at-point-functions
-  ;; 	    (mapcar #'cape-company-to-capf
-  ;; 		    (list #'company-files #'company-ispell #'company-dabbrev)))
+   I use this sequence at least once a day.
+
+#+begin_src emacs-lisp
+  ;; “Edit a grep buffer and apply those changes to the file buffer.”  In other
+  ;; words, after “searching” for something, sending the results to a buffer
+  ;; (via `embark-export' or such thing), you can edit that search results
+  ;; buffer and propogate the changes to the locations of the elements that
+  ;; matched the search.
+  ;;
+  ;;   1.  Call `consult-ripgrep' (via ~C-c f~) to search for something.
+  ;;   2.  Call `embark-export' (via ~C-s-e~) to export to a grep buffer.
+  ;;   3.  Call `wgrep-change-to-wgrep-mode' (via ~e~ or ~C-c C-p~)
+  ;;   4.  Edit the grep buffer as you would anywhere else.
+  ;;   5.  Save (via ~C-x C-s~) or Cancel (via ~C-c C-k~).
+  (use-package wgrep
+    :after (embark-consult ripgrep)
+    :straight t
+    :bind (:map wgrep-mode-map
+		;; Added keybinding to echo Magit behavior
+		("C-c C-c" . wgrep-finish-edit)
+		:map grep-mode-map
+		("e" . wgrep-change-to-wgrep-mode)
+		:map ripgrep-search-mode-map
+		("e" . wgrep-change-to-wgrep-mode)))
 #+end_src
 
 **** yasnippet.el
@@ -1364,28 +1349,10 @@ are major modes others are minor modes.
 				   ("M-h" . enh-ruby-mark-defun))
     :mode (("\\(?:\\.rb\\|ru\\|rake\\|thor\\|jbuilder\\|gemspec\\|podspec\\|/\\(?:Gem\\|Rake\\|Cap\\|Thor\\|Vagrant\\|Guard\\|Pod\\)file\\)\\'" . enh-ruby-mode)))
   (add-to-list 'interpreter-mode-alist '("ruby" . enh-ruby-mode))
-#+end_src
 
-**** go-mode.el
-
-Every so often I stumble upon a Go package.  The ~go-mode~ package gives me the
-syntax highlighting that makes reading ~Go-lang~ tolerable.
-
-#+begin_src emacs-lisp
   (use-package go-mode :straight t)
-#+end_src
-
-**** json-mode.el
-
-- ~json.el~ :: In modern web-development, JSON is nigh unavoidable.
-
-#+begin_src emacs-lisp
   (use-package json-mode :straight t)
-#+end_src
 
-**** json-reformat.el
-
-#+begin_src emacs-lisp
   ;; Because JSON can be quite ugly, I want something to help tidy it up.
   (use-package json-reformat
     :straight t

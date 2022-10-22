@@ -749,22 +749,5 @@ DayOfWeek\")."
 		    (org-element-at-point))))
     (list :project project :task task :day )))
 
-;; (defun jf/org-prompt-for-and-create-day-as-headline ()
-;;   "2022-10-21 Friday"
-;;   (let* ((text "2022-10-21 Friday")
-;; 	 (headline (org-element-map
-;; 		       (org-element-parse-buffer)
-;; 		       'headline
-;; 		     (lambda (hl)
-;; 		       (string= text
-;; 				(plist-get
-;; 				 ;; I want the raw title, no styling nor tags
-;; 				 (cadr (car (org-element-lineage hl))) :raw-value)))
-;; 		     nil t)))
-;;     (if headline
-;; 	headline
-;;       (progn
-;; 	(end-of-buffer)
-;; 	(insert (concat "\n\n*** " day-headline))))))
 (provide 'jf-org-mode)
 ;;; jf-org-mode.el ends here
