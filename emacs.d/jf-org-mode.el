@@ -18,13 +18,14 @@
 
 (defvar jf/primary-agenda-filename-for-machine
   (if (is-work-machine?)
-      "~/git/org/scientist/agenda.org"
+      "~/git/org/denote/scientist/20221021T221357--scientist-agenda__scientist.org"
     "~/git/org/agenda.org"))
 
 (defconst jf/data-directories
   (list
    jf/tor-home-directory
    "~/git/org/scientist/"
+   "~/git/org/denote/scientist"
    "~/git/dotzshrc/"
    "~/git/dotemacs/"
    "~/git/org/")

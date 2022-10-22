@@ -18,6 +18,7 @@ Why the return?  For the amazing =centaur-tabs-switch-group=.
     :commands (centaur-tabs-group-buffer-groups)
     :hook (dired-mode . centaur-tabs-local-mode)
     (helpful-mode . centaur-tabs-local-mode)
+    (denote-backlinks-mode . centaur-tabs-local-mode)
     (org-agenda-mode . centaur-tabs-local-mode)
     :config
     (setq
