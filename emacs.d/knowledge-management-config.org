@@ -24,11 +24,11 @@ Oh ~org-mode~, one of the “why you should use Emacs” packages.  It’s a set
   ;; sources for `org-mode' agenda.
   (defun is-work-machine? ()
     "Am I working on my machine"
-    (file-exists-p (file-truename "~/git/org/scientist/.keep")))
+    (f-dir-p (file-truename "~/git/org/denote/scientist/")))
 
   (defvar jf/primary-agenda-filename-for-machine
     (if (is-work-machine?)
-	"~/git/org/scientist/agenda.org"
+	"~/git/org/denote/scientist/20221021T221357--scientist-agenda__scientist.org"
       "~/git/org/agenda.org"))
 
   (defconst jf/data-directories

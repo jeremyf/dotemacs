@@ -14,7 +14,7 @@
 ;; sources for `org-mode' agenda.
 (defun is-work-machine? ()
   "Am I working on my machine"
-  (file-exists-p (file-truename "~/git/org/scientist/.keep")))
+  (f-dir? (file-truename "~/git/org/denote/scientist/")))
 
 (defvar jf/primary-agenda-filename-for-machine
   (if (is-work-machine?)
@@ -47,6 +47,7 @@
   :straight (org :type built-in)
   :hook (org-mode . turn-on-visual-line-mode)
   (org-mode . jf/org-completion-at-point-functions)
+  (org-mode . org-indent-mode)
   :bind ("C-j" . jf/jump-to-agenda-or-mark)
   :bind (:map org-mode-map ("C-j" . jf/jump-to-agenda-or-mark))
   :custom (org-use-speed-commands t)

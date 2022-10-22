@@ -1967,9 +1967,9 @@ These are a few variables and cosntants that I use throughout my configuration.
 I use org-mode and org-roam to help manage content.  Let’s load that rather extensive configuration.
 
 #+begin_src emacs-lisp
-  (org-babel-load-file
-   (concat user-emacs-directory "knowledge-management-config.org"))
-
+  ;; (org-babel-load-file
+  ;;  (concat user-emacs-directory "knowledge-management-config.org"))
+  (require 'jf-org-mode)
   (org-babel-load-file
    (concat user-emacs-directory "denote-emacs-configuration.org"))
 #+end_src
