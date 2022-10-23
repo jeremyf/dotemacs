@@ -17,6 +17,7 @@
  '(org-export-backends '(ascii html icalendar latex md odt))
  '(safe-local-variable-values
    '((projectile-require-project-root)
+     (projectile-git-command . "git ls-files -zco --exclude-from=.projectile.gitignore")
      (org-insert-tilde-language . enh-ruby)
      (org-insert-tilde-language . emacs-lisp)
      (jf/forem-minor-mode . 1)
