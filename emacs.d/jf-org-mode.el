@@ -1,4 +1,4 @@
-;;; jf-org-mode.el --- Simple focus mode and extras -*- lexical-binding: t -*-
+;;; jf-org-mode.el --- Org-Mode configuratoino -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2022  Jeremy Friesen
 ;; Author: Jeremy Friesen <jeremy@jeremyfriesen.com>
@@ -7,7 +7,7 @@
 ;;; Commentary
 
 ;;; Code
-;;; Pre-amble to prepare for `org-mode'
+;; Pre-amble to prepare for `org-mode'
 
 ;; I maintain a list of data directories, each might have “relevant to
 ;; org-mode” files.  The `jf/org-agenda-files' reads the file system to gather
@@ -36,7 +36,7 @@
 			       (basenames '("agenda.org")))
   "Return the list of filenames where BASENAMES exists in PATHS."
   ;; I want to include my configuration file in my agenda querying.
-  (setq returning-list '("~/git/dotemacs/emacs.d/configuration.org"))
+  (setq returning-list '("~/git/dotemacs/emacs.d/configuration.org" "~/git/org/denote/scientist/20221021T221357--scientist-agenda__scientist.org"))
   (dolist (path paths)
     (dolist (basename basenames)
       (when (f-exists-p (f-join path basename))
@@ -542,12 +542,12 @@ When given the PREFIX arg, paste the content into TextEdit (for future copy)."
 	)))
   )
 
-(define-key org-mode-map (kbd "~") #'org-insert-backtick)
-(defun org-insert-backtick ()
-  "Insert a backtick using `org-self-insert-command'."
-  (interactive)
-  (setq last-command-event ?`)
-  (call-interactively #'org-self-insert-command))
+;; (define-key org-mode-map (kbd "~") #'org-insert-backtick)
+;; (defun org-insert-backtick ()
+;;   "Insert a backtick using `org-self-insert-command'."
+;;   (interactive)
+;;   (setq last-command-event ?`)
+;;   (call-interactively #'org-self-insert-command))
 
 (defvar-local org-insert-tilde-language nil
   "Default language name in the current Org file.

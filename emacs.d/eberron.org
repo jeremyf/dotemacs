@@ -5,17 +5,11 @@
 #+STARTUP: showall
 #+OPTIONS: toc:3
 
-The functions of this file build on functions from [[file:configuration.org][Configuration]].
-
 #+begin_src emacs-lisp
   (jf/minor-mode-maker :title "Eberron"
-		       :abbr "eb"
-		       :hooks (list 'org-mode-hook 'markdown-mode-hook))
-#+end_src
+                       :abbr "eb"
+                       :hooks (list 'org-mode-hook 'markdown-mode-hook))
 
-* Quick Help Functions
-
-#+begin_src emacs-lisp
   (jf/transient-quick-help jf/eberron-qh-dragonmarks
     :label "Dragonmarks"
     :header "Eberron Dragonmarks, Houses, and Stock"
@@ -83,14 +77,7 @@ The functions of this file build on functions from [[file:configuration.org][Con
        "| Dark Six     | Mockery, the      | Betray, Bloodshed |"
        "| Dark Six     | Shadow, the       | Magic, Mayhem     |"
        "| Dark Six     | Traveler, the     | Chaos, Change     |")))
-#+end_src
 
-* Menu
-
-The following menu is for quick help while playing Burning Wheel games.  I
-previously defined the suffixes.
-
-#+begin_src emacs-lisp
   (transient-define-prefix jf/menu--eberron ()
     "Define the Eberron help prefix."
     ["Eberron"

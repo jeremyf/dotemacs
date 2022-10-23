@@ -12,7 +12,7 @@ By now, with all that I’ve written, it should be evident that knowledge manage
 
 Another “killer feature” of Emacs is org-mode and it’s constellation of packages.
 
-* Org-Mode
+* COMMENT Org-Mode
 
 Oh ~org-mode~, one of the “why you should use Emacs” packages.  It’s a set of organizational tools that allow for progressive adoption.  You can start writing in ~org-mode~ syntax and leave it at that.  From there you can delve further into the ~org-mode~ ecosystem.
 

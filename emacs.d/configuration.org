@@ -108,15 +108,15 @@ As we get started in Emacs, I want to make sure I have the basics lined up.
   ;; they do.
   (defvar bootstrap-version)
   (let ((bootstrap-file
-	 (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-	(bootstrap-version 5))
+         (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+        (bootstrap-version 5))
     (unless (file-exists-p bootstrap-file)
       (with-current-buffer
-	  (url-retrieve-synchronously
-	   "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
-	   'silent 'inhibit-cookies)
-	(goto-char (point-max))
-	(eval-print-last-sexp)))
+          (url-retrieve-synchronously
+           "https://raw.githubusercontent.com/raxod502/straight.el/develop/install.el"
+           'silent 'inhibit-cookies)
+        (goto-char (point-max))
+        (eval-print-last-sexp)))
     (load bootstrap-file))
 
   (setq straight-repository-branch "develop")
@@ -128,20 +128,20 @@ As we get started in Emacs, I want to make sure I have the basics lined up.
     :config
     (exec-path-from-shell-initialize)
     (if (and (fboundp 'native-comp-available-p)
-	     (native-comp-available-p))
-	(progn
-	  (message "Native comp is available")
-	  ;; Using Emacs.app/Contents/MacOS/bin since it was compiled with
-	  ;; ./configure --prefix="$PWD/nextstep/Emacs.app/Contents/MacOS"
-	  (add-to-list 'exec-path (concat invocation-directory "bin") t)
-	  (setenv "LIBRARY_PATH" (concat (getenv "LIBRARY_PATH")
-					 (when (getenv "LIBRARY_PATH")
-					   ":")
-					 ;; This is where Homebrew puts gcc libraries.
-					 (car (file-expand-wildcards
-					       "/opt/homebrew/lib/gcc/*"))))
-	  ;; Only set after LIBRARY_PATH can find gcc libraries.
-	  (setq comp-deferred-compilation t))
+             (native-comp-available-p))
+        (progn
+          (message "Native comp is available")
+          ;; Using Emacs.app/Contents/MacOS/bin since it was compiled with
+          ;; ./configure --prefix="$PWD/nextstep/Emacs.app/Contents/MacOS"
+          (add-to-list 'exec-path (concat invocation-directory "bin") t)
+          (setenv "LIBRARY_PATH" (concat (getenv "LIBRARY_PATH")
+                                         (when (getenv "LIBRARY_PATH")
+                                           ":")
+                                         ;; This is where Homebrew puts gcc libraries.
+                                         (car (file-expand-wildcards
+                                               "/opt/homebrew/lib/gcc/*"))))
+          ;; Only set after LIBRARY_PATH can find gcc libraries.
+          (setq comp-deferred-compilation t))
       (message "Native comp is *not* available")))
 
   ;; These are some general configurations that I’ve slowly accumulated.  There’s
@@ -150,7 +150,7 @@ As we get started in Emacs, I want to make sure I have the basics lined up.
   ;; later.
 
   (setq user-full-name "Jeremy Friesen"
-	user-mail-address "jeremy@jeremyfriesen.com")
+        user-mail-address "jeremy@jeremyfriesen.com")
 
   (defconst jf/silence-loading-log t
     "When t log to stdout load messages from this configuration.
@@ -239,6 +239,7 @@ As we get started in Emacs, I want to make sure I have the basics lined up.
 
   (global-hl-line-mode)
 
+  (pixel-scroll-mode)
   ;; When you open Emacs, grab all the space on the screen
   (add-to-list 'initial-frame-alist '(fullscreen . maximized))
 
@@ -252,9 +253,9 @@ As we get started in Emacs, I want to make sure I have the basics lined up.
   (set-keyboard-coding-system 'utf-8)
 
   (add-function :after after-focus-change-function
-		(defun jf/garbage-collect-maybe ()
-		  (unless (frame-focus-state)
-		    (garbage-collect))))
+                (defun jf/garbage-collect-maybe ()
+                  (unless (frame-focus-state)
+                    (garbage-collect))))
 
   ;; And I’m going to disable a few key bindings.  These were always messing me
   ;; up a bit.  Also enable a few that I find helpful.  (I’ll enable a lot more
@@ -284,7 +285,7 @@ As we get started in Emacs, I want to make sure I have the basics lined up.
     :diminish 'gcmh-mode
     :init
     (setq gcmh-idle-delay 5
-	  gcmh-high-cons-threshold (* 16 1024 1024))  ; 16mb
+          gcmh-high-cons-threshold (* 16 1024 1024))  ; 16mb
     :config (gcmh-mode))
   ;;; END Core Configuration
 
@@ -295,17 +296,17 @@ As we get started in Emacs, I want to make sure I have the basics lined up.
   Use ABBR to derive the mode-name lighter.
   Add hook to each HOOKS provided."
     (let ((mode-name (intern (s-downcase (concat "jf/" abbr "-minor-mode"))))
-	  (lighter (concat " " abbr))
-	  (docstring (concat "Minor mode for " title ".")))
+          (lighter (concat " " abbr))
+          (docstring (concat "Minor mode for " title ".")))
       `(progn
-	 (define-minor-mode ,mode-name
-	   ,docstring
-	   :init-value nil
-	   :global nil
-	   :keymap ,keymap
-	   :lighter ,lighter)
-	 (when ,hooks
-	   (-each ,hooks (lambda(hook) (add-hook hook (lambda () (,mode-name)))))))))
+         (define-minor-mode ,mode-name
+           ,docstring
+           :init-value nil
+           :global nil
+           :keymap ,keymap
+           :lighter ,lighter)
+         (when ,hooks
+           (-each ,hooks (lambda(hook) (add-hook hook (lambda () (,mode-name)))))))))
 #+end_src
 
 
@@ -616,7 +617,7 @@ What follows is adjustments to emacs settings as they relate to completion.
     ;; Emacs 28: Hide commands in M-x which do not apply to the current mode.
     ;; Corfu commands are hidden, since they are not supposed to be used via M-x.
     (setq read-extended-command-predicate
-	  #'command-completion-default-include-p)
+          #'command-completion-default-include-p)
 
     ;; TAB cycle if there are only few candidates
     (setq completion-cycle-threshold 3)
@@ -630,19 +631,19 @@ What follows is adjustments to emacs settings as they relate to completion.
     ;; With adjustments from https://git.sr.ht/~protesilaos/dotfiles/tree/master/item/emacs/.emacs.d/prot-emacs-modules/prot-emacs-completion.el
     (defun crm-indicator (args)
       (cons (format "[%s %s] %s"
-		    (propertize "CRM" 'face 'error)
-		    (propertize
-		     (replace-regexp-in-string
-		      "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
-		      crm-separator)
-		     'face 'success)
-		    (car args))
-	    (cdr args)))
+                    (propertize "CRM" 'face 'error)
+                    (propertize
+                     (replace-regexp-in-string
+                      "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
+                      crm-separator)
+                     'face 'success)
+                    (car args))
+            (cdr args)))
     (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
 
     ;; Do not allow the cursor in the minibuffer prompt
     (setq minibuffer-prompt-properties
-	  '(read-only t cursor-intangible t face minibuffer-prompt))
+          '(read-only t cursor-intangible t face minibuffer-prompt))
     (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode))
 
   (use-package vertico
@@ -652,24 +653,24 @@ What follows is adjustments to emacs settings as they relate to completion.
     ;; Use `consult-completion-in-region' if Vertico is enabled.
     ;; Otherwise use the default `completion--in-region' function.
     (setq completion-in-region-function
-	  (lambda (&rest args)
-	    (apply (if vertico-mode
-		       #'consult-completion-in-region
-		     #'completion--in-region)
-		   args)))
+          (lambda (&rest args)
+            (apply (if vertico-mode
+                       #'consult-completion-in-region
+                     #'completion--in-region)
+                   args)))
     (setq read-file-name-completion-ignore-case t
-	  read-buffer-completion-ignore-case t
-	  completion-ignore-case t)
+          read-buffer-completion-ignore-case t
+          completion-ignore-case t)
     (setq vertico-cycle t))
 
   (load "~/.emacs.d/straight/build/vertico/extensions/vertico-indexed.elc"
-	nil
-	jf/silence-loading-log)
+        nil
+        jf/silence-loading-log)
   (vertico-indexed-mode)
 
   (load "~/.emacs.d/straight/build/vertico/extensions/vertico-repeat.elc"
-	nil
-	jf/silence-loading-log)
+        nil
+        jf/silence-loading-log)
   (global-set-key (kbd "M-r") #'vertico-repeat)
   (add-hook 'minibuffer-setup-hook #'vertico-repeat-save)
   (savehist-mode 1)
@@ -686,72 +687,68 @@ What follows is adjustments to emacs settings as they relate to completion.
     :straight t
     ;; Replace bindings. Lazily loaded due by `use-package'.
     :bind (;; C-c bindings (mode-specific-map)
-	   ("C-c h" . consult-history)
-	   ;; ("C-c m" . consult-mode-command)
-	   ("C-c b" . consult-bookmark)
-	   ("C-c k" . consult-kmacro)
-	   ;; C-x bindings (ctl-x-map)
-	   ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complet-command
-	   ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
-	   ("s-b" . consult-buffer)                ;; orig. switch-to-buffer
-	   ("s-r" . consult-buffer)                ;; orig. switch-to-buffer
-	   ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
-	   ("C-s-b" . consult-buffer-other-window)
-	   ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
-	   ;; Custom M-# bindings for fast register access
-	   ("M-#" . consult-register-load)
-	   ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
-	   ("M-`" . consult-register)
-	   ;; Other custom bindings
-	   ("M-y" . consult-yank-from-kill-ring)                ;; orig. yank-pop
-	   ("<help> a" . consult-apropos)            ;; orig. apropos-command
-	   ;; M-g bindings (goto-map)
-	   ("M-g e" . consult-compile-error)
-	   ("M-g g" . consult-goto-line)             ;; orig. goto-line
-	   ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
-	   ("s-l" . consult-goto-line)           ;; orig. goto-line
-	   ("M-g o" . consult-outline)
-	   ("M-g m" . consult-mark)
-	   ("M-g k" . consult-global-mark)
-	   ("C-x C-SPC" . consult-global-mark)
-	   ("M-g i" . consult-imenu)
-	   ("s-2" . consult-imenu)
-	   ("M-g I" . consult-imenu-multi)
-	   ;; M-s bindings (search-map)
-	   ("M-s f" . consult-find)
-	   ("M-s L" . consult-locate)
-	   ("M-s g" . consult-grep)
-	   ("M-s G" . consult-git-grep)
-	   ("M-s r" . consult-ripgrep)
-	   ("C-c f" . consult-ripgrep)
-	   ("M-s l" . consult-line)
-	   ("M-s m" . consult-multi-occur)
-	   ("M-s k" . consult-keep-lines)
-	   ("M-s u" . consult-focus-lines)
-	   ;; Customizations that map to ivy
-	   ("C-c r" . consult-recent-file)
-	   ;; ("C-c o" . consult-file-externally)
-	   ("C-y" . yank)
-	   ("C-s" . consult-line) ;; I've long favored Swiper mapped to c-s
-	   ;; Isearch integration
-	   ("M-s e" . consult-isearch)
-	   :map isearch-mode-map
-	   ("M-e" . consult-isearch)                 ;; orig. isearch-edit-string
-	   ("M-s e" . consult-isearch)               ;; orig. isearch-edit-string
-	   ("M-s l" . consult-line))                 ;; required by consult-line to detect isearch
+           ("C-c h" . consult-history)
+           ;; ("C-c m" . consult-mode-command)
+           ("C-c b" . consult-bookmark)
+           ("C-c k" . consult-kmacro)
+           ;; C-x bindings (ctl-x-map)
+           ("C-x M-:" . consult-complex-command)     ;; orig. repeat-complet-command
+           ("C-x b" . consult-buffer)                ;; orig. switch-to-buffer
+           ("s-b" . consult-buffer)                ;; orig. switch-to-buffer
+           ("s-r" . consult-buffer)                ;; orig. switch-to-buffer
+           ("C-x 4 b" . consult-buffer-other-window) ;; orig. switch-to-buffer-other-window
+           ("C-s-b" . consult-buffer-other-window)
+           ("C-x 5 b" . consult-buffer-other-frame)  ;; orig. switch-to-buffer-other-frame
+           ;; Custom M-# bindings for fast register access
+           ("M-#" . consult-register-load)
+           ("M-'" . consult-register-store)          ;; orig. abbrev-prefix-mark (unrelated)
+           ("M-`" . consult-register)
+           ;; Other custom bindings
+           ("M-y" . consult-yank-from-kill-ring)                ;; orig. yank-pop
+           ("<help> a" . consult-apropos)            ;; orig. apropos-command
+           ;; M-g bindings (goto-map)
+           ("M-g e" . consult-compile-error)
+           ("M-g g" . consult-goto-line)             ;; orig. goto-line
+           ("M-g M-g" . consult-goto-line)           ;; orig. goto-line
+           ("s-l" . consult-goto-line)           ;; orig. goto-line
+           ("M-g o" . consult-outline)
+           ("M-g m" . consult-mark)
+           ("M-g k" . consult-global-mark)
+           ("C-x C-SPC" . consult-global-mark)
+           ("M-g i" . consult-imenu)
+           ("s-2" . consult-imenu)
+           ("M-g I" . consult-imenu-multi)
+           ;; M-s bindings (search-map)
+           ("M-s f" . consult-find)
+           ("M-s L" . consult-locate)
+           ("M-s g" . consult-grep)
+           ("M-s G" . consult-git-grep)
+           ("M-s r" . consult-ripgrep)
+           ("C-c f" . consult-ripgrep)
+           ("M-s l" . consult-line)
+           ("M-s m" . consult-multi-occur)
+           ("M-s k" . consult-keep-lines)
+           ("M-s u" . consult-focus-lines)
+           ;; Customizations that map to ivy
+           ("C-c r" . consult-recent-file)
+           ;; ("C-c o" . consult-file-externally)
+           ("C-y" . yank)
+           ("C-s" . consult-line) ;; I've long favored Swiper mapped to c-s
+           ;; Isearch integration
+           ("M-s e" . consult-isearch)
+           :map isearch-mode-map
+           ("M-e" . consult-isearch)                 ;; orig. isearch-edit-string
+           ("M-s e" . consult-isearch)               ;; orig. isearch-edit-string
+           ("M-s l" . consult-line))                 ;; required by consult-line to detect isearch
 
     ;; The :init configuration is always executed (Not lazy)
     :init
 
-    ;; Optionally configure the register formatting.  This improves the register
-    ;; preview for `consult-register', `consult-register-load',
-    ;; `consult-register-store' and the Emacs built-ins.
-    (setq register-preview-delay 0.1
-	  register-preview-function #'consult-register-format)
+
 
     ;; Use Consult to select xref locations with preview
     (setq xref-show-xrefs-function #'consult-xref
-	  xref-show-definitions-function #'consult-xref)
+          xref-show-definitions-function #'consult-xref)
 
     ;; Updating the default to include "--smart-case"
     ;; Leveraging ripgrep-all https://github.com/phiresky/ripgrep-all
@@ -761,7 +758,7 @@ What follows is adjustments to emacs settings as they relate to completion.
     ;; Configure other variables and modes in the :config section,
     ;; after lazily loading the package.
     :config
-
+    (consult-customize consult-theme :preview-key '(:debounce 0.5 any))
     (autoload 'projectile-project-root "projectile")
     (setq consult-project-root-function #'projectile-project-root)
 
@@ -775,10 +772,10 @@ What follows is adjustments to emacs settings as they relate to completion.
   parameter.  This function handles the REST of the parameters."
       (interactive)
       (apply consult-fn
-	     (when (use-region-p)
-	       (buffer-substring
-		(region-beginning) (region-end)))
-	     rest))
+             (when (use-region-p)
+               (buffer-substring
+                (region-beginning) (region-end)))
+             rest))
 
     (defun jf/consult-ripgrep-wrapper (consult-fn &optional dir given-initial)
       "Advising function around CONSULT-FN.
@@ -786,17 +783,21 @@ What follows is adjustments to emacs settings as they relate to completion.
   DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
       (interactive "P")
       (let ((initial (list (or given-initial
-			       (when (use-region-p)
-				 (buffer-substring (region-beginning) (region-end)))))))
-	(apply consult-fn dir initial)))
+                               (when (use-region-p)
+                                 (buffer-substring (region-beginning) (region-end)))))))
+        (apply consult-fn dir initial)))
 
     (advice-add #'consult-line
-		:around #'jf/consult-first-param-is-initial-text
-		'((name . "wrapper")))
+                :around #'jf/consult-first-param-is-initial-text
+                '((name . "wrapper")))
     (advice-add #'consult-ripgrep
-		:around #'jf/consult-ripgrep-wrapper
-		'((name . "wrapper")))
+                :around #'jf/consult-ripgrep-wrapper
+                '((name . "wrapper")))
     )
+
+  ;; Add adding a small delay to consult preview; this improves the UI just a bit.
+
+
   ;; This package helps ease traveling across directories by providing directory
   ;; candidates related to current buffers, bookmarks, and projects.  Further,
   ;; like other ~consult.el~ functions, you can use narrowing keys.  See
@@ -805,9 +806,9 @@ What follows is adjustments to emacs settings as they relate to completion.
     :straight t
     :after (consult)
     :bind (("C-x C-d" . consult-dir)
-	   :map minibuffer-local-completion-map
-	   ("C-x C-d" . consult-dir)
-	   ("C-x C-j" . consult-dir-jump-file)))
+           :map minibuffer-local-completion-map
+           ("C-x C-d" . consult-dir)
+           ("C-x C-j" . consult-dir-jump-file)))
 
   ;; package provides a function I use everyday: ~M-x consult-projectile~.  When
   ;; I invoke ~consult-projectile~, I have the file completion for the current
@@ -817,10 +818,10 @@ What follows is adjustments to emacs settings as they relate to completion.
   (use-package consult-projectile
     :commands (consult-projectile)
     :straight (consult-projectile
-	       :type git
-	       :host gitlab
-	       :repo "OlMon/consult-projectile"
-	       :branch "master")
+               :type git
+               :host gitlab
+               :repo "OlMon/consult-projectile"
+               :branch "master")
     :bind
     ;;; This overwrite `ns-open-file-using-panel'; the operating system's "Finder"
     ("s-o" . consult-projectile)
@@ -853,15 +854,15 @@ What follows is adjustments to emacs settings as they relate to completion.
     :demand t
     ;; Optionally use TAB for cycling, default is `corfu-complete'.
     :bind (:map corfu-map
-		("M-m" . corfu-move-to-minibuffer)
-		("<escape>". corfu-quit)
-		("<return>" . corfu-insert)
-		("M-d" . corfu-show-documentation)
-		("M-l" . 'corfu-show-location)
-		("TAB" . corfu-next)
-		([tab] . corfu-next)
-		("S-TAB" . corfu-previous)
-		([backtab] . corfu-previous))
+                ("M-m" . corfu-move-to-minibuffer)
+                ("<escape>". corfu-quit)
+                ("<return>" . corfu-insert)
+                ("M-d" . corfu-show-documentation)
+                ("M-l" . 'corfu-show-location)
+                ("TAB" . corfu-next)
+                ([tab] . corfu-next)
+                ("S-TAB" . corfu-previous)
+                ([backtab] . corfu-previous))
 
     :custom
     ;; Works with `indent-for-tab-command'. Make sure tab doesn't indent when you
@@ -887,12 +888,12 @@ What follows is adjustments to emacs settings as they relate to completion.
     (corfu-preselect-first t)             ; Preselect first candidate?
     :config
     (defun corfu-move-to-minibuffer ()
-    "Move \"popup\" completion candidates to minibuffer.
+      "Move \"popup\" completion candidates to minibuffer.
 
   Useful if you want a more robust view into the recommend candidates."
-    (interactive)
-    (let (completion-cycle-threshold completion-cycling)
-      (apply #'consult-completion-in-region completion-in-region--data)))
+      (interactive)
+      (let (completion-cycle-threshold completion-cycling)
+        (apply #'consult-completion-in-region completion-in-region--data)))
 
     :init
     ;; Recommended: Enable Corfu globally.
@@ -929,11 +930,11 @@ What follows is adjustments to emacs settings as they relate to completion.
     ;; NOTE 2022-02-05: At the time of writing, `corfu-doc' is not yet on melpa
     :straight (corfu-doc :type git :host github :repo "galeo/corfu-doc")
     :bind (:map corfu-map
-		;; This is a manual toggle for the documentation window.
-		([remap corfu-show-documentation] . corfu-doc-toggle) ; Remap the default doc command
-		;; Scroll in the documentation window
-		("M-n" . corfu-doc-scroll-up)
-		("M-p" . corfu-doc-scroll-down))
+                ;; This is a manual toggle for the documentation window.
+                ([remap corfu-show-documentation] . corfu-doc-toggle) ; Remap the default doc command
+                ;; Scroll in the documentation window
+                ("M-n" . corfu-doc-scroll-up)
+                ("M-p" . corfu-doc-scroll-down))
     :hook (corfu-mode . corfu-doc-mode)
     :custom
     (corfu-doc-delay 0.1)
@@ -980,30 +981,30 @@ What follows is adjustments to emacs settings as they relate to completion.
     :config
     (defvar +orderless-dispatch-alist
       '((?% . char-fold-to-regexp)
-	(?! . orderless-without-literal)
-	(?`. orderless-initialism)
-	(?= . orderless-literal)
-	(?~ . orderless-flex)))
+        (?! . orderless-without-literal)
+        (?`. orderless-initialism)
+        (?= . orderless-literal)
+        (?~ . orderless-flex)))
     (defun +orderless-dispatch (pattern index _total)
       (cond
        ;; Ensure that $ works with Consult commands, which add disambiguation suffixes
        ((string-suffix-p "$" pattern)
-	`(orderless-regexp . ,(concat (substring pattern 0 -1) "[\x100000-\x10FFFD]*$")))
+        `(orderless-regexp . ,(concat (substring pattern 0 -1) "[\x100000-\x10FFFD]*$")))
        ;; File extensions
        ((and
-	 ;; Completing filename or eshell
-	 (or minibuffer-completing-file-name
-	     (derived-mode-p 'eshell-mode))
-	 ;; File extension
-	 (string-match-p "\\`\\.." pattern))
-	`(orderless-regexp . ,(concat "\\." (substring pattern 1) "[\x100000-\x10FFFD]*$")))
+         ;; Completing filename or eshell
+         (or minibuffer-completing-file-name
+             (derived-mode-p 'eshell-mode))
+         ;; File extension
+         (string-match-p "\\`\\.." pattern))
+        `(orderless-regexp . ,(concat "\\." (substring pattern 1) "[\x100000-\x10FFFD]*$")))
        ;; Ignore single !
        ((string= "!" pattern) `(orderless-literal . ""))
        ;; Prefix and suffix
        ((if-let (x (assq (aref pattern 0) +orderless-dispatch-alist))
-	    (cons (cdr x) (substring pattern 1))
-	  (when-let (x (assq (aref pattern (1- (length pattern))) +orderless-dispatch-alist))
-	    (cons (cdr x) (substring pattern 0 -1)))))))
+            (cons (cdr x) (substring pattern 1))
+          (when-let (x (assq (aref pattern (1- (length pattern))) +orderless-dispatch-alist))
+            (cons (cdr x) (substring pattern 0 -1)))))))
 
     ;; Define orderless style with initialism by default
     (orderless-define-completion-style +orderless-with-initialism
@@ -1014,28 +1015,28 @@ What follows is adjustments to emacs settings as they relate to completion.
     ;; Basic will only be used when orderless fails, which happens only for
     ;; these special tables.
     (setq completion-styles '(orderless basic)
-	  completion-category-defaults nil
-	    ;;; Enable partial-completion for files.
-	    ;;; Either give orderless precedence or partial-completion.
-	    ;;; Note that completion-category-overrides is not really an override,
-	    ;;; but rather prepended to the default completion-styles.
-	  ;; completion-category-overrides '((file (styles orderless partial-completion))) ;; orderless is tried first
-	  completion-category-overrides '((file (styles partial-completion)) ;; partial-completion is tried first
-					  ;; enable initialism by default for symbols
-					  (command (styles +orderless-with-initialism))
-					  (variable (styles +orderless-with-initialism))
-					  (symbol (styles +orderless-with-initialism)))
-	  orderless-component-separator #'orderless-escapable-split-on-space ;; allow escaping space with backslash!
-	  orderless-style-dispatchers '(+orderless-dispatch)))
+          completion-category-defaults nil
+            ;;; Enable partial-completion for files.
+            ;;; Either give orderless precedence or partial-completion.
+            ;;; Note that completion-category-overrides is not really an override,
+            ;;; but rather prepended to the default completion-styles.
+          ;; completion-category-overrides '((file (styles orderless partial-completion))) ;; orderless is tried first
+          completion-category-overrides '((file (styles partial-completion)) ;; partial-completion is tried first
+                                          ;; enable initialism by default for symbols
+                                          (command (styles +orderless-with-initialism))
+                                          (variable (styles +orderless-with-initialism))
+                                          (symbol (styles +orderless-with-initialism)))
+          orderless-component-separator #'orderless-escapable-split-on-space ;; allow escaping space with backslash!
+          orderless-style-dispatchers '(+orderless-dispatch)))
 
   (use-package cape
     :straight t
     :init (add-to-list 'completion-at-point-functions #'cape-dabbrev)
     (add-to-list 'completion-at-point-functions #'cape-file)
     :bind (("C-c p d" . cape-dabbrev)
-	   ("C-c p f" . cape-file)
-	   ("C-c p s" . cape-symbol)
-	   ("C-c p i" . cape-ispell)))
+           ("C-c p f" . cape-file)
+           ("C-c p s" . cape-symbol)
+           ("C-c p i" . cape-ispell)))
 #+end_src
 
 **** wgrep.el
@@ -1967,8 +1968,9 @@ I use org-mode and org-roam to help manage content.  Let’s load that rather ex
   ;; (org-babel-load-file
   ;;  (concat user-emacs-directory "knowledge-management-config.org"))
   (require 'jf-org-mode)
-  (org-babel-load-file
-   (concat user-emacs-directory "denote-emacs-configuration.org"))
+  ;; (org-babel-load-file
+  ;;  (concat user-emacs-directory "denote-emacs-configuration.org"))
+  (require 'jf-denote)
 #+end_src
 
 *** org-d20.el

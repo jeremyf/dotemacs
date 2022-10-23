@@ -5,23 +5,17 @@
 #+STARTUP: showall
 #+OPTIONS: toc:3
 
-The functions of this file build on functions from [[file:configuration.org][Configuration]].
-
-Being a programmer and someone who plays table top role-playing games (TTRPG), I’ve often used the TTRPG rules-set or systems to explore programming languages and processes.  After all, I understand the TTRPG rules well enough (or the algorithm’s description) that I can spend time thinking through my approach in a programming language.
-
-* Minor Mode for Burning Wheel
-
 #+begin_src emacs-lisp
+  ;; Being a programmer and someone who plays table top role-playing games
+  ;; (TTRPG), I’ve often used the TTRPG rules-set or systems to explore
+  ;; programming languages and processes.  After all, I understand the TTRPG
+  ;; rules well enough (or the algorithm’s description) that I can spend time
+  ;; thinking through my approach in a programming language.
+
   (jf/minor-mode-maker :title "Burning Wheel Gold"
-		       :abbr "bwg"
-		       :hooks (list 'org-mode-hook 'markdown-mode-hook))
-#+end_src
+                       :abbr "bwg"
+                       :hooks (list 'org-mode-hook 'markdown-mode-hook))
 
-* Quick Help Functions
-
-Most role-playing games I play may require a bit of consultation.  The following “quick help” methods are tables that I commonly reference when playing Burning Wheel Gold.
-
-#+begin_src emacs-lisp
   (jf/transient-quick-help jf/bwg-qh-wises
     :label "Wises"
     :header "BWG Wises Obstacles (page 309)"
@@ -166,52 +160,62 @@ Most role-playing games I play may require a bit of consultation.  The following
     (s-join
      "\n"
      '("| Dice | Routine | Difficult | Challenging |
-	|------+---------+-----------+-------------|
-	|   1D | Ob 1    | Ob 1      | Ob 2+       |
-	|   2D | Ob 1    | Ob 2      | Ob 3+       |
-	|   3D | Ob 1-2  | Ob 3      | Ob 4+       |
-	|   4D | Ob 1-2  | Ob 3-4    | Ob 5+       |
-	|   5D | Ob 1-3  | Ob 4-5    | Ob 6+       |
-	|   6D | Ob 1-4  | Ob 5-6    | Ob 7+       |
-	|   7D | Ob 1-4  | Ob 5-7    | Ob 8+       |
-	|   8D | Ob 1-5  | Ob 6-8    | Ob 9+       |
-	|   9D | Ob 1-6  | Ob 7-9    | Ob 10+      |
-	|  10D | Ob 1-7  | Ob 8-10   | Ob 11+      |
-	|  11D | Ob 1-8  | Ob 9-11   | Ob 12+      |
-	|  12D | Ob 1-9  | Ob 10-12  | Ob 13+      |
-	|  13D | Ob 1-10 | Ob 11-13  | Ob 14+      |
-	|  14D | Ob 1-11 | Ob 12-14  | Ob 15+      |
-	|  15D | Ob 1-12 | Ob 13-15  | Ob 16+      |
-	|  16D | Ob 1-13 | Ob 14-16  | Ob 17+      |
-	|  17D | Ob 1-14 | Ob 15-17  | Ob 18+      |
-	|  18D | Ob 1-15 | Ob 16-18  | Ob 19+      |")))
+            |------+---------+-----------+-------------|
+            |   1D | Ob 1    | Ob 1      | Ob 2+       |
+            |   2D | Ob 1    | Ob 2      | Ob 3+       |
+            |   3D | Ob 1-2  | Ob 3      | Ob 4+       |
+            |   4D | Ob 1-2  | Ob 3-4    | Ob 5+       |
+            |   5D | Ob 1-3  | Ob 4-5    | Ob 6+       |
+            |   6D | Ob 1-4  | Ob 5-6    | Ob 7+       |
+            |   7D | Ob 1-4  | Ob 5-7    | Ob 8+       |
+            |   8D | Ob 1-5  | Ob 6-8    | Ob 9+       |
+            |   9D | Ob 1-6  | Ob 7-9    | Ob 10+      |
+            |  10D | Ob 1-7  | Ob 8-10   | Ob 11+      |
+            |  11D | Ob 1-8  | Ob 9-11   | Ob 12+      |
+            |  12D | Ob 1-9  | Ob 10-12  | Ob 13+      |
+            |  13D | Ob 1-10 | Ob 11-13  | Ob 14+      |
+            |  14D | Ob 1-11 | Ob 12-14  | Ob 15+      |
+            |  15D | Ob 1-12 | Ob 13-15  | Ob 16+      |
+            |  16D | Ob 1-13 | Ob 14-16  | Ob 17+      |
+            |  17D | Ob 1-14 | Ob 15-17  | Ob 18+      |
+            |  18D | Ob 1-15 | Ob 16-18  | Ob 19+      |")))
 #+end_src
 
 ** Physical Trauma Gray Scale (PTGS)
 
 When running Burning Wheel Gold, on occassion I need to establish the PTGS for a creature or person.
 
-Yes, I could’ve written out ~(0 "B1" "B2" "B3" "B4" "B5" "B6" "B7" "B8" "B9" "B10" "B11" "B12" "B13" "B14" "B15" "B16" "G1" "G2" "G3" "G4" "G5" "G6" "G7" "G8" "G9" "G10" "G11" "G12" "G13" "G14" "G15" "G16" "W1" "W2" "W3" "W4" "W5" "W6" "W7" "W8" "W9" "W10" "W11" "W12" "W13" "W14" "W15" "W16")~ faster than the following constant, but I wanted to learn a bit of emacs-lisp, so I chose to write the following.[fn:1]
+Yes, I could’ve written out ~(0 "B1" "B2" "B3" "B4" "B5" "B6" "B7" "B8" "B9" "B10" "B11" "B12" "B13" "B14" "B15" "B16" "G1" "G2" "G3" "G4" "G5" "G6" "G7" "G8" "G9" "G10" "G11" "G12" "G13" "G14" "G15" "G16" "W1" "W2" "W3" "W4" "W5" "W6" "W7" "W8" "W9" "W10" "W11" "W12" "W13" "W14" "W15" "W16")~ faster than the following constant, but I wanted to learn a bit of emacs-lisp, so I chose to write the following.
+
+I copied that text string from the introspected variable.  Because if I wasn't going to write it the first time, I sure wasn't going to do it if I had already stored that value in a constant.
 
 #+begin_src emacs-lisp
+  ;; When running Burning Wheel Gold, on occassion I need to establish the PTGS for a creature or person.
+  ;;
+  ;; Yes, I could’ve written out (0 "B1" "B2" "B3" "B4" "B5" "B6" "B7" "B8" "B9"
+  ;; "B10" "B11" "B12" "B13" "B14" "B15" "B16" "G1" "G2" "G3" "G4" "G5" "G6" "G7"
+  ;; "G8" "G9" "G10" "G11" "G12" "G13" "G14" "G15" "G16" "W1" "W2" "W3" "W4" "W5"
+  ;; "W6" "W7" "W8" "W9" "W10" "W11" "W12" "W13" "W14" "W15" "W16") faster than
+  ;; the following constant, but I wanted to learn a bit of emacs-lisp, so I
+  ;; chose to write the following.
+
+  ;; I copied that text string from the introspected variable.  Because if I
+  ;; wasn't going to write it the first time, I sure wasn't going to do it if I
+  ;; had already stored that value in a constant.
   (defconst jf/bwg-mortal-wounds-scale
     (let* ((shades '("B" "G" "W"))
-	   (rank '(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16))
-	   (scale (-flatten
-		   (-map (lambda (s)
-			   (-map (lambda (r)
-				   (format "%s%s" s r))
-				 rank))
-			 shades))))
+           (rank '(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16))
+           (scale (-flatten
+                   (-map (lambda (s)
+                           (-map (lambda (r)
+                                   (format "%s%s" s r))
+                                 rank))
+                         shades))))
       ;; I want B1 to have an index of 1.  Hence pre-pending the 0 to the list.
       (add-to-list 'scale 0)
       scale)
     "The BWG Physical Tolerance Grayscale (from B1 to W16).")
-#+end_src
 
-Next up is a function for calculating a Black or Gray PTGS.  This is not clean nor elegant, but it works.
-
-#+begin_src emacs-lisp
   (defun jf/bwg-qh-ptgs (forte power &optional round-up)
     "Calculate Burning Wheel PTGS.
 
@@ -221,31 +225,31 @@ Next up is a function for calculating a Black or Gray PTGS.  This is not clean n
     (interactive "sForte: \nsPower: \nP")
     ;; Note the / function uses integer floor division.
     (let* ((forte-index (-elem-index (upcase forte) jf/bwg-mortal-wounds-scale))
-	   (power-index (-elem-index (upcase power) jf/bwg-mortal-wounds-scale)))
+           (power-index (-elem-index (upcase power) jf/bwg-mortal-wounds-scale)))
       (unless forte-index (throw 'invalid-entry (format "Invalid Forte %s" forte)))
       (unless power-index (throw 'invalid-entry (format "Invalid Power %s" power)))
       (let ((scale (cond ((and (< forte-index 17) (< power-index 17))
-			  (jf/bwg-qh-ptgs--shade-black forte-index
-						       power-index
-						       round-up))
-			 ((and (< forte-index 17) (< power-index 34))
-			  (jf/bwg-qh-ptgs--shade-black forte-index
-						       (- power-index 16)
-						       round-up
-						       :add 2))
-			 ((and (< forte-index 34) (< power-index 17))
-			  (jf/bwg-qh-ptgs--shade-black (- forte-index 16)
-						       power-index
-						       round-up
-						       :add 2))
-			 ((and (< forte-index 34) (< power-index 34))
-			  (jf/bwg-qh-ptgs--shade-gray forte-index
-						      power-index
-						      round-up)))))
-	(jf/bwg-qh-ptgs--render-popup :power power
-				      :forte forte
-				      :round-up round-up
-				      :scale scale))))
+                          (jf/bwg-qh-ptgs--shade-black forte-index
+                                                       power-index
+                                                       round-up))
+                         ((and (< forte-index 17) (< power-index 34))
+                          (jf/bwg-qh-ptgs--shade-black forte-index
+                                                       (- power-index 16)
+                                                       round-up
+                                                       :add 2))
+                         ((and (< forte-index 34) (< power-index 17))
+                          (jf/bwg-qh-ptgs--shade-black (- forte-index 16)
+                                                       power-index
+                                                       round-up
+                                                       :add 2))
+                         ((and (< forte-index 34) (< power-index 34))
+                          (jf/bwg-qh-ptgs--shade-gray forte-index
+                                                      power-index
+                                                      round-up)))))
+        (jf/bwg-qh-ptgs--render-popup :power power
+                                      :forte forte
+                                      :round-up round-up
+                                      :scale scale))))
 
   (cl-defun jf/bwg-qh-ptgs--render-popup (&key power forte round-up scale)
     "Render PTGS help for given POWER, FORTE, ROUND-UP, and SCALE
@@ -254,17 +258,17 @@ Next up is a function for calculating a Black or Gray PTGS.  This is not clean n
     (jf/quick-help
      :header (concat "BWG PTGS (p98, p546) Forte:" forte ", Power: " power (when round-up " (Rounded up)"))
      :body (format (concat
-		    "Su %s; Li %s; Mi %s; Se %s; Tr %s; Mo %s"
-		    "\n\nForte: %s\nPower: %s"
-		    (when round-up "\n(Rounded up)") "\n")
-		   (nth (nth 0 scale) jf/bwg-mortal-wounds-scale)
-		   (nth (nth 1 scale) jf/bwg-mortal-wounds-scale)
-		   (nth (nth 2 scale) jf/bwg-mortal-wounds-scale)
-		   (nth (nth 3 scale) jf/bwg-mortal-wounds-scale)
-		   (nth (nth 4 scale) jf/bwg-mortal-wounds-scale)
-		   (nth (nth 5 scale) jf/bwg-mortal-wounds-scale)
-		   (upcase forte)
-		   (upcase power))))
+                    "Su %s; Li %s; Mi %s; Se %s; Tr %s; Mo %s"
+                    "\n\nForte: %s\nPower: %s"
+                    (when round-up "\n(Rounded up)") "\n")
+                   (nth (nth 0 scale) jf/bwg-mortal-wounds-scale)
+                   (nth (nth 1 scale) jf/bwg-mortal-wounds-scale)
+                   (nth (nth 2 scale) jf/bwg-mortal-wounds-scale)
+                   (nth (nth 3 scale) jf/bwg-mortal-wounds-scale)
+                   (nth (nth 4 scale) jf/bwg-mortal-wounds-scale)
+                   (nth (nth 5 scale) jf/bwg-mortal-wounds-scale)
+                   (upcase forte)
+                   (upcase power))))
 #+end_src
 
 On page 98 of “Burning Wheel Gold Revised”, we have instructions for calculating PTGS for most characters.  Page 546 overlays those instructions with additional instructions for calculating Gray-shaded attributes.
@@ -279,17 +283,17 @@ On page 98 of “Burning Wheel Gold Revised”, we have instructions for calcula
     (interactive "nForte: \nnPower: \nP")
     ;; Note the / function uses integer floor division.
     (let* ((mw-rnd (if round-up 1 0))
-	   (mo (+ 6 add (/ (+ forte power mw-rnd) 2)))
-	   (step (+ (/ (+ 1 forte) 2)))
-	   (su (+ 1 (/ forte 2)))
-	   (li (+ su step))
-	   (mi (+ li step))
-	   (se (+ mi step))
-	   (tr (+ se step))
-	   (tr (if (< tr mo) tr (- mo 1)))
-	   (se (if (< se tr) se (- tr 1)))
-	   (mi (if (< mi se) mi (- se 1)))
-	   (li (if (< li mi) li (- mi 1))))
+           (mo (+ 6 add (/ (+ forte power mw-rnd) 2)))
+           (step (+ (/ (+ 1 forte) 2)))
+           (su (+ 1 (/ forte 2)))
+           (li (+ su step))
+           (mi (+ li step))
+           (se (+ mi step))
+           (tr (+ se step))
+           (tr (if (< tr mo) tr (- mo 1)))
+           (se (if (< se tr) se (- tr 1)))
+           (mi (if (< mi se) mi (- se 1)))
+           (li (if (< li mi) li (- mi 1))))
       (list su li mi se tr mo)))
 
   (defun jf/bwg-qh-ptgs--shade-gray (forte power &optional round-up)
@@ -299,30 +303,31 @@ On page 98 of “Burning Wheel Gold Revised”, we have instructions for calcula
 
   Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
     (let* ((fort-exponent (- forte 16))
-	   (mw-rnd (if round-up 1 0))
-	   (mo (+ 6 (/ (+ forte power mw-rnd) 2)))
-	   (su fort-exponent)
-	   (li (+ su fort-exponent))
-	   (mi (- mo 4))
-	   (se (- mo 2))
-	   (tr (- mo 1)))
+           (mw-rnd (if round-up 1 0))
+           (mo (+ 6 (/ (+ forte power mw-rnd) 2)))
+           (su fort-exponent)
+           (li (+ su fort-exponent))
+           (mi (- mo 4))
+           (se (- mo 2))
+           (tr (- mo 1)))
       (list su li mi se tr mo)))
-#+end_src
-
-** Lifepath Browser
-
-While running (or playing) a game of Burning Wheel, it can be useful to have access to character lifepaths.  These can give you insight into a quick NPC.
-
-I have transformed and edited the [[http://charred-black.herokuapp.com/#/][Charred - The Burning Wheel Gold Character Burner]] data into individual YAML files that sit on my local machine.  I also created a bit of [[https://gohugo.io/][Hugo]] code to render lifepaths from those YAML files.  You can see an example at [[https://takeonrules.com/2018/10/10/burning-wheel-lifepaths-inspired-by-warhammer-fantasy/][Burning Wheel Lifepaths Inspired by Warhammer Fantasy]].
-
-I’m thinking what would be useful to create a searchable index of those lifepaths.  For now, I’ll search based on the stock, setting, and lifepath name (all of which happen to be in the pathname of the YAML file).
-
-But instead of hopping to the YAML file, I’d like to jump to the spot on an HTML page with that information.  This way when I “find” a lifepath, I can see what other lifepaths are of comparable station (a common need when testing Circles).
-
-- [ ] I need a “stable” HTML files with all lifepaths.  Each lifepath should
-  have a unique DOM ID.
-
-#+begin_src emacs-lisp
+  ;; While running (or playing) a game of Burning Wheel, it can be useful to have
+  ;; access to character lifepaths.  These can give you insight into a quick NPC.
+  ;;
+  ;; I have transformed and edited the http://charred-black.herokuapp.com/#/ into
+  ;; individual YAML files that sit on my local machine.  I also created a bit of
+  ;; https://gohugo.io/ code to render lifepaths from those YAML files.  You can
+  ;; see an example at
+  ;; https://takeonrules.com/2018/10/10/burning-wheel-lifepaths-inspired-by-warhammer-fantasy/
+  ;;
+  ;; I’m thinking what would be useful to create a searchable index of those
+  ;; lifepaths.  For now, I’ll search based on the stock, setting, and lifepath
+  ;; name (all of which happen to be in the pathname of the YAML file).
+  ;;
+  ;; But instead of hopping to the YAML file, I’d like to jump to the spot on an
+  ;; HTML page with that information.  This way when I “find” a lifepath, I can
+  ;; see what other lifepaths are of comparable station (a common need when
+  ;; testing Circles).
   (defconst jf/bwg-lifepath--path-to-html-file
     "~/git/org/assets/burning-wheel.html"
     "The path to an HTML")
@@ -330,18 +335,7 @@ But instead of hopping to the YAML file, I’d like to jump to the spot on an HT
   (defconst jf/bwg-lifepath--narrowing-regexp
     "data-lifepath="
     "All lines in `jf/bwg-lifepath--path-to-html-file' that have this substring contain filterable data.")
-#+end_src
 
-#+begin_example
-> rg "id=\"(?P<domId>[^\"]*)\" data-description=\"(?P<desc>[^\"]*)\"" -r '$desc $domId' -o \
-     ~/git/org/assets/burning-wheel.html
-#+end_example
-
-* Menu
-
-The following menu is for quick help while playing Burning Wheel games.  I previously defined the suffixes.
-
-#+begin_src emacs-lisp
   (global-set-key (kbd "C-M-s-b") 'jf/menu--bwg)
   (transient-define-prefix jf/menu--bwg ()
     "Define the BWG help prefix."
@@ -356,7 +350,3 @@ The following menu is for quick help while playing Burning Wheel games.  I previ
      ("w" jf/bwg-qh-wises)
      ])
 #+end_src
-
-* Footnotes
-
-[fn:1] I copyied that text string from the introspected variable.  Because if I wasn't going to write it the first time, I sure wasn't going to do it if I had already stored that value in a constant.

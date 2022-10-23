@@ -58,6 +58,7 @@
 	consult-projectile
 	ivy-occur-click
 	ivy-switch-buffer
+	mark-whole-buffer
 	org-insert-backtick
 	rspec-toggle-spec-and-target
 	rspec-verify-all

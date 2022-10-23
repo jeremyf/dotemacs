@@ -16,12 +16,15 @@
  '(global-display-line-numbers-mode t)
  '(org-export-backends '(ascii html icalendar latex md odt))
  '(safe-local-variable-values
-   '((org-insert-tilde-language . enh-ruby)
+   '((projectile-require-project-root)
+     (org-insert-tilde-language . enh-ruby)
      (org-insert-tilde-language . emacs-lisp)
      (jf/forem-minor-mode . 1)
      (jf/tor-minor-mode . 1)
      (encoding . utf-8)))
  '(show-paren-mode t)
+ '(tmr-timer-finished-functions
+   (list #'tmr-print-message-for-completed-timer #'tmr-sound-play #'jf/tmr-notification-notify) nil nil "Customized with use-package tmr")
  '(typopunct-buffer-language 'english)
  '(use-package-always-ensure t)
  '(warning-suppress-log-types '((comp)))

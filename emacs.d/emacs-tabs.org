@@ -1,17 +1,13 @@
 # -*- org-insert-tilde-language: emacs-lisp; -*-
 #+TITLE: Tabs
 
-Show tabs in the current window.  The tab system is something I wrestle with, but I appreciate it’s existence.  These configurations make it easier to use.
-
-* Centaur Tabs
-
-+As <2022-08-03 Wed> I encountered problems in which the tabs were of the wrong colors.  I didn’t want to fight that.+
-
-Welcome back Centaur Tabs!  In v2.5.0 of the =modus-themes=, Prot removed support for Centaur Tabs.  In v2.7.0, after upstream changes in =centaur-tabs=, he restored support.  See [[https://git.sr.ht/~protesilaos/modus-themes/tree/main/item/CHANGELOG.org][=modus-themes= Changelog]] for details.
-
-Why the return?  For the amazing =centaur-tabs-switch-group=.
-
 #+begin_src emacs-lisp
+  ;; In v2.5.0 of the =modus-themes=, Prot removed support for Centaur Tabs.  In
+  ;; v2.7.0, after upstream changes in =centaur-tabs=, he restored support.  See
+  ;; https://git.sr.ht/~protesilaos/modus-themes/tree/main/item/CHANGELOG.org for
+  ;; details.
+  ;;
+  ;; Why the return?  For the amazing =centaur-tabs-switch-group=.
   (use-package centaur-tabs
     :straight t
     :commands (centaur-tabs-group-by-projectile-project)
@@ -36,38 +32,38 @@ Why the return?  For the amazing =centaur-tabs-switch-group=.
   Other buffer group by `centaur-tabs-get-group-name' with project name."
       (list
        (cond
-	;; ((not (eq (file-remote-p (buffer-file-name)) nil))
-	;; "Remote")
-	((or (string-equal "*" (substring (buffer-name) 0 1))
-	     (memq major-mode '(magit-process-mode
-				magit-status-mode
-				magit-diff-mode
-				magit-log-mode
-				magit-file-mode
-				magit-blob-mode
-				magit-blame-mode
-				)))
-	 "Emacs")
-	((derived-mode-p 'prog-mode)
-	 "Programming")
-	((derived-mode-p 'dired-mode)
-	 "Dired")
-	((memq major-mode '(helpful-mode
-			    help-mode))
-	 "Help")
-	((memq major-mode '(org-mode
-			    org-agenda-clockreport-mode
-			    org-src-mode
-			    org-agenda-mode
-			    org-beamer-mode
-			    org-indent-mode
-			    org-bullets-mode
-			    org-cdlatex-mode
-			    org-agenda-log-mode
-			    diary-mode))
-	 "OrgMode")
-	(t
-	 (centaur-tabs-get-group-name (current-buffer))))))
+        ;; ((not (eq (file-remote-p (buffer-file-name)) nil))
+        ;; "Remote")
+        ((or (string-equal "*" (substring (buffer-name) 0 1))
+             (memq major-mode '(magit-process-mode
+                                magit-status-mode
+                                magit-diff-mode
+                                magit-log-mode
+                                magit-file-mode
+                                magit-blob-mode
+                                magit-blame-mode
+                                )))
+         "Emacs")
+        ((derived-mode-p 'prog-mode)
+         "Programming")
+        ((derived-mode-p 'dired-mode)
+         "Dired")
+        ((memq major-mode '(helpful-mode
+                            help-mode))
+         "Help")
+        ((memq major-mode '(org-mode
+                            org-agenda-clockreport-mode
+                            org-src-mode
+                            org-agenda-mode
+                            org-beamer-mode
+                            org-indent-mode
+                            org-bullets-mode
+                            org-cdlatex-mode
+                            org-agenda-log-mode
+                            diary-mode))
+         "OrgMode")
+        (t
+         (centaur-tabs-get-group-name (current-buffer))))))
 
     ;; :hook
     ;; (dashboard-mode . centaur-tabs-local-mode)
@@ -89,7 +85,7 @@ Why the return?  For the amazing =centaur-tabs-switch-group=.
   (defun jf/centaur-tabs-toggle-grouping ()
     (interactive)
     (if (jf/centaur-tabs-grouping-by-buffer-groups?)
-	(centaur-tabs-group-by-projectile-project)
+        (centaur-tabs-group-by-projectile-project)
       (centaur-tabs-group-buffer-groups)))
 
   (defun jf/centaur-tabs-grouping-by-buffer-groups? ()
