@@ -37,6 +37,8 @@
   ("H-d s" . 'consult-notes-search-in-all-notes)
   ("H-d f RET" . 'consult-notes)
   :config  (setq consult-notes-sources (list))
+  ;; Ensuring that I search my sub-directory.
+  :custom (consult-notes-ripgrep-args "rg --null --line-buffered --color=never --max-columns=1000 --path-separator / --no-ignore-vcs --ignore-case --no-heading --line-number --hidden --glob=!.git/ -L --sortr=accessed")
   :commands (consult-notes
              consult-notes-search-in-all-notes))
 
