@@ -729,16 +729,32 @@ DayOfWeek\")."
 	   (from-day (plist-get day-project-task :day))
 	   (from-project (plist-get day-project-task :project))
 	   (from-task (plist-get day-project-task :task)))
-      (org-capture-string (format "%s %s :%s:\n\n%s %s %s :%s:"
-				  (s-repeat (org-element-property :level from-project) "*")
-				  (org-element-property :title from-project)
-				  (s-join ":" (org-element-property :tags from-project))
-				  (s-repeat (org-element-property :level from-task) "*")
-				  (org-element-property :todo-keyword from-task)
-				  (org-element-property :title from-task)
-				  (s-join ":" (org-element-property :tags from-task)))
-			  "d")
+      (narrow-to-region (org-element-property :begin from-task) (org-element-property :end from-task))
+      (let ((content (s-join "\n" (org-element-map (org-element-parse-buffer) 'section
+				    (lambda (section)
+				      (mapconcat
+				       (lambda (element)
+					 (message "%s" (org-element-type element))
+					 (pcase (org-element-type element)
+					   ('drawer nil)
+					   (_ (buffer-substring-no-properties
+					       (org-element-property :begin element)
+					       (org-element-property :end element)))))
+				       (org-element-contents section)
+				       "\n"))))))
+	(org-capture-string (format "%s %s :%s:\n\n%s %s %s :%s:\n%s"
+				    (s-repeat (org-element-property :level from-project) "*")
+				    (org-element-property :title from-project)
+				    (s-join ":" (org-element-property :tags from-project))
+				    (s-repeat (org-element-property :level from-task) "*")
+				    (org-element-property :todo-keyword from-task)
+				    (org-element-property :title from-task)
+				    (s-join ":" (org-element-property :tags from-task))
+				    content)
+			    "d")
+	(widen))
       (goto-char (org-element-property :begin from-task))
+      ;; Prompt for the todo state of the original task.
       (call-interactively 'org-todo))))
 
 (defun jf/org-get-day-and-project-and-task-at-point ()
