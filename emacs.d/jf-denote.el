@@ -141,28 +141,25 @@
          (finder-docstring (concat "Find file in \""
                                    domain
                                    "\" subdirectory of `denote-directory'."))
-         (default-create-fn (unless create-fn
-                              (intern (concat "jf/denote-create--" domain))))
-         (default-create-docstring (unless create-fn
-                                     (concat "Create denote in \""
-                                             domain
-                                             "\" subdirectory of `denote-directory'.")))
+         (default-create-fn (intern (concat "jf/denote-create--" domain "--default")))
+         (default-create-docstring (concat "Create denote in \""
+                                           domain
+                                           "\" subdirectory of `denote-directory'."))
          (inserter-fn (intern (concat "jf/denote-link--" domain)))
          (inserter-docstring (concat "Link to denote in \""
                                      domain
                                      "\" subdirectory of `denote-directory'.")))
-
     `(progn
        (add-to-list 'jf/denote-subdirectories ,domain)
        (when (boundp 'consult-notes-sources)
          (add-to-list 'consult-notes-sources '(,domain ,key ,subdirectory)))
-       (unless ,create-fn
-         (defun ,default-create-fn ()
-           ,default-create-docstring
-           (interactive)
-           (let ((denote-directory (f-join (denote-directory) ,domain))
-                 (denote-prompts '(title keywords)))
-             (call-interactively #'denote))))
+
+       (defun ,default-create-fn ()
+	 ,default-create-docstring
+	 (interactive)
+	 (let ((denote-directory (f-join (denote-directory) ,domain))
+	       (denote-prompts '(title keywords)))
+	   (call-interactively #'denote)))
        (bind-key (format "H-d c %c" ,key) (or ,create-fn ',default-create-fn))
        (bind-key (format "H-d f %c" ,key) ',finder-fn)
        (defun ,finder-fn ()
@@ -511,9 +508,9 @@
          (buffer (find-file-noselect filename)))
     (with-current-buffer buffer
       (jf/export-org-to-tor--global-buffer-prop-ensure
-                          :key "ROAM_REFS"
-                          :plist (jf/org-global-props-as-plist :props-regexp "ROAM_REFS")
-                          :default url)
+       :key "ROAM_REFS"
+       :plist (jf/org-global-props-as-plist :props-regexp "ROAM_REFS")
+       :default url)
       (save-buffer))))
 
 ;; ;; Used as test.
