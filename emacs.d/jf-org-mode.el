@@ -671,93 +671,51 @@ When given PREFIX_ARG, clear the org-roam database (via `org-roam-db-clear-all')
       (org-roam-db-sync)
       (org-roam-update-org-id-locations))))
 
-;; I want a function that I can “send forward a task”
-
-;; Throughout my work week, I’m writing TODO items.  I find myself carrying
-;; them forward from a previous day.  What I would like to do is from a
-;; =:task:= headline:
-;;
-;; - Using =org-id-get-create= drop an identifier on the current task; we’ll save that.
-;; - Create a new task for today and in the source task’s project; same headline, status, and tags.
-;; - Using =org-id-get-create=, create and save the new identifier.
-;; - On the new task:
-;;   - Insert a link to the previous task with text “Carried forward from <DATE>” where date is the date of the previous task.
-;;   - Insert the previous task’s content.
-;;   - Save the buffer
-;;   - Start a clock
-;; - On the previous task:
-;;   - Remove the status tag
-;;   - Replace the now copied content with “Carried forward to <DATE>” where date is the date of the new task.
-;; (cl-defun jf/org-carry-forward-task (from-task to-headline)
-;;   "Carry the FROM-TASK forward to the TO-HEADLINE.
-
-;; The FROM-TASK is an `org-entry'; the TO-HEADLINE is a string that
-;; matches the 3rd-level date headline (e.g. \"CCYY-MM-DD
-;; DayOfWeek\")."
-;;   (interactive (list (jf/org-task-at-point) (jf/org-prompt-for-headline)))
-;;   (jf/org-extract-new-entry from-task)
-;;   (message "%s" from-task))
-
-;; (defun jf/org-extract-new-entry (from-task)
-;;   "The entry is of the form:
-
-;; - Headline
-;; - Metadata
-;; - Content
-
-;; The metadata is property drawers and such."
-;;   (let ((text (buffer-substring-no-properties
-;; 	       (org-element-property :begin from-task)
-;; 	       (org-element-property :end from-task))))
-;;     (org-id-get-create)
-;;     (org-todo "")
-;;     text))
-
-;; (defun jf/org-prompt-for-headline ()
-;;   "Prompt for headline"
-;;   (format-time-string "%Y-%m-%d %A"))
-
 (cl-defun jf/org-agenda-carry-forward-task ()
-  "Carry the `org-mode' task node forward."
+  "Carry an `org-mode' task node forward."
   (interactive)
   (save-excursion
     (let* ((day-project-task (jf/org-agenda-get-day-and-project-and-task-at-point))
-	   (from-day (plist-get day-project-task :day))
-	   (from-project (plist-get day-project-task :project))
-	   (from-task (plist-get day-project-task :task)))
-      (narrow-to-region (org-element-property :begin from-task) (org-element-property :end from-task))
+           (from-project (plist-get day-project-task :project))
+           (from-task (plist-get day-project-task :task)))
+      ;; Narrowing the region to perform quicker queries on the element
+      (narrow-to-region (org-element-property :begin from-task)
+                        (org-element-property :end from-task))
+
+      ;; Grab each section for the from-task and convert that into text.
+      ;;
+      ;; Yes we have the from-task, however, we haven't parsed that entity.
+      ;; Without parsing that element, the `org-element-contents' returns nil.
       (let ((content (s-join "\n" (org-element-map (org-element-parse-buffer) 'section
-				    (lambda (section)
-				      (mapconcat
-				       (lambda (element)
-					 (message "%s" (org-element-type element))
-					 (pcase (org-element-type element)
-					   ('drawer nil)
-					   (_ (buffer-substring-no-properties
-					       (org-element-property :begin element)
-					       (org-element-property :end element)))))
-				       (org-element-contents section)
-				       "\n"))))))
-	(org-capture-string (format "%s %s :%s:\n\n%s %s %s :%s:\n%s"
-				    (s-repeat (org-element-property :level from-project) "*")
-				    (org-element-property :title from-project)
-				    (s-join ":" (org-element-property :tags from-project))
-				    (s-repeat (org-element-property :level from-task) "*")
-				    (org-element-property :todo-keyword from-task)
-				    (org-element-property :title from-task)
-				    (s-join ":" (org-element-property :tags from-task))
-				    content)
-			    "d")
-	(widen))
+                                    (lambda (section)
+                                      (mapconcat
+                                       (lambda (element)
+                                         (pcase (org-element-type element)
+                                           ;; I want to skip my time entries
+                                           ('drawer nil)
+                                           (_ (buffer-substring-no-properties
+                                               (org-element-property :begin element)
+                                               (org-element-property :end element)))))
+                                       (org-element-contents section)
+                                       "\n"))))))
+        (org-capture-string (format "%s %s :%s:\n\n%s %s %s :%s:\n%s"
+                                    (s-repeat (org-element-property :level from-project) "*")
+                                    (org-element-property :title from-project)
+                                    (s-join ":" (org-element-property :tags from-project))
+                                    (s-repeat (org-element-property :level from-task) "*")
+                                    (org-element-property :todo-keyword from-task)
+                                    (org-element-property :title from-task)
+                                    (s-join ":" (org-element-property :tags from-task))
+                                    content)
+                            "d")
+        (widen))
+      ;; Now that we've added the content, let's tidy up the from-task.
       (goto-char (org-element-property :begin from-task))
       ;; Prompt for the todo state of the original task.
       (call-interactively 'org-todo))))
 
 (defun jf/org-agenda-get-day-and-project-and-task-at-point ()
   "Return a plist of :day, :project, and :task for element at point."
-  ;; This is not a bullet proof means of finding the current task.  We'll need
-  ;; to work on it.
-  (interactive)
   (let* ((task (jf/org-agenda-task-at-point))
 	 (project (progn
 		    (org-up-heading-safe)
@@ -765,22 +723,22 @@ When given PREFIX_ARG, clear the org-roam database (via `org-roam-db-clear-all')
 	 (day (progn
 		(org-up-heading-safe)
 		(org-element-at-point))))
-    (list :project project :task task :day )))
+    (list :project project :task task :day day)))
 
 (defun jf/org-agenda-task-at-point ()
-  "Find the agenda task at point."
+  "Find the `org-mode' task at point."
   (let ((element (org-element-at-point)))
     (if (eq 'headline (org-element-type element))
-	(pcase (org-element-property :level element)
-	  (1 (error "Selected element is a year"))
-	  (2 (error "Selected element is a month"))
-	  (3 (error "Selected element is a day"))
-	  (4 (error "Selected element is a project"))
-	  (5 (progn (message "%s" element) element))
-	  (_ (progn (org-up-heading-safe) (jf/org-task-at-point))))
+        (pcase (org-element-property :level element)
+          (1 (error "Selected element is a year"))
+          (2 (error "Selected element is a month"))
+          (3 (error "Selected element is a day"))
+          (4 (error "Selected element is a project"))
+          (5 (progn (message "%s" element) element))
+          (_ (progn (org-up-heading-safe) (jf/org-task-at-point))))
       (progn
-	(org-back-to-heading)
-	(jf/org-task-at-point)))))
+        (org-back-to-heading)
+        (jf/org-task-at-point)))))
 
 (provide 'jf-org-mode)
 ;;; jf-org-mode.el ends here
