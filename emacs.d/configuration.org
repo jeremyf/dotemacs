@@ -2337,6 +2337,9 @@ I use org-mode and org-roam to help manage content.  Let’s load that rather ex
     :bind (:map eww-mode-map ("U" . eww-up-url))
     :bind (("C-s-w" . browse-url-at-point))
     :hook ((eww-mode . jf/reader-visual)))
+
+  (use-package vterm
+    :straight t)
 #+end_src
 
 *** Random Tables
