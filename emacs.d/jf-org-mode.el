@@ -14,7 +14,7 @@
 ;; sources for `org-mode' agenda.
 (defun jf/is-work-machine? ()
   "Am I working on my machine"
-  (f-dir? (file-truename "~/git/org/denote/scientist/")))
+  (f-file? (file-truename "~/git/org/denote/scientist/20221021T221357--scientist-agenda__scientist.org")))
 
 (defvar jf/primary-agenda-filename-for-machine
   (if (jf/is-work-machine?)
