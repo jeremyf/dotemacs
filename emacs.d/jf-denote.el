@@ -506,6 +506,7 @@
 
 (defun jf/associate-blog-post-url-with-identifier (url identifier)
   "Associate given URL with the `denote' IDENTIFIER."
+  (message "Associating URL: %s with IDENTIFIER: %s." identifier url)
   (let* ((filename (denote-get-path-by-id identifier))
          (buffer (find-file-noselect filename)))
     (with-current-buffer buffer
