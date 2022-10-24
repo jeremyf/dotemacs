@@ -176,7 +176,7 @@
   :custom (org-src-tab-acts-natively t)
   (org-clock-clocktable-default-properties '(:maxlevel 5 :link t :tags t))
   :bind (:map org-mode-map
-	      ("C-c l i" . jf/org-insert-link-dwim)
+	      ("C-c l i" . org-insert-link)
 	      ("s-2" . consult-org-heading))
   :bind (("C-c l s" . org-store-link)
 	 ("C-c a" . org-agenda)
