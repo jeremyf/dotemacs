@@ -239,7 +239,7 @@ As we get started in Emacs, I want to make sure I have the basics lined up.
 
   (global-hl-line-mode)
 
-  (pixel-scroll-mode)
+
   ;; When you open Emacs, grab all the space on the screen
   (add-to-list 'initial-frame-alist '(fullscreen . maximized))
 

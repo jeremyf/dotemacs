@@ -12,12 +12,12 @@
 ;; I maintain a list of data directories, each might have “relevant to
 ;; org-mode” files.  The `jf/org-agenda-files' reads the file system to gather
 ;; sources for `org-mode' agenda.
-(defun is-work-machine? ()
+(defun jf/is-work-machine? ()
   "Am I working on my machine"
   (f-dir? (file-truename "~/git/org/denote/scientist/")))
 
 (defvar jf/primary-agenda-filename-for-machine
-  (if (is-work-machine?)
+  (if (jf/is-work-machine?)
       "~/git/org/denote/scientist/20221021T221357--scientist-agenda__scientist.org"
     "~/git/org/agenda.org"))
 
@@ -555,23 +555,23 @@ If nil, `org-insert-tilde' after 2 tildes inserts an \"example\"
 block.  If a string, it inserts a \"src\" block with the given
 language name.")
 
-(define-key org-mode-map (kbd "`") #'org-insert-tilde)
-(defun org-insert-tilde ()
-  "Insert a tilde using `org-self-insert-command'."
-  (interactive)
-  (if (string= (buffer-substring-no-properties (- (point) 3) (point))
-	       "\n~~")
-      (progn (delete-char -2)
-	     (if org-insert-tilde-language
-		 (insert (format "#+begin_src %s\n#+end_src"
-				 org-insert-tilde-language))
-	       (insert "#+begin_example\n#+end_example"))
-	     (forward-line -1)
-	     (if (string= org-insert-tilde-language "")
-		 (move-end-of-line nil)
-	       (org-edit-special)))
-    (setq last-command-event ?~)
-    (call-interactively #'org-self-insert-command)))
+;; (define-key org-mode-map (kbd "`") #'org-insert-tilde)
+;; (defun org-insert-tilde ()
+;;   "Insert a tilde using `org-self-insert-command'."
+;;   (interactive)
+;;   (if (string= (buffer-substring-no-properties (- (point) 3) (point))
+;; 	       "\n~~")
+;;       (progn (delete-char -2)
+;; 	     (if org-insert-tilde-language
+;; 		 (insert (format "#+begin_src %s\n#+end_src"
+;; 				 org-insert-tilde-language))
+;; 	       (insert "#+begin_example\n#+end_example"))
+;; 	     (forward-line -1)
+;; 	     (if (string= org-insert-tilde-language "")
+;; 		 (move-end-of-line nil)
+;; 	       (org-edit-special)))
+;;     (setq last-command-event ?~)
+;;     (call-interactively #'org-self-insert-command)))
 
 ;; In
 ;; https://takeonrules.com/2022/02/26/note-taking-with-org-roam-and-transclusion/,
@@ -717,15 +717,11 @@ When given PREFIX_ARG, clear the org-roam database (via `org-roam-db-clear-all')
 ;;   "Prompt for headline"
 ;;   (format-time-string "%Y-%m-%d %A"))
 
-(cl-defun jf/org-carry-forward-task ()
-  "Carry the FROM-TASK forward to the TO-HEADLINE.
-
-The FROM-TASK is an `org-entry'; the TO-HEADLINE is a string that
-matches the 3rd-level date headline (e.g. \"CCYY-MM-DD
-DayOfWeek\")."
+(cl-defun jf/org-agenda-carry-forward-task ()
+  "Carry the `org-mode' task node forward."
   (interactive)
   (save-excursion
-    (let* ((day-project-task (jf/org-get-day-and-project-and-task-at-point))
+    (let* ((day-project-task (jf/org-agenda-get-day-and-project-and-task-at-point))
 	   (from-day (plist-get day-project-task :day))
 	   (from-project (plist-get day-project-task :project))
 	   (from-task (plist-get day-project-task :task)))
@@ -757,13 +753,12 @@ DayOfWeek\")."
       ;; Prompt for the todo state of the original task.
       (call-interactively 'org-todo))))
 
-(defun jf/org-get-day-and-project-and-task-at-point ()
+(defun jf/org-agenda-get-day-and-project-and-task-at-point ()
   "Return a plist of :day, :project, and :task for element at point."
   ;; This is not a bullet proof means of finding the current task.  We'll need
   ;; to work on it.
-  (let* ((task (progn
-		 (org-back-to-heading)
-		 (org-element-at-point)))
+  (interactive)
+  (let* ((task (jf/org-agenda-task-at-point))
 	 (project (progn
 		    (org-up-heading-safe)
 		    (org-element-at-point)))
@@ -771,6 +766,21 @@ DayOfWeek\")."
 		(org-up-heading-safe)
 		(org-element-at-point))))
     (list :project project :task task :day )))
+
+(defun jf/org-agenda-task-at-point ()
+  "Find the agenda task at point."
+  (let ((element (org-element-at-point)))
+    (if (eq 'headline (org-element-type element))
+	(pcase (org-element-property :level element)
+	  (1 (error "Selected element is a year"))
+	  (2 (error "Selected element is a month"))
+	  (3 (error "Selected element is a day"))
+	  (4 (error "Selected element is a project"))
+	  (5 (progn (message "%s" element) element))
+	  (_ (progn (org-up-heading-safe) (jf/org-task-at-point))))
+      (progn
+	(org-back-to-heading)
+	(jf/org-task-at-point)))))
 
 (provide 'jf-org-mode)
 ;;; jf-org-mode.el ends here
