@@ -1,33 +1,51 @@
 ;; -*- mode: lisp -*-
+;;; Commentary
+;;
+;; Organize this file by mode then by abbreviation.  Multi-modes have their own
+;; section
 
-fundamental-mode ;; Available everywhere
+;;; Single Mode Entries
 
-(today (format-time-string "%Y-%m-%d"))
-
+;;;; emacs-lisp
 emacs-lisp-mode
 
 (lambda "(lambda (" p ")" n> r> ")")
 
-enh-ruby-mode ruby-mode
+;;;; fundamental-mode
+fundamental-mode
 
-(db "require \"debug\"; binding.break" n)
-(bench "require \"benchmark\"" n "Benchmark.bmbm do |b|" n "  b.report(\"\") do" n "    # Stuff" n "  end" n "end")
-(frozen "# frozen_string_literal: true")
-(shell "#!/usr/bin/env ruby -w")
+(today (format-time-string "%Y-%m-%d"))
 
-web-mode
-
-(db "<% require \"debug\"; binding.break %>" n)
-
+;;;; org-mode
 org-mode
 
-(today "[[date:" (format-time-string "%Y-%m-%d") "][today]]")
 (idiomatic "{{{i(" (p (completing-read "Idiom: " (jf/org-macro-value-list "i"))) ")}}}")
-(uml "#+begin_src plantuml" n> "@startuml" n> "!theme amiga" n> q n> "@enduml" n> "#+end_src" n>)
 (shell "#+begin_src bash :results scalar replace :exports both :tangle yes" n> q n> "#+end_src" n>)
+(today "[[date:" (format-time-string "%Y-%m-%d") "][today]]")
+(tor "[[https://takeonrules.com][Take on Rules]]")
+(uml "#+begin_src plantuml" n> "@startuml" n> "!theme amiga" n> q n> "@enduml" n> "#+end_src" n>)
 
+;;;; text-mode
 text-mode
 
+;; This is an example of using the value of `(s str)' to populate the above and
+;; below line!
 (asciibox "+-" (make-string (length str) ?-) "-+" n
           "| " (s str)                       " |" n
           "+-" (make-string (length str) ?-) "-+" n)
+
+;;;; web-mode
+web-mode
+
+(db "<% require \"debug\"; binding.break %>" n)
+(tor "<cite><a href=\"https://takeonrules.com\">Take on Rules</a></cite>")
+
+;;; Multi-Mode Entries
+
+;;;; enh-ruby-mode ruby-mode
+enh-ruby-mode ruby-mode
+
+(bench "require \"benchmark\"" n "Benchmark.bmbm do |b|" n "  b.report(\"\") do" n "    # Stuff" n "  end" n "end")
+(db "require \"debug\"; binding.break" n)
+(frozen "# frozen_string_literal: true")
+(shell "#!/usr/bin/env ruby -w")
