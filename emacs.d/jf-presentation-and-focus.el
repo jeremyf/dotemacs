@@ -68,9 +68,9 @@
 ;;; Presentation mode leveraging logos
 (defvar jf/lp-minor-mode-map (let ((map (make-sparse-keymap)))
 			       (dolist (key `("]" "RET" "SPC" "<right>" "<down>" "n" "C-n"))
-				       (define-key map (kbd key) #'logos-forward-page-dwim))
+				 (define-key map (kbd key) #'logos-forward-page-dwim))
 			       (dolist (key `("[" "DEL" "<left>" "<up>" "C-p" "p"))
-				       (define-key map (kbd key) #'logos-backward-page-dwim))
+				 (define-key map (kbd key) #'logos-backward-page-dwim))
 			       map))
 
 (jf/minor-mode-maker :title "Logos Presenter"
@@ -82,7 +82,7 @@
     (call-interactively 'logos-narrow-dwim)
     (setq-local  org-hide-emphasis-markers t)
     (read-only-mode 1)
-    (display-line-numbers-mode nil)
+    (display-line-numbers-mode -1)
     (org-indent-mode -1)
     (when (fboundp 'fontaine-set-preset) (fontaine-set-preset 'presenting))
     (when (fboundp 'logos-focus-mode) (logos-focus-mode 1))

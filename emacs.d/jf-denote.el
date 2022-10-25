@@ -153,7 +153,6 @@
        (add-to-list 'jf/denote-subdirectories ,domain)
        (when (boundp 'consult-notes-sources)
          (add-to-list 'consult-notes-sources '(,domain ,key ,subdirectory)))
-
        (defun ,default-create-fn ()
 	 ,default-create-docstring
 	 (interactive)

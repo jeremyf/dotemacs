@@ -71,7 +71,7 @@
 				org-directory
 				"/captured-notes.org")
 	org-log-done 'time
-	org-todo-keywords '((type "TODO(t)" "IN-PROGRESS(i!)" "BLOCKED(b@/!)" "IN-REVIEW(r!)" "|" "DONE(d!)" "DELEGATED(g@/!)" "CANCELLED(c@)"))
+	org-todo-keywords '((type "TODO(t)" "IN-PROGRESS(i!)" "BLOCKED(b@/!)" "IN-REVIEW(r!)" "|" "DONE(d!)" "DELEGATED(g@/!)" "SENT-FORWARD(s!)" "CANCELLED(c@)"))
 	)
   (setq org-capture-templates
 	'(("@"
@@ -732,10 +732,10 @@ When given PREFIX_ARG, clear the org-roam database (via `org-roam-db-clear-all')
           (3 (error "Selected element is a day"))
           (4 (error "Selected element is a project"))
           (5 (progn (message "%s" element) element))
-          (_ (progn (org-up-heading-safe) (jf/org-task-at-point))))
+          (_ (progn (org-up-heading-safe) (jf/org-agenda-task-at-point))))
       (progn
         (org-back-to-heading)
-        (jf/org-task-at-point)))))
+        (jf/org-agenda-task-at-point)))))
 
 (provide 'jf-org-mode)
 ;;; jf-org-mode.el ends here
