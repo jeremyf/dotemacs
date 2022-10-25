@@ -200,14 +200,11 @@
 (defun jf/org-completion-at-point-functions ()
   "The `completion-at-point-functions' I envision using for `org-mode'."
   (setq-local completion-at-point-functions
-	      (list (cape-super-capf
-		     #'tempel-expand
+	      (list  #'tempel-expand
 		     #'jf/org-completion-symbols
 		     #'cape-dabbrev
 		     #'cape-file
-		     #'cape-keyword
-		     #'cape-history
-		     #'elisp-completion-at-point))))
+		     #'cape-history)))
 (defun jf/org-confirm-babel-evaluate (lang body) nil)
 (bind-key "s-8" 'jf/capture-region-contents-with-metadata)
 (defun jf/capture-region-contents-with-metadata (start end parg)
