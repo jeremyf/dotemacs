@@ -315,118 +315,7 @@ As we get started in Emacs, I want to make sure I have the basics lined up.
 I want to start with a basic look and feel.  First, the choice of primary font.
 
 #+begin_src emacs-lisp
-  (mapc #'disable-theme custom-enabled-themes)
-  (use-package fontaine
-    :straight t
-    :config
-    (setq fontaine-presets
-          '((small
-             :default-height 110)
-            (default
-             :default-height 155)
-            (coding
-             :default-height 155)
-            (presenting
-             :default-weight semilight
-             :default-height 220
-             :bold-weight extrabold)
-            (reading
-             :default-weight semilight
-             :default-height 220
-             :bold-weight extrabold)
-            (t
-             ;; Following Prot’s example, keeping these for for didactic purposes.
-             :default-family "Iosevka Comfy Motion Fixed"
-             :default-weight regular
-             :default-height 155
-             :fixed-pitch-family nil ; falls back to :default-family
-             :fixed-pitch-weight nil ; falls back to :default-weight
-             :fixed-pitch-height 1.0
-             :fixed-pitch-serif-family nil ; falls back to :default-family
-             :fixed-pitch-serif-weight nil ; falls back to :default-weight
-             :fixed-pitch-serif-height 1.0
-             :variable-pitch-family "ETBembo"
-             :variable-pitch-weight nil
-             :variable-pitch-height 1.0
-             :bold-family nil ; use whatever the underlying face has
-             :bold-weight bold
-             :italic-family nil
-             :italic-slant italic
-             :line-spacing nil))))
-  (fontaine-set-preset 'default)
-
-  ;; And now the theme.  I’ve chosen the modus themes (e.g. ~modus-vivendi~ and
-  ;; ~modus-operandi~).  They provide a light and dark theme with a focus on visual
-  ;; accessibility.
-
-  ;; I love [[http://protesilaos.com][Prot]]’s attention to detail with the modus
-  ;; themes.  Here’s my configuration for these two sibling themes.  There’s a
-  ;; bit of chatter, but all told it sets things up how I like.
-
-
-  (use-package modus-themes
-    ;; :straight (modus-themes :type built-in)
-    :straight (:type git :host gitlab :repo "protesilaos/modus-themes" :branch "main")
-    :init
-    (setq
-     modus-themes-vivendi-color-overrides
-     ;; '((bg-region-accent-subtle . "#240f55")) ;; Default
-     ;; '((bg-region-accent-subtle . "#323da2"));; Good candidate
-     '((bg-region-accent-subtle . "#304466"))
-
-     modus-themes-bold-constructs t
-     modus-themes-completions '((matches . (extrabold))
-				(selection . (semibold accented))
-				(popup . (accented intense)))
-     modus-themes-diffs nil
-     modus-themes-fringes 'intense
-     modus-themes-hl-line '(accented intense)
-     modus-themes-intense-markup t
-     modus-themes-links '(faint background)
-     modus-themes-subtle-line-numbers t
-     modus-themes-mixed-fonts t
-     modus-themes-mode-line '(accented moody)
-     modus-themes-org-blocks 'gray-background
-     modus-themes-paren-match '(bold intense)
-     modus-themes-prompts '(intense accented)
-     modus-themes-region '(bg-only accented)
-     modus-themes-scale-headings t
-     modus-themes-slanted-constructs t
-     modus-themes-subtle-line-numbers t
-     modus-themes-syntax '(alt-syntax yellow-comments green-strings)
-     modus-themes-tabs-accented t
-     modus-themes-headings
-     '((1 . (variable-pitch light 1.6))
-       (2 . (overline semibold 1.4))
-       (3 . (monochrome overline 1.2 background))
-       (4 . (overline 1.1))
-       (t . (rainbow 1.05)))))
-  (modus-themes-load-themes)
-
-  (if (eq system-type 'darwin)
-      (progn
-	(defun jf/dark ()
-	  "Toggle system-wide Dark or Light setting."
-	  (interactive)
-	  (shell-command "osascript -e 'tell application \"System Events\" to tell appearance preferences to set dark mode to not dark mode'")
-	  (jf/emacs-theme-by-osx-appearance))
-
-	(defalias 'modus-themes-toggle 'jf/dark)
-	(defun jf/emacs-theme-by-osx-appearance ()
-	  "Set theme based on OSX apperance state."
-	  (if (equal "Dark" (substring (shell-command-to-string "defaults read -g AppleInterfaceStyle") 0 4))
-	      (modus-themes-load-vivendi)
-	    (modus-themes-load-operandi)))
-	;; And load the appropriate theme
-	(jf/emacs-theme-by-osx-appearance))
-    (progn
-      (defun modus-themes-toggle ()
-	"Toggle between `modus-operandi' and `modus-vivendi' themes."
-	(interactive)
-	(if (eq (car custom-enabled-themes) 'modus-vivendi)
-	    (modus-themes-load-vivendi)
-	  (modus-themes-load-operandi)))
-      (modus-themes-load-operandi)))
+  (require 'jf-windows)
 
   ;; Useful for referential icons.
   (use-package all-the-icons
@@ -435,15 +324,15 @@ I want to start with a basic look and feel.  First, the choice of primary font.
     (cl-defmacro jf/all-the-icons--with(&key name)
       "A macro to provide functions for icon names."
       (let ((defun-fn (intern (concat "jf/all-the-icons--with-" name)))
-	    (icon-fn (intern (concat "all-the-icons-" name)))
-	    (docstring (concat "Displays an ICON from `all-the-icons-" name "'.")))
-	`(defun ,defun-fn (icon str &optional height v-adjust)
-	   ,docstring
-	   (s-concat (,icon-fn
-		      icon
-		      :v-adjust (or v-adjust 0)
-		      :height (or height 1))
-		     " " str))))
+            (icon-fn (intern (concat "all-the-icons-" name)))
+            (docstring (concat "Displays an ICON from `all-the-icons-" name "'.")))
+        `(defun ,defun-fn (icon str &optional height v-adjust)
+           ,docstring
+           (s-concat (,icon-fn
+                      icon
+                      :v-adjust (or v-adjust 0)
+                      :height (or height 1))
+                     " " str))))
     (jf/all-the-icons--with :name "faicon")
     (jf/all-the-icons--with :name "material")
     (jf/all-the-icons--with :name "octicon")
@@ -461,8 +350,8 @@ I want to start with a basic look and feel.  First, the choice of primary font.
 *** Tabs
 
 #+begin_src emacs-lisp
-  (org-babel-load-file
-   (concat user-emacs-directory "emacs-tabs.org"))
+  ;; (org-babel-load-file
+  ;;  (concat user-emacs-directory "emacs-tabs.org"))
 #+end_src
 
 ** How Does this Thing Work?
@@ -1039,6 +928,9 @@ What follows is adjustments to emacs settings as they relate to completion.
            ("C-c p i" . cape-ispell)))
 #+end_src
 
+#+RESULTS:
+: cape-ispell
+
 **** wgrep.el
 
 - ~wgrep.el~ ::
@@ -1141,14 +1033,6 @@ What follows is adjustments to emacs settings as they relate to completion.
     :bind ("s-4" . 'imenu-list-smart-toggle)
     :bind (:map imenu-list-major-mode-map ("o" . 'imenu-list-goto-entry))
     :straight t)
-
-  (use-package ibuffer-sidebar
-    :straight t
-    ;; Width of 52 characters...like recommended git titles.
-    :custom (ibuffer-sidebar-width 52)
-    (ibuffer-sidebar-display-alist '((side . right) (slot . 1)))
-    :bind ("s-3" . ibuffer-sidebar-toggle-sidebar)
-    :commands (ibuffer-sidebar-toggle-sidebar))
 #+end_src
 
 **** Extending the Mark
@@ -1753,8 +1637,7 @@ A timestamp library.
   ;;
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   (use-package pretty-hydra
-      :straight (pretty-hydra
-		 :type git :host github :repo "jerrypnz/major-mode-hydra.el"
+      :straight (:type git :host github :repo "jerrypnz/major-mode-hydra.el"
 		 :files (:defaults (:exclude "major-mode-hydra.el"))))
 
   (defvar jf/typography--title
