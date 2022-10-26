@@ -1074,30 +1074,12 @@ What follows is adjustments to emacs settings as they relate to completion.
   toggle the popup buffer.  See that method for further implementation details.
 
 #+begin_src emacs-lisp
-  (use-package popper
-    :straight t
-    :custom
-    (popper-reference-buffers
-      '("\\*Messages\\*"
-	"Output\\*$"
-	"^\\*Org Select"
-	"\\*Async Shell Command\\*"
-	help-mode
-	compilation-mode
-	"^\\*helpful.*\\*$"))
-    (setq popper-window-height (lambda (win)
-				 (fit-window-to-buffer
-				  win
-				  (floor (frame-height) 2))))
-    (popper-mode +1)
-    (popper-echo-mode +1))
-
   ;; Enforce rules for popups.  See https://depp.brause.cc/shackle/.
   (use-package shackle
     :straight t
     :custom
     (shackle-rules '((compilation-mode :noselect t))
-		   shackle-default-rule '(:select t)))
+                   shackle-default-rule '(:select t)))
 
   (use-package ace-window
       :straight t
@@ -1636,61 +1618,61 @@ A timestamp library.
   ;;  mnemonic device (e.g. "C-x 8 RET" searches for a character to insert).
   ;;
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  (use-package pretty-hydra
-      :straight (:type git :host github :repo "jerrypnz/major-mode-hydra.el"
-		 :files (:defaults (:exclude "major-mode-hydra.el"))))
+  ;; (use-package pretty-hydra
+  ;;     :straight (:type git :host github :repo "jerrypnz/major-mode-hydra.el"
+  ;; 	       :files (:defaults (:exclude "major-mode-hydra.el"))))
 
-  (defvar jf/typography--title
-    (jf/all-the-icons--with-octicon "pencil" "Typography (C-x 8 RET for Search)" 1 -0.05)
-    "The menu title for typography")
-  (pretty-hydra-define jf/typography--menu (:foreign-keys warn :title jf/typography--title :quit-key "q" :exit t)
-    ("Characters" (
-		   ("d d" (insert "-") "- dash")
-		   ("d m" (insert "—") "— em dash")
-		   ("d n" (insert "–") "– en dash")
-		   (". e" (insert "…") "… ellipsis")
-		   (". d" (insert "·") "º degree")
-		   (". m" (insert "·") "· middot")
-		   ("t d" (insert "†") "† dagger")
-		   ("t 2" (insert "‡") "‡ double dagger")
-		   ("t s" (insert "§") "§ section")
-		   ("t p" (insert "¶") "¶ paragraph")
-		   ("? !" (insert "‽") "‽ Interobang")
-		   )
-     "Math" (
-	     ("a x" (insert "×") "× Multiplication Sign")
-	     ("a d" (insert "÷") "÷ Division Sign")
-	     ("a m" (insert "−") "− Minus Sign")
-	     ("a p" (insert "±") "± Plus or Minus Sign")
-	     ("m n" (insert "¬") "¬ Negation")
-	     ;; For declaring regex functions.  See
-	     ;; https://www.johndcook.com/blog/2022/01/08/corner-quotes-in-unicode/
-	     ;; and https://irreal.org/blog/?p=10265
-	     ("c l" (insert "⌜") "⌜ Left Corner Quote")
-	     ("c r" (insert " ⌟") "⌟ Right Corner Quote")
-	     ;; Included as a reminder as I use these for menu structures
-	     ("f h"   (insert "─") "─ Forms light horizontal")
-	     ("f D l" (insert "┐") "┐ Forms light down and left")
-	     ("f v"   (insert "│") "│ Forms light vertical")
-	     ("f V r" (insert "├") "├ Forms light vertical and right")
-	     ("f U r" (insert "└") "└ Forms light up and right")
-	     )
-     "Quotes" (
-	       ("\" o" (insert "“") "“ Double quote open")
-	       ("\" c" (insert "”") "” Doule quote close")
-	       ("\" O" (insert "«") "« Guillemet open")
-	       ("\" C" (insert "»") "» Guillemet close")
-	       ("\" l" (insert "⌈") "⌈ Left ceiling")
-	       ("' o" (insert "‘") "‘ Single quote open")
-	       ("' c" (insert "’") "’ Single quote close")
-	       ("' O" (insert "‹") "‹ Single guillemet open")
-	       ("' C" (insert "›") "› Single guillemet close")
-	       ("p 1" (insert "′") "′ Single Prime (feet, arcminutes)")
-	       ("p 2" (insert "″") "″ Double Prime (inches, arcseconds)")
-	       ("p 3" (insert "‴") "‴ Triple Prime"))
-     ))
+  ;; (defvar jf/typography--title
+  ;;   (jf/all-the-icons--with-octicon "pencil" "Typography (C-x 8 RET for Search)" 1 -0.05)
+  ;;   "The menu title for typography")
+  ;; (pretty-hydra-define jf/typography--menu (:foreign-keys warn :title jf/typography--title :quit-key "q" :exit t)
+  ;;   ("Characters" (
+  ;; 		 ("d d" (insert "-") "- dash")
+  ;; 		 ("d m" (insert "—") "— em dash")
+  ;; 		 ("d n" (insert "–") "– en dash")
+  ;; 		 (". e" (insert "…") "… ellipsis")
+  ;; 		 (". d" (insert "·") "º degree")
+  ;; 		 (". m" (insert "·") "· middot")
+  ;; 		 ("t d" (insert "†") "† dagger")
+  ;; 		 ("t 2" (insert "‡") "‡ double dagger")
+  ;; 		 ("t s" (insert "§") "§ section")
+  ;; 		 ("t p" (insert "¶") "¶ paragraph")
+  ;; 		 ("? !" (insert "‽") "‽ Interobang")
+  ;; 		 )
+  ;;    "Math" (
+  ;; 	   ("a x" (insert "×") "× Multiplication Sign")
+  ;; 	   ("a d" (insert "÷") "÷ Division Sign")
+  ;; 	   ("a m" (insert "−") "− Minus Sign")
+  ;; 	   ("a p" (insert "±") "± Plus or Minus Sign")
+  ;; 	   ("m n" (insert "¬") "¬ Negation")
+  ;; 	   ;; For declaring regex functions.  See
+  ;; 	   ;; https://www.johndcook.com/blog/2022/01/08/corner-quotes-in-unicode/
+  ;; 	   ;; and https://irreal.org/blog/?p=10265
+  ;; 	   ("c l" (insert "⌜") "⌜ Left Corner Quote")
+  ;; 	   ("c r" (insert " ⌟") "⌟ Right Corner Quote")
+  ;; 	   ;; Included as a reminder as I use these for menu structures
+  ;; 	   ("f h"   (insert "─") "─ Forms light horizontal")
+  ;; 	   ("f D l" (insert "┐") "┐ Forms light down and left")
+  ;; 	   ("f v"   (insert "│") "│ Forms light vertical")
+  ;; 	   ("f V r" (insert "├") "├ Forms light vertical and right")
+  ;; 	   ("f U r" (insert "└") "└ Forms light up and right")
+  ;; 	   )
+  ;;    "Quotes" (
+  ;; 	     ("\" o" (insert "“") "“ Double quote open")
+  ;; 	     ("\" c" (insert "”") "” Doule quote close")
+  ;; 	     ("\" O" (insert "«") "« Guillemet open")
+  ;; 	     ("\" C" (insert "»") "» Guillemet close")
+  ;; 	     ("\" l" (insert "⌈") "⌈ Left ceiling")
+  ;; 	     ("' o" (insert "‘") "‘ Single quote open")
+  ;; 	     ("' c" (insert "’") "’ Single quote close")
+  ;; 	     ("' O" (insert "‹") "‹ Single guillemet open")
+  ;; 	     ("' C" (insert "›") "› Single guillemet close")
+  ;; 	     ("p 1" (insert "′") "′ Single Prime (feet, arcminutes)")
+  ;; 	     ("p 2" (insert "″") "″ Double Prime (inches, arcseconds)")
+  ;; 	     ("p 3" (insert "‴") "‴ Triple Prime"))
+  ;;    ))
 
-  (global-set-key (kbd "C-s-8") 'jf/typography--menu/body)
+  ;; (global-set-key (kbd "C-s-8") 'jf/typography--menu/body)
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;;
   ;;; END Typography Menu

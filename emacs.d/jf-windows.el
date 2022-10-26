@@ -5,6 +5,8 @@
 
 ;; This file is NOT part of GNU Emacs.
 ;;; Commentary
+;;
+;; This package provides font, theme, and window support.
 
 ;;; Code
 
@@ -49,7 +51,6 @@
 (fontaine-set-preset 'default)
 
 ;;;; Themes
-
 (mapc #'disable-theme custom-enabled-themes)
 
 ;; And now the theme.  I’ve chosen the modus themes (e.g. ~modus-vivendi~ and
@@ -143,25 +144,26 @@
 ;;
 ;; Why this instead of Centaur Tabs?  `bufler' integrates with `tab-bar-mode'
 ;; and `tab-lines-mode'.  Why is this important?  Because `centaur-tabs-mode'
-;; hacked the buffer to add the tags; which meant that the popped buffers would
+;; hack the buffer to add the tabs; the impact was that popped buffers would
 ;; have sizing issues.
 (use-package bufler
   :straight t
+  :hook (after-init . (lambda () (bufler-mode) (bufler-tabs-mode 1)))
   :config
-  (bufler-mode)
-  (bufler-tabs-mode)
-  (defun bufler-workspace-mode-lighter ()
-    "Return the lighter string mode line."
-    "Bflr")
   (setq tab-line-switch-cycling t)
   :bind (:map bufler-list-mode-map ("s-3" . quit-window))
   :bind (("s-b" . bufler-switch-buffer)
 	 ("s-3" . bufler)
-	 ("s-\\" . jf/tab-bar-switch)
+	 ("s-\\" . jf/tab-bar-switch-prompt-for-tab)
 	 ("s-]" . tab-line-switch-to-next-tab)
 	 ("s-}" . jf/tab-bar-switch-to-next-tab)
 	 ("s-[" . tab-line-switch-to-prev-tab)
 	 ("s-{" . jf/tab-bar-switch-to-prev-tab)))
+
+(defun jf/bufler-workspace-mode-lighter ()
+  "Return the lighter string mode line."
+  "Bflr")
+(advice-add #'bufler-workspace-mode-lighter :override #'jf/bufler-workspace-mode-lighter '((name . "wrapper")))
 
 (defun jf/tab-bar-switch-to-next-tab ()
   "Move to the next `tab-bar' tab and open the first buffer."
@@ -182,10 +184,13 @@
   (let* ((path (frame-parameter nil 'bufler-workspace-path))
 	 (buffers (bufler-buffer-alist-at
                    path :filter-fns bufler-workspace-switch-buffer-filter-fns)))
-    (switch-to-buffer (caar buffers))))
+    (switch-to-buffer (caar buffers)))
+  ;; A hack to ensure that I have the top tabs; I don't need it because I could
+  ;; use `jf/tab-bar-switch-prompt-for-tab'.
+  (bufler-tabs-mode t))
 
 (require 'bufler)
-(defun jf/tab-bar-switch (name)
+(defun jf/tab-bar-switch-prompt-for-tab (name)
   "Switch to the NAME tab and prompt for a buffer."
   (interactive
    (let* ((recent-tabs (mapcar (lambda (tab)
@@ -195,7 +200,15 @@
                             recent-tabs nil nil nil nil recent-tabs))))
   (tab-bar-select-tab (1+ (or (tab-bar--tab-index-by-name name) 0)))
   (bufler-switch-buffer)
-  )
+  (bufler-tabs-mode t))
+
+;; (advice-add 'switch-to-buffer
+;;             :around #'find-file-in-the-files-tab-advice)
+
+(defun find-file-in-the-files-tab-advice (orig-func filename &rest wildcards)
+  "Open FILENAME in the files tab."
+  (bufler-group-auto-workspace filename)
+  (apply orig-func filename wildcards))
 
 (provide 'jf-windows)
 ;;; jf-windows.el ends here
