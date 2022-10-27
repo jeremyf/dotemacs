@@ -6,6 +6,17 @@
 ;; This file is NOT part of GNU Emacs.
 ;;; Commentary
 
+;; This package configures and extends `denote' by adding conceptual domains to
+;; my note taking.  The domains are larger demarcations than simple tags.
+;;
+;; Further by leveraging domains, I have three means of searching:
+;;
+;; - "posts/" are all of my blog posts
+;; - "-word" will find title's with "word" in them
+;; - "_tag" will find the "tag" amongst the files keywords
+;;
+;; Further this allows me to leverage, if I want, Denote's siloing feature.
+
 ;;; Code
 
 ;;;; Loading dependencies
@@ -30,22 +41,25 @@
            ;; And `org-read-date' is an amazing bit of tech
            (denote-date-prompt-denote-date-prompt-use-org-read-date t)))
 
-;;Let’s add another way at looking up files.
+;;Let’s add another way at looking up files.  I appreciate the ability to
+;;search all files and start with a character (e.g. =b=) followed by <space> to
+;;filter to the note source keyed as =s= (e.g. Scientist).
 (use-package consult-notes
   :straight (:type git :host github :repo "mclear-tools/consult-notes")
+  :after (consult denote)
   :bind
   ("H-d s" . 'consult-notes-search-in-all-notes)
   ("H-d f RET" . 'consult-notes)
   :config  (setq consult-notes-sources (list))
-  ;; Ensuring that I search my sub-directory.
-  :custom (consult-notes-ripgrep-args "rg --null --line-buffered --color=never --max-columns=1000 --path-separator / --no-ignore-vcs --ignore-case --no-heading --line-number --hidden --glob=!.git/ -L --sortr=accessed")
+  ;; Ensuring that I search my denote/scientist sub-directory.
+  :custom (consult-notes-ripgrep-args "rg --null --line-buffered --color=never --max-columns=1000 --path-separator / --ignore-case --no-heading --line-number --hidden --glob=!.git/ -L --sortr=accessed")
   :commands (consult-notes
              consult-notes-search-in-all-notes))
 
 ;;;; Note taking configurations
-
+;;
 ;;;;; `denote' and `org-mode' integration
-
+;;
 ;; The following functions help me retrieve Org-Mode properties from the given
 ;; Denote ID.
 (cl-defun jf/denote-org-property-from-id (&key identifier property)
@@ -61,6 +75,7 @@
       (with-current-buffer (find-file-noselect filename)
         (cadar (org-collect-keywords (list property)))))))
 
+;; This function is the plural version of `jf/denote-org-property-from-id'
 (cl-defun jf/denote-org-properties-from-id (&key identifier properties)
   "Given an IDENTIFIER and PROPERTIES list return an a-list of values.
 
@@ -93,6 +108,7 @@
    "\n"))
 
 ;;;;; `denote' file finding functions
+;;
 ;; I’m not looking at active silo-ing and want to be able to search
 ;; specifically from the top-level and all subdirectories.
 (defun jf/denote-file-prompt (fn &optional initial-dir)
@@ -117,13 +133,15 @@
   (interactive)
   (require 'consult-projectile)
   (require 'denote)
-  (consult-projectile--file (denote-directory)))
+  ;; For this query, override the `projectile-git-command' so that I can
+  ;; include my "denote/scientist" notes.
+  (let ((projectile-git-command "git ls-files -zco --exclude-from=.projectile.gitignore"))
+    (consult-projectile--file (denote-directory))))
 
 ;;;;; Note taking Domains
-
+;;
 ;; ;; This should return a list
 ;; (message "%s" (jf/calculated-list-of-denote-known-keywords :from "~/git/org/denote/glossary"))
-
 (cl-defmacro jf/denote-create-functions-for (&key domain key (create-fn nil))
   "A macro to create functions for the given DOMAIN.
 
@@ -145,8 +163,8 @@
          (default-create-docstring (concat "Create denote in \""
                                            domain
                                            "\" subdirectory of `denote-directory'."))
-         (inserter-fn (intern (concat "jf/denote-link--" domain)))
-         (inserter-docstring (concat "Link to denote in \""
+         (link-or-creator-fn (intern (concat "jf/denote-link--" domain)))
+         (link-or-creator-docstring (concat "Link to denote in \""
                                      domain
                                      "\" subdirectory of `denote-directory'.")))
     `(progn
@@ -166,9 +184,9 @@
          (interactive)
          (let ((denote-directory (f-join (denote-directory) ,domain)))
            (call-interactively #'jf/denote-find-file)))
-       (bind-key (format "H-d l %c" ,key) ',inserter-fn)
-       (defun ,inserter-fn ()
-         ,inserter-docstring
+       (bind-key (format "H-d l %c" ,key) ',link-or-creator-fn)
+       (defun ,link-or-creator-fn ()
+         ,link-or-creator-docstring
          (interactive)
          (let ((denote-directory (f-join (denote-directory) ,domain)))
            (call-interactively #'denote-link-or-create)))
