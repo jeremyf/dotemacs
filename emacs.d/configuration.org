@@ -1271,7 +1271,12 @@ are major modes others are minor modes.
     :straight t
     ;; Ensure that we’re loading enh-ruby-mode before we do any rspec loading.
     :after enh-ruby-mode
-    :custom (rspec-use-spring-when-possible nil)
+    :custom
+    (rspec-use-spring-when-possible nil)
+    (rspec-use-docker-when-possible t)
+    (rspec-container-name "web")
+    (rspec-docker-cwd "./")
+    (rspec-docker-command "docker compose exec")
     :bind (:map rspec-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
     :bind (:map enh-ruby-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
     :diminish 'rspec-mode)
