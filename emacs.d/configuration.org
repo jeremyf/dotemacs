@@ -538,6 +538,17 @@ What follows is adjustments to emacs settings as they relate to completion.
   (use-package vertico
     :straight t
     :config
+    ;; https://github.com/minad/vertico/wiki#restrict-the-set-of-candidates
+    (defun jf/vertico-restrict-to-matches ()
+      "Restrict set of candidates to visible candidates"
+    (interactive)
+    (let ((inhibit-read-only t))
+      (goto-char (point-max))
+      (insert " ")
+      (add-text-properties (minibuffer-prompt-end) (point-max)
+                           '(invisible t read-only t cursor-intangible t rear-nonsticky t))))
+
+    (define-key vertico-map (kbd "S-SPC") #'jf/vertico-restrict-to-matches)
     (vertico-mode)
     ;; Use `consult-completion-in-region' if Vertico is enabled.
     ;; Otherwise use the default `completion--in-region' function.
@@ -562,7 +573,9 @@ What follows is adjustments to emacs settings as they relate to completion.
         jf/silence-loading-log)
   (global-set-key (kbd "M-r") #'vertico-repeat)
   (add-hook 'minibuffer-setup-hook #'vertico-repeat-save)
-  (savehist-mode 1)
+  (use-package savehist
+    :init
+    (savehist-mode))
 
   (use-package marginalia
     :straight t
@@ -1191,24 +1204,24 @@ are major modes others are minor modes.
 
   (use-package eglot
     :hook ((css-mode
-	    enh-ruby-mode
-	    yaml-mode
-	    html-mode
-	    js-mode
-	    scss-mode) . eglot-ensure)
+            enh-ruby-mode
+            yaml-mode
+            html-mode
+            js-mode
+            scss-mode) . eglot-ensure)
     :config
     (setq eglot-ignored-server-capabilites (quote (:documentHighlightProvider))
-	  completion-category-overrides '((eglot (styles orderless))))
+          completion-category-overrides '((eglot (styles orderless))))
     (add-to-list 'eglot-server-programs
-		 `(enh-ruby-mode . ("solargraph" "socket" "--port" :autoport)))
+                 `(enh-ruby-mode . ("solargraph" "socket" "--port" :autoport)))
     :straight t)
 
   (use-package emmet-mode
     :straight t
     :bind (("C-c C-e" . emmet-expand-yas ))
     :hook ((sgml-mode . emmet-mode)
-	   (html-mode . emmet-mode)
-	   (css-mode . emmet-mode)))
+           (html-mode . emmet-mode)
+           (css-mode . emmet-mode)))
 
   (use-package enh-ruby-mode
     :straight t
@@ -1216,7 +1229,7 @@ are major modes others are minor modes.
     :hook (enh-ruby-mode . eldoc-mode)
     :hook (enh-ruby-mode . enh-ruby-imenu-create-index)
     :bind (:map enh-ruby-mode-map ("C-j" . jf/jump-to-agenda-or-mark)
-				   ("M-h" . enh-ruby-mark-defun))
+                ("M-h" . enh-ruby-mark-defun))
     :mode (("\\(?:\\.rb\\|ru\\|rake\\|thor\\|jbuilder\\|gemspec\\|podspec\\|/\\(?:Gem\\|Rake\\|Cap\\|Thor\\|Vagrant\\|Guard\\|Pod\\)file\\)\\'" . enh-ruby-mode)))
   (add-to-list 'interpreter-mode-alist '("ruby" . enh-ruby-mode))
 
@@ -1254,16 +1267,16 @@ are major modes others are minor modes.
     :straight t
     :hook ((markdown-mode . turn-on-visual-line-mode))
     :mode (("README\\.md\\'" . gfm-mode)
-	   ("\\.md\\'" . markdown-mode)
-	   ("\\.markdown\\'" . markdown-mode))
+           ("\\.md\\'" . markdown-mode)
+           ("\\.markdown\\'" . markdown-mode))
     :init (setq markdown-command "/opt/homebrew/bin/pandoc"))
 
   ;; A mode for working with PlantUML.  See https://plantuml.com
   (use-package plantuml-mode
     :config (setq plantuml-executable-path (concat (getenv "HB_PATH") "/bin/plantuml")
-		  plantuml-default-exec-mode 'executable
-		  org-plantuml-executable-path (concat (getenv "HB_PATH") "/bin/plantuml")
-		  org-plantuml-exec-mode 'executable)
+                  plantuml-default-exec-mode 'executable
+                  org-plantuml-executable-path (concat (getenv "HB_PATH") "/bin/plantuml")
+                  org-plantuml-exec-mode 'executable)
     :mode (("\\.plantuml\\'" . plantuml-mode))
     :straight t)
 
@@ -1271,10 +1284,11 @@ are major modes others are minor modes.
     :straight t
     ;; Ensure that we’re loading enh-ruby-mode before we do any rspec loading.
     :after enh-ruby-mode
+    :config
+    (setq rspec-container-name "web")
     :custom
     (rspec-use-spring-when-possible nil)
     (rspec-use-docker-when-possible t)
-    (rspec-container-name "web")
     (rspec-docker-cwd "./")
     (rspec-docker-command "docker compose exec")
     :bind (:map rspec-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
@@ -1294,8 +1308,8 @@ are major modes others are minor modes.
     :straight t
     :bind
     (:map so-long-mode-map
-	  ("C-s" . isearch-forward)
-	  ("C-r" . isearch-backward))
+          ("C-s" . isearch-forward)
+          ("C-r" . isearch-backward))
     :config (global-so-long-mode 1))
 
   (use-package sql-indent
@@ -1322,8 +1336,8 @@ are major modes others are minor modes.
   (use-package web-mode
     :straight t
     :config (setq web-mode-markup-indent-offset 2
-		  web-mode-css-indent-offset 2
-		  web-mode-code-indent-offset 2))
+                  web-mode-css-indent-offset 2
+                  web-mode-code-indent-offset 2))
   (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
 

@@ -189,7 +189,6 @@
   ;; use `jf/tab-bar-switch-prompt-for-tab'.
   (bufler-tabs-mode t))
 
-(require 'bufler)
 (defun jf/tab-bar-switch-prompt-for-tab (name)
   "Switch to the NAME tab and prompt for a buffer."
   (interactive
@@ -201,14 +200,6 @@
   (tab-bar-select-tab (1+ (or (tab-bar--tab-index-by-name name) 0)))
   (bufler-switch-buffer)
   (bufler-tabs-mode t))
-
-;; (advice-add 'switch-to-buffer
-;;             :around #'find-file-in-the-files-tab-advice)
-
-(defun find-file-in-the-files-tab-advice (orig-func filename &rest wildcards)
-  "Open FILENAME in the files tab."
-  (bufler-group-auto-workspace filename)
-  (apply orig-func filename wildcards))
 
 (provide 'jf-windows)
 ;;; jf-windows.el ends here
