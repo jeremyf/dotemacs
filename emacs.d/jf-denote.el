@@ -192,14 +192,17 @@
            (call-interactively #'denote-link-or-create)))
        )))
 
+;;;;;; Blog Posts
 ;; The blog-post domain is for things that I have, will, or might publish to
 ;; https://takeonrules.com
 (jf/denote-create-functions-for :domain "blog-posts"
                                 :key ?b)
 
+;;;;;; Scientist
 (jf/denote-create-functions-for :domain "scientist"
                                 :key ?s)
 
+;;;;;; Epigraphs
 (cl-defun jf/denote-create-epigraph (&key
                                      (body (read-from-minibuffer "Epigraph Text: "))
                                      ;; Todo prompt for Author Name
@@ -245,6 +248,7 @@
                                 :key ?e
                                 :create-fn 'jf/denote-create-epigraph)
 
+;;;;;; Glossary Entries
 (cl-defun jf/denote-create-glossary-entry
     (&key
      (title (read-from-minibuffer "Name the Entry: "))
@@ -288,14 +292,17 @@
 ;; (message "%s" (jf/denote-org-property-from-id :id "20220930T215235"
 ;; 					      :property "ABBR"))
 
+;;;;;; Melange
 ;; All the other things; perhaps they could become blog posts, but for now they
 ;; remain part of the mixture and medley.
 (jf/denote-create-functions-for :domain "melange" :key ?m)
 
+;;;;;; People
 ;; I do write notes about people I interact with.  Technically I have glossary
 ;; entries for people.  But those entries are for folks I don’t interact with.
 (jf/denote-create-functions-for :domain "people" :key ?p)
 
+;;;;;; Indices
 ;; On my site I write https://takeonrules.com/series/.  I track this data in a
 ;; YAML file; I’d like to treat this data similar to my glossary.
 (cl-defun jf/denote-create-indices-entry (&key
