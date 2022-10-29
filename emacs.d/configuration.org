@@ -2539,8 +2539,7 @@ those modes.
 I wrote [[file:burning-wheel-emacs-config.org][some tooling to help while playing Burning Wheel]].
 
 #+begin_src emacs-lisp
-  (org-babel-load-file
-   (concat user-emacs-directory "burning-wheel-emacs-config.org"))
+  (require 'jf-burning-wheel)
 #+end_src
 
 ** Eberron
