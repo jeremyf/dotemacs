@@ -689,11 +689,6 @@ What follows is adjustments to emacs settings as they relate to completion.
     ("s-t" . consult-projectile)
     ("s-p" . consult-projectile))
 
-  (use-package consult-yasnippet
-    :straight t
-    :after (consult yasnippet)
-    :bind ("C-c y" . consult-yasnippet))
-
   ;; I use ~embark.el~ and ~consult.el~, let’s add a little bit more connective
   ;;  tissue.
   (use-package embark-consult
@@ -1033,16 +1028,7 @@ What follows is adjustments to emacs settings as they relate to completion.
     :config
     ;; :hook (prog-mode . fci-mode)
     (setq fci-rule-width 1))
-#+end_src
 
-
-**** popper.el
-
-- ~popper.el~ :: Treat some types of windows as popups (e.g., something easier
-  to dismiss, a bit more like the mini-buffer).  Further ~jf/popper~ can
-  toggle the popup buffer.  See that method for further implementation details.
-
-#+begin_src emacs-lisp
   ;; Enforce rules for popups.  See https://depp.brause.cc/shackle/.
   (use-package shackle
     :straight t
@@ -1198,17 +1184,6 @@ are major modes others are minor modes.
     :after json-mode
     :init (setq json-reformat:indent-width 2))
 
-  ;; For awhile, I was trying to use lsp-mode.  It might look a bit nicer, but it
-  ;; was a little to “nosy”.  On my read, ~eglot~ leverages many of the built-in
-  ;; APIs of Emacs.
-  ;;
-  ;; https://github.com/joaotavora/eglot#1-2-3-pitfall
-  (use-package xref
-    :straight t
-    :custom
-    (xref-file-name-display 'project-relative)
-    (xref-search-program 'ripgrep))
-
   (use-package project
     :straight t)
 
@@ -1299,6 +1274,17 @@ are major modes others are minor modes.
 
   (add-to-list `auto-mode-alist '("\\.svg\\'" . xml-mode))
 
+  ;; For awhile, I was trying to use lsp-mode.  It might look a bit nicer, but it
+  ;; was a little to “nosy”.  On my read, ~eglot~ leverages many of the built-in
+  ;; APIs of Emacs.
+  ;;
+  ;; https://github.com/joaotavora/eglot#1-2-3-pitfall
+  (use-package xref
+    :straight t
+    :custom
+    (xref-file-name-display 'project-relative)
+    (xref-search-program 'ripgrep))
+
   (use-package yaml-mode :straight t)
 
   (use-package yard-mode
@@ -1347,13 +1333,8 @@ A timestamp library.
   (use-package titlecase
     :straight (titlecase :host github :repo "duckwork/titlecase.el")
     :custom (titlecase-style 'wikipedia))
-#+end_src
 
-**** fill-sentences-correctly.el
 
-- ~fill-sentences-correctly.el~ ::
-
-#+BEGIN_src emacs-lisp
   ;; After using Emacs for awhile, with it’s sentence navigation, I’ve come to
   ;; strongly favor two spaces after a period.  The
   ;; `fill-sentences-correctly-mode' ensures that `fill-paragraph' (e.g. M-q)
@@ -1361,19 +1342,10 @@ A timestamp library.
   (use-package fill-sentences-correctly
     :straight (fill-sentences-correctly :host github :repo "duckwork/fill-sentences-correctly.el")
     :hook (fundamental-mode . fill-sentences-correctly-mode))
-#+end_src
 
-**** savekill.el
-
-- ~savekill.el~ :: Write "kill" command inputs to disk.
-
-#+begin_src emacs-lisp
+  ;; Write "kill" command inputs to disk.
   (use-package savekill :straight t)
-#+end_src
 
-**** math-at-point.el
-
-#+begin_src emacs-lisp
   ;; Calculate math functions at point and message result in minibuffer.  See
   ;; https://github.com/shankar2k/math-at-point.
   (use-package math-at-point
@@ -1409,13 +1381,7 @@ A timestamp library.
     :bind (("M-SPC" . hippie-expand)))
 
   (global-set-key [remap dabbrev-expand] 'hippie-expand)
-#+end_src
 
-**** expand-region.el
-
-- ~expand-region.el~ ::
-
-#+begin_src emacs-lisp
   ;; A simple package that does two related things really well; expands and
   ;; contracts the current region.  I use this all the time.
   ;;
@@ -1426,11 +1392,7 @@ A timestamp library.
     :straight t
     :bind (("C-=" . er/expand-region)
 	   ("C-+" . er/contract-region)))
-#+end_src
 
-**** multiple-cursors.el
-
-#+begin_src emacs-lisp
   ;; Allow Emacs to work with multiple cursors.  See
   ;; https://melpa.org/#/multiple-cursors
   (use-package multiple-cursors
@@ -1479,11 +1441,7 @@ A timestamp library.
   (use-package unfill
     :bind ("M-q" . unfill-toggle)
     :straight t)
-#+end_src
 
-**** undo-tree.el
-
-#+begin_src emacs-lisp
   ;; Provides a UI for undo trees.  I'm not certain what I want to do with this.
   (use-package undo-tree
     :diminish
@@ -1493,43 +1451,22 @@ A timestamp library.
     (setq undo-tree-enable-undo-in-region t)
     (global-undo-tree-mode +1)
     (unbind-key "M-_" undo-tree-map))
-#+end_src
 
-**** hungry-delete.el
-
-#+begin_src emacs-lisp
   ;; Delete multiple spaces in one delete stroke.
   (use-package hungry-delete
       :straight t
       :diminish 'hungry-delete-mode
       :config (global-hungry-delete-mode))
-#+end_src
 
-**** move-text.el
-
-#+begin_src emacs-lisp
   ;; A simple package ability to move lines up and down.
   (use-package move-text
     :straight t
     :bind (([C-s-down] . move-text-down)
-	   ([C-s-up] . move-text-up)))
-#+end_src
+           ([C-s-up] . move-text-up)))
 
-**** string-inflection.el
-
-#+begin_src emacs-lisp
   (use-package string-inflection
     :straight t)
-#+end_src
 
-
-**** tempel.el
-
-**** whole-line-or-region.el
-
-- ~whole-line-or-region.el~ ::
-
-#+begin_src emacs-lisp
   ;; From the package commentary, “This minor mode allows functions to operate on
   ;; the current line if they would normally operate on a region and region is
   ;; currently undefined.”  I’ve used this for awhile and believe it’s not baked
@@ -1538,11 +1475,7 @@ A timestamp library.
     :straight t
     :diminish 'whole-line-or-region-local-mode
     :config (whole-line-or-region-global-mode))
-#+end_src
 
-**** smartparens.el
-
-#+begin_src emacs-lisp
   ;; provides some “intelligent” treatment of parentheses.  I’ve been using this
   ;; for awhile, so I assume it’s baked into my memory.
   (use-package smartparens :straight t)
@@ -1806,11 +1739,7 @@ These are a few variables and cosntants that I use throughout my configuration.
 I use org-mode and org-roam to help manage content.  Let’s load that rather extensive configuration.
 
 #+begin_src emacs-lisp
-  ;; (org-babel-load-file
-  ;;  (concat user-emacs-directory "knowledge-management-config.org"))
   (require 'jf-org-mode)
-  ;; (org-babel-load-file
-  ;;  (concat user-emacs-directory "denote-emacs-configuration.org"))
   (require 'jf-denote)
 #+end_src
 
