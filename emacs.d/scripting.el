@@ -1,0 +1,12 @@
+'jf-coding.el
+'jf-communicating.el
+'jf-completing.el
+'jf-gaming.el
+'jf-illuminating.el
+jf-launching.el
+jf-navigating.el
+jf-organizing.el
+jf-reading.el
+jf-utility.el
+jf-versioning.el
+jf-writing.el
