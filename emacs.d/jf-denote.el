@@ -73,6 +73,7 @@
 	     denote-get-path-by-id)
   :bind ("H-f" . 'jf/denote-find-file)
   ("H-l" . 'denote-link-or-create)
+  ("H-i" . 'denote-link-or-create)
   :hook (dired-mode . denote-dired-mode)
   :custom ((denote-directory (expand-file-name "denote" org-directory))
            ;; These are the minimum viable prompts for notes
