@@ -4,10 +4,31 @@
 ;; Author: Jeremy Friesen <jeremy@jeremyfriesen.com>
 
 ;; This file is NOT part of GNU Emacs.
+
 ;;; Commentary
 
+;;;; Preamble
+;;
+;; Prior to `denote' I made extensive use of `org-roam'; I was following
+;; `denote' development and appreciate Protesilaos's pedagological approach to
+;; documentation.  I also appreciate the design considerations; which I wrote
+;; about here: https://takeonrules.com/2022/10/09/denote-emacs-configuration/
+;;
+;; I installed denote and began exploring.  I am a software developer by trade,
+;; and found the code accessible and discernable; that with it's sole
+;; dependency being `emacs' I felt warranted further exploration.  Accessible,
+;; discernable, and no dependencies are attractive attributes of software that
+;; I use as my tools of work and play.  In my experience, the maintenance and
+;; enhancement is easier for this kind of software.
+;;
+;; With further exploration, I migrated fully from `org-roam' to `denote'.
+;;
+;;
+;;;; On Domains
+;;
 ;; This package configures and extends `denote' by adding conceptual domains to
-;; my note taking.  The domains are larger demarcations than simple tags.
+;; my note taking.  The domains are larger demarcations than simple tags.  This
+;; is built on top of the `denote-directory' variable and function.
 ;;
 ;; Further by leveraging domains, I have three means of searching:
 ;;
@@ -15,7 +36,28 @@
 ;; - "-word" will find title's with "word" in them
 ;; - "_tag" will find the "tag" amongst the files keywords
 ;;
-;; Further this allows me to leverage, if I want, Denote's siloing feature.
+;; This allows me to leverage, if I want, Denote's siloing feature.
+
+;;;; On Org Mode integration
+;;
+;; I make extensive use of `org-mode'; it is the format I use for crafting my
+;; blog posts (see https://takeonrules.com).  It is also the tool I use for my
+;; day to day task tracking and time tracking.
+;;
+;; I have structured my workflow so that any of these day to day activities can
+;; easily produce blog posts.  I want my internal writing to have lots of
+;; connective references; to help me find previous notes and perhaps look for
+;; interesting connections.
+;;
+;; I also want posts that I publish to provide a similar experience; but the
+;; links need to only be for publicly available connections.  In other words,
+;; when I export a blog post, any internal links that have an external proxy
+;; are rendered as links to those external proxies.  Any internal links without
+;; an external proxy are rendered without links.
+;;
+;; This is done via `org-link-set-parameters' and denote's documentation (see
+;; https://protesilaos.com/emacs/denote) provides excellent examples a
+;; `org-link-set-parameters'.
 
 ;;; Code
 
@@ -51,7 +93,8 @@
   ("H-d s" . 'consult-notes-search-in-all-notes)
   ("H-d f RET" . 'consult-notes)
   :config  (setq consult-notes-sources (list))
-  ;; Ensuring that I search my denote/scientist sub-directory.
+  ;; Ensuring that I search my denote/scientist sub-directory, which is
+  ;; excluded from it's containing project's git repository.
   :custom (consult-notes-ripgrep-args "rg --null --line-buffered --color=never --max-columns=1000 --path-separator / --ignore-case --no-heading --line-number --hidden --glob=!.git/ -L --sortr=accessed")
   :commands (consult-notes
              consult-notes-search-in-all-notes))
