@@ -6,49 +6,9 @@
 ;; This file is NOT part of GNU Emacs.
 ;;; Commentary
 ;;
-;; This package provides font, theme, and window support.
+;; This package provides theme, frame, and window support.
 
 ;;; Code
-
-;;;; Fonts
-(use-package fontaine
-  :straight t
-  :config
-  (setq fontaine-presets
-        '((small
-           :default-height 110)
-          (default
-           :default-height 155)
-          (coding
-           :default-height 155)
-          (presenting
-           :default-weight semilight
-           :default-height 220
-           :bold-weight extrabold)
-          (reading
-           :default-weight semilight
-           :default-height 220
-           :bold-weight extrabold)
-          (t
-           ;; Following Prot’s example, keeping these for for didactic purposes.
-           :default-family "Iosevka Comfy Motion Fixed"
-           :default-weight regular
-           :default-height 155
-           :fixed-pitch-family nil ; falls back to :default-family
-           :fixed-pitch-weight nil ; falls back to :default-weight
-           :fixed-pitch-height 1.0
-           :fixed-pitch-serif-family nil ; falls back to :default-family
-           :fixed-pitch-serif-weight nil ; falls back to :default-weight
-           :fixed-pitch-serif-height 1.0
-           :variable-pitch-family "ETBembo"
-           :variable-pitch-weight nil
-           :variable-pitch-height 1.0
-           :bold-family nil ; use whatever the underlying face has
-           :bold-weight bold
-           :italic-family nil
-           :italic-slant italic
-           :line-spacing nil))))
-(fontaine-set-preset 'default)
 
 ;;;; Themes
 (mapc #'disable-theme custom-enabled-themes)
