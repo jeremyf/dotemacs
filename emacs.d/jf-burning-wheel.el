@@ -14,6 +14,9 @@
 ;; thinking through my approach in a programming language.
 
 ;;; Code
+(require 'jf-minor-mode-maker)
+(require 'jf-quick-help)
+
 (jf/minor-mode-maker :title "Burning Wheel Gold"
                      :abbr "bwg"
                      :hooks (list 'org-mode-hook 'markdown-mode-hook))

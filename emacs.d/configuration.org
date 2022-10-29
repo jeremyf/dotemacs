@@ -289,24 +289,8 @@ As we get started in Emacs, I want to make sure I have the basics lined up.
     :config (gcmh-mode))
   ;;; END Core Configuration
 
-  (cl-defmacro jf/minor-mode-maker (&key title abbr hooks keymap)
-    "A macro to declare a minor mode.
+  (require 'jf-minor-mode-maker)
 
-  Use TITLE to derive the docstring.
-  Use ABBR to derive the mode-name lighter.
-  Add hook to each HOOKS provided."
-    (let ((mode-name (intern (s-downcase (concat "jf/" abbr "-minor-mode"))))
-          (lighter (concat " " abbr))
-          (docstring (concat "Minor mode for " title ".")))
-      `(progn
-         (define-minor-mode ,mode-name
-           ,docstring
-           :init-value nil
-           :global nil
-           :keymap ,keymap
-           :lighter ,lighter)
-         (when ,hooks
-           (-each ,hooks (lambda(hook) (add-hook hook (lambda () (,mode-name)))))))))
 #+end_src
 
 
@@ -2529,10 +2513,6 @@ In work and in play, there are several “me” specific contexts.  The
 contexual minor modes.  My intention is to build out even more functions on
 those modes.
 
-#+begin_src emacs-lisp
-  (jf/minor-mode-maker :title "Take on Rules"
-		       :abbr "tor")
-#+end_src
 
 ** Burning Wheel
 
@@ -2540,6 +2520,7 @@ I wrote [[file:burning-wheel-emacs-config.org][some tooling to help while playin
 
 #+begin_src emacs-lisp
   (require 'jf-burning-wheel)
+  (require 'jf-eberron)
 #+end_src
 
 ** Eberron
