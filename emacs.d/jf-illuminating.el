@@ -1,24 +1,35 @@
-;;; jf-illuminating.el --- Simple focus mode and extras -*- lexical-binding: t -*-
+;;; jf-illuminating.el --- Packages and functions that "illuminate" the current state -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2022  Jeremy Friesen
 ;; Author: Jeremy Friesen <jeremy@jeremyfriesen.com>
 
 ;; This file is NOT part of GNU Emacs.
-;;; Commentary
-
-;; Packages specifically here for helping with my coding activities.
 
 ;;; Code
+(use-package expand-region
+  ;; A simple package that does two related things really well; expands and
+  ;; contracts the current region.  I use this all the time.
+  ;;
+  ;; In writing, with the cursor at point, when I expand it selects the word.
+  ;; The next expand the sentence, then paragraph, then page.  In programming it
+  ;; leverages sexp.
+  :straight t
+  :bind (("C-=" . er/expand-region)
+         ("C-+" . er/contract-region)))
 
-;; I vascilate between yes and no; but invariably find myself stuck in a
-;; recursed buffer.
-(setq enable-recursive-minibuffers t)
-(use-package recursion-indicator
+(use-package fill-column-indicator
   :straight t
   :config
-  (recursion-indicator-mode))
+  ;; :hook (prog-mode . fci-mode)
+  (setq fci-rule-width 1))
 
-(global-hl-line-mode)
+(use-package highlight-indent-guides
+  ;; provides column highlighting.  Useful when you start seeing too many nested
+  ;; layers.
+  :straight t
+  :custom (highlight-indent-guides-method 'character)
+  (highlight-indent-guides-responsive 'top)
+  :hook (prog-mode . highlight-indent-guides-mode))
 
 (use-package kind-icon
   :straight t
@@ -45,56 +56,18 @@
   ;; function unless you use something similar
   (add-hook 'kb/themes-hooks #'(lambda () (interactive) (kind-icon-reset-cache))))
 
-;; A simple package that does two related things really well; expands and
-;; contracts the current region.  I use this all the time.
-;;
-;; In writing, with the cursor at point, when I expand it selects the word.
-;; The next expand the sentence, then paragraph, then page.  In programming it
-;; leverages sexp.
-(use-package expand-region
-  :straight t
-  :bind (("C-=" . er/expand-region)
-         ("C-+" . er/contract-region)))
-
-;; provides column highlighting.  Useful when you start seeing too many nested
-;; layers.
-(use-package highlight-indent-guides
-  :straight t
-  :custom (highlight-indent-guides-method 'character)
-  (highlight-indent-guides-responsive 'top)
-  :hook (prog-mode . highlight-indent-guides-mode))
-
-;;  “LIN locally remaps the hl-line face to a style that is optimal for major
-;;  modes where line selection is the primary mode of interaction.”  In
-;;  otherwords, ~lin.el~ improves the highlighted line behavior for the
-;;  competing contexts.
 (use-package lin
+  ;;  “LIN locally remaps the hl-line face to a style that is optimal for major
+  ;;  modes where line selection is the primary mode of interaction.”  In
+  ;;  otherwords, ~lin.el~ improves the highlighted line behavior for the
+  ;;  competing contexts.
   :straight (lin :host gitlab :repo "protesilaos/lin")
+  :init (global-hl-line-mode)
   :config (lin-global-mode 1)
   (setq lin-face 'lin-blue))
 
-(use-package fill-column-indicator
-  :straight t
-  :config
-  ;; :hook (prog-mode . fci-mode)
-  (setq fci-rule-width 1))
-
-(use-package yafolding :straight t)
-
-;; A quick and useful visual queue for paranthesis.
-(use-package rainbow-delimiters
-  :straight t
-  :hook ((fundamental-mode) . rainbow-delimiters-mode))
-
-;; Show tilde (e.g. ~\~~) on empty trailing lines.  This is a feature ported
-;; from https://en.wikipedia.org/wiki/Vi
-(use-package vi-tilde-fringe
-  :straight t
-  :diminish 'vi-tilde-fringe-mode
-  :config (global-vi-tilde-fringe-mode))
-
-;; A little bit of visual feedback.  See https://protesilaos.com/codelog/2022-03-14-emacs-pulsar-demo/
 (use-package pulsar
+  ;; A little bit of visual feedback.  See https://protesilaos.com/codelog/2022-03-14-emacs-pulsar-demo/
   :straight (pulsar :host gitlab :repo "protesilaos/pulsar")
   :hook
   (consult-after-jump . pulsar-recenter-top)
@@ -116,22 +89,46 @@
       (pulsar-pulse-line)))
   :bind (("C-l" . jf/pulse)))
 
-;; From the package commentary, “This minor mode allows functions to operate on
-;; the current line if they would normally operate on a region and region is
-;; currently undefined.”  I’ve used this for awhile and believe it’s not baked
-;; into my assumptions regarding how I navigate Emacs.
+(use-package rainbow-delimiters
+  ;; A quick and useful visual queue for paranthesis.
+  :straight t
+  :hook ((fundamental-mode) . rainbow-delimiters-mode))
+
+(use-package recursion-indicator
+  ;; I vascilate between yes and no; but invariably find myself stuck in a
+  ;; recursed buffer.
+  :straight t
+  :config
+  (setq enable-recursive-minibuffers t)
+  (recursion-indicator-mode))
+
+(use-package smartparens
+  ;; provides some “intelligent” treatment of parentheses.  I’ve been using this
+  ;; for awhile, so I assume it’s baked into my memory.
+  :straight t)
+
+(use-package symbol-overlay
+  ;; This warrants a lot more work.  See
+  ;; https://github.com/wolray/symbol-overlay/tree/c439b73a5f9713bb3dce98986b589bb901e22130
+  :straight t)
+
+(use-package vi-tilde-fringe
+  ;; Show tilde (e.g. ~\~~) on empty trailing lines.  This is a feature ported
+  ;; from https://en.wikipedia.org/wiki/Vi
+  :straight t
+  :diminish 'vi-tilde-fringe-mode
+  :config (global-vi-tilde-fringe-mode))
+
 (use-package whole-line-or-region
+  ;; From the package commentary, “This minor mode allows functions to operate on
+  ;; the current line if they would normally operate on a region and region is
+  ;; currently undefined.”  I’ve used this for awhile and believe it’s not baked
+  ;; into my assumptions regarding how I navigate Emacs.
   :straight t
   :diminish 'whole-line-or-region-local-mode
   :config (whole-line-or-region-global-mode))
 
-;; provides some “intelligent” treatment of parentheses.  I’ve been using this
-;; for awhile, so I assume it’s baked into my memory.
-(use-package smartparens :straight t)
-
-;; This warrants a lot more work.  See https://github.com/wolray/symbol-overlay/tree/c439b73a5f9713bb3dce98986b589bb901e22130
-(use-package symbol-overlay
-  :straight t)
+(use-package yafolding :straight t)
 
 (provide 'jf-illuminating)
 ;;; jf-illuminating.el ends here
