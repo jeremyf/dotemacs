@@ -8,7 +8,7 @@
 
 ;;; Code
 
-;;; BEGIN Core Configuration
+;; BEGIN Core Configuration
 ;; I have chosen to adopt \"straight.el\" for my package management.  The fact
 ;; that it seamlessly works with `use-package' has help me keep my code more
 ;; organized.
@@ -193,7 +193,24 @@
   (setq gcmh-idle-delay 5
         gcmh-high-cons-threshold (* 16 1024 1024))  ; 16mb
   :config (gcmh-mode))
-;;; END Core Configuration
+
+
+(defconst jf/tor-home-directory
+  (file-truename "~/git/takeonrules.source")
+  "The home directory of TakeOnRules.com Hugo repository.")
+
+(defconst jf/tor-hostname-default-local
+  "http://localhost:1313"
+  "The scheme, host name, and port for serving up a local TakeOnRules.com.")
+
+(defconst jf/tor-hostname-default-remote
+  "https://takeonrules.com"
+  "The scheme and host name for TakeOnRules.com.")
+
+(defvar jf/tor-hostname-current
+  jf/tor-hostname-default-local
+  "What is the current hostname for serving TakeOnRules content.")
+
 
 (provide 'jf-launching)
 ;;; jf-launching.el ends here

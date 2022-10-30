@@ -43,6 +43,7 @@
 	typopunct-insert-ellipsis-or-middot
 	typopunct-insert-mp
 	typopunct-insert-quotation-mark
+	typopunct-insert-times
 	typopunct-insert-typographical-dashes
 	wdired-finish-edit
 	wgrep-finish-edit

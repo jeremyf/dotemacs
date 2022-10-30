@@ -51,12 +51,12 @@
   ;; https://github.com/minad/vertico/wiki#restrict-the-set-of-candidates
   (defun jf/vertico-restrict-to-matches ()
     "Restrict set of candidates to visible candidates"
-  (interactive)
-  (let ((inhibit-read-only t))
-    (goto-char (point-max))
-    (insert " ")
-    (add-text-properties (minibuffer-prompt-end) (point-max)
-                         '(invisible t read-only t cursor-intangible t rear-nonsticky t))))
+    (interactive)
+    (let ((inhibit-read-only t))
+      (goto-char (point-max))
+      (insert " ")
+      (add-text-properties (minibuffer-prompt-end) (point-max)
+                           '(invisible t read-only t cursor-intangible t rear-nonsticky t))))
 
   (define-key vertico-map (kbd "S-SPC") #'jf/vertico-restrict-to-matches)
   (vertico-mode)
@@ -85,27 +85,41 @@
 (add-hook 'minibuffer-setup-hook #'vertico-repeat-save)
 
 (use-package embark
-    :straight t
-    :bind
-    (("C-." . embark-act)       ;; pick some comfortable binding
-     ("M-." . embark-dwim)
-     ("C-s-e" . embark-export)
-     ("H-e" . embark-export)
-     ("C-h b" . embark-bindings))
-    :init
-    ;; Optionally replace the key help with a completing-read interface
-    (setq prefix-help-command #'embark-prefix-help-command)
-    :config
-    (setq embark-action-indicator
-	  (lambda (map &optional _target)
-	    (which-key--show-keymap "Embark" map nil nil 'no-paging)
-	    #'which-key--hide-popup-ignore-command)
-	  embark-become-indicator embark-action-indicator)
-    ;; Hide the mode line of the Embark live/completions buffers
-    (add-to-list 'display-buffer-alist
-		 '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
-		   nil
-		   (window-parameters (mode-line-format . none)))))
+  :straight t
+  :bind
+  (("C-." . embark-act)       ;; pick some comfortable binding
+   ("M-." . embark-dwim)
+   ("C-s-e" . embark-export)
+   ("H-e" . embark-export)
+   ("C-h b" . embark-bindings))
+  :init
+  ;; Optionally replace the key help with a completing-read interface
+  (setq prefix-help-command #'embark-prefix-help-command)
+  :config
+  (setq embark-action-indicator
+	(lambda (map &optional _target)
+	  (which-key--show-keymap "Embark" map nil nil 'no-paging)
+	  #'which-key--hide-popup-ignore-command)
+	embark-become-indicator embark-action-indicator)
+  ;; Hide the mode line of the Embark live/completions buffers
+  (add-to-list 'display-buffer-alist
+	       '("\\`\\*Embark Collect \\(Live\\|Completions\\)\\*"
+		 nil
+		 (window-parameters (mode-line-format . none)))))
+
+
+;; I use ~embark.el~ and ~consult.el~, let’s add a little bit more connective
+;;  tissue.
+(use-package embark-consult
+  :straight t
+  :after (embark consult)
+  :demand t ; only necessary if you have the hook below
+  ;; if you want to have consult previews as you move around an
+  ;; auto-updating embark collect buffer
+  :hook
+
+  (embark-collect-mode . consult-preview-at-point-mode)
+  (embark-collect-mode . embark-consult-preview-minor-mode))
 
 (use-package marginalia
   :straight t
@@ -474,74 +488,81 @@ Useful if you want a more robust view into the recommend candidates."
 (global-set-key [remap dabbrev-expand] 'hippie-expand)
 
 (use-package yasnippet
-    :straight t
-    :diminish 'yas-minor-mode
-    :init
-    (setq yas-snippet-dirs '("~/git/dotemacs/snippets"))
-    (yas-global-mode 1))
+  :straight t
+  :diminish 'yas-minor-mode
+  :init
+  (setq yas-snippet-dirs '("~/git/dotemacs/snippets"))
+  (yas-global-mode 1))
 
 (use-package which-key
-    :straight t
-    :diminish 'which-key-mode
-    :custom
-    (which-key-side-window-max-width 70)
-    (which-key-min-column-description-width 50)
-    (which-key-max-description-length 50)
-    :config
-    (which-key-mode)
-    (which-key-setup-side-window-right)
-    (which-key-show-major-mode))
+  :straight t
+  :diminish 'which-key-mode
+  :custom
+  (which-key-side-window-max-width 70)
+  (which-key-min-column-description-width 50)
+  (which-key-max-description-length 50)
+  :config
+  (which-key-mode)
+  (which-key-setup-side-window-right)
+  (which-key-show-major-mode))
 
-  ;; Grab a link from a variety of MacOS applications.
-  (use-package grab-mac-link
-    :straight t
-    ;; Ensuring we load these, as I'll need them later.
-    :commands (grab-mac-link-safari-1 grab-mac-link-firefox-1)
-    :config
-    ;; A replacement function for existing grab-mac-link-make-html-link
-    (defun jf/grab-mac-link-make-html-link (url name)
-      "Using HTML syntax, link to and cite the URL with the NAME."
-      (format "<cite><a href=\"%s\" class=\"u-url p-name\" rel=\"cite\">%s</a></cite>" url name))
-    ;; The function advice to override the default behavior
+;; Grab a link from a variety of MacOS applications.
+(use-package grab-mac-link
+  :straight t
+  ;; Ensuring we load these, as I'll need them later.
+  :commands (grab-mac-link-safari-1 grab-mac-link-firefox-1)
+  :config
+  ;; A replacement function for existing grab-mac-link-make-html-link
+  (defun jf/grab-mac-link-make-html-link (url name)
+    "Using HTML syntax, link to and cite the URL with the NAME."
+    (format "<cite><a href=\"%s\" class=\"u-url p-name\" rel=\"cite\">%s</a></cite>" url name))
+  ;; The function advice to override the default behavior
 
-    (advice-add 'grab-mac-link-make-html-link
-		:override 'jf/grab-mac-link-make-html-link
-		'((name . "jnf")))
-    :bind (("C-c g" . grab-mac-link)))
+  (advice-add 'grab-mac-link-make-html-link
+	      :override 'jf/grab-mac-link-make-html-link
+	      '((name . "jnf")))
+  :bind (("C-c g" . grab-mac-link)))
 
-  ;; Similar to `grab-mac-link' this specifically grabs a link and inserts in
-  ;; `org-mode' format.
-  (use-package org-mac-link
-    :straight (org-mac-link :type git :host github :repo "jeremyf/org-mac-link")
-    :bind (:map org-mode-map (("C-c g" . org-mac-grab-link))))
+;; Similar to `grab-mac-link' this specifically grabs a link and inserts in
+;; `org-mode' format.
+(use-package org-mac-link
+  :straight (org-mac-link :type git :host github :repo "jeremyf/org-mac-link")
+  :bind (:map org-mode-map (("C-c g" . org-mac-grab-link))))
 
 (use-package helpful
-    :init
-    (use-package transient :straight t)
-    ;; I'm going to talk about this later, but I'm adding this to the menu, so I
-    ;; may as well state the dependency.
-    (use-package embark :straight t)
-    :straight t
-    :config
-    (transient-define-prefix jf/helpful-menu ()
-      "Return a `transient' compliant list to apply to different transients."
-      ["Help"
-       ""
-       ("Q" "Kill Helpful Buffers" helpful-kill-buffers)
-       ""
-       ("b" "Bindings" embark-bindings)
-       ("c" "Command" helpful-command)
-       ("f" "Function (interactive)" helpful-callable)
-       ("F" "Function (all)" helpful-function)
-       ("k" "Key" helpful-key)
-       ("l" "Library" find-library)
-       ("m" "Macro" helpful-macro)
-       ("p" "Thing at point" helpful-at-point)
-       ("." "Thing at point" helpful-at-point)
-       ("t" "Text properties" describe-text-properties)
-       ("v" "Variable" helpful-variable)])
-    :bind ("H-h" . jf/helpful-menu)
-    ("C-s-h" . jf/helpful-menu))
+  :init
+  (use-package transient :straight t)
+  ;; I'm going to talk about this later, but I'm adding this to the menu, so I
+  ;; may as well state the dependency.
+  (use-package embark :straight t)
+  :straight t
+  :config
+  (transient-define-prefix jf/helpful-menu ()
+    "Return a `transient' compliant list to apply to different transients."
+    ["Help"
+     ""
+     ("Q" "Kill Helpful Buffers" helpful-kill-buffers)
+     ""
+     ("b" "Bindings" embark-bindings)
+     ("c" "Command" helpful-command)
+     ("f" "Function (interactive)" helpful-callable)
+     ("F" "Function (all)" helpful-function)
+     ("k" "Key" helpful-key)
+     ("l" "Library" find-library)
+     ("m" "Macro" helpful-macro)
+     ("p" "Thing at point" helpful-at-point)
+     ("." "Thing at point" helpful-at-point)
+     ("t" "Text properties" describe-text-properties)
+     ("v" "Variable" helpful-variable)])
+  :bind ("H-h" . jf/helpful-menu)
+  ("C-s-h" . jf/helpful-menu))
+
+;; The =abbrev= package is simple and powerful, providing an auto-correct that
+;; I configure.  No more “teh” in my text.
+(use-package abbrev
+  :straight (:type built-in)
+  :custom (abbrev-file-name (file-truename "~/git/dotemacs/emacs.d/abbrev_defs"))
+  :hook (text-mode . abbrev-mode))
 
 (provide 'jf-completing)
 ;;; jf-completing.el ends here

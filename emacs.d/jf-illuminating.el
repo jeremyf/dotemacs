@@ -45,18 +45,93 @@
   ;; function unless you use something similar
   (add-hook 'kb/themes-hooks #'(lambda () (interactive) (kind-icon-reset-cache))))
 
-;; I use ~embark.el~ and ~consult.el~, let’s add a little bit more connective
-;;  tissue.
-(use-package embark-consult
+;; A simple package that does two related things really well; expands and
+;; contracts the current region.  I use this all the time.
+;;
+;; In writing, with the cursor at point, when I expand it selects the word.
+;; The next expand the sentence, then paragraph, then page.  In programming it
+;; leverages sexp.
+(use-package expand-region
   :straight t
-  :after (embark consult)
-  :demand t ; only necessary if you have the hook below
-  ;; if you want to have consult previews as you move around an
-  ;; auto-updating embark collect buffer
-  :hook
+  :bind (("C-=" . er/expand-region)
+         ("C-+" . er/contract-region)))
 
-  (embark-collect-mode . consult-preview-at-point-mode)
-  (embark-collect-mode . embark-consult-preview-minor-mode))
+;; provides column highlighting.  Useful when you start seeing too many nested
+;; layers.
+(use-package highlight-indent-guides
+  :straight t
+  :custom (highlight-indent-guides-method 'character)
+  (highlight-indent-guides-responsive 'top)
+  :hook (prog-mode . highlight-indent-guides-mode))
+
+;;  “LIN locally remaps the hl-line face to a style that is optimal for major
+;;  modes where line selection is the primary mode of interaction.”  In
+;;  otherwords, ~lin.el~ improves the highlighted line behavior for the
+;;  competing contexts.
+(use-package lin
+  :straight (lin :host gitlab :repo "protesilaos/lin")
+  :config (lin-global-mode 1)
+  (setq lin-face 'lin-blue))
+
+(use-package fill-column-indicator
+  :straight t
+  :config
+  ;; :hook (prog-mode . fci-mode)
+  (setq fci-rule-width 1))
+
+(use-package yafolding :straight t)
+
+;; A quick and useful visual queue for paranthesis.
+(use-package rainbow-delimiters
+  :straight t
+  :hook ((fundamental-mode) . rainbow-delimiters-mode))
+
+;; Show tilde (e.g. ~\~~) on empty trailing lines.  This is a feature ported
+;; from https://en.wikipedia.org/wiki/Vi
+(use-package vi-tilde-fringe
+  :straight t
+  :diminish 'vi-tilde-fringe-mode
+  :config (global-vi-tilde-fringe-mode))
+
+;; A little bit of visual feedback.  See https://protesilaos.com/codelog/2022-03-14-emacs-pulsar-demo/
+(use-package pulsar
+  :straight (pulsar :host gitlab :repo "protesilaos/pulsar")
+  :hook
+  (consult-after-jump . pulsar-recenter-top)
+  (consult-after-jump . pulsar-reveal-entry)
+  ;; integration with the built-in `imenu':
+  (imenu-after-jump . pulsar-recenter-top)
+  (imenu-after-jump . pulsar-reveal-entry)
+  :config
+  (pulsar-global-mode 1)
+  (setq pulsar-face 'pulsar-magenta
+	pulsar-delay 0.05)
+  (defun jf/pulse (parg)
+    "Pulse the current line.
+
+  If PARG (given as universal prefix), pulse between `point' and `mark'."
+    (interactive "P")
+    (if (car parg)
+	(pulsar--pulse nil nil (point) (mark))
+      (pulsar-pulse-line)))
+  :bind (("C-l" . jf/pulse)))
+
+;; From the package commentary, “This minor mode allows functions to operate on
+;; the current line if they would normally operate on a region and region is
+;; currently undefined.”  I’ve used this for awhile and believe it’s not baked
+;; into my assumptions regarding how I navigate Emacs.
+(use-package whole-line-or-region
+  :straight t
+  :diminish 'whole-line-or-region-local-mode
+  :config (whole-line-or-region-global-mode))
+
+;; provides some “intelligent” treatment of parentheses.  I’ve been using this
+;; for awhile, so I assume it’s baked into my memory.
+(use-package smartparens :straight t)
+
+;; This warrants a lot more work.  See https://github.com/wolray/symbol-overlay/tree/c439b73a5f9713bb3dce98986b589bb901e22130
+(use-package symbol-overlay
+  :straight t)
 
 (provide 'jf-illuminating)
 ;;; jf-illuminating.el ends here

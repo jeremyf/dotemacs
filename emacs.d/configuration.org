@@ -96,6 +96,7 @@ As we get started in Emacs, I want to make sure I have the basics lined up.
   (require 'jf-launching)
   (require 'jf-minor-mode-maker)
   (require 'jf-illuminating)
+  (require 'jf-navigating)
 #+end_src
 
 
@@ -157,35 +158,7 @@ When I start writing functions, there’s a few packages I want to consider.
 - ~keychain-environment.el~ :: Load keychain environment variables
 
 #+begin_src emacs-lisp
-  ;;; Support packages
-
-  ;; Load keychain environment
-  (use-package keychain-environment
-    :straight t
-    :config (keychain-refresh-environment))
-
-  ;; A modern list API for Emacs. No 'cl required.  (See https://github.com/magnars/dash.el/)
-  (use-package dash :straight t)
-
-  ;; A modern API for working with files and directories in Emacs. (See https://github.com/rejeep/f.el/)
-  (use-package f :straight t)
-
-  ;; The long lost Emacs string manipulation library.  (See https://github.com/magnars/s.el/)
-  (use-package s :straight t)
-
-  ;; “EditorConfig helps maintain consistent coding styles for multiple
-  ;; developers working on the same project across various editors and IDEs.”
-  ;; See https://editorconfig.org/#overview for more details.
-  (use-package editorconfig
-    :straight t
-    :diminish editorconfig-mode
-    :config
-    (editorconfig-mode 1))
-
-  (use-package rg
-    :config (rg-enable-menu)
-    ;; :init (setq ripgrep-arguments "--ignore-case")
-    :straight t)
+  (require 'jf-utility)
 #+end_src
 
 *** Completion
@@ -195,9 +168,6 @@ When I start writing functions, there’s a few packages I want to consider.
 What follows is adjustments to emacs settings as they relate to completion.
 
 #+begin_src emacs-lisp
-  (use-package savehist
-    :init
-    (savehist-mode))
   (require 'jf-completing)
 #+end_src
 
@@ -212,27 +182,6 @@ What follows is adjustments to emacs settings as they relate to completion.
    I use this sequence at least once a day.
 
 #+begin_src emacs-lisp
-  ;; “Edit a grep buffer and apply those changes to the file buffer.”  In other
-  ;; words, after “searching” for something, sending the results to a buffer
-  ;; (via `embark-export' or such thing), you can edit that search results
-  ;; buffer and propogate the changes to the locations of the elements that
-  ;; matched the search.
-  ;;
-  ;;   1.  Call `consult-ripgrep' (via ~C-c f~) to search for something.
-  ;;   2.  Call `embark-export' (via ~C-s-e~) to export to a grep buffer.
-  ;;   3.  Call `wgrep-change-to-wgrep-mode' (via ~e~ or ~C-c C-p~)
-  ;;   4.  Edit the grep buffer as you would anywhere else.
-  ;;   5.  Save (via ~C-x C-s~) or Cancel (via ~C-c C-k~).
-  (use-package wgrep
-    :after (embark-consult ripgrep)
-    :straight t
-    :bind (:map wgrep-mode-map
-		;; Added keybinding to echo Magit behavior
-		("C-c C-c" . wgrep-finish-edit)
-		:map grep-mode-map
-		("e" . wgrep-change-to-wgrep-mode)
-		:map ripgrep-search-mode-map
-		("e" . wgrep-change-to-wgrep-mode)))
 #+end_src
 
 **** yasnippet.el
@@ -245,127 +194,15 @@ What follows is adjustments to emacs settings as they relate to completion.
 
 #+end_src
 
-*** Navigation
-**** avy.el
-
-#+begin_src emacs-lisp
-  ;;; Navigation
-  ;;
-  ;; Pick a letter, avy finds all words with that at the beginning of it.  Narrow
-  ;; results from there.
-  (use-package avy
-    :bind (("C-c j" . avy-goto-char))
-    :straight t)
-
-  (use-package link-hint
-    :straight t
-    :bind
-    ("C-c l o" . link-hint-open-link)
-    ("C-c l c" . link-hint-copy-link))
-
-  (use-package imenu-list
-    :custom (imenu-list-focus-after-activation t)
-    (imenu-list-size 0.4)
-    (imenu-list-position 'right)
-    :bind ("s-4" . 'imenu-list-smart-toggle)
-    :bind (:map imenu-list-major-mode-map ("o" . 'imenu-list-goto-entry))
-    :straight t)
-#+end_src
-
-**** Extending the Mark
-
 *** Display
 
 **** highlight-indent-guides.el
 
-#+begin_src emacs-lisp
-  ;; provides column highlighting.  Useful when you start seeing too many nested
-  ;; layers.
-  (use-package highlight-indent-guides
-    :straight t
-    :custom (highlight-indent-guides-method 'character)
-    (highlight-indent-guides-responsive 'top)
-    :hook (prog-mode . highlight-indent-guides-mode))
-
-  ;;  “LIN locally remaps the hl-line face to a style that is optimal for major
-  ;;  modes where line selection is the primary mode of interaction.”  In
-  ;;  otherwords, ~lin.el~ improves the highlighted line behavior for the
-  ;;  competing contexts.
-  (use-package lin
-    :straight (lin :host gitlab :repo "protesilaos/lin")
-    :config (lin-global-mode 1)
-    (setq lin-face 'lin-blue))
-
-  (use-package fill-column-indicator
-    :straight t
-    :config
-    ;; :hook (prog-mode . fci-mode)
-    (setq fci-rule-width 1))
-
-  ;; Enforce rules for popups.  See https://depp.brause.cc/shackle/.
-
-
-  (use-package ace-window
-      :straight t
-      :bind (("M-o" . ace-window)))
-#+end_src
-
 **** Folding
 
 #+begin_src emacs-lisp
-  (use-package yafolding :straight t)
 
-  ;; A quick and useful visual queue for paranthesis.
-  (use-package rainbow-delimiters
-    :straight t
-    :hook ((fundamental-mode) . rainbow-delimiters-mode))
 
-  ;; Show tilde (e.g. ~\~~) on empty trailing lines.  This is a feature ported
-  ;; from https://en.wikipedia.org/wiki/Vi
-  (use-package vi-tilde-fringe
-    :straight t
-    :diminish 'vi-tilde-fringe-mode
-    :config (global-vi-tilde-fringe-mode))
-
-  ;; A little bit of visual feedback.  See https://protesilaos.com/codelog/2022-03-14-emacs-pulsar-demo/
-  (use-package pulsar
-    :straight (pulsar :host gitlab :repo "protesilaos/pulsar")
-    :hook
-    (consult-after-jump . pulsar-recenter-top)
-    (consult-after-jump . pulsar-reveal-entry)
-    ;; integration with the built-in `imenu':
-    (imenu-after-jump . pulsar-recenter-top)
-    (imenu-after-jump . pulsar-reveal-entry)
-    :config
-    (pulsar-global-mode 1)
-    (setq pulsar-face 'pulsar-magenta
-	  pulsar-delay 0.05)
-    (defun jf/pulse (parg)
-      "Pulse the current line.
-
-  If PARG (given as universal prefix), pulse between `point' and `mark'."
-      (interactive "P")
-      (if (car parg)
-	  (pulsar--pulse nil nil (point) (mark))
-	(pulsar-pulse-line)))
-    :bind (("C-l" . jf/pulse)))
-
-  (use-package emojify
-    :straight t
-    :config
-    (defun --set-emoji-font (frame)
-      "Adjust the font settings of FRAME so Emacs can display emoji properly."
-      (if (eq system-type 'darwin)
-	  ;; For NS/Cocoa
-	  (set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji") frame 'prepend)
-	;; For Linux
-	(set-fontset-font t 'symbol (font-spec :family "Symbola") frame 'prepend)))
-
-    ;; For when Emacs is started in GUI mode:
-    (--set-emoji-font nil)
-    ;; Hook for when a frame is created with emacsclient
-    ;; see https://www.gnu.org/software/emacs/manual/html_node/elisp/Creating-Frames.html
-    (add-hook 'after-make-frame-functions '--set-emoji-font))
 #+end_src
 
 **** DONE unicode-fonts.el
@@ -373,21 +210,12 @@ What follows is adjustments to emacs settings as they relate to completion.
 I’m uncertain why I included this, aside from “sure would be nice to have unicode fonts.”
 
 #+begin_src emacs-lisp
-  (use-package unicode-fonts
-    :straight t
-    :config (unicode-fonts-setup))
+
 #+end_src
 
 **** flymake-proselint
 
-#+begin_src emacs-lisp
-  (use-package flymake-proselint
-    :straight t)
 
-  ;; (add-hook 'text-mode-hook (lambda ()
-  ;; 			    (flymake-mode)
-  ;; 			    (flymake-proselint-setup)))
-#+end_src
 
 *** Modes
 
@@ -413,45 +241,15 @@ are major modes others are minor modes.
 *** Utilities
 
 
-**** edit-indirect.el
-
-The ~edit-indirect.el~ behaves similarly to the amazing ~org-edit-source-code~ but for any regions.  This is particularly nice for markdown “triple back-tick regions” (e.g. =```=).
-
-#+begin_src emacs-lisp
-
-#+end_src
-
-**** ts.el
-
-A timestamp library.
-
-#+begin_src emacs-lisp
-  (use-package ts
-    :straight t)
-#+end_src
-
-**** Custom Dictionary
-
-#+begin_src emacs-lisp
-
-#+end_src
+***
 
 **** titlecase.el
 
 #+begin_src emacs-lisp
-  ;; The rules of “titlecase” are confounding.  The ~titlecase.el~ package
-  ;; provides numerous ways to cast a string to “titlecase.”  I chose wikipedia
-  ;; style as a quasi-opinionated compromise.
-  (use-package titlecase
-    :straight (titlecase :host github :repo "duckwork/titlecase.el")
-    :custom (titlecase-style 'wikipedia))
-
-
-  ;; After using Emacs for awhile, with it’s sentence navigation, I’ve come to
+;; After using Emacs for awhile, with it’s sentence navigation, I’ve come to
   ;; strongly favor two spaces after a period.  The
 
-  ;; Write "kill" command inputs to disk.
-  (use-package savekill :straight t)
+
 
   ;; Calculate math functions at point and message result in minibuffer.  See
   ;; https://github.com/shankar2k/math-at-point.
@@ -463,53 +261,12 @@ A timestamp library.
 **** Expansion Options
 
 #+begin_src emacs-lisp
-  ;; The =abbrev= package is simple and powerful, providing an auto-correct that
-  ;; I configure.  No more “teh” in my text.
-  (use-package abbrev
-    :straight (:type built-in)
-    :custom (abbrev-file-name (file-truename "~/git/dotemacs/emacs.d/abbrev_defs"))
-    :hook (text-mode . abbrev-mode))
-
   ;; Using Hippie expand, I toggle through words already referenced.
-
-  ;; A simple package that does two related things really well; expands and
-  ;; contracts the current region.  I use this all the time.
-  ;;
-  ;; In writing, with the cursor at point, when I expand it selects the word.
-  ;; The next expand the sentence, then paragraph, then page.  In programming it
-  ;; leverages sexp.
-  (use-package expand-region
-    :straight t
-    :bind (("C-=" . er/expand-region)
-           ("C-+" . er/contract-region)))
-
-  ;; Allow Emacs to work with multiple cursors.  See
-  ;; https://melpa.org/#/multiple-cursors
-  (use-package multiple-cursors
-      :bind (("C-M-SPC" . set-rectangular-region-anchor)
-             ("C->" . mc/mark-next-like-this)
-             ("C-<" . mc/mark-previous-like-this)
-             ("C-s-<mouse-1>" . mc/add-cursor-on-click)
-             ("C-c C->" . mc/mark-all-like-this)
-             ("C-c C-SPC" . mc/edit-lines)) ;; CTRL+CMD+c
-      :straight t)
-
-  ;; Type \"C-;\" to select current symbol and all matches; Then edit at multiple
-  ;; points.
-  (use-package iedit :straight t)
 #+end_src
 
 **** crux.el
 
 #+begin_src emacs-lisp
-  ;; A mix of a few odd and useful functions.
-  (use-package crux
-    :straight t
-    :bind (("C-a" . crux-move-beginning-of-line)
-	   ("<C-s-return>" . crux-smart-open-line-above)
-	   ("C-s-k" . crux-kill-line-backwards)
-	   ("<s-backspace>" . crux-kill-line-backwards)
-	   ("<f9>" . crux-kill-other-buffers)))
 #+end_src
 
 **** ethan-wspace.el
@@ -522,59 +279,6 @@ A timestamp library.
     :hook (before-save . delete-trailing-whitespace)
     :init (setq-default mode-require-final-newline nil)
     :config (global-ethan-wspace-mode 1))
-#+end_src
-
-**** unfill.el
-
-#+begin_src emacs-lisp
-  ;; Provides the reverse of ~fill-paragraph~, and a toggle fill and unfill.
-  (use-package unfill
-    :bind ("M-q" . unfill-toggle)
-    :straight t)
-
-  ;; Provides a UI for undo trees.  I'm not certain what I want to do with this.
-  (use-package undo-tree
-    :diminish
-    :bind (("C-z" . undo)
-           ("C-s-z" . undo-tree-redo))
-    :config
-    (setq undo-tree-enable-undo-in-region t)
-    (global-undo-tree-mode +1)
-    (unbind-key "M-_" undo-tree-map))
-
-  ;; Delete multiple spaces in one delete stroke.
-  (use-package hungry-delete
-      :straight t
-      :diminish 'hungry-delete-mode
-      :config (global-hungry-delete-mode))
-
-  ;; A simple package ability to move lines up and down.
-  (use-package move-text
-    :straight t
-    :bind (([C-s-down] . move-text-down)
-           ([C-s-up] . move-text-up)))
-
-  (use-package string-inflection
-    :straight t)
-
-  ;; From the package commentary, “This minor mode allows functions to operate on
-  ;; the current line if they would normally operate on a region and region is
-  ;; currently undefined.”  I’ve used this for awhile and believe it’s not baked
-  ;; into my assumptions regarding how I navigate Emacs.
-  (use-package whole-line-or-region
-    :straight t
-    :diminish 'whole-line-or-region-local-mode
-    :config (whole-line-or-region-global-mode))
-
-  ;; provides some “intelligent” treatment of parentheses.  I’ve been using this
-  ;; for awhile, so I assume it’s baked into my memory.
-  (use-package smartparens :straight t)
-#+end_src
-
-**** grab-mac-link.el
-
-#+begin_src emacs-lisp
-
 #+end_src
 
 *** TODO Typography
@@ -660,103 +364,7 @@ A timestamp library.
 **** TODO typopunct.el
 
 #+begin_src emacs-lisp
-  (use-package typopunct
-    :straight t
-    :config
-    (add-hook 'org-mode-hook 'jf/typopunct-init)
-    (defun jf/typopunct-init ()
-      (require 'typopunct)
-      (typopunct-change-language 'english)
-      (typopunct-mode 1))
-    (setq typopunct-buffer-language 'english)
-
-    ;; To insert a typographical ellipsis sign (…) on three consecutive
-    ;; dots, or a middle dot (·) on ‘^.’
-    (defconst typopunct-ellipsis (decode-char 'ucs #x2026))
-    (defconst typopunct-middot   (decode-char 'ucs #xB7)) ; or 2219
-    (defun typopunct-insert-ellipsis-or-middot (arg)
-      "Change three consecutive dots to a typographical ellipsis mark."
-      (interactive "p")
-      (cond
-       ((and (= 1 arg)
-	     (eq (char-before) ?^))
-	(delete-char -1)
-	(insert typopunct-middot))
-       ((and (= 1 arg)
-	     (eq this-command last-command)
-	     (looking-back "\\.\\." 1))
-	(replace-match "")
-	(insert typopunct-ellipsis))
-       (t
-	(self-insert-command arg))))
-    (define-key typopunct-map "." 'typopunct-insert-ellipsis-or-middot)
-
-
-    (defconst typopunct-prime  (decode-char 'ucs #x2032)) ; feet, arcminutes, derivatives
-    (defconst typopunct-dprime (decode-char 'ucs #x2033)) ; inches, arcseconds, double derivatives
-    (defconst typopunct-tprime (decode-char 'ucs #x2034))
-
-    ;; The minus sign (−) is separate from the hyphen (-), en dash (–) and
-    ;; em dash (—). To build upon the clever behavior of the ‘-’ key
-    (defconst typopunct-minus (decode-char 'ucs #x2212))
-    (defconst typopunct-pm    (decode-char 'ucs #xB1))
-    (defconst typopunct-mp    (decode-char 'ucs #x2213))
-    (defadvice typopunct-insert-typographical-dashes
-	(around minus-or-pm activate)
-      (cond
-       ((or (eq (char-before) typopunct-em-dash)
-	    (looking-back "\\([[:blank:]]\\|^\\)\\^" 2))
-	(delete-char -1)
-	(insert typopunct-minus))
-       ((looking-back "[^[:blank:]]\\^" 1)
-	(insert typopunct-minus))
-       ((looking-back "+/" 1)
-	(progn (replace-match "")
-	       (insert typopunct-pm)))
-       (t ad-do-it)))
-    (defun typopunct-insert-mp (arg)
-      (interactive "p")
-      (if (and (= 1 arg) (looking-back "-/" 2))
-	  (progn (replace-match "")
-		 (insert typopunct-mp))
-	(self-insert-command arg)))
-    (define-key typopunct-map "+" 'typopunct-insert-mp)
-    (defconst typopunct-times (decode-char 'ucs #xD7))
-    (defun typopunct-insert-times (arg)
-      "Insert multiplication sign at ARG."
-      (interactive "p")
-      (if (and (= 1 arg) (looking-back "\\([[:blank:]]\\|^\\)\\^"))
-	  (progn (delete-char -1)
-		 (insert typopunct-times))
-	(self-insert-command arg)))
-    (define-key typopunct-map "x" 'typopunct-insert-times)
-
-    (defadvice typopunct-insert-quotation-mark (around wrap-region activate)
-      (let* ((lang (or (get-text-property (point) 'typopunct-language)
-		       typopunct-buffer-language))
-	     (omark (if single
-			(typopunct-opening-single-quotation-mark lang)
-		      (typopunct-opening-quotation-mark lang)))
-	     (qmark (if single
-			(typopunct-closing-single-quotation-mark lang)
-		      (typopunct-closing-quotation-mark lang))))
-	(cond
-	 (mark-active
-	  (let ((skeleton-end-newline nil)
-		(singleo (typopunct-opening-single-quotation-mark lang))
-		(singleq (typopunct-closing-single-quotation-mark lang)))
-	    (if (> (point) (mark))
-		(exchange-point-and-mark))
-	    (save-excursion
-	      (while (re-search-forward (regexp-quote (string omark)) (mark) t)
-		(replace-match (regexp-quote (string singleo)) nil nil)))
-	    (save-excursion
-	      (while (re-search-forward (regexp-quote (string qmark)) (mark) t)
-		(replace-match (regexp-quote (string singleq)) nil nil)))
-	    (skeleton-insert (list nil omark '_ qmark) -1)))
-	 ((looking-at (regexp-opt (list (string omark) (string qmark))))
-	  (forward-char 1))
-	 (t ad-do-it)))))
+  (require 'jf-writing)
 #+end_src
 
 ** Integrated “Applications”
@@ -783,15 +391,6 @@ These are a few variables and cosntants that I use throughout my configuration.
     "What is the current hostname for serving TakeOnRules content.")
 #+end_src
 
-*** Doc View
-
-#+begin_src emacs-lisp
-  (use-package doc-view
-    :straight (doc-view :type built-in)
-    :bind (:map doc-view-mode-map
-                ("C-c g" . doc-view-goto-page)))
-#+end_src
-
 *** Mastodon
 
 #+begin_src emacs-lisp
@@ -810,21 +409,7 @@ I use org-mode and org-roam to help manage content.  Let’s load that rather ex
 *** org-d20.el
 
 #+begin_src emacs-lisp
-  ;; I’m really only using this for the ~org-d20--roll~ function.
-  (use-package org-d20
-    :after org
-    :bind  (("C-s-r" . jf/roll-expression-dwim))
-    :config
-    (defun jf/roll-expression-dwim (expression &optional)
-      "Roll the EXPRESSION, check `thing-at-point' then prompt."
-      (interactive (list (if (string-match
-			      "[dD][0-9]"
-			      (format "%s" (thing-at-point 'sexp t)))
-			     (thing-at-point 'sexp t)
-			   (read-string "Dice Expression: "))))
-      (-let* (((rolls . result) (org-d20--roll expression)))
-	(message "%s => %s" expression result)))
-    :straight (org-d20 :host github :repo "spwhitton/org-d20"))
+
 #+end_src
 
 *** RSS Feed
@@ -832,349 +417,24 @@ I use org-mode and org-roam to help manage content.  Let’s load that rather ex
 **** elfeed.el
 
 #+begin_src emacs-lisp
-  ;; An Emacs RSS reader.  I’ve used Google Reader, Feedly, Inoreader, and
-  ;; Newsboat.  I wrote about
-  ;; https://takeonrules.com/2020/04/12/switching-from-inoreader-to-newsboat-for-rss-reader/,
-  ;; and the principles apply for Elfeed.
-  (use-package elfeed
-    :straight t
-    :after org
-    :hook ((elfeed-show-mode . jf/reader-visual))
-    :config
-    (setq-default elfeed-search-filter "@2-days-ago +unread ")
-    :bind ((:map elfeed-search-mode-map
-		 ("q" . jf/elfeed-save-db-and-bury))))
-
-  ;;write to disk when quiting
-  (defun jf/elfeed-save-db-and-bury ()
-    "Wrapper to save the elfeed db to disk before burying buffer"
-    (interactive)
-    (elfeed-db-save)
-    (quit-window))
-
-  (defun jf/elfeed-load-db-and-open ()
-    "Load the elfeed db from disk before opening"
-    (interactive)
-    (elfeed)
-    (elfeed-update)
-    (elfeed-db-load)
-    (elfeed-search-update--force))
-  (defalias 'rss 'jf/elfeed-load-db-and-open)
-
-    ;; From https://karthinks.com/blog/lazy-elfeed/
-  (defun elfeed-search-show-entry-pre (&optional lines)
-    "Returns a function to scroll forward or back in the Elfeed
-    search results, displaying entries without switching to them."
-    (lambda (times)
-      (interactive "p")
-      (forward-line (* times (or lines 0)))
-      (recenter)
-      (call-interactively #'elfeed-search-show-entry)
-      (select-window (previous-window))
-      (unless elfeed-search-remain-on-entry (forward-line -1))))
-  (eval-after-load 'elfeed-search
-    '(define-key elfeed-search-mode-map (kbd "n") (elfeed-search-show-entry-pre +1)))
-  (eval-after-load 'elfeed-search
-    '(define-key elfeed-search-mode-map (kbd "p") (elfeed-search-show-entry-pre -1)))
-  (eval-after-load 'elfeed-search
-    '(define-key elfeed-search-mode-map (kbd "M-RET") (elfeed-search-show-entry-pre)))
-  ;; End https://karthinks.com/blog/lazy-elfeed/
-
-  ;; Maintaining my RSS subscriptions in `org-mode' format.
-  (use-package elfeed-org
-    :straight t
-    :after elfeed
-    :config (elfeed-org)
-    (setq rmh-elfeed-org-files (list "~/git/org/elfeed.org")))
+  (require 'jf-reading)
 #+end_src
 
 *** Source Control
 
 #+begin_src emacs-lisp
-  (use-package git-modes :straight t)
-  (use-package magit
-    :straight t
-    :commands (magit-process-git)
-    :init (use-package with-editor :straight t)
-
-    ;; Adding format to git-commit-fill-column of 72 as best practice.
-    (setq git-commit-fill-column 72)
-
-    ;; Keeping the summary terse helps with legibility when you run a
-    ;; report with only summary.
-    (setq git-commit-summary-max-length 50)
-
-    ;; Set the tabular display columns for the `magit-list-repositories'
-    (setq magit-repolist-columns
-	  '(("Name"    25 magit-repolist-column-ident ())
-	    ("Version" 25 magit-repolist-column-version ())
-	    ("δ"        1 magit-repolist-column-dirty ())
-	    ("⇣"        3 magit-repolist-column-unpulled-from-upstream
-	     ((:right-align t)
-	      (:help-echo "Upstream changes not in branch")))
-	    ("⇡"        3 magit-repolist-column-unpushed-to-upstream
-	     ((:right-align t)
-	      (:help-echo "Local changes not in upstream")))
-	    ("Branch"  25 magit-repolist-column-branch ())
-	    ("Path"    99 magit-repolist-column-path ())))
-
-    ;; The default relevant `magit-list-repositories'
-    (setq magit-repository-directories
-	  `(("~/git/takeonrules.source/" . 1)
-	    ("~/git/burning_wheel_lifepaths/" . 1)
-	    ("~/git/dotzshrc/" .  1)
-	    ("~/git/dotemacs/" . 1)
-	    ("~/git/emacs-bookmarks/" . 1)
-	    ("~/git/org" . 1)
-	    ("~/git/org/archive" . 1)
-	    ("~/git/takeonrules.source/themes/hugo-tufte" . 1)))
-
-    ;; Have magit-status go full screen and quit to previous
-    ;; configuration.  Taken from
-    ;; http://whattheemacsd.com/setup-magit.el-01.html#comment-748135498
-    ;; and http://irreal.org/blog/?p=2253
-    ;; (defadvice magit-status (around magit-fullscreen activate)
-    ;;   (window-configuration-to-register :magit-fullscreen)
-    ;;   ad-do-it
-    ;;   (delete-other-windows))
-    ;; (defadvice magit-mode-quit-window (after magit-restore-screen activate)
-    ;;   (jump-to-register :magit-fullscreen))
-    :config
-    ;; (use-package libgit :straight t)
-    (remove-hook 'magit-status-sections-hook 'magit-insert-tags-header)
-    (defun jf/magit-browse-pull-request ()
-      "In `magit-log-mode' open the associated pull request
-    at point.
-
-    Assumes that the commit log title ends in the PR #, which
-    is the case when you use the Squash and Merge strategy.
-
-    This implementation is dependent on `magit' and `s'."
-      (interactive)
-      (let* ((beg (line-beginning-position))
-	     (end (line-end-position))
-	     (summary
-	      (buffer-substring-no-properties
-	       beg end)))
-	(jf/open-pull-request-for :summary summary)))
-    (defun jf/git-current-remote-url ()
-      "Get the current remote url."
-      (s-trim
-       (shell-command-to-string
-	(concat
-	 "git remote get-url "
-	 (format "%s" (magit-get-current-remote))))))
-    (cl-defun jf/open-pull-request-for (&key summary)
-      "Given the SUMMARY open the related pull request.
-
-    This method assumes you're using Github's Squash and Strategy."
-      (let ((remote-url (jf/git-current-remote-url)))
-	(save-match-data
-	  (and (string-match "(\\#\\([0-9]+\\))$" summary)
-	       (browse-url
-		(concat
-		 ;; I tend to favor HTTPS and the repos end in ".git"
-		 (s-replace ".git" "" remote-url)
-		 "/pull/"
-		 (match-string 1 summary)))))))
-    (defun jf/open-pull-request-for-current-line ()
-      "For the current line open the applicable pull request."
-      (interactive)
-      (let ((summary
-	     (s-trim
-	      (shell-command-to-string
-	       (concat "git --no-pager annotate "
-		       "-w -L "
-		       (format "%s" (line-number-at-pos))
-		       ",+1 "
-		       "--porcelain "
-		       buffer-file-name
-		       " | rg \"^summary\"")))))
-	(jf/open-pull-request-for :summary summary)))
-    :bind (("s-7" . magit-status)
-	   ("C-x g f" . magit-file-dispatch)
-	   ("C-x g d" . magit-dispatch))
-    ;; In other situations I bind s-6 to `git-messenger:popup-message'
-    :bind (:map magit-log-mode-map ("s-6" . 'jf/magit-browse-pull-request))
-    :hook ((with-editor-post-finish-hook . magit-status)))
-
-  ;; COMMENTED OUT FOR FUTURE REFERENCE
-  ;; (transient-define-prefix jf/magit-aux-commands ()
-  ;;   "My personal auxiliary magit commands."
-  ;;   ["Auxiliary commands"
-  ;;    ("d" "Difftastic Diff (dwim)" jf/magit-diff-with-difftastic)
-  ;;    ("s" "Difftastic Show" jf/magit-show-with-difftastic)])
-
-  ;; (require 'magit)
-  ;; (transient-append-suffix 'magit-dispatch "!"
-  ;;   '("#" "My Magit Cmds" jf/magit-aux-commands))
-
-  ;; (define-key magit-status-mode-map (kbd "#") #'jf/magit-aux-commands)
-
-  ;; With the time machine, travel back and forth through a files history.
-  (use-package git-timemachine
-    :straight (:host github :repo "emacsmirror/git-timemachine"))
-
-  ;; Show the current git state in the gutter.  As you edit a line in a file
-  ;; track by git, the indicators change to reflect if this is a modification,
-  ;; addition, or deletion.
-  (use-package git-gutter
-    :straight t
-    :diminish 'git-gutter-mode
-    :custom (git-gutter:update-interval 0.25)
-    :bind ("C-x g =" . git-gutter:popup-hunk)
-    ("C-x g p" . git-gutter:previous-hunk)
-    ("C-x g n" . git-gutter:next-hunk)
-    :init (global-git-gutter-mode t)
-    (setq git-gutter:modified-sign "Δ"
-	  git-gutter:added-sign "+"
-	  git-gutter:deleted-sign "-"))
-
-  ;; Type ~M-x git-link~ and the function pushes the Git forge URL to the kill
-  ;; ring; I’ve configured the URL to use the SHA of the commit of the line on
-  ;; which I called `git-link'.  This is helpful for sharing links with other
-  ;; folks.  I use this /all of the time./ See https://github.com/sshaw/git-link.
-  (use-package git-link
-    :config
-    (defun jf/git-browse-to-repository (remote)
-      "Open in external browser the current repository's given REMOTE."
-      (interactive (list (git-link--select-remote)))
-      (git-link-homepage remote)
-      (browse-url (car kill-ring)))
-    (setq git-link-use-commit t) ;; URL will be SHA instead of branch
-    :straight t)
-
-  ;; Sometimes I want to see more ~git~ information regarding the current line.
-  ;; `git-messenger' provides a popup that shows the information and provides
-  ;; some additional options.
-  (use-package git-messenger
-    :config (setq git-messenger:show-detail t)
-    (defun jf/git-messenger-popup ()
-      "Open `git-messenger' or github PR.
-
-    With universal argument, open the github PR for current line.
-
-    Without universal argument, open `git-messenger'."
-      (interactive)
-      (if (equal current-prefix-arg nil) ; no C-u
-	  (git-messenger:popup-message)
-	(jf/open-pull-request-for-current-line)))
-    :custom
-    (git-messenger:use-magit-popup t)
-    :bind (:map git-messenger-map (("p" . 'jf/open-pull-request-for-current-line)
-				   ("l" . 'git-link)))
-    :bind (("s-6" . jf/git-messenger-popup)
-	   ("<f6>" . jf/git-messenger-popup))
-    :straight t)
-
-  ;; When working in code, I want different ways to view the metadata around the
-  ;; code.  This adds a quick annotation to the current line; When did the last
-  ;; person touch this and what was the message.  It's most useful aspect is
-  ;; seeing multiple lines without relying on the blame.
-  (use-package blamer
-    :straight (blamer :host github :repo "Artawower/blamer.el")
-    :custom
-    ;; Set to 0 because I don’t enable by default.  So I’m in a mindset of show
-    ;; me who and when.
-    (blamer-idle-time 0.0)
-    (blamer-author-formatter "✎ %s ")
-    (blamer-datetime-formatter "[%s] ")
-    (blamer-commit-formatter "● %s")
-    (blamer-min-offset 40)
-    (blamer-max-commit-message-length 20))
+  (require 'jf-versioning)
 #+end_src
 
 *** tmr.el
 
 #+begin_src emacs-lisp
-  ;; Set some timers.
-  (use-package tmr
-    ;; My dbus install is not behaving so I'm cheating with a bit of AppleScript
-    :config (defun jf/tmr-notification-notify (timer)
-	      "Dispatch a notification for TIMER."
-	      (let ((title "TMR May Ring (Emacs tmr package)")
-		    (description (tmr--timer-description timer)))
-		(ns-do-applescript (concat "display notification \"" description "\" sound name \"Glass\""))))
-    :custom (tmr-notify-function #'jf/notifications-notify)
-    (tmr-timer-completed-functions
-     (list #'tmr-print-message-for-completed-timer
-	   #'tmr-sound-play
-	   #'jf/tmr-notification-notify))
-    :straight (tmr :host nil :type git :repo "https://git.sr.ht/~protesilaos/tmr"))
 #+end_src
 
 
 *** EWW
 
-#+begin_src emacs-lisp
-  ;; A plain text browser.  Use this to see just how bad much of the web has become.
-  (use-package eww
-    :straight t
-    :config
-    (defun shr-tag-dfn (dom)
-      (shr-fontize-dom dom 'italic))
 
-    (defun shr-tag-cite (dom)
-      (shr-fontize-dom dom 'italic))
-
-    (defun shr-tag-q (dom)
-      (shr-insert (car shr-around-q-tag))
-      (shr-generic dom)
-      (shr-insert (cdr shr-around-q-tag)))
-
-    (defcustom shr-around-q-tag '("“" . "”")
-      "The before and after quotes.  `car' is inserted before the Q-tag and `cdr' is inserted after the Q-tag.
-
-  Alternative suggestions are: - '(\"\\\"“\" . \"\\\"\")"
-      :type (cons 'string 'string))
-
-    (defface shr-small
-      '((t :height 0.8))
-      "Face for <small> elements.")
-
-    ;; Drawing inspiration from shr-tag-h1
-    (defun shr-tag-small (dom)
-      (shr-fontize-dom dom (when shr-use-fonts 'shr-small)))
-
-    (defface shr-time
-      '((t :inherit underline :underline (:style wave)))
-      "Face for <time> elements.")
-
-    ;; Drawing inspiration from shr-tag-abbr
-    (defun shr-tag-time (dom)
-      (when-let* ((datetime (or
-			     (dom-attr dom 'title)
-			     (dom-attr dom 'datetime)))
-		  (start (point)))
-	(shr-generic dom)
-	(shr-add-font start (point) 'shr-time)
-	(add-text-properties
-	 start (point)
-	 (list
-	  'help-echo datetime
-	  'mouse-face 'highlight))))
-
-
-    ;; EWW lacks a style for article
-    (defun shr-tag-article (dom)
-      (shr-ensure-paragraph)
-      (shr-generic dom)
-      (shr-ensure-paragraph))
-
-    ;; EWW lacks a style for section; This is quite provisional
-    (defun shr-tag-section (dom)
-      (shr-ensure-paragraph)
-      (shr-generic dom)
-      (shr-ensure-paragraph))
-
-    (setq browse-url-browser-function 'browse-url-default-macosx-browser)
-    :bind (:map eww-mode-map ("U" . eww-up-url))
-    :bind (("C-s-w" . browse-url-at-point))
-    :hook ((eww-mode . jf/reader-visual)))
-
-  (use-package vterm
-    :straight t)
-#+end_src
 
 *** Random Tables
 
