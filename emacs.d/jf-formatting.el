@@ -13,17 +13,17 @@
 
 ;;; Code
 
-;; Whitespace hygene package.  The author's documentation and commentary echoes
-;; my sentiments.
 (use-package ethan-wspace
+  ;; Whitespace hygene package.  The author's documentation and commentary echoes
+  ;; my sentiments.
   :straight t
   :hook (before-save . delete-trailing-whitespace)
   :init (setq-default mode-require-final-newline nil)
   :config (global-ethan-wspace-mode 1))
 
-;; `fill-sentences-correctly-mode' ensures that `fill-paragraph' (e.g. M-q)
-;; preserves two spaces.
 (use-package fill-sentences-correctly
+  ;; `fill-sentences-correctly-mode' ensures that `fill-paragraph' (e.g. M-q)
+  ;; preserves two spaces.
   :straight (fill-sentences-correctly :host github :repo "duckwork/fill-sentences-correctly.el")
   :hook (fundamental-mode . fill-sentences-correctly-mode))
 

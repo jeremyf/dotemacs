@@ -54,8 +54,8 @@
 
 ;;;; Icons
 
-;; Useful for referential icons.
 (use-package all-the-icons
+  ;; Useful for referential icons.
   :straight t
   :config
   (cl-defmacro jf/all-the-icons--with(&key name)
@@ -75,10 +75,10 @@
   (jf/all-the-icons--with :name "octicon")
   (jf/all-the-icons--with :name "alltheicon"))
 
-;; Incorporates file icons with file listings of dired.  /Note/: On 2021-04-11
-;; I was getting the following error with this package: "*ERROR*: Symbol's
-;; value as variable is void: file"
 (use-package all-the-icons-dired
+  ;; Incorporates file icons with file listings of dired.  /Note/: On 2021-04-11
+  ;; I was getting the following error with this package: "*ERROR*: Symbol's
+  ;; value as variable is void: file"
   :straight t
   :after all-the-icons
   :hook (dired-mode . all-the-icons-dired-mode))

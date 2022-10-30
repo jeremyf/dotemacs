@@ -8,7 +8,7 @@
 ;;; Commentary
 
 ;; Provides a macro for personal minor mode declaration.  Why the macro?  As a
-;; matter of practice and documentation.
+;; matter of practice and documentation.  I also want to get better at writing.
 (require 'cl-macs)
 (cl-defmacro jf/minor-mode-maker (&key title abbr hooks keymap)
     "A macro to declare a minor mode.

@@ -37,8 +37,8 @@
 (setq straight-repository-branch "develop")
 (straight-use-package 'use-package)
 
-;; https://xenodium.com/trying-out-gccemacs-on-macos/
 (use-package exec-path-from-shell
+  ;; https://xenodium.com/trying-out-gccemacs-on-macos/
   :straight t
   :config
   (exec-path-from-shell-initialize)
@@ -178,17 +178,13 @@
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 (global-set-key (kbd "M-RET") 'newline-and-indent)
 
-;; provides a means of not displaying the :lighter of a minor mode in the
-;; modeline.
-(use-package diminish
+(use-package minions
   :straight t
-  :diminish 'eldoc-mode
-  :diminish 'abbrev-mode)
+  :config (minions-mode 1))
 
-;; *Gcmh* does garbage collection (GC) when the user is idle.
 (use-package gcmh
+  ;; *Gcmh* does garbage collection (GC) when the user is idle.
   :straight t
-  :diminish 'gcmh-mode
   :init
   (setq gcmh-idle-delay 5
         gcmh-high-cons-threshold (* 16 1024 1024))  ; 16mb

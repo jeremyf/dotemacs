@@ -68,15 +68,16 @@
 
 (use-package json-mode :straight t)
 
-;; Because JSON can be quite ugly, I want something to help tidy it up.
 (use-package json-reformat
+  ;; Because JSON can be quite ugly, I want something to help tidy it up.
   :straight t
   :after json-mode
   :init (setq json-reformat:indent-width 2))
 
-;; For working with https://www.hammerspoon.org; which provides me the
-;; wonderful https://github.com/dmgerman/editWithEmacs.spoon/
-(use-package lua-mode :straight t)
+(use-package lua-mode
+  ;; For working with https://www.hammerspoon.org; which provides me the
+  ;; wonderful https://github.com/dmgerman/editWithEmacs.spoon/
+  :straight t)
 
 (use-package markdown-mode
   :straight t
@@ -86,8 +87,8 @@
          ("\\.markdown\\'" . markdown-mode))
   :init (setq markdown-command "/opt/homebrew/bin/pandoc"))
 
-;; A mode for working with PlantUML.  See https://plantuml.com
 (use-package plantuml-mode
+  ;; A mode for working with PlantUML.  See https://plantuml.com
   :config (setq plantuml-executable-path (concat (getenv "HB_PATH") "/bin/plantuml")
                 plantuml-default-exec-mode 'executable
                 org-plantuml-executable-path (concat (getenv "HB_PATH") "/bin/plantuml")
@@ -110,8 +111,8 @@
   :bind (:map enh-ruby-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
   :init (eval-after-load 'rspec-mode '(rspec-install-snippets)))
 
-;; Nice and simple package for string interpolation.
 (use-package ruby-interpolation
+  ;; Nice and simple package for string interpolation.
   :straight t
   :hook (enh-ruby-mode . ruby-interpolation-mode))
 
@@ -123,9 +124,8 @@
 
 (use-package typescript-mode :straight t)
 
-;; See https://github.com/emacs-tree-sitter/elisp-tree-sitter
-;; Waiting on https://github.com/emacs-tree-sitter/elisp-tree-sitter/issues/197 to resolve.
 (use-package tree-sitter
+  ;; See https://github.com/emacs-tree-sitter/elisp-tree-sitter
   :straight (tree-sitter :host github :repo "emacs-tree-sitter/elisp-tree-sitter")
   :config
   (add-to-list 'tree-sitter-major-mode-language-alist '(enh-ruby-mode . ruby))

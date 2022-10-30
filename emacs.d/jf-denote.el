@@ -91,10 +91,10 @@
            ;; And `org-read-date' is an amazing bit of tech
            (denote-date-prompt-denote-date-prompt-use-org-read-date t)))
 
-;;Let’s add another way at looking up files.  I appreciate the ability to
-;;search all files and start with a character (e.g. =b=) followed by <space> to
-;;filter to the note source keyed as =s= (e.g. Scientist).
 (use-package consult-notes
+  ;;Let’s add another way at looking up files.  I appreciate the ability to
+  ;;search all files and start with a character (e.g. =b=) followed by <space> to
+  ;;filter to the note source keyed as =s= (e.g. Scientist).
   :straight (:type git :host github :repo "mclear-tools/consult-notes")
   :after (consult denote)
   :bind
@@ -112,12 +112,11 @@
 		      consult-notes-search-in-all-notes)))
 
 ;;;; Note taking configurations
-;;
+
 ;;;;; `denote' and `org-mode' integration
-;;
-;; The following functions help me retrieve Org-Mode properties from the given
-;; Denote ID.
 (cl-defun jf/denote-org-property-from-id (&key identifier property)
+  ;; This function helps me retrieve Org-Mode properties from the given Denote
+  ;; ID.
   "Given an IDENTIFIER and PROPERTY return it's value or nil.
 
     Return nil when:
@@ -130,7 +129,6 @@
       (with-current-buffer (find-file-noselect filename)
         (cadar (org-collect-keywords (list property)))))))
 
-;; This function is the plural version of `jf/denote-org-property-from-id'
 (cl-defun jf/denote-org-properties-from-id (&key identifier properties)
   "Given an IDENTIFIER and PROPERTIES list return an a-list of values.
 
@@ -138,19 +136,23 @@
 
     - is not a denote file
     - IDENTIFIER leads to a non `org-mode' file
-    - PROPERTY does not exist on the file"
+    - PROPERTY does not exist on the file.
+
+This function is the plural version of `jf/denote-org-property-from-id'."
+  ;; ;; Testing jf/denote-org-property-from-id
+  ;; (message "%s" (jf/denote-org-property-from-id
+  ;; 		 :identifier "20220930T215235"
+  ;;		 :property "ABBR"))
+  ;; ;; Testing jf/denote-org-properties-from-id
+  ;; (message "%s" (jf/denote-org-properties-from-id
+  ;; 		 :identifier "20220930T215235"
+  ;; 		 :properties '("TITLE" "ABBR")))
+
   (when-let ((filename (denote-get-path-by-id identifier)))
     (when (string= (file-name-extension filename) "org")
       (with-current-buffer (find-file-noselect filename)
         (org-collect-keywords properties)))))
-;; ;; Testing jf/denote-org-property-from-id
-;; (message "%s" (jf/denote-org-property-from-id
-;; 		 :identifier "20220930T215235"
-;;		 :property "ABBR"))
-;; ;; Testing jf/denote-org-properties-from-id
-;; (message "%s" (jf/denote-org-properties-from-id
-;; 		 :identifier "20220930T215235"
-;; 		 :properties '("TITLE" "ABBR")))
+
 
 (cl-defun jf/calculated-list-of-denote-known-keywords (&key from)
   "Return a list of known `denote' keywords.
@@ -167,11 +169,11 @@ Our controlled vocabulary...if you will."
    "\n"))
 
 ;;;;; `denote' file finding functions
-;;
-;; I’m not looking at active silo-ing and want to be able to search
-;; specifically from the top-level and all subdirectories.
+
 (defun jf/denote-file-prompt (fn &optional initial-dir)
   "An override of the provided denote-file-prompt."
+  ;; I’m not looking at active silo-ing and want to be able to search
+  ;; specifically from the top-level and all subdirectories.
   (if initial-dir
       (funcall fn initial-dir)
     (let* ((vc-dirs-ignores (mapcar
@@ -204,10 +206,6 @@ Our controlled vocabulary...if you will."
     (consult-projectile--file (denote-directory))))
 
 ;;;;; Note taking Domains
-;;
-;; ;; This should return a list
-;; (message "%s" (jf/calculated-list-of-denote-known-keywords
-;; 		 :from "~/git/org/denote/glossary"))
 (cl-defmacro jf/denote-create-functions-for (&key domain key (create-fn nil))
   "A macro to create functions for the given DOMAIN.
 
@@ -375,14 +373,17 @@ Our controlled vocabulary...if you will."
 ;;;;;; Melange
 ;; All the other things; perhaps they could become blog posts, but for now they
 ;; remain part of the mixture and medley.
-(jf/denote-create-functions-for :domain "melange" :key ?m)
+(jf/denote-create-functions-for :domain "melange"
+				:key ?m)
 
 ;;;;;; People
 ;; I do write notes about people I interact with.  Technically I have glossary
 ;; entries for people.  But those entries are for folks I don’t interact with.
-(jf/denote-create-functions-for :domain "people" :key ?p)
+(jf/denote-create-functions-for :domain "people"
+				:key ?p)
 
 ;;;;;; Indices
+
 ;; On my site I write https://takeonrules.com/series/.  I track this data in a
 ;; YAML file; I’d like to treat this data similar to my glossary.
 (cl-defun jf/denote-create-indices-entry (&key

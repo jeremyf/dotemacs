@@ -13,9 +13,9 @@
 
 ;;;; Other packages and their configurations
 
-;; The =abbrev= package is simple and powerful, providing an auto-correct that
-;; I configure.  No more “teh” in my text.
 (use-package abbrev
+  ;; The =abbrev= package is simple and powerful, providing an auto-correct that
+  ;; I configure.  No more “teh” in my text.
   :straight (:type built-in)
   :custom (abbrev-file-name (file-truename "~/git/dotemacs/emacs.d/abbrev_defs"))
   :hook (text-mode . abbrev-mode))
@@ -79,9 +79,9 @@
 		 (window-parameters (mode-line-format . none)))))
 
 
-;; I use ~embark.el~ and ~consult.el~, let’s add a little bit more connective
-;;  tissue.
 (use-package embark-consult
+  ;; I use ~embark.el~ and ~consult.el~, let’s add a little bit more connective
+  ;;  tissue.
   :straight t
   :after (embark consult)
   :demand t ; only necessary if you have the hook below
@@ -204,11 +204,11 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
               '((name . "wrapper")))
   )
 
-;; This package helps ease traveling across directories by providing directory
-;; candidates related to current buffers, bookmarks, and projects.  Further,
-;; like other ~consult.el~ functions, you can use narrowing keys.  See
-;; https://github.com/karthink/consult-dir.
 (use-package consult-dir
+  ;; This package helps ease traveling across directories by providing directory
+  ;; candidates related to current buffers, bookmarks, and projects.  Further,
+  ;; like other ~consult.el~ functions, you can use narrowing keys.  See
+  ;; https://github.com/karthink/consult-dir.
   :straight t
   :after (consult)
   :bind (("C-x C-d" . consult-dir)
@@ -216,12 +216,12 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
          ("C-x C-d" . consult-dir)
          ("C-x C-j" . consult-dir-jump-file)))
 
-;; package provides a function I use everyday: ~M-x consult-projectile~.  When
-;; I invoke ~consult-projectile~, I have the file completion for the current
-;; project.  I can also type =b= + =SPACE= to narrow my initial search to open
-;; buffers in the project.  Or =p= + =space= to narrow to other projects; and
-;; then select a file within that project.
 (use-package consult-projectile
+  ;; package provides a function I use everyday: ~M-x consult-projectile~.  When
+  ;; I invoke ~consult-projectile~, I have the file completion for the current
+  ;; project.  I can also type =b= + =SPACE= to narrow my initial search to open
+  ;; buffers in the project.  Or =p= + =space= to narrow to other projects; and
+  ;; then select a file within that project.
   :commands (consult-projectile)
   :straight (consult-projectile
              :type git
@@ -317,29 +317,7 @@ Useful if you want a more robust view into the recommend candidates."
   ;; manual toggling via `corfu-doc-toggle'.
   (corfu-doc-mode))
 
-;; NOTE 2022-02-05: `kind-icon' depends `svg-lib' which creates a cache
 
-;; The https://github.com/minad/orderless package provides completion tooling
-;; for non-strict word order.  I spent considerable time reading through the
-;; https://github.com/minad/consult/wiki
-;;
-;; As configured the orderless completion recognizes the following “switches”:
-;;
-;; - Flex (~\~~) :: Just start typing characters and you’ll get matches that have
-;;   those characters
-;; - File Extension (~\.ext~) :: Match files with this extension.
-;; - Regexp ~^.$~ :: Use some regular expression syntax
-;;   - ~^~ matching beginning
-;;   - ~.~ any ol’ character
-;;   - ~$~ matching ending
-;; - Initialism (~`~) :: In ~M-x~ when I typed ~`pl~ the ~previous-line~ function
-;;   was a top match.  The initialism switch “explodes” the characters and says
-;;   match methods who’s words start with those characters.
-;; - Not Literal ~!~ :: Exclude candidates that match the literal
-;;   (e.g. ~!previous~ won’t show ~previous-line~ in the ~M-x~ completion).
-;; - Literal ~=~ :: No “fuzzy buziness”, just match exactly what I typed.
-;;
-;; There is another case (e.g. ~%~ character fold) that I don’t yet understand.
 (use-package cape
   :straight t
   :init (add-to-list 'completion-at-point-functions #'cape-dabbrev)
@@ -350,6 +328,7 @@ Useful if you want a more robust view into the recommend candidates."
          ("C-c p i" . cape-ispell)))
 
 (use-package grab-mac-link
+  ;; Grab a link from a variety of MacOS applications.
   :straight t
   ;; Ensuring we load these, as I'll need them later.
   :commands (grab-mac-link-safari-1 grab-mac-link-firefox-1)
@@ -365,9 +344,9 @@ Useful if you want a more robust view into the recommend candidates."
 	      '((name . "jnf")))
   :bind (("C-c g" . grab-mac-link)))
 
-;; Similar to `grab-mac-link' this specifically grabs a link and inserts in
-;; `org-mode' format.
 (use-package helpful
+  ;; Similar to `grab-mac-link' this specifically grabs a link and inserts in
+  ;; `org-mode' format.
   :init
   (use-package transient :straight t)
   ;; I'm going to talk about this later, but I'm adding this to the menu, so I
@@ -421,6 +400,27 @@ Useful if you want a more robust view into the recommend candidates."
   :init (marginalia-mode))
 
 (use-package orderless
+  ;; The https://github.com/minad/orderless package provides completion tooling
+  ;; for non-strict word order.  I spent considerable time reading through the
+  ;; https://github.com/minad/consult/wiki
+  ;;
+  ;; As configured the orderless completion recognizes the following “switches”:
+  ;;
+  ;; - Flex (~\~~) :: Just start typing characters and you’ll get matches that have
+  ;;   those characters
+  ;; - File Extension (~\.ext~) :: Match files with this extension.
+  ;; - Regexp ~^.$~ :: Use some regular expression syntax
+  ;;   - ~^~ matching beginning
+  ;;   - ~.~ any ol’ character
+  ;;   - ~$~ matching ending
+  ;; - Initialism (~`~) :: In ~M-x~ when I typed ~`pl~ the ~previous-line~ function
+  ;;   was a top match.  The initialism switch “explodes” the characters and says
+  ;;   match methods who’s words start with those characters.
+  ;; - Not Literal ~!~ :: Exclude candidates that match the literal
+  ;;   (e.g. ~!previous~ won’t show ~previous-line~ in the ~M-x~ completion).
+  ;; - Literal ~=~ :: No “fuzzy buziness”, just match exactly what I typed.
+  ;;
+  ;; There is another case (e.g. ~%~ character fold) that I don’t yet understand.
   :straight t
   :config
   (defvar +orderless-dispatch-alist
@@ -506,8 +506,6 @@ Useful if you want a more robust view into the recommend candidates."
   ;; (tempel-global-abbrev-mode)
   :init (tempel-key "C-c i" idiomatic org-mode-map))
 
-
-;; Grab a link from a variety of MacOS applications.
 (use-package vertico
   :straight t
   :config

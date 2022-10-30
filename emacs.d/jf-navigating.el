@@ -13,9 +13,9 @@
   :straight t
   :bind (("M-o" . ace-window)))
 
+(use-package avy
 ;; Pick a letter, avy finds all words with that at the beginning of it.  Narrow
 ;; results from there.
-(use-package avy
   :bind (("C-c j" . avy-goto-char))
   :straight t)
 
@@ -34,10 +34,10 @@
   ("C-c l c" . link-hint-copy-link))
 
 ;;;; Custom Functions
-;; See https://www.reddit.com/r/emacs/comments/r7l3ar/how_do_you_scroll_half_a_page/
 (global-set-key (kbd "M-n") 'jf/scroll-down-half-page)
 (defun jf/scroll-down-half-page ()
   "Scroll down half a page while keeping the cursor centered"
+  ;; See https://www.reddit.com/r/emacs/comments/r7l3ar/how_do_you_scroll_half_a_page/
   (interactive)
   (let ((ln (line-number-at-pos (point)))
         (lmax (line-number-at-pos (point-max))))
@@ -47,10 +47,10 @@
                (move-to-window-line -1)
                (recenter))))))
 
-;; See https://www.reddit.com/r/emacs/comments/r7l3ar/how_do_you_scroll_half_a_page/
 (global-set-key (kbd "M-p") 'jf/scroll-up-half-page)
 (defun jf/scroll-up-half-page ()
   "Scroll up half a page while keeping the cursor centered"
+  ;; See https://www.reddit.com/r/emacs/comments/r7l3ar/how_do_you_scroll_half_a_page/
   (interactive)
   (let ((ln (line-number-at-pos (point)))
         (lmax (line-number-at-pos (point-max))))

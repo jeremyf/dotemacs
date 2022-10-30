@@ -13,11 +13,11 @@
               ("C-c g" . doc-view-goto-page)))
 
 
-;; An Emacs RSS reader.  I’ve used Google Reader, Feedly, Inoreader, and
-;; Newsboat.  I wrote about
-;; https://takeonrules.com/2020/04/12/switching-from-inoreader-to-newsboat-for-rss-reader/,
-;; and the principles apply for Elfeed.
 (use-package elfeed
+  ;; An Emacs RSS reader.  I’ve used Google Reader, Feedly, Inoreader, and
+  ;; Newsboat.  I wrote about
+  ;; https://takeonrules.com/2020/04/12/switching-from-inoreader-to-newsboat-for-rss-reader/,
+  ;; and the principles apply for Elfeed.
   :straight t
   :after org
   :hook ((elfeed-show-mode . jf/reader-visual))
@@ -26,9 +26,9 @@
   :bind ((:map elfeed-search-mode-map
 	       ("q" . jf/elfeed-save-db-and-bury))))
 
-;;write to disk when quiting
 (defun jf/elfeed-save-db-and-bury ()
   "Wrapper to save the elfeed db to disk before burying buffer"
+  ;;write to disk when quiting
   (interactive)
   (elfeed-db-save)
   (quit-window))
@@ -61,15 +61,15 @@
   '(define-key elfeed-search-mode-map (kbd "M-RET") (elfeed-search-show-entry-pre)))
 ;; End https://karthinks.com/blog/lazy-elfeed/
 
-;; Maintaining my RSS subscriptions in `org-mode' format.
 (use-package elfeed-org
+  ;; Maintaining my RSS subscriptions in `org-mode' format.
   :straight t
   :after elfeed
   :config (elfeed-org)
   (setq rmh-elfeed-org-files (list "~/git/org/elfeed.org")))
 
-;; A plain text browser.  Use this to see just how bad much of the web has become.
 (use-package eww
+  ;; A plain text browser.  Use this to see just how bad much of the web has become.
   :straight t
   :config
   (defun shr-tag-dfn (dom)
@@ -133,9 +133,9 @@ Alternative suggestions are: - '(\"\\\"“\" . \"\\\"\")"
   :bind (("C-s-w" . browse-url-at-point))
   :hook ((eww-mode . jf/reader-visual)))
 
-;; A little bit of RSS beautification.
 (defun jf/reader-visual ()
   "A method to turn on visual line mode and adjust text scale."
+  ;; A little bit of RSS beautification.
   (text-scale-set 2)
   (turn-on-visual-line-mode))
 

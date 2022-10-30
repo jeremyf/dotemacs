@@ -12,8 +12,8 @@
 (use-package project
   :straight t)
 
-;; Convenient organization and commands
 (use-package projectile
+  ;; Convenient organization and commands
   :straight t
   :diminish 'projectile-mode
   :config (projectile-mode 1)
