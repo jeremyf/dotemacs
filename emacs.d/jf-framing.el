@@ -15,38 +15,7 @@
 ;; To enter presentation mode: "M-x jf/lp-minor-mode"
 
 ;;; Code
-
-(require 'jf-minor-mode-maker)
-
-(use-package so-long
-  :defer t
-  :straight t
-  :bind
-  (:map so-long-mode-map
-        ("C-s" . isearch-forward)
-        ("C-r" . isearch-backward))
-  :config (global-so-long-mode 1))
-
 (use-package edit-indirect :straight t)
-
-(use-package shackle
-    :straight t
-    :custom
-    (shackle-rules '((compilation-mode :noselect t))
-                   shackle-default-rule '(:select t)))
-
-(use-package esxml :straight t)
-
-(use-package "nov.el" :straight t
-  :config (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
-  :custom (nov-text-width 80))
-
-(use-package olivetti
-  :straight t
-  :custom
-  (olivetti-body-width 0.6)
-  (olivetti-minimum-body-width 80)
-  (olivetti-recall-visual-line-mode-entry-state t))
 
 (use-package logos
   :straight t
@@ -71,20 +40,50 @@
 		logos-outline-regexp-alist
 		`((emacs-lisp-mode . "^;;;+ ")
 		  (org-mode . "^\\*+ +")
-		  (markdown-mode . "^\\#+ +"))))
+		  (markdown-mode . "^\\#+ +")))
 
-(defun logos--reveal-entry ()
-  "Reveal Org or Outline entry."
-  (cond
-   ((and (eq major-mode 'org-mode)
-	 (org-at-heading-p))
-    (org-show-subtree))
-   ((or (eq major-mode 'outline-mode)
-	(bound-and-true-p outline-minor-mode))
-    (outline-show-subtree))))
-(add-hook 'logos-page-motion-hook #'logos--reveal-entry)
+  (defun logos--reveal-entry ()
+    "Reveal Org or Outline entry."
+    (cond
+     ((and (eq major-mode 'org-mode)
+	   (org-at-heading-p))
+      (org-show-subtree))
+     ((or (eq major-mode 'outline-mode)
+	  (bound-and-true-p outline-minor-mode))
+      (outline-show-subtree))))
+  :init
+  (add-hook 'logos-page-motion-hook #'logos--reveal-entry))
+
+(use-package "nov.el" :straight t
+  :config (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
+  (use-package esxml :straight t)
+  :custom (nov-text-width 80))
+
+(use-package shackle
+    :straight t
+    :custom
+    (shackle-rules '((compilation-mode :noselect t))
+                   shackle-default-rule '(:select t)))
+
+(use-package so-long
+  :defer t
+  :straight t
+  :bind
+  (:map so-long-mode-map
+        ("C-s" . isearch-forward)
+        ("C-r" . isearch-backward))
+  :config (global-so-long-mode 1))
+
+(use-package olivetti
+  :straight t
+  :custom
+  (olivetti-body-width 0.6)
+  (olivetti-minimum-body-width 80)
+  (olivetti-recall-visual-line-mode-entry-state t))
 
 ;;; Presentation mode leveraging logos
+(require 'jf-minor-mode-maker)
+
 (defvar jf/lp-minor-mode-map (let ((map (make-sparse-keymap)))
 			       (dolist (key `("]" "RET" "SPC" "<right>" "<down>" "n" "C-n"))
 				 (define-key map (kbd key) #'logos-forward-page-dwim))

@@ -1,4 +1,4 @@
-;;; jf-completing.el --- Simple focus mode and extras -*- lexical-binding: t -*-
+;;; jf-completing.el --- Packages of the "completing" variety -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2022  Jeremy Friesen
 ;; Author: Jeremy Friesen <jeremy@jeremyfriesen.com>
@@ -6,9 +6,19 @@
 ;; This file is NOT part of GNU Emacs.
 ;;; Commentary
 
-;; Packages specifically here for helping with my coding activities.
+;; These packages help configure the "completing" activity in coding.  The
+;; general idea of find me something.
 
 ;;; Code
+
+;;;; Other packages and their configurations
+
+;; The =abbrev= package is simple and powerful, providing an auto-correct that
+;; I configure.  No more “teh” in my text.
+(use-package abbrev
+  :straight (:type built-in)
+  :custom (abbrev-file-name (file-truename "~/git/dotemacs/emacs.d/abbrev_defs"))
+  :hook (text-mode . abbrev-mode))
 
 (use-package emacs
   :init
@@ -44,45 +54,6 @@
   (setq minibuffer-prompt-properties
         '(read-only t cursor-intangible t face minibuffer-prompt))
   (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode))
-
-(use-package vertico
-  :straight t
-  :config
-  ;; https://github.com/minad/vertico/wiki#restrict-the-set-of-candidates
-  (defun jf/vertico-restrict-to-matches ()
-    "Restrict set of candidates to visible candidates"
-    (interactive)
-    (let ((inhibit-read-only t))
-      (goto-char (point-max))
-      (insert " ")
-      (add-text-properties (minibuffer-prompt-end) (point-max)
-                           '(invisible t read-only t cursor-intangible t rear-nonsticky t))))
-
-  (define-key vertico-map (kbd "S-SPC") #'jf/vertico-restrict-to-matches)
-  (vertico-mode)
-  ;; Use `consult-completion-in-region' if Vertico is enabled.
-  ;; Otherwise use the default `completion--in-region' function.
-  (setq completion-in-region-function
-        (lambda (&rest args)
-          (apply (if vertico-mode
-                     #'consult-completion-in-region
-                   #'completion--in-region)
-                 args)))
-  (setq read-file-name-completion-ignore-case t
-        read-buffer-completion-ignore-case t
-        completion-ignore-case t)
-  (setq vertico-cycle t))
-
-(load "~/.emacs.d/straight/build/vertico/extensions/vertico-indexed.elc"
-      nil
-      jf/silence-loading-log)
-(vertico-indexed-mode)
-
-(load "~/.emacs.d/straight/build/vertico/extensions/vertico-repeat.elc"
-      nil
-      jf/silence-loading-log)
-(global-set-key (kbd "M-r") #'vertico-repeat)
-(add-hook 'minibuffer-setup-hook #'vertico-repeat-save)
 
 (use-package embark
   :straight t
@@ -120,14 +91,6 @@
 
   (embark-collect-mode . consult-preview-at-point-mode)
   (embark-collect-mode . embark-consult-preview-minor-mode))
-
-(use-package marginalia
-  :straight t
-  :config (setq marginalia-max-relative-age 0) ;; Set absolute value
-  ;; /Note:/ The declaration of `marginalia-mode' must be in the :init
-  ;; section.This ensures that it is enabled right away.  It also forces the
-  ;; loading of the package.
-  :init (marginalia-mode))
 
 (use-package consult
   :straight t
@@ -377,6 +340,86 @@ Useful if you want a more robust view into the recommend candidates."
 ;; - Literal ~=~ :: No “fuzzy buziness”, just match exactly what I typed.
 ;;
 ;; There is another case (e.g. ~%~ character fold) that I don’t yet understand.
+(use-package cape
+  :straight t
+  :init (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  (add-to-list 'completion-at-point-functions #'cape-file)
+  :bind (("C-c p d" . cape-dabbrev)
+         ("C-c p f" . cape-file)
+         ("C-c p s" . cape-symbol)
+         ("C-c p i" . cape-ispell)))
+
+(use-package grab-mac-link
+  :straight t
+  ;; Ensuring we load these, as I'll need them later.
+  :commands (grab-mac-link-safari-1 grab-mac-link-firefox-1)
+  :config
+  ;; A replacement function for existing grab-mac-link-make-html-link
+  (defun jf/grab-mac-link-make-html-link (url name)
+    "Using HTML syntax, link to and cite the URL with the NAME."
+    (format "<cite><a href=\"%s\" class=\"u-url p-name\" rel=\"cite\">%s</a></cite>" url name))
+  ;; The function advice to override the default behavior
+
+  (advice-add 'grab-mac-link-make-html-link
+	      :override 'jf/grab-mac-link-make-html-link
+	      '((name . "jnf")))
+  :bind (("C-c g" . grab-mac-link)))
+
+;; Similar to `grab-mac-link' this specifically grabs a link and inserts in
+;; `org-mode' format.
+(use-package helpful
+  :init
+  (use-package transient :straight t)
+  ;; I'm going to talk about this later, but I'm adding this to the menu, so I
+  ;; may as well state the dependency.
+  (use-package embark :straight t)
+  :straight t
+  :config
+  (transient-define-prefix jf/helpful-menu ()
+    "Return a `transient' compliant list to apply to different transients."
+    ["Help"
+     ""
+     ("Q" "Kill Helpful Buffers" helpful-kill-buffers)
+     ""
+     ("b" "Bindings" embark-bindings)
+     ("c" "Command" helpful-command)
+     ("f" "Function (interactive)" helpful-callable)
+     ("F" "Function (all)" helpful-function)
+     ("k" "Key" helpful-key)
+     ("l" "Library" find-library)
+     ("m" "Macro" helpful-macro)
+     ("p" "Thing at point" helpful-at-point)
+     ("." "Thing at point" helpful-at-point)
+     ("t" "Text properties" describe-text-properties)
+     ("v" "Variable" helpful-variable)])
+  :bind ("H-h" . jf/helpful-menu)
+  ("C-s-h" . jf/helpful-menu))
+
+(use-package hippie-exp
+  :straight t
+  :config
+  (setq hippie-expand-try-functions-list '(try-expand-dabbrev-visible
+					   try-expand-dabbrev
+					   try-expand-dabbrev-all-buffers
+					   try-expand-dabbrev-from-kill
+					   try-complete-file-name-partially
+					   try-complete-file-name
+					   try-expand-all-abbrevs
+					   try-expand-list
+					   try-expand-line
+					   try-complete-lisp-symbol-partially
+					   try-complete-lisp-symbol))
+  :bind (("M-SPC" . hippie-expand))
+  :init (global-set-key [remap dabbrev-expand] 'hippie-expand))
+
+(use-package marginalia
+  :straight t
+  :config (setq marginalia-max-relative-age 0) ;; Set absolute value
+  ;; /Note:/ The declaration of `marginalia-mode' must be in the :init
+  ;; section.This ensures that it is enabled right away.  It also forces the
+  ;; loading of the package.
+  :init (marginalia-mode))
+
 (use-package orderless
   :straight t
   :config
@@ -430,15 +473,9 @@ Useful if you want a more robust view into the recommend candidates."
         orderless-component-separator #'orderless-escapable-split-on-space ;; allow escaping space with backslash!
         orderless-style-dispatchers '(+orderless-dispatch)))
 
-(use-package cape
-  :straight t
-  :init (add-to-list 'completion-at-point-functions #'cape-dabbrev)
-  (add-to-list 'completion-at-point-functions #'cape-file)
-  :bind (("C-c p d" . cape-dabbrev)
-         ("C-c p f" . cape-file)
-         ("C-c p s" . cape-symbol)
-         ("C-c p i" . cape-ispell)))
-
+(use-package org-mac-link
+  :straight (org-mac-link :type git :host github :repo "jeremyf/org-mac-link")
+  :bind (:map org-mode-map (("C-c g" . org-mac-grab-link))))
 
 (use-package tempel
   :straight (tempel :host github :repo "minad/tempel")
@@ -469,34 +506,50 @@ Useful if you want a more robust view into the recommend candidates."
   ;; (tempel-global-abbrev-mode)
   :init (tempel-key "C-c i" idiomatic org-mode-map))
 
-(use-package hippie-exp
+
+;; Grab a link from a variety of MacOS applications.
+(use-package vertico
   :straight t
   :config
-  (setq hippie-expand-try-functions-list '(try-expand-dabbrev-visible
-					   try-expand-dabbrev
-					   try-expand-dabbrev-all-buffers
-					   try-expand-dabbrev-from-kill
-					   try-complete-file-name-partially
-					   try-complete-file-name
-					   try-expand-all-abbrevs
-					   try-expand-list
-					   try-expand-line
-					   try-complete-lisp-symbol-partially
-					   try-complete-lisp-symbol))
-  :bind (("M-SPC" . hippie-expand)))
+  ;; https://github.com/minad/vertico/wiki#restrict-the-set-of-candidates
+  (defun jf/vertico-restrict-to-matches ()
+    "Restrict set of candidates to visible candidates"
+    (interactive)
+    (let ((inhibit-read-only t))
+      (goto-char (point-max))
+      (insert " ")
+      (add-text-properties (minibuffer-prompt-end) (point-max)
+                           '(invisible t read-only t cursor-intangible t rear-nonsticky t))))
 
-(global-set-key [remap dabbrev-expand] 'hippie-expand)
-
-(use-package yasnippet
-  :straight t
-  :diminish 'yas-minor-mode
+  (define-key vertico-map (kbd "S-SPC") #'jf/vertico-restrict-to-matches)
+  (vertico-mode)
+  ;; Use `consult-completion-in-region' if Vertico is enabled.
+  ;; Otherwise use the default `completion--in-region' function.
+  (setq completion-in-region-function
+        (lambda (&rest args)
+          (apply (if vertico-mode
+                     #'consult-completion-in-region
+                   #'completion--in-region)
+                 args)))
+  (setq read-file-name-completion-ignore-case t
+        read-buffer-completion-ignore-case t
+        completion-ignore-case t)
+  (setq vertico-cycle t)
   :init
-  (setq yas-snippet-dirs '("~/git/dotemacs/snippets"))
-  (yas-global-mode 1))
+
+  (load "~/.emacs.d/straight/build/vertico/extensions/vertico-indexed.elc"
+	nil
+	jf/silence-loading-log)
+  (vertico-indexed-mode)
+
+  (load "~/.emacs.d/straight/build/vertico/extensions/vertico-repeat.elc"
+	nil
+	jf/silence-loading-log)
+  (global-set-key (kbd "M-r") #'vertico-repeat)
+  (add-hook 'minibuffer-setup-hook #'vertico-repeat-save))
 
 (use-package which-key
   :straight t
-  :diminish 'which-key-mode
   :custom
   (which-key-side-window-max-width 70)
   (which-key-min-column-description-width 50)
@@ -505,64 +558,6 @@ Useful if you want a more robust view into the recommend candidates."
   (which-key-mode)
   (which-key-setup-side-window-right)
   (which-key-show-major-mode))
-
-;; Grab a link from a variety of MacOS applications.
-(use-package grab-mac-link
-  :straight t
-  ;; Ensuring we load these, as I'll need them later.
-  :commands (grab-mac-link-safari-1 grab-mac-link-firefox-1)
-  :config
-  ;; A replacement function for existing grab-mac-link-make-html-link
-  (defun jf/grab-mac-link-make-html-link (url name)
-    "Using HTML syntax, link to and cite the URL with the NAME."
-    (format "<cite><a href=\"%s\" class=\"u-url p-name\" rel=\"cite\">%s</a></cite>" url name))
-  ;; The function advice to override the default behavior
-
-  (advice-add 'grab-mac-link-make-html-link
-	      :override 'jf/grab-mac-link-make-html-link
-	      '((name . "jnf")))
-  :bind (("C-c g" . grab-mac-link)))
-
-;; Similar to `grab-mac-link' this specifically grabs a link and inserts in
-;; `org-mode' format.
-(use-package org-mac-link
-  :straight (org-mac-link :type git :host github :repo "jeremyf/org-mac-link")
-  :bind (:map org-mode-map (("C-c g" . org-mac-grab-link))))
-
-(use-package helpful
-  :init
-  (use-package transient :straight t)
-  ;; I'm going to talk about this later, but I'm adding this to the menu, so I
-  ;; may as well state the dependency.
-  (use-package embark :straight t)
-  :straight t
-  :config
-  (transient-define-prefix jf/helpful-menu ()
-    "Return a `transient' compliant list to apply to different transients."
-    ["Help"
-     ""
-     ("Q" "Kill Helpful Buffers" helpful-kill-buffers)
-     ""
-     ("b" "Bindings" embark-bindings)
-     ("c" "Command" helpful-command)
-     ("f" "Function (interactive)" helpful-callable)
-     ("F" "Function (all)" helpful-function)
-     ("k" "Key" helpful-key)
-     ("l" "Library" find-library)
-     ("m" "Macro" helpful-macro)
-     ("p" "Thing at point" helpful-at-point)
-     ("." "Thing at point" helpful-at-point)
-     ("t" "Text properties" describe-text-properties)
-     ("v" "Variable" helpful-variable)])
-  :bind ("H-h" . jf/helpful-menu)
-  ("C-s-h" . jf/helpful-menu))
-
-;; The =abbrev= package is simple and powerful, providing an auto-correct that
-;; I configure.  No more “teh” in my text.
-(use-package abbrev
-  :straight (:type built-in)
-  :custom (abbrev-file-name (file-truename "~/git/dotemacs/emacs.d/abbrev_defs"))
-  :hook (text-mode . abbrev-mode))
 
 (provide 'jf-completing)
 ;;; jf-completing.el ends here

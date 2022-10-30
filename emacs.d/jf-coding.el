@@ -1,14 +1,20 @@
-;;; jf-coding.el --- Simple focus mode and extras -*- lexical-binding: t -*-
+;;; jf-coding.el --- Packages related to "coding" -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2022  Jeremy Friesen
 ;; Author: Jeremy Friesen <jeremy@jeremyfriesen.com>
 
 ;; This file is NOT part of GNU Emacs.
+
 ;;; Commentary
 
-;; Packages specifically here for helping with my coding activities.
+;; Coding is writing, but not all writing is coding.  This configures and
+;; extends packages specifically here for helping with my coding activities.
 
 ;;; Code
+;;;; Pre-requisites
+(require 'jf-writing)
+
+;;;; Other packages and their configurations
 (use-package bundler
   :straight (bundler :type git :host github :repo "endofunky/bundler.el"))
 
@@ -20,7 +26,6 @@
 
 (use-package editorconfig
     :straight t
-    :diminish editorconfig-mode
     :config
     (editorconfig-mode 1))
 
@@ -58,6 +63,8 @@
   :init (add-to-list 'interpreter-mode-alist '("ruby" . enh-ruby-mode)))
 
 (use-package go-mode :straight t)
+
+(require 'hide-comnt)
 
 (use-package json-mode :straight t)
 
@@ -101,13 +108,11 @@
   (rspec-docker-command "docker compose exec")
   :bind (:map rspec-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
   :bind (:map enh-ruby-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
-  :diminish 'rspec-mode
   :init (eval-after-load 'rspec-mode '(rspec-install-snippets)))
 
 ;; Nice and simple package for string interpolation.
 (use-package ruby-interpolation
   :straight t
-  :diminish 'ruby-interpolation-mode
   :hook (enh-ruby-mode . ruby-interpolation-mode))
 
 (use-package sql-indent
@@ -122,7 +127,6 @@
 ;; Waiting on https://github.com/emacs-tree-sitter/elisp-tree-sitter/issues/197 to resolve.
 (use-package tree-sitter
   :straight (tree-sitter :host github :repo "emacs-tree-sitter/elisp-tree-sitter")
-  :diminish 'tree-sitter-mode
   :config
   (add-to-list 'tree-sitter-major-mode-language-alist '(enh-ruby-mode . ruby))
   :init (global-tree-sitter-mode)
@@ -146,9 +150,7 @@
 
 (use-package yard-mode
   :straight t
-  :diminish 'yard-mode
   :hook (enh-ruby-mode . yard-mode))
-
 
 (provide 'jf-coding)
 ;;; jf-coding.el ends here

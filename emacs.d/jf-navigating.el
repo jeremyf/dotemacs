@@ -8,6 +8,7 @@
 
 ;;; Code
 
+;;;; Packages
 (use-package ace-window
   :straight t
   :bind (("M-o" . ace-window)))
@@ -32,6 +33,7 @@
   ("C-c l o" . link-hint-open-link)
   ("C-c l c" . link-hint-copy-link))
 
+;;;; Custom Functions
 ;; See https://www.reddit.com/r/emacs/comments/r7l3ar/how_do_you_scroll_half_a_page/
 (global-set-key (kbd "M-n") 'jf/scroll-down-half-page)
 (defun jf/scroll-down-half-page ()
