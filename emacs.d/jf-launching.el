@@ -66,6 +66,8 @@
 
 (setq user-full-name "Jeremy Friesen"
       user-mail-address "jeremy@jeremyfriesen.com")
+(defconst jf/github-username "jeremyf"
+  "My username on github.")
 
 (defconst jf/silence-loading-log t
   "When t log to stdout load messages from this configuration.
@@ -74,10 +76,6 @@
      This flag allowed me to more easily troubleshoot those load
      attempts.")
 
-(defconst jf/github-username "jeremyf"
-  "My username on github.")
-
-(global-so-long-mode) ;; Handle long files.
 (electric-pair-mode)  ;; https://blog.sumtypeofway.com/posts/emacs-config.html
 (make-directory "~/.emacs.d/autosaves/" t) ;; Ensuring I have an autosave
 ;; directory.
@@ -141,8 +139,11 @@
  ;; https://protesilaos.com/emacs/modus-themes
 
  ns-right-command-modifier 'hyper ;; Exposing one additional modifier key.
- )
 
+ line-move-visual t)
+
+;; With subword-mode, HelloWorld is two words for navigation.
+(global-subword-mode)
 
 
 ;; When you open Emacs, grab all the space on the screen
@@ -193,8 +194,6 @@
         gcmh-high-cons-threshold (* 16 1024 1024))  ; 16mb
   :config (gcmh-mode))
 ;;; END Core Configuration
-
-(require 'jf-minor-mode-maker)
 
 (provide 'jf-launching)
 ;;; jf-launching.el ends here

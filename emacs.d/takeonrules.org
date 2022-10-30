@@ -19,8 +19,7 @@ that I have required ~ox~.
 #+BEGIN_SRC emacs-lisp
   (require 'ox)
 
-  (use-package tomelr
-    :straight (tomelr :host github :repo "kaushalmodi/tomelr"))
+  (require 'jf-formatting)
 
   (use-package ox-hugo
     :straight t
