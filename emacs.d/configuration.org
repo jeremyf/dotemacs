@@ -14,551 +14,34 @@
 #+STARTUP: showall
 #+OPTIONS: toc:3
 
-* Introduction
+Welcome to a stripped down configuration; I have been working with a literate configuration but have found that it doesn’t suit my needs.  I want to be able to jump to the definition and begin editing.
 
-On <2020-05-25> I wrote [[https://takeonrules.com/2020/05/25/principles-of-my-text-editor/][Principles of My Text Editor]].  I was exploring adopting
-a new text editor, and wanted to ensure that I knew what I was looking for.
-You know, “begin with the end in mind.”[fn:8]
-
-I did not realize how inadequate I was in thinking about my text editor; but
-that is a different tale.
-
-When I first dove into Emacs, I looked into [[https://github.com/hlissner/doom-emacs][Doom]] and [[https://www.spacemacs.org][Spacemacs]].  However, in
-doing that I got ahead of myself.  So I started with an empty ~init.el~ and
-walked through the tutorial.
-
-From that point forward, I committed to use Emacs as is and when I knew I
-needed something, I’d look into how to do it.  The result?  A configuration
-that is uniquely mine.
-
-On <2022-02-01 Tue> I chose to begin extracting my the various ~*.el~ into a
-[[https://en.wikipedia.org/wiki/Literate_programming][Literate programming]] format.  As with all Emacs configurations, what follows is
-a work in progress.
-
-** Tips on Troubleshooting
-
-As I migrated from my ~*.el~ configurations, I moved one ~.el~ file at a time.
-With each move, I would restart my Emacs daemon[fn:5].  I went so far as
-to write a ~e-reboot~ alias[fn:4].  So if I “messed up”, I could easily
-recover and fix the files I broke.
-
-In other words, when I’m working on extending my Emacs configuration, I tend to
-favor a bisset approach.  Make a change, verify it, and commit.  This helps
-insulate me from “getting to far ahead of myself.”  Along the way, I failed to
-always apply that discipline.
-
-** About the Current Structure
-
-The current structure is carried over from my past structure.  As I was first
-adopting Emacs, I spent time organizing the packages.  This organization is a
-bit muddy, as I never quite established the nomenclature.
-
-What I can say is the order may be important.  But I’ll be working to untangle
-that.
-
-Where feasible, I have tried to bind keys “close” to their utilization.  That
-is to say, I often leverage the ~:bind~, ~:hook~, and ~:map~ keywords for
-~use-package~.  But I’m not always consistent.
-
-In the ~org-mode~ version, I’m making use of “TODO” indicators to help me track
-what else I may need to do.  A node marked as “DONE” should be viewed as “I
-don’t need to go back and amend any documentation in that part.  However, it
-doesn’t mean I won’t put more things in that section.”
-
-** Organizing the Ideas
-
-I’ve thought quite a bit about how to organize this file.  How does one narrate
-the intertwined concepts of a configuration that is an amalgamation of so many
-other people’s work?
-
-My approach is to think back to my experience with the tutorial.  How it walked
-me through the concepts.  I also need to be mindful that as I introduce source
-code concepts, they are evaluated in that order.
-
-** Conventions
-
-I’ve written quite a few functions to further extend the utility of Emacs.  I
-try to prefix them with ~jf/~.  And if I cribbed those functions from
-elsewhere, I attempt to give credit to the source.
-
-* Into the Emacs
-
-** Launching Emacs
-
-As we get started in Emacs, I want to make sure I have the basics lined up.
-
-- Core Configuration
-- Basic Theming
-
-*** Core Configuration
+** Baseline Requires
 
 #+begin_src emacs-lisp
   (require 'jf-launching)
   (require 'jf-minor-mode-maker)
   (require 'jf-illuminating)
   (require 'jf-navigating)
-#+end_src
-
-
-*** Basic Theming
-
-I want to start with a basic look and feel.  First, the choice of primary font.
-
-#+begin_src emacs-lisp
   (require 'jf-fonts-and-iconography)
   (require 'jf-windows)
-#+end_src
-
-*** Tabs
-
-#+begin_src emacs-lisp
-  ;; (org-babel-load-file
-  ;;  (concat user-emacs-directory "emacs-tabs.org"))
-#+end_src
-
-** How Does this Thing Work?
-
-In this section my goal is to load some “fundamental” packages that help me
-better introspect and navigate Emacs.
-
-With the initial “setup” out of the way, let’s dive into how things work.
-
-I want to make it easy to find help on different aspects of Emacs.  There’s
-tooling baked into Emacs, but the ~helpful~ package “provides much more
-contextual information.”
-
-Futhermore, I want to make a menu to help remind me of the help I have
-available.  In previous incarnations I’ve written these menus using
-[[https://github.com/jerrypnz/major-mode-hydra.el#pretty-hydra][pretty-hydra]], but I’ve started moving these to [[https://github.com/magit/transient/tree/440a341831398b825dc2288a10821cf7be1999ca][transient]]; a package that’s a
-hard requirement for packages I’ll later introduce.
-
-** Writing, Coding, Computering
-
-*** Projects
-
-- ~projectile.el~ :: this package provides convenient organization and commands to run over projects.
-
-#+begin_src emacs-lisp
-  ;; Convenient organization and commands
-  (use-package projectile
-    :straight t
-    :diminish 'projectile-mode
-    :config (projectile-mode 1)
-    :custom (projectile-project-search-path '("~/git/"))
-    :bind ("s-." . projectile-toggle-between-implementation-and-test))
-#+end_src
-
-/Note:/ The =CMD= + =.= is a carryover from my [[https://macromates.com][Textmate]] and [[https://www.sublimetext.com/][Sublime Text]] days.
-That’s one of those hot-keys almost burned into soul.
-
-*** Support Packages
-
-When I start writing functions, there’s a few packages I want to consider.
-
-- ~keychain-environment.el~ :: Load keychain environment variables
-
-#+begin_src emacs-lisp
   (require 'jf-utility)
-#+end_src
-
-*** Completion
-
-**** Emacs Adjustments for Completion
-
-What follows is adjustments to emacs settings as they relate to completion.
-
-#+begin_src emacs-lisp
   (require 'jf-completing)
-#+end_src
-
-#+RESULTS:
-: cape-ispell
-
-**** wgrep.el
-
-- ~wgrep.el~ ::
-
-
-   I use this sequence at least once a day.
-
-#+begin_src emacs-lisp
-#+end_src
-
-**** yasnippet.el
-
-- ~yasnippet.el~ :: A rather convenient snippet manager.  When you create a
-  snippet, it understands the mode you're in and puts the snippet in the right
-  place.
-
-#+begin_src emacs-lisp
-
-#+end_src
-
-*** Display
-
-**** highlight-indent-guides.el
-
-**** Folding
-
-#+begin_src emacs-lisp
-
-
-#+end_src
-
-**** DONE unicode-fonts.el
-
-I’m uncertain why I included this, aside from “sure would be nice to have unicode fonts.”
-
-#+begin_src emacs-lisp
-
-#+end_src
-
-**** flymake-proselint
-
-
-
-*** Modes
-
-Emacs has the concept of modes.  Each buffer has one major mode and can have
-multiple minor modes.  A major mode may derive from another major mode.
-
-These modes impact lots of things; key bindings being one of them.
-
-What follows are a list of modes presented in a somewhat random order.  Some
-are major modes others are minor modes.
-
-**** bundler.el
-
-- ~bundler.el~ :: Adds the useful ~bundle-open~ command.
-
-#+begin_src emacs-lisp
   (require 'jf-coding)
   (require 'jf-organizing)
   (require 'jf-framing)
   (require 'jf-utility)
   (require 'jf-writing)
-#+end_src
-*** Utilities
-
-
-***
-
-**** titlecase.el
-
-#+begin_src emacs-lisp
-;; After using Emacs for awhile, with it’s sentence navigation, I’ve come to
-  ;; strongly favor two spaces after a period.  The
-
-
-
-  ;; Calculate math functions at point and message result in minibuffer.  See
-  ;; https://github.com/shankar2k/math-at-point.
-  (use-package math-at-point
-      :straight (math-at-point :type git :host github :repo "shankar2k/math-at-point")
-      :bind ("C-c =" . math-at-point))
-#+end_src
-
-**** Expansion Options
-
-#+begin_src emacs-lisp
-  ;; Using Hippie expand, I toggle through words already referenced.
-#+end_src
-
-**** crux.el
-
-#+begin_src emacs-lisp
-#+end_src
-
-**** ethan-wspace.el
-
-#+begin_src emacs-lisp
-  ;; Whitespace hygene package.  The author's documentation and commentary echoes
-  ;; my sentiments.
-  (use-package ethan-wspace
-    :straight t
-    :hook (before-save . delete-trailing-whitespace)
-    :init (setq-default mode-require-final-newline nil)
-    :config (global-ethan-wspace-mode 1))
-#+end_src
-
-*** TODO Typography
-
-#+begin_src emacs-lisp
-  ;;; Commentary:
-  ;;
-  ;;  This package serves the purpose of assisting with adding
-  ;;  characters that are not readily available on an ANSI keyboard.
-  ;;
-  ;;; Code:
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  ;;
-  ;;; BEGIN Typography Menu
-  ;;
-  ;;  The purpose of the typography menu is to provide easier access to
-  ;;  typographic characters that I use; It also provides a bit of a
-  ;;  mnemonic device (e.g. "C-x 8 RET" searches for a character to insert).
-  ;;
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  ;; (use-package pretty-hydra
-  ;;     :straight (:type git :host github :repo "jerrypnz/major-mode-hydra.el"
-  ;; 	       :files (:defaults (:exclude "major-mode-hydra.el"))))
-
-  ;; (defvar jf/typography--title
-  ;;   (jf/all-the-icons--with-octicon "pencil" "Typography (C-x 8 RET for Search)" 1 -0.05)
-  ;;   "The menu title for typography")
-  ;; (pretty-hydra-define jf/typography--menu (:foreign-keys warn :title jf/typography--title :quit-key "q" :exit t)
-  ;;   ("Characters" (
-  ;; 		 ("d d" (insert "-") "- dash")
-  ;; 		 ("d m" (insert "—") "— em dash")
-  ;; 		 ("d n" (insert "–") "– en dash")
-  ;; 		 (". e" (insert "…") "… ellipsis")
-  ;; 		 (". d" (insert "·") "º degree")
-  ;; 		 (". m" (insert "·") "· middot")
-  ;; 		 ("t d" (insert "†") "† dagger")
-  ;; 		 ("t 2" (insert "‡") "‡ double dagger")
-  ;; 		 ("t s" (insert "§") "§ section")
-  ;; 		 ("t p" (insert "¶") "¶ paragraph")
-  ;; 		 ("? !" (insert "‽") "‽ Interobang")
-  ;; 		 )
-  ;;    "Math" (
-  ;; 	   ("a x" (insert "×") "× Multiplication Sign")
-  ;; 	   ("a d" (insert "÷") "÷ Division Sign")
-  ;; 	   ("a m" (insert "−") "− Minus Sign")
-  ;; 	   ("a p" (insert "±") "± Plus or Minus Sign")
-  ;; 	   ("m n" (insert "¬") "¬ Negation")
-  ;; 	   ;; For declaring regex functions.  See
-  ;; 	   ;; https://www.johndcook.com/blog/2022/01/08/corner-quotes-in-unicode/
-  ;; 	   ;; and https://irreal.org/blog/?p=10265
-  ;; 	   ("c l" (insert "⌜") "⌜ Left Corner Quote")
-  ;; 	   ("c r" (insert " ⌟") "⌟ Right Corner Quote")
-  ;; 	   ;; Included as a reminder as I use these for menu structures
-  ;; 	   ("f h"   (insert "─") "─ Forms light horizontal")
-  ;; 	   ("f D l" (insert "┐") "┐ Forms light down and left")
-  ;; 	   ("f v"   (insert "│") "│ Forms light vertical")
-  ;; 	   ("f V r" (insert "├") "├ Forms light vertical and right")
-  ;; 	   ("f U r" (insert "└") "└ Forms light up and right")
-  ;; 	   )
-  ;;    "Quotes" (
-  ;; 	     ("\" o" (insert "“") "“ Double quote open")
-  ;; 	     ("\" c" (insert "”") "” Doule quote close")
-  ;; 	     ("\" O" (insert "«") "« Guillemet open")
-  ;; 	     ("\" C" (insert "»") "» Guillemet close")
-  ;; 	     ("\" l" (insert "⌈") "⌈ Left ceiling")
-  ;; 	     ("' o" (insert "‘") "‘ Single quote open")
-  ;; 	     ("' c" (insert "’") "’ Single quote close")
-  ;; 	     ("' O" (insert "‹") "‹ Single guillemet open")
-  ;; 	     ("' C" (insert "›") "› Single guillemet close")
-  ;; 	     ("p 1" (insert "′") "′ Single Prime (feet, arcminutes)")
-  ;; 	     ("p 2" (insert "″") "″ Double Prime (inches, arcseconds)")
-  ;; 	     ("p 3" (insert "‴") "‴ Triple Prime"))
-  ;;    ))
-
-  ;; (global-set-key (kbd "C-s-8") 'jf/typography--menu/body)
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-  ;;
-  ;;; END Typography Menu
-  ;;
-  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-#+end_src
-
-**** TODO typopunct.el
-
-#+begin_src emacs-lisp
-  (require 'jf-writing)
-#+end_src
-
-** Integrated “Applications”
-
-*** Variable and Constant Definitions
-
-These are a few variables and cosntants that I use throughout my configuration.
-
-#+begin_src emacs-lisp
-  (defconst jf/tor-home-directory
-    (file-truename "~/git/takeonrules.source")
-    "The home directory of TakeOnRules.com Hugo repository.")
-
-  (defconst jf/tor-hostname-default-local
-    "http://localhost:1313"
-    "The scheme, host name, and port for serving up a local TakeOnRules.com.")
-
-  (defconst jf/tor-hostname-default-remote
-    "https://takeonrules.com"
-    "The scheme and host name for TakeOnRules.com.")
-
-  (defvar jf/tor-hostname-current
-    jf/tor-hostname-default-local
-    "What is the current hostname for serving TakeOnRules content.")
-#+end_src
-
-*** Mastodon
-
-#+begin_src emacs-lisp
   (require 'jf-communicating)
-#+end_src
-
-*** Knowledge Management
-
-I use org-mode and org-roam to help manage content.  Let’s load that rather extensive configuration.
-
-#+begin_src emacs-lisp
   (require 'jf-org-mode)
   (require 'jf-denote)
-#+end_src
-
-*** org-d20.el
-
-#+begin_src emacs-lisp
-
-#+end_src
-
-*** RSS Feed
-
-**** elfeed.el
-
-#+begin_src emacs-lisp
   (require 'jf-reading)
-#+end_src
-
-*** Source Control
-
-#+begin_src emacs-lisp
   (require 'jf-versioning)
+  (require 'jf-quick-help)
+  (require 'jf-gaming)
 #+end_src
 
-*** tmr.el
-
-#+begin_src emacs-lisp
-#+end_src
-
-
-*** EWW
-
-
-
-*** Random Tables
-
-Let’s add some [[file:random-tables.org][Random Table tooling]].
-
-#+begin_src emacs-lisp
-  (org-babel-load-file
-   (concat user-emacs-directory "random-tables.org"))
-#+end_src
-
-*** Hammerspoon
-
-Hammerspoon is Lua application that provides a consistent API for interacting
-with MacOS.  The editWithEmacs.spoon allows me to copy text from one region,
-edit it in Emacs, and paste it back into the Application.
-
-#+begin_src emacs-lisp
-  (when (file-directory-p
-	 "~/git/dotzshrc/symlinks/.hammerspoon/Spoons/editWithEmacs.spoon")
-    (load
-     "~/git/dotzshrc/symlinks/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el"
-     nil
-     jf/silence-loading-log))
-#+end_src
-
-** Connective Tissue and Oddities
-
-*** Functions
-
-The following chunk of allows me to take multiple filenames passed via the
-emacsclient and open those files in windows within the same frame.
-
-You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/main/bin/git-edit][git-edit]] command line tool.
-
-#+begin_src emacs-lisp
-  ;;; Connective Tissue and oddity functions:
-  (defvar server-visit-files-custom-find:buffer-count
-    "A counter for assisting with opening multiple files via a single
-    client call.")
-  (defadvice server-visit-files
-      (around server-visit-files-custom-find
-	      activate compile)
-    "Maintain a counter of visited files from a single client call."
-    (let ((server-visit-files-custom-find:buffer-count 0))
-      ad-do-it))
-  (defun server-visit-hook-custom-find ()
-    "Arrange to visit the files from a client call in separate windows."
-    (if (zerop server-visit-files-custom-find:buffer-count)
-	(progn
-	  (delete-other-windows)
-	  (switch-to-buffer (current-buffer)))
-      (let ((buffer (current-buffer))
-	    (window (split-window-sensibly)))
-	(switch-to-buffer buffer)
-	(balance-windows)))
-    (setq server-visit-files-custom-find:buffer-count
-	  (1+ server-visit-files-custom-find:buffer-count)))
-  (add-hook 'server-visit-hook 'server-visit-hook-custom-find)
-
-  ;; The following function facilitates a best of both worlds.  By default, I
-  ;; want Option to be Meta (e.g. \"M-\") in Emacs.  However, I can toggle that
-  ;; setting.  That way if I need an umlaut (e.g., \"¨\"), I can use MacOS’s
-  ;; native functions to type \"⌥\" + \"u\".
-  ;;
-  ;; I like having MacOS’s native Option (e.g. =⌥=) modifier available.  But
-  ;; using that default in Emacs would be a significant hinderance.
-  (defun jf/toggle-osx-alternate-modifier ()
-    "Toggle native OS-X Option modifier setting (e.g. `ns-alternate-modifier')."
-    (interactive)
-    (if ns-alternate-modifier
-	(progn (setq ns-alternate-modifier nil)
-	       (message "Enabling OS X native Option modifier"))
-      (progn (setq ns-alternate-modifier 'meta)
-	     (message "Disabling OX X native Option modifier (e.g. Option as Meta)"))))
-
-  ;; I try to get quick feedback when writing emacs-lisp; the
-  ;; `jf/eval-region-dwim' binds a mnemonic key sequence to an extend
-  ;; `eval-region'.
-  (define-key emacs-lisp-mode-map (kbd "C-c C-c") 'jf/eval-region-dwim)
-  (defun jf/eval-region-dwim ()
-    "When region is active, evaluate it and kill the mark. Else,
-      evaluate the whole buffer."
-    (interactive)
-    (if (not (region-active-p))
-	(progn
-	  (message "Evaluating buffer...")
-	  (eval-buffer))
-      (progn
-	(message "Evaluating region...")
-	(eval-region (region-beginning) (region-end)))
-      (setq-local deactivate-mark t)))
-
-  ;; A little bit of RSS beautification.
-  (defun jf/reader-visual ()
-    "A method to turn on visual line mode and adjust text scale."
-    (text-scale-set 2)
-    (turn-on-visual-line-mode))
-
-  ;; See https://www.reddit.com/r/emacs/comments/r7l3ar/how_do_you_scroll_half_a_page/
-  (global-set-key (kbd "M-n") 'jf/scroll-down-half-page)
-  (defun jf/scroll-down-half-page ()
-    "Scroll down half a page while keeping the cursor centered"
-    (interactive)
-    (let ((ln (line-number-at-pos (point)))
-	  (lmax (line-number-at-pos (point-max))))
-      (cond ((= ln 1) (move-to-window-line nil))
-	    ((= ln lmax) (recenter (window-end)))
-	    (t (progn
-		 (move-to-window-line -1)
-		 (recenter))))))
-
-  ;; See https://www.reddit.com/r/emacs/comments/r7l3ar/how_do_you_scroll_half_a_page/
-  (global-set-key (kbd "M-p") 'jf/scroll-up-half-page)
-  (defun jf/scroll-up-half-page ()
-    "Scroll up half a page while keeping the cursor centered"
-    (interactive)
-    (let ((ln (line-number-at-pos (point)))
-	  (lmax (line-number-at-pos (point-max))))
-      (cond ((= ln 1) nil)
-	    ((= ln lmax) (move-to-window-line nil))
-	    (t (progn
-		 (move-to-window-line 0)
-		 (recenter))))))
-#+end_src
+** TODO Functions to Place in their Package
 
 #+begin_src emacs-lisp
   ;; Insert an active timestamp, with a few options.
@@ -582,7 +65,7 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
     "Delete selected region otherwise delete backwards the ARG number of words."
     (interactive "p")
     (if (region-active-p)
-	(delete-region (region-beginning) (region-end))
+        (delete-region (region-beginning) (region-end))
       (sp-backward-delete-word arg)))
 
   ;; Wedding two methods together: `kill-region' and `kill-line'.
@@ -591,7 +74,7 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
     "Kill the selected region otherwise kill the PARG number of lines."
     (interactive "P")
     (if (use-region-p)
-	(kill-region (region-beginning) (region-end))
+        (kill-region (region-beginning) (region-end))
       (kill-line parg)))
 
   ;; There are plenty of times where I want the file name.  This command helps me
@@ -608,16 +91,16 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
     ;; https://blog.sumtypeofway.com/posts/emacs-config.html
     (interactive "P")
     (let* ((prefix (car parg))
-	   (raw-filename
-	    (if (equal major-mode 'dired-mode) default-directory (buffer-file-name)))
-	   (filename
-	    (cond
-	     ((not prefix)  raw-filename)
-	     ((= prefix 4)  (file-name-nondirectory raw-filename))
-	     ((= prefix 16) (file-name-directory raw-filename)))))
+           (raw-filename
+            (if (equal major-mode 'dired-mode) default-directory (buffer-file-name)))
+           (filename
+            (cond
+             ((not prefix)  raw-filename)
+             ((= prefix 4)  (file-name-nondirectory raw-filename))
+             ((= prefix 16) (file-name-directory raw-filename)))))
       (when filename
-	(kill-new filename)
-	(message "Copied buffer file name '%s' to the clipboard." filename))))
+        (kill-new filename)
+        (message "Copied buffer file name '%s' to the clipboard." filename))))
 
   ;; A simple combination of two functions `sort-lines'
   ;; and `delete-duplicate-lines'.
@@ -662,18 +145,18 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
       (not-modified)
       (if mode (funcall mode) (special-mode))
       (when read-only
-	(progn (read-only-mode) (local-set-key (kbd "s-w") 'kill-buffer-and-window)))
+        (progn (read-only-mode) (local-set-key (kbd "s-w") 'kill-buffer-and-window)))
       (let ((display-buffer-mark-dedicated t))
-	(pop-to-buffer buffer-name '((display-buffer-in-side-window)
-				     (side . right)
-				     (window-width 72)
-				     (window-parameters
-				      (tab-line-format . none)
-				      (mode-line-format . none)
-				      (no-delete-other-windows . t))))
-	(message "Created *Sidebar*\nq - Remove Window")
-	(require 'pulsar)
-	(pulsar-pulse-line))))
+        (pop-to-buffer buffer-name '((display-buffer-in-side-window)
+                                     (side . right)
+                                     (window-width 72)
+                                     (window-parameters
+                                      (tab-line-format . none)
+                                      (mode-line-format . none)
+                                      (no-delete-other-windows . t))))
+        (message "Created *Sidebar*\nq - Remove Window")
+        (require 'pulsar)
+        (pulsar-pulse-line))))
 
   ;; Sometimes I want to move, without renaming, a file.  This function helps
   ;; make that easy.
@@ -682,7 +165,7 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
     "Write this file to TARGET-DIRECTORY, and delete old one."
     (interactive "DTarget Directory: ")
     (let* ((source (expand-file-name (file-name-nondirectory (buffer-name)) default-directory))
-	   (target (f-join target-directory (file-name-nondirectory (buffer-name)))))
+           (target (f-join target-directory (file-name-nondirectory (buffer-name)))))
       (save-buffer)
       (rename-file source target)
       (kill-current-buffer)))
@@ -692,13 +175,13 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
     "Copy region, between BEGIN and END, untabifying and removing indentation."
     (interactive "r")
     (let ((orig-tab-width tab-width)
-	  (region (buffer-substring-no-properties begin end)))
+          (region (buffer-substring-no-properties begin end)))
       (with-temp-buffer
-	(setq tab-width orig-tab-width)
-	(insert region)
-	(untabify (point-min) (point-max))
-	(org-do-remove-indentation)
-	(kill-new (buffer-string)))))
+        (setq tab-width orig-tab-width)
+        (insert region)
+        (untabify (point-min) (point-max))
+        (org-do-remove-indentation)
+        (kill-new (buffer-string)))))
 
   ;; Sometimes I just want to duplicate an area without copy and paste.  This
   ;; helps that process.  It’s not as smart as TextMate’s equivalent function,
@@ -709,22 +192,22 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
     "Duplicate ARG times current line or the lines of the current region."
     (interactive "p")
     (if (use-region-p)
-	(progn
-	  (when (> (point) (mark))
-	    (exchange-point-and-mark))
-	  (beginning-of-line)
-	  (exchange-point-and-mark)
-	  (end-of-line)
-	  (goto-char (+ (point) 1))
-	  (exchange-point-and-mark)
-	  (let* ((end (mark))
-		 (beg (point))
-		 (region
-		  (buffer-substring-no-properties beg end)))
-	    (dotimes (_i parg)
-	      (goto-char end)
-	      (insert region)
-	      (setq end (point)))))
+        (progn
+          (when (> (point) (mark))
+            (exchange-point-and-mark))
+          (beginning-of-line)
+          (exchange-point-and-mark)
+          (end-of-line)
+          (goto-char (+ (point) 1))
+          (exchange-point-and-mark)
+          (let* ((end (mark))
+                 (beg (point))
+                 (region
+                  (buffer-substring-no-properties beg end)))
+            (dotimes (_i parg)
+              (goto-char end)
+              (insert region)
+              (setq end (point)))))
       (crux-duplicate-current-line-or-region parg)))
 
   ;; A simple wrapper around scratch, that helps name it and sets the major mode
@@ -736,102 +219,37 @@ You can see this in my [[https://codeberg.org/takeonrules/dotzshrc/src/branch/ma
     (crux-create-scratch-buffer)
     (rename-buffer (concat "*scratch* at " (format-time-string "%Y-%m-%d %H:%M")))
     (funcall mode))
-#+end_src
 
 
-*** TODO Blogging Functions
-
-
-#+begin_src emacs-lisp
   (org-babel-load-file
      (concat user-emacs-directory "takeonrules.org"))
-#+end_src
 
-#+begin_src emacs-lisp
-  (require 'jf-quick-help)
-#+end_src
-
-*** Keyboard Macros
-
-#+begin_src emacs-lisp
   (org-babel-load-file
      (concat user-emacs-directory "keyboard-macros-config.org"))
-#+end_src
 
-*** Minor Modes
-
-In work and in play, there are several “me” specific contexts.  The
-~jf/minor-mode-maker~ macro helps me quickly and consistently make those
-contexual minor modes.  My intention is to build out even more functions on
-those modes.
-
-
-** Burning Wheel
-
-I wrote [[file:burning-wheel-emacs-config.org][some tooling to help while playing Burning Wheel]].
-
-#+begin_src emacs-lisp
-  (require 'jf-gaming)
-#+end_src
-
-** Utility Functions
-
-#+begin_src emacs-lisp
   (org-babel-load-file
    (concat user-emacs-directory "utility-functions.org"))
 #+end_src
 
-** Crafting Menus to Help Organize
+** TODO Menus
 
-I use Emacs for software development, knowledge management, blogging, and just
-about whatever else I can.  And as I wrote in [[*Knowledge Management][Knowledge Management]], I try to
-provide guidance when working within those contexts.
 
-As I wrote earlier, I’ve settled on transient as my “menu creation” tool.  I am
-thankful to the author of [[https://www.reddit.com/r/emacs/comments/m518xh/transient_api_example_alternative_bindings_part_1/][Transient API Example (Alternative Bindings Part 1) :
-emacs]], as they helped me understand what is a relatively straight forward
-system.
-
-I’ll explain the language just a bit.  We have a prefix, infix, and suffix.
-The prefix is what you start doing, the infix is modifications/adjustments,
-before you finally invoke the suffix to “complete” the sequence.  A prefix and
-a suffix are emacs-lisp functions, and transient provides a macro to make more
-composable prefixes and suffixes.
-
-I already introduced a simple transient prefix in the helpful package.  I want
-to write some transient suffixes to.  As you’ll see later, you don’t need to
-use the ~transient-define-suffix~ for adding a function to a transient prefix,
-but a suffix can provide a description.
 
 #+begin_src emacs-lisp
-  ;; this suffix provides a dynamic description of the current major mode for a
-  ;; `hammerspoon-edit-minor-mode' buffer.  And the prefix’s function toggles
-  ;; that mode.
-  (transient-define-suffix jf/hammerspoon-toggle-mode ()
-    "Set the hammerspoon mode"
-    :description '(lambda ()
-		    (concat
-		     "Hammerspoon Mode: "
-		     (propertize
-		      (format "%s" major-mode)
-		      'face 'transient-argument)))
-    (interactive)
-    (hammerspoon-toggle-mode))
-
   ;; this suffix provides a dynamic description of the current host I want to use
   ;; for my blog.  And the prefix’s function toggles the host.
   (transient-define-suffix jf/tor-hostname-current-toggle (hostname)
     "Set `jf/tor-hostname-current' to HOSTNAME."
     :description '(lambda ()
-		    (concat "Host: "
-			    (propertize
-			     (format "%s" jf/tor-hostname-current)
-			     'face 'transient-argument)))
+                    (concat "Host: "
+                            (propertize
+                             (format "%s" jf/tor-hostname-current)
+                             'face 'transient-argument)))
     (interactive (list (completing-read
-			"Host: " (list
-				  (list jf/tor-hostname-default-local 1)
-				  (list jf/tor-hostname-default-remote 2)
-				  ))))
+                        "Host: " (list
+                                  (list jf/tor-hostname-default-local 1)
+                                  (list jf/tor-hostname-default-remote 2)
+                                  ))))
     (setq jf/tor-hostname-current hostname))
 
   (transient-define-prefix jf/menu--tor ()
@@ -933,19 +351,3 @@ but a suffix can provide a description.
       ]
      ])
 #+end_src
-
-* Footnotes
-
-[fn:8] Steve Covey, and trademarked by FranklinCovey.
-
-[fn:7] Yes, I said I didn’t want an Electron-based editor, but VS Code is a dominant player in the open source text editor.
-
-[fn:2]  https://github.com/minad/consult#introduction
-
-[fn:3]  These functions assume that the repository is using a [[https://rietta.com/blog/github-merge-types/#squash-and-merge][Squash and Merge strategy]].
-
-[fn:4] My alias is as follows: ~alias e-reboot='cd ~/git/dotemacs; git stash ; edaemon ; git stash pop ; git edit'~.
-
-[fn:5] My [[https://codeberg.org/takeonrules/dotzshrc/src/ab8b781cbdddd2fdbe674e031436b7e9a8e8a024/README.org#L1][dotzshrc]] config has my ~$EDITOR~
-
-[fn:6] “Ag” is the chemical symbol for the Silver element.

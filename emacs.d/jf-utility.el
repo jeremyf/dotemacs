@@ -97,8 +97,74 @@
 	 ("<f9>" . crux-kill-other-buffers)))
 
 (use-package math-at-point
-      :straight (math-at-point :type git :host github :repo "shankar2k/math-at-point")
-      :bind ("C-c =" . math-at-point))
+  :straight (math-at-point :type git :host github :repo "shankar2k/math-at-point")
+  :bind ("C-c =" . math-at-point))
+
+;;;; Hammerspoon --------------------------------------------------------------
+
+
+
+;; Hammerspoon is Lua application that provides a consistent API for
+;; interacting with MacOS.  The editWithEmacs.spoon allows me to copy text from
+;; one region, edit it in Emacs, and paste it back into the Application.
+(when (file-directory-p
+       "~/git/dotzshrc/symlinks/.hammerspoon/Spoons/editWithEmacs.spoon")
+  (load
+   "~/git/dotzshrc/symlinks/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el"
+   nil
+   jf/silence-loading-log))
+
+(require 'transient)
+;; this suffix provides a dynamic description of the current major mode for a
+;; `hammerspoon-edit-minor-mode' buffer.  And the prefix’s function toggles
+;; that mode.
+(transient-define-suffix jf/hammerspoon-toggle-mode ()
+  "Set the hammerspoon mode"
+  :description '(lambda ()
+		  (concat
+		   "Hammerspoon Mode: "
+		   (propertize
+		    (format "%s" major-mode)
+		    'face 'transient-argument)))
+  (interactive)
+  (hammerspoon-toggle-mode))
+
+
+
+
+;; The following function facilitates a best of both worlds.  By default, I
+;; want Option to be Meta (e.g. \"M-\") in Emacs.  However, I can toggle that
+;; setting.  That way if I need an umlaut (e.g., \"¨\"), I can use MacOS’s
+;; native functions to type \"⌥\" + \"u\".
+;;
+;; I like having MacOS’s native Option (e.g. =⌥=) modifier available.  But
+;; using that default in Emacs would be a significant hinderance.
+(defun jf/toggle-osx-alternate-modifier ()
+  "Toggle native OS-X Option modifier setting (e.g. `ns-alternate-modifier')."
+  (interactive)
+  (if ns-alternate-modifier
+      (progn (setq ns-alternate-modifier nil)
+	     (message "Enabling OS X native Option modifier"))
+    (progn (setq ns-alternate-modifier 'meta)
+	   (message "Disabling OX X native Option modifier (e.g. Option as Meta)"))))
+
+;; I try to get quick feedback when writing emacs-lisp; the
+;; `jf/eval-region-dwim' binds a mnemonic key sequence to an extend
+;; `eval-region'.
+(define-key emacs-lisp-mode-map (kbd "C-c C-c") 'jf/eval-region-dwim)
+(defun jf/eval-region-dwim ()
+  "When region is active, evaluate it and kill the mark. Else,
+      evaluate the whole buffer."
+  (interactive)
+  (if (not (region-active-p))
+      (progn
+	(message "Evaluating buffer...")
+	(eval-buffer))
+    (progn
+      (message "Evaluating region...")
+      (eval-region (region-beginning) (region-end)))
+    (setq-local deactivate-mark t)))
+
 
 (provide 'jf-utility)
 ;;; jf-utility.el ends here

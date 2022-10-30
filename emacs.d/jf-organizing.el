@@ -12,6 +12,13 @@
 (use-package project
   :straight t)
 
+;; Convenient organization and commands
+(use-package projectile
+  :straight t
+  :diminish 'projectile-mode
+  :config (projectile-mode 1)
+  :custom (projectile-project-search-path '("~/git/"))
+  :bind ("s-." . projectile-toggle-between-implementation-and-test))
+
 (provide 'jf-organizing)
 ;;; jf-organizing.el ends here
-

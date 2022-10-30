@@ -195,6 +195,32 @@
   :config (gcmh-mode))
 
 
+;;; Connective Tissue and oddity functions:
+(defvar server-visit-files-custom-find:buffer-count
+  "A counter for assisting with opening multiple files via a single
+    client call.")
+
+(defadvice server-visit-files
+    (around server-visit-files-custom-find
+	    activate compile)
+  "Maintain a counter of visited files from a single client call."
+  (let ((server-visit-files-custom-find:buffer-count 0))
+    ad-do-it))
+(defun server-visit-hook-custom-find ()
+  "Arrange to visit the files from a client call in separate windows."
+  (if (zerop server-visit-files-custom-find:buffer-count)
+      (progn
+	(delete-other-windows)
+	(switch-to-buffer (current-buffer)))
+    (let ((buffer (current-buffer))
+	  (window (split-window-sensibly)))
+      (switch-to-buffer buffer)
+      (balance-windows)))
+  (setq server-visit-files-custom-find:buffer-count
+	(1+ server-visit-files-custom-find:buffer-count)))
+(add-hook 'server-visit-hook 'server-visit-hook-custom-find)
+
+
 (defconst jf/tor-home-directory
   (file-truename "~/git/takeonrules.source")
   "The home directory of TakeOnRules.com Hugo repository.")

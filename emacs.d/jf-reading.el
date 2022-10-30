@@ -8,9 +8,9 @@
 
 ;;; Code
 (use-package doc-view
-    :straight (doc-view :type built-in)
-    :bind (:map doc-view-mode-map
-                ("C-c g" . doc-view-goto-page)))
+  :straight (doc-view :type built-in)
+  :bind (:map doc-view-mode-map
+              ("C-c g" . doc-view-goto-page)))
 
 
 ;; An Emacs RSS reader.  I’ve used Google Reader, Feedly, Inoreader, and
@@ -42,7 +42,7 @@
   (elfeed-search-update--force))
 (defalias 'rss 'jf/elfeed-load-db-and-open)
 
-  ;; From https://karthinks.com/blog/lazy-elfeed/
+;; From https://karthinks.com/blog/lazy-elfeed/
 (defun elfeed-search-show-entry-pre (&optional lines)
   "Returns a function to scroll forward or back in the Elfeed
   search results, displaying entries without switching to them."
@@ -132,6 +132,12 @@ Alternative suggestions are: - '(\"\\\"“\" . \"\\\"\")"
   :bind (:map eww-mode-map ("U" . eww-up-url))
   :bind (("C-s-w" . browse-url-at-point))
   :hook ((eww-mode . jf/reader-visual)))
+
+;; A little bit of RSS beautification.
+(defun jf/reader-visual ()
+  "A method to turn on visual line mode and adjust text scale."
+  (text-scale-set 2)
+  (turn-on-visual-line-mode))
 
 (provide 'jf-reading)
 ;;; jf-reading.el ends here
