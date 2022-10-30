@@ -1,21 +1,21 @@
-;;; jf-gaming.el --- Simple focus mode and extras -*- lexical-binding: t -*-
+;;; jf-gaming.el --- Gaming related functions -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2022  Jeremy Friesen
 ;; Author: Jeremy Friesen <jeremy@jeremyfriesen.com>
 
 ;; This file is NOT part of GNU Emacs.
-;;; Commentary
 
 ;;; Code
 
+;;;; Dependencies
 (require 'jf-minor-mode-maker)
 (require 'jf-quick-help)
 (require 'jf-org-mode)
 
 (use-package decide :straight (decide :host github :type git :repo "jeremyf/decide-mode"))
 
-;; I’m really only using this for the ~org-d20--roll~ function.
 (use-package org-d20
+  ;; I’m really only using this for the ~org-d20--roll~ function.
   :after org
   :bind  (("C-s-r" . jf/roll-expression-dwim))
   :config
@@ -31,12 +31,12 @@
   :straight (org-d20 :host github :repo "spwhitton/org-d20"))
 
 ;;;; Burning Wheel Code
-;; Being a programmer and someone who plays table top role-playing games
-;; (TTRPG), I’ve often used the TTRPG rules-set or systems to explore
-;; programming languages and processes.  After all, I understand the TTRPG
-;; rules well enough (or the algorithm’s description) that I can spend time
-;; thinking through my approach in a programming language.
 (jf/minor-mode-maker :title "Burning Wheel Gold"
+		     ;; Being a programmer and someone who plays table top role-playing games
+		     ;; (TTRPG), I’ve often used the TTRPG rules-set or systems to explore
+		     ;; programming languages and processes.  After all, I understand the TTRPG
+		     ;; rules well enough (or the algorithm’s description) that I can spend time
+		     ;; thinking through my approach in a programming language.
                      :abbr "bwg"
                      :hooks (list 'org-mode-hook 'markdown-mode-hook))
 
@@ -204,19 +204,19 @@
           |  17D | Ob 1-14 | Ob 15-17  | Ob 18+      |
           |  18D | Ob 1-15 | Ob 16-18  | Ob 19+      |")))
 
-;; When running Burning Wheel Gold, on occassion I need to establish the PTGS for a creature or person.
-;;
-;; Yes, I could’ve written out (0 "B1" "B2" "B3" "B4" "B5" "B6" "B7" "B8" "B9"
-;; "B10" "B11" "B12" "B13" "B14" "B15" "B16" "G1" "G2" "G3" "G4" "G5" "G6" "G7"
-;; "G8" "G9" "G10" "G11" "G12" "G13" "G14" "G15" "G16" "W1" "W2" "W3" "W4" "W5"
-;; "W6" "W7" "W8" "W9" "W10" "W11" "W12" "W13" "W14" "W15" "W16") faster than
-;; the following constant, but I wanted to learn a bit of emacs-lisp, so I
-;; chose to write the following.
-
-;; I copied that text string from the introspected variable.  Because if I
-;; wasn't going to write it the first time, I sure wasn't going to do it if I
-;; had already stored that value in a constant.
 (defconst jf/bwg-mortal-wounds-scale
+  ;; When running Burning Wheel Gold, on occassion I need to establish the PTGS for a creature or person.
+  ;;
+  ;; Yes, I could’ve written out (0 "B1" "B2" "B3" "B4" "B5" "B6" "B7" "B8" "B9"
+  ;; "B10" "B11" "B12" "B13" "B14" "B15" "B16" "G1" "G2" "G3" "G4" "G5" "G6" "G7"
+  ;; "G8" "G9" "G10" "G11" "G12" "G13" "G14" "G15" "G16" "W1" "W2" "W3" "W4" "W5"
+  ;; "W6" "W7" "W8" "W9" "W10" "W11" "W12" "W13" "W14" "W15" "W16") faster than
+  ;; the following constant, but I wanted to learn a bit of emacs-lisp, so I
+  ;; chose to write the following.
+
+  ;; I copied that text string from the introspected variable.  Because if I
+  ;; wasn't going to write it the first time, I sure wasn't going to do it if I
+  ;; had already stored that value in a constant.
   (let* ((shades '("B" "G" "W"))
          (rank '(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16))
          (scale (-flatten
@@ -321,24 +321,25 @@ Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
          (se (- mo 2))
          (tr (- mo 1)))
     (list su li mi se tr mo)))
-;; While running (or playing) a game of Burning Wheel, it can be useful to have
-;; access to character lifepaths.  These can give you insight into a quick NPC.
-;;
-;; I have transformed and edited the http://charred-black.herokuapp.com/#/ into
-;; individual YAML files that sit on my local machine.  I also created a bit of
-;; https://gohugo.io/ code to render lifepaths from those YAML files.  You can
-;; see an example at
-;; https://takeonrules.com/2018/10/10/burning-wheel-lifepaths-inspired-by-warhammer-fantasy/
-;;
-;; I’m thinking what would be useful to create a searchable index of those
-;; lifepaths.  For now, I’ll search based on the stock, setting, and lifepath
-;; name (all of which happen to be in the pathname of the YAML file).
-;;
-;; But instead of hopping to the YAML file, I’d like to jump to the spot on an
-;; HTML page with that information.  This way when I “find” a lifepath, I can
-;; see what other lifepaths are of comparable station (a common need when
-;; testing Circles).
+
 (defconst jf/bwg-lifepath--path-to-html-file
+  ;; While running (or playing) a game of Burning Wheel, it can be useful to have
+  ;; access to character lifepaths.  These can give you insight into a quick NPC.
+  ;;
+  ;; I have transformed and edited the http://charred-black.herokuapp.com/#/ into
+  ;; individual YAML files that sit on my local machine.  I also created a bit of
+  ;; https://gohugo.io/ code to render lifepaths from those YAML files.  You can
+  ;; see an example at
+  ;; https://takeonrules.com/2018/10/10/burning-wheel-lifepaths-inspired-by-warhammer-fantasy/
+  ;;
+  ;; I’m thinking what would be useful to create a searchable index of those
+  ;; lifepaths.  For now, I’ll search based on the stock, setting, and lifepath
+  ;; name (all of which happen to be in the pathname of the YAML file).
+  ;;
+  ;; But instead of hopping to the YAML file, I’d like to jump to the spot on an
+  ;; HTML page with that information.  This way when I “find” a lifepath, I can
+  ;; see what other lifepaths are of comparable station (a common need when
+  ;; testing Circles).
   "~/git/org/assets/burning-wheel.html"
   "The path to an HTML")
 
