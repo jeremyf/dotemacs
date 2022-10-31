@@ -56,7 +56,6 @@
 ;; See https://editorconfig.org/#overview for more details.
 (use-package editorconfig
   :straight t
-  :diminish editorconfig-mode
   :config
   (editorconfig-mode 1))
 

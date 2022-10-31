@@ -15,7 +15,6 @@
 (use-package projectile
   ;; Convenient organization and commands
   :straight t
-  :diminish 'projectile-mode
   :config (projectile-mode 1)
   :custom (projectile-project-search-path '("~/git/"))
   :bind ("s-." . projectile-toggle-between-implementation-and-test))

@@ -51,7 +51,6 @@
 ;; Delete multiple spaces in one delete stroke.
 (use-package hungry-delete
   :straight t
-  :diminish 'hungry-delete-mode
   :config (global-hungry-delete-mode))
 
 ;; A simple package ability to move lines up and down.

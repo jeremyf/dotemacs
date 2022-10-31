@@ -136,7 +136,6 @@
 ;; addition, or deletion.
 (use-package git-gutter
   :straight t
-  :diminish 'git-gutter-mode
   :custom (git-gutter:update-interval 0.25)
   :bind ("C-x g =" . git-gutter:popup-hunk)
   ("C-x g p" . git-gutter:previous-hunk)
@@ -208,7 +207,6 @@
 
 ;; Provides a UI for undo trees.  I'm not certain what I want to do with this.
 (use-package undo-tree
-  :diminish
   :bind (("C-z" . undo)
          ("C-s-z" . undo-tree-redo))
   :config

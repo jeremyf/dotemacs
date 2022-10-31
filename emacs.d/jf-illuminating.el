@@ -5,6 +5,11 @@
 
 ;; This file is NOT part of GNU Emacs.
 
+;;; Commentary
+
+;; Within this package are tools for highlighting and illuminating the current
+;; moment.
+
 ;;; Code
 (use-package expand-region
   ;; A simple package that does two related things really well; expands and
@@ -138,7 +143,6 @@
   ;; Show tilde (e.g. ~\~~) on empty trailing lines.  This is a feature ported
   ;; from https://en.wikipedia.org/wiki/Vi
   :straight t
-  :diminish 'vi-tilde-fringe-mode
   :config (global-vi-tilde-fringe-mode))
 
 (use-package whole-line-or-region
@@ -147,7 +151,6 @@
   ;; currently undefined.”  I’ve used this for awhile and believe it’s not baked
   ;; into my assumptions regarding how I navigate Emacs.
   :straight t
-  :diminish 'whole-line-or-region-local-mode
   :config (whole-line-or-region-global-mode))
 
 (use-package yafolding :straight t)
