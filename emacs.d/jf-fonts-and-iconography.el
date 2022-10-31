@@ -4,8 +4,9 @@
 ;; Author: Jeremy Friesen <jeremy@jeremyfriesen.com>
 
 ;; This file is NOT part of GNU Emacs.
+
 ;;; Commentary
-;;
+
 ;; This package provides font, theme, and window support.
 
 ;;; Code
@@ -29,6 +30,7 @@
            :bold-weight extrabold)
           (reading
            :default-weight semilight
+	   :default-family "ETBembo"
            :default-height 220
            :bold-weight extrabold)
           (t
