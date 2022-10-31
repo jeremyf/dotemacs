@@ -55,9 +55,10 @@
   (add-hook 'logos-page-motion-hook #'logos--reveal-entry))
 
 (use-package "nov.el" :straight t
-  :config (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
-  (use-package esxml :straight t)
-  :custom (nov-text-width 80))
+	     :init (use-package esxml :straight t)
+	     :config
+	     (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
+	     :custom (nov-text-width 80))
 
 (use-package shackle
     :straight t

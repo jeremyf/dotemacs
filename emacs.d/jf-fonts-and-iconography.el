@@ -50,7 +50,7 @@
            :italic-family nil
            :italic-slant italic
            :line-spacing nil)))
-  :init (fontaine-set-preset 'default))
+  (fontaine-set-preset 'default))
 
 ;;;; Icons
 
