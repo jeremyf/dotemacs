@@ -110,7 +110,29 @@
 (use-package symbol-overlay
   ;; This warrants a lot more work.  See
   ;; https://github.com/wolray/symbol-overlay/tree/c439b73a5f9713bb3dce98986b589bb901e22130
-  :straight t)
+  :straight t
+  :hook (prog-mode . symbol-overlay-mode)
+  :config
+  (use-package transient :straight t)
+  (transient-define-prefix symbol-overlay-transient ()
+    "Symbol Overlay transient"
+    ["Symbol Overlay"
+     ["Overlays"
+      ("." "Add/Remove at point" symbol-overlay-put)
+      ("k" "Remove All" symbol-overlay-remove-all)
+      ]
+     ["Move to Symbol"
+      ("n" "Next" symbol-overlay-switch-forward)
+      ("p" "Previous" symbol-overlay-switch-backward)
+      ]
+     ["Other"
+      ("m" "Highlight symbol-at-point" symbol-overlay-mode)
+      ("q" "Query and replace" symbol-overlay-query-replace)
+      ("r" "Rename" symbol-overlay-rename)
+      ]
+     ]
+    )
+  :bind ("H-." . symbol-overlay-transient))
 
 (use-package vi-tilde-fringe
   ;; Show tilde (e.g. ~\~~) on empty trailing lines.  This is a feature ported
