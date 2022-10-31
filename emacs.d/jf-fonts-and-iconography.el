@@ -21,9 +21,9 @@
         '((overviewing
            :default-height 110)
           (default
-            :default-height 140)
+            :default-height 150)
           (coding
-           :default-height 140)
+           :default-height 150)
           (presenting
            :default-weight semilight
            :default-height 220

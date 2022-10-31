@@ -39,13 +39,24 @@ web-mode
 
 (db "<% require \"debug\"; binding.break %>" n)
 (tor "<cite><a href=\"https://takeonrules.com\">Take on Rules</a></cite>")
+(today "<time datetime=\"" (format-time-string "%Y-%m-%d") "\">today</time>")
 
 ;;; Multi-Mode Entries
 
 ;;;; enh-ruby-mode ruby-mode
-enh-ruby-mode ruby-mode
+enh-ruby-mode ruby-mode rspec-mode
 
 (bench "require \"benchmark\"" n "Benchmark.bmbm do |b|" n "  b.report(\"\") do" n "    # Stuff" n "  end" n "end")
 (db "require \"debug\"; binding.break" n)
 (frozen "# frozen_string_literal: true")
 (shell "#!/usr/bin/env ruby -w")
+(dc "described_class")
+(desc (when (rspec-top-level-desc-p) "RSpec.") "describe " q " do" n> n "end")
+
+;; # -*- mode: snippet -*-
+;; # name: describe Class do ... end
+;; # expand-env: ((top-level (rspec-top-level-desc-p)) (global-dsl rspec-expose-dsl-globally) (maybe-quote (unless top-level "\"")))
+;; # --
+;; `(and top-level (not global-dsl) "RSpec.")`describe `maybe-quote`${1:`(and top-level (rspec-class-from-file-name))`}`maybe-quote` do
+;;   $0
+;; end

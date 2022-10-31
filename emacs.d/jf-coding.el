@@ -100,6 +100,7 @@
   :straight t
   ;; Ensure that we’re loading enh-ruby-mode before we do any rspec loading.
   :after enh-ruby-mode
+  ;; :init (eval-after-load 'rspec-mode '(rspec-install-snippets))
   :config
   (setq rspec-container-name "web")
   :custom
@@ -108,8 +109,8 @@
   (rspec-docker-cwd "./")
   (rspec-docker-command "docker compose exec")
   :bind (:map rspec-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
-  :bind (:map enh-ruby-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
-  :init (eval-after-load 'rspec-mode '(rspec-install-snippets)))
+  :bind (:map enh-ruby-mode-map (("s-." . 'rspec-toggle-spec-and-target))))
+
 
 (use-package ruby-interpolation
   ;; Nice and simple package for string interpolation.
