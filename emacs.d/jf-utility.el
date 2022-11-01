@@ -165,5 +165,123 @@
     (setq-local deactivate-mark t)))
 
 
+(global-set-key (kbd "C-k") 'jf/kill-line-or-region)
+(defun jf/kill-line-or-region (&optional parg)
+  "Kill the selected region otherwise kill the PARG number of lines."
+  (interactive "P")
+  (if (use-region-p)
+      (kill-region (region-beginning) (region-end))
+    (kill-line parg)))
+
+(global-set-key (kbd "C-c n") 'jf/nab-file-name-to-clipboard)
+(defun jf/nab-file-name-to-clipboard (parg)
+  "Nab, I mean copy, the current buffer file name to the clipboard.
+
+  The PARG is the universal prefix argument.
+
+  If you pass no args, copy the filename with full path.
+  If you pass one arg, copy the filename without path.
+  If you pass two args, copy the path to the directory of the file."
+  ;; https://blog.sumtypeofway.com/posts/emacs-config.html
+  (interactive "P")
+  (let* ((prefix (car parg))
+         (raw-filename
+          (if (equal major-mode 'dired-mode) default-directory (buffer-file-name)))
+         (filename
+          (cond
+           ((not prefix)  raw-filename)
+           ((= prefix 4)  (file-name-nondirectory raw-filename))
+           ((= prefix 16) (file-name-directory raw-filename)))))
+    (when filename
+      (kill-new filename)
+      (message "Copied buffer file name '%s' to the clipboard." filename))))
+
+(defun jf/sort-unique-lines (reverse beg end &optional adjacent keep-blanks interactive)
+  "Sort lines and delete duplicates.
+
+  By default the sort is lexigraphically ascending.  To sort as
+  descending set REVERSE to non-nil.  Specify BEG and END for the
+  bounds of sorting.  By default, this is the selected region.
+
+  I've included ADJACENT, KEEP-BLANKS, and INTERACTIVE so I can
+  echo the method signature of `sort-lines' and
+  `delete-duplicate-lines'"
+  (interactive "P\nr")
+  (sort-lines reverse beg end)
+  (delete-duplicate-lines beg end reverse adjacent keep-blanks interactive))
+
+;; Sometimes I just want to duplicate an area without copy and paste.  This
+  ;; helps that process.  It’s not as smart as TextMate’s equivalent function,
+  ;; but it’s close enough.
+
+(global-set-key (kbd "C-M-d") 'jf/duplicate-current-line-or-lines-of-region)
+(global-set-key (kbd "C-c d") 'jf/duplicate-current-line-or-lines-of-region)
+(defun jf/duplicate-current-line-or-lines-of-region (parg)
+  "Duplicate ARG times current line or the lines of the current region."
+  (interactive "p")
+  (if (use-region-p)
+      (progn
+        (when (> (point) (mark))
+          (exchange-point-and-mark))
+        (beginning-of-line)
+        (exchange-point-and-mark)
+        (end-of-line)
+        (goto-char (+ (point) 1))
+        (exchange-point-and-mark)
+        (let* ((end (mark))
+               (beg (point))
+               (region
+                (buffer-substring-no-properties beg end)))
+          (dotimes (_i parg)
+            (goto-char end)
+            (insert region)
+            (setq end (point)))))
+    (crux-duplicate-current-line-or-region parg)))
+
+;; A simple wrapper around scratch, that helps name it and sets the major mode
+;; to `org-mode'.
+(global-set-key (kbd "<f12>") 'jf/create-scratch-buffer)
+(cl-defun jf/create-scratch-buffer (&key (mode 'org-mode))
+  "Quickly open a scratch buffer and enable the given MODE."
+  (interactive)
+  (crux-create-scratch-buffer)
+  (rename-buffer (concat "*scratch* at " (format-time-string "%Y-%m-%d %H:%M")))
+  (funcall mode))
+
+;; Sometimes I want to move, without renaming, a file.  This function helps
+;; make that easy.
+(global-set-key (kbd "C-x m") 'jf/move-file)
+(defun jf/move-file (target-directory)
+  "Write this file to TARGET-DIRECTORY, and delete old one."
+  (interactive "DTarget Directory: ")
+  (let* ((source (expand-file-name (file-name-nondirectory (buffer-name)) default-directory))
+         (target (f-join target-directory (file-name-nondirectory (buffer-name)))))
+    (save-buffer)
+    (rename-file source target)
+    (kill-current-buffer)))
+
+(global-set-key (kbd "s-5") 'jf/org-insert-immediate-active-timestamp)
+(defun jf/org-insert-immediate-active-timestamp (parg)
+  "Insert an active date for today.
+
+  One universal arg (e.g., prefix call with C-u) inserts timestamp.
+  Two universal arsg (e.g., prefix call with C-u C-u) prompts for date then insertes active date."
+  ;; Insert an active timestamp, with a few options.
+  (interactive "P")
+  (let ((prefix (car parg)))
+    (cond
+     ((not prefix)  (org-insert-time-stamp nil nil nil))
+     ((= prefix 4)  (org-insert-time-stamp nil t nil))
+     ((= prefix 16) (org-insert-time-stamp (org-read-date nil t nil "Date") nil nil)))))
+
+(global-set-key (kbd "C-w") 'jf/delete-region-or-backward-word)
+(global-set-key (kbd "M-DEL") 'jf/delete-region-or-backward-word)
+(global-set-key (kbd "<C-M-backspace>") 'backward-kill-paragraph)
+(defun jf/delete-region-or-backward-word (&optional arg)
+  "Delete selected region otherwise delete backwards the ARG number of words."
+  (interactive "p")
+  (if (region-active-p)
+      (delete-region (region-beginning) (region-end))
+    (sp-backward-delete-word arg)))
 (provide 'jf-utility)
 ;;; jf-utility.el ends here

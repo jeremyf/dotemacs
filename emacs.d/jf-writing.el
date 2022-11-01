@@ -37,6 +37,14 @@
 
 (use-package flymake-proselint :straight t)
 
+;; (use-package flymake-vale
+;;   :straight (flymake-value :type git :host github :repo "tpeacock19/flymake-vale")
+;;   :hook ((text-mode       . flymake-vale-load)
+;;          (latex-mode      . flymake-vale-load)
+;;          (org-mode        . flymake-vale-load)
+;;          (markdown-mode   . flymake-vale-load)
+;;          (message-mode    . flymake-vale-load)))
+
 (use-package unicode-fonts
   :straight t
   :config (unicode-fonts-setup))

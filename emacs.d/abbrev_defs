@@ -4086,10 +4086,6 @@
     ("ytou" "you" nil :count 1)
     ("yuo" "you" nil :count 1)
     ("zeebra" "zebra" nil :count 1)
+    ("consluting" "consulting" nil :count 2)
+    ("isntead" "instead" nil :count 2)
    ))
-
-(define-abbrev-table 'org-mode-abbrev-table
-  '(
-    ("consulting" "consluting" nil :count 2)
-   ))
-

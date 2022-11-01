@@ -196,8 +196,64 @@ https://tsdh.org/posts/2022-07-20-using-eldoc-with-magit-async.html
     :type 'hook)
 #+end_src
 
+** Windows Management
+
+
+
 #+begin_src emacs-lisp
-  ;; This warrants a lot more work.  See https://github.com/wolray/symbol-overlay/tree/c439b73a5f9713bb3dce98986b589bb901e22130
-  (use-package symbol-overlay
-      :straight t)
+;; Creates a sticky side window.  Sometimes this is just the right thing for
+;; reviewing files.  I don’t know when I need it, but when I use it I’m always
+;; thankful I have it.
+(global-set-key (kbd "C-s-\\") 'jf/display-dedicated-buffer-in-side-window)
+(cl-defun jf/display-dedicated-buffer-in-side-window (&key (buffer (current-buffer)))
+  "Display the given BUFFER in a dedicated sidebar."
+  (interactive)
+  (with-current-buffer buffer
+    (jf/sidebar--build
+     :buffer-name (concat "*Sidebar*")
+     :position (point)
+     :read-only t
+     :body (buffer-string)
+     :mode major-mode)))
+
+(cl-defun jf/sidebar--build (&key buffer-name body (read-only nil) (position nil) (mode nil))
+  "Build the sidebar from the given buffer attributes.
+
+Create the BUFFER_NAME with the given BODY and move to the given
+POSITION and toggle on the MODE.  Then set the buffer to READ_ONLY."
+  (interactive)
+  (get-buffer-create buffer-name)
+  (with-current-buffer buffer-name
+    (insert body)
+    (goto-char (or position (point-min)))
+    (not-modified)
+    (if mode (funcall mode) (special-mode))
+    (when read-only
+      (progn (read-only-mode) (local-set-key (kbd "s-w") 'kill-buffer-and-window)))
+    (let ((display-buffer-mark-dedicated t))
+      (pop-to-buffer buffer-name '((display-buffer-in-side-window)
+                                   (side . right)
+                                   (window-width 72)
+                                   (window-parameters
+                                    (tab-line-format . none)
+                                    (mode-line-format . none)
+                                    (no-delete-other-windows . t))))
+      (message "Created *Sidebar*\nq - Remove Window")
+      (require 'pulsar)
+      (pulsar-pulse-line))))
+
+
+
+;; From http://mbork.pl/2022-05-23_Copying_code_snippets
+(defun jf/copy-snippet-deindented (begin end)
+  "Copy region, between BEGIN and END, untabifying and removing indentation."
+  (interactive "r")
+  (let ((orig-tab-width tab-width)
+        (region (buffer-substring-no-properties begin end)))
+    (with-temp-buffer
+      (setq tab-width orig-tab-width)
+      (insert region)
+      (untabify (point-min) (point-max))
+      (org-do-remove-indentation)
+      (kill-new (buffer-string)))))
 #+end_src
