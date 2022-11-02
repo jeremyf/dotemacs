@@ -49,9 +49,6 @@ Welcome to a stripped down configuration; I have been working with a literate co
 
   (org-babel-load-file
      (concat user-emacs-directory "keyboard-macros-config.org"))
-
-  (org-babel-load-file
-   (concat user-emacs-directory "utility-functions.org"))
 #+end_src
 
 ** TODO Menus

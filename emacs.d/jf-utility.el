@@ -283,5 +283,17 @@
   (if (region-active-p)
       (delete-region (region-beginning) (region-end))
     (sp-backward-delete-word arg)))
+
+(defun jf/auto-create-missing-dirs ()
+  "Ensure that we create directories along the new path."
+  ;; Ensure that we create the directories along the path of a new file I’m
+  ;; creating.  See
+  ;; https://emacsredux.com/blog/2022/06/12/auto-create-missing-directories/
+  (let ((target-dir (file-name-directory buffer-file-name)))
+    (unless (file-exists-p target-dir)
+      (make-directory target-dir t))))
+
+(add-to-list 'find-file-not-found-functions #'jf/auto-create-missing-dirs)
+
 (provide 'jf-utility)
 ;;; jf-utility.el ends here

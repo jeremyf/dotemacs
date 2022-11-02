@@ -24,8 +24,8 @@
 
 (use-package fill-column-indicator
   :straight t
+  :hook (prog-mode . fci-mode)
   :config
-  ;; :hook (prog-mode . fci-mode)
   (setq fci-rule-width 1))
 
 (use-package highlight-indent-guides
@@ -41,16 +41,20 @@
   :after corfu
   :custom
   (kind-icon-use-icons t)
-  (kind-icon-default-face 'corfu-default) ; Have background color be the same as `corfu' face background
-  (kind-icon-blend-background nil)  ; Use midpoint color between foreground and background colors ("blended")?
+  (kind-icon-default-face 'corfu-default) ; Have background color be the same as
+					  ; `corfu' face background
+  (kind-icon-blend-background nil)  ; Use midpoint color between foreground and
+				    ; background colors ("blended")?
   (kind-icon-blend-frac 0.08)
 
   ;; directory that defaults to the `user-emacs-directory'. Here, I change that
   ;; directory to a location appropriate to `no-littering' conventions, a
   ;; package which moves directories of other packages to sane locations.
-  ;; (svg-lib-icons-dir (no-littering-expand-var-file-name "svg-lib/cache/")) ; Change cache dir
+  ;; (svg-lib-icons-dir (no-littering-expand-var-file-name "svg-lib/cache/")) ;
+  ;; Change cache dir
   :config
-  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter) ; Enable `kind-icon'
+					; Enable `kind-icon'
+  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)
 
   ;; Add hook to reset cache so the icon colors match my theme
   ;; NOTE 2022-02-05: This is a hook which resets the cache whenever I switch
@@ -59,7 +63,8 @@
   ;; match the background color corresponding to the current theme. Important
   ;; since I have a light theme and dark theme I switch between. This has no
   ;; function unless you use something similar
-  (add-hook 'kb/themes-hooks #'(lambda () (interactive) (kind-icon-reset-cache))))
+  (add-hook 'kb/themes-hooks
+	    #'(lambda () (interactive) (kind-icon-reset-cache))))
 
 (use-package lin
   ;;  “LIN locally remaps the hl-line face to a style that is optimal for major
@@ -72,7 +77,8 @@
   (setq lin-face 'lin-blue))
 
 (use-package pulsar
-  ;; A little bit of visual feedback.  See https://protesilaos.com/codelog/2022-03-14-emacs-pulsar-demo/
+  ;; A little bit of visual feedback.  See
+  ;; https://protesilaos.com/codelog/2022-03-14-emacs-pulsar-demo/
   :straight (pulsar :host gitlab :repo "protesilaos/pulsar")
   :hook
   (consult-after-jump . pulsar-recenter-top)
@@ -146,10 +152,10 @@
   :config (global-vi-tilde-fringe-mode))
 
 (use-package whole-line-or-region
-  ;; From the package commentary, “This minor mode allows functions to operate on
-  ;; the current line if they would normally operate on a region and region is
-  ;; currently undefined.”  I’ve used this for awhile and believe it’s not baked
-  ;; into my assumptions regarding how I navigate Emacs.
+  ;; From the package commentary, “This minor mode allows functions to operate
+  ;; on the current line if they would normally operate on a region and region
+  ;; is currently undefined.”  I’ve used this for awhile and believe it’s not
+  ;; baked into my assumptions regarding how I navigate Emacs.
   :straight t
   :config (whole-line-or-region-global-mode))
 

@@ -184,18 +184,6 @@ And why do all of this? To sharpen my tools. Practice extending my text editor t
 * Support Functions
 
 #+begin_src emacs-lisp
-  ;; Ensure that we create the directories along the path of a new file I’m
-  ;; creating.  See
-  ;; https://emacsredux.com/blog/2022/06/12/auto-create-missing-directories/
-  (defun jf/auto-create-missing-dirs ()
-    (let ((target-dir (file-name-directory buffer-file-name)))
-      (unless (file-exists-p target-dir)
-	(make-directory target-dir t))))
-
-  (add-to-list 'find-file-not-found-functions #'jf/auto-create-missing-dirs)
-#+end_src
-
-#+begin_src emacs-lisp
   ;; This function manipulates the git repository.  We have a valid (enough)
   ;; directory and a new branch-name, now let’s do the file system work to ensure
   ;; we can safely do this work.
