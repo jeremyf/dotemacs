@@ -64,7 +64,8 @@
     "A macro to provide functions for icon names."
     (let ((defun-fn (intern (concat "jf/all-the-icons--with-" name)))
           (icon-fn (intern (concat "all-the-icons-" name)))
-          (docstring (concat "Displays an ICON from `all-the-icons-" name "'.")))
+          (docstring (concat
+		      "Displays an ICON from `all-the-icons-" name "'.")))
       `(defun ,defun-fn (icon str &optional height v-adjust)
          ,docstring
          (s-concat (,icon-fn
@@ -118,8 +119,10 @@
   (define-key typopunct-map "." 'typopunct-insert-ellipsis-or-middot)
 
 
-  (defconst typopunct-prime  (decode-char 'ucs #x2032)) ; feet, arcminutes, derivatives
-  (defconst typopunct-dprime (decode-char 'ucs #x2033)) ; inches, arcseconds, double derivatives
+  ;; feet, arcminutes, derivatives
+  (defconst typopunct-prime  (decode-char 'ucs #x2032))
+  ;; inches, arcseconds, double derivatives
+  (defconst typopunct-dprime (decode-char 'ucs #x2033))
   (defconst typopunct-tprime (decode-char 'ucs #x2034))
 
   ;; The minus sign (−) is separate from the hyphen (-), en dash (–) and
