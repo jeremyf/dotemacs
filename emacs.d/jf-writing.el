@@ -20,9 +20,17 @@
     "Adjust the font settings of FRAME so Emacs can display emoji properly."
     (if (eq system-type 'darwin)
 	;; For NS/Cocoa
-	(set-fontset-font t 'symbol (font-spec :family "Apple Color Emoji") frame 'prepend)
+	(set-fontset-font t
+			  'symbol
+			  (font-spec :family "Apple Color Emoji")
+			  frame
+			  'prepend)
       ;; For Linux
-      (set-fontset-font t 'symbol (font-spec :family "Symbola") frame 'prepend)))
+      (set-fontset-font t
+			'symbol
+			(font-spec :family "Symbola")
+			frame
+			'prepend)))
 
   ;; For when Emacs is started in GUI mode:
   (--set-emoji-font nil)
@@ -30,7 +38,8 @@
   ;; see https://www.gnu.org/software/emacs/manual/html_node/elisp/Creating-Frames.html
   (add-hook 'after-make-frame-functions '--set-emoji-font))
 
-;; This follows from http://mbork.pl/2017-01-14_I'm_now_using_the_right_dictionary
+;; This follows from
+;; http://mbork.pl/2017-01-14_I'm_now_using_the_right_dictionary
 (use-package sdcv-mode
   :straight (sdcv-mode :type git :host github :repo "gucong/emacs-sdcv")
   :bind ("C-c C-'" . sdcv-search))
@@ -38,7 +47,9 @@
 (use-package flymake-proselint :straight t)
 
 ;; (use-package flymake-vale
-;;   :straight (flymake-value :type git :host github :repo "tpeacock19/flymake-vale")
+;;   :straight (flymake-value :type git
+;; 			   :host github
+;; 			   :repo "tpeacock19/flymake-vale")
 ;;   :hook ((text-mode       . flymake-vale-load)
 ;;          (latex-mode      . flymake-vale-load)
 ;;          (org-mode        . flymake-vale-load)

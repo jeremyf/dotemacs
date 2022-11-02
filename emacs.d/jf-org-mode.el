@@ -36,7 +36,8 @@
 			       (basenames '("agenda.org")))
   "Return the list of filenames where BASENAMES exists in PATHS."
   ;; I want to include my configuration file in my agenda querying.
-  (setq returning-list '("~/git/dotemacs/emacs.d/configuration.org" "~/git/org/denote/scientist/20221021T221357--scientist-agenda__scientist.org"))
+  (setq returning-list '("~/git/dotemacs/emacs.d/configuration.org"
+			 "~/git/org/denote/scientist/20221021T221357--scientist-agenda__scientist.org"))
   (dolist (path paths)
     (dolist (basename basenames)
       (when (f-exists-p (f-join path basename))
@@ -56,7 +57,10 @@
   (setq org-confirm-babel-evaluate #'jf/org-confirm-babel-evaluate
 	;; I'd prefer to use the executable, but that doe not appear to be the
 	;; implementation of org-babel.
-	org-plantuml-jar-path (concat (string-trim (shell-command-to-string "brew-path plantuml")) "/libexec/plantuml.jar")
+	org-plantuml-jar-path (concat
+			       (string-trim
+				(shell-command-to-string "brew-path plantuml"))
+			       "/libexec/plantuml.jar")
 	org-insert-heading-respect-content t
 	org-catch-invisible-edits 'show-and-error
 	org-use-fast-todo-selection 'expert
@@ -71,16 +75,27 @@
 				org-directory
 				"/captured-notes.org")
 	org-log-done 'time
-	org-todo-keywords '((type "TODO(t)" "IN-PROGRESS(i!)" "BLOCKED(b@/!)" "IN-REVIEW(r!)" "|" "DONE(d!)" "DELEGATED(g@/!)" "SENT-FORWARD(s!)" "CANCELLED(c@)"))
-	)
+	org-todo-keywords '((type "TODO(t)"
+				  "IN-PROGRESS(i!)"
+				  "BLOCKED(b@/!)"
+				  "IN-REVIEW(r!)"
+				  "|"
+				  "DONE(d!)"
+				  "DELEGATED(g@/!)"
+				  "SENT-FORWARD(s!)"
+				  "CANCELLED(c@)")))
   (setq org-capture-templates
 	'(("@"
 	   "All Todo"
-	   entry (file+olp jf/primary-agenda-filename-for-machine "General Todo Items")
+	   entry (file+olp
+		  jf/primary-agenda-filename-for-machine
+		  "General Todo Items")
 	   "* TODO %?\n  %i\n  %a"
 	   :empty-lines-before 1)
 	  ("b" "Blocker"
-	   plain (file+function jf/primary-agenda-filename-for-machine jf/org-mode-agenda-find-blocked-node)
+	   plain (file+function
+		  jf/primary-agenda-filename-for-machine
+		  jf/org-mode-agenda-find-blocked-node)
 	   "***** BLOCKED %^{Describe the blocker} :blocker:"
 	   :immediate-finish t
 	   :jump-to-captured t
@@ -96,7 +111,9 @@
 	   :time-prompt t
 	   :immediate-finish t)
 	  ("m" "Merge Request"
-	   plain (file+function jf/primary-agenda-filename-for-machine jf/org-mode-agenda-find-merge-request-node)
+	   plain (file+function
+		  jf/primary-agenda-filename-for-machine
+		  jf/org-mode-agenda-find-merge-request-node)
 	   "***** IN-PROGRESS %^{URL of Merge Request} :mergerequest:"
 	   :immediate-finish t
 	   :jump-to-captured t
@@ -113,8 +130,11 @@
 	  ("t" "Task"
 	   ;; I tried this as a node, but that created headaches.  Instead I'm
 	   ;; making the assumption about project/task depth.
-	   plain (file+function jf/primary-agenda-filename-for-machine jf/org-mode-agenda-find-project-node)
-	   ;; The five ***** is due to the assumptive depth of the projects and tasks.
+	   plain (file+function
+		  jf/primary-agenda-filename-for-machine
+		  jf/org-mode-agenda-find-project-node)
+	   ;; The five ***** is due to the assumptive depth of the projects and
+	   ;; tasks.
 	   "***** TODO %^{Describe the task} :task:\n\n"
 	   :jump-to-captured t
 	   :immediate-finish t
@@ -208,7 +228,7 @@
 (defun jf/org-confirm-babel-evaluate (lang body) nil)
 (bind-key "s-8" 'jf/capture-region-contents-with-metadata)
 (defun jf/capture-region-contents-with-metadata (start end parg)
-  "Write selected text between START and END to currently clocked `org-mode' entry.
+  "Write text between START and END to currently clocked `org-mode' entry.
 
     With PARG kill the content instead."
   (interactive "r\nP")
@@ -219,7 +239,7 @@
 
 ;; With Heavy inspiration from http://www.howardism.org/Technical/Emacs/capturing-content.html
 (defun jf/region-contents-get-with-metadata (start end)
-  "Get the region contents between START and END and return an `org-mode' formatted string."
+  "Get the text between START and END returning an `org-mode' formatted string."
   (require 'magit)
   (require 'git-link)
   (let* ((file-name (buffer-file-name (current-buffer)))
@@ -256,7 +276,9 @@
 		    "\n#+END_%s\n"
 		    "\n- Local :: %s"
 		    (when (and remote-link file-name)
-		      (format "\n- Remote :: [[%s][%s]]" remote-link (or func-name file-name))))
+		      (format "\n- Remote :: [[%s][%s]]"
+			      remote-link
+			      (or func-name file-name))))
 	    type
 	    org-src-mode
 	    code-snippet
@@ -286,7 +308,8 @@
       (insert (org-make-link-string
 	       clipboard-url
 	       (read-string "Title: "
-			    (with-current-buffer (url-retrieve-synchronously clipboard-url)
+			    (with-current-buffer
+				(url-retrieve-synchronously clipboard-url)
 			      (dom-text (car
 					 (dom-by-tag (libxml-parse-html-region
 						      (point-min)
@@ -297,7 +320,8 @@
 
 ;;; Org Mode time tracking and task tracking adjustments
 
-;; I work on several different projects each day; helping folks get unstuck.  I also need to track and record my time.
+;; I work on several different projects each day; helping folks get unstuck.  I
+;; also need to track and record my time.
 (bind-key "C-j" 'jf/jump-to-agenda-or-mark)
 (cl-defun jf/jump-to-agenda-or-mark (prefix-arg)
   "Jump to and from current agenda item to mark.
@@ -308,7 +332,8 @@
   (if (car prefix-arg)
       ;; Jump to where we would put a project were we to capture it.
       (org-capture-goto-target "p")
-    (if (string= (buffer-file-name) (file-truename jf/primary-agenda-filename-for-machine))
+    (if (string= (buffer-file-name) (file-truename
+				     jf/primary-agenda-filename-for-machine))
 	(call-interactively #'consult-global-mark)
       (progn
 	(call-interactively #'set-mark-command)
@@ -336,15 +361,17 @@
 ;; When I jump to a new task for the day, I want to position that task within
 ;; the prompted project.  Inspiration from
 ;; https://gist.github.com/webbj74/0ab881ed0ce61153a82e.
-(cl-defun jf/org-mode-agenda-find-project-node (&key
-						(tag "project")
-						(project (jf/org-mode-agenda-project-prompt))
-						;; The `file+olp+datetree` directive creates a headline like “2022-09-03 Saturday”.
-						(within_headline (format-time-string "%Y-%m-%d %A")))
+(cl-defun jf/org-mode-agenda-find-project-node
+    (&key
+     (tag "project")
+     (project (jf/org-mode-agenda-project-prompt))
+     ;; The `file+olp+datetree` directive creates a headline like “2022-09-03 Saturday”.
+     (within_headline (format-time-string "%Y-%m-%d %A")))
   "Find and position the cursor at the end of
     the given PROJECT WITHIN_HEADLINE."
   ;; We need to be using the right agenda file.
-  (with-current-buffer (find-file-noselect jf/primary-agenda-filename-for-machine)
+  (with-current-buffer (find-file-noselect
+			jf/primary-agenda-filename-for-machine)
     (let ((existing-position (org-element-map
 				 (org-element-parse-buffer)
 				 'headline
@@ -355,16 +382,23 @@
 			       ;; - and is within the given headline
 			       (lambda (hl)
 				 (and (=(org-element-property :level hl) 4)
-				      ;; I can't use the :title attribute as it is a
-				      ;; more complicated structure; this gets me
-				      ;; the raw string.
-				      (string= project (plist-get (cadr hl) :raw-value))
-				      (member tag (org-element-property :tags hl))
-				      ;; The element must have an ancestor with a headline of today
+				      ;; I can't use the :title attribute as it
+				      ;; is a more complicated structure; this
+				      ;; gets me the raw string.
+				      (string= project
+					       (plist-get (cadr hl) :raw-value))
+				      (member tag
+					      (org-element-property :tags hl))
+				      ;; The element must have an ancestor with
+				      ;; a headline of today
 				      (string= within_headline
 					       (plist-get
-						;; I want the raw title, no styling nor tags
-						(cadr (car (org-element-lineage hl))) :raw-value))
+						;; I want the raw title, no
+						;; styling nor tags
+						(cadr
+						 (car
+						  (org-element-lineage hl)))
+						:raw-value))
 				      (org-element-property :end hl)))
 			       nil t)))
       (if existing-position
@@ -381,19 +415,25 @@
 		      (string= within_headline
 			       (plist-get
 				;; I want the raw title, no styling nor tags
-				(cadr (car (org-element-lineage hl))) :raw-value))))
+				(cadr (car (org-element-lineage hl)))
+				:raw-value))))
 	    (insert (concat "\n\n*** "within_headline)))
 	  (insert (concat "\n\n**** " project " :" tag ":\n\n")))))))
 
 (cl-defun jf/org-mode-agenda-find-blocked-node ()
   "Add a blocker node to today."
   (jf/org-mode-agenda-find-project-node :tag "blockers"
-					:project (concat "Blockers for " (format-time-string "%Y-%m-%d"))))
+					:project (concat
+						  "Blockers for "
+						  (format-time-string
+						   "%Y-%m-%d"))))
 
 (cl-defun jf/org-mode-agenda-find-merge-request-node ()
   "Add a mergerequest node to today."
   (jf/org-mode-agenda-find-project-node :tag "mergerequests"
-					:project (concat "Merge Requests for " (format-time-string "%Y-%m-%d"))))
+					:project (concat "Merge Requests for "
+							 (format-time-string
+							  "%Y-%m-%d"))))
 
 ;; Takes my notes for the day and formats them for a summary report.
 (defun jf/org-mode-agenda-to-stand-up-summary (parg)
@@ -404,12 +444,15 @@ When given PREFIX-ARG, prompt for the day of interest.
 NOTE: This follows the convention that projects are on headline 4 and
 tasks within projects are headline 5."
   (interactive "P")
-  (with-current-buffer (find-file-noselect jf/primary-agenda-filename-for-machine)
+  (with-current-buffer (find-file-noselect
+			jf/primary-agenda-filename-for-machine)
     (save-excursion
       (let ((within_headline
-	     ;; Use the CCYY-MM-DD Dayname format and prompt for a date if PREFIX-ARG given.
+	     ;; Use the CCYY-MM-DD Dayname format and prompt for a date if
+	     ;; PREFIX-ARG given.
 	     (format-time-string "%Y-%m-%d %A"
-				 (when (car parg) (org-read-date nil t nil "Pick a day:" )))))
+				 (when (car parg)
+				   (org-read-date nil t nil "Pick a day:" )))))
 	(kill-new
 	 (concat "*Summary of " within_headline "*\n\n"
 		 (s-trim
@@ -422,7 +465,8 @@ tasks within projects are headline 5."
 		       (when (member
 			      within_headline
 			      (mapcar
-			       (lambda (ancestor) (plist-get (cadr ancestor) :raw-value))
+			       (lambda (ancestor)
+				 (plist-get (cadr ancestor) :raw-value))
 			       (org-element-lineage hl)))
 			 (if (=(org-element-property :level hl) 4)
 			     (concat "\n" (plist-get (cadr hl) :raw-value))
@@ -462,12 +506,18 @@ Assumes that I'm on a :project: headline.
 "
   (interactive)
   (let* ((project (plist-get (cadr (org-element-at-point)) :raw-value))
-	 (tasks (s-join "\n" (org-with-wide-buffer
-			      (when (org-goto-first-child)
-				(cl-loop collect (concat "- " (org-no-properties (org-get-heading t t)))
-					 while (outline-get-next-sibling))))))
+	 (tasks (s-join "\n"
+			(org-with-wide-buffer
+			 (when (org-goto-first-child)
+			   (cl-loop collect (concat "- "
+						    (org-no-properties
+						     (org-get-heading t t)))
+				    while (outline-get-next-sibling))))))
 	 (hours (/ (org-clock-sum-current-item) 60.0))
-	 (output (format "Project: %s\nHours: %s\nTasks:\n%s" project hours tasks)))
+	 (output (format "Project: %s\nHours: %s\nTasks:\n%s"
+			 project
+			 hours
+			 tasks)))
     (kill-new tasks)
     (message output)))
 
@@ -601,14 +651,16 @@ only the description"
 	     (link-begin (org-element-property :begin elem))
 	     (link-end (org-element-property :end elem)))
 	(when (and content-begin content-end)
-	  (let ((content (buffer-substring-no-properties content-begin content-end)))
+	  (let ((content (buffer-substring-no-properties
+			  content-begin content-end)))
 	    (delete-region link-begin link-end)
 	    (insert (concat content " "))))))))
 
 (defun jf/force-org-rebuild-cache (prefix-arg)
-  "Call some functions to rebuild the applicable `org-mode' and `org-roam' cache(s).
+  "Call functions to rebuild the applicable `org-mode' and `org-roam' cache(s).
 
-When given PREFIX_ARG, clear the org-roam database (via `org-roam-db-clear-all') then sync.  This will slow down the sync."
+When given PREFIX_ARG, clear the org-roam database (via
+ `org-roam-db-clear-all') then sync.  This will slow down the sync."
   (interactive "P")
   (org-id-update-id-locations)
   (when (fboundp 'org-roam-db-clear-all)
@@ -621,7 +673,8 @@ When given PREFIX_ARG, clear the org-roam database (via `org-roam-db-clear-all')
   "Carry an `org-mode' task node forward."
   (interactive)
   (save-excursion
-    (let* ((day-project-task (jf/org-agenda-get-day-and-project-and-task-at-point))
+    (let* ((day-project-task
+	    (jf/org-agenda-get-day-and-project-and-task-at-point))
            (from-project (plist-get day-project-task :project))
            (from-task (plist-get day-project-task :task)))
       ;; Narrowing the region to perform quicker queries on the element
@@ -632,7 +685,8 @@ When given PREFIX_ARG, clear the org-roam database (via `org-roam-db-clear-all')
       ;;
       ;; Yes we have the from-task, however, we haven't parsed that entity.
       ;; Without parsing that element, the `org-element-contents' returns nil.
-      (let ((content (s-join "\n" (org-element-map (org-element-parse-buffer) 'section
+      (let ((content (s-join "\n" (org-element-map (org-element-parse-buffer)
+				      'section
                                     (lambda (section)
                                       (mapconcat
                                        (lambda (element)
@@ -640,8 +694,10 @@ When given PREFIX_ARG, clear the org-roam database (via `org-roam-db-clear-all')
                                            ;; I want to skip my time entries
                                            ('drawer nil)
                                            (_ (buffer-substring-no-properties
-                                               (org-element-property :begin element)
-                                               (org-element-property :end element)))))
+                                               (org-element-property
+						:begin element)
+                                               (org-element-property
+						:end element)))))
                                        (org-element-contents section)
                                        "\n"))))))
 	(widen)
@@ -694,8 +750,8 @@ When given PREFIX_ARG, clear the org-roam database (via `org-roam-db-clear-all')
   ;; define them as part of the config because without the package these won't
   ;; work.
   ;;
-  ;; For this to work, I needed to permit my \"~/bin/emacsclient\" in the Security
-  ;; & Privacy > Accessibility system preference.
+  ;; For this to work, I needed to permit my \"~/bin/emacsclient\" in the
+  ;; Security & Privacy > Accessibility system preference.
   ;;
   ;; http://mbork.pl/2021-05-02_Org-mode_to_Markdown_via_the_clipboard
   (defun jf/org-copy-region-as-markdown ()
@@ -711,7 +767,9 @@ When given PREFIX_ARG, clear the org-roam database (via `org-roam-db-clear-all')
 		(org-export-string-as region 'md t '(:with-toc nil))))
 	  (gui-set-selection 'CLIPBOARD markdown))))
 
-  ;; I have found that Slack resists posting rich content, so I often need to open up TextEdit, paste into an empty file, copy the contents, and then paste into Slack.
+  ;; I have found that Slack resists posting rich content, so I often need to
+  ;; open up TextEdit, paste into an empty file, copy the contents, and then
+  ;; paste into Slack.
   (defun jf/formatted-copy-org-to-html (prefix)
     "Export region to HTML, and copy it to the clipboard.
 
