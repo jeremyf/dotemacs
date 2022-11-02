@@ -83,7 +83,7 @@
 (run-at-time nil (* 2 60) 'recentf-save-list) ;; Save files every 2 minutes
 (global-auto-revert-mode)
 
-(setq-default fill-column 79)   ;; Feeling a bit old school with 80 characters.
+(setq-default fill-column 80)
 (setq-default cursor-type 'bar) ;; Doing a bit of configuration of my cursors
 (blink-cursor-mode t)
 

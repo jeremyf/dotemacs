@@ -12,7 +12,8 @@
 (require 'jf-quick-help)
 (require 'jf-org-mode)
 
-(use-package decide :straight (decide :host github :type git :repo "jeremyf/decide-mode"))
+(use-package decide
+  :straight (decide :host github :type git :repo "jeremyf/decide-mode"))
 
 (use-package org-d20
   ;; I’m really only using this for the ~org-d20--roll~ function.
@@ -32,11 +33,13 @@
 
 ;;;; Burning Wheel Code
 (jf/minor-mode-maker :title "Burning Wheel Gold"
-		     ;; Being a programmer and someone who plays table top role-playing games
-		     ;; (TTRPG), I’ve often used the TTRPG rules-set or systems to explore
-		     ;; programming languages and processes.  After all, I understand the TTRPG
-		     ;; rules well enough (or the algorithm’s description) that I can spend time
-		     ;; thinking through my approach in a programming language.
+		     ;; Being a programmer and someone who plays table top
+		     ;; role-playing games (TTRPG), I’ve often used the TTRPG
+		     ;; rules-set or systems to explore programming languages
+		     ;; and processes.  After all, I understand the TTRPG rules
+		     ;; well enough (or the algorithm’s description) that I can
+		     ;; spend time thinking through my approach in a
+		     ;; programming language.
                      :abbr "bwg"
                      :hooks (list 'org-mode-hook 'markdown-mode-hook))
 
@@ -205,14 +208,15 @@
           |  18D | Ob 1-15 | Ob 16-18  | Ob 19+      |")))
 
 (defconst jf/bwg-mortal-wounds-scale
-  ;; When running Burning Wheel Gold, on occassion I need to establish the PTGS for a creature or person.
+  ;; When running Burning Wheel Gold, on occassion I need to establish the PTGS
+  ;; for a creature or person.
   ;;
   ;; Yes, I could’ve written out (0 "B1" "B2" "B3" "B4" "B5" "B6" "B7" "B8" "B9"
-  ;; "B10" "B11" "B12" "B13" "B14" "B15" "B16" "G1" "G2" "G3" "G4" "G5" "G6" "G7"
-  ;; "G8" "G9" "G10" "G11" "G12" "G13" "G14" "G15" "G16" "W1" "W2" "W3" "W4" "W5"
-  ;; "W6" "W7" "W8" "W9" "W10" "W11" "W12" "W13" "W14" "W15" "W16") faster than
-  ;; the following constant, but I wanted to learn a bit of emacs-lisp, so I
-  ;; chose to write the following.
+  ;; "B10" "B11" "B12" "B13" "B14" "B15" "B16" "G1" "G2" "G3" "G4" "G5" "G6"
+  ;; "G7" "G8" "G9" "G10" "G11" "G12" "G13" "G14" "G15" "G16" "W1" "W2" "W3"
+  ;; "W4" "W5" "W6" "W7" "W8" "W9" "W10" "W11" "W12" "W13" "W14" "W15" "W16")
+  ;; faster than the following constant, but I wanted to learn a bit of
+  ;; emacs-lisp, so I chose to write the following.
 
   ;; I copied that text string from the introspected variable.  Because if I
   ;; wasn't going to write it the first time, I sure wasn't going to do it if I
@@ -270,7 +274,8 @@ Note, this assumes Black or Grey shade only."
 
   Where SCALE is a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
   (jf/quick-help
-   :header (concat "BWG PTGS (p98, p546) Forte:" forte ", Power: " power (when round-up " (Rounded up)"))
+   :header (concat "BWG PTGS (p98, p546) Forte:"
+		   forte ", Power: " power (when round-up " (Rounded up)"))
    :body (format (concat
                   "Su %s; Li %s; Mi %s; Se %s; Tr %s; Mo %s"
                   "\n\nForte: %s\nPower: %s"
@@ -284,7 +289,9 @@ Note, this assumes Black or Grey shade only."
                  (upcase forte)
                  (upcase power))))
 
-(cl-defun jf/bwg-qh-ptgs--shade-black (forte power &optional round-up &key (add 0))
+(cl-defun jf/bwg-qh-ptgs--shade-black (forte power
+					     &optional round-up
+					     &key (add 0))
   "Calculate Black shade PTGS (BWGR p98, p546).
 
 This requires FORTE, POWER, and ROUND-UP.
@@ -345,7 +352,8 @@ Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
 
 (defconst jf/bwg-lifepath--narrowing-regexp
   "data-lifepath="
-  "All lines in `jf/bwg-lifepath--path-to-html-file' that have this substring contain filterable data.")
+  "All lines in `jf/bwg-lifepath--path-to-html-file' that have this substring
+ contain filterable data.")
 
 (global-set-key (kbd "C-M-s-b") 'jf/menu--bwg)
 (transient-define-prefix jf/menu--bwg ()
