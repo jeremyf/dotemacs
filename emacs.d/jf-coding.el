@@ -64,7 +64,7 @@
   :hook (enh-ruby-mode . enh-ruby-imenu-create-index)
   :bind (:map enh-ruby-mode-map ("C-j" . jf/jump-to-agenda-or-mark)
               ("M-h" . enh-ruby-mark-defun))
-  :mode (("\\(?:\\.rb\\|ru\\|rake\\|thor\\|jbuilder\\|gemspec\\|podspec\\|/\\(?:Gem\\|Rake\\|Cap\\|Thor\\|Vagrant\\|Guard\\|Pod\\)file\\)\\'" . enh-ruby-mode))
+  :mode ("\\(?:\\.rb\\|ru\\|rake\\|thor\\|jbuilder\\|gemspec\\|podspec\\|/\\(?:Gem\\|Rake\\|Cap\\|Thor\\|Vagrant\\|Guard\\|Pod\\)file\\)\\'" . enh-ruby-mode)
   :init (add-to-list 'interpreter-mode-alist '("ruby" . enh-ruby-mode)))
 
 (use-package go-mode :straight t)
@@ -94,9 +94,11 @@
 
 (use-package plantuml-mode
   ;; A mode for working with PlantUML.  See https://plantuml.com
-  :config (setq plantuml-executable-path (concat (getenv "HB_PATH") "/bin/plantuml")
+  :config (setq plantuml-executable-path (concat
+					  (getenv "HB_PATH") "/bin/plantuml")
                 plantuml-default-exec-mode 'executable
-                org-plantuml-executable-path (concat (getenv "HB_PATH") "/bin/plantuml")
+                org-plantuml-executable-path (concat
+					      (getenv "HB_PATH") "/bin/plantuml")
                 org-plantuml-exec-mode 'executable)
   :mode (("\\.plantuml\\'" . plantuml-mode))
   :straight t)
@@ -137,7 +139,8 @@
 
 (use-package tree-sitter
   ;; See https://github.com/emacs-tree-sitter/elisp-tree-sitter
-  :straight (tree-sitter :host github :repo "emacs-tree-sitter/elisp-tree-sitter")
+  :straight (tree-sitter :host github
+			 :repo "emacs-tree-sitter/elisp-tree-sitter")
   :config
   (add-to-list 'tree-sitter-major-mode-language-alist '(enh-ruby-mode . ruby))
   :init (global-tree-sitter-mode)
