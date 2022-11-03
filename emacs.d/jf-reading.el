@@ -54,11 +54,14 @@
     (select-window (previous-window))
     (unless elfeed-search-remain-on-entry (forward-line -1))))
 (eval-after-load 'elfeed-search
-  '(define-key elfeed-search-mode-map (kbd "n") (elfeed-search-show-entry-pre +1)))
+  '(define-key elfeed-search-mode-map (kbd "n")
+     (elfeed-search-show-entry-pre +1)))
 (eval-after-load 'elfeed-search
-  '(define-key elfeed-search-mode-map (kbd "p") (elfeed-search-show-entry-pre -1)))
+  '(define-key elfeed-search-mode-map (kbd "p")
+     (elfeed-search-show-entry-pre -1)))
 (eval-after-load 'elfeed-search
-  '(define-key elfeed-search-mode-map (kbd "M-RET") (elfeed-search-show-entry-pre)))
+  '(define-key elfeed-search-mode-map (kbd "M-RET")
+     (elfeed-search-show-entry-pre)))
 ;; End https://karthinks.com/blog/lazy-elfeed/
 
 (use-package elfeed-org
@@ -69,7 +72,8 @@
   (setq rmh-elfeed-org-files (list "~/git/org/elfeed.org")))
 
 (use-package eww
-  ;; A plain text browser.  Use this to see just how bad much of the web has become.
+  ;; A plain text browser.  Use this to see just how bad much of the web has
+  ;; become.
   :straight t
   :config
   (defun shr-tag-dfn (dom)

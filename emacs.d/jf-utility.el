@@ -23,13 +23,16 @@
 	    "Dispatch a notification for TIMER."
 	    (let ((title "TMR May Ring (Emacs tmr package)")
 		  (description (tmr--timer-description timer)))
-	      (ns-do-applescript (concat "display notification \"" description "\" sound name \"Glass\""))))
+	      (ns-do-applescript (concat "display notification \""
+					 description
+					 "\" sound name \"Glass\""))))
   :custom (tmr-notify-function #'jf/notifications-notify)
   (tmr-timer-completed-functions
    (list #'tmr-print-message-for-completed-timer
 	 #'tmr-sound-play
 	 #'jf/tmr-notification-notify))
-  :straight (tmr :host nil :type git :repo "https://git.sr.ht/~protesilaos/tmr"))
+  :straight (tmr :host nil :type git
+		 :repo "https://git.sr.ht/~protesilaos/tmr"))
 
 (use-package transient :straight t)
 
@@ -42,19 +45,25 @@
   :straight t
   :config (keychain-refresh-environment))
 
-;; A modern list API for Emacs. No 'cl required.  (See https://github.com/magnars/dash.el/)
-(use-package dash :straight t)
+(use-package dash
+  ;; A modern list API for Emacs. No 'cl required.
+  ;; (See https://github.com/magnars/dash.el/)
+  :straight t)
 
-;; A modern API for working with files and directories in Emacs. (See https://github.com/rejeep/f.el/)
-(use-package f :straight t)
+(use-package f
+  ;; A modern API for working with files and directories in Emacs.
+  ;; (See https://github.com/rejeep/f.el/)
+  :straight t)
 
-;; The long lost Emacs string manipulation library.  (See https://github.com/magnars/s.el/)
-(use-package s :straight t)
+(use-package s
+  ;; The long lost Emacs string manipulation library.
+  ;; (See https://github.com/magnars/s.el/)
+  :straight t)
 
-;; “EditorConfig helps maintain consistent coding styles for multiple
-;; developers working on the same project across various editors and IDEs.”
-;; See https://editorconfig.org/#overview for more details.
 (use-package editorconfig
+  ;; “EditorConfig helps maintain consistent coding styles for multiple
+  ;; developers working on the same project across various editors and IDEs.”
+  ;; See https://editorconfig.org/#overview for more details.
   :straight t
   :config
   (editorconfig-mode 1))
@@ -96,7 +105,8 @@
 	 ("<f9>" . crux-kill-other-buffers)))
 
 (use-package math-at-point
-  :straight (math-at-point :type git :host github :repo "shankar2k/math-at-point")
+  :straight (math-at-point :type git :host github
+			   :repo "shankar2k/math-at-point")
   :bind ("C-c =" . math-at-point))
 
 ;;;; Hammerspoon --------------------------------------------------------------
@@ -186,7 +196,9 @@
   (interactive "P")
   (let* ((prefix (car parg))
          (raw-filename
-          (if (equal major-mode 'dired-mode) default-directory (buffer-file-name)))
+          (if (equal major-mode 'dired-mode)
+	      default-directory
+	    (buffer-file-name)))
          (filename
           (cond
            ((not prefix)  raw-filename)
@@ -196,7 +208,8 @@
       (kill-new filename)
       (message "Copied buffer file name '%s' to the clipboard." filename))))
 
-(defun jf/sort-unique-lines (reverse beg end &optional adjacent keep-blanks interactive)
+(defun jf/sort-unique-lines (reverse beg end
+				     &optional adjacent keep-blanks interactive)
   "Sort lines and delete duplicates.
 
   By default the sort is lexigraphically ascending.  To sort as
@@ -254,8 +267,11 @@
 (defun jf/move-file (target-directory)
   "Write this file to TARGET-DIRECTORY, and delete old one."
   (interactive "DTarget Directory: ")
-  (let* ((source (expand-file-name (file-name-nondirectory (buffer-name)) default-directory))
-         (target (f-join target-directory (file-name-nondirectory (buffer-name)))))
+  (let* ((source (expand-file-name (file-name-nondirectory
+				    (buffer-name))
+				   default-directory))
+         (target (f-join target-directory (file-name-nondirectory
+					   (buffer-name)))))
     (save-buffer)
     (rename-file source target)
     (kill-current-buffer)))
@@ -265,14 +281,16 @@
   "Insert an active date for today.
 
   One universal arg (e.g., prefix call with C-u) inserts timestamp.
-  Two universal arsg (e.g., prefix call with C-u C-u) prompts for date then insertes active date."
+  Two universal arsg (e.g., prefix call with C-u C-u) prompts for date
+  then insertes active date."
   ;; Insert an active timestamp, with a few options.
   (interactive "P")
   (let ((prefix (car parg)))
     (cond
      ((not prefix)  (org-insert-time-stamp nil nil nil))
      ((= prefix 4)  (org-insert-time-stamp nil t nil))
-     ((= prefix 16) (org-insert-time-stamp (org-read-date nil t nil "Date") nil nil)))))
+     ((= prefix 16) (org-insert-time-stamp (org-read-date nil t nil "Date")
+					   nil nil)))))
 
 (global-set-key (kbd "C-w") 'jf/delete-region-or-backward-word)
 (global-set-key (kbd "M-DEL") 'jf/delete-region-or-backward-word)
