@@ -147,7 +147,7 @@ Welcome to a stripped down configuration; I have been working with a literate co
      ;; ]
      ["Tasks"
       ("c" "Capture region to clock…" (lambda (b e p) (interactive "r\nP") (jf/capture-region-contents-with-metadata b e p)))
-      ("s" "Search note content…" (lambda () (interactive) (consult-notes-search-in-all-notes)))
+      ("s" "Search note content…" consult-notes-search-in-all-notes)
       ("S" "Search note filename…" (lambda () (interactive) (consult-notes)))
       ("C-t" "Start a timer…" tmr-with-description)
       ("u" "Copy stand-up to kill ring" jf/org-mode-agenda-to-stand-up-summary)

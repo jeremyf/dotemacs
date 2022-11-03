@@ -105,8 +105,8 @@
   ;; excluded from it's containing project's git repository.
   :custom (consult-notes-ripgrep-args
 	   (concat
-	    "rg --null --line-buffered --color=never --max-columns=1000 / "
-	    "--path-separator  --ignore-case --no-heading --line-number / "
+	    "rg --null --line-buffered --color=never --max-columns=1000 "
+	    "--path-separator / --ignore-case --no-heading --line-number "
 	    "--hidden --glob=!.git/ -L --sortr=accessed")
 	   :commands (consult-notes
 		      consult-notes-search-in-all-notes)))

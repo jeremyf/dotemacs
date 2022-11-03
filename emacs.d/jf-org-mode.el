@@ -235,7 +235,7 @@
   (let ((text (jf/region-contents-get-with-metadata start end)))
     (if (car parg)
 	(kill-new text)
-      (org-capture-string (concat "-----\n" text) "c"))))
+      (org-capture-string text "c"))))
 
 ;; With Heavy inspiration from http://www.howardism.org/Technical/Emacs/capturing-content.html
 (defun jf/region-contents-get-with-metadata (start end)
@@ -260,30 +260,19 @@
 	 (remote-link (when (magit-list-remotes)
 			(progn
 			  (call-interactively 'git-link)
-			  (car kill-ring))))
-	 (local-link (if (null func-name)
-			 (format "From [[file:%s::%s][%s]]"
-				 file-name
-				 line-number
-				 file-base)
-		       (format "From ~%s~ (in [[file:%s::%s][%s]])"
-			       func-name
-			       file-name
-			       line-number
-			       file-base))))
-    (format (concat "\n#+BEGIN_%s %s"
-		    "\n%s"
-		    "\n#+END_%s\n"
-		    "\n- Local :: %s"
-		    (when (and remote-link file-name)
-		      (format "\n- Remote :: [[%s][%s]]"
-			      remote-link
-			      (or func-name file-name))))
+			  (car kill-ring)))))
+    (format (concat
+	     (format "\n- Local File :: [[file:%s::%s]]" file-name line-number)
+	     (when func-name (format "\n- Function Name :: =%s=" func-name))
+	     (when (and remote-link file-name)
+	       (format "\n- Remote URL :: [[%s][%s]]" remote-link file-name))
+	     "\n\n#+BEGIN_%s %s"
+	     "\n%s"
+	     "\n#+END_%s\n")
 	    type
 	    org-src-mode
 	    code-snippet
-	    type
-	    local-link)))
+	    type)))
 
 ;;; Additionally Functionality for Org Mode
 ;; Cribbed from https://xenodium.com/emacs-dwim-do-what-i-mean/
