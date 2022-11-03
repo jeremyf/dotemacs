@@ -110,7 +110,6 @@ Welcome to a stripped down configuration; I have been working with a literate co
     [["Contexts"
       ("-b" "Burning Wheel…"  jf/menu--bwg)
       ("-e" "Eberron…" jf/menu--eberron)
-      ;; ("-f" "Forem…" jf/menu--forem)
       ("-t" "TakeOnRules…" jf/menu--tor)
       ("-w" "Register window configuration" window-configuration-to-register)
       ]
@@ -148,7 +147,7 @@ Welcome to a stripped down configuration; I have been working with a literate co
      ["Tasks"
       ("c" "Capture region to clock…" (lambda (b e p) (interactive "r\nP") (jf/capture-region-contents-with-metadata b e p)))
       ("s" "Search note content…" consult-notes-search-in-all-notes)
-      ("S" "Search note filename…" (lambda () (interactive) (consult-notes)))
+      ("S" "Search note filename…" consult-notes)
       ("C-t" "Start a timer…" tmr-with-description)
       ("u" "Copy stand-up to kill ring" jf/org-mode-agenda-to-stand-up-summary)
       ("w" "Weekly hours report" jf/org-mode-weekly-report)

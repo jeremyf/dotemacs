@@ -45,6 +45,11 @@
 
 (use-package eldoc :straight t)
 
+(use-package emacs-refactor
+  :straight (emacs-refactor :host github :repo "Wilfred/emacs-refactor")
+  :bind ((:map enh-ruby-mode-map ("M-RET" . emr-show-refactor-menu))
+	 (:map emacs-lisp-mode-map ("M-RET" . emr-show-refactor-menu))))
+
 (use-package emmet-mode
   :straight t
   :bind (("C-c C-e" . emmet-expand-yas ))
@@ -116,6 +121,11 @@
   ;; Nice and simple package for string interpolation.
   :straight t
   :hook (enh-ruby-mode . ruby-interpolation-mode))
+
+(use-package ruby-refactor
+  :straight t
+  :hook (enh-ruby-mode . ruby-refactor-mode-launch)
+  (ruby-mode . ruby-refactor-mode-launch))
 
 (use-package sql-indent
   :straight t
