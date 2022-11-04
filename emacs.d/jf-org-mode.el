@@ -486,7 +486,7 @@ for the week."
 ;; entries in our time tracking software.  From the day’s project link in the
 ;; =org-clock-report=, I want to copy the headlines of each of the tasks.  I
 ;; fill out my time sheets one day at a time.
-(defun jf/org-mode-tasks-for-project-and-day ()
+(defun jf/org-mode-time-entry-for-project-and-day ()
   "Function to help report time for Scientist.com
 
 Assumes that I'm on a :project: headline.
