@@ -541,7 +541,7 @@ Useful if you want a more robust view into the recommend candidates."
 				       cursor-intangible t
 				       rear-nonsticky t))))
 
-  (define-key vertico-map (kbd "S-SPC") #'jf/vertico-restrict-to-matches)
+  (define-key vertico-map (kbd "C-SPC") #'jf/vertico-restrict-to-matches)
   (vertico-mode)
   ;; Use `consult-completion-in-region' if Vertico is enabled.
   ;; Otherwise use the default `completion--in-region' function.

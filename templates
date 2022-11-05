@@ -16,6 +16,11 @@ fundamental-mode
 
 (today (format-time-string "%Y-%m-%d"))
 
+;;;; markdown-mode
+markdown-mode
+
+(tor "[Take on Rules](https://takeonrules.com)")
+
 ;;;; org-mode
 org-mode
 

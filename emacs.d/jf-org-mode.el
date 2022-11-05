@@ -788,5 +788,21 @@ When given the PREFIX arg, paste the content into TextEdit (for future copy)."
 	    "end tell")))
 	))))
 
+;; https://www.reddit.com/r/emacs/comments/yjobc2/what_method_do_you_use_to_create_internal_links/
+(defun jf/org-parse-headline (x)
+  (plist-get (cadr x) :raw-value))
+
+(defun jf/org-get-headlines ()
+  (org-element-map (org-element-parse-buffer)
+      'headline #'jf/org-parse-headline))
+
+(defun jf/org-link-to-headline ()
+  "Insert an internal link to a headline."
+  (interactive)
+  (let* ((headlines (jf/org-get-headlines))
+	 (choice (completing-read "Headings: " headlines nil t))
+	 (desc (read-string "Description: " choice)))
+    (org-insert-link buffer-file-name (concat "*" choice) desc)))
+
 (provide 'jf-org-mode)
 ;;; jf-org-mode.el ends here
