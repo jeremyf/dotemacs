@@ -58,46 +58,46 @@
      (4 . (overline 1.1))
      (t . (rainbow 1.05)))))
 
-(use-package ef-themes
-  :straight (ef-themes :host nil :type git :repo "https://git.sr.ht/~protesilaos/ef-themes")
-  :custom (ef-themes-headings ; read the manual's entry or the doc string
-	   '((0 . (variable-pitch light 1.9))
-             (1 . (variable-pitch light 1.8))
-             (2 . (variable-pitch regular 1.7))
-             (3 . (variable-pitch regular 1.6))
-             (4 . (variable-pitch regular 1.5))
-             (5 . (variable-pitch 1.4)) ; absence of weight means `bold'
-             (6 . (variable-pitch 1.3))
-             (7 . (variable-pitch 1.2))
-             (t . (variable-pitch 1.1))))
-  (ef-themes-mixed-fonts t)
-  (ef-themes-variable-pitch-ui t))
+;; (use-package ef-themes
+;;   :straight (ef-themes :host nil :type git :repo "https://git.sr.ht/~protesilaos/ef-themes")
+;;   :custom (ef-themes-headings ; read the manual's entry or the doc string
+;; 	   '((0 . (variable-pitch light 1.9))
+;;              (1 . (variable-pitch light 1.8))
+;;              (2 . (variable-pitch regular 1.7))
+;;              (3 . (variable-pitch regular 1.6))
+;;              (4 . (variable-pitch regular 1.5))
+;;              (5 . (variable-pitch 1.4)) ; absence of weight means `bold'
+;;              (6 . (variable-pitch 1.3))
+;;              (7 . (variable-pitch 1.2))
+;;              (t . (variable-pitch 1.1))))
+;;   (ef-themes-mixed-fonts t)
+;;   (ef-themes-variable-pitch-ui t)
+;;   :init (ef-themes-select 'ef-cyprus))
 
-(ef-themes-select 'ef-cyprus)
-;; (if (eq system-type 'darwin)
-;;     (progn
-;;       (defun jf/dark ()
-;;         "Toggle system-wide Dark or Light setting."
-;;         (interactive)
-;;         (shell-command "osascript -e 'tell application \"System Events\" to tell appearance preferences to set dark mode to not dark mode'")
-;;         (jf/emacs-theme-by-osx-appearance))
+(if (eq system-type 'darwin)
+    (progn
+      (defun jf/dark ()
+        "Toggle system-wide Dark or Light setting."
+        (interactive)
+        (shell-command "osascript -e 'tell application \"System Events\" to tell appearance preferences to set dark mode to not dark mode'")
+        (jf/emacs-theme-by-osx-appearance))
 
-;;       (defalias 'modus-themes-toggle 'jf/dark)
-;;       (defun jf/emacs-theme-by-osx-appearance ()
-;;         "Set theme based on OSX apperance state."
-;;         (if (equal "Dark" (substring (shell-command-to-string "defaults read -g AppleInterfaceStyle") 0 4))
-;;             (modus-themes-load-vivendi)
-;;           (modus-themes-load-operandi)))
-;;       ;; And load the appropriate theme
-;;       (jf/emacs-theme-by-osx-appearance))
-;;   (progn
-;;     (defun modus-themes-toggle ()
-;;       "Toggle between `modus-operandi' and `modus-vivendi' themes."
-;;       (interactive)
-;;       (if (eq (car custom-enabled-themes) 'modus-vivendi)
-;;           (modus-themes-load-vivendi)
-;;         (modus-themes-load-operandi)))
-;;     (modus-themes-load-operandi)))
+      (defalias 'modus-themes-toggle 'jf/dark)
+      (defun jf/emacs-theme-by-osx-appearance ()
+        "Set theme based on OSX apperance state."
+        (if (equal "Dark" (substring (shell-command-to-string "defaults read -g AppleInterfaceStyle") 0 4))
+            (modus-themes-load-vivendi)
+          (modus-themes-load-operandi)))
+      ;; And load the appropriate theme
+      (jf/emacs-theme-by-osx-appearance))
+  (progn
+    (defun modus-themes-toggle ()
+      "Toggle between `modus-operandi' and `modus-vivendi' themes."
+      (interactive)
+      (if (eq (car custom-enabled-themes) 'modus-vivendi)
+          (modus-themes-load-vivendi)
+        (modus-themes-load-operandi)))
+    (modus-themes-load-operandi)))
 
 ;;;; Buffers and Tabs
 ;; https://github.com/alphapapa/bufler.el

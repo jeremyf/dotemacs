@@ -104,6 +104,8 @@
 
  global-mark-ring-max 32
 
+ help-window-select t
+
  idle-update-delay 1.1       ;; Slow down the UI being updated to improve
  ;; performance
 

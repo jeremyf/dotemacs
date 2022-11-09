@@ -100,7 +100,6 @@
   :bind
   ("H-d s" . 'consult-notes-search-in-all-notes)
   ("H-d f RET" . 'consult-notes)
-  :config  (setq consult-notes-sources (list))
   ;; Ensuring that I search my denote/scientist sub-directory, which is
   ;; excluded from it's containing project's git repository.
   :custom (consult-notes-ripgrep-args
@@ -170,30 +169,32 @@ Our controlled vocabulary...if you will."
 
 ;;;;; `denote' file finding functions
 
-(defun jf/denote-file-prompt (fn &optional initial-dir)
-  "An override of the provided denote-file-prompt."
-  ;; I’m not looking at active silo-ing and want to be able to search
-  ;; specifically from the top-level and all subdirectories.
-  (if initial-dir
-      (funcall fn initial-dir)
-    (let* ((vc-dirs-ignores (mapcar
-                             (lambda (dir)
-			       (concat dir "/"))
-                             vc-directory-exclusion-list))
-           (all-files (mapcan
-		       (lambda (sub-dir)
-                         (project--files-in-directory (f-join
-						       (denote-directory)
-						       sub-dir)
-						      vc-dirs-ignores))
-		       jf/denote-subdirectories)))
-      (funcall project-read-file-name-function
-	       "Find file" all-files nil 'file-name-history))))
-(advice-add #'denote-file-prompt
-	    :around #'jf/denote-file-prompt
-	    '((name . "wrapper")))
+;; (defun jf/denote-file-prompt (fn &optional initial-dir)
+;;   "An override of the provided denote-file-prompt."
+;;   ;; I’m not looking at active silo-ing and want to be able to search
+;;   ;; specifically from the top-level and all subdirectories.
+;;   (if initial-dir
+;;       (funcall fn initial-dir)
+;;     (let* ((vc-dirs-ignores (mapcar
+;;                              (lambda (dir)
+;; 			       (concat dir "/"))
+;;                              vc-directory-exclusion-list))
+;;            (all-files (mapcan
+;; 		       (lambda (sub-dir)
+;;                          (project--files-in-directory (f-join
+;; 						       (denote-directory)
+;; 						       sub-dir)
+;; 						      vc-dirs-ignores))
+;; 		       jf/denote-subdirectories)))
+;;       (funcall project-read-file-name-function
+;; 	       "Find file" all-files nil 'file-name-history))))
+;; (advice-add #'denote-file-prompt
+;; 	    :around #'jf/denote-file-prompt
+;; 	    '((name . "wrapper")))
 
+(setq consult-notes-sources (list))
 (setq jf/denote-subdirectories (list))
+
 (defun jf/denote-find-file ()
   "Find file in the current `denote-directory'."
   (interactive)
@@ -230,7 +231,7 @@ Our controlled vocabulary...if you will."
                                            domain
                                            "\" subdirectory of "
 					   "`denote-directory'."))
-         (link-or-creator-fn (intern (concat "jf/denote-link--" domain)))
+         (link-or-creator-fn (intern (concat "jf/denote-link-or-create--" domain)))
          (link-or-creator-docstring (concat "Link to denote in \""
 					    domain
 					    "\" subdirectory of "
