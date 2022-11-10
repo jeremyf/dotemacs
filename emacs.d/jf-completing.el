@@ -162,11 +162,11 @@
   (setq consult-ripgrep-command
 	(concat "rga --null --line-buffered --color=ansi --max-columns=1000 "
 		"--smart-case --no-heading --line-number --no-ignore-vcs . "
-		"-e ARG OPTS"))
+		"--glob !vendor/ -e ARG OPTS"))
   (setq consult-ripgrep-args
 	(concat "rga --null --line-buffered --color=never --max-columns=1000 "
 		"--path-separator / --no-ignore-vcs --smart-case --no-heading "
-		"--line-number ."))
+		"--glob !vendor/ --line-number ."))
 
   ;; Configure other variables and modes in the :config section,
   ;; after lazily loading the package.

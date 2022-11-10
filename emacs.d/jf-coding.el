@@ -36,11 +36,20 @@
           html-mode
           js-mode
           scss-mode) . eglot-ensure)
+  :hook (eglot-managed-mode . jf/eglot-capf)
   :config
   (setq eglot-ignored-server-capabilites (quote (:documentHighlightProvider))
         completion-category-overrides '((eglot (styles orderless))))
   (add-to-list 'eglot-server-programs
                `(enh-ruby-mode . ("solargraph" "socket" "--port" :autoport)))
+
+  (defun jf/eglot-capf ()
+    ;; https://stackoverflow.com/questions/72601990/how-to-show-suggestions-for-yasnippets-when-using-eglot
+    (setq-local completion-at-point-functions
+		(list (cape-super-capf
+                       #'eglot-completion-at-point
+                       #'tempel-expand
+		       #'cape-file))))
   :straight t)
 
 (use-package eldoc :straight t)
