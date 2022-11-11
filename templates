@@ -76,6 +76,8 @@ text-mode
           "| " (s str)                       " |" n
           "+-" (make-string (length str) ?-) "-+" n)
 
+(banner comment-start (make-string (length title) ?=) n comment-start (p "Title: " title) n comment-start (make-string (length title) ?=))
+
 ;;;; web-mode
 web-mode
 

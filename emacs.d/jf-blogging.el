@@ -944,5 +944,10 @@
     ;;; END Wrapping Functions
 ;;
 ;;******************************************************************************
+
+
+(fset 'jf/tidy-ox-hugo-header-export
+      (kmacro-lambda-form [?\C-c ?\C-n ?\s-f ?\{ return ?\C-b ?\C-b ?\C-k] 0 "%d"))
+
 (provide 'jf-blogging)
 ;;; jf-blogging.el ends here

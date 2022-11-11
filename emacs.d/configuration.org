@@ -42,13 +42,6 @@ Welcome to a stripped down configuration; I have been working with a literate co
   (require 'jf-blogging)
 #+end_src
 
-** TODO Functions to Place in their Package
-
-#+begin_src emacs-lisp
-  (org-babel-load-file
-     (concat user-emacs-directory "keyboard-macros-config.org"))
-#+end_src
-
 ** TODO Menus
 
 #+begin_src emacs-lisp
