@@ -72,8 +72,8 @@
 	     denote--title-prompt
 	     denote-get-path-by-id)
   :bind ("H-f" . 'jf/denote-find-file)
-  ("H-l" . 'denote-link-or-create)
-  ("H-i" . 'denote-link-or-create)
+  ("H-l" . 'jf/denote-link-or-create)
+  ("H-i" . 'jf/denote-link-or-create)
   :hook (dired-mode . denote-dired-mode)
   :custom ((denote-directory (expand-file-name "denote" org-directory))
            ;; These are the minimum viable prompts for notes
@@ -169,28 +169,35 @@ Our controlled vocabulary...if you will."
 
 ;;;;; `denote' file finding functions
 
-;; (defun jf/denote-file-prompt (fn &optional initial-dir)
-;;   "An override of the provided denote-file-prompt."
-;;   ;; I’m not looking at active silo-ing and want to be able to search
-;;   ;; specifically from the top-level and all subdirectories.
-;;   (if initial-dir
-;;       (funcall fn initial-dir)
-;;     (let* ((vc-dirs-ignores (mapcar
-;;                              (lambda (dir)
-;; 			       (concat dir "/"))
-;;                              vc-directory-exclusion-list))
-;;            (all-files (mapcan
-;; 		       (lambda (sub-dir)
-;;                          (project--files-in-directory (f-join
-;; 						       (denote-directory)
-;; 						       sub-dir)
-;; 						      vc-dirs-ignores))
-;; 		       jf/denote-subdirectories)))
-;;       (funcall project-read-file-name-function
-;; 	       "Find file" all-files nil 'file-name-history))))
-;; (advice-add #'denote-file-prompt
-;; 	    :around #'jf/denote-file-prompt
-;; 	    '((name . "wrapper")))
+(defun jf/denote-link-or-create (target &optional id-only)
+  "Use `denote-link' on TARGET file, creating it if necessary.
+
+As `denote-link-or-create' but use `jf/denote-file-prompt' instead of `denote-file-prompt'.
+
+This function is intended for a global find of all notes."
+  (interactive (list (jf/denote-file-prompt)
+		     current-prefix-arg))
+  (if (file-exists-p target)
+      (denote-link target id-only)
+    (denote--push-extracted-title-to-history)
+    (call-interactively #'denote-link-after-creating)))
+
+(defun jf/denote-file-prompt ()
+  ;; I’m not looking at active silo-ing and want to be able to search
+  ;; specifically from the top-level and all subdirectories.
+  (let* ((vc-dirs-ignores (mapcar
+                           (lambda (dir)
+			     (concat dir "/"))
+                           vc-directory-exclusion-list))
+         (all-files (mapcan
+		     (lambda (sub-dir)
+                       (project--files-in-directory (f-join
+						     (denote-directory)
+						     sub-dir)
+						    vc-dirs-ignores))
+		     jf/denote-subdirectories)))
+    (funcall project-read-file-name-function
+	     "Find file" all-files nil 'file-name-history)))
 
 (setq consult-notes-sources (list))
 (setq jf/denote-subdirectories (list))
