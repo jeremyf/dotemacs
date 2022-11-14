@@ -82,6 +82,7 @@
 				  "|"
 				  "DONE(d!)"
 				  "DELEGATED(g@/!)"
+				  "HOLD(h@/!)"
 				  "SENT-FORWARD(s!)"
 				  "CANCELLED(c@)")))
   (setq org-capture-templates
@@ -506,10 +507,11 @@ Assumes that I'm on a :project: headline.
 						     (org-get-heading t t)))
 				    while (outline-get-next-sibling))))))
 	 (hours (/ (org-clock-sum-current-item) 60.0))
-	 (output (format "Project: %s\nHours: %s\nTasks:\n%s"
+	 (output (format "Tasks:\n%s\nProject: %s\nHours: %s\n"
+			 tasks
 			 project
 			 hours
-			 tasks)))
+			 )))
     (kill-new tasks)
     (message output)))
 
