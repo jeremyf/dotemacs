@@ -1,6 +1,0 @@
-# -*- mode: snippet -*-
-# contributor: Jeremy Friesen <jeremy.n.friesen@gmail.com>
-# key: ab
-# name: glossary - abbreviation
-# --
-{{< glossary key="${1:$$(yas-choose-value (jf/tor-glossary-key-list))}" abbr="t" ${2:${3: plural="t"}${4: noIcon="t"}${5: noTitle="t"}${6: dfn="t"}${7: itemprop="mentions"}} >}} $0

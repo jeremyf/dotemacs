@@ -1,6 +1,0 @@
-# -*- mode: snippet -*-
-# name: @param
-# group: Yard
-# key: @p
-# --
-# @param ${1:name} [${2:Types}] $0

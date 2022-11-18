@@ -1,6 +1,0 @@
-# -*- mode: snippet -*-
-# name: debugger
-# key: db
-# contributor: Jeremy Friesen
-# --
-require "debug"; binding.break

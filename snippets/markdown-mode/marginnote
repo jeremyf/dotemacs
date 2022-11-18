@@ -1,6 +1,0 @@
-# -*- mode: snippet -*-
-# contributor: Jeremy Friesen <jeremy.n.friesen@gmail.com>
-# key: mn
-# name: {{< marginnote >}}
-# --
-{{< marginnote${1: tag="aside"}>}}$0{{< /marginnote >}}

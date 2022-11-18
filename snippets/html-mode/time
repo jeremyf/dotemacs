@@ -1,6 +1,0 @@
-# -*- mode: snippet -*-
-# contributor: Jeremy Friesen <jeremy.n.friesen@gmail.com>
-# key: time
-# name: <time>
-# --
-<time datetime="${1:`(format-time-string "%Y-%m-%d")`}">$0</time>

@@ -1,6 +1,0 @@
-# -*- mode: snippet -*-
-# name: each { |...| ... }
-# group : collections
-# key: each
-# --
-each { |${e}| $0 }

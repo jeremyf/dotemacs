@@ -1,8 +1,0 @@
-# -*- mode: snippet -*-
-# contributor: Jeremy Friesen <jeremy.n.friesen@gmail.com>
-# key: mf
-# name: {{< marginfgure >}}
-# --
-{{% marginfigureWithCaption src="/images/${1:$$(yas-choose-value (jf/tor-asset-relative-pathname-list))}" alt="$2"${3:${4: title="${5:}"}${6: rotate="${7:270}"}${8: resize="${9:360x}"}} %}}
-$0
-{{% /marginfigureWithCaption %}}$0

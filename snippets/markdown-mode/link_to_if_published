@@ -1,6 +1,0 @@
-# -*- mode: snippet -*-
-# contributor : Jeremy Friesen <jeremy.n.friesen@gmail.com>
-# name: {{< link_to_if_published >}}
-# key: ltif
-# --
-{{< link_to_if_published ref="$1" text="$2" >}}$0

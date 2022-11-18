@@ -1,6 +1,0 @@
-# -*- mode: snippet -*-
-# contributor: Jeremy Friesen <jeremy.n.friesen@gmail.com>
-# key: nt
-# name: <span class=\"newthought\">
-# --
-<span class="newthought">$1</span>$0

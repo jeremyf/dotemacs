@@ -1,8 +1,0 @@
-# -*- mode: snippet -*-
-# contributor: Jeremy Friesen <jeremy.n.friesen@gmail.com>
-# name: changelog
-# key: ch
-# --
-- date: ${1:`(format-time-string "%Y-%m-%d")`}
-  entries:
-  - "$0"

@@ -1,6 +1,0 @@
-# -*- mode: snippet -*-
-# contributor: Jeremy Friesen <jeremy.n.friesen@gmail.com>
-# key: cite
-# name: <cite>
-# --
-<cite><a href="$1" class="u-url p-name" rel="cite">$0</a></cite>

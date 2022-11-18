@@ -1,6 +1,0 @@
-# -*- mode: snippet -*-
-# contributor : Jeremy Friesen <jeremy.n.friesen@gmail.com>
-# name: {{< linkToSeries >}}
-# key: lts
-# --
-{{< linkToSeries "${1:$$(yas-choose-value (jf/tor-series-list))}" >}}$0

@@ -1,5 +1,0 @@
-# -*- mode: snippet -*-
-# name: Include Summary
-# key: +is
-# --
-#+INCLUDE: "${1:$$(yas-choose-value (org-files-names-in-project-list))}::*Summary" :only-contents t
