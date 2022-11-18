@@ -40,5 +40,6 @@ Welcome to a stripped down configuration; I have been working with a literate co
   (require 'jf-quick-help)
   (require 'jf-gaming)
   (require 'jf-blogging)
+  (require 'jf-project)
   (require 'jf-menus)
 #+end_src

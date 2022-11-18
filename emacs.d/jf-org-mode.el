@@ -64,6 +64,7 @@
 	org-insert-heading-respect-content t
 	org-catch-invisible-edits 'show-and-error
 	org-use-fast-todo-selection 'expert
+	org-log-into-drawer t
 	org-imenu-depth 3
 	org-export-with-sub-superscripts nil
 	org-agenda-log-mode-items '(clock)
@@ -198,7 +199,7 @@
   (org-clock-clocktable-default-properties '(:maxlevel 5 :link t :tags t))
   :bind (:map org-mode-map
 	      ("C-c l i" . org-insert-link)
-	      ("s-2" . consult-org-heading))
+	      ("M-g o" . consult-org-heading))
   :bind (("C-c l s" . org-store-link)
 	 ("C-c a" . org-agenda)
 	 ("C-c c" . org-capture)
@@ -720,6 +721,21 @@ When given PREFIX_ARG, clear the org-roam database (via
 		(org-up-heading-safe)
 		(org-element-at-point))))
     (list :project project :task task :day day)))
+
+(defun jf/org-agenda-task-at-point ()
+  "Find the `org-mode' task at point."
+  (let ((element (org-element-at-point)))
+    (if (eq 'headline (org-element-type element))
+        (pcase (org-element-property :level element)
+          (1 (error "Selected element is a year"))
+          (2 (error "Selected element is a month"))
+          (3 (error "Selected element is a day"))
+          (4 (error "Selected element is a project"))
+          (5 (progn (message "Found %s" element) element))
+          (_ (progn (org-up-heading-safe) (jf/org-agenda-task-at-point))))
+      (progn
+        (org-back-to-heading)
+        (jf/org-agenda-task-at-point)))))
 
 (defun jf/org-agenda-task-at-point ()
   "Find the `org-mode' task at point."
