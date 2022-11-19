@@ -52,6 +52,10 @@
 		       #'cape-file))))
   :straight t)
 
+(use-package eglot-tempel
+  :after (eglot)
+  :straight (eglot-tempel :host github :repo "fejfighter/eglot-tempel"))
+
 (use-package eldoc :straight t)
 
 (use-package emacs-refactor
