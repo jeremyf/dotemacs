@@ -182,7 +182,7 @@ Noted projects would be found within the given DIRECTORY."
 
 (cl-defun jf/project/get-project-from-current-buffer-is-agenda (&key (buffer (current-buffer)))
   "Returns the current project's name or nil based on point in current buffer."
-  (when (f-file-p (buffer-file-name buffer))
+  (when (and (buffer-file-name buffer) (f-file-p (buffer-file-name buffer)))
     (when (string-equal
 	   (file-truename (buffer-file-name buffer))
 	   (file-truename jf/primary-agenda-filename-for-machine))
