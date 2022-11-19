@@ -34,66 +34,61 @@
 (require 'transient)
 
 ;;;; Interactive Commands
-
-(cl-defun jf/project/jump-to-agenda (&optional project
-				     &key
+(cl-defun jf/project/jump-to-agenda (&key
+				     (project (jf/project/find-dwim))
 				     (tag "project")
 				     (within_headline
 				      (format-time-string "%Y-%m-%d %A")))
   "Jump to the agenda for the given PROJECT."
   (interactive)
-  (let ((the-project (or project (jf/project/find-dwim))))
-    (with-current-buffer (find-file jf/primary-agenda-filename-for-machine)
-      (let ((start (org-element-map (org-element-parse-buffer)
-		       'headline
-		     ;; Finds the begin position of:
-		     ;; - a level 4 headline
-		     ;; - that is tagged as a :project:
-		     ;; - is titled as the given project
-		     ;; - and is within the given headline
-		     (lambda (hl)
-		       (and (=(org-element-property :level hl) 4)
-			    ;; I can't use the :title attribute as it
-			    ;; is a more complicated structure; this
-			    ;; gets me the raw string.
-			    (string= the-project
-				     (plist-get (cadr hl) :raw-value))
-			    (member tag
-				    (org-element-property :tags hl))
-			    ;; The element must have an ancestor with
-			    ;; a headline of today
-			    (string= within_headline
-				     (plist-get
-				      ;; I want the raw title, no
-				      ;; styling nor tags
-				      (cadr
-				       (car
-					(org-element-lineage hl)))
-				      :raw-value))
-			    (org-element-property :begin hl)))
-		     nil t)))
-	(goto-char start)
-	(pulsar-pulse-line)))))
+  (with-current-buffer (find-file jf/primary-agenda-filename-for-machine)
+    (let ((start (org-element-map (org-element-parse-buffer)
+		     'headline
+		   ;; Finds the begin position of:
+		   ;; - a level 4 headline
+		   ;; - that is tagged as a :project:
+		   ;; - is titled as the given project
+		   ;; - and is within the given headline
+		   (lambda (hl)
+		     (and (=(org-element-property :level hl) 4)
+			  ;; I can't use the :title attribute as it
+			  ;; is a more complicated structure; this
+			  ;; gets me the raw string.
+			  (string= project
+				   (plist-get (cadr hl) :raw-value))
+			  (member tag
+				  (org-element-property :tags hl))
+			  ;; The element must have an ancestor with
+			  ;; a headline of today
+			  (string= within_headline
+				   (plist-get
+				    ;; I want the raw title, no
+				    ;; styling nor tags
+				    (cadr
+				     (car
+				      (org-element-lineage hl)))
+				    :raw-value))
+			  (org-element-property :begin hl)))
+		   nil t)))
+      (goto-char start)
+      (pulsar-pulse-line))))
 
-(cl-defun jf/project/jump-to-board (&optional
-				    project
-				    &key (keyword "PROJECT_PATH_TO_BOARD"))
+(cl-defun jf/project/jump-to-board (&key
+				    (project (jf/project/find-dwim))
+				    (keyword "PROJECT_PATH_TO_BOARD"))
   "Jump to the given PROJECT's project board."
   (interactive)
-  (let* ((the-project (or project (jf/project/find-dwim)))
-	 (filename (cdar (jf/project/list-projects :project the-project))))
+  (let* ((filename (cdar (jf/project/list-projects :project project))))
     (with-current-buffer (find-file-noselect filename)
       (let ((url (cadar (org-collect-keywords (list keyword)))))
 	(eww-browse-with-external-browser url)))))
 
-(cl-defun jf/project/jump-to-code (&optional
-				   project
-				   &key
+(cl-defun jf/project/jump-to-code (&key
+				   (project (jf/project/find-dwim))
 				   (keyword "PROJECT_PATH_TO_CODE"))
   "Jump to the given PROJECT's source code."
   (interactive)
-  (let* ((the-project (or project (jf/project/find-dwim)))
-	 (filename (cdar (jf/project/list-projects :project the-project))))
+  (let* ((filename (cdar (jf/project/list-projects :project project))))
     (with-current-buffer (find-file-noselect filename)
       (let ((filename (file-truename (cadar
 				      (org-collect-keywords (list keyword))))))
@@ -101,23 +96,20 @@
 	    (dired filename)
 	  (find-file filename))))))
 
-(cl-defun jf/project/jump-to-notes (&optional project)
+(cl-defun jf/project/jump-to-notes (&key (project (jf/project/find-dwim)))
   "Jump to the given PROJECT's notes file.
 
 Determine the PROJECT by querying `jf/project/list-projects'."
   (interactive)
-  (let* ((the-project (or project (jf/project/find-dwim)))
-	 (filename (cdar (jf/project/list-projects :project the-project))))
+  (let* ((filename (cdar (jf/project/list-projects :project project))))
     (find-file filename)))
 
-(cl-defun jf/project/jump-to-remote (&optional
-				     project
-				     &key
+(cl-defun jf/project/jump-to-remote (&key
+				     (project (jf/project/find-dwim))
 				     (keyword "PROJECT_PATH_TO_REMOTE"))
   "Jump to the given PROJECT's remote."
   (interactive)
-  (let* ((the-project (or project (jf/project/find-dwim)))
-	 (filename (cdar (jf/project/list-projects :project the-project))))
+  (let* ((filename (cdar (jf/project/list-projects :project project))))
     (with-current-buffer (find-file-noselect filename)
       (let ((url (cadar (org-collect-keywords (list keyword)))))
 	(eww-browse-with-external-browser url)))))
@@ -186,15 +178,20 @@ The DIRECTORY defaults to `org-directory' but you can specify otherwise."
   ["Projects"
    ["Current project"
     ("a" "Agenda…" (lambda () (interactive)
-		     (jf/project/jump-to-agenda jf/project/current-project)))
+		     (jf/project/jump-to-agenda
+		      :project jf/project/current-project)))
     ("b" "Board…" (lambda () (interactive)
-		    (jf/project/jump-to-board jf/project/current-project)))
+		    (jf/project/jump-to-board
+		     :project jf/project/current-project)))
     ("c" "Code…" (lambda () (interactive)
-		   (jf/project/jump-to-code jf/project/current-project)))
+		   (jf/project/jump-to-code
+		    :project jf/project/current-project)))
     ("n" "Notes…" (lambda () (interactive)
-		    (jf/project/jump-to-notes jf/project/current-project)))
+		    (jf/project/jump-to-notes
+		     :project jf/project/current-project)))
     ("r" "Remote…" (lambda () (interactive)
-		     (jf/project/jump-to-remote jf/project/current-project)))
+		     (jf/project/jump-to-remote
+		      :project jf/project/current-project)))
     ("." jf/project/transient-current-project :transient t)]
    ["Other projects"
     ("A" "Agenda…" jf/project/jump-to-agenda)
