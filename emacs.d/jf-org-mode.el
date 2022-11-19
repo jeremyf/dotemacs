@@ -151,9 +151,9 @@
 					 (shell . t)
 					 (plantuml . t)
 					 (ruby . t))))
-  :init
   (add-to-list 'org-structure-template-alist '("M" . "marginnote"))
   (add-to-list 'org-structure-template-alist '("S" . "sidenote"))
+  :init
   (require 'ox)
   ;; I grabbed from the following LaTeX class from
   ;; https://www.reddit.com/r/emacs/comments/3zcr43/nooborgmode_custom_latexpdf_export_custom_style/.

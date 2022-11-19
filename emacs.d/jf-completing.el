@@ -13,6 +13,7 @@
 
 ;;;; Other packages and their configurations
 
+(require 'jf-org-mode)
 (use-package abbrev
   ;; The =abbrev= package is simple and powerful, providing an auto-correct
   ;; that I configure.  No more “teh” in my text.

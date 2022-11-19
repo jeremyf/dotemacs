@@ -1,5 +1,5 @@
 ;; -*- mode: lisp -*-
-;;; Commentary
+	;;; Commentary
 ;;
 ;; Organize this file by mode then by abbreviation.  Multi-modes have their own
 ;; section
@@ -36,7 +36,7 @@ emacs-lisp-mode
 (loop "(cl-loop for " p " in " p " do" n> r> ")")
 (command "(defun " p " (" p ")\n  \"" p "\"" n> "(interactive" p ")" n> r> ")")
 (advice "(defun " (p "adv" name) " (&rest app)" n> p n> "(apply app))" n>
-        "(advice-add #'" (p "fun") " " (p ":around") " #'" (s name) ")")
+	"(advice-add #'" (p "fun") " " (p ":around") " #'" (s name) ")")
 (package ";;; " (file-name-base (or (buffer-file-name) (buffer-name))) " --- " p " -*- lexical-binding: t -*-"
 	 n n
 	 ";; Copyright (C) " (format-time-string "%Y") " Jeremy Friesen" n
@@ -45,7 +45,7 @@ emacs-lisp-mode
 	 ";;; Commentary" n p n
 	 ";;; Code" n p n
 	 "(provide '" (file-name-base (or (buffer-file-name) (buffer-name))) ")" n
-         ";;; " (file-name-nondirectory (or (buffer-file-name) (buffer-name))) " ends here" n)
+	 ";;; " (file-name-nondirectory (or (buffer-file-name) (buffer-name))) " ends here" n)
 
 ;;;; fundamental-mode
 fundamental-mode
@@ -73,8 +73,8 @@ text-mode
 ;; This is an example of using the value of `(s str)' to populate the above and
 ;; below line!
 (asciibox "+-" (make-string (length str) ?-) "-+" n
-          "| " (s str)                       " |" n
-          "+-" (make-string (length str) ?-) "-+" n)
+	  "| " (s str)                       " |" n
+	  "+-" (make-string (length str) ?-) "-+" n)
 
 (banner comment-start (make-string (length title) ?=) n comment-start (p "Title: " title) n comment-start (make-string (length title) ?=))
 
@@ -96,11 +96,3 @@ enh-ruby-mode ruby-mode rspec-mode
 (shell "#!/usr/bin/env ruby -w")
 (dc "described_class")
 (desc (when (rspec-top-level-desc-p) "RSpec.") "describe " q " do" n> n "end")
-
-;; # -*- mode: snippet -*-
-;; # name: describe Class do ... end
-;; # expand-env: ((top-level (rspec-top-level-desc-p)) (global-dsl rspec-expose-dsl-globally) (maybe-quote (unless top-level "\"")))
-;; # --
-;; `(and top-level (not global-dsl) "RSpec.")`describe `maybe-quote`${1:`(and top-level (rspec-class-from-file-name))`}`maybe-quote` do
-;;   $0
-;; end
