@@ -83,31 +83,6 @@
       (goto-char start)
       (pulsar-pulse-line))))
 
-(cl-defun jf/project/jump-to-board (&key
-				    project
-				    (keyword "PROJECT_PATH_TO_BOARD"))
-  "Jump to the given PROJECT's project board."
-  (interactive)
-  (let* ((project (or (s-presence project) (jf/project/find-dwim)))
-	 (filename (cdar (jf/project/list-projects :project project))))
-    (with-current-buffer (find-file-noselect filename)
-      (let ((url (cadar (org-collect-keywords (list keyword)))))
-	(eww-browse-with-external-browser url)))))
-
-(cl-defun jf/project/jump-to-code (&key
-				   project
-				   (keyword "PROJECT_PATH_TO_CODE"))
-  "Jump to the given PROJECT's source code."
-  (interactive)
-  (let* ((project (or (s-presence project) (jf/project/find-dwim)))
-	 (filename (cdar (jf/project/list-projects :project project))))
-    (with-current-buffer (find-file-noselect filename)
-      (let ((filename (file-truename (cadar
-				      (org-collect-keywords (list keyword))))))
-	(if (f-dir-p filename)
-	    (dired filename)
-	  (find-file filename))))))
-
 (cl-defun jf/project/jump-to-notes (&key project)
   "Jump to the given PROJECT's notes file.
 
@@ -117,16 +92,37 @@ Determine the PROJECT by querying `jf/project/list-projects'."
 	 (filename (cdar (jf/project/list-projects :project project))))
     (find-file filename)))
 
-(cl-defun jf/project/jump-to-remote (&key
-				     project
-				     (keyword "PROJECT_PATH_TO_REMOTE"))
-  "Jump to the given PROJECT's remote."
-  (interactive)
-  (let* ((project (or (s-presence project) (jf/project/find-dwim)))
-	 (filename (cdar (jf/project/list-projects :project project))))
-    (with-current-buffer (find-file-noselect filename)
-      (let ((url (cadar (org-collect-keywords (list keyword)))))
-	(eww-browse-with-external-browser url)))))
+(defmacro jf/project/create-jump-to-fn (key)
+  (let* ((default_keyword (concat "PROJECT_PATH_TO_" (upcase key)))
+	 (key (downcase key))
+	 (fn (intern (concat "jf/project/jump-to-" key)))
+	 (docstring (concat "Jump to the given PROJECT's " key ".\n\n
+Check URL, directory, and filename.")))
+    `(cl-defun ,fn (&key project (keyword ,default_keyword))
+       ,docstring
+       (interactive)
+       (let* ((project (or (s-presence project) (jf/project/find-dwim)))
+	      (filename (cdar (jf/project/list-projects :project project))))
+	 (with-current-buffer (find-file-noselect filename)
+	   (if-let ((path (cadar (org-collect-keywords (list keyword)))))
+	       (cond
+		((s-starts-with? "http" path)
+		 (eww-browse-with-external-browser path))
+		((f-dir-p path)
+		 (dired path))
+		((f-file-p path)
+		 (find-file path))
+		(t (progn
+		     (message "WARNING: Project %s missing %s \"%s\""
+			      project ,key path)
+		     (jf/project/jump-to-notes :project project))))
+	     (progn
+	       (message "WARNING: Project %s has no %s" project ,key)
+	       (jf/project/jump-to-notes :project project))))))))
+
+(jf/project/create-jump-to-fn "board")
+(jf/project/create-jump-to-fn "code")
+(jf/project/create-jump-to-fn "remote")
 
 ;;;; Support Functions
 (cl-defun jf/project/list-projects (&key (project ".+")
@@ -195,6 +191,9 @@ Noted projects would be found within the given DIRECTORY."
       (if (member "project" (org-element-property :tag element))
 	  (org-element-property :title element)
 	(if (eq 'headline (org-element-type element))
+	    ;; TODO: I'd prefer something a little more elegant and not
+	    ;; presumptive about the structure of the agenda file.  But this
+	    ;; works for now.
 	    (pcase (org-element-property :level element)
 	      (1 nil)
 	      (2 nil)
