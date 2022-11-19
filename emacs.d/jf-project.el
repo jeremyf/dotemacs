@@ -38,7 +38,8 @@
 (cl-defun jf/project/jump-to-agenda (&optional project
 				     &key
 				     (tag "project")
-				     (within_headline (format-time-string "%Y-%m-%d %A")))
+				     (within_headline
+				      (format-time-string "%Y-%m-%d %A")))
   "Jump to the agenda for the given PROJECT."
   (interactive)
   (let ((the-project (or project (jf/project/find-dwim))))
@@ -74,7 +75,9 @@
 	(goto-char start)
 	(pulsar-pulse-line)))))
 
-(cl-defun jf/project/jump-to-board (&optional project &key (keyword "PROJECT_PATH_TO_BOARD"))
+(cl-defun jf/project/jump-to-board (&optional
+				    project
+				    &key (keyword "PROJECT_PATH_TO_BOARD"))
   "Jump to the given PROJECT's project board."
   (interactive)
   (let* ((the-project (or project (jf/project/find-dwim)))
@@ -83,13 +86,17 @@
       (let ((url (cadar (org-collect-keywords (list keyword)))))
 	(eww-browse-with-external-browser url)))))
 
-(cl-defun jf/project/jump-to-code (&optional project &key (keyword "PROJECT_PATH_TO_CODE"))
+(cl-defun jf/project/jump-to-code (&optional
+				   project
+				   &key
+				   (keyword "PROJECT_PATH_TO_CODE"))
   "Jump to the given PROJECT's source code."
   (interactive)
   (let* ((the-project (or project (jf/project/find-dwim)))
 	 (filename (cdar (jf/project/list-projects :project the-project))))
     (with-current-buffer (find-file-noselect filename)
-      (let ((filename (file-truename (cadar (org-collect-keywords (list keyword))))))
+      (let ((filename (file-truename (cadar
+				      (org-collect-keywords (list keyword))))))
 	(if (f-dir-p filename)
 	    (dired filename)
 	  (find-file filename))))))
@@ -103,7 +110,10 @@ Determine the PROJECT by querying `jf/project/list-projects'."
 	 (filename (cdar (jf/project/list-projects :project the-project))))
     (find-file filename)))
 
-(cl-defun jf/project/jump-to-remote (&optional project &key (keyword "PROJECT_PATH_TO_REMOTE"))
+(cl-defun jf/project/jump-to-remote (&optional
+				     project
+				     &key
+				     (keyword "PROJECT_PATH_TO_REMOTE"))
   "Jump to the given PROJECT's remote."
   (interactive)
   (let* ((the-project (or project (jf/project/find-dwim)))
@@ -113,8 +123,12 @@ Determine the PROJECT by querying `jf/project/list-projects'."
 	(eww-browse-with-external-browser url)))))
 
 ;;;; Support Functions
-(cl-defun jf/project/list-projects (&key (project ".+") (directory org-directory))
-  "Return a list of `cons' of '(project . filename)' that match the given PROJECT.
+(cl-defun jf/project/list-projects (&key (project ".+")
+					 (directory org-directory))
+"Return a list of `cons' that match the given PROJECT.
+
+The `car' of the `cons' is the project (e.g. \"Take on Rules\").
+The `cdr' is the fully qualified path to that projects notes file.
 
 The DIRECTORY defaults to `org-directory' but you can specify otherwise."
   (mapcar (lambda (line)
@@ -171,11 +185,16 @@ The DIRECTORY defaults to `org-directory' but you can specify otherwise."
   "My Project menu."
   ["Projects"
    ["Current project"
-    ("a" "Agenda…" (lambda () (interactive) (jf/project/jump-to-agenda jf/project/current-project)))
-    ("b" "Board…" (lambda () (interactive) (jf/project/jump-to-board jf/project/current-project)))
-    ("c" "Code…" (lambda () (interactive) (jf/project/jump-to-code jf/project/current-project)))
-    ("n" "Notes…" (lambda () (interactive) (jf/project/jump-to-notes jf/project/current-project)))
-    ("r" "Remote…" (lambda () (interactive) (jf/project/jump-to-remote jf/project/current-project)))
+    ("a" "Agenda…" (lambda () (interactive)
+		     (jf/project/jump-to-agenda jf/project/current-project)))
+    ("b" "Board…" (lambda () (interactive)
+		    (jf/project/jump-to-board jf/project/current-project)))
+    ("c" "Code…" (lambda () (interactive)
+		   (jf/project/jump-to-code jf/project/current-project)))
+    ("n" "Notes…" (lambda () (interactive)
+		    (jf/project/jump-to-notes jf/project/current-project)))
+    ("r" "Remote…" (lambda () (interactive)
+		     (jf/project/jump-to-remote jf/project/current-project)))
     ("." jf/project/transient-current-project :transient t)]
    ["Other projects"
     ("A" "Agenda…" jf/project/jump-to-agenda)
