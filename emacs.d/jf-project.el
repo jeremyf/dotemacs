@@ -6,12 +6,13 @@
 ;; This file is NOT part of GNU Emacs.
 ;;; Commentary
 
-;; I have four primary places where I work on a project:
+;; I have five primary places where I work on a project:
 ;;
 ;; - Agenda
 ;; - Code
 ;; - Notes
 ;; - Project board
+;; - Remote
 ;;
 ;; These are the standard elements.
 ;;
@@ -33,34 +34,6 @@
 (require 'transient)
 
 ;;;; Interactive Commands
-(cl-defun jf/project/jump-to-notes (&optional project)
-  "Jump to the given PROJECT's notes file.
-
-Determine the PROJECT by querying `jf/project/list-projects'."
-  (interactive)
-  (let* ((the-project (or project (jf/project/find-dwim)))
-	 (filename (cdar (jf/project/list-projects :project the-project))))
-    (find-file filename)))
-
-(cl-defun jf/project/jump-to-source-code (&optional project &key (keyword "PROJECT_PATH_TO_CODE"))
-  "Jump to the given PROJECT's source code."
-  (interactive)
-  (let* ((the-project (or project (jf/project/find-dwim)))
-	 (filename (cdar (jf/project/list-projects :project the-project))))
-    (with-current-buffer (find-file-noselect filename)
-      (let ((filename (file-truename (cadar (org-collect-keywords (list keyword))))))
-	(if (f-dir-p filename)
-	    (dired filename)
-	  (find-file filename))))))
-
-(cl-defun jf/project/jump-to-project-board (&optional project &key (keyword "PROJECT_PATH_TO_BOARD"))
-  "Jump to the given PROJECT's project board."
-  (interactive)
-  (let* ((the-project (or project (jf/project/find-dwim)))
-	 (filename (cdar (jf/project/list-projects :project the-project))))
-    (with-current-buffer (find-file-noselect filename)
-      (let ((url (cadar (org-collect-keywords (list keyword)))))
-	(eww-browse-with-external-browser url)))))
 
 (cl-defun jf/project/jump-to-agenda (&optional project
 				     &key
@@ -100,6 +73,44 @@ Determine the PROJECT by querying `jf/project/list-projects'."
 		     nil t)))
 	(goto-char start)
 	(pulsar-pulse-line)))))
+
+(cl-defun jf/project/jump-to-board (&optional project &key (keyword "PROJECT_PATH_TO_BOARD"))
+  "Jump to the given PROJECT's project board."
+  (interactive)
+  (let* ((the-project (or project (jf/project/find-dwim)))
+	 (filename (cdar (jf/project/list-projects :project the-project))))
+    (with-current-buffer (find-file-noselect filename)
+      (let ((url (cadar (org-collect-keywords (list keyword)))))
+	(eww-browse-with-external-browser url)))))
+
+(cl-defun jf/project/jump-to-code (&optional project &key (keyword "PROJECT_PATH_TO_CODE"))
+  "Jump to the given PROJECT's source code."
+  (interactive)
+  (let* ((the-project (or project (jf/project/find-dwim)))
+	 (filename (cdar (jf/project/list-projects :project the-project))))
+    (with-current-buffer (find-file-noselect filename)
+      (let ((filename (file-truename (cadar (org-collect-keywords (list keyword))))))
+	(if (f-dir-p filename)
+	    (dired filename)
+	  (find-file filename))))))
+
+(cl-defun jf/project/jump-to-notes (&optional project)
+  "Jump to the given PROJECT's notes file.
+
+Determine the PROJECT by querying `jf/project/list-projects'."
+  (interactive)
+  (let* ((the-project (or project (jf/project/find-dwim)))
+	 (filename (cdar (jf/project/list-projects :project the-project))))
+    (find-file filename)))
+
+(cl-defun jf/project/jump-to-remote (&optional project &key (keyword "PROJECT_PATH_TO_REMOTE"))
+  "Jump to the given PROJECT's remote."
+  (interactive)
+  (let* ((the-project (or project (jf/project/find-dwim)))
+	 (filename (cdar (jf/project/list-projects :project the-project))))
+    (with-current-buffer (find-file-noselect filename)
+      (let ((url (cadar (org-collect-keywords (list keyword)))))
+	(eww-browse-with-external-browser url)))))
 
 ;;;; Support Functions
 (cl-defun jf/project/list-projects (&key (project ".+") (directory org-directory))
@@ -161,15 +172,17 @@ The DIRECTORY defaults to `org-directory' but you can specify otherwise."
   ["Projects"
    ["Current project"
     ("a" "Agenda…" (lambda () (interactive) (jf/project/jump-to-agenda jf/project/current-project)))
-    ("b" "Project board…" (lambda () (interactive) (jf/project/jump-to-project-board jf/project/current-project)))
-    ("c" "Code…" (lambda () (interactive) (jf/project/jump-to-source-code jf/project/current-project)))
+    ("b" "Board…" (lambda () (interactive) (jf/project/jump-to-board jf/project/current-project)))
+    ("c" "Code…" (lambda () (interactive) (jf/project/jump-to-code jf/project/current-project)))
     ("n" "Notes…" (lambda () (interactive) (jf/project/jump-to-notes jf/project/current-project)))
+    ("r" "Remote…" (lambda () (interactive) (jf/project/jump-to-remote jf/project/current-project)))
     ("." jf/project/transient-current-project :transient t)]
    ["Other projects"
     ("A" "Agenda…" jf/project/jump-to-agenda)
-    ("B" "Project board…" jf/project/jump-to-project-board)
-    ("C" "Code…" jf/project/jump-to-source-code)
-    ("N" "Notes…" jf/project/jump-to-notes)]
+    ("B" "Board…" jf/project/jump-to-board)
+    ("C" "Code…" jf/project/jump-to-code)
+    ("N" "Notes…" jf/project/jump-to-notes)
+    ("R" "Notes…" jf/project/jump-to-remote)]
    ])
 
 (transient-define-suffix jf/project/transient-current-project (project)
