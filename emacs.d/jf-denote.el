@@ -538,7 +538,6 @@ This function is intended for a global find of all notes."
 (cl-defun jf/denote-link-ol-epigraph-link (link
 					   description format protocol
 					   &key
-					   property-name
 					   additional-hugo-parameters
 					   (use_hugo_shortcode
 					    jf/exporting-org-to-tor))
@@ -546,19 +545,14 @@ This function is intended for a global find of all notes."
 
   NOTE: This only works for blog export.
   TODO: Consider how to expand beyond blog support."
-  (let* ((prop-list (jf/denote-org-properties-from-id
-                     :identifier link
-                     :properties (list "TITLE"
-				       property-name
-				       "GLOSSARY_KEY"))))
-    (cond
-     ((and use_hugo_shortcode (or (eq format 'html) (eq format 'md)))
-      (format "{{< epigraph key=\"%s\" >}}" link))
-     ((or (eq format 'html) (eq format 'md))
-      (concat "<blockquote>\n"
-	      (jf/epigraph-text-for :identifier link)
-	      "\n</blockquote>"))
-     (t nil))))
+  (cond
+   ((and use_hugo_shortcode (or (eq format 'html) (eq format 'md)))
+    (format "{{< epigraph key=\"%s\" >}}" link))
+   ((or (eq format 'html) (eq format 'md))
+    (concat "<blockquote>\n"
+	    (jf/epigraph-text-for :identifier link)
+	    "\n</blockquote>"))
+   (t nil)))
 
 (cl-defun jf/epigraph-text-for (&key identifier)
   "Return the epigraph text for `denote' IDENTIFIER."
@@ -581,9 +575,7 @@ This function is intended for a global find of all notes."
                                       :subdirectory "epigraphs"))
                          :export (lambda (link description format protocol)
                                    (jf/denote-link-ol-epigraph-link
-				    link description format protocol
-                                    :property-name "ABBR"
-                                    :additional-hugo-parameters "abbr=\"t\""))
+				    link description format protocol))
                          :face #'jf/org-faces-epigraph
                          :follow #'denote-link-ol-follow)
 
