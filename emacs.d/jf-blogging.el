@@ -293,7 +293,7 @@
 	   do (goto-char pos)))
 ;;******************************************************************************
 ;;
-  ;;; BEGIN Non-Interactive Utility Functions
+;;; BEGIN Non-Interactive Utility Functions
 ;;
 ;;******************************************************************************
 (cl-defun jf/convert-text-to-key (text &key (length 5))
