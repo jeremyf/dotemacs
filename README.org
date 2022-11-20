@@ -8,6 +8,10 @@ This is my Emacs configuration repository.  It pairs with my [[https://github.co
 
 For those curious, I wrote [[https://takeonrules.com/2020/10/18/why-i-chose-emacs-as-my-new-text-editor/][Why I Chose Emacs as My New Text Editor // Take on Rules]].
 
+!!hello!!
+
+%%hello%%
+
 * The Structure
 
 Below is the top-level directory:

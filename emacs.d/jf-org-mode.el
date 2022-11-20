@@ -142,7 +142,6 @@
 	   :immediate-finish t
 	   :clock-in t)))
 
-
   (setq org-latex-default-class "jf/article")
 
   (org-babel-do-load-languages 'org-babel-load-languages
@@ -821,6 +820,19 @@ When given the PREFIX arg, paste the content into TextEdit (for future copy)."
 	 (choice (completing-read "Headings: " headlines nil t))
 	 (desc (read-string "Description: " choice)))
     (org-insert-link buffer-file-name (concat "*" choice) desc)))
+
+(use-package ox-odt
+  :straight (ox-odt
+	     :host github
+	     :repo "kjambunathan/org-mode-ox-odt"
+	     :files ("lisp/ox-odt.el"
+		     "etc"
+		     "docs"
+		     "contrib/odt/LibreOffice")))
+;; (require 'ox-odt)
+
+(use-package org-extra-emphasis
+  :straight (org-extra-emphasis :host github :repo "QiangF/org-extra-emphasis"))
 
 (provide 'jf-org-mode)
 ;;; jf-org-mode.el ends here
