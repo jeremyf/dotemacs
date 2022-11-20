@@ -298,6 +298,7 @@ This function is intended for a global find of all notes."
                                 (subseq body-as-list 0 nth-words)
 			      body-as-list)))
          (template (concat
+		    ":METADATA:"
                     ;; The name of the author
                     "#+AUTHOR_NAME: " author_name "\n"
                     ;; Where can you “find” this author?
@@ -316,7 +317,8 @@ This function is intended for a global find of all notes."
                     ;; work.
                     "#+PAGE:\n"
                     ;; The name of the translator
-                    "#+TRANSLATOR_NAME:\n")))
+                    "#+TRANSLATOR_NAME:\n"
+		    ":END:")))
     (denote title
             nil
             'org
@@ -341,7 +343,8 @@ This function is intended for a global find of all notes."
     NOTE: At present there is no consideration for uniqueness."
   (interactive)
   (let* ((key (downcase (denote-sluggify (if (s-present? abbr) abbr title))))
-         (template (concat "#+GLOSSARY_KEY: " key "\n"
+         (template (concat ":METADATA:"
+			   "#+GLOSSARY_KEY: " key "\n"
                            "#+ABBR:" (when (s-present? abbr)
 				       (concat " " abbr))
 			   "\n"
@@ -357,7 +360,8 @@ This function is intended for a global find of all notes."
                            "#+PLURAL_TITLE:\n"
                            "#+SAME_AS:\n"
                            "#+TAG:\n" ;; TODO: Assert uniqueness
-                           "#+VERBOSE_TITLE:\n"))
+                           "#+VERBOSE_TITLE:\n"
+			   ":END:"))
          (keywords (list)))
     ;; Add both "abbr" and the abbr to the keywords; both help in searching
     ;; results
@@ -467,46 +471,44 @@ This function is intended for a global find of all notes."
                 title
                 property)))))
 
-(org-link-set-parameters
- "abbr"
- :complete (lambda (&optional parg)
-	     (jf/org-link-complete-link-for
-              parg
-              :scheme "abbr"
-              :filter " _abbr*"
-              :subdirectory "glossary"))
- :export (lambda (link description format protocol)
-           (jf/denote-link-ol-link-with-property
-	    link description format protocol
-            :property-name "ABBR"
-            :additional-hugo-parameters "abbr=\"t\""))
- :face #'denote-faces-link
- :follow #'denote-link-ol-follow
- )
+(org-link-set-parameters "abbr"
+			 :complete (lambda (&optional parg)
+				     (jf/org-link-complete-link-for
+				      parg
+				      :scheme "abbr"
+				      :filter " _abbr*"
+				      :subdirectory "glossary"))
+			 :export (lambda (link description format protocol)
+				   (jf/denote-link-ol-link-with-property
+				    link description format protocol
+				    :property-name "ABBR"
+				    :additional-hugo-parameters "abbr=\"t\""))
+			 :face #'jf/org-faces-abbr
+			 :follow #'denote-link-ol-follow
+			 )
 
-(org-link-set-parameters
- "abbr-plural"
- :complete (lambda (&optional parg)
-	     (jf/org-link-complete-link-for
-              parg
-              :scheme "abbr-plural"
-              :filter " _plural_abbr*"
-              :subdirectory "glossary"))
- :export (lambda (link description format protocol)
-           (jf/denote-link-ol-link-with-property
-	    link description format protocol
-            :property-name "PLURAL_ABBR"
-            :additional-hugo-parameters "abbr=\"t\" plural=\"t\""))
- :face #'denote-faces-link
- :follow #'denote-link-ol-follow
+(org-link-set-parameters "abbr-plural"
+			 :complete (lambda (&optional parg)
+				     (jf/org-link-complete-link-for
+				      parg
+				      :scheme "abbr-plural"
+				      :filter " _plural_abbr*"
+				      :subdirectory "glossary"))
+			 :export (lambda (link description format protocol)
+				   (jf/denote-link-ol-link-with-property
+				    link description format protocol
+				    :property-name "PLURAL_ABBR"
+				    :additional-hugo-parameters "abbr=\"t\" plural=\"t\""))
+			 :face #'jf/org-faces-abbr
+			 :follow #'denote-link-ol-follow
     ;;;; I'm unclear if/how I want to proceed with this
- ;; :store (lambda (jf/org-link-store-link-for :scheme "abbr-plural"))
- )
+			 ;; :store (lambda (jf/org-link-store-link-for :scheme "abbr-plural"))
+			 )
 
 (org-link-set-parameters "date"
                          :complete #'jf/denote-link-complete-date
                          :export #'jf/denote-link-export-date
-                         :face #'denote-faces-link
+                         :face #'jf/org-faces-date
                          :follow #'jf/denote-link-follow-date
                          )
 
@@ -552,7 +554,23 @@ This function is intended for a global find of all notes."
     (cond
      ((and use_hugo_shortcode (or (eq format 'html) (eq format 'md)))
       (format "{{< epigraph key=\"%s\" >}}" link))
+     ((or (eq format 'html) (eq format 'md))
+      (concat "<blockquote>\n"
+	      (jf/epigraph-text-for :identifier link)
+	      "\n</blockquote>"))
      (t nil))))
+
+(cl-defun jf/epigraph-text-for (&key identifier)
+  "Return the epigraph text for `denote' IDENTIFIER."
+  (let ((filename (denote-get-path-by-id identifier)))
+    (with-current-buffer (find-file-noselect filename)
+      (let ((text (s-join "\n\n" (org-element-map
+				   (org-element-parse-buffer)
+				   'paragraph
+				 (lambda (p) (caddr p))))))
+	(if (cadar (org-collect-keywords '("POEM")))
+	    (format "<pre class=\"poem\">\n%s\n</pre>" text)
+	  (format "%s" text))))))
 
 (org-link-set-parameters "epigraph"
                          :complete (lambda (&optional parg)
@@ -566,9 +584,41 @@ This function is intended for a global find of all notes."
 				    link description format protocol
                                     :property-name "ABBR"
                                     :additional-hugo-parameters "abbr=\"t\""))
-                         :face #'denote-faces-link
-                         :follow #'denote-link-ol-follow
-                         )
+                         :face #'jf/org-faces-epigraph
+                         :follow #'denote-link-ol-follow)
+
+(defface jf/org-faces-date '((default :inherit link
+			       :underline nil)
+			     (((class color) (min-colors 88) (background light))
+			      :foreground "#125458")
+			     (((class color) (min-colors 88) (background dark))
+			      :foreground "#a4d0bb"))
+  "Face used to style `org-mode' date links in the buffer."
+  :group 'denote-faces
+  :package-version '(denote . "0.5.0"))
+
+(defface jf/org-faces-epigraph '((default :inherit link
+					    :underline nil
+					    :slant oblique)
+					 (((class color) (min-colors 88) (background light))
+					  :foreground "#2a486a")
+					 (((class color) (min-colors 88) (background dark))
+					 :foreground "#b0d6f5"))
+  "Face used to style `org-mode' epigraph links in the buffer."
+  :group 'denote-faces
+  :package-version '(denote . "0.5.0"))
+
+(defface jf/org-faces-abbr '((default :inherit link
+			       :underline t
+			       :slant oblique)
+			     (((class color) (min-colors 88) (background light))
+			      :foreground "#505050")
+			     (((class color) (min-colors 88) (background dark))
+			      :foreground "#a8a8a8"))
+  "Face used to style `org-mode' abbr links in the buffer."
+  :group 'denote-faces
+  :package-version '(denote . "0.5.0"))
+
 (cl-defun jf/denote-link-ol-export (link
 				    description
 				    format

@@ -66,6 +66,7 @@ org-mode
 (today "[[date:" (format-time-string "%Y-%m-%d") "][today]]")
 (tor "[[https://takeonrules.com][Take on Rules]]")
 (uml "#+begin_src plantuml" n> "@startuml" n> "!theme amiga" n> q n> "@enduml" n> "#+end_src" n>)
+(project ":PROJECT:" n "#+PROJECT_NAME: " p n "#+PROJECT_PATH_TO_CODE: " p n "#+PROJECT_PATH_TO_REMOTE: " p n "#+PROJECT_PATH_TO_BOARD: " p n ":END:")
 
 ;;;; text-mode
 text-mode

@@ -171,7 +171,12 @@ Noted projects would be found within the given DIRECTORY."
   "Return the current clocked project's name or nil."
   ;; This is a naive implementation that assumes a :task: has the clock.  A
   ;; :task:'s immediate ancestor is a :project:.
-  (when-let ((m (and (org-clocking-p) org-clock-marker)))
+
+  (when-let ((m (and
+		 (fboundp 'org-clocking-p) ;; If this isn't set, we ain't
+					   ;; clocking.
+		 (org-clocking-p)
+		 org-clock-marker)))
     (with-current-buffer (marker-buffer m)
       (goto-char m)
       (jf/project/get-project-from-current-agenda-buffer))))
