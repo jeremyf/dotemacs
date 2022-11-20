@@ -16,48 +16,64 @@ Below is the top-level directory:
   > tree -L 1
   .
   ├── README.org
-  ├── deprecated-packages
   ├── emacs.d
   ├── lib
-  └── snippets
+  ├── random-tables
+  └── templates
 
-  4 directories, 1 file
+  3 directories, 2 files
 #+END_EXAMPLE
 
 The files and directories:
 
 - README.org :: This file.
-- emacs.d :: A directory that contains files symlinked into =$HOME/.emacs.d=
-  directory.
-- deprecated-packages :: A directory of elisp-files.  I have since moved
-  towards a literate configuration style.
-- snippets :: A directory of [[https://joaotavora.github.io/yasnippet/][yasnippets]] I’ve created.
+- emacs.d :: A directory that contains files symlinked into =$HOME/.emacs.d= directory.
+- lib :: Some scripts I’ve written to help with my Emacs configuration.
+- random-tables :: Fodder for gaming, really not very well developed.
+- templates :: Templates for the [[https://github.com/minad/tempel][Emacs tempel package]].
+*
+The emacs.d Directory
 
-* The emacs.d Directory
+There are two “primary” files to consider in ~./emacs.d~:
 
-There are three “primary” files to consider in ~./emacs.d~:
-
-- [[file:emacs.d/configuration.org][configuration.org]] :: This file is where I write my Emacs configuration with a [[https://en.wikipedia.org/wiki/Literate_programming][Literate programming]] mindset. (/Note:/ This is a conversion from my past structure, but as I make new functions, I try to approach solutions with a Literate Programming mindset.)
-- [[file:emacs.d/init.el][init.el]] :: The file evaluated when Emacs launches.  Using [[https://orgmode.org/worg/org-contrib/babel/intro.html][Org Babel]], it evaluates the configuration.org file.
+- [[file:emacs.d/init.el][init.el]] :: The file evaluated when Emacs launches.
 - early-init.el :: The file evaluated early on when Emacs launches.
-
-/At some point, I move the configuration file up to the repository README level; that would mean treating the configuration as my almost entire discourse on how I Emacs./
 
 * Digging Further into emacs.d
 
-I’m starting to disassemble the large singular configuration file.  As of <2022-10-16 Sun> the org files I have are as follows:
+The init.el file requires the various files in my =emacs.d= directory.  As of <2022-11-19 Sat> I shifted from Literate configuration to a Emacs Lisp configuration.  I appreciate being able to jump to the definition and edit directly; something that wasn’t immediately obvious with Literate configuration.
 
-- [[file:emacs.d/burning-wheel-emacs-config.org][burning-wheel-emacs-config.org]] :: This contains specific utilities that I use when playing Burning Wheel.  It’s a prototype for how I might think about other games; looking at you “Stars without Number” and “Worlds without Number.”
-- [[file:emacs.d/configuration.org][configuration.org]] :: I wrote about that above; it is responsible for loading all of the other =org= files in emacs.d
-- [[file:emacs.d/core-rpg-config.org][core-rpg-config.org]] :: Similar in concept to burning-wheel-emacs-config.org.
-- [[file:emacs.d/denote-emacs-configuration.org][denote-emacs-configuration.org]] :: This contains my [[https://protesilaos.com/emacs/denote][Denote]] configuration tuned to Org-Mode.  This should be moved into my knowledge-management-config.
-- [[file:emacs.d/eberron.org][eberron.org]] ::  Similar in concept to burning-wheel-emacs-config.org.
-- [[file:emacs.d/emacs-tabs.org][emacs-tabs.org]] :: Because of a long-standing now resolved bug in Centaur Tabs related to Modus-Themes, I sequestered the tabs into their own file.
-- [[file:emacs.d/experiments.org][experiments.org]] :: A scratch place that I don’t load but where I can write and consider new functionality.
-- [[file:emacs.d/forem-config.org][forem-config.org]] :: The functions I wrote for my work at a previous job.
-- [[file:emacs.d/indesk.org][indesk.org]] :: A thought experiment regarding Org Mode and PDFs
-- [[file:emacs.d/keyboard-macros-config.org][keyboard-macros-config.org]] :: I place where I write and store keyboard macros; I don’t often use this.
-- [[file:emacs.d/knowledge-management-config.org][knowledge-management-config.org]] :: My Org-Mode configuration; with extensive yet now previous Org-Roam functions.
-- [[file:emacs.d/random-tables.org][random-tables.org]] :: I play TTRPGs (when I’m not fiddling with Emacs).  This is a place I’m considering developing random tables.
-- [[file:emacs.d/takeonrules.org][takeonrules.org]] :: Some of the functions for my export to TakeOnRules.com
-- [[file:emacs.d/utility-functions.org][utility-functions.org]] :: Some odd utility functions that didn’t quite belong anywhere.
+Organizing concepts is an interesting challenge, as packages interact in a multi-dimensional manner.  Each of my =jf-<concept>.el= has a rudimentary commentary.
+
+#+begin_example shell
+> tree emacs.d
+├── abbrev_defs
+├── custom.el
+├── early-init.el
+├── emacs.d
+├── hide-comnt.el
+├── init.el
+├── jf-blogging.el
+├── jf-coding.el
+├── jf-communicating.el
+├── jf-completing.el
+├── jf-denote.el
+├── jf-fonts-and-iconography.el
+├── jf-formatting.el
+├── jf-framing.el
+├── jf-gaming.el
+├── jf-illuminating.el
+├── jf-launching.el
+├── jf-menus.el
+├── jf-minor-mode-maker.el
+├── jf-navigating.el
+├── jf-org-mode.el
+├── jf-organizing.el
+├── jf-project.el
+├── jf-quick-help.el
+├── jf-reading.el
+├── jf-utility.el
+├── jf-versioning.el
+├── jf-windows.el
+└── jf-writing.el
+#+end_example
