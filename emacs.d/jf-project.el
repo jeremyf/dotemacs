@@ -7,7 +7,7 @@
 
 ;;; Commentary
 
-;; I have five primary spaces where I work on a project:
+;; I have primary spaces where I work on a project:
 ;;
 ;; - Agenda :: Where I track time.
 ;; - Code :: Where I write code.
@@ -43,7 +43,7 @@
 (require 'transient)
 
 ;;;; Interactive Commands
-(cl-defun jf/project/jump-to-agenda (&key
+(cl-defun jf/project/jump-to-timesheet (&key
 				     project
 				     (tag "project")
 				     (within_headline
@@ -241,9 +241,6 @@ When the `current-prefix-arg' is set always prompt for the project."
   ["Projects"
    ["Current project"
     ("." jf/project/current-project-set :transient t)
-    ("a" "Agenda…" (lambda () (interactive)
-		     (jf/project/jump-to-agenda
-		      :project jf/project/current-project)))
     ("b" "Board…" (lambda () (interactive)
 		    (jf/project/jump-to-board
 		     :project jf/project/current-project)))
@@ -255,14 +252,17 @@ When the `current-prefix-arg' is set always prompt for the project."
 		     :project jf/project/current-project)))
     ("r" "Remote…" (lambda () (interactive)
 		     (jf/project/jump-to-remote
+		      :project jf/project/current-project)))
+    ("t" "Timesheet…" (lambda () (interactive)
+		     (jf/project/jump-to-timesheet
 		      :project jf/project/current-project)))]
    ["Other projects"
     ""
-    ("A" "Agenda…" jf/project/jump-to-agenda)
     ("B" "Board…" jf/project/jump-to-board)
     ("C" "Code…" jf/project/jump-to-code)
     ("N" "Notes…" jf/project/jump-to-notes)
-    ("R" "Remote…" jf/project/jump-to-remote)]
+    ("R" "Remote…" jf/project/jump-to-remote)
+    ("T" "Timesheet…" jf/project/jump-to-timesheet)]
    ])
 
 (transient-define-suffix jf/project/current-project-set (project)
