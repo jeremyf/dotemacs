@@ -39,8 +39,10 @@
 
 ;;;; Dependencies
 (require 's)
-(require 'jf-org-mode)
+(require 'f)
 (require 'transient)
+(require 'pulsar)
+(require 'jf-org-mode)
 
 ;;;; Interactive Commands
 (cl-defun jf/project/jump-to-timesheet (&key
@@ -80,8 +82,13 @@
 				     :raw-value))
 			   (org-element-property :begin hl)))
 		    nil t)))
-      (goto-char start)
-      (pulsar-pulse-line))))
+      (if start
+	  (progn
+	    (goto-char start)
+	    (pulsar-pulse-line))
+	(progn
+	  (end-of-buffer)
+	  (error "No \"%s\" timesheet entry for today" project))))))
 
 (cl-defun jf/project/jump-to-notes (&key project)
   "Jump to the given PROJECT's notes file.
