@@ -298,7 +298,7 @@ This function is intended for a global find of all notes."
                                 (subseq body-as-list 0 nth-words)
 			      body-as-list)))
          (template (concat
-		    ":METADATA:"
+		    ":METADATA:\n"
                     ;; The name of the author
                     "#+AUTHOR_NAME: " author_name "\n"
                     ;; Where can you “find” this author?
@@ -343,7 +343,7 @@ This function is intended for a global find of all notes."
     NOTE: At present there is no consideration for uniqueness."
   (interactive)
   (let* ((key (downcase (denote-sluggify (if (s-present? abbr) abbr title))))
-         (template (concat ":METADATA:"
+         (template (concat ":METADATA:\n"
 			   "#+GLOSSARY_KEY: " key "\n"
                            "#+ABBR:" (when (s-present? abbr)
 				       (concat " " abbr))
