@@ -13,7 +13,6 @@
 (setq custom-file (concat user-emacs-directory "custom.el"))
 (load custom-file :noerror)
 
-
 (require 'jf-launching)
 (require 'jf-minor-mode-maker)
 (require 'jf-illuminating)
@@ -40,7 +39,6 @@
 
 (load (concat user-emacs-directory "hide-comnt.el") :noerror)
 
-(find-file jf/primary-agenda-filename-for-machine)
 (server-start)
 
 (setq gc-cons-threshold (expt 2 24) ;; 16777216

@@ -41,28 +41,7 @@
 	   (let* ((br (org-html-close-tag "br" nil info))
 		  (re (format "\\(?:%s\\)?[ \t]*\n" (regexp-quote br))))
 	     (replace-regexp-in-string re (concat br "\n") contents)))))
-(defun jf/org-tor-link (fn link desc &rest rest)
-  "Conditional LINK and DESC rendering for ID-based links.
 
-    Otherwise `apply' the FN with the REST of the parameters."
-  (if (string= "id" (org-element-property :type link))
-      (jf/org-md-link-by-id link desc)
-    (apply fn link desc rest)))
-
-  ;;; Removed as I'm no longer using `org-roam'
-;; (advice-add #'org-md-link :around #'jf/org-tor-link '((name . "wrapper")))
-;; (advice-add #'org-hugo-link :around #'jf/org-tor-link '((name . "wrapper")))
-
-(defun jf/org-md-link-by-id (link desc)
-  "With an \"id\" type LINK render the markdown.
-
-  If the node for the given \"id\" has a ROAM_REF, use that as a markdown URL.
-  Otherwise render a span with DESC.
-
-  This prevents links to non-world accessible files."
-  (let* ((node (org-roam-node-from-id (org-element-property :path link))))
-    (or (jf/org-markdown-export-format-link-for :node node :desc desc)
-	(format "<span class=\"ref\">%s</span>" desc))))
 
 (cl-defun jf/org-markdown-export-format-link-for (&key node desc)
   "Return a \"link\" text based on the given NODE and DESC.
@@ -202,17 +181,6 @@
       'keyword
     (lambda (el)
       (when (string-match property (org-element-property :key el)) el))))
-
-(cl-defun jf/jump_to_corresponding_org_file (&key (buffer (current-buffer)))
-  "Find the org id in the BUFFER and jump to corresponding file."
-  (interactive)
-  (with-current-buffer buffer
-    (save-excursion
-      (beginning-of-buffer)
-      (save-match-data
-	(if (re-search-forward "\norg_id: \\(.+\\)\n" nil t)
-	    (find-file (denote-get-path-by-id (match-string 1)))
-	  (message "Unable to find org_id: in document"))))))
 
 (cl-defun jf/jump_to_corresponding_hugo_file (&key (buffer (current-buffer)))
   "Find the TakeOnRules.com url in the BUFFER and jump to corresponding Hugo file."
