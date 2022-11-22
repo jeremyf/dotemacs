@@ -1,4 +1,4 @@
-;;; jf-fonts-and-iconography.el --- Working to manage my windows -*- lexical-binding: t -*-
+;;; jf-fonts-and-iconography.el --- How words and symbols are displayed -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2022  Jeremy Friesen
 ;; Author: Jeremy Friesen <jeremy@jeremyfriesen.com>

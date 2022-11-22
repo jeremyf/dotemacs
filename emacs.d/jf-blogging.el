@@ -1,4 +1,4 @@
-;;; jf-blogging.el --- Simple focus mode and extras -*- lexical-binding: t -*-
+;;; jf-blogging.el --- Blogging related functions -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2022  Jeremy Friesen
 ;; Author: Jeremy Friesen <jeremy@jeremyfriesen.com>
