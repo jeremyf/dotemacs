@@ -11,6 +11,7 @@
 ;;
 ;; - Agenda :: Where I track time.
 ;; - Code :: Where I write code.
+;; - Discussion :: Where I discuss the project with collaborators.
 ;; - Notes :: Where I take larger conceptual notes.
 ;; - Project board :: Where I see what's in flight.
 ;; - Remote :: Where I read/write issues and pull requests.
@@ -130,6 +131,7 @@ Check URL, directory, and filename.")))
 (jf/project/create-jump-to-fn "board")
 (jf/project/create-jump-to-fn "code")
 (jf/project/create-jump-to-fn "remote")
+(jf/project/create-jump-to-fn "discussion")
 
 ;;;; Support Functions
 (cl-defun jf/project/list-projects (&key (project ".+")
@@ -254,6 +256,9 @@ When the `current-prefix-arg' is set always prompt for the project."
     ("c" "Code…" (lambda () (interactive)
 		   (jf/project/jump-to-code
 		    :project jf/project/current-project)))
+    ("d" "Discussion…" (lambda () (interactive)
+			 (jf/project/jump-to-discussion
+			  :project jf/project/current-project)))
     ("n" "Notes…" (lambda () (interactive)
 		    (jf/project/jump-to-notes
 		     :project jf/project/current-project)))
@@ -267,6 +272,7 @@ When the `current-prefix-arg' is set always prompt for the project."
     ""
     ("B" "Board…" jf/project/jump-to-board)
     ("C" "Code…" jf/project/jump-to-code)
+    ("D" "Discussion…" jf/project/jump-to-discussion)
     ("N" "Notes…" jf/project/jump-to-notes)
     ("R" "Remote…" jf/project/jump-to-remote)
     ("T" "Timesheet…" jf/project/jump-to-timesheet)]
