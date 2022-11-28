@@ -202,7 +202,7 @@ Noted projects would be found within the given DIRECTORY."
   "Find the `org-mode' task at point for the current buffer."
   (unless (eq 1 (point))
     (when-let ((element (org-element-at-point)))
-      (if (member "project" (org-element-property :tag element))
+      (if (member "projects" (org-element-property :tag element))
 	  (org-element-property :title element)
 	(if (eq 'headline (org-element-type element))
 	    ;; TODO: I'd prefer something a little more elegant and not

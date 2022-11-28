@@ -136,7 +136,7 @@
 		  jf/org-mode-agenda-find-project-node)
 	   ;; The five ***** is due to the assumptive depth of the projects and
 	   ;; tasks.
-	   "***** TODO %^{Describe the task} :task:\n\n"
+	   "***** TODO %^{Describe the task} :tasks:\n\n"
 	   :jump-to-captured t
 	   :immediate-finish t
 	   :clock-in t)))
@@ -345,7 +345,7 @@
      (org-map-entries
       (lambda ()
 	(org-element-property :title (org-element-at-point)))
-      "+LEVEL=4+project" 'agenda)
+      "+LEVEL=4+projects" 'agenda)
      ) #'string<)))
 
 ;; When I jump to a new task for the day, I want to position that task within
