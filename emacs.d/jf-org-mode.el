@@ -36,8 +36,7 @@
 			       (basenames '("agenda.org")))
   "Return the list of filenames where BASENAMES exists in PATHS."
   ;; I want to include my configuration file in my agenda querying.
-  (setq returning-list '("~/git/dotemacs/emacs.d/configuration.org"
-			 "~/git/org/denote/scientist/20221021T221357--scientist-agenda__scientist.org"))
+  (setq returning-list '("~/git/org/denote/scientist/20221021T221357--scientist-agenda__scientist.org"))
   (dolist (path paths)
     (dolist (basename basenames)
       (when (f-exists-p (f-join path basename))
@@ -125,7 +124,7 @@
 	  ;; properly generated.
 	  ("p" "Project"
 	   entry (file+olp+datetree jf/primary-agenda-filename-for-machine)
-	   "* %(jf/org-mode-agenda-project-prompt) :project:\n\n%?"
+	   "* %(jf/org-mode-agenda-project-prompt) :projects:\n\n%?"
 	   :empty-lines-before 1
 	   :immediate-finish t
 	   :empty-lines-after 1)
@@ -354,7 +353,7 @@
 ;; https://gist.github.com/webbj74/0ab881ed0ce61153a82e.
 (cl-defun jf/org-mode-agenda-find-project-node
     (&key
-     (tag "project")
+     (tag "projects")
      (project (jf/org-mode-agenda-project-prompt))
      ;; The `file+olp+datetree` directive creates a headline like “2022-09-03 Saturday”.
      (within_headline (format-time-string "%Y-%m-%d %A")))
@@ -368,7 +367,7 @@
 				 'headline
 			       ;; Finds the end position of:
 			       ;; - a level 4 headline
-			       ;; - that is tagged as a :project:
+			       ;; - that is tagged as a :projects:
 			       ;; - is titled as the given project
 			       ;; - and is within the given headline
 			       (lambda (hl)
@@ -491,7 +490,7 @@ for the week."
 (defun jf/org-mode-time-entry-for-project-and-day ()
   "Function to help report time for Scientist.com
 
-Assumes that I'm on a :project: headline.
+Assumes that I'm on a :projects: headline.
 
 - Sum the hours (in decimal form) for the tasks.
 - Create a list of the tasks.

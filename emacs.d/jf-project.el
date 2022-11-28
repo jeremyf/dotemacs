@@ -48,7 +48,7 @@
 ;;;; Interactive Commands
 (cl-defun jf/project/jump-to-timesheet (&key
 				     project
-				     (tag "project")
+				     (tag "projects")
 				     (within_headline
 				      (format-time-string "%Y-%m-%d %A")))
   "Jump to the agenda for the given PROJECT."
@@ -59,7 +59,7 @@
 		      'headline
 		    ;; Finds the begin position of:
 		    ;; - a level 4 headline
-		    ;; - that is tagged as a :project:
+		    ;; - that is tagged as a :projects:
 		    ;; - is titled as the given project
 		    ;; - and is within the given headline
 		    (lambda (hl)
@@ -179,7 +179,7 @@ Noted projects would be found within the given DIRECTORY."
 (defun jf/project/get-project-from-current-clock ()
   "Return the current clocked project's name or nil."
   ;; This is a naive implementation that assumes a :task: has the clock.  A
-  ;; :task:'s immediate ancestor is a :project:.
+  ;; :task:'s immediate ancestor is a :projects:.
 
   (when-let ((m (and
 		 (fboundp 'org-clocking-p) ;; If this isn't set, we ain't
@@ -275,8 +275,7 @@ When the `current-prefix-arg' is set always prompt for the project."
     ("D" "Discussion…" jf/project/jump-to-discussion)
     ("N" "Notes…" jf/project/jump-to-notes)
     ("R" "Remote…" jf/project/jump-to-remote)
-    ("T" "Timesheet…" jf/project/jump-to-timesheet)]
-   ])
+    ("T" "Timesheet…" jf/project/jump-to-timesheet)]])
 
 (transient-define-suffix jf/project/current-project-set (project)
   "Select FILES to use as source for work desk."

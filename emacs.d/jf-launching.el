@@ -87,6 +87,9 @@
 (setq-default cursor-type 'bar) ;; Doing a bit of configuration of my cursors
 (blink-cursor-mode t)
 
+(when (executable-find "rg")
+  (setq grep-program "rg"))
+
 (setq
  backup-by-copying t         ;; Don't delink hardlinks
 

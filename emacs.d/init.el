@@ -37,6 +37,8 @@
 (require 'jf-project)
 (require 'jf-menus)
 
+
+(setq jf/artist-mode-spraycan "🞄⁛◌🞆⊖⊗⁛●◯⦿⬤")
 (load (concat user-emacs-directory "hide-comnt.el") :noerror)
 
 (server-start)
