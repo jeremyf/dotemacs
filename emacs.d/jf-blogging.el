@@ -72,7 +72,7 @@
   (setq jf/exporting-org-to-tor t)
   (with-current-buffer buffer
     (save-excursion
-      (let* ((export-global-plist (jf/org-global-props-as-plist))
+      (let* ((export-global-plist (jf/org-keywords-as-plist))
 	     (section (jf/export-org-to-tor--global-buffer-prop-ensure
 		       :key "HUGO_SECTION"
 		       :plist export-global-plist
@@ -167,11 +167,11 @@
   ;; 	(org-set-property "SESSION_REPORT_LOCATION" location))))
   )
 
-(cl-defun jf/org-global-props-as-plist (&key (props-regexp "\\(IDENTIFIER\\|FILETAGS\\|HUGO_FRONT_MATTER_FORMAT\\|HUGO_SECTION\\|HUGO_BASE_DIR\\|TITLE\\|SUBTITLE\\)"))
+(cl-defun jf/org-keywords-as-plist (&key (keywords-regexp "\\(IDENTIFIER\\|FILETAGS\\|HUGO_FRONT_MATTER_FORMAT\\|HUGO_SECTION\\|HUGO_BASE_DIR\\|TITLE\\|SUBTITLE\\)"))
   (-flatten (mapcar (lambda (prop)
 		      (list (org-element-property :key prop)
 			    (org-element-property :value prop)))
-		    (jf/org-global-props props-regexp))))
+		    (jf/org-global-props keywords-regexp))))
 
 (defun jf/org-global-props (&optional property)
   "Get the plists of global org properties of current buffer."

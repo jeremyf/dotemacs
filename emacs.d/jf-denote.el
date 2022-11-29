@@ -75,14 +75,15 @@
   ("H-l" . 'jf/denote-link-or-create)
   ("H-i" . 'jf/denote-link-or-create)
   :hook (dired-mode . denote-dired-mode)
+  :init (require 'denote-org-dblock)
   :custom ((denote-directory (expand-file-name "denote" org-directory))
            ;; These are the minimum viable prompts for notes
            (denote-prompts '(title keywords))
            ;; I love ‘org-mode format; reading ahead I'm setting this
            (denote-file-type 'org)
-           (denote-known-keywords (jf/calculated-list-of-denote-known-keywords
-                                   :from (expand-file-name "denote/glossary"
-							   org-directory)))
+           ;; (denote-known-keywords (jf/calculated-list-of-denote-known-keywords
+           ;;                         :from (expand-file-name "denote/glossary"
+	   ;; 						   org-directory)))
            ;; Explicitly ensuring that tags can be multi-word (e.g. two or more
            ;; words joined with a dash).  Given that I export these tags, they
            ;; should be accessible to screen-readers.  And without the dashes
@@ -90,6 +91,7 @@
            (denote-allow-multi-word-keywords t)
            ;; And `org-read-date' is an amazing bit of tech
            (denote-date-prompt-denote-date-prompt-use-org-read-date t)))
+
 
 (use-package consult-notes
   ;;Let’s add another way at looking up files.  I appreciate the ability to
@@ -128,29 +130,56 @@
       (with-current-buffer (find-file-noselect filename)
         (cadar (org-collect-keywords (list property)))))))
 
-(cl-defun jf/denote-org-properties-from-id (&key identifier properties)
-  "Given an IDENTIFIER and PROPERTIES list return an a-list of values.
+(cl-defun jf/denote-org-keywords-from-id (&key identifier keywords)
+  "Given an IDENTIFIER and KEYWORDS list return an a-list of values.
 
     Return nil when:
 
     - is not a denote file
     - IDENTIFIER leads to a non `org-mode' file
-    - PROPERTY does not exist on the file.
+    - KEYWORD does not exist on the file.
 
 This function is the plural version of `jf/denote-org-property-from-id'."
   ;; ;; Testing jf/denote-org-property-from-id
   ;; (message "%s" (jf/denote-org-property-from-id
   ;; 		 :identifier "20220930T215235"
   ;;		 :property "ABBR"))
-  ;; ;; Testing jf/denote-org-properties-from-id
-  ;; (message "%s" (jf/denote-org-properties-from-id
+  ;; ;; Testing jf/denote-org-keywords-from-id
+  ;; (message "%s" (jf/denote-org-keywords-from-id
   ;; 		 :identifier "20220930T215235"
   ;; 		 :properties '("TITLE" "ABBR")))
 
   (when-let ((filename (denote-get-path-by-id identifier)))
     (when (string= (file-name-extension filename) "org")
       (with-current-buffer (find-file-noselect filename)
-        (org-collect-keywords properties)))))
+        (org-collect-keywords keywords)))))
+
+(defun jf/denote-plist-for-export-of-id (identifier)
+  "Given an IDENTIFIER export a `plist' with the following properties:
+
+    - :title
+    - :key
+    - :url
+
+    Return nil when:
+
+    - is not a denote file
+    - IDENTIFIER leads to a non `org-mode' file"
+  ;; Testing
+  ;; (message "%s" (jf/denote-plist-for-export-of-id "20221009T115949"))
+  (when-let ((filename (denote-get-path-by-id identifier)))
+    (when (string= (file-name-extension filename) "org")
+      (with-current-buffer (find-file-noselect filename)
+	(let ((kw-plist (jf/org-keywords-as-plist
+			 :keywords-regexp "\\(TITLE\\|GLOSSARY_KEY\\|OFFER\\|ROAM_REFS\\|SAME_AS\\)")))
+	  (list
+	   :title (lax-plist-get kw-plist "TITLE")
+	   :key (lax-plist-get kw-plist "GLOSSARY_KEY")
+	   :url (or
+		 (lax-plist-get kw-plist "OFFER")
+		 (when-let ((refs (lax-plist-get kw-plist "ROAM_REFS")))
+		   (first (s-split " " refs t)))
+		 (lax-plist-get kw-plist "SAME_AS"))))))))
 
 
 (cl-defun jf/calculated-list-of-denote-known-keywords (&key from)
@@ -439,12 +468,12 @@ This function is intended for a global find of all notes."
             (denote-retrieve-filename-identifier
 	     (denote-file-prompt filter)))))
 
-(cl-defun jf/denote-link-ol-link-with-property (link
+(cl-defun jf/denote-link-ol-abbr-with-property (link
 						description
 						format
 						protocol
                                                 &key
-                                                property-name
+                                                keyword
                                                 additional-hugo-parameters
                                                 (use_hugo_shortcode
 						 jf/exporting-org-to-tor))
@@ -452,12 +481,12 @@ This function is intended for a global find of all notes."
 
     FORMAT is an Org export backend. We will discard the given
     DESCRIPTION.  PROTOCOL is ignored."
-  (let* ((prop-list (jf/denote-org-properties-from-id
+  (let* ((keyword-alist (jf/denote-org-keywords-from-id
                      :identifier link
-                     :properties (list "TITLE" property-name  "GLOSSARY_KEY")))
-         (title (car (alist-get "TITLE" prop-list nil nil #'string=)))
-         (property (car (alist-get property-name prop-list nil nil #'string=)))
-         (key (car (alist-get "GLOSSARY_KEY" prop-list nil nil #'string=))))
+                     :keywords (list "TITLE" keyword  "GLOSSARY_KEY")))
+         (title (car (alist-get "TITLE" keyword-alist nil nil #'string=)))
+         (keyword-value (car (alist-get keyword keyword-alist nil nil #'string=)))
+         (key (car (alist-get "GLOSSARY_KEY" keyword-alist nil nil #'string=))))
     (cond
      ((or (eq format 'html) (eq format 'md))
       (if use_hugo_shortcode
@@ -466,10 +495,10 @@ This function is intended for a global find of all notes."
                   additional-hugo-parameters)
         (format "<abbr title=\"%s\">%s</abbr>"
                 title
-                property)))
+                keyword-value)))
      (t (format "%s (%s)"
                 title
-                property)))))
+                keyword-value)))))
 
 (org-link-set-parameters "abbr"
 			 :complete (lambda (&optional parg)
@@ -479,9 +508,9 @@ This function is intended for a global find of all notes."
 				      :filter " _abbr*"
 				      :subdirectory "glossary"))
 			 :export (lambda (link description format protocol)
-				   (jf/denote-link-ol-link-with-property
+				   (jf/denote-link-ol-abbr-with-property
 				    link description format protocol
-				    :property-name "ABBR"
+				    :keyword "ABBR"
 				    :additional-hugo-parameters "abbr=\"t\""))
 			 :face #'jf/org-faces-abbr
 			 :follow #'denote-link-ol-follow
@@ -495,9 +524,9 @@ This function is intended for a global find of all notes."
 				      :filter " _plural_abbr*"
 				      :subdirectory "glossary"))
 			 :export (lambda (link description format protocol)
-				   (jf/denote-link-ol-link-with-property
+				   (jf/denote-link-ol-abbr-with-property
 				    link description format protocol
-				    :property-name "PLURAL_ABBR"
+				    :keyword "PLURAL_ABBR"
 				    :additional-hugo-parameters "abbr=\"t\" plural=\"t\""))
 			 :face #'jf/org-faces-abbr
 			 :follow #'denote-link-ol-follow
@@ -628,22 +657,25 @@ This function is intended for a global find of all notes."
 
   {{< glossary key=\"GLOSSARY_KEY\" >}}."
   (let* ((path-id (denote-link--ol-resolve-link-to-target link :path-id))
-         (title (jf/denote-org-property-from-id
-		 :identifier link
-		 :property "TITLE"))
          (path (file-name-nondirectory (car path-id)))
-         (url (jf/denote-export-url-from-id link))
+         (export-plist (jf/denote-plist-for-export-of-id link))
+         (title (plist-get export-plist :title))
+         (url (plist-get export-plist :url))
+         (glossary_key (plist-get export-plist :key))
          (desc (or description title)))
     (if url
         (cond
-         ((eq format 'html) (format "<a href=\"%s\">%s</a>" url desc))
+         ((and use_hugo_shortcode glossary_key)
+	  (format "{{< glossary key=\"%s\" >}}" glossary_key))
+	 ((eq format 'html)
+	  (format "<a href=\"%s\">%s</a>" url desc))
+         ((eq format 'md) (format "[%s](%s)" desc url))
          ((or (eq format 'latex) (eq format 'beamer))
 	  (format "\\href{%s}{%s}"
 		  (replace-regexp-in-string "[\\{}$%&_#~^]" "\\\\\\&" path)
 		  desc))
          ((eq format 'texinfo) (format "@uref{%s,%s}" path desc))
          ((eq format 'ascii) (format "[%s] <denote:%s>" desc path))
-         ((eq format 'md) (format "[%s](%s)" desc url))
          (t path))
       desc)))
 
@@ -665,18 +697,19 @@ This function is intended for a global find of all notes."
 ;;   was typically the Wikidata URL.
 (defun jf/denote-export-url-from-id (identifier)
   "Return the appropriate url for the given `denote' identifier."
+  ;; TODO: Remove function
   (when-let ((filename (denote-get-path-by-id identifier)))
     (when (string= (file-name-extension filename) "org")
       (with-current-buffer (find-file-noselect filename)
-        (let* ((props-plist
-		(jf/org-global-props-as-plist
-		 :props-regexp "\\(OFFER\\|ROAM_REFS\\|SAME_AS\\)")))
+        (let* ((kw-plist
+		(jf/org-keywords-as-plist
+		 :keywords-regexp "\\(OFFER\\|ROAM_REFS\\|SAME_AS\\)")))
           (cond
            ;; Favor affiliate links
-           ((lax-plist-get props-plist "OFFER"))
-           ((when-let ((refs (lax-plist-get props-plist "ROAM_REFS")))
+           ((lax-plist-get kw-plist "OFFER"))
+           ((when-let ((refs (lax-plist-get kw-plist "ROAM_REFS")))
 	      (first (s-split " " refs t))))
-           ((lax-plist-get props-plist "SAME_AS"))))))))
+           ((lax-plist-get kw-plist "SAME_AS"))))))))
 
 ;;  ;; Should be: https://www.worldcat.org link
 ;; (message "%s" (jf/denote-export-url-from-id "20221009T115949"))
@@ -695,7 +728,7 @@ This function is intended for a global find of all notes."
     (with-current-buffer buffer
       (jf/export-org-to-tor--global-buffer-prop-ensure
        :key "ROAM_REFS"
-       :plist (jf/org-global-props-as-plist :props-regexp "ROAM_REFS")
+       :plist (jf/org-keywords-as-plist :keywords-regexp "ROAM_REFS")
        :default url)
       (save-buffer))))
 

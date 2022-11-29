@@ -110,7 +110,7 @@
   ;; recursed buffer.
   :straight t
   :config
-  (setq enable-recursive-minibuffers t)
+  (setq enable-recursive-minibuffers nil)
   (recursion-indicator-mode))
 
 (use-package smartparens
