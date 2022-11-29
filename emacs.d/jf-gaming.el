@@ -637,11 +637,11 @@ Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
      "| Face a Revelation Episode                    |               - | 1           |")))
 
 (defvar jf/gaming/the-one-ring/strider-mode/telling-table
-  '(("Certain" . ("No with extreme result or twist" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes with extreme result or twist"))
-    ("Likely" . ("No with extreme result or twist" "No" "No" "No" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes with extreme result or twist"))
-    ("Middling" . ("No with extreme result or twist" "No" "No" "No" "No" "No" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes with extreme result or twist"))
-    ("Doubtful" . ("No with extreme result or twist" "No" "No" "No" "No" "No" "No" "No" "Yes" "Yes" "Yes" "Yes with extreme result or twist"))
-    ("Unthinkable" . ("No with extreme result or twist" "No" "No" "No" "No" "No" "No" "No" "No" "No" "Yes" "Yes with extreme result or twist")))
+  '(("Certain" . ("No with an extreme result or twist" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes with an extreme result or twist"))
+    ("Likely" . ("No with an extreme result or twist" "No" "No" "No" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes with an extreme result or twist"))
+    ("Middling" . ("No with an extreme result or twist" "No" "No" "No" "No" "No" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes with an extreme result or twist"))
+    ("Doubtful" . ("No with an extreme result or twist" "No" "No" "No" "No" "No" "No" "No" "Yes" "Yes" "Yes" "Yes with an extreme result or twist"))
+    ("Unthinkable" . ("No with an extreme result or twist" "No" "No" "No" "No" "No" "No" "No" "No" "No" "Yes" "Yes with an extreme result or twist")))
   "An translation of the Telling Table from Strider Mode.")
 
 
