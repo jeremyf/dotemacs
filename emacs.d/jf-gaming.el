@@ -598,5 +598,84 @@ Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
    ("p" jf/eberron-qh-planes)
    ("r" jf/eberron-qh-religion)
    ])
+
+;;;; The One Ring
+
+(jf/transient-quick-help jf/gaming/the-one-ring/strider-mode/telling-table
+  :label "Strider: Telling Table"
+  :header "Strider: Telling Table "
+  :body
+  (s-join
+   "\n"
+   '("| Chance                           | Yes if Feat Die |"
+     "|----------------------------------+-----------------|"
+     "| Certain                          | ≥ 1             |"
+     "| Likely                           | ≥ 4             |"
+     "| Middling                         | ≥ 6             |"
+     "| Doubtful                         | ≥ 8             |"
+     "| Unthinkable                      | 10              |"
+     "| Yes with extreme result or twist | Gandalf         |"
+     "| No with extreme result or twist  | Eye of Sauron   |")))
+
+(jf/transient-quick-help jf/gaming/the-one-ring/strider-mode/experience-milestones
+  :label "Strider: Experience Milestones"
+  :header "Strider: Experience Milestones"
+  :body
+  (s-join
+   "\n"
+   '("| Milestone                                    | Adventure Point | Skill Point |"
+     "|----------------------------------------------+-----------------+-------------|"
+     "| Accept a mission from a patron               |               1 | -           |"
+     "| Adventure Point and 1 Skill                  |               1 | 1           |"
+     "| Complete a patron’s mission                  |               1 | 1           |"
+     "| Complete a meaningful journey                |               2 | -           |"
+     "| Face a Noteworthy Encounter during a journey |               1 | -           |"
+     "| Reveal a significant location or discovery   |               - | 1           |"
+     "| Overcome a tricky obstacle                   |               1 | -           |"
+     "| Participate in a Council                     |               1 | -           |"
+     "| Survive a dangerous combat                   |               - | 1           |"
+     "| Face a Revelation Episode                    |               - | 1           |")))
+
+(defvar jf/gaming/the-one-ring/strider-mode/lore-table
+  (list
+   :action '("Abandon" "Attack" "Betray" "Corrupt" "Defeat" "Weaken" ;; Eye of Sauron
+	     "Aid" "Arrive" "Await" "Breach" "Break" "Capture" ;; 1
+	     "Change" "Chase" "Command" "Control" "Create" "Defy" ;; 2
+	     "Demand" "Discover" "Disguise" "Endure" "Escape" "Evade" ;; 3
+	     "Explore" "Find" "Focus" "Gather" "Guard" "Guide" ;; 4
+	     "Hide" "Hinder" "Hoard" "Hold" "Hunt" "Journey" ;; 5
+	     "Lead" "Learn" "Leave" "Lose" "Mourn" "Move" ;; 6
+	     "Persist" "Preserve" "Prevent" "Refuse" "Reject" "Remove" ;; 7
+	     "Replenish" "Restore" "Scheme" "Search" "Seize" "Share" ;; 8
+	     "Slay" "Steal" "Summon" "Surrender" "Surround" "Threaten" ;; 9
+	     "Transform" "Trap" "Trick" "Uncover" "Uphold" "Withstand" ;; 10
+	     "Believe" "Bolster" "Defend" "Forgive" "Resist" "Strengthen") ;; Rune of Gandalf
+   :aspect '("Corrupted" "Cruel" "Deceptive" "Fell" "Ruined" "Treacherous" ;; Eye of Sauron
+	     "Active" "Ancient" "Bold" "Bright" "Broken" "Cheerless" ;; 1
+	     "Cold" "Concealed" "Dangerous" "Dark" "Dead" "Defended" ;; 2
+	     "Desolate" "Destroyed" "Dreadful" "Empty" "Evil" "Faded" ;; 3
+	     "Far-reaching" "Fierce" "Foreboding" "Forgotten" "Fragile" "Ghastly" ;; 4
+	     "Gloomy" "Growing" "Hidden" "Ill-fated" "Impenetrable" "Inspiring" ;; 5
+	     "Isolated" "Lofty" "Lost" "Menacing" "Mighty" "Mysterious" ;; 6
+	     "Noble" "Obstructed" "Old" "Ominous" "Open" "Peaceful" ;; 7
+	     "Restored" "Sheltered" "Silent" "Simple" "Small" "Sombre" ;; 8
+	     "Stony" "Stout" "Stricken" "Stubborn" "Twisted" "Unnatural" ;; 9
+	     "Veiled" "Vigorous" "Weary" "Wild" "Wretched" "Young" ;; 10
+	     "Flourishing" "Beautiful" "Good" "Kind" "Gentle" "Wondrous") ;; Rune of Gandalf
+   :focus '("Curse" "Despair" "Enemy" "Fear" "Shadow" "War" ;; Eye of Sauron
+	    "Battle" "Border" "Burden" "Council" "Court" "Creature" ;; 1
+	    "Darkness" "Death" "Defence" "Depths" "Doubt" "Dreams" ;; 2
+	    "Fate" "Fire" "Folk" "Followers" "Greed" "Haven" ;; 3
+	    "History" "Honour" "Journey" "Kindred" "Knowledge" "Land" ;; 4
+	    "Leader" "Legend" "Life" "Light" "Luck" "Memory" ;; 5
+	    "Message" "Might" "Nature" "Pain" "Path" "Patron" ;; 6
+	    "Peril" "Plan" "Power" "Prophecy" "Quest" "Refuge" ;; 7
+	    "Riddle" "Ruins" "Rumour" "Secret" "Skill" "Song" ;; 8
+	    "Story" "Strength" "Time" "Tool" "Treasure" "Trust" ;; 9
+	    "Truth" "Vengeance" "Wealth" "Weapon" "Wilds" "Wish" ;; 10
+	    "Courage" "Duty" "Fellowship" "Hope" "Love" "Peace") ;; Rune of Gandalf
+   )
+  "From Strider Mode p11-12")
+
 (provide 'jf-gaming)
 ;;; jf-gaming.el ends here
