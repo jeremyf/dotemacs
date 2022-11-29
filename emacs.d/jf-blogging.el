@@ -121,16 +121,15 @@
 	   "\n#+HUGO_CUSTOM_FRONT_MATTER: :licenses '(all-rights-reserved)"
 	   "\n#+HUGO_CUSTOM_FRONT_MATTER: :draft true"
 	   "\n#+HUGO_CUSTOM_FRONT_MATTER: :org_id " identifier
-	   "\n#+INCLUDE: " jf/org-macros-setup-filename)
-	  )
-  (let ((date (car (org-property-values "SESSION_REPORT_DATE"))))
-    (when date
-      (let ((game (car (org-property-values "SESSION_REPORT_GAME")))
-	    (location (car (org-property-values "SESSION_REPORT_LOCATION"))))
-	(insert
-	 (format
-	  "\n#+HUGO_CUSTOM_FRONT_MATTER: :sessionReport '((date . \"%s\") (game . \"%s\") (location . \"%s\"))"
-	  date game location))))))
+	   "\n#+INCLUDE: " jf/org-macros-setup-filename))
+  (when-let ((kw-plist (jf/org-keywords-as-plist
+			 :keywords-regexp "\\(SESSION_REPORT_DATE\\|SESSION_REPORT_LOCATION\\|SESSION_REPORT_GAME\\)")))
+    (insert
+     (format
+      "\n#+HUGO_CUSTOM_FRONT_MATTER: :sessionReport '((date . \"%s\") (game . \"%s\") (location . \"%s\"))"
+      (lax-plist-get kw-plist "SESSION_REPORT_DATE")
+      (lax-plist-get kw-plist "SESSION_REPORT_GAME")
+      (lax-plist-get kw-plist "SESSION_REPORT_LOCATION")))))
 
 (cl-defun jf/export-org-to-tor--global-buffer-prop-ensure (&key key plist (default nil))
   "Ensure the current buffer has the given KEY in the global PLIST, if not set the DEFAULT or prompt for it."
@@ -150,22 +149,22 @@
   "TakeOnRules session report locations")
 
 (cl-defun jf/org-tag-as-session-report (&key (buffer (current-buffer)))
-  "Set the current BUFFER as a \"session-report\".
-
-    This involves adding a FILETAG and metadata around the details of the session report."
+  "Set the current BUFFER as a \"session-report\"."
   (interactive)
-  (message "TODO: Adjust for Denote methodology")
-  ;; (with-current-buffer buffer
-  ;;   (save-excursion
-  ;;     (beginning-of-buffer)
-  ;;     (org-roam-tag-add '("sessions"))
-  ;;     (let* ((date (org-read-date nil nil nil "Session Date"))
-  ;; 	     (game (completing-read "Game: " (jf/tor-game-list)))
-  ;; 	     (location (completing-read "Location: " jf/tor-session-report-location)))
-  ;; 	(org-set-property "SESSION_REPORT_DATE" date)
-  ;; 	(org-set-property "SESSION_REPORT_GAME" game)
-  ;; 	(org-set-property "SESSION_REPORT_LOCATION" location))))
-  )
+  (with-current-buffer buffer
+    (save-excursion
+      (denote-keywords-add '("sessions"))
+      (beginning-of-buffer)
+      (goto-line 5)
+      (let* ((date (org-read-date nil nil nil "Session Date"))
+	     (game (completing-read "Game: " (jf/tor-game-list)))
+	     (location (completing-read "Location: "
+					jf/tor-session-report-location)))
+	(insert (format
+		 (concat "\n#+SESSION_REPORT_DATE: %s"
+			 "\n#+SESSION_REPORT_GAME: %s"
+			 "\n#+SESSION_REPORT_LOCATION: %s")
+		 date game location))))))
 
 (cl-defun jf/org-keywords-as-plist (&key (keywords-regexp "\\(IDENTIFIER\\|FILETAGS\\|HUGO_FRONT_MATTER_FORMAT\\|HUGO_SECTION\\|HUGO_BASE_DIR\\|TITLE\\|SUBTITLE\\)"))
   (-flatten (mapcar (lambda (prop)
