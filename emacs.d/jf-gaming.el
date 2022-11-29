@@ -607,15 +607,15 @@ Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
   :body
   (s-join
    "\n"
-   '("| Chance                           | Yes if Feat Die |"
-     "|----------------------------------+-----------------|"
-     "| Certain                          | ≥ 1             |"
-     "| Likely                           | ≥ 4             |"
-     "| Middling                         | ≥ 6             |"
-     "| Doubtful                         | ≥ 8             |"
-     "| Unthinkable                      | 10              |"
-     "| Yes with extreme result or twist | Gandalf         |"
-     "| No with extreme result or twist  | Eye of Sauron   |")))
+   '("| Chance                              | Yes if Feat Die |"
+     "|-------------------------------------+-----------------|"
+     "| Certain                             | ≥ 1             |"
+     "| Likely                              | ≥ 4             |"
+     "| Middling                            | ≥ 6             |"
+     "| Doubtful                            | ≥ 8             |"
+     "| Unthinkable                         | 10              |"
+     "| Yes with an extreme result or twist | Gandalf         |"
+     "| No with an extreme result or twist  | Eye of Sauron   |")))
 
 (jf/transient-quick-help jf/gaming/the-one-ring/strider-mode/experience-milestones
   :label "Strider: Experience Milestones"
@@ -637,12 +637,24 @@ Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
      "| Face a Revelation Episode                    |               - | 1           |")))
 
 (defvar jf/gaming/the-one-ring/strider-mode/telling-table
-  '(("Certain" . ("No with an extreme result or twist" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes with an extreme result or twist"))
-    ("Likely" . ("No with an extreme result or twist" "No" "No" "No" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes with an extreme result or twist"))
-    ("Middling" . ("No with an extreme result or twist" "No" "No" "No" "No" "No" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes with an extreme result or twist"))
-    ("Doubtful" . ("No with an extreme result or twist" "No" "No" "No" "No" "No" "No" "No" "Yes" "Yes" "Yes" "Yes with an extreme result or twist"))
-    ("Unthinkable" . ("No with an extreme result or twist" "No" "No" "No" "No" "No" "No" "No" "No" "No" "Yes" "Yes with an extreme result or twist")))
-  "An translation of the Telling Table from Strider Mode.")
+  ;; List contains 12 elements; 0th index is "Sauron", then 1st through 10th are
+  ;; 1 through 10 and 11th is "Gandalf".
+  '(("Certain" . ("No with an extreme result or twist"
+		  "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes"
+		  "Yes with an extreme result or twist"))
+    ("Likely" . ("No with an extreme result or twist"
+		 "No" "No" "No" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes"
+		 "Yes with an extreme result or twist"))
+    ("Middling" . ("No with an extreme result or twist"
+		   "No" "No" "No" "No" "No" "Yes" "Yes" "Yes" "Yes" "Yes"
+		   "Yes with an extreme result or twist"))
+    ("Doubtful" . ("No with an extreme result or twist"
+		   "No" "No" "No" "No" "No" "No" "No" "Yes" "Yes" "Yes"
+		   "Yes with an extreme result or twist"))
+    ("Unthinkable" . ("No with an extreme result or twist"
+		      "No" "No" "No" "No" "No" "No" "No" "No" "No" "Yes"
+		      "Yes with an extreme result or twist")))
+  "A translation of the Telling Table from Strider Mode.")
 
 
 
