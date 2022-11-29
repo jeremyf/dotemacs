@@ -146,7 +146,7 @@
   (insert (format "\n#+%s: %s" (upcase key) value)))
 
 (defvar jf/tor-session-report-location
-  '("around the table" "via Zoom" "via Discord and Roll20" "via Discord")
+  '("around the table" "via Zoom" "via Discord and Roll20" "via Discord" "in my living room")
   "TakeOnRules session report locations")
 
 (cl-defun jf/org-tag-as-session-report (&key (buffer (current-buffer)))
