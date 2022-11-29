@@ -636,6 +636,16 @@ Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
      "| Survive a dangerous combat                   |               - | 1           |"
      "| Face a Revelation Episode                    |               - | 1           |")))
 
+(defvar jf/gaming/the-one-ring/strider-mode/telling-table
+  '(("Certain" . ("No with extreme result or twist" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes with extreme result or twist"))
+    ("Likely" . ("No with extreme result or twist" "No" "No" "No" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes with extreme result or twist"))
+    ("Middling" . ("No with extreme result or twist" "No" "No" "No" "No" "No" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes with extreme result or twist"))
+    ("Doubtful" . ("No with extreme result or twist" "No" "No" "No" "No" "No" "No" "No" "Yes" "Yes" "Yes" "Yes with extreme result or twist"))
+    ("Unthinkable" . ("No with extreme result or twist" "No" "No" "No" "No" "No" "No" "No" "No" "No" "Yes" "Yes with extreme result or twist")))
+  "An translation of the Telling Table from Strider Mode.")
+
+
+
 (defvar jf/gaming/the-one-ring/strider-mode/lore-table
   (list
    :action '("Abandon" "Attack" "Betray" "Corrupt" "Defeat" "Weaken" ;; Eye of Sauron
@@ -676,6 +686,8 @@ Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
 	    "Courage" "Duty" "Fellowship" "Hope" "Love" "Peace") ;; Rune of Gandalf
    )
   "From Strider Mode p11-12")
+
+
 
 (provide 'jf-gaming)
 ;;; jf-gaming.el ends here

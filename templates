@@ -67,10 +67,20 @@ org-mode
 (tor "[[https://takeonrules.com][Take on Rules]]")
 (uml "#+begin_src plantuml" n> "@startuml" n> "!theme amiga" n> q n> "@enduml" n> "#+end_src" n>)
 (project ":PROJECT:" n "#+PROJECT_NAME: " p n "#+PROJECT_PATH_TO_CODE: " p n "#+PROJECT_PATH_TO_REMOTE: " p n "#+PROJECT_PATH_TO_BOARD: " p n ":END:")
-(lore-table "- Question :: " (p "Question: " question t) (s question) n
-	    "- Action :: " (seq-random-elt (plist-get jf/gaming/the-one-ring/strider-mode/lore-table :action)) n
-	    "- Aspect :: " (seq-random-elt (plist-get jf/gaming/the-one-ring/strider-mode/lore-table :aspect)) n
-	    "- Focus :: " (seq-random-elt (plist-get jf/gaming/the-one-ring/strider-mode/lore-table :focus)) n q)
+(lore-table n "#+BEGIN_MARGINNOTE" n>
+	    "With the question \"" (p "Question: " question t) (s question) "\" I consult the {{{i(Lore Table)}}} and get the following clues:" n>
+	    "- Action :: " (seq-random-elt (plist-get jf/gaming/the-one-ring/strider-mode/lore-table :action)) n>
+	    "- Aspect :: " (seq-random-elt (plist-get jf/gaming/the-one-ring/strider-mode/lore-table :aspect)) n>
+	    "- Focus :: " (seq-random-elt (plist-get jf/gaming/the-one-ring/strider-mode/lore-table :focus))
+	    n "#+END_MARGINNOTE" q)
+
+(telling-table n "#+BEGIN_MARGINNOTE" n>
+	       "I wonder \"" (p "Question: " question t) (s question) "\".  I find the likelihood of this being yes to be "
+	       (p (completing-read "Likelihood of yes: " jf/gaming/the-one-ring/strider-mode/telling-table) likelihood t)
+	       "{{{i(" (s likelihood) ")}}}. Consulting the {{{i(Telling Table)}}} the answer is: "
+	       (seq-random-elt (alist-get likelihood jf/gaming/the-one-ring/strider-mode/telling-table nil nil #'string=)) n
+	       "#+END_MARGINNOTE" n)
+
 
 
 ;;;; text-mode
