@@ -461,8 +461,6 @@ tasks within projects are headline 5."
 			 (if (=(org-element-property :level hl) 4)
 			     (concat "\n" (plist-get (cadr hl) :raw-value))
 			   (concat "- "
-				   (org-element-property :todo-keyword hl)
-				   " "
 				   (plist-get (cadr hl) :raw-value)))))
 		     )))))
 	(jf/create-scratch-buffer)
