@@ -75,22 +75,34 @@
   ("H-l" . 'jf/denote-link-or-create)
   ("H-i" . 'jf/denote-link-or-create)
   :hook (dired-mode . denote-dired-mode)
-  :init (require 'denote-org-dblock)
-  :custom ((denote-directory (expand-file-name "denote" org-directory))
-           ;; These are the minimum viable prompts for notes
-           (denote-prompts '(title keywords))
-           ;; I love ‘org-mode format; reading ahead I'm setting this
-           (denote-file-type 'org)
-           ;; (denote-known-keywords (jf/calculated-list-of-denote-known-keywords
-           ;;                         :from (expand-file-name "denote/glossary"
-	   ;; 						   org-directory)))
-           ;; Explicitly ensuring that tags can be multi-word (e.g. two or more
-           ;; words joined with a dash).  Given that I export these tags, they
-           ;; should be accessible to screen-readers.  And without the dashes
-           ;; they are a garbled word salad.
-           (denote-allow-multi-word-keywords t)
-           ;; And `org-read-date' is an amazing bit of tech
-           (denote-date-prompt-denote-date-prompt-use-org-read-date t)))
+  :init
+  (require 'denote-org-dblock)
+  :custom
+  (denote-directory (expand-file-name "denote" org-directory))
+  ;; These are the minimum viable prompts for notes
+  (denote-prompts '(title keywords))
+  ;; I love ‘org-mode format; reading ahead I'm setting this
+  (denote-file-type 'org)
+  ;; Our controlled vocabulary...if you will.  This originally was a function
+  ;; call, however there was a timing conflict with requiring denote-org-dblock
+  ;; and when/where I declared the previous function.  By "inlining" the
+  ;; function, I remove that temporal dependency.
+  (denote-known-keywords (split-string-and-unquote
+			  (shell-command-to-string
+			   (concat
+			    "rg \"#\\+TAG:\\s([\\w-]+)\" "
+			    (expand-file-name "denote/glossary" org-directory)
+			    " --only-matching"
+			    " --no-filename "
+			    " --replace '$1'"))
+			  "\n"))
+  ;; Explicitly ensuring that tags can be multi-word (e.g. two or more
+  ;; words joined with a dash).  Given that I export these tags, they
+  ;; should be accessible to screen-readers.  And without the dashes
+  ;; they are a garbled word salad.
+  (denote-allow-multi-word-keywords t)
+  ;; And `org-read-date' is an amazing bit of tech
+  (denote-date-prompt-denote-date-prompt-use-org-read-date t))
 
 
 (use-package consult-notes
@@ -180,21 +192,6 @@ This function is the plural version of `jf/denote-org-property-from-id'."
 		 (when-let ((refs (lax-plist-get kw-plist "ROAM_REFS")))
 		   (first (s-split " " refs t)))
 		 (lax-plist-get kw-plist "SAME_AS"))))))))
-
-
-(cl-defun jf/calculated-list-of-denote-known-keywords (&key from)
-  "Return a list of known `denote' keywords.
-
-Our controlled vocabulary...if you will."
-  (split-string-and-unquote
-   (shell-command-to-string
-    (concat
-     "rg \"#\\+TAG:\\s([\\w-]+)\" "
-     from
-     " --only-matching"
-     " --no-filename "
-     " --replace '$1'"))
-   "\n"))
 
 ;;;;; `denote' file finding functions
 
