@@ -697,6 +697,15 @@ Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
    )
   "From Strider Mode p11-12")
 
+(defvar jf/gaming/the-one-ring/feat-die
+  '("⏿"
+    "1" "2" "3" "4" "5" "6" "7" "8" "9" "10"
+    "ᚠ"))
+
+(defvar jf/gaming/the-one-ring/success-die
+  '("①" "②" "③"
+    "❹" "❺" "❻Շ"))
+
 (defvar jf/gaming/runes
   '(
     "ᚠ" ;; (Runic Letter Fehu Feoh Fe F) Gandalf rune
