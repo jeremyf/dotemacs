@@ -607,15 +607,15 @@ Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
   :body
   (s-join
    "\n"
-   '("| Chance                              | Yes if Feat Die |"
-     "|-------------------------------------+-----------------|"
-     "| Certain                             | ≥ 1             |"
-     "| Likely                              | ≥ 4             |"
-     "| Middling                            | ≥ 6             |"
-     "| Doubtful                            | ≥ 8             |"
-     "| Unthinkable                         | 10              |"
-     "| Yes with an extreme result or twist | Gandalf         |"
-     "| No with an extreme result or twist  | Eye of Sauron   |")))
+   '("| Chance                              | Yes if Feat Die  |"
+     "|-------------------------------------+------------------|"
+     "| Certain                             | ≥ 1              |"
+     "| Likely                              | ≥ 4              |"
+     "| Middling                            | ≥ 6              |"
+     "| Doubtful                            | ≥ 8              |"
+     "| Unthinkable                         | 10               |"
+     "| Yes with an extreme result or twist | ᚠ Gandalf rune   |"
+     "| No with an extreme result or twist  | ⏿ Eye of Sauron |")))
 
 (jf/transient-quick-help jf/gaming/the-one-ring/strider-mode/experience-milestones
   :label "Strider: Experience Milestones"
@@ -639,28 +639,26 @@ Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
 (defvar jf/gaming/the-one-ring/strider-mode/telling-table
   ;; List contains 12 elements; 0th index is "Sauron", then 1st through 10th are
   ;; 1 through 10 and 11th is "Gandalf".
-  '(("Certain" . ("No with an extreme result or twist"
+  '(("Certain" . ("⏿ No with an extreme result or twist"
 		  "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes"
-		  "Yes with an extreme result or twist"))
-    ("Likely" . ("No with an extreme result or twist"
+		  "ᚠ Yes with an extreme result or twist"))
+    ("Likely" . ("⏿ No with an extreme result or twist"
 		 "No" "No" "No" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes"
-		 "Yes with an extreme result or twist"))
-    ("Middling" . ("No with an extreme result or twist"
+		 "ᚠ Yes with an extreme result or twist"))
+    ("Middling" . ("⏿ No with an extreme result or twist"
 		   "No" "No" "No" "No" "No" "Yes" "Yes" "Yes" "Yes" "Yes"
-		   "Yes with an extreme result or twist"))
-    ("Doubtful" . ("No with an extreme result or twist"
+		   "ᚠ Yes with an extreme result or twist"))
+    ("Doubtful" . ("⏿ No with an extreme result or twist"
 		   "No" "No" "No" "No" "No" "No" "No" "Yes" "Yes" "Yes"
-		   "Yes with an extreme result or twist"))
-    ("Unthinkable" . ("No with an extreme result or twist"
+		   "ᚠ Yes with an extreme result or twist"))
+    ("Unthinkable" . ("⏿ No with an extreme result or twist"
 		      "No" "No" "No" "No" "No" "No" "No" "No" "No" "Yes"
-		      "Yes with an extreme result or twist")))
-  "A translation of the Telling Table from Strider Mode.")
-
-
+		      "ᚠ Yes with an extreme result or twist")))
+  "An translation of the Telling Table from Strider Mode.")
 
 (defvar jf/gaming/the-one-ring/strider-mode/lore-table
   (list
-   :action '("Abandon" "Attack" "Betray" "Corrupt" "Defeat" "Weaken" ;; Eye of Sauron
+   :action '("⏿ Abandon" "⏿ Attack" "⏿ Betray" "⏿ Corrupt" "⏿ Defeat" "⏿ Weaken" ;; Eye of Sauron
 	     "Aid" "Arrive" "Await" "Breach" "Break" "Capture" ;; 1
 	     "Change" "Chase" "Command" "Control" "Create" "Defy" ;; 2
 	     "Demand" "Discover" "Disguise" "Endure" "Escape" "Evade" ;; 3
@@ -671,8 +669,8 @@ Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
 	     "Replenish" "Restore" "Scheme" "Search" "Seize" "Share" ;; 8
 	     "Slay" "Steal" "Summon" "Surrender" "Surround" "Threaten" ;; 9
 	     "Transform" "Trap" "Trick" "Uncover" "Uphold" "Withstand" ;; 10
-	     "Believe" "Bolster" "Defend" "Forgive" "Resist" "Strengthen") ;; Rune of Gandalf
-   :aspect '("Corrupted" "Cruel" "Deceptive" "Fell" "Ruined" "Treacherous" ;; Eye of Sauron
+	     "ᚠ Believe" "ᚠ Bolster" "ᚠ Defend" "ᚠ Forgive" "ᚠ Resist" "ᚠ Strengthen") ;; Rune of Gandalf
+   :aspect '("⏿ Corrupted" "⏿ Cruel" "⏿ Deceptive" "⏿ Fell" "⏿ Ruined" "⏿ Treacherous" ;; Eye of Sauron
 	     "Active" "Ancient" "Bold" "Bright" "Broken" "Cheerless" ;; 1
 	     "Cold" "Concealed" "Dangerous" "Dark" "Dead" "Defended" ;; 2
 	     "Desolate" "Destroyed" "Dreadful" "Empty" "Evil" "Faded" ;; 3
@@ -683,8 +681,8 @@ Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
 	     "Restored" "Sheltered" "Silent" "Simple" "Small" "Sombre" ;; 8
 	     "Stony" "Stout" "Stricken" "Stubborn" "Twisted" "Unnatural" ;; 9
 	     "Veiled" "Vigorous" "Weary" "Wild" "Wretched" "Young" ;; 10
-	     "Flourishing" "Beautiful" "Good" "Kind" "Gentle" "Wondrous") ;; Rune of Gandalf
-   :focus '("Curse" "Despair" "Enemy" "Fear" "Shadow" "War" ;; Eye of Sauron
+	     "ᚠ Flourishing" "ᚠ Beautiful" "ᚠ Good" "ᚠ Kind" "ᚠ Gentle" "ᚠ Wondrous") ;; Rune of Gandalf
+   :focus '("⏿ Curse" "⏿ Despair" "⏿ Enemy" "⏿ Fear" "⏿ Shadow" "⏿ War" ;; Eye of Sauron
 	    "Battle" "Border" "Burden" "Council" "Court" "Creature" ;; 1
 	    "Darkness" "Death" "Defence" "Depths" "Doubt" "Dreams" ;; 2
 	    "Fate" "Fire" "Folk" "Followers" "Greed" "Haven" ;; 3
@@ -695,11 +693,16 @@ Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
 	    "Riddle" "Ruins" "Rumour" "Secret" "Skill" "Song" ;; 8
 	    "Story" "Strength" "Time" "Tool" "Treasure" "Trust" ;; 9
 	    "Truth" "Vengeance" "Wealth" "Weapon" "Wilds" "Wish" ;; 10
-	    "Courage" "Duty" "Fellowship" "Hope" "Love" "Peace") ;; Rune of Gandalf
+	    "ᚠ Courage" "ᚠ Duty" "ᚠ Fellowship" "ᚠ Hope" "ᚠ Love" "ᚠ Peace") ;; Rune of Gandalf
    )
   "From Strider Mode p11-12")
 
-
+(defvar jf/gaming/utf-8-characters
+  '(
+    "ᚠ" ;; (Runic Letter Fehu Feoh Fe F) Gandalf rune
+    "Շ" ;; (Armenian Capital Letter Sha) Success Icon
+    "⏿" ;; (Observer Eye Symbol) Sauron symbol
+    ))
 
 (provide 'jf-gaming)
 ;;; jf-gaming.el ends here
