@@ -697,7 +697,7 @@ Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
    )
   "From Strider Mode p11-12")
 
-(defvar jf/gaming/utf-8-characters
+(defvar jf/gaming/runes
   '(
     "ᚠ" ;; (Runic Letter Fehu Feoh Fe F) Gandalf rune
     "Շ" ;; (Armenian Capital Letter Sha) Success Icon
