@@ -116,9 +116,9 @@
 	 ("s-3" . bufler)
 	 ("s-\\" . jf/tab-bar-switch-prompt-for-tab)
 	 ("s-]" . tab-line-switch-to-next-tab)
-	 ("s-}" . jf/tab-bar-switch-to-next-tab)
+	 ("s-}" . tab-line-switch-to-next-tab)
 	 ("s-[" . tab-line-switch-to-prev-tab)
-	 ("s-{" . jf/tab-bar-switch-to-prev-tab)))
+	 ("s-{" . tab-line-switch-to-prev-tab)))
 
 (defun jf/bufler-workspace-mode-lighter ()
   "Return the lighter string mode line."
