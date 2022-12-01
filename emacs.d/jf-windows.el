@@ -108,22 +108,26 @@
 ;; have sizing issues.
 (use-package bufler
   :straight t
-  :hook (after-init . (lambda () (bufler-mode) (bufler-tabs-mode 1)))
+  :hook (after-init . (lambda () (bufler-mode) (jf/bufler/tab-configuration)))
   :config
+  (defun jf/bufler/tab-configuration ()
+    (bufler-tabs-mode 1)
+    (tab-bar-mode -1)
+    (bufler-workspace-tabs))
   (setq tab-line-switch-cycling t)
+  (defun jf/bufler-workspace-mode-lighter ()
+    "Return the lighter string mode line."
+    "Bflr")
+  (advice-add #'bufler-workspace-mode-lighter
+	      :override #'jf/bufler-workspace-mode-lighter
+	      '((name . "wrapper")))
   :bind (:map bufler-list-mode-map ("s-3" . quit-window))
-  :bind (("s-b" . bufler-switch-buffer)
-	 ("s-3" . bufler)
+  :bind (("s-3" . bufler)
 	 ("s-\\" . jf/tab-bar-switch-prompt-for-tab)
 	 ("s-]" . tab-line-switch-to-next-tab)
 	 ("s-}" . tab-line-switch-to-next-tab)
 	 ("s-[" . tab-line-switch-to-prev-tab)
 	 ("s-{" . tab-line-switch-to-prev-tab)))
-
-(defun jf/bufler-workspace-mode-lighter ()
-  "Return the lighter string mode line."
-  "Bflr")
-(advice-add #'bufler-workspace-mode-lighter :override #'jf/bufler-workspace-mode-lighter '((name . "wrapper")))
 
 (defun jf/tab-bar-switch-to-next-tab ()
   "Move to the next `tab-bar' tab and open the first buffer."
@@ -147,7 +151,7 @@
     (switch-to-buffer (caar buffers)))
   ;; A hack to ensure that I have the top tabs; I don't need it because I could
   ;; use `jf/tab-bar-switch-prompt-for-tab'.
-  (bufler-tabs-mode t))
+  (jf/bufler/tab-configuration))
 
 (defun jf/tab-bar-switch-prompt-for-tab (name)
   "Switch to the NAME tab and prompt for a buffer."
@@ -159,7 +163,7 @@
                             recent-tabs nil nil nil nil recent-tabs))))
   (tab-bar-select-tab (1+ (or (tab-bar--tab-index-by-name name) 0)))
   (bufler-switch-buffer)
-  (bufler-tabs-mode t))
+  (jf/bufler/tab-configuration))
 
 (provide 'jf-windows)
 ;;; jf-windows.el ends here
