@@ -708,9 +708,9 @@ Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
 
 (defvar jf/gaming/runes
   '(
-    "ᚠ" ;; (Runic Letter Fehu Feoh Fe F) Gandalf rune
-    "Շ" ;; (Armenian Capital Letter Sha) Success Icon
-    "⏿" ;; (Observer Eye Symbol) Sauron symbol
+    '("ᚠ" . "Gandalf Rune for the One Ring") ;; (Runic Letter Fehu Feoh Fe F) Gandalf rune
+    '("Շ" . "Success Icon for the One Ring") ;; (Armenian Capital Letter Sha) Success Icon
+    '("⏿" . "Eye of Sauron for the One Ring") ;; (Observer Eye Symbol) Sauron symbol
     ))
 
 (provide 'jf-gaming)
