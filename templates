@@ -76,9 +76,9 @@ org-mode
 	    n "#+end_marginnote" n q)
 
 (telling-table n "#+begin_marginnote"
-	       n> "I wonder “" (p "Question: " question t) (s question) "”  As {{{i(Loremaster)}}}, I find the likelihood of this question being yes is "
+	       n> "I wonder “" (p "Question: " question t) (s question) "”  As {{{i(Loremaster)}}}, I find the likelihood of the answer being yes is "
 	       (p (completing-read "Likelihood of yes: " jf/gaming/the-one-ring/strider-mode/telling-table) likelihood t)
-	       "{{{i(" (s likelihood) ")}}}.  Consulting the {{{i(Telling Table)}}} the answer is “"
+	       "{{{i(" (s likelihood) ")}}}.  Consulting the {{{i(Telling Table)}}} the answer /is/ “"
 	       (seq-random-elt (alist-get likelihood jf/gaming/the-one-ring/strider-mode/telling-table nil nil #'string=)) ".”"
 	       n "#+end_marginnote" n q)
 

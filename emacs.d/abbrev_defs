@@ -1297,6 +1297,7 @@
     ("drnik" "drink" nil :count 1)
     ("druming" "drumming" nil :count 1)
     ("drummless" "drumless" nil :count 1)
+    ("Dunedain" "Dúnedain" nil :count 1)
     ("dum" "dumb" nil :count 1)
     ("dupicate" "duplicate" nil :count 1)
     ("durig" "during" nil :count 1)

@@ -151,6 +151,7 @@
 					 (plantuml . t)
 					 (ruby . t))))
   (add-to-list 'org-structure-template-alist '("M" . "marginnote"))
+  (add-to-list 'org-structure-template-alist '("i" . "inline_comments"))
   (add-to-list 'org-structure-template-alist '("S" . "sidenote"))
   :init
   (require 'ox)
@@ -616,7 +617,7 @@ language name.")
 
 (add-to-list 'org-export-global-macros
 	     '("linkToSeries" . "@@hugo:{{< linkToSeries \"@@$1@@hugo:\" >}}@@"))'
-
+;;;###autoload
 (cl-defun jf/org-macro-value-list (macro-name &key (dir org-directory))
   "List the unique inner text of all uses of MACRO-NAME in given DIR."
   (s-split

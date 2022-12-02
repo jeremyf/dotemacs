@@ -15,8 +15,13 @@
 
 (use-package ox-hugo
   :straight t
-  :custom (org-hugo-paired-shortcodes "marginnote sidenote poem")
+  :custom
+  (org-hugo-paired-shortcodes "marginnote sidenote poem inline_comments")
+  (hugo-use-code-for-kbd t)
   :after ox)
+
+(advice-add #'org-blackfriday-plain-list :override #'org-html-plain-list '((name . "wrapper")))
+(advice-add #'org-blackfriday-item :override #'org-html-item '((name . "wrapper")))
 
 (setq org-hugo-base-dir "~/git/takeonrules.source")
 
