@@ -82,7 +82,7 @@ org-mode
 	       (seq-random-elt (alist-get likelihood jf/gaming/the-one-ring/strider-mode/telling-table nil nil #'string=)) ".”"
 	       n "#+end_marginnote" n q)
 
-(rune (completing-read "Rune: " jf/gaming/runes))
+(rune "{{{rune(" (completing-read "Rune: " jf/gaming/runes) ")}}}")
 
 ;;;; text-mode
 text-mode
