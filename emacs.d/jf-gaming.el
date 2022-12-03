@@ -699,7 +699,7 @@ Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
 
 (defvar jf/gaming/the-one-ring/feat-die
   '("⏿"
-    "1" "2" "3" "4" "5" "6" "7" "8" "9" "10"
+    1 2 3 4 5 6 7 8 9 10
     "ᚠ"))
 
 (defvar jf/gaming/the-one-ring/success-die
@@ -712,6 +712,58 @@ Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
     '("Շ" . "Success Icon for the One Ring") ;; (Armenian Capital Letter Sha) Success Icon
     '("⏿" . "Eye of Sauron for the One Ring") ;; (Observer Eye Symbol) Sauron symbol
     ))
+
+(defun jf/gaming/the-one-ring/roll (dice favorability)
+  "Roll the number of DICE with the given FAVORABILITY for the feat die."
+  (interactive (list
+		(read-number "Number of D6s: ")
+		(completing-read "Favourability: "
+				 jf/gaming/the-one-ring/feat-die-favourability)))
+  (let* ((feat-die (funcall
+		    (alist-get favorability
+			       jf/gaming/the-one-ring/feat-die-favourability
+			       nil
+			       nil
+			       #'string=)))
+	 (success-dice (jf/gaming/the-one-ring/roll-success-dice dice)))
+    (cond
+     ((numberp feat-die)
+      (format "%s %sd6: %s %sՇ"
+	      favorability
+	      dice
+	      (+ feat-die (plist-get success-dice :total))
+	      (plist-get success-dice :sixes)))
+     ((string= "⏿" feat-die)
+      (format "%s %sd6: %s %s %sՇ"
+	      favorability
+	      dice
+	      feat-die
+	      (plist-get success-dice :total)
+	      (plist-get success-dice :sixes)))
+     ((string= "ᚠ" feat-die)
+      (format "%s %sd6: %s %sՇ"
+	      favorability
+	      dice
+	      feat-die
+	      (plist-get success-dice :sixes))))))
+
+(defun jf/gaming/the-one-ring/roll-success-dice (number)
+  "Roll a NUMBER of \"The One Ring\" success dice."
+  (let ((total 0)
+	(sixes 0)
+	(roll 0))
+    (while (> number 0)
+      (setq roll (1+ (random 6)))
+      (setq total (+ total roll))
+      (when (= 6 roll) (setq sixes (+ 1 sixes)))
+      (setq number (1- number)))
+      (list :total total :sixes sixes)))
+(message "%s" (jf/gaming/the-one-ring/roll-success-dice 4))
+
+(defvar jf/gaming/the-one-ring/feat-die-favourability
+  '(("Favoured" . (lambda () (nth (max (random 12) (random 12)) jf/gaming/the-one-ring/feat-die)))
+    ("Neutral" . (lambda () (seq-random-elt jf/gaming/the-one-ring/feat-die)))
+    ("Ill-Favoured" . (lambda () (nth (min (random 12) (random 12)) jf/gaming/the-one-ring/feat-die)))))
 
 (provide 'jf-gaming)
 ;;; jf-gaming.el ends here

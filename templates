@@ -83,6 +83,7 @@ org-mode
 	       n "#+end_marginnote" n q)
 
 (rune "{{{rune(" (completing-read "Rune: " jf/gaming/runes) ")}}}")
+(tor-roll (call-interactively 'jf/gaming/the-one-ring/roll))
 
 ;;;; text-mode
 text-mode
