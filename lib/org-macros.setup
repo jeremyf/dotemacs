@@ -3,4 +3,4 @@
 #+MACRO: epigraph @@hugo:{{< epigraph key="$1" >}}@@
 #+MACRO: blockquote (eval (jf/blockquote-hugo $1))
 #+MACRO: cite @@hugo:<cite>@@$1@@hugo:</cite>@@
-MACRO: rune @@hugo:<span class="rune">@@$1@@hugo:</span>@@
+#+MACRO: rune @@hugo:<span class="rune">@@$1@@hugo:</span>@@
