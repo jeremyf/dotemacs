@@ -56,7 +56,9 @@
      (2 . (overline semibold 1.4))
      (3 . (monochrome overline 1.2 background))
      (4 . (overline 1.1))
-     (t . (rainbow 1.05)))))
+     (5 . (rainbow 1.05))
+     (6 . (rainbow 1.0))
+     (t . (rainbow 0.85)))))
 
 ;; (use-package ef-themes
 ;;   :straight (ef-themes :host nil :type git :repo "https://git.sr.ht/~protesilaos/ef-themes")

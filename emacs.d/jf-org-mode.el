@@ -47,7 +47,11 @@
   :straight (org :type built-in)
   :hook (org-mode . turn-on-visual-line-mode)
   (org-mode . jf/org-completion-at-point-functions)
-  (org-mode . org-indent-mode)
+  ;; Disable org-indent-mode; it's easy enough to enable.  The primary reason is
+  ;; that it does not play nice with the multi-cursor package.  And I'd prefer
+  ;; to have that work better by default.
+  ;;
+  ;; (org-mode . org-indent-mode)
   :bind ("C-j" . jf/jump-to-agenda-or-mark)
   :bind (:map org-mode-map ("C-j" . jf/jump-to-agenda-or-mark))
   :custom (org-use-speed-commands t)
@@ -459,11 +463,10 @@ tasks within projects are headline 5."
 			       (lambda (ancestor)
 				 (plist-get (cadr ancestor) :raw-value))
 			       (org-element-lineage hl)))
-			 (if (=(org-element-property :level hl) 4)
-			     (concat "\n" (plist-get (cadr hl) :raw-value))
-			   (concat "- "
-				   (plist-get (cadr hl) :raw-value)))))
-		     )))))
+			 (pcase (org-element-property :level hl)
+			   (4 (concat "\n" (plist-get (cadr hl) :raw-value)))
+			   (5 (concat "- " (plist-get (cadr hl) :raw-value)))
+			   (_ nil)))))))))
 	(jf/create-scratch-buffer)
 	(yank)))))
 

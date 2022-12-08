@@ -294,35 +294,35 @@ Useful if you want a more robust view into the recommend candidates."
   ;; This is recommended since dabbrev can be used globally (M-/).
   (global-corfu-mode))
 
-(use-package corfu-doc
-  ;; NOTE 2022-02-05: At the time of writing, `corfu-doc' is not yet on melpa
-  :straight (corfu-doc :type git :host github :repo "galeo/corfu-doc")
-  :bind (:map corfu-map
-              ;; This is a manual toggle for the documentation window.
-	      ;; Remap the default doc command
-              ([remap corfu-show-documentation] . corfu-doc-toggle)
-              ;; Scroll in the documentation window
-              ("M-n" . corfu-doc-scroll-up)
-              ("M-p" . corfu-doc-scroll-down))
-  :hook (corfu-mode . corfu-doc-mode)
-  :custom
-  (corfu-doc-delay 0.1)
-  (corfu-doc-hide-threshold 10)
-  (corfu-doc-max-width 60)
-  (corfu-doc-max-height 10)
+;; (use-package corfu-doc
+;;   ;; NOTE 2022-02-05: At the time of writing, `corfu-doc' is not yet on melpa
+;;   :straight (corfu-doc :type git :host github :repo "galeo/corfu-doc")
+;;   :bind (:map corfu-map
+;;               ;; This is a manual toggle for the documentation window.
+;; 	      ;; Remap the default doc command
+;;               ([remap corfu-show-documentation] . corfu-doc-toggle)
+;;               ;; Scroll in the documentation window
+;;               ("M-n" . corfu-doc-scroll-up)
+;;               ("M-p" . corfu-doc-scroll-down))
+;;   :hook (corfu-mode . corfu-doc-mode)
+;;   :custom
+;;   (corfu-doc-delay 0.1)
+;;   (corfu-doc-hide-threshold 10)
+;;   (corfu-doc-max-width 60)
+;;   (corfu-doc-max-height 10)
 
-  ;; NOTE 2022-02-05: I've also set this in the `corfu' use-package to be
-  ;; extra-safe that this is set when corfu-doc is loaded. I do not want
-  ;; documentation shown in both the echo area and in the `corfu-doc' popup.
-  ;; (corfu-echo-documentation nil)
-  :config
-  ;; NOTE 2022-02-05: This is optional. Enabling the mode means that every corfu
-  ;; popup will have corfu-doc already enabled. This isn't desirable for me
-  ;; since (i) most of the time I do not need to see the documentation and (ii)
-  ;; when scrolling through many candidates, corfu-doc makes the corfu popup
-  ;; considerably laggy when there are many candidates. Instead, I rely on
-  ;; manual toggling via `corfu-doc-toggle'.
-  (corfu-doc-mode))
+;;   ;; NOTE 2022-02-05: I've also set this in the `corfu' use-package to be
+;;   ;; extra-safe that this is set when corfu-doc is loaded. I do not want
+;;   ;; documentation shown in both the echo area and in the `corfu-doc' popup.
+;;   ;; (corfu-echo-documentation nil)
+;;   :config
+;;   ;; NOTE 2022-02-05: This is optional. Enabling the mode means that every corfu
+;;   ;; popup will have corfu-doc already enabled. This isn't desirable for me
+;;   ;; since (i) most of the time I do not need to see the documentation and (ii)
+;;   ;; when scrolling through many candidates, corfu-doc makes the corfu popup
+;;   ;; considerably laggy when there are many candidates. Instead, I rely on
+;;   ;; manual toggling via `corfu-doc-toggle'.
+;;   (corfu-doc-mode))
 
 
 (use-package cape
