@@ -620,21 +620,6 @@ language name.")
 
 (add-to-list 'org-export-global-macros
 	     '("linkToSeries" . "@@hugo:{{< linkToSeries \"@@$1@@hugo:\" >}}@@"))'
-;;;###autoload
-(cl-defun jf/org-macro-value-list (macro-name &key (dir org-directory))
-  "List the unique inner text of all uses of MACRO-NAME in given DIR."
-  (s-split
-   "\n"
-   (s-trim
-    (shell-command-to-string
-     (concat
-      "rg \"\\{\\{\\{"
-      macro-name
-      "\\((.+?)\\)\\}\\}\\}"
-      "\" --only-matching --no-filename -r '$1' "
-      dir
-      " | sort | uniq")))))
-
 
 (defun jf/org-link-delete-link ()
   "Remove the link part of an org-mode link at point and keep

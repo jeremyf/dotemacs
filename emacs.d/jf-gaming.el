@@ -601,21 +601,8 @@ Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
 
 ;;;; The One Ring
 
-(jf/transient-quick-help jf/gaming/the-one-ring/strider-mode/telling-table
-  :label "Strider: Telling Table"
-  :header "Strider: Telling Table "
-  :body
-  (s-join
-   "\n"
-   '("| Chance                              | Yes if Feat Die  |"
-     "|-------------------------------------+------------------|"
-     "| Certain                             | ≥ 1              |"
-     "| Likely                              | ≥ 4              |"
-     "| Middling                            | ≥ 6              |"
-     "| Doubtful                            | ≥ 8              |"
-     "| Unthinkable                         | 10               |"
-     "| Yes with an extreme result or twist | ᚠ Gandalf rune   |"
-     "| No with an extreme result or twist  | ⏿ Eye of Sauron |")))
+(jf/minor-mode-maker :title "The One Ring"
+		     :abbr "TOR")
 
 (jf/transient-quick-help jf/gaming/the-one-ring/strider-mode/experience-milestones
   :label "Strider: Experience Milestones"
@@ -702,68 +689,88 @@ Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
     1 2 3 4 5 6 7 8 9 10
     "ᚠ"))
 
-(defvar jf/gaming/the-one-ring/success-die
-  '("①" "②" "③"
-    "❹" "❺" "❻Շ"))
-
 (defvar jf/gaming/runes
-  '(
-    '("ᚠ" . "Gandalf Rune for the One Ring") ;; (Runic Letter Fehu Feoh Fe F) Gandalf rune
-    '("Շ" . "Success Icon for the One Ring") ;; (Armenian Capital Letter Sha) Success Icon
-    '("⏿" . "Eye of Sauron for the One Ring") ;; (Observer Eye Symbol) Sauron symbol
+  '(("ᚠ" . "Gandalf Rune for the One Ring") ;; (Runic Letter Fehu Feoh Fe F) Gandalf rune
+    ("Շ" . "Success Icon for the One Ring") ;; (Armenian Capital Letter Sha) Success Icon
+    ("⏿" . "Eye of Sauron for the One Ring") ;; (Observer Eye Symbol) Sauron symbol
     ))
 
-(defun jf/gaming/the-one-ring/roll (dice favorability)
-  "Roll the number of DICE with the given FAVORABILITY for the feat die."
+(defun jf/gaming/the-one-ring/roll (dice favorability is_weary)
+  "Roll the dice of DICE with the given FAVORABILITY for the feat die."
   (interactive (list
 		(read-number "Number of D6s: ")
 		(completing-read "Favourability: "
-				 jf/gaming/the-one-ring/feat-die-favourability)))
+				 jf/gaming/the-one-ring/feat-die-favourability)
+		(yes-or-no-p "Weary?")))
   (let* ((feat-die (funcall
 		    (alist-get favorability
 			       jf/gaming/the-one-ring/feat-die-favourability
 			       nil
 			       nil
 			       #'string=)))
-	 (success-dice (jf/gaming/the-one-ring/roll-success-dice dice)))
+	 (success-dice (jf/gaming/the-one-ring/roll-success-dice :dice dice :is_weary is_weary))
+	 (weary_message (if is_weary " with Weary condition" "")))
     (cond
      ((numberp feat-die)
-      (format "%s %sd6: %s %sՇ"
+      (format "%s %sd6%s [Feat: %s  Success: %s]: %s %sՇ "
 	      favorability
 	      dice
+	      weary_message
+	      feat-die
+	      (plist-get success-dice :rolls)
 	      (+ feat-die (plist-get success-dice :total))
 	      (plist-get success-dice :sixes)))
      ((string= "⏿" feat-die)
-      (format "%s %sd6: %s %s %sՇ"
+      (format "%s %sd6%s [Feat: %s  Success: %s]: %s %s %sՇ"
 	      favorability
 	      dice
+	      weary_message
+	      feat-die
+	      (plist-get success-dice :rolls)
 	      feat-die
 	      (plist-get success-dice :total)
 	      (plist-get success-dice :sixes)))
      ((string= "ᚠ" feat-die)
-      (format "%s %sd6: %s %sՇ"
+      (format "%s %sd6%s [Feat: %s  Success: %s]: %s %sՇ"
 	      favorability
 	      dice
+	      weary_message
+	      feat-die
+	      (plist-get success-dice :rolls)
 	      feat-die
 	      (plist-get success-dice :sixes))))))
 
-(defun jf/gaming/the-one-ring/roll-success-dice (number)
-  "Roll a NUMBER of \"The One Ring\" success dice."
+(cl-defun jf/gaming/the-one-ring/roll-success-dice (&key dice (is_weary nil))
+  "Roll a number of \"The One Ring\" success DICE.  And reject some results when IS_WEARY."
   (let ((total 0)
 	(sixes 0)
+	(rolls (list))
 	(roll 0))
-    (while (> number 0)
+    (while (> dice 0)
       (setq roll (1+ (random 6)))
-      (setq total (+ total roll))
+      (push roll rolls)
+      (when (or (not is_weary) (> roll 3)) (setq total (+ total roll)))
       (when (= 6 roll) (setq sixes (+ 1 sixes)))
-      (setq number (1- number)))
-      (list :total total :sixes sixes)))
-(message "%s" (jf/gaming/the-one-ring/roll-success-dice 4))
+      (setq dice (1- dice)))
+      (list :total total :sixes sixes :rolls rolls)))
 
 (defvar jf/gaming/the-one-ring/feat-die-favourability
-  '(("Favoured" . (lambda () (nth (max (random 12) (random 12)) jf/gaming/the-one-ring/feat-die)))
-    ("Neutral" . (lambda () (seq-random-elt jf/gaming/the-one-ring/feat-die)))
-    ("Ill-Favoured" . (lambda () (nth (min (random 12) (random 12)) jf/gaming/the-one-ring/feat-die)))))
+  '(("Favoured" . (lambda ()
+		    (nth (max (random 12) (random 12))
+			 jf/gaming/the-one-ring/feat-die)))
+    ("Neutral" . (lambda ()
+		   (seq-random-elt jf/gaming/the-one-ring/feat-die)))
+    ("Ill-Favoured" . (lambda ()
+			(nth (min (random 12) (random 12))
+			     jf/gaming/the-one-ring/feat-die)))))
 
+;; I want a menu that:
+
+;; Rolls the Feat die (prompting for type)
+;; Rolls a skill check; insert at point
+;; Opens Duinhir's Character Sheet
+
+
+;; TODO: Consider how I might "lookup" my character sheet for Solo Play.
 (provide 'jf-gaming)
 ;;; jf-gaming.el ends here

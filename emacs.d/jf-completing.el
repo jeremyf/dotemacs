@@ -504,7 +504,19 @@ Useful if you want a more robust view into the recommend candidates."
 	 ("M-*" . tempel-insert))
 
   :init
-
+  (cl-defun jf/org-macro-value-list (macro-name &key (dir org-directory))
+    "List the unique inner text of all uses of MACRO-NAME in given DIR."
+    (s-split
+     "\n"
+     (s-trim
+      (shell-command-to-string
+       (concat
+	"rg \"\\{\\{\\{"
+	macro-name
+	"\\((.+?)\\)\\}\\}\\}"
+	"\" --only-matching --no-filename -r '$1' "
+	dir
+	" | sort | uniq")))))
   ;; Setup completion at point
   (defun tempel-setup-capf ()
     ;; Add the Tempel Capf to `completion-at-point-functions'. `tempel-expand'

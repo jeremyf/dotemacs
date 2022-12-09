@@ -30,7 +30,7 @@
   "The path to the file that has inline org macros.")
 
 (with-eval-after-load 'ox-hugo
-  (add-to-list 'org-hugo-special-block-type-properties '("sidenote" . (:trim-pre t :trim-post t))))
+  (add-to-list 'org-hugo-special-block-type-properties '("sidenote" . (:trim-pre t))))
 
 (defun jf/org-html-verse-block (_verse-block contents info)
   "Transcode a VERSE-BLOCK element from Org to HTML.

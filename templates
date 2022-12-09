@@ -67,23 +67,27 @@ org-mode
 (tor "[[https://takeonrules.com][Take on Rules]]")
 (uml "#+begin_src plantuml" n> "@startuml" n> "!theme amiga" n> q n> "@enduml" n> "#+end_src" n>)
 (project ":PROJECT:" n "#+PROJECT_NAME: " p n "#+PROJECT_PATH_TO_CODE: " p n "#+PROJECT_PATH_TO_REMOTE: " p n "#+PROJECT_PATH_TO_BOARD: " p n ":END:")
-(lore-table n "#+begin_marginnote"
-	    n> "With the question “" (p "Question: " question t) (s question) "” I consult the {{{i(Lore Table)}}} and get the following clues:"
-	    n>
-	    n> "- Action :: " (seq-random-elt (plist-get jf/gaming/the-one-ring/strider-mode/lore-table :action))
+
+;;;;; Consider "The One Ring" minor mode to inject these.
+(lore-table n "{{{i(Lore Table)}}}:"
+	    n
+	    n "- Question :: “" (p "Question: " question t) (s question) "”"
+	    n "- Action :: " (seq-random-elt (plist-get jf/gaming/the-one-ring/strider-mode/lore-table :action))
 	    n "- Aspect :: " (seq-random-elt (plist-get jf/gaming/the-one-ring/strider-mode/lore-table :aspect))
 	    n "- Focus :: " (seq-random-elt (plist-get jf/gaming/the-one-ring/strider-mode/lore-table :focus))
-	    n "#+end_marginnote" n q)
+	    n q)
 
-(telling-table n "#+begin_marginnote"
-	       n> "I wonder “" (p "Question: " question t) (s question) "”  As {{{i(Loremaster)}}}, I find the likelihood of the answer being yes is "
-	       (p (completing-read "Likelihood of yes: " jf/gaming/the-one-ring/strider-mode/telling-table) likelihood t)
-	       "{{{i(" (s likelihood) ")}}}.  Consulting the {{{i(Telling Table)}}} the answer /is/ “"
-	       (seq-random-elt (alist-get likelihood jf/gaming/the-one-ring/strider-mode/telling-table nil nil #'string=)) ".”"
-	       n "#+end_marginnote" n q)
-
+(telling-table n "{{{i(Telling Table)}}}:"
+	       n
+	       n "- Question ::  “" (p "Question: " question t) (s question) "”"
+	       n "- Likelihood :: " (p (completing-read "Likelihood of yes: " jf/gaming/the-one-ring/strider-mode/telling-table) likelihood t)
+	       "{{{i(" (s likelihood) ")}}}."
+	       n "- Answer :: “" (seq-random-elt (alist-get likelihood jf/gaming/the-one-ring/strider-mode/telling-table nil nil #'string=)) ".”"
+	       n q)
 (rune "{{{rune(" (completing-read "Rune: " jf/gaming/runes) ")}}}")
 (tor-roll (call-interactively 'jf/gaming/the-one-ring/roll))
+(tor-feat-die (format "%s" (seq-random-elt jf/gaming/the-one-ring/feat-die)))
+(asl "As {{{i(Loremaster)}}}, ")
 
 ;;;; text-mode
 text-mode

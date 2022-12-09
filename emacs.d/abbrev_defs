@@ -16,6 +16,7 @@
     ("abotu" "about" nil :count 1)
     ("abouta" "about a" nil :count 1)
     ("aboutit" "about it" nil :count 1)
+    ("dui" "Duinhir" nil :count 1)
     ("aboutthe" "about the" nil :count 1)
     ("abreviate" "abbreviate" nil :count 1)
     ("abreviated" "abbreviated" nil :count 1)
