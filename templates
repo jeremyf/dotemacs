@@ -69,24 +69,7 @@ org-mode
 (project ":PROJECT:" n "#+PROJECT_NAME: " p n "#+PROJECT_PATH_TO_CODE: " p n "#+PROJECT_PATH_TO_REMOTE: " p n "#+PROJECT_PATH_TO_BOARD: " p n ":END:")
 
 ;;;;; Consider "The One Ring" minor mode to inject these.
-(lore-table n "{{{i(Lore Table)}}}:"
-	    n
-	    n "- Question :: “" (p "Question: " question t) (s question) "”"
-	    n "- Action :: " (seq-random-elt (plist-get jf/gaming/the-one-ring/strider-mode/lore-table :action))
-	    n "- Aspect :: " (seq-random-elt (plist-get jf/gaming/the-one-ring/strider-mode/lore-table :aspect))
-	    n "- Focus :: " (seq-random-elt (plist-get jf/gaming/the-one-ring/strider-mode/lore-table :focus))
-	    n q)
-
-(telling-table n "{{{i(Telling Table)}}}:"
-	       n
-	       n "- Question ::  “" (p "Question: " question t) (s question) "”"
-	       n "- Likelihood :: " (p (completing-read "Likelihood of yes: " jf/gaming/the-one-ring/strider-mode/telling-table) likelihood t)
-	       "{{{i(" (s likelihood) ")}}}."
-	       n "- Answer :: “" (seq-random-elt (alist-get likelihood jf/gaming/the-one-ring/strider-mode/telling-table nil nil #'string=)) ".”"
-	       n q)
 (rune "{{{rune(" (completing-read "Rune: " jf/gaming/runes) ")}}}")
-(tor-roll (call-interactively 'jf/gaming/the-one-ring/roll))
-(tor-feat-die (format "%s" (seq-random-elt jf/gaming/the-one-ring/feat-die)))
 (asl "As {{{i(Loremaster)}}}, ")
 
 ;;;; text-mode

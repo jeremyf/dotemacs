@@ -695,53 +695,56 @@ Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
     ("⏿" . "Eye of Sauron for the One Ring") ;; (Observer Eye Symbol) Sauron symbol
     ))
 
-(defun jf/gaming/the-one-ring/roll (dice favorability is_weary)
+
+(cl-defun jf/gaming/the-one-ring/roll/feat-die (favorability)
+  (interactive (list (completing-read "Favourability: "
+				      jf/gaming/the-one-ring/feat-die-favourability)))
+  (funcall
+   (alist-get favorability
+	      jf/gaming/the-one-ring/feat-die-favourability
+	      nil
+	      nil
+	      #'string=)))
+
+(cl-defun jf/gaming/the-one-ring/roll/skill-check (dice
+						   favorability
+						   &key
+						   (is_weary
+						    jf/gaming/the-one-ring/character-is-weary))
   "Roll the dice of DICE with the given FAVORABILITY for the feat die."
   (interactive (list
 		(read-number "Number of D6s: ")
 		(completing-read "Favourability: "
-				 jf/gaming/the-one-ring/feat-die-favourability)
-		(yes-or-no-p "Weary?")))
-  (let* ((feat-die (funcall
-		    (alist-get favorability
-			       jf/gaming/the-one-ring/feat-die-favourability
-			       nil
-			       nil
-			       #'string=)))
-	 (success-dice (jf/gaming/the-one-ring/roll-success-dice :dice dice :is_weary is_weary))
-	 (weary_message (if is_weary " with Weary condition" "")))
+				 jf/gaming/the-one-ring/feat-die-favourability)))
+  (let* ((feat-die (jf/gaming/the-one-ring/roll/feat-die favorability))
+	 (success-dice (jf/gaming/the-one-ring/roll/success-dice :dice dice :is_weary is_weary))
+	 (weary_message (if is_weary " with Weary condition" ""))
+	 (prefix (format "%s %sd6%s [Feat: %s  Success: %s]"
+			 favorability
+			 dice
+			 weary_message
+			 feat-die
+			 (plist-get success-dice :rolls))))
     (cond
      ((numberp feat-die)
-      (format "%s %sd6%s [Feat: %s  Success: %s]: %s %sՇ "
-	      favorability
-	      dice
-	      weary_message
-	      feat-die
-	      (plist-get success-dice :rolls)
+      (format "%s: %s %sՇ "
+	      prefix
 	      (+ feat-die (plist-get success-dice :total))
 	      (plist-get success-dice :sixes)))
      ((string= "⏿" feat-die)
-      (format "%s %sd6%s [Feat: %s  Success: %s]: %s %s %sՇ"
-	      favorability
-	      dice
-	      weary_message
-	      feat-die
-	      (plist-get success-dice :rolls)
+      (format "%s: %s %s %sՇ"
+	      prefix
 	      feat-die
 	      (plist-get success-dice :total)
 	      (plist-get success-dice :sixes)))
      ((string= "ᚠ" feat-die)
-      (format "%s %sd6%s [Feat: %s  Success: %s]: %s %sՇ"
-	      favorability
-	      dice
-	      weary_message
-	      feat-die
-	      (plist-get success-dice :rolls)
+      (format "%s: %s %sՇ"
+	      prefix
 	      feat-die
 	      (plist-get success-dice :sixes))))))
 
-(cl-defun jf/gaming/the-one-ring/roll-success-dice (&key dice (is_weary nil))
-  "Roll a number of \"The One Ring\" success DICE.  And reject some results when IS_WEARY."
+(cl-defun jf/gaming/the-one-ring/roll/success-dice (&key dice (is_weary nil))
+  "Roll a number of \"The One Ring\" success DICE.  And reject some results when character IS_WEARY."
   (let ((total 0)
 	(sixes 0)
 	(rolls (list))
@@ -752,7 +755,7 @@ Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
       (when (or (not is_weary) (> roll 3)) (setq total (+ total roll)))
       (when (= 6 roll) (setq sixes (+ 1 sixes)))
       (setq dice (1- dice)))
-      (list :total total :sixes sixes :rolls rolls)))
+    (list :total total :sixes sixes :rolls rolls)))
 
 (defvar jf/gaming/the-one-ring/feat-die-favourability
   '(("Favoured" . (lambda ()
@@ -769,7 +772,80 @@ Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
 ;; Rolls the Feat die (prompting for type)
 ;; Rolls a skill check; insert at point
 ;; Opens Duinhir's Character Sheet
+;;
 
+(defun jf/gaming/the-one-ring/roll/lore-table (question)
+  (interactive (list
+		(read-string "Open-ended Question: ")))
+  (concat "{{{i(Lore Table)}}}:\n"
+	  "\n"
+	  "- Question :: “" question "”\n"
+	  "- Action :: " (seq-random-elt (plist-get jf/gaming/the-one-ring/strider-mode/lore-table :action)) "\n"
+	  "- Aspect :: " (seq-random-elt (plist-get jf/gaming/the-one-ring/strider-mode/lore-table :aspect)) "\n"
+	  "- Focus :: " (seq-random-elt (plist-get jf/gaming/the-one-ring/strider-mode/lore-table :focus)) "\n"))
+
+(defun jf/gaming/the-one-ring/roll/telling-table (question likelihood)
+  "Ask the QUESTION with the given LIKELIHOOD on the `jf/gaming/the-one-ring/strider-mode/telling-table'."
+  (interactive (list
+		(read-string "Yes/No Question: ")
+		(completing-read "Likelihood of yes: " jf/gaming/the-one-ring/strider-mode/telling-table)))
+  (concat "{{{i(Telling Table)}}}:\n"
+	  "\n"
+	  "- Question :: “" question "”\n"
+	  "- Likelihood :: " likelihood "\n"
+	  "- Answer :: “" (seq-random-elt (alist-get likelihood jf/gaming/the-one-ring/strider-mode/telling-table nil nil #'string=)) "”"
+	  "\n"))
+
+(cl-defmacro jf/gaming/the-one-ring/create-condition (&key condition)
+  (let* ((var-sym (intern (concat "jf/gaming/the-one-ring/character-is-" condition)))
+	 (var-docstring (concat "Is the current character is " condition "?"))
+         (fun-sym (intern (concat "jf/gaming/the-one-ring/character-is-" condition "/set")))
+	 (fun-docstring (concat "Toggle current character's \"" condition "\" condition status.")))
+    `(progn
+       (defvar ,var-sym
+	 nil
+	 ,var-docstring)
+       (transient-define-suffix ,fun-sym ()
+	 ,fun-docstring
+	 :description '(lambda ()
+			 (concat
+			  (s-titleize ,condition) ": "
+			  (propertize
+			   (format "%s" (if ,var-sym "Yes" "No"))
+			   'face 'transient-argument)))
+	 (interactive)
+	 (setq ,var-sym (not ,var-sym))))))
+
+(jf/gaming/the-one-ring/create-condition :condition "miserable")
+(jf/gaming/the-one-ring/create-condition :condition "weary")
+
+(global-set-key (kbd "H-1") 'jf/gaming/the-one-ring/menu)
+(transient-define-prefix jf/gaming/the-one-ring/menu ()
+  ["The One Ring\n"
+   ["Rolls"
+    ("f" "Feat die…"
+     (lambda ()
+       (interactive)
+       (insert
+	(format "Feat Die: %s"
+		(call-interactively 'jf/gaming/the-one-ring/roll/feat-die)))))
+    ("l" "Lore table…"
+     (lambda ()
+       (interactive)
+       (insert (call-interactively 'jf/gaming/the-one-ring/roll/lore-table))))
+    ("s" "Skill check…"
+     (lambda ()
+       (interactive)
+       (insert (call-interactively 'jf/gaming/the-one-ring/roll/skill-check))))
+    ("t" "Telling table…"
+     (lambda ()
+       (interactive)
+       (insert (call-interactively 'jf/gaming/the-one-ring/roll/telling-table))))
+    ]
+   ["Conditions"
+    ("-m" jf/gaming/the-one-ring/character-is-miserable/set :transient t)
+    ("-w" jf/gaming/the-one-ring/character-is-weary/set :transient t)
+    ]])
 
 ;; TODO: Consider how I might "lookup" my character sheet for Solo Play.
 (provide 'jf-gaming)
