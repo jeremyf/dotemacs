@@ -730,9 +730,20 @@ Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
 (defun jf/gaming/the-one-ring/roll/event-table (favorability)
   (interactive (list (completing-read "Favourability: "
 				      jf/gaming/the-one-ring/feat-die-favourability)))
-  ;; Roll on the event-table's :table
-  )
-(message "%s" (seq-random-elt (plist-get jf/gaming/the-one-ring/event-table :table)))
+  (let* ((subtable-name (jf/gaming/the-one-ring/roll/favorability
+			 :favorability favorability
+			 :table (plist-get jf/gaming/the-one-ring/event-table :table)))
+	 (details (plist-get jf/gaming/the-one-ring/event-table :details))
+	 (subtable (plist-get details subtable-name))
+	 (subtable-events (seq-random-elt (plist-get subtable :events))))
+    (format "%s: %s\n\n- Fatigue :: %s\n- Consequence :: %s\n- Task :: %s\n"
+	     (plist-get subtable :title)
+	     (car subtable-events)
+	     (plist-get subtable :fatigue)
+	     (plist-get subtable :consequence)
+	     (cdr subtable-events))))
+
+;; (message "%s" (seq-random-elt (plist-get jf/gaming/the-one-ring/event-table :table)))
 (defconst jf/gaming/the-one-ring/event-table
   (list :table '(:terrible-misfortune :despair :ill-choices :ill-choices
 		 :mishap :mishap :mishap :mishap
@@ -742,7 +753,7 @@ Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
 	      (list :consequence "If the roll fails, the target is Wounded."
 		    :title "Terrible Misfortune"
 		    :fatigue 3
-		    :table
+		    :events
 		    '(("Dire confrontation" . "Noteworthy Encounter")
 		      ("Rival Predator" . "HUNTING to avoid becoming the hunted")
 		      ("Violent weather" . "EXPLORE to find shelter")
@@ -753,7 +764,7 @@ Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
 	      (list :consequence "If the roll fails, gain 2 Shadow points (Dread)."
 		    :title "Despair"
 		    :fatigue 2
-		    :table
+		    :events
 		    '(("Servants of the Enemy" . "Noteworthy Encounter")
 		      ("Torrential weather" . "EXPLORE to find the least exposed path")
 		      ("Nightmarish presence" . "AWARENESS to sense the danger")
@@ -761,10 +772,10 @@ Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
 		      ("Corrupted site" . "EXPLORE to find your way out")
 		      ("Grisly scene or foreboding portent" . "AWARENESS to be forewarned")))
 	      :mishap
-	      (list :consequences "If the roll fails, add 1 day to the length of the journey, and gain 1 additional Fatigue."
+	      (list :consequence "If the roll fails, add 1 day to the length of the journey, and gain 1 additional Fatigue."
 		    :title "Mishap"
 		    :fatigue 2
-		    :table
+		    :events
 		    '(("Sparse wildlife" . "HUNTING to forage what you can")
 		      ("Lost direction" . "EXPLORE to find your way")
 		      ("Obstructed path" . "AWARENESS to spot a way around")
@@ -772,10 +783,10 @@ Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
 		      ("Rough terrain" . "EXPLORE to safely traverse")
 		      ("Wandering enemies" . "AWARENESS to sense their coming")))
 	      :ill-choices
-	      (list :consequences "If the roll fails, gain 1 Shadow point (Dread)."
+	      (list :consequence "If the roll fails, gain 1 Shadow point (Dread)."
 		    :title "Ill Choices"
 		    :fatigue 2
-		    :table
+		    :events
 		    '(("Mismanaged provisions" . "HUNTING to replenish stores")
 		      ("Wayward path" . "EXPLORE to retrace your steps")
 		      ("Overlooked hazard" . "AWARENESS to escape safely")
@@ -783,10 +794,10 @@ Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
 		      ("Disorienting environs" . "EXPLORE to find your way")
 		      ("Haunting visions" . "AWARENESS to over- come darkness")))
 	      :short-cut
-	      (list :consequences "If the roll succeeds, reduce the length of the journey by 1 day."
+	      (list :consequence "If the roll succeeds, reduce the length of the journey by 1 day."
 		    :title "Short Cut"
 		    :fatigue 1
-		    :table
+		    :events
 		    '(("Game trail" . "HUNTING to traverse the path")
 		      ("Secluded path" . "EXPLORE to navigate the wilds")
 		      ("Helpful tracks" . "AWARENESS to follow the tracks")
@@ -797,7 +808,7 @@ Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
 	      (list :consequence "If the roll succeeds, no Fatigue is gained, and you may envision a favourable encounter."
 		    :title "Chance Meeting"
 		    :fatigue 1
-		    :table
+		    :events
 		    '(("Lone hunter" . "HUNTING to trade stories")
 		      ("Fellow traveller" . "EXPLORE to learn about the path ahead")
 		      ("Discreet watcher" . "AWARENESS to spot them")
@@ -805,9 +816,10 @@ Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
 		      ("Secluded encampment" . "EXPLORE to find your way off the beaten path")
 		      ("Auspicious gathering" . "Noteworthy Encounter")))
 	      :joyful-sight
-	      (list :consequences "If the roll succeeds, regain 1 Hope."
+	      (list :consequence "If the roll succeeds, regain 1 Hope."
+		    :title "Joyful Sight"
 		    :fatigue 0
-		    :table
+		    :events
 		    '(("Majestic creatures" . "HUNTING to observe without startling them")
 		      ("Inspiring vista" . "EXPLORE to reach a vantage point")
 		      ("Benevolent being" . "AWARENESS to sense their presence")
@@ -826,16 +838,19 @@ Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
     ("⏿" . "Eye of Sauron for the One Ring") ;; (Observer Eye Symbol) Sauron symbol
     ))
 
-
 (cl-defun jf/gaming/the-one-ring/roll/feat-die (favorability)
   (interactive (list (completing-read "Favourability: "
 				      jf/gaming/the-one-ring/feat-die-favourability)))
-  (funcall
-   (alist-get favorability
-	      jf/gaming/the-one-ring/feat-die-favourability
-	      nil
-	      nil
-	      #'string=)))
+  (jf/gaming/the-one-ring/roll/favorability :favorability favorability
+					    :table jf/gaming/the-one-ring/feat-die))
+
+(cl-defun jf/gaming/the-one-ring/roll/favorability (&key favorability table)
+  (funcall (alist-get favorability
+		      jf/gaming/the-one-ring/feat-die-favourability
+		      nil
+		      nil
+		      #'string=)
+	   table))
 
 (cl-defun jf/gaming/the-one-ring/roll/skill-check (dice
 						   favorability
@@ -889,14 +904,16 @@ Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
     (list :total total :sixes sixes :rolls rolls)))
 
 (defvar jf/gaming/the-one-ring/feat-die-favourability
-  '(("Favoured" . (lambda ()
-		    (nth (max (random 12) (random 12))
-			 jf/gaming/the-one-ring/feat-die)))
-    ("Neutral" . (lambda ()
-		   (seq-random-elt jf/gaming/the-one-ring/feat-die)))
-    ("Ill-Favoured" . (lambda ()
-			(nth (min (random 12) (random 12))
-			     jf/gaming/the-one-ring/feat-die)))))
+  '(("Favoured" . (lambda (table)
+		    (nth (max (random (length table))
+			      (random (length table)))
+			 table)))
+    ("Neutral" . (lambda (table)
+		   (seq-random-elt table)))
+    ("Ill-Favoured" . (lambda (table)
+			(nth (min (random (length table))
+				  (random (length table)))
+			     table)))))
 
 (defun jf/gaming/the-one-ring/roll/lore-table (question)
   (interactive (list
@@ -953,6 +970,10 @@ Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
        (insert
 	(format "Feat Die: %s"
 		(call-interactively 'jf/gaming/the-one-ring/roll/feat-die)))))
+    ("j" "Journey event"
+     (lambda ()
+       (interactive)
+       (insert (call-interactively 'jf/gaming/the-one-ring/roll/event-table))))
     ("l" "Lore table…"
      (lambda ()
        (interactive)
