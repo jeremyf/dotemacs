@@ -26,72 +26,67 @@
 
 ;;;; Tables
 
+;;;;; Core Rules
+
 (defconst jf/gaming/the-one-ring/feat-die
   '("⏿"
     1 2 3 4 5 6 7 8 9 10
     "ᚠ")
   "By convention all Feat-die tables treat the initial list item as the \"⏿\" roll.")
 
-(defconst jf/gaming/the-one-ring/strider-mode/telling-table
-  ;; List contains 12 elements; 0th index is "Sauron", then 1st through 10th are
-  ;; 1 through 10 and 11th is "Gandalf".
-  '(("Certain" . ("⏿ No with an extreme result or twist"
-		  "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes"
-		  "ᚠ Yes with an extreme result or twist"))
-    ("Likely" . ("⏿ No with an extreme result or twist"
-		 "No" "No" "No" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes"
-		 "ᚠ Yes with an extreme result or twist"))
-    ("Middling" . ("⏿ No with an extreme result or twist"
-		   "No" "No" "No" "No" "No" "Yes" "Yes" "Yes" "Yes" "Yes"
-		   "ᚠ Yes with an extreme result or twist"))
-    ("Doubtful" . ("⏿ No with an extreme result or twist"
-		   "No" "No" "No" "No" "No" "No" "No" "Yes" "Yes" "Yes"
-		   "ᚠ Yes with an extreme result or twist"))
-    ("Unthinkable" . ("⏿ No with an extreme result or twist"
-		      "No" "No" "No" "No" "No" "No" "No" "No" "No" "Yes"
-		      "ᚠ Yes with an extreme result or twist")))
-  "An translation of the Telling Table from Strider Mode.")
+(defconst jf/gaming/the-one-ring/feat-die-favourability
+  '(("Favoured" . (lambda (table)
+		    (nth (max (random (length table))
+			      (random (length table)))
+			 table)))
+    ("Neutral" . (lambda (table)
+		   (seq-random-elt table)))
+    ("Ill-Favoured" . (lambda (table)
+			(nth (min (random (length table))
+				  (random (length table)))
+			     table))))
+  "Favourability options and associated roller.")
 
-(defconst jf/gaming/the-one-ring/strider-mode/lore-table
-  '(
-    :action ("⏿ Abandon" "⏿ Attack" "⏿ Betray" "⏿ Corrupt" "⏿ Defeat" "⏿ Weaken" ;; Eye of Sauron
-	     "Aid" "Arrive" "Await" "Breach" "Break" "Capture" ;; 1
-	     "Change" "Chase" "Command" "Control" "Create" "Defy" ;; 2
-	     "Demand" "Discover" "Disguise" "Endure" "Escape" "Evade" ;; 3
-	     "Explore" "Find" "Focus" "Gather" "Guard" "Guide" ;; 4
-	     "Hide" "Hinder" "Hoard" "Hold" "Hunt" "Journey" ;; 5
-	     "Lead" "Learn" "Leave" "Lose" "Mourn" "Move" ;; 6
-	     "Persist" "Preserve" "Prevent" "Refuse" "Reject" "Remove" ;; 7
-	     "Replenish" "Restore" "Scheme" "Search" "Seize" "Share" ;; 8
-	     "Slay" "Steal" "Summon" "Surrender" "Surround" "Threaten" ;; 9
-	     "Transform" "Trap" "Trick" "Uncover" "Uphold" "Withstand" ;; 10
-	     "ᚠ Believe" "ᚠ Bolster" "ᚠ Defend" "ᚠ Forgive" "ᚠ Resist" "ᚠ Strengthen") ;; Rune of Gandalf
-    :aspect ("⏿ Corrupted" "⏿ Cruel" "⏿ Deceptive" "⏿ Fell" "⏿ Ruined" "⏿ Treacherous" ;; Eye of Sauron
-	     "Active" "Ancient" "Bold" "Bright" "Broken" "Cheerless" ;; 1
-	     "Cold" "Concealed" "Dangerous" "Dark" "Dead" "Defended" ;; 2
-	     "Desolate" "Destroyed" "Dreadful" "Empty" "Evil" "Faded" ;; 3
-	     "Far-reaching" "Fierce" "Foreboding" "Forgotten" "Fragile" "Ghastly" ;; 4
-	     "Gloomy" "Growing" "Hidden" "Ill-fated" "Impenetrable" "Inspiring" ;; 5
-	     "Isolated" "Lofty" "Lost" "Menacing" "Mighty" "Mysterious" ;; 6
-	     "Noble" "Obstructed" "Old" "Ominous" "Open" "Peaceful" ;; 7
-	     "Restored" "Sheltered" "Silent" "Simple" "Small" "Sombre" ;; 8
-	     "Stony" "Stout" "Stricken" "Stubborn" "Twisted" "Unnatural" ;; 9
-	     "Veiled" "Vigorous" "Weary" "Wild" "Wretched" "Young" ;; 10
-	     "ᚠ Flourishing" "ᚠ Beautiful" "ᚠ Good" "ᚠ Kind" "ᚠ Gentle" "ᚠ Wondrous") ;; Rune of Gandalf
-    :focus ("⏿ Curse" "⏿ Despair" "⏿ Enemy" "⏿ Fear" "⏿ Shadow" "⏿ War" ;; Eye of Sauron
-	    "Battle" "Border" "Burden" "Council" "Court" "Creature" ;; 1
-	    "Darkness" "Death" "Defence" "Depths" "Doubt" "Dreams" ;; 2
-	    "Fate" "Fire" "Folk" "Followers" "Greed" "Haven" ;; 3
-	    "History" "Honour" "Journey" "Kindred" "Knowledge" "Land" ;; 4
-	    "Leader" "Legend" "Life" "Light" "Luck" "Memory" ;; 5
-	    "Message" "Might" "Nature" "Pain" "Path" "Patron" ;; 6
-	    "Peril" "Plan" "Power" "Prophecy" "Quest" "Refuge" ;; 7
-	    "Riddle" "Ruins" "Rumour" "Secret" "Skill" "Song" ;; 8
-	    "Story" "Strength" "Time" "Tool" "Treasure" "Trust" ;; 9
-	    "Truth" "Vengeance" "Wealth" "Weapon" "Wilds" "Wish" ;; 10
-	    "ᚠ Courage" "ᚠ Duty" "ᚠ Fellowship" "ᚠ Hope" "ᚠ Love" "ᚠ Peace") ;; Rune of Gandalf
-    )
-  "From Strider Mode p11-12")
+(defconst jf/gaming/the-one-ring/table/nameless-things
+  '(:name-prefix
+    ("The Bane" "The Scourge" "The Horror" "The Terror"
+     "The Defiler" "The Devourer" "The Stalker" "The Hunter"
+     "The Watcher" "The Crawler" "The Lurker" "The Flame")
+    :name-suffix
+    ("in the Dark" "of the Abyss" "in the Deep"
+     "of the Pit" "of Udûn" "in the Water")
+    :named-by
+    ("by Men" "by Elves" "by Dwarves"
+     "by Orcs" "by the Wise" "in ancient lore")
+    :description-prefix
+    ("Bat-like" "Spider-like" "Fish-like" "Slug-like"
+     "Worm-like" "Centipede-like" "Insect-like" "Crustacean-like"
+     "Octopus-like" "Fish-like" "Toad-like" "Troll-like")
+    :description-suffix
+    ("with remorseless eyes" "with great horns" "with luminous skin"
+     "with a huge head" "with a swollen body" "yet greater")
+    :before-you-see-it
+    ("notice a deadly silence" "hear a sinister hissing"
+     "hear a low growl" "see the bones of its victims"
+     "feel your skin crawl" "hear a deafening sound or scream"
+     "notice its tracks" "hear a terrifying scream"
+     "smell a hideous stench" "feel a violent gust of air"
+     "hear a piping sound" "feel a terrible cold")
+    :what-you-first-see
+    ("is a great shadow, in the middle of which is a dark form"
+     "are its great claws"
+     "are its eyes, glowing in the dark"
+     "is that its body is flaccid and translucent, as if composed of gelatinous material"
+     "is its gaping mouth, opening and closing as if gasping for air"
+     "is a large maw, with fangs eerily similar to human teeth"
+     "is that swarms of insects or other vermin are crawling before it"
+     "is a long, sinuous tentacle, slithering towards you"
+     "are its huge fangs, so big and long that it cannot close its mouth"
+     "are its wide, blind eyes"
+     "are many twisted horns of stained ivory"
+     "is a vision of a beautiful creature, a phantom of the mind")))
+
+;;;;; Strider Mode
 
 (defconst jf/gaming/the-one-ring/strider-mode/event-table
   '(:table (:terrible-misfortune :despair :ill-choices :ill-choices
@@ -176,58 +171,6 @@
 	       ("Ancient monument" . "AWARENESS to recognize its significance")
 	       ("Peaceful sanctuary" . "Noteworthy Encounter"))))))
 
-(defconst jf/gaming/the-one-ring/feat-die-favourability
-  '(("Favoured" . (lambda (table)
-		    (nth (max (random (length table))
-			      (random (length table)))
-			 table)))
-    ("Neutral" . (lambda (table)
-		   (seq-random-elt table)))
-    ("Ill-Favoured" . (lambda (table)
-			(nth (min (random (length table))
-				  (random (length table)))
-			     table))))
-  "Favourability options and associated roller.")
-
-(defconst jf/gaming/the-one-ring/table/nameless-things
-  '(:name-prefix
-    ("The Bane" "The Scourge" "The Horror" "The Terror"
-     "The Defiler" "The Devourer" "The Stalker" "The Hunter"
-     "The Watcher" "The Crawler" "The Lurker" "The Flame")
-    :name-suffix
-    ("in the Dark" "of the Abyss" "in the Deep"
-     "of the Pit" "of Udûn" "in the Water")
-    :named-by
-    ("by Men" "by Elves" "by Dwarves"
-     "by Orcs" "by the Wise" "in ancient lore")
-    :description-prefix
-    ("Bat-like" "Spider-like" "Fish-like" "Slug-like"
-     "Worm-like" "Centipede-like" "Insect-like" "Crustacean-like"
-     "Octopus-like" "Fish-like" "Toad-like" "Troll-like")
-    :description-suffix
-    ("with remorseless eyes" "with great horns" "with luminous skin"
-     "with a huge head" "with a swollen body" "yet greater")
-    :before-you-see-it
-    ("notice a deadly silence" "hear a sinister hissing"
-     "hear a low growl" "see the bones of its victims"
-     "feel your skin crawl" "hear a deafening sound or scream"
-     "notice its tracks" "hear a terrifying scream"
-     "smell a hideous stench" "feel a violent gust of air"
-     "hear a piping sound" "feel a terrible cold")
-    :what-you-first-see
-    ("is a great shadow, in the middle of which is a dark form"
-     "are its great claws"
-     "are its eyes, glowing in the dark"
-     "is that its body is flaccid and translucent, as if composed of gelatinous material"
-     "is its gaping mouth, opening and closing as if gasping for air"
-     "is a large maw, with fangs eerily similar to human teeth"
-     "is that swarms of insects or other vermin are crawling before it"
-     "is a long, sinuous tentacle, slithering towards you"
-     "are its huge fangs, so big and long that it cannot close its mouth"
-     "are its wide, blind eyes"
-     "are many twisted horns of stained ivory"
-     "is a vision of a beautiful creature, a phantom of the mind")))
-
 (defconst jf/gaming/the-one-ring/strider-mode/fortune-tables
   '(("ᚠ" .
      ("The Eye of the Enemy focuses elsewhere. Decrease Eye Awareness by 1."
@@ -256,6 +199,47 @@
       "You face a test which is contrary to your nature or abilities"
       "An ally becomes a hindrance or liability"))))
 
+(defconst jf/gaming/the-one-ring/strider-mode/lore-table
+  '(
+    :action ("⏿ Abandon" "⏿ Attack" "⏿ Betray" "⏿ Corrupt" "⏿ Defeat" "⏿ Weaken" ;; Eye of Sauron
+	     "Aid" "Arrive" "Await" "Breach" "Break" "Capture" ;; 1
+	     "Change" "Chase" "Command" "Control" "Create" "Defy" ;; 2
+	     "Demand" "Discover" "Disguise" "Endure" "Escape" "Evade" ;; 3
+	     "Explore" "Find" "Focus" "Gather" "Guard" "Guide" ;; 4
+	     "Hide" "Hinder" "Hoard" "Hold" "Hunt" "Journey" ;; 5
+	     "Lead" "Learn" "Leave" "Lose" "Mourn" "Move" ;; 6
+	     "Persist" "Preserve" "Prevent" "Refuse" "Reject" "Remove" ;; 7
+	     "Replenish" "Restore" "Scheme" "Search" "Seize" "Share" ;; 8
+	     "Slay" "Steal" "Summon" "Surrender" "Surround" "Threaten" ;; 9
+	     "Transform" "Trap" "Trick" "Uncover" "Uphold" "Withstand" ;; 10
+	     "ᚠ Believe" "ᚠ Bolster" "ᚠ Defend" "ᚠ Forgive" "ᚠ Resist" "ᚠ Strengthen") ;; Rune of Gandalf
+    :aspect ("⏿ Corrupted" "⏿ Cruel" "⏿ Deceptive" "⏿ Fell" "⏿ Ruined" "⏿ Treacherous" ;; Eye of Sauron
+	     "Active" "Ancient" "Bold" "Bright" "Broken" "Cheerless" ;; 1
+	     "Cold" "Concealed" "Dangerous" "Dark" "Dead" "Defended" ;; 2
+	     "Desolate" "Destroyed" "Dreadful" "Empty" "Evil" "Faded" ;; 3
+	     "Far-reaching" "Fierce" "Foreboding" "Forgotten" "Fragile" "Ghastly" ;; 4
+	     "Gloomy" "Growing" "Hidden" "Ill-fated" "Impenetrable" "Inspiring" ;; 5
+	     "Isolated" "Lofty" "Lost" "Menacing" "Mighty" "Mysterious" ;; 6
+	     "Noble" "Obstructed" "Old" "Ominous" "Open" "Peaceful" ;; 7
+	     "Restored" "Sheltered" "Silent" "Simple" "Small" "Sombre" ;; 8
+	     "Stony" "Stout" "Stricken" "Stubborn" "Twisted" "Unnatural" ;; 9
+	     "Veiled" "Vigorous" "Weary" "Wild" "Wretched" "Young" ;; 10
+	     "ᚠ Flourishing" "ᚠ Beautiful" "ᚠ Good" "ᚠ Kind" "ᚠ Gentle" "ᚠ Wondrous") ;; Rune of Gandalf
+    :focus ("⏿ Curse" "⏿ Despair" "⏿ Enemy" "⏿ Fear" "⏿ Shadow" "⏿ War" ;; Eye of Sauron
+	    "Battle" "Border" "Burden" "Council" "Court" "Creature" ;; 1
+	    "Darkness" "Death" "Defence" "Depths" "Doubt" "Dreams" ;; 2
+	    "Fate" "Fire" "Folk" "Followers" "Greed" "Haven" ;; 3
+	    "History" "Honour" "Journey" "Kindred" "Knowledge" "Land" ;; 4
+	    "Leader" "Legend" "Life" "Light" "Luck" "Memory" ;; 5
+	    "Message" "Might" "Nature" "Pain" "Path" "Patron" ;; 6
+	    "Peril" "Plan" "Power" "Prophecy" "Quest" "Refuge" ;; 7
+	    "Riddle" "Ruins" "Rumour" "Secret" "Skill" "Song" ;; 8
+	    "Story" "Strength" "Time" "Tool" "Treasure" "Trust" ;; 9
+	    "Truth" "Vengeance" "Wealth" "Weapon" "Wilds" "Wish" ;; 10
+	    "ᚠ Courage" "ᚠ Duty" "ᚠ Fellowship" "ᚠ Hope" "ᚠ Love" "ᚠ Peace") ;; Rune of Gandalf
+    )
+  "From Strider Mode p11-12")
+
 (defconst jf/gaming/the-one-ring/strider-mode/revelation-episode-table
   '("Internal strife or an external threat puts your Safe Haven in peril"
     "Unexpected danger arises on the path ahead, forcing you to seek a new route"
@@ -270,6 +254,27 @@
     "Conflict brews between allies"
     "An important ally is put in danger")
   "Roll a 1d12; by convention the 0th is Sauron.")
+
+(defconst jf/gaming/the-one-ring/strider-mode/telling-table
+  ;; List contains 12 elements; 0th index is "Sauron", then 1st through 10th are
+  ;; 1 through 10 and 11th is "Gandalf".
+  '(("Certain" . ("⏿ No with an extreme result or twist"
+		  "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes"
+		  "ᚠ Yes with an extreme result or twist"))
+    ("Likely" . ("⏿ No with an extreme result or twist"
+		 "No" "No" "No" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes"
+		 "ᚠ Yes with an extreme result or twist"))
+    ("Middling" . ("⏿ No with an extreme result or twist"
+		   "No" "No" "No" "No" "No" "Yes" "Yes" "Yes" "Yes" "Yes"
+		   "ᚠ Yes with an extreme result or twist"))
+    ("Doubtful" . ("⏿ No with an extreme result or twist"
+		   "No" "No" "No" "No" "No" "No" "No" "Yes" "Yes" "Yes"
+		   "ᚠ Yes with an extreme result or twist"))
+    ("Unthinkable" . ("⏿ No with an extreme result or twist"
+		      "No" "No" "No" "No" "No" "No" "No" "No" "No" "Yes"
+		      "ᚠ Yes with an extreme result or twist")))
+  "An translation of the Telling Table from Strider Mode.")
+
 
 ;;;;; Help
 
@@ -294,30 +299,6 @@
 
 ;;;; Rollers
 
-(defun jf/gaming/the-one-ring/roll/solo-event-table (favorability)
-  "Prompt for the FAVORABILITY and roll on the solo event table."
-  (interactive (list (completing-read "Favourability: "
-				      jf/gaming/the-one-ring/feat-die-favourability)))
-  (let* ((subtable-name (jf/gaming/the-one-ring/roll/favorability-with-table
-			 :favorability favorability
-			 :table (plist-get jf/gaming/the-one-ring/strider-mode/event-table :table)))
-	 (details (plist-get jf/gaming/the-one-ring/strider-mode/event-table :details))
-	 (subtable (plist-get details subtable-name))
-	 (subtable-events (seq-random-elt (plist-get subtable :events))))
-    (format "%s: %s\n\n- Fatigue :: %s\n- Consequence :: %s\n- Task :: %s\n"
-	    (plist-get subtable :title)
-	    (car subtable-events)
-	    (plist-get subtable :fatigue)
-	    (plist-get subtable :consequence)
-	    (cdr subtable-events))))
-
-(cl-defun jf/gaming/the-one-ring/roll/feat-die (favorability)
-  "Prompt for the FAVORABILITY and roll the feat die."
-  (interactive (list (completing-read "Favourability: "
-				      jf/gaming/the-one-ring/feat-die-favourability)))
-  (jf/gaming/the-one-ring/roll/favorability-with-table :favorability favorability
-						       :table jf/gaming/the-one-ring/feat-die))
-
 (cl-defun jf/gaming/the-one-ring/roll/favorability-with-table (&key favorability table)
   "Roll on the TABLE using the FAVORABILITY."
   (funcall (alist-get favorability
@@ -326,6 +307,27 @@
 		      nil
 		      #'string=)
 	   table))
+
+(cl-defun jf/gaming/the-one-ring/roll/feat-die (favorability)
+  "Prompt for the FAVORABILITY and roll the feat die."
+  (interactive (list (completing-read "Favourability: "
+				      jf/gaming/the-one-ring/feat-die-favourability)))
+  (jf/gaming/the-one-ring/roll/favorability-with-table :favorability favorability
+						       :table jf/gaming/the-one-ring/feat-die))
+
+(cl-defun jf/gaming/the-one-ring/roll/lore-table
+    (question
+     &key
+     (lore-table jf/gaming/the-one-ring/strider-mode/lore-table))
+  "Prompt for a QUESTION and roll on the LORE-TABLE."
+  (interactive (list
+		(read-string "Open-ended Question: ")))
+  (concat "{{{i(Lore Table)}}}:\n"
+	  "\n"
+	  "- Question :: “" question "”\n"
+	  "- Action :: " (seq-random-elt (plist-get lore-table :action)) "\n"
+	  "- Aspect :: " (seq-random-elt (plist-get lore-table :aspect)) "\n"
+	  "- Focus :: " (seq-random-elt (plist-get lore-table :focus)) "\n"))
 
 (cl-defun jf/gaming/the-one-ring/roll/skill-check (dice
 						   favorability
@@ -364,6 +366,23 @@
 	      feat-die
 	      (plist-get success-dice :sixes))))))
 
+(defun jf/gaming/the-one-ring/roll/solo-event-table (favorability)
+  "Prompt for the FAVORABILITY and roll on the solo event table."
+  (interactive (list (completing-read "Favourability: "
+				      jf/gaming/the-one-ring/feat-die-favourability)))
+  (let* ((subtable-name (jf/gaming/the-one-ring/roll/favorability-with-table
+			 :favorability favorability
+			 :table (plist-get jf/gaming/the-one-ring/strider-mode/event-table :table)))
+	 (details (plist-get jf/gaming/the-one-ring/strider-mode/event-table :details))
+	 (subtable (plist-get details subtable-name))
+	 (subtable-events (seq-random-elt (plist-get subtable :events))))
+    (format "%s: %s\n\n- Fatigue :: %s\n- Consequence :: %s\n- Task :: %s\n"
+	    (plist-get subtable :title)
+	    (car subtable-events)
+	    (plist-get subtable :fatigue)
+	    (plist-get subtable :consequence)
+	    (cdr subtable-events))))
+
 (cl-defun jf/gaming/the-one-ring/roll/success-dice (&key dice (is_weary nil))
   "Roll a number of \"The One Ring\" success DICE.  And reject some results when character IS_WEARY."
   (let ((total 0)
@@ -377,20 +396,6 @@
       (when (= 6 roll) (setq sixes (+ 1 sixes)))
       (setq dice (1- dice)))
     (list :total total :sixes sixes :rolls rolls)))
-
-(cl-defun jf/gaming/the-one-ring/roll/lore-table
-    (question
-     &key
-     (lore-table jf/gaming/the-one-ring/strider-mode/lore-table))
-  "Prompt for a QUESTION and roll on the LORE-TABLE."
-  (interactive (list
-		(read-string "Open-ended Question: ")))
-  (concat "{{{i(Lore Table)}}}:\n"
-	  "\n"
-	  "- Question :: “" question "”\n"
-	  "- Action :: " (seq-random-elt (plist-get lore-table :action)) "\n"
-	  "- Aspect :: " (seq-random-elt (plist-get lore-table :aspect)) "\n"
-	  "- Focus :: " (seq-random-elt (plist-get lore-table :focus)) "\n"))
 
 (defun jf/gaming/the-one-ring/roll/telling-table (question likelihood)
   "Ask the QUESTION with the given LIKELIHOOD on the `jf/gaming/the-one-ring/strider-mode/telling-table'."
