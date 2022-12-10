@@ -727,10 +727,10 @@ Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
     "An important ally is put in danger")
   "Roll a 1d12; by convention the 0th is Sauron.")
 
-(defun jf/gaming/the-one-ring/roll/event-table (favorability)
+(defun jf/gaming/the-one-ring/roll/solo-event-table (favorability)
   (interactive (list (completing-read "Favourability: "
 				      jf/gaming/the-one-ring/feat-die-favourability)))
-  (let* ((subtable-name (jf/gaming/the-one-ring/roll/favorability
+  (let* ((subtable-name (jf/gaming/the-one-ring/roll/favorability-with-table
 			 :favorability favorability
 			 :table (plist-get jf/gaming/the-one-ring/event-table :table)))
 	 (details (plist-get jf/gaming/the-one-ring/event-table :details))
@@ -841,10 +841,11 @@ Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
 (cl-defun jf/gaming/the-one-ring/roll/feat-die (favorability)
   (interactive (list (completing-read "Favourability: "
 				      jf/gaming/the-one-ring/feat-die-favourability)))
-  (jf/gaming/the-one-ring/roll/favorability :favorability favorability
+  (jf/gaming/the-one-ring/roll/favorability-with-table :favorability favorability
 					    :table jf/gaming/the-one-ring/feat-die))
 
-(cl-defun jf/gaming/the-one-ring/roll/favorability (&key favorability table)
+(cl-defun jf/gaming/the-one-ring/roll/favorability-with-table (&key favorability table)
+  "Roll on the TABLE using the FAVORABILITY."
   (funcall (alist-get favorability
 		      jf/gaming/the-one-ring/feat-die-favourability
 		      nil
@@ -970,14 +971,19 @@ Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
        (insert
 	(format "Feat Die: %s"
 		(call-interactively 'jf/gaming/the-one-ring/roll/feat-die)))))
-    ("j" "Journey event"
+    ("j" "Journey event (Solo)"
      (lambda ()
        (interactive)
-       (insert (call-interactively 'jf/gaming/the-one-ring/roll/event-table))))
+       (insert (call-interactively 'jf/gaming/the-one-ring/roll/solo-event-table))))
     ("l" "Lore table…"
      (lambda ()
        (interactive)
        (insert (call-interactively 'jf/gaming/the-one-ring/roll/lore-table))))
+    ("r" "Revelation Episode…"
+     (lambda ()
+       (interactive)
+       (insert (concat "Revelation Episode: "
+		       (seq-random-elt jf/gaming/the-one-ring/revelation-episode-table)))))
     ("s" "Skill check…"
      (lambda ()
        (interactive)
