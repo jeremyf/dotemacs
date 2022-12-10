@@ -684,7 +684,138 @@ Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
    )
   "From Strider Mode p11-12")
 
-(defvar jf/gaming/the-one-ring/feat-die
+(defconst jf/gaming/the-one-ring/fortune-tables
+  (list (cons "ᚠ"
+	 '("The Eye of the Enemy focuses elsewhere. Decrease Eye Awareness by 1."
+	   "You may bypass a threat without attracting notice"
+	   "You gain the attention of a potential ally"
+	   "An enemy inadvertently reveals their position"
+	   "You gain favoured ground"
+	   "Enemies run afoul of danger"
+	   "You locate or learn of a useful item"
+	   "Your success instils new hope or renewed resolve"
+	   "You find a moment of comfort or safety"
+	   "You learn or realize something which gives helpful insight into your mission"
+	   "You encounter an opportunity suited to your nature or abilities"
+	   "An unexpected ally appears or sends aid"))
+	(cons "⏿"
+	 '("Your actions catch the Eye of the Enemy. Increase Eye Awareness by 2."
+	   "You draw unwanted attention"
+	   "Your actions are observed by someone of ill-intent"
+	   "Unexpected enemies emerge or are sighted"
+	   "You are hindered by difficult terrain or an unfa- vourable environment"
+	   "You find yourself ill-equipped for the circumstances"
+	   "A favoured weapon or item is lost, broken, or sacrificed"
+	   "You are plagued by troubling visions or thoughts"
+	   "An old injury or stress resurfaces"
+	   "You learn or realize something which adds a new complication to your mission"
+	   "You face a test which is contrary to your nature or abilities"
+	   "An ally becomes a hindrance or liability"))))
+
+(defconst jf/gaming/the-one-ring/revelation-episode-table
+  '("Internal strife or an external threat puts your Safe Haven in peril"
+    "Unexpected danger arises on the path ahead, forcing you to seek a new route"
+    "Nature is corrupted and turns against you"
+    "Spies of the Enemy carry word of your mission"
+    "Enemy minions launch an ambush or lay a trap"
+    "Enemy minions pick up your trail"
+    "An important location is overtaken by an enemy"
+    "An item you carry holds a curse, or is hunted by an enemy"
+    "You are tempted by something greatly desired, to the detriment of your mission"
+    "Malicious lies cause others to mistrust or fear you"
+    "Conflict brews between allies"
+    "An important ally is put in danger")
+  "Roll a 1d12; by convention the 0th is Sauron.")
+
+(defun jf/gaming/the-one-ring/roll/event-table (favorability)
+  (interactive (list (completing-read "Favourability: "
+				      jf/gaming/the-one-ring/feat-die-favourability)))
+  ;; Roll on the event-table's :table
+  )
+(message "%s" (seq-random-elt (plist-get jf/gaming/the-one-ring/event-table :table)))
+(defconst jf/gaming/the-one-ring/event-table
+  (list :table '(:terrible-misfortune :despair :ill-choices :ill-choices
+		 :mishap :mishap :mishap :mishap
+		 :short-cut :short-cut :chance-meeting :joyful-sight)
+	:details
+	(list :terrible-misfortune
+	      (list :consequence "If the roll fails, the target is Wounded."
+		    :title "Terrible Misfortune"
+		    :fatigue 3
+		    :table
+		    '(("Dire confrontation" . "Noteworthy Encounter")
+		      ("Rival Predator" . "HUNTING to avoid becoming the hunted")
+		      ("Violent weather" . "EXPLORE to find shelter")
+		      ("Hidden hazard" . "AWARENESS to avoid stumbling into danger")
+		      ("Dangerous terrain" . "EXPLORE to find a safer route")
+		      ("Stalking enemy" . "AWARENESS to spot the foul presence")))
+	      :despair
+	      (list :consequence "If the roll fails, gain 2 Shadow points (Dread)."
+		    :title "Despair"
+		    :fatigue 2
+		    :table
+		    '(("Servants of the Enemy" . "Noteworthy Encounter")
+		      ("Torrential weather" . "EXPLORE to find the least exposed path")
+		      ("Nightmarish presence" . "AWARENESS to sense the danger")
+		      ("Fading vigour" . "HUNTING to gain sustenance")
+		      ("Corrupted site" . "EXPLORE to find your way out")
+		      ("Grisly scene or foreboding portent" . "AWARENESS to be forewarned")))
+	      :mishap
+	      (list :consequences "If the roll fails, add 1 day to the length of the journey, and gain 1 additional Fatigue."
+		    :title "Mishap"
+		    :fatigue 2
+		    :table
+		    '(("Sparse wildlife" . "HUNTING to forage what you can")
+		      ("Lost direction" . "EXPLORE to find your way")
+		      ("Obstructed path" . "AWARENESS to spot a way around")
+		      ("Elusive quarry" . "HUNTING to track it down")
+		      ("Rough terrain" . "EXPLORE to safely traverse")
+		      ("Wandering enemies" . "AWARENESS to sense their coming")))
+	      :ill-choices
+	      (list :consequences "If the roll fails, gain 1 Shadow point (Dread)."
+		    :title "Ill Choices"
+		    :fatigue 2
+		    :table
+		    '(("Mismanaged provisions" . "HUNTING to replenish stores")
+		      ("Wayward path" . "EXPLORE to retrace your steps")
+		      ("Overlooked hazard" . "AWARENESS to escape safely")
+		      ("Lost quarry" . "HUNTING to follow its tracks")
+		      ("Disorienting environs" . "EXPLORE to find your way")
+		      ("Haunting visions" . "AWARENESS to over- come darkness")))
+	      :short-cut
+	      (list :consequences "If the roll succeeds, reduce the length of the journey by 1 day."
+		    :title "Short Cut"
+		    :fatigue 1
+		    :table
+		    '(("Game trail" . "HUNTING to traverse the path")
+		      ("Secluded path" . "EXPLORE to navigate the wilds")
+		      ("Helpful tracks" . "AWARENESS to follow the tracks")
+		      ("Animal guide" . "HUNTING to follow at a distance")
+		      ("Favourable weather" . "EXPLORE to make the most of it")
+		      ("Familiar waypoint" . "AWARENESS to recognize the landmark")))
+	      :chance-meeting
+	      (list :consequence "If the roll succeeds, no Fatigue is gained, and you may envision a favourable encounter."
+		    :title "Chance Meeting"
+		    :fatigue 1
+		    :table
+		    '(("Lone hunter" . "HUNTING to trade stories")
+		      ("Fellow traveller" . "EXPLORE to learn about the path ahead")
+		      ("Discreet watcher" . "AWARENESS to spot them")
+		      ("Noble beast" . "HUNTING to commune")
+		      ("Secluded encampment" . "EXPLORE to find your way off the beaten path")
+		      ("Auspicious gathering" . "Noteworthy Encounter")))
+	      :joyful-sight
+	      (list :consequences "If the roll succeeds, regain 1 Hope."
+		    :fatigue 0
+		    :table
+		    '(("Majestic creatures" . "HUNTING to observe without startling them")
+		      ("Inspiring vista" . "EXPLORE to reach a vantage point")
+		      ("Benevolent being" . "AWARENESS to sense their presence")
+		      ("Abundant foraging" . "HUNTING to replenish your rations")
+		      ("Ancient monument" . "AWARENESS to recognize its significance")
+		      ("Peaceful sanctuary" . "Noteworthy Encounter"))))))
+
+(defconst jf/gaming/the-one-ring/feat-die
   '("⏿"
     1 2 3 4 5 6 7 8 9 10
     "ᚠ"))
@@ -766,13 +897,6 @@ Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
     ("Ill-Favoured" . (lambda ()
 			(nth (min (random 12) (random 12))
 			     jf/gaming/the-one-ring/feat-die)))))
-
-;; I want a menu that:
-
-;; Rolls the Feat die (prompting for type)
-;; Rolls a skill check; insert at point
-;; Opens Duinhir's Character Sheet
-;;
 
 (defun jf/gaming/the-one-ring/roll/lore-table (question)
   (interactive (list
