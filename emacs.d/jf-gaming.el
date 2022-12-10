@@ -960,6 +960,7 @@ Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
 
 (jf/gaming/the-one-ring/create-condition :condition "miserable")
 (jf/gaming/the-one-ring/create-condition :condition "weary")
+(jf/gaming/the-one-ring/create-condition :condition "wounded")
 
 (global-set-key (kbd "H-1") 'jf/gaming/the-one-ring/menu)
 (transient-define-prefix jf/gaming/the-one-ring/menu ()
@@ -996,6 +997,7 @@ Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
    ["Conditions"
     ("-m" jf/gaming/the-one-ring/character-is-miserable/set :transient t)
     ("-w" jf/gaming/the-one-ring/character-is-weary/set :transient t)
+    ("-W"  jf/gaming/the-one-ring/character-is-wounded/set :transient t)
     ]])
 
 ;; TODO: Consider how I might "lookup" my character sheet for Solo Play.
