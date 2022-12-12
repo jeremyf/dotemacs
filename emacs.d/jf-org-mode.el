@@ -271,7 +271,7 @@
 	     (format "\n- Local File :: [[file:%s::%s]]" file-name line-number)
 	     (when func-name (format "\n- Function Name :: =%s=" func-name))
 	     (when (and remote-link file-name)
-	       (format "\n- Remote URL :: [[%s][%s]]" remote-link file-name))
+	       (format "\n- Remote URL :: [[%s]]" remote-link))
 	     "\n\n#+BEGIN_%s %s"
 	     "\n%s"
 	     "\n#+END_%s\n")
