@@ -147,6 +147,7 @@
 
  line-move-visual t)
 
+(bind-key "H-s" 'save-buffer)
 ;; With subword-mode, HelloWorld is two words for navigation.
 (global-subword-mode)
 

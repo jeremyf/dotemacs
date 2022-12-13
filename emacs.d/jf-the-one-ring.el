@@ -22,7 +22,8 @@
 
 ;;; Code
 
-(use-package transient :straight t)
+(require 'transient)
+(require 'jf-quick-help)
 
 ;;;; Tables
 
@@ -86,6 +87,30 @@
      "are many twisted horns of stained ivory"
      "is a vision of a beautiful creature, a phantom of the mind")))
 
+(defconst jf/gaming/the-one-ring/distinctive-features-table
+  '("Synonym of a PC's distinctive feature"
+    (("Bold" "Cunning" "Eager" "Fair" "Fair-spoken" "Faithful")
+     ("Arrogant" "Brutal" "Cowardly" "Cruel" "Deceitful" "Fearful"))
+    (("Fierce" "Generous" "Honourable" "Inquisitive" "Keen-eyed" "Lordly")
+     ("Forgetful" "Grasping" "Guilt-ridden" "Haughty" "Idle" "Mistrustful"))
+    (("Merry" "Patient" "Proud" "Rustic" "Secretive" "Stern")
+     ("Murderous" "Overconfident" "Resentful" "Scheming" "Scornful" "Spiteful"))
+    (("Subtle" "Swift" "Tall" "True-hearted" "Wary" "Wilful")
+     ("Thieving" "Traitorous" "Troubled" "Tyrannical" "Uncaring" "Wavering"))
+    "Antonym of a PC's distinctive feature"))
+
+(defun jf/roll-on-table (source)
+  "Recursively roll on SOURCE"
+  (cond
+   ((listp source)
+    (jf/roll-on-table (seq-random-elt source)))
+   ((symbolp source)
+    (jf/roll-on-table (symbol-value source)))
+   ((functionp source)
+    (funcall source))
+   ((ad-lambda-p source)
+    (funcall source))
+   (t source)))
 ;;;;; Strider Mode
 
 (defconst jf/gaming/the-one-ring/strider-mode/event-table
@@ -279,23 +304,23 @@
 ;;;;; Help
 
 (jf/transient-quick-help jf/gaming/the-one-ring/strider-mode/experience-milestones
-  :label "Strider: Experience Milestones"
+  :label "Strider: XP Milestones"
   :header "Strider: Experience Milestones"
   :body
   (s-join
    "\n"
-   '("| Milestone                                    | Adventure Point | Skill Point |"
-     "|----------------------------------------------+-----------------+-------------|"
-     "| Accept a mission from a patron               |               1 | -           |"
-     "| Achieve a notable personal goal              |               1 | 1           |"
-     "| Complete a patron’s mission                  |               1 | 1           |"
-     "| Complete a meaningful journey                |               2 | -           |"
-     "| Face a Noteworthy Encounter during a journey |               1 | -           |"
-     "| Reveal a significant location or discovery   |               - | 1           |"
-     "| Overcome a tricky obstacle                   |               1 | -           |"
-     "| Participate in a Council                     |               1 | -           |"
-     "| Survive a dangerous combat                   |               - | 1           |"
-     "| Face a Revelation Episode                    |               - | 1           |")))
+   '("| Milestone                                    | Adventure Pt | Skill Pt |"
+     "|----------------------------------------------+--------------+----------|"
+     "| Accept a mission from a patron               |            1 | -        |"
+     "| Achieve a notable personal goal              |            1 | 1        |"
+     "| Complete a patron’s mission                  |            1 | 1        |"
+     "| Complete a meaningful journey                |            - | 2        |"
+     "| Face a Noteworthy Encounter during a journey |            - | 1        |"
+     "| Reveal a significant location or discovery   |            1 | -        |"
+     "| Overcome a tricky obstacle                   |            - | 1        |"
+     "| Participate in a Council                     |            - | 1        |"
+     "| Survive a dangerous combat                   |            1 | -        |"
+     "| Face a Revelation Episode                    |            1 | -        |")))
 
 ;;;; Rollers
 
@@ -309,17 +334,30 @@
 	   table))
 
 (cl-defun jf/gaming/the-one-ring/roll/feat-die (favorability)
-  "Prompt for the FAVORABILITY and roll the feat die."
+  "Return a random result of the feat die based on the given FAVORABILITY."
   (interactive (list (completing-read "Favourability: "
 				      jf/gaming/the-one-ring/feat-die-favourability)))
   (jf/gaming/the-one-ring/roll/favorability-with-table :favorability favorability
 						       :table jf/gaming/the-one-ring/feat-die))
 
+(defun jf/gaming/the-one-ring/roll/fortune-table (fortune_type)
+  "Return a random fortune based given FORTUNE_TYPE."
+  (interactive (list
+		(completing-read "Fortune Type: "
+				 jf/gaming/the-one-ring/strider-mode/fortune-tables)))
+  (format "Fortune %s: “%s”"
+	  fortune_type
+	  (seq-random-elt (alist-get fortune_type
+			     jf/gaming/the-one-ring/strider-mode/fortune-tables
+			     nil
+			     nil
+			     #'string=))))
+
 (cl-defun jf/gaming/the-one-ring/roll/lore-table
     (question
      &key
      (lore-table jf/gaming/the-one-ring/strider-mode/lore-table))
-  "Prompt for a QUESTION and roll on the LORE-TABLE."
+  "Return the response from asking the lore table the given QUESTION."
   (interactive (list
 		(read-string "Open-ended Question: ")))
   (concat "{{{i(Lore Table)}}}:\n"
@@ -334,7 +372,7 @@
 						   &key
 						   (is_weary
 						    jf/gaming/the-one-ring/character-is-weary))
-  "Roll the dice of DICE with the given FAVORABILITY for the feat die."
+  "Return the verbose results of rolling the DICE with the given FAVORABILITY for the feat die."
   (interactive (list
 		(read-number "Number of D6s: ")
 		(completing-read "Favourability: "
@@ -367,7 +405,7 @@
 	      (plist-get success-dice :sixes))))))
 
 (defun jf/gaming/the-one-ring/roll/solo-event-table (favorability)
-  "Prompt for the FAVORABILITY and roll on the solo event table."
+  "Return the results of rolling on the solo event table with the given FAVORABILITY."
   (interactive (list (completing-read "Favourability: "
 				      jf/gaming/the-one-ring/feat-die-favourability)))
   (let* ((subtable-name (jf/gaming/the-one-ring/roll/favorability-with-table
@@ -398,7 +436,7 @@
     (list :total total :sixes sixes :rolls rolls)))
 
 (defun jf/gaming/the-one-ring/roll/telling-table (question likelihood)
-  "Ask the QUESTION with the given LIKELIHOOD on the `jf/gaming/the-one-ring/strider-mode/telling-table'."
+  "Return the response from asking the telling table a yes/no QUESTION with a given LIKELIHOOD."
   (interactive (list
 		(read-string "Yes/No Question: ")
 		(completing-read "Likelihood of yes: " jf/gaming/the-one-ring/strider-mode/telling-table)))
@@ -409,7 +447,59 @@
 	  "- Answer :: “" (seq-random-elt (alist-get likelihood jf/gaming/the-one-ring/strider-mode/telling-table nil nil #'string=)) "”"
 	  "\n"))
 
-;;;; Session Tracking Functions
+;;;; Session Tracking
+(defvar jf/gaming/the-one-ring/strider-mode/character-sheet-filename
+  (file-truename "~/git/org/denote/melange/20221128T203953--duinhir-tailwind__rpgs_the-one-ring.org"))
+
+(defvar jf/gaming/the-one-ring/strider-mode/campaign-index-filename
+  (file-truename "~/git/org/denote/indices/20221129T091857--the-travels-of-duinhir-tailwind__rpgs_the-one-ring.org"))
+
+(cl-defun jf/sidebar--build (&key
+			     buffer-name
+			     (body nil)
+			     (read-only nil)
+			     (position nil)
+			     (mode nil))
+  "Build the sidebar from the given buffer attributes.
+
+Find or create the BUFFER_NAME with the given BODY and move to
+the given POSITION and toggle on the MODE.  Then set the buffer
+to READ_ONLY."
+  (interactive)
+  ;; If the buffer doesn't exist, create it and configure accordingly
+  (unless (get-buffer buffer-name)
+    (progn
+      (get-buffer-create buffer-name)
+      (with-current-buffer buffer-name
+	(insert (or body (buffer-string)))
+	(goto-char (or position (point-min)))
+	(not-modified)
+	(if mode (funcall mode) (special-mode))
+	(when read-only (read-only-mode)))))
+  (with-current-buffer buffer-name
+    (local-set-key (kbd "s-w") 'kill-buffer-and-window)
+    (let ((display-buffer-mark-dedicated t))
+      (pop-to-buffer buffer-name '((display-buffer-in-side-window)
+				   (side . right)
+				   (window-width 72)
+				   (window-parameters
+				    (tab-line-format . none)
+				    (mode-line-format . none)
+				    (no-delete-other-windows . t)))))
+    (message "s-q - Remove Window")
+    (require 'pulsar)
+    (pulsar-pulse-line)))
+
+(cl-defun jf/gaming/the-one-ring/strider-mode/pop-open-filename
+    (&key (filename jf/gaming/the-one-ring/strider-mode/character-sheet-filename))
+  "Pop open for viewing the given FILENAME."
+  (with-current-buffer (find-file-noselect filename)
+    (jf/sidebar--build
+     :buffer-name filename
+     :read-only t
+     :body (buffer-string)
+     :mode 'org-mode)))
+
 (cl-defmacro jf/gaming/the-one-ring/register-condition (&key condition)
   "Generate the `transient' suffix and variable for the given CONDITION."
   (let* ((var-sym (intern (concat "jf/gaming/the-one-ring/character-is-" condition)))
@@ -443,30 +533,41 @@
 (transient-define-prefix jf/gaming/the-one-ring/menu ()
   ["The One Ring\n"
    ["Rolls"
-    ("f" "Feat die…"
+    ("r d" "Distinctive features…"
+     (lambda ()
+       (interactive)
+       (insert
+	(concat "Distinctive Features: "
+		"“" (jf/roll-on-table jf/gaming/the-one-ring/distinctive-features-table) "” "
+		"“" (jf/roll-on-table jf/gaming/the-one-ring/distinctive-features-table) "”"))))
+    ("r f" "Feat die…"
      (lambda ()
        (interactive)
        (insert
 	(format "Feat Die: %s"
 		(call-interactively 'jf/gaming/the-one-ring/roll/feat-die)))))
-    ("j" "Journey event (Solo)"
+    ("r F" "Fortune table"
+     (lambda ()
+       (interactive)
+       (insert (call-interactively 'jf/gaming/the-one-ring/roll/fortune-table))))
+    ("r j" "Journey event (Solo)"
      (lambda ()
        (interactive)
        (insert (call-interactively 'jf/gaming/the-one-ring/roll/solo-event-table))))
-    ("l" "Lore table…"
+    ("r l" "Lore table…"
      (lambda ()
        (interactive)
        (insert (call-interactively 'jf/gaming/the-one-ring/roll/lore-table))))
-    ("r" "Revelation Episode…"
+    ("r r" "Revelation Episode…"
      (lambda ()
        (interactive)
        (insert (concat "Revelation Episode: "
 		       (seq-random-elt jf/gaming/the-one-ring/revelation-episode-table)))))
-    ("s" "Skill check…"
+    ("r s" "Skill check…"
      (lambda ()
        (interactive)
        (insert (call-interactively 'jf/gaming/the-one-ring/roll/skill-check))))
-    ("t" "Telling table…"
+    ("r t" "Telling table…"
      (lambda ()
        (interactive)
        (insert (call-interactively 'jf/gaming/the-one-ring/roll/telling-table))))
@@ -476,8 +577,19 @@
     ("-w" jf/gaming/the-one-ring/character-is-weary/set :transient t)
     ("-W"  jf/gaming/the-one-ring/character-is-wounded/set :transient t)
     ]
-   ["Help"
-    ("h m" jf/gaming/the-one-ring/strider-mode/experience-milestones)]])
+   ["Jump To"
+    ("j c" "Character Sheet"
+     (lambda ()
+       (interactive)
+       (jf/gaming/the-one-ring/strider-mode/pop-open-filename
+	:filename jf/gaming/the-one-ring/strider-mode/character-sheet-filename)))
+    ("j i" "Index of Campaign"
+     (lambda ()
+       (interactive)
+       (jf/gaming/the-one-ring/strider-mode/pop-open-filename
+	:filename jf/gaming/the-one-ring/strider-mode/campaign-index-filename)))
+    ("j x" jf/gaming/the-one-ring/strider-mode/experience-milestones)
+    ]])
 
 (provide 'jf-the-one-ring)
 ;;; jf-the-one-ring.el ends here

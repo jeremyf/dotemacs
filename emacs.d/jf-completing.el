@@ -241,6 +241,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   ;;; noticing the way I'm typing this and it is feeling wrong.  So now I won't
   ;;; have that way open.
   ("s-t" . consult-projectile)
+  ("H-t" . consult-projectile)
   ("s-p" . consult-projectile))
 
 (use-package corfu
