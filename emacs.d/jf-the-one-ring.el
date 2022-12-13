@@ -41,7 +41,7 @@
 			      (random (length table)))
 			 table)))
     ("Neutral" . (lambda (table)
-		   (seq-random-elt table)))
+		   (jf/roll-on-table table)))
     ("Ill-Favoured" . (lambda (table)
 			(nth (min (random (length table))
 				  (random (length table)))
@@ -99,20 +99,39 @@
      ("Thieving" "Traitorous" "Troubled" "Tyrannical" "Uncaring" "Wavering"))
     "Antonym of a PC's distinctive feature"))
 
-(defun jf/roll-on-table (source)
-  "Recursively roll on SOURCE"
+(defun jf/roll-on-table/interpolate (value)
+  "Interpolate VALUE for rolling."
+  ;; Two parts first part could be the index value or dice roll second optional
+  ;; part would be the table.
+  (jf/roll-on-table (intern value)))
+
+(defun jf/roll-on-table (source &optional container)
+  "Recursively roll on SOURCE which is within (or is) the given CONTAINER.
+
+The CONTAINER allows looking outside of the SOURCE to potentially
+find and reference other tables.  One thing I haven't figured out
+is how to handle tokens within the text.
+
+When the SOURCE is a string, use `s-format' to expand the
+\"${tab-name}\" template."
+  (unless container (setq container source))
   (cond
    ((listp source)
-    (jf/roll-on-table (seq-random-elt source)))
+    (jf/roll-on-table (seq-random-elt source) container))
    ((symbolp source)
-    (jf/roll-on-table (symbol-value source)))
+    (jf/roll-on-table (symbol-value source) container))
    ((functionp source)
-    (funcall source))
+    (funcall source container))
    ((ad-lambda-p source)
-    (funcall source))
-   (t source)))
-;;;;; Strider Mode
+    (funcall source container))
+   ((numberp source) source)
+   ;; Once I have a string; explode on tokens.  What do the tokens look like?
+   ;; Inclined to go with the following: "On the horizon you see ${table-name}."
+   ((stringp source)
+    (s-format source #'jf/roll-on-table/interpolate))
+   (t (error (format "Unable to handle %s." source)))))
 
+;;;;; Strider Mode
 (defconst jf/gaming/the-one-ring/strider-mode/event-table
   '(:table (:terrible-misfortune :despair :ill-choices :ill-choices
 				:mishap :mishap :mishap :mishap
@@ -347,7 +366,7 @@
 				 jf/gaming/the-one-ring/strider-mode/fortune-tables)))
   (format "Fortune %s: “%s”"
 	  fortune_type
-	  (seq-random-elt (alist-get fortune_type
+	  (jf/roll-on-table (alist-get fortune_type
 			     jf/gaming/the-one-ring/strider-mode/fortune-tables
 			     nil
 			     nil
@@ -363,9 +382,9 @@
   (concat "{{{i(Lore Table)}}}:\n"
 	  "\n"
 	  "- Question :: “" question "”\n"
-	  "- Action :: " (seq-random-elt (plist-get lore-table :action)) "\n"
-	  "- Aspect :: " (seq-random-elt (plist-get lore-table :aspect)) "\n"
-	  "- Focus :: " (seq-random-elt (plist-get lore-table :focus)) "\n"))
+	  "- Action :: " (jf/roll-on-table (plist-get lore-table :action)) "\n"
+	  "- Aspect :: " (jf/roll-on-table (plist-get lore-table :aspect)) "\n"
+	  "- Focus :: " (jf/roll-on-table (plist-get lore-table :focus)) "\n"))
 
 (cl-defun jf/gaming/the-one-ring/roll/skill-check (dice
 						   favorability
@@ -413,7 +432,7 @@
 			 :table (plist-get jf/gaming/the-one-ring/strider-mode/event-table :table)))
 	 (details (plist-get jf/gaming/the-one-ring/strider-mode/event-table :details))
 	 (subtable (plist-get details subtable-name))
-	 (subtable-events (seq-random-elt (plist-get subtable :events))))
+	 (subtable-events (jf/roll-on-table (plist-get subtable :events))))
     (format "%s: %s\n\n- Fatigue :: %s\n- Consequence :: %s\n- Task :: %s\n"
 	    (plist-get subtable :title)
 	    (car subtable-events)
@@ -444,7 +463,7 @@
 	  "\n"
 	  "- Question :: “" question "”\n"
 	  "- Likelihood :: " likelihood "\n"
-	  "- Answer :: “" (seq-random-elt (alist-get likelihood jf/gaming/the-one-ring/strider-mode/telling-table nil nil #'string=)) "”"
+	  "- Answer :: “" (jf/roll-on-table (alist-get likelihood jf/gaming/the-one-ring/strider-mode/telling-table nil nil #'string=)) "”"
 	  "\n"))
 
 ;;;; Session Tracking
@@ -562,7 +581,7 @@ to READ_ONLY."
      (lambda ()
        (interactive)
        (insert (concat "Revelation Episode: "
-		       (seq-random-elt jf/gaming/the-one-ring/revelation-episode-table)))))
+		       (jf/roll-on-table jf/gaming/the-one-ring/strider-mode/revelation-episode-table)))))
     ("r s" "Skill check…"
      (lambda ()
        (interactive)
