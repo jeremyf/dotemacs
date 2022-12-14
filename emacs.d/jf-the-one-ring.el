@@ -124,7 +124,8 @@ When the SOURCE is a string, use `s-format' to expand the
     (funcall source container))
    ((ad-lambda-p source)
     (funcall source container))
-   ((numberp source) source)
+   ((numberp source)
+    source)
    ;; Once I have a string; explode on tokens.  What do the tokens look like?
    ;; Inclined to go with the following: "On the horizon you see ${table-name}."
    ((stringp source)
