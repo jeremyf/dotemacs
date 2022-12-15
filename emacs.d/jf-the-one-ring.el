@@ -24,6 +24,7 @@
 
 (require 'transient)
 (require 'jf-quick-help)
+(require 's)
 
 ;;;; Tables
 
