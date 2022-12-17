@@ -41,6 +41,9 @@
 ;; There should be one `#+PROJECT_NAME:' keyword and there can be many
 ;; `#+PROJECT_PATHS:'.  Each `#+PROJECT_PATHS:' is a `cons' cell.  The `car' is
 ;; the label and the `cdr' is the path.  The path can be a filename or a URL.
+;;
+;; The `jf/project/jump-to/project-space' will prompt for a project then a
+;; workspace.  From there, it will jump to the corresponding location.
 
 ;;; Code
 
