@@ -110,8 +110,8 @@
      ((f-file-p path)
       (find-file path))
      (t (progn
-	  (message "WARNING: Project %s missing path name \"%s\""
-		   project path-name)
+	  (message "WARNING: Project %s missing path name \"%s\" (with path %s)"
+		   project path-name path)
 	  (jf/project/jump-to-notes :project project))))))
 
 (cl-defun jf/project/jump-to-notes (&key project)
@@ -158,10 +158,10 @@ Noted projects would be found within the given DIRECTORY."
 				 project_path_to_code_truename)))
       (let ((filename (s-trim (shell-command-to-string
 			       (concat
-				"rg \"^#\\+PROJECT_PATH_TO_CODE: +"
+				"rg \"^#\\+PROJECT_PATHS: .*"
 				project_path_to_code " *$\" "
 				directory " --files-with-matches "
-				" --no-ignore-vcs")))))
+				" --no-ignore-vcs --ignore-case")))))
 	(unless (string-equal "" filename)
 	  (with-current-buffer (find-file-noselect (file-truename filename))
 	    (cadar (org-collect-keywords (list "PROJECT_NAME")))))))))
