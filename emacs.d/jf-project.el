@@ -91,6 +91,28 @@
 	  (end-of-buffer)
 	  (error "No \"%s\" timesheet entry for today" project))))))
 
+(cl-defun jf/project/open-project-path-for (project)
+  "Prompt for PROJECT then workspace and open that workspace."
+  (interactive (list (completing-read "Project: " (jf/project/list-projects))))
+  (let*
+      ;; Get the project's file name
+      ((filename (cdar (jf/project/list-projects :project project)))
+       (paths-cons-list (with-current-buffer (find-file-noselect filename)
+			(cl-maplist #'read (cdar (org-collect-keywords '("PROJECT_PATHS"))))))
+       (path-name (completing-read "Path: " paths-cons-list nil t))
+       (path (alist-get path-name paths-cons-list nil nil #'string=)))
+    (cond
+     ((s-starts-with? "http" path)
+      (eww-browse-with-external-browser path))
+     ((f-dir-p path)
+      (dired path))
+     ((f-file-p path)
+      (find-file path))
+     (t (progn
+	  (message "WARNING: Project %s missing path name \"%s\""
+		   project path-name)
+	  (jf/project/jump-to-notes :project project))))))
+
 (cl-defun jf/project/jump-to-notes (&key project)
   "Jump to the given PROJECT's notes file.
 
@@ -227,8 +249,8 @@ When the `current-prefix-arg' is set always prompt for the project."
   ;; `jf/project/get-project-from-current-agenda-buffer'
   (or
    (and (not current-prefix-arg)
-	(or (jf/project/get-project-from-current-clock)
-	    (jf/project/get-project-from-current-buffer-is-agenda)
+	(or (jf/project/get-project-from-current-buffer-is-agenda)
+	    (jf/project/get-project-from-current-clock)
 	    (jf/project/get-project-from-project-current)))
    (completing-read "Project: " (jf/project/list-projects))))
 

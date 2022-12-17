@@ -32,38 +32,38 @@
   Other buffer group by `centaur-tabs-get-group-name' with project name."
       (list
        (cond
-        ;; ((not (eq (file-remote-p (buffer-file-name)) nil))
-        ;; "Remote")
-        ((or (string-equal "*" (substring (buffer-name) 0 1))
-             (memq major-mode '(magit-process-mode
-                                magit-status-mode
-                                magit-diff-mode
-                                magit-log-mode
-                                magit-file-mode
-                                magit-blob-mode
-                                magit-blame-mode
-                                )))
-         "Emacs")
-        ((derived-mode-p 'prog-mode)
-         "Programming")
-        ((derived-mode-p 'dired-mode)
-         "Dired")
-        ((memq major-mode '(helpful-mode
-                            help-mode))
-         "Help")
-        ((memq major-mode '(org-mode
-                            org-agenda-clockreport-mode
-                            org-src-mode
-                            org-agenda-mode
-                            org-beamer-mode
-                            org-indent-mode
-                            org-bullets-mode
-                            org-cdlatex-mode
-                            org-agenda-log-mode
-                            diary-mode))
-         "OrgMode")
-        (t
-         (centaur-tabs-get-group-name (current-buffer))))))
+	;; ((not (eq (file-remote-p (buffer-file-name)) nil))
+	;; "Remote")
+	((or (string-equal "*" (substring (buffer-name) 0 1))
+	     (memq major-mode '(magit-process-mode
+				magit-status-mode
+				magit-diff-mode
+				magit-log-mode
+				magit-file-mode
+				magit-blob-mode
+				magit-blame-mode
+				)))
+	 "Emacs")
+	((derived-mode-p 'prog-mode)
+	 "Programming")
+	((derived-mode-p 'dired-mode)
+	 "Dired")
+	((memq major-mode '(helpful-mode
+			    help-mode))
+	 "Help")
+	((memq major-mode '(org-mode
+			    org-agenda-clockreport-mode
+			    org-src-mode
+			    org-agenda-mode
+			    org-beamer-mode
+			    org-indent-mode
+			    org-bullets-mode
+			    org-cdlatex-mode
+			    org-agenda-log-mode
+			    diary-mode))
+	 "OrgMode")
+	(t
+	 (centaur-tabs-get-group-name (current-buffer))))))
 
     ;; :hook
     ;; (dashboard-mode . centaur-tabs-local-mode)
@@ -85,7 +85,7 @@
   (defun jf/centaur-tabs-toggle-grouping ()
     (interactive)
     (if (jf/centaur-tabs-grouping-by-buffer-groups?)
-        (centaur-tabs-group-by-projectile-project)
+	(centaur-tabs-group-by-projectile-project)
       (centaur-tabs-group-buffer-groups)))
 
   (defun jf/centaur-tabs-grouping-by-buffer-groups? ()
