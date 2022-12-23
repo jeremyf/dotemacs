@@ -10,7 +10,7 @@
 ;; There are three interactive functions:
 ;;
 ;; - `jf/project/jump-to/notes'
-;; - `jf/project/jump-to/project-space'
+;; - `jf/project/jump-to/project-work-space'
 ;; - `jf/project/jump-to/timesheet'
 ;;
 ;; Let's talk of the three targets for jumping.
@@ -42,7 +42,7 @@
 ;; `#+PROJECT_PATHS:'.  Each `#+PROJECT_PATHS:' is a `cons' cell.  The `car' is
 ;; the label and the `cdr' is the path.  The path can be a filename or a URL.
 ;;
-;; The `jf/project/jump-to/project-space' will prompt for a project then a
+;; The `jf/project/jump-to/project-work-space' will prompt for a project then a
 ;; workspace.  From there, it will jump to the corresponding location.
 
 ;;; Code
@@ -63,8 +63,8 @@ Determine the PROJECT by querying `jf/project/list-projects'."
 	 (filename (cdar (jf/project/list-projects :project project))))
     (find-file filename)))
 
-(bind-key "s-2" 'jf/project/jump-to/project-space)
-(cl-defun jf/project/jump-to/project-space (project)
+(bind-key "s-2" 'jf/project/jump-to/project-work-space)
+(cl-defun jf/project/jump-to/project-work-space (project)
   "Prompt for PROJECT then workspace and open that workspace."
   (interactive (list (jf/project/find-dwim)))
   (let*
@@ -153,7 +153,7 @@ The DIRECTORY defaults to `org-directory' but you can specify otherwise."
 	     "| tr '\n' '@'"))
 	   "@")))
 
-(cl-defun jf/project/get-project-from/project-current (&key (directory org-directory))
+(cl-defun jf/project/get-project-from/project-source-code (&key (directory org-directory))
   "Return the current \"noted\" project name.
 
 Return nil if the current buffer is not part of a noted project.
@@ -227,7 +227,7 @@ When the `current-prefix-arg' is set always prompt for the project."
    (and (not current-prefix-arg)
 	(or (jf/project/get-project-from/current-buffer-is-agenda)
 	    (jf/project/get-project-from/current-clock)
-	    (jf/project/get-project-from/project-current)))
+	    (jf/project/get-project-from/project-source-code)))
    (completing-read "Project: " (jf/project/list-projects))))
 
 (provide 'jf-project)
