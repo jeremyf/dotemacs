@@ -109,90 +109,91 @@
 ;; details.
 ;;
 ;; Why the return?  For the amazing =centaur-tabs-switch-group=.
-(use-package centaur-tabs
-  :straight t
-  :commands (centaur-tabs-group-by-projectile-project)
-  :commands (centaur-tabs-group-buffer-groups)
-  :hook (dired-mode . centaur-tabs-local-mode)
-  (helpful-mode . centaur-tabs-local-mode)
-  (denote-backlinks-mode . centaur-tabs-local-mode)
-  (org-agenda-mode . centaur-tabs-local-mode)
-  :config
-  (setq
-   centaur-tabs-set-icons t
-   centaur-tabs-set-modified-marker t
-   centaur-tabs-enable-ido-completion nil
-   uniquify-separator "/"
-   uniquify-buffer-name-style 'forward)
+;; (use-package centaur-tabs
+;;   :straight t
+;;   :commands (centaur-tabs-group-by-projectile-project)
+;;   :commands (centaur-tabs-group-buffer-groups)
+;;   :hook
+;;   ;; (dired-mode . centaur-tabs-local-mode)
+;;   (helpful-mode . centaur-tabs-local-mode)
+;;   (denote-backlinks-mode . centaur-tabs-local-mode)
+;;   (org-agenda-mode . centaur-tabs-local-mode)
+;;   :config
+;;   (setq
+;;    centaur-tabs-set-icons t
+;;    centaur-tabs-set-modified-marker t
+;;    centaur-tabs-enable-ido-completion nil
+;;    uniquify-separator "/"
+;;    uniquify-buffer-name-style 'forward)
 
-  (defun centaur-tabs-buffer-groups ()
-    "`centaur-tabs-buffer-groups' control buffers' group rules.
+;;   ;; (defun centaur-tabs-buffer-groups ()
+;; ;;     "`centaur-tabs-buffer-groups' control buffers' group rules.
 
-Group centaur-tabs with mode if buffer is derived from `eshell-mode' `emacs-lisp-mode' `dired-mode' `org-mode' `magit-mode'.
-All buffer name start with * will group to \"Emacs\".
-Other buffer group by `centaur-tabs-get-group-name' with project name."
-    (list
-     (cond
-      ;; ((not (eq (file-remote-p (buffer-file-name)) nil))
-      ;; "Remote")
-      ((or (string-equal "*" (substring (buffer-name) 0 1))
-           (memq major-mode '(magit-process-mode
-                              magit-status-mode
-                              magit-diff-mode
-                              magit-log-mode
-                              magit-file-mode
-                              magit-blob-mode
-                              magit-blame-mode
-                              )))
-       "Emacs")
-      ((derived-mode-p 'prog-mode)
-       "Programming")
-      ((derived-mode-p 'dired-mode)
-       "Dired")
-      ((memq major-mode '(helpful-mode
-                          help-mode))
-       "Help")
-      ((memq major-mode '(org-mode
-                          org-agenda-clockreport-mode
-                          org-src-mode
-                          org-agenda-mode
-                          org-beamer-mode
-                          org-indent-mode
-                          org-bullets-mode
-                          org-cdlatex-mode
-                          org-agenda-log-mode
-                          diary-mode))
-       "OrgMode")
-      (t
-       (centaur-tabs-get-group-name (current-buffer))))))
+;; ;; Group centaur-tabs with mode if buffer is derived from `eshell-mode' `emacs-lisp-mode' `dired-mode' `org-mode' `magit-mode'.
+;; ;; All buffer name start with * will group to \"Emacs\".
+;; ;; Other buffer group by `centaur-tabs-get-group-name' with project name."
+;; ;;     (list
+;; ;;      (cond
+;; ;;       ;; ((not (eq (file-remote-p (buffer-file-name)) nil))
+;; ;;       ;; "Remote")
+;; ;;       ((or (string-equal "*" (substring (buffer-name) 0 1))
+;; ;;            (memq major-mode '(magit-process-mode
+;; ;;                               magit-status-mode
+;; ;;                               magit-diff-mode
+;; ;;                               magit-log-mode
+;; ;;                               magit-file-mode
+;; ;;                               magit-blob-mode
+;; ;;                               magit-blame-mode
+;; ;;                               )))
+;; ;;        "Emacs")
+;; ;;       ((derived-mode-p 'prog-mode)
+;; ;;        "Programming")
+;; ;;       ;; ((derived-mode-p 'dired-mode)
+;; ;;       ;;  "Dired")
+;; ;;       ((memq major-mode '(helpful-mode
+;; ;;                           help-mode))
+;; ;;        "Help")
+;; ;;       ((memq major-mode '(org-mode
+;; ;;                           org-agenda-clockreport-mode
+;; ;;                           org-src-mode
+;; ;;                           org-agenda-mode
+;; ;;                           org-beamer-mode
+;; ;;                           org-indent-mode
+;; ;;                           org-bullets-mode
+;; ;;                           org-cdlatex-mode
+;; ;;                           org-agenda-log-mode
+;; ;;                           diary-mode))
+;; ;;        "OrgMode")
+;; ;;       (t
+;; ;;        (centaur-tabs-get-group-name (current-buffer))))))
 
-  ;; :hook
-  ;; (dashboard-mode . centaur-tabs-local-mode)
-  ;; (term-mode . centaur-tabs-local-mode)
-  ;; (calendar-mode . centaur-tabs-local-mode)
-  ;; (org-agenda-mode . centaur-tabs-local-mode)
-  ;; (helpful-mode . centaur-tabs-local-mode)
-  :bind
-  ("s-[" . centaur-tabs-backward-group)
-  ("s-]" . centaur-tabs-forward-group)
-  ;; Move through the tabs of the group
-  ("s-{" . centaur-tabs-backward-tab)
-  ("s-}" . centaur-tabs-forward-tab)
-  ("s-\\" . centaur-tabs-switch-group)
-  ("M-s-\\" . jf/centaur-tabs-toggle-grouping))
+;;   ;; :hook
+;;   ;; (dashboard-mode . centaur-tabs-local-mode)
+;;   ;; (term-mode . centaur-tabs-local-mode)
+;;   ;; (calendar-mode . centaur-tabs-local-mode)
+;;   ;; (org-agenda-mode . centaur-tabs-local-mode)
+;;   ;; (helpful-mode . centaur-tabs-local-mode)
+;;   :bind
+;;   ("s-[" . centaur-tabs-backward-group)
+;;   ("s-]" . centaur-tabs-forward-group)
+;;   ;; Move through the tabs of the group
+;;   ("s-{" . centaur-tabs-backward-tab)
+;;   ("s-}" . centaur-tabs-forward-tab)
+;;   ("s-\\" . centaur-tabs-switch-group)
+;;   ("M-s-\\" . jf/centaur-tabs-toggle-grouping))
 
-(centaur-tabs-group-by-projectile-project)
+;; (centaur-tabs-group-by-projectile-project)
 
-(defun jf/centaur-tabs-toggle-grouping ()
-  (interactive)
-  (if (jf/centaur-tabs-grouping-by-buffer-groups?)
-      (centaur-tabs-group-by-projectile-project)
-    (centaur-tabs-group-buffer-groups)))
+;; (defun jf/centaur-tabs-toggle-grouping ()
+;;   (interactive)
+;;   (if (jf/centaur-tabs-grouping-by-buffer-groups?)
+;;       (centaur-tabs-group-by-projectile-project)
+;;     (centaur-tabs-group-buffer-groups)))
 
-(defun jf/centaur-tabs-grouping-by-buffer-groups? ()
-  (eq 'centaur-tabs-buffer-groups centaur-tabs-buffer-groups-function))
+;; (defun jf/centaur-tabs-grouping-by-buffer-groups? ()
+;;   (eq 'centaur-tabs-buffer-groups centaur-tabs-buffer-groups-function))
 
-(centaur-tabs-mode t)
+;; (centaur-tabs-mode t)
 
 
 ;;;; Buffers and Tabs
@@ -202,64 +203,64 @@ Other buffer group by `centaur-tabs-get-group-name' with project name."
 ;; and `tab-lines-mode'.  Why is this important?  Because `centaur-tabs-mode'
 ;; hack the buffer to add the tabs; the impact was that popped buffers would
 ;; have sizing issues.
-;; (use-package bufler
-;;   :straight t
-;;   :hook (after-init . (lambda () (bufler-mode) (jf/bufler/tab-configuration)))
-;;   :config
-;;   (defun jf/bufler/tab-configuration ()
-;;     (bufler-tabs-mode 1)
-;;     (tab-bar-mode -1)
-;;     (bufler-workspace-tabs))
-;;   (setq tab-line-switch-cycling t)
-;;   (defun jf/bufler-workspace-mode-lighter ()
-;;     "Return the lighter string mode line."
-;;     "Bflr")
-;;   (advice-add #'bufler-workspace-mode-lighter
-;; 	      :override #'jf/bufler-workspace-mode-lighter
-;; 	      '((name . "wrapper")))
-;;   :bind (:map bufler-list-mode-map ("s-3" . quit-window))
-;;   :bind (("s-3" . bufler)
-;; 	 ("s-\\" . jf/tab-bar-switch-prompt-for-tab)
-;; 	 ("s-]" . tab-line-switch-to-next-tab)
-;; 	 ("s-}" . tab-line-switch-to-next-tab)
-;; 	 ("s-[" . tab-line-switch-to-prev-tab)
-;; 	 ("s-{" . tab-line-switch-to-prev-tab)))
+(use-package bufler
+  :straight t
+  :hook (after-init . (lambda () (bufler-mode) (jf/bufler/tab-configuration)))
+  :config
+  (defun jf/bufler/tab-configuration ()
+    (bufler-tabs-mode 1)
+    (tab-bar-mode -1)
+    (bufler-workspace-tabs))
+  (setq tab-line-switch-cycling t)
+  (defun jf/bufler-workspace-mode-lighter ()
+    "Return the lighter string mode line."
+    "Bflr")
+  (advice-add #'bufler-workspace-mode-lighter
+	      :override #'jf/bufler-workspace-mode-lighter
+	      '((name . "wrapper")))
+  :bind (:map bufler-list-mode-map ("s-3" . quit-window))
+  :bind (("s-3" . bufler)
+	 ("s-\\" . jf/tab-bar-switch-prompt-for-tab)
+	 ("s-]" . tab-line-switch-to-next-tab)
+	 ("s-}" . tab-line-switch-to-next-tab)
+	 ("s-[" . tab-line-switch-to-prev-tab)
+	 ("s-{" . tab-line-switch-to-prev-tab)))
 
-;; (defun jf/tab-bar-switch-to-next-tab ()
-;;   "Move to the next `tab-bar' tab and open the first buffer."
-;;   (interactive)
-;;   (call-interactively 'tab-bar-switch-to-next-tab)
-;;   (jf/tab-bar-activate-first-buffer))
+(defun jf/tab-bar-switch-to-next-tab ()
+  "Move to the next `tab-bar' tab and open the first buffer."
+  (interactive)
+  (call-interactively 'tab-bar-switch-to-next-tab)
+  (jf/tab-bar-activate-first-buffer))
 
-;; (defun jf/tab-bar-switch-to-prev-tab ()
-;;   "Move to the previous `tab-bar' tab and open the first buffer."
-;;   (interactive)
-;;   (call-interactively 'tab-bar-switch-to-prev-tab)
-;;   (jf/tab-bar-activate-first-buffer))
+(defun jf/tab-bar-switch-to-prev-tab ()
+  "Move to the previous `tab-bar' tab and open the first buffer."
+  (interactive)
+  (call-interactively 'tab-bar-switch-to-prev-tab)
+  (jf/tab-bar-activate-first-buffer))
 
-;; (defun jf/tab-bar-activate-first-buffer ()
-;;   "Switch to the first buffer in this buffer group.
+(defun jf/tab-bar-activate-first-buffer ()
+  "Switch to the first buffer in this buffer group.
 
-;;   This is cribbed from `bufler-switch-buffer'."
-;;   (let* ((path (frame-parameter nil 'bufler-workspace-path))
-;; 	 (buffers (bufler-buffer-alist-at
-;;                    path :filter-fns bufler-workspace-switch-buffer-filter-fns)))
-;;     (switch-to-buffer (caar buffers)))
-;;   ;; A hack to ensure that I have the top tabs; I don't need it because I could
-;;   ;; use `jf/tab-bar-switch-prompt-for-tab'.
-;;   (jf/bufler/tab-configuration))
+  This is cribbed from `bufler-switch-buffer'."
+  (let* ((path (frame-parameter nil 'bufler-workspace-path))
+	 (buffers (bufler-buffer-alist-at
+                   path :filter-fns bufler-workspace-switch-buffer-filter-fns)))
+    (switch-to-buffer (caar buffers)))
+  ;; A hack to ensure that I have the top tabs; I don't need it because I could
+  ;; use `jf/tab-bar-switch-prompt-for-tab'.
+  (jf/bufler/tab-configuration))
 
-;; (defun jf/tab-bar-switch-prompt-for-tab (name)
-;;   "Switch to the NAME tab and prompt for a buffer."
-;;   (interactive
-;;    (let* ((recent-tabs (mapcar (lambda (tab)
-;;                                  (alist-get 'name tab))
-;;                                (bufler-workspace-tabs))))
-;;      (list (completing-read "Select tab-bar: "
-;;                             recent-tabs nil nil nil nil recent-tabs))))
-;;   (tab-bar-select-tab (1+ (or (tab-bar--tab-index-by-name name) 0)))
-;;   (bufler-switch-buffer)
-;;   (jf/bufler/tab-configuration))
+(defun jf/tab-bar-switch-prompt-for-tab (name)
+  "Switch to the NAME tab and prompt for a buffer."
+  (interactive
+   (let* ((recent-tabs (mapcar (lambda (tab)
+                                 (alist-get 'name tab))
+                               (bufler-workspace-tabs))))
+     (list (completing-read "Select tab-bar: "
+                            recent-tabs nil nil nil nil recent-tabs))))
+  (tab-bar-select-tab (1+ (or (tab-bar--tab-index-by-name name) 0)))
+  (bufler-switch-buffer)
+  (jf/bufler/tab-configuration))
 
 (provide 'jf-windows)
 ;;; jf-windows.el ends here
