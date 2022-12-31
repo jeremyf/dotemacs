@@ -53,12 +53,12 @@
    modus-themes-tabs-accented t
    modus-themes-headings
    '((1 . (variable-pitch light 1.6))
-     (2 . (overline semibold 1.4))
-     (3 . (monochrome overline 1.2 background))
-     (4 . (overline 1.1))
-     (5 . (rainbow 1.05))
-     (6 . (rainbow 1.0))
-     (t . (rainbow 0.85)))))
+     (2 . (overline semibold 1.5))
+     (3 . (monochrome overline 1.4 background))
+     (4 . (overline 1.3))
+     (5 . (rainbow 1.2))
+     (6 . (rainbow 1.15))
+     (t . (rainbow 1.1)))))
 
 ;; (use-package ef-themes
 ;;   :straight (ef-themes :host nil :type git :repo "https://git.sr.ht/~protesilaos/ef-themes")

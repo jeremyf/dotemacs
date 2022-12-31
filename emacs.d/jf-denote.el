@@ -664,6 +664,10 @@ This function is intended for a global find of all notes."
         (cond
          ((and use_hugo_shortcode glossary_key)
 	  (format "{{< glossary key=\"%s\" >}}" glossary_key))
+	 ;; Use the TakeOnRules shortcode that leverages Hugo built-in
+	 ((and use_hugo_shortcode (s-starts-with? "https://takeonrules.com/" url))
+	  (format "{{< linkToPath \"%s\" >}}"
+		  (s-trim (s-replace "https://takeonrules.com/" "/" url))))
 	 ((eq format 'html)
 	  (format "<a href=\"%s\">%s</a>" url desc))
          ((eq format 'md) (format "[%s](%s)" desc url))

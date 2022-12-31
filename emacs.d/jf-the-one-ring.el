@@ -42,7 +42,7 @@
 			      (random (length table)))
 			 table)))
     ("Neutral" . (lambda (table)
-		   (jf/roll-on-table table)))
+		   (seq-random-elt table)))
     ("Ill-Favoured" . (lambda (table)
 			(nth (min (random (length table))
 				  (random (length table)))
@@ -117,6 +117,8 @@ When the SOURCE is a string, use `s-format' to expand the
 \"${tab-name}\" template."
   (unless container (setq container source))
   (cond
+   ((-cons-pair? source)
+    source)
    ((listp source)
     (jf/roll-on-table (seq-random-elt source) container))
    ((symbolp source)
@@ -132,6 +134,7 @@ When the SOURCE is a string, use `s-format' to expand the
    ((stringp source)
     (s-format source #'jf/roll-on-table/interpolate))
    (t (error (format "Unable to handle %s." source)))))
+
 
 ;;;;; Strider Mode
 (defconst jf/gaming/the-one-ring/strider-mode/event-table
