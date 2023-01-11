@@ -369,9 +369,8 @@ This function is intended for a global find of all notes."
   (let* ((key (downcase (denote-sluggify (if (s-present? abbr) abbr title))))
          (template (concat ":METADATA:\n"
 			   "#+GLOSSARY_KEY: " key "\n"
-                           "#+ABBR:" (when (s-present? abbr)
-				       (concat " " abbr))
-			   "\n"
+                           (when (s-present? abbr)
+			     (concat "#+ABBR: " abbr "\n"))
 			   ;; TODO: Include a prompt of existing disclaimers
                            "#+CONTENT_DISCLAIMER:\n"
                            "#+DESCRIPTION:\n"
