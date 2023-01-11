@@ -24,41 +24,39 @@
   ;; :straight (modus-themes :type built-in)
   :straight (:type git :host gitlab :repo "protesilaos/modus-themes" :branch "main")
   :init
-  (setq
-   modus-themes-vivendi-color-overrides
-   ;; '((bg-region-accent-subtle . "#240f55")) ;; Default
-   ;; '((bg-region-accent-subtle . "#323da2"));; Good candidate
-   '((bg-region-accent-subtle . "#304466"))
-
-   modus-themes-bold-constructs t
-   modus-themes-completions '((matches . (extrabold))
-                              (selection . (semibold accented))
-                              (popup . (accented intense)))
-   modus-themes-diffs nil
-   modus-themes-fringes 'intense
-   modus-themes-hl-line '(accented intense)
-   modus-themes-intense-markup t
-   modus-themes-links '(faint background)
-   modus-themes-subtle-line-numbers t
-   modus-themes-mixed-fonts t
-   modus-themes-mode-line '(accented moody)
-   modus-themes-org-blocks 'gray-background
-   modus-themes-paren-match '(bold intense)
-   modus-themes-prompts '(intense accented)
-   modus-themes-region '(bg-only accented)
-   modus-themes-scale-headings t
-   modus-themes-slanted-constructs t
-   modus-themes-subtle-line-numbers t
-   modus-themes-syntax '(alt-syntax yellow-comments green-strings)
-   modus-themes-tabs-accented t
-   modus-themes-headings
-   '((1 . (variable-pitch light 1.6))
-     (2 . (overline semibold 1.5))
-     (3 . (monochrome overline 1.4 background))
-     (4 . (overline 1.3))
-     (5 . (rainbow 1.2))
-     (6 . (rainbow 1.15))
-     (t . (rainbow 1.1)))))
+  (setq modus-themes-italic-constructs t
+	modus-themes-bold-constructs t
+	modus-themes-mixed-fonts t
+	modus-themes-variable-pitch-ui nil
+	modus-themes-custom-auto-reload t
+	modus-themes-disable-other-themes t
+	modus-themes-common-palette-overrides '((bg-mode-line-active bg-blue-subtle)
+						(border-mode-line-active blue-intense)
+						(comment yellow-faint)
+						(constant magenta-cooler)
+						(docmarkup magenta-faint)
+						(docstring green-faint)
+						(fg-mode-line-active fg-main)
+						(fnname magenta-warmer)
+						(keyword cyan)
+						(preprocessor cyan-cooler)
+						(rx-backslash blue-cooler)
+						(rx-construct magenta-warmer)
+						(string green-cooler)
+						(type magenta-cooler)
+						(variable blue-warmer)
+						(builtin magenta))
+	modus-themes-completions '((matches . (extrabold))
+				   (selection . (semibold accented))
+				   (popup . (accented intense)))
+	modus-themes-headings
+	'((1 . (variable-pitch light 1.6))
+	  (2 . (overline semibold 1.5))
+	  (3 . (monochrome overline 1.4 background))
+	  (4 . (overline 1.3))
+	  (5 . (rainbow 1.2))
+	  (6 . (rainbow 1.15))
+	  (t . (rainbow 1.1)))))
 
 ;; (use-package ef-themes
 ;;   :straight (ef-themes :host nil :type git :repo "https://git.sr.ht/~protesilaos/ef-themes")
@@ -76,30 +74,21 @@
 ;;   (ef-themes-variable-pitch-ui t)
 ;;   :init (ef-themes-select 'ef-cyprus))
 
-(if (eq system-type 'darwin)
-    (progn
-      (defun jf/dark ()
-        "Toggle system-wide Dark or Light setting."
-        (interactive)
-        (shell-command "osascript -e 'tell application \"System Events\" to tell appearance preferences to set dark mode to not dark mode'")
-        (jf/emacs-theme-by-osx-appearance))
+(load-theme 'modus-vivendi t t)
+(load-theme 'modus-operandi t t)
+(defun jf/dark ()
+  "Toggle system-wide Dark or Light setting."
+  (interactive)
+  (shell-command "osascript -e 'tell application \"System Events\" to tell appearance preferences to set dark mode to not dark mode'")
+  (jf/emacs-theme-by-osx-appearance))
 
-      (defalias 'modus-themes-toggle 'jf/dark)
-      (defun jf/emacs-theme-by-osx-appearance ()
-        "Set theme based on OSX apperance state."
-        (if (equal "Dark" (substring (shell-command-to-string "defaults read -g AppleInterfaceStyle") 0 4))
-            (modus-themes-load-vivendi)
-          (modus-themes-load-operandi)))
-      ;; And load the appropriate theme
-      (jf/emacs-theme-by-osx-appearance))
-  (progn
-    (defun modus-themes-toggle ()
-      "Toggle between `modus-operandi' and `modus-vivendi' themes."
-      (interactive)
-      (if (eq (car custom-enabled-themes) 'modus-vivendi)
-          (modus-themes-load-vivendi)
-        (modus-themes-load-operandi)))
-    (modus-themes-load-operandi)))
+(defun jf/emacs-theme-by-osx-appearance ()
+  "Set theme based on OSX apperance state."
+  (if (equal "Dark" (substring (shell-command-to-string "defaults read -g AppleInterfaceStyle") 0 4))
+      (enable-theme 'modus-vivendi)
+    (enable-theme 'modus-operandi)))
+
+(jf/emacs-theme-by-osx-appearance)
 
 ;;;; Centaur Tabs
 
