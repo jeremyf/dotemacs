@@ -324,7 +324,6 @@ This function is intended for a global find of all notes."
                                 (subseq body-as-list 0 nth-words)
 			      body-as-list)))
          (template (concat
-		    ":METADATA:\n"
                     ;; The name of the author
                     "#+AUTHOR_NAME: " author_name "\n"
                     ;; Where can you “find” this author?
@@ -343,8 +342,7 @@ This function is intended for a global find of all notes."
                     ;; work.
                     "#+PAGE:\n"
                     ;; The name of the translator
-                    "#+TRANSLATOR_NAME:\n"
-		    ":END:")))
+                    "#+TRANSLATOR_NAME:\n")))
     (denote title
             nil
             'org

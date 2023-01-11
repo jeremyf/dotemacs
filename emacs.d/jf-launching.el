@@ -102,7 +102,7 @@
  create-lockfiles nil        ;; Don't create lock files.
 
  delete-old-versions t       ;; Automatically delete excess backups
-
+ dired-dwim-target t ;; https://www.reddit.com/r/emacs/comments/102y0n4/weekly_tips_tricks_c_thread/
  echo-key-strokes 0.2
 
  global-mark-ring-max 32
