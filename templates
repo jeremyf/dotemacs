@@ -66,14 +66,14 @@ org-mode
 (today "[[date:" (format-time-string "%Y-%m-%d") "][today]]")
 (tor "[[https://takeonrules.com][Take on Rules]]")
 (uml "#+begin_src plantuml" n> "@startuml" n> "!theme amiga" n> q n> "@enduml" n> "#+end_src" n>)
-(project n "#+PROJECT_NAME: " p
-	 n "#+PROJECT_PATHS: (\"Local Code\" . \"" p "\")"
-	 n "#+PROJECT_PATHS: (\"Notes\" . \"" (buffer-file-name)  "\")"
+(project n "#+PROJECT_NAME: " (p "Project Name: " project-name)
+	 n "#+PROJECT_PATHS: (\"Code, Local\" . \"" p "\")"
+	 n "#+PROJECT_PATHS: (\"Notes, " (s project-name) "\" . \"" (buffer-file-name)  "\")"
 	 n "#+PROJECT_PATHS: (\"Project Board\" . \"" p "\")"
-	 n "#+PROJECT_PATHS: (\"Remote Code\" . \"" (p "Remote Code: " remote) "\")"
-	 n "#+PROJECT_PATHS: (\"Remote Actions\" . \"" (s remote) "actions/\")"
-	 n "#+PROJECT_PATHS: (\"Remote Issues\" . \"" (s remote) "issues/\")"
-	 n "#+PROJECT_PATHS: (\"Remote Pull Requests\" . \"" (s remote) "pulls/\")")
+	 n "#+PROJECT_PATHS: (\"Code, Remote\" . \"" (p "Remote Code: " remote) "\")"
+	 n "#+PROJECT_PATHS: (\"Actions\" . \"" (s remote) "actions/\")"
+	 n "#+PROJECT_PATHS: (\"Issues\" . \"" (s remote) "issues/\")"
+	 n "#+PROJECT_PATHS: (\"Pull Requests\" . \"" (s remote) "pulls/\")")
 
 ;;;;; Consider "The One Ring" minor mode to inject these.
 (rune "{{{rune(" (completing-read "Rune: " jf/gaming/runes) ")}}}")

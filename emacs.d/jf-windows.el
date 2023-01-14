@@ -74,8 +74,8 @@
 ;;   (ef-themes-variable-pitch-ui t)
 ;;   :init (ef-themes-select 'ef-cyprus))
 
-(load-theme 'modus-vivendi t t)
-(load-theme 'modus-operandi t t)
+(load-theme 'modus-vivendi-tinted t t)
+(load-theme 'modus-operandi-tinted t t)
 (defun jf/dark ()
   "Toggle system-wide Dark or Light setting."
   (interactive)
@@ -85,8 +85,8 @@
 (defun jf/emacs-theme-by-osx-appearance ()
   "Set theme based on OSX apperance state."
   (if (equal "Dark" (substring (shell-command-to-string "defaults read -g AppleInterfaceStyle") 0 4))
-      (enable-theme 'modus-vivendi)
-    (enable-theme 'modus-operandi)))
+      (enable-theme 'modus-vivendi-tinted)
+    (enable-theme 'modus-operandi-tinted)))
 
 (jf/emacs-theme-by-osx-appearance)
 
