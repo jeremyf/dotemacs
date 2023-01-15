@@ -404,44 +404,6 @@
       (start-process "hugo-server" buffer-name "hugo" "server" "-D")
       (message (concat "Starting Hugo in \"" buffer-name "\" buffer…")))))
 
-(defun jf/tor-retitle-post (title)
-  "Replace the given buffer's title with the new TITLE.
-
-    This function will: replace the content's title, update the slug,
-    and rename the buffer."
-  (interactive "sNew Post's Title: ")
-  (let* ((metadataTitle (concat "title: '"
-				(jf/tor-convert-text-to-post-title title) "'"))
-	 (slug (jf/tor-convert-text-to-slug title))
-	 (metadataSlug (concat "slug: " slug))
-	 (filename (buffer-file-name))
-	 (new-filename (concat (file-name-directory filename)
-			       slug ".md")))
-
-    ;; Replace the title metadata entry
-    (goto-char (point-min))
-    (while (search-forward-regexp "^title:.*$" nil t)
-      (replace-match metadataTitle))
-
-    ;; Replace the slug metadata entry
-    (goto-char (point-min))
-    (while (search-forward-regexp "^slug:.*$" nil t)
-      (replace-match metadataSlug))
-
-    ;; Need to save before we rename the buffer
-    (save-buffer)
-
-    ;; Rename the buffer, accounting for version control
-    (cond
-     ((vc-backend filename)
-      (vc-rename-file filename new-filename))
-     (t
-      (rename-file filename new-filename t)
-      (set-visited-file-name new-filename t t)))
-
-    ;; Report filename change
-    (message "Renamed %s -> %s" filename new-filename)))
-
 (defvar jf/tor-hostname-regexp
   "^https?://takeonrules\.com"
   "A regular expression for checking if it's TakeOnRules.com.")
