@@ -540,32 +540,6 @@
   (yas-expand)
   (message "Ready to insert a new epigraph"))
 
-(cl-defun jf/tor-post-amplifying-the-blogosphere (subheading
-						  &key
-						  citeTitle
-						  citeURL
-						  citeAuthor)
-  "Create and visit draft post for amplifying the blogosphere.
-
-    If there's an active region, prompt for the :SUBHEADING.  The file
-    for the blog post conforms to the path schema of posts for
-    TakeOnRules.com.
-
-    We'll pass the :CITETITLE, :CITEAUTHOR, and :CITEURL to
-    `jf/tor-post---create-or-append'"
-  (interactive (list (if (use-region-p)
-			 (read-string "Sub-Heading: ")
-		       nil)))
-  (jf/tor-post---create-or-append
-   :title (format-time-string "Amplifying the Blogosphere (v%Y-%m-%d)")
-   :toc "true"
-   :subheading subheading
-   :series "amplifying-the-blogosphere"
-   :tags "response to other blogs"
-   :citeTitle citeTitle
-   :citeURL citeURL
-   :citeAuthor citeAuthor))
-
 ;; Note: I needed to use `fboundp' because if I invoked this functions
 ;; before other consult functions I got a method void error.
 (cl-defun jf/find-file-via-matching (&key prompt matching in)
