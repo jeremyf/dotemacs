@@ -100,6 +100,9 @@
       (pulsar-pulse-line)))
   :bind (("C-l" . jf/pulse)))
 
+(use-package rainbow-mode
+  :straight t)
+
 (use-package rainbow-delimiters
   ;; A quick and useful visual queue for paranthesis.
   :straight t

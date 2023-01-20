@@ -104,6 +104,9 @@
   ;; And `org-read-date' is an amazing bit of tech
   (denote-date-prompt-denote-date-prompt-use-org-read-date t))
 
+(use-package denote-explore
+  :straight (:host github :repo "pprevos/denote-explore")
+  :after (denote))
 
 (use-package consult-notes
   ;;Let’s add another way at looking up files.  I appreciate the ability to
