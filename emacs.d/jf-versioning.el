@@ -107,11 +107,12 @@
 		     buffer-file-name
 		     " | rg \"^summary\"")))))
       (jf/open-pull-request-for :summary summary)))
-  :bind (("s-7" . magit-status)
+  :bind (("C-c m" . magit-status)
+	 ("C-x g m" . magit-status)
 	 ("C-x g f" . magit-file-dispatch)
 	 ("C-x g d" . magit-dispatch))
   ;; In other situations I bind s-6 to `git-messenger:popup-message'
-  :bind (:map magit-log-mode-map ("s-6" . 'jf/magit-browse-pull-request))
+  :bind (:map magit-log-mode-map ("C-x g b" . 'jf/magit-browse-pull-request))
   :hook ((with-editor-post-finish-hook . magit-status)))
 
 ;; COMMENTED OUT FOR FUTURE REFERENCE
@@ -178,8 +179,7 @@
   (git-messenger:use-magit-popup t)
   :bind (:map git-messenger-map (("p" . 'jf/open-pull-request-for-current-line)
 				 ("l" . 'git-link)))
-  :bind (("s-6" . jf/git-messenger-popup)
-	 ("<f6>" . jf/git-messenger-popup))
+  :bind (("C-x g b" . jf/git-messenger-popup))
   :straight t)
 
 ;; When working in code, I want different ways to view the metadata around the
