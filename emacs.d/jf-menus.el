@@ -115,6 +115,7 @@
     ]
    ])
 
+
 (use-package file-info
   :straight (:host github :repo "artawower/file-info.el")
   :bind (("C-c i" . 'file-info-show))
@@ -125,6 +126,8 @@
                                                :internal-border-color "#61AFEF"
                                                :left-fringe 16
                                                :right-fringe 16)))
+
+(unbind-key "C-c d") ;; 'file-info-show
 
 (provide 'jf-menus)
 ;;; jf-menus.el ends here

@@ -733,6 +733,14 @@ This function is intended for a global find of all notes."
        :default url)
       (save-buffer))))
 
+(cl-defun jf/convert-org-link-type-at-point (&key (types '("abbr" "abbr-plural" "denote" "epigraph")))
+  "Convert link at POINT from one `org-link' type to another."
+  (interactive)
+  (if-let ((element (org-element-lineage (org-element-context) '(link) t)))
+      ;; Change type
+      (message "%s" element)
+    (error "Point is not an org-link.")))
+
 ;;;;; Capturing functions for applications
 (defun jf/menu--org-capture-firefox ()
   "Create an `denote' entry from Firefox page."

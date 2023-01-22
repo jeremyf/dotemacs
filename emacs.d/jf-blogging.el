@@ -20,8 +20,29 @@
   (hugo-use-code-for-kbd t)
   :after ox)
 
-(advice-add #'org-blackfriday-plain-list :override #'org-html-plain-list '((name . "wrapper")))
-(advice-add #'org-blackfriday-item :override #'org-html-item '((name . "wrapper")))
+;; These functions work to aggressively.  The types of lists (ordered,
+;; definition, and unordered) are co-mingled.  This co-mingling means that I'm
+;; not getting the behavior I want.  So I'll proceed.
+;;
+;; (advice-add #'org-blackfriday-plain-list :override #'org-html-plain-list '((name . "wrapper")))
+;; (advice-add #'org-blackfriday-item :override #'org-html-item '((name . "wrapper")))
+
+;; Convert footnote to sidenote for HTML export
+(defun jf/org-hugo-sidenote (footnote-reference _contents info)
+  "Transcode a FOOTNOTE-REFERENCE element from Org to Hugo sidenote shortcode.
+CONTENTS is nil.  INFO is a plist holding contextual information."
+  (let* ((element (car (org-export-get-footnote-definition footnote-reference info)))
+	 (beg (org-element-property :contents-begin element))
+         (end (org-element-property :contents-end element)))
+    (format "{{< sidenote >}}%s{{< /sidenote >}}"
+	    (s-trim (buffer-substring-no-properties beg end)))))
+
+(advice-add #'org-blackfriday-footnote-reference
+	    :override #'jf/org-hugo-sidenote
+	    '((name . "wrapper")))
+(advice-add #'org-blackfriday-footnote-section
+	    :override (lambda (&rest rest) ())
+	    '((name . "wrapper")))
 
 (setq org-hugo-base-dir "~/git/takeonrules.source")
 
