@@ -16,13 +16,13 @@
 (use-package ox-hugo
   :straight t
   :custom
-  (org-hugo-paired-shortcodes "marginnote sidenote poem inline_comments")
+  (org-hugo-paired-shortcodes "marginnote poem inline_comments")
   (hugo-use-code-for-kbd t)
   :after ox)
 
 ;; These functions work to aggressively.  The types of lists (ordered,
 ;; definition, and unordered) are co-mingled.  This co-mingling means that I'm
-;; not getting the behavior I want.  So I'll proceed.
+;; not getting the behavior I want.  So I'll proceed.g
 ;;
 ;; (advice-add #'org-blackfriday-plain-list :override #'org-html-plain-list '((name . "wrapper")))
 ;; (advice-add #'org-blackfriday-item :override #'org-html-item '((name . "wrapper")))
@@ -33,9 +33,12 @@
 CONTENTS is nil.  INFO is a plist holding contextual information."
   (let* ((element (car (org-export-get-footnote-definition footnote-reference info)))
 	 (beg (org-element-property :contents-begin element))
-         (end (org-element-property :contents-end element)))
-    (format "{{< sidenote >}}%s{{< /sidenote >}}"
-	    (s-trim (buffer-substring-no-properties beg end)))))
+         (end (org-element-property :contents-end element))
+	 (content (s-trim
+		   (org-export-string-as
+		    (buffer-substring-no-properties beg end)
+		    'md t '(:with-toc nil)))))
+    (format "{{< sidenote >}}%s{{< /sidenote >}}" content)))
 
 (advice-add #'org-blackfriday-footnote-reference
 	    :override #'jf/org-hugo-sidenote
@@ -49,9 +52,6 @@ CONTENTS is nil.  INFO is a plist holding contextual information."
 (defvar jf/org-macros-setup-filename
   "~/git/dotemacs/lib/org-macros.setup"
   "The path to the file that has inline org macros.")
-
-(with-eval-after-load 'ox-hugo
-  (add-to-list 'org-hugo-special-block-type-properties '("sidenote" . (:trim-pre t))))
 
 (defun jf/org-html-verse-block (_verse-block contents info)
   "Transcode a VERSE-BLOCK element from Org to HTML.

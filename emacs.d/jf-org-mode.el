@@ -154,9 +154,8 @@
 					 (shell . t)
 					 (plantuml . t)
 					 (ruby . t))))
-  (add-to-list 'org-structure-template-alist '("M" . "marginnote"))
+  (add-to-list 'org-structure-template-alist '("m" . "marginnote"))
   (add-to-list 'org-structure-template-alist '("i" . "inline_comments"))
-  (add-to-list 'org-structure-template-alist '("S" . "sidenote"))
   :init
   (require 'ox)
   ;; I grabbed from the following LaTeX class from
@@ -614,9 +613,6 @@ language name.")
 	     '("linkToGame" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" abbr=\"t\" >}}@@"))
 (add-to-list 'org-export-global-macros
 	     '("i" . "@@html:<i class=\"dfn\">@@$1@@html:</i>@@"))
-
-(add-to-list 'org-export-global-macros
-	     '("sidenote" . "@@hugo:{{< sidenote >}}@@$1@@hugo:{{< /sidenote >}}@@"))
 
 (add-to-list 'org-export-global-macros
 	     '("linkToSeries" . "@@hugo:{{< linkToSeries \"@@$1@@hugo:\" >}}@@"))'
