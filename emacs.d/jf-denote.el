@@ -104,9 +104,9 @@
   ;; And `org-read-date' is an amazing bit of tech
   (denote-date-prompt-denote-date-prompt-use-org-read-date t))
 
-(use-package denote-explore
-  :straight (:host github :repo "pprevos/denote-explore")
-  :after (denote))
+;; (use-package denote-explore
+;;   :straight (:host github :repo "pprevos/denote-explore")
+;;   :after (denote))
 
 (use-package consult-notes
   ;;Let’s add another way at looking up files.  I appreciate the ability to
@@ -370,8 +370,7 @@ This function is intended for a global find of all notes."
     NOTE: At present there is no consideration for uniqueness."
   (interactive)
   (let* ((key (downcase (denote-sluggify (if (s-present? abbr) abbr title))))
-         (template (concat ":METADATA:\n"
-			   "#+GLOSSARY_KEY: " key "\n"
+         (template (concat "#+GLOSSARY_KEY: " key "\n"
                            (when (s-present? abbr)
 			     (concat "#+ABBR: " abbr "\n"))
 			   ;; TODO: Include a prompt of existing disclaimers
@@ -386,8 +385,7 @@ This function is intended for a global find of all notes."
                            "#+PLURAL_TITLE:\n"
                            "#+SAME_AS:\n"
                            "#+TAG:\n" ;; TODO: Assert uniqueness
-                           "#+VERBOSE_TITLE:\n"
-			   ":END:"))
+                           "#+VERBOSE_TITLE:\n"))
          (keywords (list)))
     ;; Add both "abbr" and the abbr to the keywords; both help in searching
     ;; results
@@ -518,7 +516,7 @@ This function is intended for a global find of all notes."
 				     (jf/org-link-complete-link-for
 				      parg
 				      :scheme "abbr-plural"
-				      :filter " _plural_abbr*"
+				      :filter " _abbr*"
 				      :subdirectory "glossary"))
 			 :export (lambda (link description format protocol)
 				   (jf/denote-link-ol-abbr-with-property

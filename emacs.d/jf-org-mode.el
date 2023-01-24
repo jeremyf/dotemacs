@@ -592,9 +592,6 @@ language name.")
 	       '("kbd" . "@@html:<kbd>@@$1@@html:</kbd>@@"))
 
   (add-to-list 'org-export-global-macros
-	       '("date" . "@@html:<time datetime=\"$1\">@@$2@@html:</time>@@"))
-
-  (add-to-list 'org-export-global-macros
 	       '("cite" . "@@html:<cite>@@$1@@html:</cite>@@"))
 
   (add-to-list 'org-export-global-macros
@@ -609,8 +606,6 @@ language name.")
 	     '("abbr" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" abbr=\"t\" >}}@@"))
 (add-to-list 'org-export-global-macros
 	     '("abbr-plural" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" abbr=\"t\" plural=\"t\" >}}@@"))
-(add-to-list 'org-export-global-macros
-	     '("linkToGame" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" abbr=\"t\" >}}@@"))
 (add-to-list 'org-export-global-macros
 	     '("i" . "@@html:<i class=\"dfn\">@@$1@@html:</i>@@"))
 
