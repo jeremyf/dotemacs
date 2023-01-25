@@ -201,7 +201,7 @@ Noted projects would be found within the given DIRECTORY."
   (unless (eq 1 (point))
     (when-let ((element (org-element-at-point)))
       (if (member "projects" (org-element-property :tag element))
-	  (org-element-property :title element)
+	  (org-element-property :raw-value element)
 	(if (eq 'headline (org-element-type element))
 	    ;; TODO: I'd prefer something a little more elegant and not
 	    ;; presumptive about the structure of the agenda file.  But this
@@ -210,7 +210,7 @@ Noted projects would be found within the given DIRECTORY."
 	      (1 nil)
 	      (2 nil)
 	      (3 nil)
-	      (4 (org-element-property :title element))
+	      (4 (org-element-property :raw-value element))
 	      (_ (progn
 		   (org-up-heading-safe)
 		   (jf/project/get-project-from/current-agenda-buffer))))

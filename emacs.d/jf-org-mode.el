@@ -348,7 +348,7 @@
     (-distinct
      (org-map-entries
       (lambda ()
-	(org-element-property :title (org-element-at-point)))
+	(org-element-property :raw-value (org-element-at-point)))
       "+LEVEL=4+projects" 'agenda)
      ) #'string<)))
 
@@ -680,11 +680,11 @@ When given PREFIX_ARG, clear the org-roam database (via
 	(widen)
         (org-capture-string (format "%s %s :%s:\n\n%s %s %s :%s:\n%s"
                                     (s-repeat (org-element-property :level from-project) "*")
-                                    (org-element-property :title from-project)
+                                    (org-element-property :raw-value from-project)
                                     (s-join ":" (org-element-property :tags from-project))
                                     (s-repeat (org-element-property :level from-task) "*")
                                     (org-element-property :todo-keyword from-task)
-                                    (org-element-property :title from-task)
+                                    (org-element-property :raw-value from-task)
                                     (s-join ":" (org-element-property :tags from-task))
                                     content)
                             "d"))
