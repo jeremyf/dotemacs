@@ -68,11 +68,6 @@
   :config
   (editorconfig-mode 1))
 
-(use-package rg
-  :config (rg-enable-menu)
-  ;; :init (setq ripgrep-arguments "--ignore-case")
-  :straight t)
-
 ;; “Edit a grep buffer and apply those changes to the file buffer.”  In other
 ;; words, after “searching” for something, sending the results to a buffer
 ;; (via `embark-export' or such thing), you can edit that search results
@@ -86,7 +81,7 @@
 ;;   5.  Save (via ~C-x C-s~) or Cancel (via ~C-c C-k~).
 (use-package wgrep
   :after (embark-consult ripgrep)
-  :straight t
+  :straight (:type git :host github :repo "jeremyf/Emacs-wgrep" :branch "main")
   :bind (:map wgrep-mode-map
 	      ;; Added keybinding to echo Magit behavior
 	      ("C-c C-c" . wgrep-finish-edit)
@@ -94,6 +89,12 @@
 	      ("e" . wgrep-change-to-wgrep-mode)
 	      :map ripgrep-search-mode-map
 	      ("e" . wgrep-change-to-wgrep-mode)))
+
+(use-package rg
+  :after (wgrep)
+  :config (rg-enable-menu)
+  ;; :init (setq ripgrep-arguments "--ignore-case")
+  :straight t)
 
 ;; A mix of a few odd and useful functions.
 (use-package crux
