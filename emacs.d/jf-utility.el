@@ -68,6 +68,17 @@
   :config
   (editorconfig-mode 1))
 
+;; Where consult-rg provides a live search feature, deadgrep provides a
+;; resulting search buffer.  You submit your search term and get the metadata
+;; and the matches.
+(use-package deadgrep
+  :straight t
+  :bind (:map deadgrep-mode-map
+	      (("C-c C-p" . deadgrep-edit-mode)
+	       ("e" . deadgrep-edit-mode))
+	      :map deadgrep-edit-mode-map
+	      ("C-c C-c" . deadgrep-mode)))
+
 ;; “Edit a grep buffer and apply those changes to the file buffer.”  In other
 ;; words, after “searching” for something, sending the results to a buffer
 ;; (via `embark-export' or such thing), you can edit that search results

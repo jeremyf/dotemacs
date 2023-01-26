@@ -210,11 +210,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
               '((name . "wrapper")))
   )
 
-;; Where consult-rg provides a live search feature, deadgrep provides a
-;; resulting search buffer.  You submit your search term and get the metadata
-;; and the matches.
-(use-package deadgrep
-  :straight t)
 
 (use-package consult-dir
   ;; This package helps ease traveling across directories by providing directory
