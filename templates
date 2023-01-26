@@ -63,6 +63,8 @@ org-mode
 (@ (p (jf/denote-link--people)))
 (idiomatic "{{{i(" (p (completing-read "Idiom: " (jf/org-macro-value-list "i"))) ")}}}")
 (shell "#+begin_src bash :results scalar replace :exports both :tangle yes" n> q n> "#+end_src" n>)
+(rpgs "[[abbr-plural:20221009T115226][RPGs]]")
+(rpg "[[abbr:20221009T115226][RPGs]]")
 (today "[[date:" (format-time-string "%Y-%m-%d") "][today]]")
 (tor "[[https://takeonrules.com][Take on Rules]]")
 (uml "#+begin_src plantuml" n> "@startuml" n> "!theme amiga" n> q n> "@enduml" n> "#+end_src" n>)
