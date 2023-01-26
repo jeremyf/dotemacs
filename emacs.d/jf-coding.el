@@ -123,9 +123,8 @@
   ;; Ensure that we’re loading enh-ruby-mode before we do any rspec loading.
   :after enh-ruby-mode
   ;; :init (eval-after-load 'rspec-mode '(rspec-install-snippets))
-  :config
-  (setq rspec-container-name "web")
   :custom
+  (rspec-docker-container "web")
   (rspec-use-spring-when-possible nil)
   (rspec-use-docker-when-possible t)
   (rspec-docker-cwd "./")
