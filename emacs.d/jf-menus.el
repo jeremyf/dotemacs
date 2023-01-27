@@ -119,7 +119,7 @@
 
 (use-package file-info
   :straight (:host github :repo "artawower/file-info.el")
-  :bind (("C-c i" . 'file-info-show))
+  :bind (("s-6" . 'file-info-show))
   :config
   (setq hydra-hint-display-type 'posframe)
   (setq hydra-posframe-show-params `(:poshandler posframe-poshandler-frame-center
