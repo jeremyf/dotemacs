@@ -32,7 +32,6 @@
   [["Contexts"
     ("-b" "Burning Wheel…"  jf/menu--bwg)
     ("-e" "Eberron…" jf/menu--eberron)
-    ("-t" "TakeOnRules…" jf/menu--tor)
     ("-w" "Register window configuration" window-configuration-to-register)
     ]
    ["Jump to"
