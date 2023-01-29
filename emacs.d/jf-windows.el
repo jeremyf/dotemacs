@@ -32,12 +32,6 @@
       (side . bottom)
       (slot . 0)
       (window-parameters . ((mode-line-format . none))))
-     ("\\*Org Select\\*" ; the `org-capture' key selection
-      (display-buffer-in-side-window)
-      (dedicated . t)
-      (side . bottom)
-      (slot . 0)
-      (window-parameters . ((mode-line-format . none))))
      ;; I'd been using bufler with tabs.  However the tab behavior is not
      ;; something that I regularly leverage; in part because tab grouping is not
      ;; as predictable as I'd like.
@@ -46,7 +40,7 @@
       (window-width . 0.67)
       (dedicated . t)
       (window-parameters . ((mode-line-format . ("Select a Buffer"))))
-      (side . right)
+      (side . left)
       (slot . 0))
      ("\\*Embark Actions\\*"
            (display-buffer-reuse-mode-window display-buffer-at-bottom)
@@ -270,6 +264,7 @@
 
   :bind (:map bufler-list-mode-map ("s-3" . quit-window))
   :bind (("s-3" . bufler)
+	 ("s-\\" . bufler)
 	 ;; ("s-\\" . jf/tab-bar-switch-prompt-for-tab)
 	 ;; ("s-]" . tab-line-switch-to-next-tab)
 	 ;; ("s-}" . tab-line-switch-to-next-tab)
