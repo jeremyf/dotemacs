@@ -23,12 +23,16 @@
 	 ("s-]" . previous-buffer))
   :custom
   (display-buffer-alist
-   '(("\\*Bufler\\*"
+   '(;; no window
+     ("\\`\\*Async Shell Command\\*\\'"
+      (display-buffer-no-window))
+     ;; I'd been using bufler with tabs.  However the tab behavior is not
+     ;; something that I regularly leverage; in part because tab grouping is not
+     ;; as predictable as I'd like.
+     ("\\*Bufler\\*"
       (display-buffer-in-side-window)
       (window-width . 0.67)
-      ;; (window-parameters . ((no-delete-other-windows . t)
-      ;; 			    (no-other-window . t)
-      ;; 			    (mode-line-format . ("Select a Buffer"))))
+      (window-parameters . ((mode-line-format . ("Select a Buffer"))))
       (side . left)
       (slot . 0))
      ("\\*elfeed.*"
@@ -38,6 +42,7 @@
       (window-width . 0.33)
       (side . right)
       (slot . 0))
+     ;; The junk drawer of *something* buffers.
      ("\\*.*\\*"
       (display-buffer-in-side-window)
       (window-height . 0.33)
