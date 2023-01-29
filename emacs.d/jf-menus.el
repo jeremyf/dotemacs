@@ -10,38 +10,6 @@
 
 ;; this suffix provides a dynamic description of the current host I want to use
 ;; for my blog.  And the prefix’s function toggles the host.
-(transient-define-suffix jf/tor-hostname-current-toggle (hostname)
-  "Set `jf/tor-hostname-current' to HOSTNAME."
-  :description '(lambda ()
-                  (concat "Host: "
-                          (propertize
-                           (format "%s" jf/tor-hostname-current)
-                           'face 'transient-argument)))
-  (interactive (list (completing-read
-                      "Host: " (list
-                                (list jf/tor-hostname-default-local 1)
-                                (list jf/tor-hostname-default-remote 2)
-                                ))))
-  (setq jf/tor-hostname-current hostname))
-
-(transient-define-prefix jf/menu--tor ()
-  "My Take on Rules menu; useful when developing my blog."
-  ["Take on Rules"
-   ["Host"
-    ("-h" jf/tor-hostname-current-toggle :transient t)
-    ]]
-  [["Find"
-    ("f d" "in draft status…" jf/tor-find-file-draft)
-    ("f u" "by url…" jf/tor-find-hugo-file-by-url)
-    ("f f" "by filename…" jf/tor-find-file)]
-   ["Create"
-    ("c a" "Amplify the Blogosphere…" jf/tor-post-amplifying-the-blogosphere)
-    ("c c" "Changelog entry…" jf/tor-find-changelog-and-insert-entry)
-    ("c e" "Epigraph entry…" jf/tor-insert-epigraph-entry)
-    ("c g" "Glossary entry…" jf/tor-find-glossary-and-insert-entry)
-    ("c p" "Post…" jf/tor-create-post)
-    ("c s" "Series…" jf/tor-find-series-and-insert-entry)]
-   ])
 
 (global-set-key (kbd "s-1") 'jf/menu)
 (transient-define-prefix jf/menu ()

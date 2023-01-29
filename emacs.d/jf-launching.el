@@ -132,9 +132,9 @@
 
  switch-to-buffer-obey-display-actions t ;; https://www.masteringemacs.org/article/demystifying-emacs-window-manager
 
- split-width-threshold nil ;; 160 * 8
+ ;; split-width-threshold nil ;; 160 * 8
 
- split-height-threshold nil ;; 160 * 8
+ ;; split-height-threshold nil ;; 160 * 8
 
  vc-follow-symlinks t        ;; Follow symlinks instead of prompting.
 

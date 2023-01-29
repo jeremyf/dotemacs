@@ -60,17 +60,20 @@
 	     (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
 	     :custom (nov-text-width 80))
 
-;; (use-package shackle
-;;     :straight t
-;;     :custom
-;;     (shackle-rules '((compilation-mode :noselect t))
-;;                    shackle-default-rule '(:select t)))
-
-;; Finally a predictable window handler.  I think that I only want to render
-;; these in one window.
-(use-package current-window-only
-  :straight (:host github :repo "frostyx/current-window-only")
-  :config (current-window-only-mode 1))
+(use-package window
+  :straight (:type built-in)
+  :custom
+  (display-buffer-alist
+   '(("*eshell*"
+      (display-buffer-in-side-window)
+      (window-height . 0.33)
+      (side . bottom)
+      (slot . 0))
+     ("\\*Embark Collect\\*"
+      (display-buffer-in-side-window)
+      (window-height . 0.33)
+      (side . bottom)
+      (slot . 0)))))
 
 (use-package so-long
   :defer t
