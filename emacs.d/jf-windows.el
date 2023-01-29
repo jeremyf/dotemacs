@@ -26,15 +26,33 @@
    '(;; no window
      ("\\`\\*Async Shell Command\\*\\'"
       (display-buffer-no-window))
+     ("\\*Org Select\\*" ; the `org-capture' key selection
+      (display-buffer-in-side-window)
+      (dedicated . t)
+      (side . bottom)
+      (slot . 0)
+      (window-parameters . ((mode-line-format . none))))
+     ("\\*Org Select\\*" ; the `org-capture' key selection
+      (display-buffer-in-side-window)
+      (dedicated . t)
+      (side . bottom)
+      (slot . 0)
+      (window-parameters . ((mode-line-format . none))))
      ;; I'd been using bufler with tabs.  However the tab behavior is not
      ;; something that I regularly leverage; in part because tab grouping is not
      ;; as predictable as I'd like.
      ("\\*Bufler\\*"
       (display-buffer-in-side-window)
       (window-width . 0.67)
+      (dedicated . t)
       (window-parameters . ((mode-line-format . ("Select a Buffer"))))
-      (side . left)
+      (side . right)
       (slot . 0))
+     ("\\*Embark Actions\\*"
+           (display-buffer-reuse-mode-window display-buffer-at-bottom)
+           (window-height . fit-window-to-buffer)
+           (window-parameters . ((no-other-window . t)
+                                 (mode-line-format . none))))
      ("\\*elfeed.*"
       (display-buffer-same-window))
      ("\\*Ilist\\*"
