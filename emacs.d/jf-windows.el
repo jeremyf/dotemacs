@@ -262,7 +262,9 @@
     (kill-buffer "*Bufler*"))
   (advice-add 'bufler-list-buffer-switch :after 'jf/bufler-list-buffer-switch)
 
-  :bind (:map bufler-list-mode-map ("s-3" . quit-window))
+  :bind (:map bufler-list-mode-map
+	      ("s-3" . quit-window)
+	      ("s-\\" . quit-window))
   :bind (("s-3" . bufler)
 	 ("s-\\" . bufler)
 	 ;; ("s-\\" . jf/tab-bar-switch-prompt-for-tab)
