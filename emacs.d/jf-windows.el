@@ -17,6 +17,35 @@
 ;; ~modus-operandi~).  They provide a light and dark theme with a focus on visual
 ;; accessibility.
 
+(use-package window
+  :straight (:type built-in)
+  :custom
+  (display-buffer-alist
+   '(("\\*Bufler\\*"
+      (display-buffer-in-side-window)
+      (window-width . 0.67)
+      ;; (window-parameters . ((no-delete-other-windows . t)
+      ;; 			    (no-other-window . t)
+      ;; 			    (mode-line-format . ("Select a Buffer"))))
+      (side . left)
+      (slot . 0))
+     ("\\*Ilist\\*"
+      (display-buffer-in-side-window)
+      (window-width . 0.33)
+      (side . right)
+      (slot . 0))
+     ("\\*.*\\*"
+      (display-buffer-in-side-window)
+      (window-height . 0.33)
+      (side . bottom)
+      (slot . 0))
+     ;; ("^magit-*"
+     ;;  (display-buffer-in-side-window)
+     ;;  (window-height . 0.5)
+     ;;  (side . bottom)
+     ;;  (slot . 1))
+     )))
+
 ;; I love [[http://protesilaos.com][Prot]]’s attention to detail with the modus
 ;; themes.  Here’s my configuration for these two sibling themes.  There’s a
 ;; bit of chatter, but all told it sets things up how I like.
@@ -194,7 +223,7 @@
 ;; have sizing issues.
 (use-package bufler
   :straight t
-  :hook (after-init . (lambda () (bufler-mode) (jf/bufler/tab-configuration)))
+  :hook (after-init . (bufler-mode))
   :config
   (defun jf/bufler/tab-configuration ()
     (bufler-tabs-mode 1)
@@ -207,6 +236,11 @@
   (advice-add #'bufler-workspace-mode-lighter
 	      :override #'jf/bufler-workspace-mode-lighter
 	      '((name . "wrapper")))
+  ;; Ensuring that when I make a selection, it closes the bufler buffer.
+  (defun jf/bufler-list-buffer-switch (&rest args)
+    (kill-buffer "*Bufler*"))
+  (advice-add 'bufler-list-buffer-switch :after 'jf/bufler-list-buffer-switch)
+
   :bind (:map bufler-list-mode-map ("s-3" . quit-window))
   :bind (("s-3" . bufler)
 	 ("s-\\" . jf/tab-bar-switch-prompt-for-tab)

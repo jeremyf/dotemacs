@@ -60,21 +60,6 @@
 	     (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
 	     :custom (nov-text-width 80))
 
-(use-package window
-  :straight (:type built-in)
-  :custom
-  (display-buffer-alist
-   '(("*eshell*"
-      (display-buffer-in-side-window)
-      (window-height . 0.33)
-      (side . bottom)
-      (slot . 0))
-     ("\\*Embark Collect\\*"
-      (display-buffer-in-side-window)
-      (window-height . 0.33)
-      (side . bottom)
-      (slot . 0)))))
-
 (use-package so-long
   :defer t
   :straight t
