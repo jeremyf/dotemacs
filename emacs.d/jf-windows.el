@@ -19,6 +19,8 @@
 
 (use-package window
   :straight (:type built-in)
+  :bind (("s-[" . next-buffer)
+	 ("s-]" . previous-buffer))
   :custom
   (display-buffer-alist
    '(("\\*Bufler\\*"
@@ -29,6 +31,8 @@
       ;; 			    (mode-line-format . ("Select a Buffer"))))
       (side . left)
       (slot . 0))
+     ("\\*elfeed.*"
+      (display-buffer-same-window))
      ("\\*Ilist\\*"
       (display-buffer-in-side-window)
       (window-width . 0.33)
@@ -243,11 +247,12 @@
 
   :bind (:map bufler-list-mode-map ("s-3" . quit-window))
   :bind (("s-3" . bufler)
-	 ("s-\\" . jf/tab-bar-switch-prompt-for-tab)
-	 ("s-]" . tab-line-switch-to-next-tab)
-	 ("s-}" . tab-line-switch-to-next-tab)
-	 ("s-[" . tab-line-switch-to-prev-tab)
-	 ("s-{" . tab-line-switch-to-prev-tab)))
+	 ;; ("s-\\" . jf/tab-bar-switch-prompt-for-tab)
+	 ;; ("s-]" . tab-line-switch-to-next-tab)
+	 ;; ("s-}" . tab-line-switch-to-next-tab)
+	 ;; ("s-[" . tab-line-switch-to-prev-tab)
+	 ;; ("s-{" . tab-line-switch-to-prev-tab)
+	 ))
 
 (defun jf/tab-bar-switch-to-next-tab ()
   "Move to the next `tab-bar' tab and open the first buffer."
