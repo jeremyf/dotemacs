@@ -77,7 +77,6 @@
     ("j s" "Jump to Shortdoc" shortdoc-display-group)
     ]
    ["Modes"
-    ("C-n" "MacOS Night Shift" (lambda () (interactive) (shell-command "nightlight on")))
     ;; I could write functions for these, but this is concise enough
     ("m h" jf/hammerspoon-toggle-mode  :if-non-nil hammerspoon-edit-minor-mode)
     ("m t" "Typopunct ( )" typopunct-mode :if-nil typopunct-mode)

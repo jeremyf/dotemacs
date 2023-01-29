@@ -130,7 +130,7 @@
 
  ring-bell-function 'ignore  ;; Stop ringing any bell
 
- ;; switch-to-buffer-obey-display-actions t ;; https://www.masteringemacs.org/article/demystifying-emacs-window-manager
+ switch-to-buffer-obey-display-actions t ;; https://www.masteringemacs.org/article/demystifying-emacs-window-manager
 
  split-width-threshold nil ;; 160 * 8
 

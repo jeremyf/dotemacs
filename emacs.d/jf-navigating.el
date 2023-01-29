@@ -11,6 +11,7 @@
 ;;;; Packages
 (use-package ace-window
   :straight t
+  :custom (aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
   :bind (("M-o" . ace-window)))
 
 (use-package avy
