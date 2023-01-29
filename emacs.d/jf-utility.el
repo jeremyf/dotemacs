@@ -312,7 +312,15 @@
   (interactive "p")
   (if (region-active-p)
       (delete-region (region-beginning) (region-end))
-    (sp-backward-delete-word arg)))
+    (jf/delete-word (- arg))))
+
+(defun jf/delete-word (arg)
+  "Delete characters forward until encountering the end of a word.
+With argument, do this that many times."
+  (interactive "p")
+  (if (use-region-p)
+      (delete-region (region-beginning) (region-end))
+    (delete-region (point) (progn (forward-word arg) (point)))))
 
 (defun jf/auto-create-missing-dirs ()
   "Ensure that we create directories along the new path."
