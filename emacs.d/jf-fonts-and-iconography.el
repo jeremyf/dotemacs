@@ -21,9 +21,9 @@
         '((overviewing
            :default-height 110)
           (default
-            :default-height 150)
+            :default-height 160)
           (coding
-           :default-height 150)
+           :default-height 160)
           (presenting
            :default-weight semilight
            :default-height 220
@@ -37,7 +37,7 @@
            ;; Following Prot’s example, keeping these for for didactic purposes.
            :default-family "Iosevka Comfy Motion Fixed"
            :default-weight regular
-           :default-height 140
+           :default-height 160
            :fixed-pitch-family nil ; falls back to :default-family
            :fixed-pitch-weight nil ; falls back to :default-weight
            :fixed-pitch-height 1.0
