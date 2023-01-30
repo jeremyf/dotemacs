@@ -103,22 +103,6 @@
 	  (6 . (rainbow 1.15))
 	  (t . (rainbow 1.1)))))
 
-;; (use-package ef-themes
-;;   :straight (ef-themes :host nil :type git :repo "https://git.sr.ht/~protesilaos/ef-themes")
-;;   :custom (ef-themes-headings ; read the manual's entry or the doc string
-;; 	   '((0 . (variable-pitch light 1.9))
-;;              (1 . (variable-pitch light 1.8))
-;;              (2 . (variable-pitch regular 1.7))
-;;              (3 . (variable-pitch regular 1.6))
-;;              (4 . (variable-pitch regular 1.5))
-;;              (5 . (variable-pitch 1.4)) ; absence of weight means `bold'
-;;              (6 . (variable-pitch 1.3))
-;;              (7 . (variable-pitch 1.2))
-;;              (t . (variable-pitch 1.1))))
-;;   (ef-themes-mixed-fonts t)
-;;   (ef-themes-variable-pitch-ui t)
-;;   :init (ef-themes-select 'ef-cyprus))
-
 (load-theme 'modus-vivendi-tinted t t)
 (load-theme 'modus-operandi-tinted t t)
 (defun jf/dark ()
