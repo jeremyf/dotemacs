@@ -245,6 +245,7 @@
 (use-package bufler
   :straight t
   :hook (after-init . (bufler-mode))
+  :custom (bufler-columns '("Name" "VC" "Path"))
   :config
   (defun jf/bufler/tab-configuration ()
     (bufler-tabs-mode 1)
