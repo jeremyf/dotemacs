@@ -60,11 +60,6 @@
       (window-height . 0.33)
       (side . bottom)
       (slot . 0))
-     ;; ("^magit-*"
-     ;;  (display-buffer-in-side-window)
-     ;;  (window-height . 0.5)
-     ;;  (side . bottom)
-     ;;  (slot . 1))
      )))
 
 ;; I love [[http://protesilaos.com][Prot]]’s attention to detail with the modus
