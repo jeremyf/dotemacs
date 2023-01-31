@@ -23,15 +23,14 @@
 	 ("s-]" . previous-buffer))
   :custom
   (display-buffer-alist
-   '(;; no window
+   '(;; no windows
      ("\\`\\*Async Shell Command\\*\\'"
       (display-buffer-no-window))
-     ("\\*Org Select\\*" ; the `org-capture' key selection
-      (display-buffer-in-side-window)
-      (dedicated . t)
-      (side . bottom)
-      (slot . 0)
-      (window-parameters . ((mode-line-format . none))))
+     ;; These I want as part of the "default" windowing experience
+     ("\\*\\(elfeed\\|scratch\\).*"
+      (display-buffer-same-window))
+     ;; Side Left
+     ;;
      ;; I'd been using bufler with tabs.  However the tab behavior is not
      ;; something that I regularly leverage; in part because tab grouping is not
      ;; as predictable as I'd like.
@@ -42,26 +41,41 @@
       (window-parameters . ((mode-line-format . ("Select a Buffer"))))
       (side . left)
       (slot . 0))
-     ("\\*Embark Export.*"
+     ;; Side Right
+     ;;
+     ;; Windows that provide supplementary context for the initiating buffer.
+     ("\\*Ilist\\*"
       (display-buffer-in-side-window)
-      (window-width . 0.5)
-      (dedicated . t)
+      (window-width . 0.4)
       (side . right)
       (slot . 0))
+     ("\\*Embark Export.*"
+      (display-buffer-in-side-window)
+      (window-width . 0.4)
+      (dedicated . t)
+      (side . right)
+      (slot . 1))
+     ;; Side bottom
+     ;;
+     ("\\*\\(Agenda Commands\\|Org Select\\)\\*" ; the `org-capture' key selection
+      (display-buffer-in-side-window)
+      (dedicated . t)
+      (side . bottom)
+      (slot . -1)
+      (window-height . fit-window-to-buffer)
+      (window-parameters . ((mode-line-format . none))))
+     ;; Pop a new frame
+     ((or . ((derived-mode . Man-mode)
+                  (derived-mode . woman-mode)
+                  "\\*\\(Man\\|woman\\).*"))
+           (display-buffer-reuse-window display-buffer-pop-up-frame)
+           (pop-up-frame-parameters . ((width . (text-pixels . 640))
+                                       (height . (text-pixels . 640)))))
      ("\\*Embark Actions\\*"
            (display-buffer-reuse-mode-window display-buffer-at-bottom)
            (window-height . fit-window-to-buffer)
            (window-parameters . ((no-other-window . t)
                                  (mode-line-format . none))))
-     ("\\*elfeed.*"
-      (display-buffer-same-window))
-     ("\\*scratch.*"
-      (display-buffer-same-window))
-     ("\\*Ilist\\*"
-      (display-buffer-in-side-window)
-      (window-width . 0.33)
-      (side . right)
-      (slot . 0))
      ;; The junk drawer of *something* buffers.
      ("\\*.*\\*"
       (display-buffer-in-side-window)

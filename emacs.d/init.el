@@ -36,6 +36,7 @@
 (require 'jf-blogging)
 (require 'jf-project)
 (require 'jf-menus)
+(require 'jf-experiments)
 
 
 (setq jf/artist-mode-spraycan "🞄⁛◌🞆⊖⊗⁛●◯⦿⬤")
