@@ -57,7 +57,7 @@
      ;; The junk drawer of *something* buffers.
      ("\\*.*\\*"
       (display-buffer-in-side-window)
-      (window-height . 0.33)
+      (window-height . 0.40)
       (side . bottom)
       (slot . 0))
      )))
