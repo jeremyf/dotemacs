@@ -71,7 +71,7 @@ Determine the PROJECT by querying `jf/project/list-projects'."
       ;; Get the project's file name
       ((filename (cdar (jf/project/list-projects :project project)))
        (paths-cons-list (with-current-buffer (find-file-noselect filename)
-			(cl-maplist #'read (cdar (org-collect-keywords '("PROJECT_PATHS"))))))
+			  (cl-maplist #'read (cdar (org-collect-keywords '("PROJECT_PATHS"))))))
        (path-name (completing-read "Path: " paths-cons-list nil t))
        (path (alist-get path-name paths-cons-list nil nil #'string=)))
     (cond
@@ -87,10 +87,10 @@ Determine the PROJECT by querying `jf/project/list-projects'."
 	  (jf/project/jump-to/notes :project project))))))
 
 (cl-defun jf/project/jump-to/timesheet (&key
-				     project
-				     (tag "projects")
-				     (within_headline
-				      (format-time-string "%Y-%m-%d %A")))
+					project
+					(tag "projects")
+					(within_headline
+					 (format-time-string "%Y-%m-%d %A")))
   "Jump to the agenda for the given PROJECT."
   (interactive)
   (with-current-buffer (find-file jf/primary-agenda-filename-for-machine)
@@ -181,7 +181,7 @@ Noted projects would be found within the given DIRECTORY."
   ;; :task:'s immediate ancestor is a :projects:.
   (when-let ((m (and
 		 (fboundp 'org-clocking-p) ;; If this isn't set, we ain't
-					   ;; clocking.
+		 ;; clocking.
 		 (org-clocking-p)
 		 org-clock-marker)))
     (with-current-buffer (marker-buffer m)
@@ -229,6 +229,33 @@ When the `current-prefix-arg' is set always prompt for the project."
 	    (jf/project/get-project-from/current-clock)
 	    (jf/project/get-project-from/project-source-code)))
    (completing-read "Project: " (jf/project/list-projects))))
+
+;; The default relevant `magit-list-repositories'
+;; The following command shows all "project" directories
+;;
+(defvar jf/git-project-paths
+  '(("~/git/takeonrules.source/" . 1)
+    ("~/git/burning_wheel_lifepaths/" . 1)
+    ("~/git/dotzshrc/" .  1)
+    ("~/git/dotemacs/" . 1)
+    ("~/git/emacs-bookmarks/" . 1)
+    ("~/git/org" . 1)
+    ("~/git/takeonrules.source/themes/hugo-tufte" . 1))
+  "A list of cons cells.")
+
+(defun jf/git-project-paths/dynamic ()
+  ;; Dynamically query my "project paths"
+  (split-string-and-unquote
+   (s-trim-right
+    (shell-command-to-string
+     (concat
+      "rg \"^#\\+PROJECT_PATHS: +[^\\.]+\\. +\\\"(~/git/[^/]+/)\\\"\\)\" "
+      "~/git/org --no-ignore-vcs --replace='$1' --only-matching --no-filename")))
+   "\n"))
+
+(dolist (path (jf/git-project-paths/dynamic))
+  (add-to-list 'jf/git-project-paths (cons path 1)))
+(setq magit-repository-directories jf/git-project-paths)
 
 (provide 'jf-project)
 ;;; jf-project.el ends here

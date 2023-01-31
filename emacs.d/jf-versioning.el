@@ -34,17 +34,6 @@
 	  ("Branch"  25 magit-repolist-column-branch ())
 	  ("Path"    99 magit-repolist-column-path ())))
 
-  ;; The default relevant `magit-list-repositories'
-  (setq magit-repository-directories
-	`(("~/git/takeonrules.source/" . 1)
-	  ("~/git/burning_wheel_lifepaths/" . 1)
-	  ("~/git/dotzshrc/" .  1)
-	  ("~/git/dotemacs/" . 1)
-	  ("~/git/emacs-bookmarks/" . 1)
-	  ("~/git/org" . 1)
-	  ("~/git/org/archive" . 1)
-	  ("~/git/takeonrules.source/themes/hugo-tufte" . 1)))
-
   ;; Have magit-status go full screen and quit to previous
   ;; configuration.  Taken from
   ;; http://whattheemacsd.com/setup-magit.el-01.html#comment-748135498

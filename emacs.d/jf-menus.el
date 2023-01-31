@@ -29,18 +29,20 @@
     ("w s" "Side-note sentence or region…" jf/tor-wrap-as-sidenote-dwim  :if-derived (or markdown-mode html-mode))
     ("w w" "Wrap point or region in html…" jf/tor-wrap-in-html-tag  :if-derived (or markdown-mode html-mode))
     ]]
-  [["Contexts"
-    ("-b" "Burning Wheel…"  jf/menu--bwg)
-    ("-e" "Eberron…" jf/menu--eberron)
-    ("-w" "Register window configuration" window-configuration-to-register)
-    ]
+  [
+    ;; ["Contexts"
+   ;;  ("-b" "Burning Wheel…"  jf/menu--bwg)
+   ;;  ("-e" "Eberron…" jf/menu--eberron)
+   ;;  ("-w" "Register window configuration" window-configuration-to-register)
+   ;;  ]
    ["Jump to"
     ("j a" "Agenda" jf/jump-to-agenda-or-mark)
     ("j b" "iBuffer" ibuffer)
     ("j g" "Global Mark" consult-global-mark)
     ("j h" "Hugo File" jf/jump_to_corresponding_hugo_file :if-derived org-mode)
     ("j m" "Mark" consult-mark)
-    ("j p" "Jump in PDF" doc-view-goto-page :if-derived doc-view-mode)
+    ("j P" "Jump in PDF" doc-view-goto-page :if-derived doc-view-mode)
+    ("j l" "Jump to List of Projects" magit-list-repositories)
     ("j s" "Jump to Shortdoc" shortdoc-display-group)
     ]
    ["Modes"
