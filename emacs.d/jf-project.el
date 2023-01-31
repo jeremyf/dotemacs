@@ -241,21 +241,26 @@ When the `current-prefix-arg' is set always prompt for the project."
     ("~/git/emacs-bookmarks/" . 1)
     ("~/git/org" . 1)
     ("~/git/takeonrules.source/themes/hugo-tufte" . 1))
-  "A list of cons cells.")
+  "A list of `con' cells where the `car' is the name of a directory
+and the `cdr' is a ranking.  I have pre-populated this list with
+repositories that are generally available on both machines.")
 
 (defun jf/git-project-paths/dynamic ()
-  ;; Dynamically query my "project paths"
+  "Return a list of code repository paths."
   (split-string-and-unquote
    (s-trim-right
     (shell-command-to-string
      (concat
       "rg \"^#\\+PROJECT_PATHS: +[^\\.]+\\. +\\\"(~/git/[^/]+/)\\\"\\)\" "
-      "~/git/org --no-ignore-vcs --replace='$1' --only-matching --no-filename")))
+      "~/git/org --no-ignore-vcs --replace='$1' "
+      "--only-matching --no-filename")))
    "\n"))
 
 (dolist (path (jf/git-project-paths/dynamic))
   (add-to-list 'jf/git-project-paths (cons path 1)))
+
 (setq magit-repository-directories jf/git-project-paths)
+
 
 (provide 'jf-project)
 ;;; jf-project.el ends here
