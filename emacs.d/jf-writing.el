@@ -88,12 +88,22 @@
 ;; Allow Emacs to work with multiple cursors.  See
 ;; https://melpa.org/#/multiple-cursors
 (use-package multiple-cursors
+  :after (region-bindings)
   :bind (("C-M-SPC" . set-rectangular-region-anchor)
          ("C->" . mc/mark-next-like-this)
          ("C-<" . mc/mark-previous-like-this)
          ("C-s-<mouse-1>" . mc/add-cursor-on-click)
          ("C-c C->" . mc/mark-all-like-this)
          ("C-c C-SPC" . mc/edit-lines)) ;; CTRL+CMD+c
+  :bind ( :map region-bindings-mode-map
+	  ("n" . mc/mark-next-symbol-like-this)
+	  ("N" . mc/mark-next-like-this)
+	  ("p" . mc/mark-previous-symbol-like-this)
+	  ("P" . mc/mark-previous-like-this)
+	  ("a" . mc/mark-all-symbols-like-this)
+	  ("A" . mc/mark-all-like-this)
+	  ("s" . mc/mark-all-in-region-regexp)
+	  ("l" . mc/edit-ends-of-lines))
   :straight t)
 
 ;; Type \"C-;\" to select current symbol and all matches; Then edit at multiple

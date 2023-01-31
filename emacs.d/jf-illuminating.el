@@ -116,10 +116,18 @@
   (setq enable-recursive-minibuffers t)
   (recursion-indicator-mode))
 
-(use-package smartparens
-  ;; provides some “intelligent” treatment of parentheses.  I’ve been using this
-  ;; for awhile, so I assume it’s baked into my memory.
-  :straight t)
+(use-package puni
+  ;; Replacing smartparens based on LOC.  puni is 2k lines whereas smartparens
+  ;; was 10k
+  :straight t
+  :after (region-bindings)
+  :config
+  (puni-global-mode)
+  :bind (:map region-bindings-mode-map
+          ("(" . puni-wrap-round)
+          ("[" . puni-wrap-square)
+          ("{" . puni-wrap-curly)
+          ("<" . puni-wrap-angle)))
 
 (use-package symbol-overlay
   ;; This warrants a lot more work.  See

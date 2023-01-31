@@ -38,6 +38,11 @@
 
 (use-package ts :straight t)
 
+(use-package region-bindings
+  :straight (:host github :repo "andreyorst/region-bindings.el")
+  :config
+  (global-region-bindings-mode 1))
+
 ;;; Support packages
 
 ;; Load keychain environment
