@@ -42,12 +42,20 @@
       (window-parameters . ((mode-line-format . ("Select a Buffer"))))
       (side . left)
       (slot . 0))
+     ("\\*Embark Export.*"
+      (display-buffer-in-side-window)
+      (window-width . 0.5)
+      (dedicated . t)
+      (side . right)
+      (slot . 0))
      ("\\*Embark Actions\\*"
            (display-buffer-reuse-mode-window display-buffer-at-bottom)
            (window-height . fit-window-to-buffer)
            (window-parameters . ((no-other-window . t)
                                  (mode-line-format . none))))
      ("\\*elfeed.*"
+      (display-buffer-same-window))
+     ("\\*scratch.*"
       (display-buffer-same-window))
      ("\\*Ilist\\*"
       (display-buffer-in-side-window)
