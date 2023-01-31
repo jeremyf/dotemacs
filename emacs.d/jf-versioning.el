@@ -207,12 +207,11 @@
 
 ;; Provides a UI for undo trees.  I'm not certain what I want to do with this.
 (use-package undo-tree
+  :straight t
   :bind (("C-z" . undo)
          ("C-s-z" . undo-tree-redo))
   :config
-  (setq undo-tree-enable-undo-in-region t)
-  (global-undo-tree-mode +1)
-  (unbind-key "M-_" undo-tree-map))
+  (global-undo-tree-mode +1))
 
 
 (provide 'jf-versioning)
