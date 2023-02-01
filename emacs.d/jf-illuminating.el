@@ -117,11 +117,9 @@
   (recursion-indicator-mode))
 
 (use-package puni
-  ;; Replacing smartparens based on LOC.  puni is 2k lines whereas smartparens
-  ;; was 10k
   :straight t
   :after (region-bindings)
-  :config
+  :hook ((prog-mode . puni-mode))
   :bind (:map region-bindings-mode-map
           ("(" . puni-wrap-round)
           ("[" . puni-wrap-square)
