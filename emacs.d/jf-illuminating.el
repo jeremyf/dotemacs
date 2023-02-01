@@ -119,7 +119,7 @@
 (use-package puni
   :straight t
   :after (region-bindings)
-  :hook ((prog-mode . puni-mode))
+  :hook ((emacs-lisp-mode . puni-mode))
   :bind (:map region-bindings-mode-map
           ("(" . puni-wrap-round)
           ("[" . puni-wrap-square)
