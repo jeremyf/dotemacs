@@ -122,7 +122,6 @@
   :straight t
   :after (region-bindings)
   :config
-  (puni-global-mode)
   :bind (:map region-bindings-mode-map
           ("(" . puni-wrap-round)
           ("[" . puni-wrap-square)
