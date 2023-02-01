@@ -40,6 +40,7 @@
 
 (use-package region-bindings
   :straight (:host github :repo "andreyorst/region-bindings.el")
+  :hook (elfeed-search-mode . (lambda () (region-bindings-mode -1)))
   :config
   (global-region-bindings-mode 1))
 
