@@ -62,8 +62,7 @@
       (dedicated . t)
       (side . bottom)
       (slot . -1)
-      (window-height . fit-window-to-buffer)
-      (window-parameters . ((mode-line-format . none))))
+      (window-height . fit-window-to-buffer))
      ;; Pop a new frame
      ((or . ((derived-mode . Man-mode)
                   (derived-mode . woman-mode)
@@ -75,7 +74,8 @@
            (display-buffer-reuse-mode-window display-buffer-at-bottom)
            (window-height . fit-window-to-buffer)
            (window-parameters . ((no-other-window . t)
-                                 (mode-line-format . none))))
+                                 ;; (mode-line-format . none)
+				 )))
      ;; The junk drawer of *something* buffers.
      ("\\*.*\\*"
       (display-buffer-in-side-window)
