@@ -30,7 +30,7 @@
     ("w w" "Wrap point or region in html…" jf/tor-wrap-in-html-tag  :if-derived (or markdown-mode html-mode))
     ]]
   [
-    ;; ["Contexts"
+   ;; ["Contexts"
    ;;  ("-b" "Burning Wheel…"  jf/menu--bwg)
    ;;  ("-e" "Eberron…" jf/menu--eberron)
    ;;  ("-w" "Register window configuration" window-configuration-to-register)
@@ -41,10 +41,22 @@
     ("j g" "Global Mark" consult-global-mark)
     ("j h" "Hugo File" jf/jump_to_corresponding_hugo_file :if-derived org-mode)
     ("j m" "Mark" consult-mark)
-    ("j P" "Jump in PDF" doc-view-goto-page :if-derived doc-view-mode)
+    ;; ("j P" "Jump in PDF" doc-view-goto-page :if-derived doc-view-mode)
     ("j l" "Jump to List of Projects" magit-list-repositories)
-    ("j s" "Jump to Shortdoc" shortdoc-display-group)
+    ;; ("j s" "Jump to Shortdoc" shortdoc-display-group)
+    ("j v" "Jump to Violet Sprint Board" (lambda () (interactive) (eww-browse-with-external-browser "https://github.com/orgs/scientist-softserv/projects/43") ))
     ]
+   ["Tasks"
+    ("c" "Capture region to clock…" (lambda (b e p) (interactive "r\nP") (jf/capture-region-contents-with-metadata b e p)))
+    ("f" "Deadgrep…" deadgrep)
+    ("s" "Search note content…" consult-notes-search-in-all-notes)
+    ("S" "Search note filename…" consult-notes)
+    ("C-t" "Start a timer…" tmr-with-description)
+    ("u" "Copy stand-up to kill ring" jf/org-mode-agenda-to-stand-up-summary)
+    ("w" "Weekly hours report" jf/org-mode-weekly-report)
+    ("x" "Export to TakeOnRules…" jf/export-org-to-tor :if-derived org-mode)
+    ]]
+  [
    ["Modes"
     ;; I could write functions for these, but this is concise enough
     ("m h" jf/hammerspoon-toggle-mode  :if-non-nil hammerspoon-edit-minor-mode)
@@ -52,9 +64,7 @@
     ("m t" "Typopunct (*)" typopunct-mode :if-non-nil typopunct-mode)
     ("m o" "MacOS Native Option ( )" jf/toggle-osx-alternate-modifier :if-non-nil ns-alternate-modifier)
     ("m o" "MacOS Native Option (*)" jf/toggle-osx-alternate-modifier :if-nil ns-alternate-modifier)
-    ]]
-  ["Org"
-
+    ]
    ;; ["Add Metadata"
    ;; ("C-e a" "Add epigraph properties…" jf/org-mode-add-epigraph-keys :if-derived org-mode)
    ;; ("C-e i" "Add epigraph at point…" jf/org-roam-insert-at-point-epigraph-macro :if-derived org-mode)
@@ -66,16 +76,7 @@
    ;; ("M-c" "Context set…" jf/org-auto-tags--set-by-context :transient t)
    ;; ("M-t" jf/org-auto-tags--transient :transient t)
    ;; ]
-   ["Tasks"
-    ("c" "Capture region to clock…" (lambda (b e p) (interactive "r\nP") (jf/capture-region-contents-with-metadata b e p)))
-    ("f" "Deadgrep…" deadgrep)
-    ("s" "Search note content…" consult-notes-search-in-all-notes)
-    ("S" "Search note filename…" consult-notes)
-    ("C-t" "Start a timer…" tmr-with-description)
-    ("u" "Copy stand-up to kill ring" jf/org-mode-agenda-to-stand-up-summary)
-    ("w" "Weekly hours report" jf/org-mode-weekly-report)
-    ("x" "Export to TakeOnRules…" jf/export-org-to-tor :if-derived org-mode)
-    ]
+
    ["Grab Refs"
     ("g e" "Elfeed" jf/menu--org-capture-elfeed-show :if-derived elfeed-show-mode)
     ("g f" "Firefox" jf/menu--org-capture-firefox)
@@ -91,10 +92,10 @@
   :config
   (setq hydra-hint-display-type 'posframe)
   (setq hydra-posframe-show-params `(:poshandler posframe-poshandler-frame-center
-                                               :internal-border-width 2
-                                               :internal-border-color "#61AFEF"
-                                               :left-fringe 16
-                                               :right-fringe 16)))
+						 :internal-border-width 2
+						 :internal-border-color "#61AFEF"
+						 :left-fringe 16
+						 :right-fringe 16)))
 
 (unbind-key "C-c d") ;; 'file-info-show
 (global-set-key (kbd "C-c d") 'jf/duplicate-current-line-or-lines-of-region)
