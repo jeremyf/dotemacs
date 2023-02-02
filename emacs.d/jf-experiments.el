@@ -20,7 +20,7 @@
 	       :command-line (format "cd %s; rg \"^ +((bulk|hy)rax|rails|qa|blacklight(-spotlight)?) \\(\\d+\\.\\d+\\.\\d+\" Gemfile.lock" dir)
 	       :display (format "Samvera gem versions for %s" dir))))
      (list :command-name "run-command-takeonrules-server"
-	   :command-line "cd ~/git/takeonrules.source/; bin/rake knowledge_manager:pull; hugo -D"
+	   :command-line "cd ~/git/takeonrules.source/; bin/rake knowledge_manager:pull; hugo serve -D"
 	   :display "Serve takeonrules.com locally")))
   (add-to-list 'run-command-recipes 'jf/run-command-recipes))
 
