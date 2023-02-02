@@ -18,6 +18,9 @@
   :custom
   (org-hugo-paired-shortcodes "marginnote poem inline_comments")
   (hugo-use-code-for-kbd t)
+  :config
+  ;; I want to have backticks instead of indentations.
+  (advice-add #'org-md-example-block :override #'org-blackfriday-src-block)
   :after ox)
 
 ;; These functions work to aggressively.  The types of lists (ordered,
