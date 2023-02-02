@@ -125,7 +125,7 @@
   ;; :init (eval-after-load 'rspec-mode '(rspec-install-snippets))
   :custom
   (rspec-docker-container "web")
-  (rspec-use-spring-when-possible nil)
+  (rspec-use-spring-when-possible t)
   (rspec-use-docker-when-possible t)
   (rspec-docker-cwd "./")
   (rspec-docker-command "docker compose exec")
