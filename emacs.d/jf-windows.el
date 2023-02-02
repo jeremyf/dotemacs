@@ -57,7 +57,7 @@
       (slot . 1))
      ;; Side bottom
      ;;
-     ("\\*\\(Agenda Commands\\|Org Select\\)\\*" ; the `org-capture' key selection
+     ("\\*\\(Org Select\\)\\*" ; the `org-capture' key selection
       (display-buffer-in-side-window)
       (dedicated . t)
       (side . bottom)
@@ -71,7 +71,7 @@
            (display-buffer-reuse-window display-buffer-pop-up-frame)
            (pop-up-frame-parameters . ((width . (text-pixels . 640))
                                        (height . (text-pixels . 640)))))
-     ("\\*Embark Actions\\*"
+     ("\\*\\(Agenda Commands\\|Embark Actions\\|Org Agenda\\)\\*"
            (display-buffer-reuse-mode-window display-buffer-at-bottom)
            (window-height . fit-window-to-buffer)
            (window-parameters . ((no-other-window . t)
