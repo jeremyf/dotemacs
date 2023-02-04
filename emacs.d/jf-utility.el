@@ -72,6 +72,8 @@
 ;; resulting search buffer.  You submit your search term and get the metadata
 ;; and the matches.
 (use-package deadgrep
+  :custom (deadgrep-display-buffer-function
+	   (lambda (buffer) (display-buffer-same-window buffer '())))
   :straight t
   :bind (:map deadgrep-mode-map
 	      (("C-c C-p" . deadgrep-edit-mode)

@@ -13,10 +13,6 @@
 ;;;; Themes
 (mapc #'disable-theme custom-enabled-themes)
 
-;; And now the theme.  I’ve chosen the modus themes (e.g. ~modus-vivendi~ and
-;; ~modus-operandi~).  They provide a light and dark theme with a focus on visual
-;; accessibility.
-
 (use-package window
   :straight (:type built-in)
   :bind (("s-[" . next-buffer)
@@ -26,63 +22,73 @@
    '(;; no windows
      ("\\`\\*Async Shell Command\\*\\'"
       (display-buffer-no-window))
+     ;; I like the slide out window for this "context-type menus"
+     ("\\*\\(Ilist\\|Embark Actions\\|helpful .*\\)\\*"
+      (display-buffer-in-side-window)
+      (window-width . 0.5)
+      (side . right)
+      (slot . 0)
+      (window-parameters . ((mode-line-format . (" %b")))))
+     ;; Maybe I want re-use
+     (t (display-buffer-reuse-window display-buffer-same-window))
+     ;; (t (display-buffer-same-window))
      ;; These I want as part of the "default" windowing experience
-     ("\\*\\(elfeed\\|scratch\\).*"
-      (display-buffer-same-window))
-     ;; Side Left
-     ;;
-     ;; I'd been using bufler with tabs.  However the tab behavior is not
-     ;; something that I regularly leverage; in part because tab grouping is not
-     ;; as predictable as I'd like.
-     ("\\*Bufler\\*"
-      (display-buffer-in-side-window)
-      (window-width . 0.67)
-      (dedicated . t)
-      (window-parameters . ((mode-line-format . ("Select a Buffer"))))
-      (side . left)
-      (slot . 0))
-     ;; Side Right
-     ;;
-     ;; Windows that provide supplementary context for the initiating buffer.
-     ("\\*Ilist\\*"
-      (display-buffer-in-side-window)
-      (window-width . 0.4)
-      (side . right)
-      (slot . 0))
-     ("\\*Embark Export.*"
-      (display-buffer-in-side-window)
-      (window-width . 0.4)
-      (dedicated . t)
-      (side . right)
-      (slot . 1))
-     ;; Side bottom
-     ;;
-     ("\\*\\(Org Select\\)\\*" ; the `org-capture' key selection
-      (display-buffer-in-side-window)
-      (dedicated . t)
-      (side . bottom)
-      (slot . -1)
-      (window-height . fit-window-to-buffer))
-     ;; Pop a new frame
-     ((or . ((derived-mode . Man-mode)
-                  (derived-mode . woman-mode)
-                  "\\*\\(Man\\|woman\\).*"))
-           (display-buffer-reuse-window display-buffer-pop-up-frame)
-           (pop-up-frame-parameters . ((width . (text-pixels . 640))
-                                       (height . (text-pixels . 640)))))
-     ("\\*\\(Agenda Commands\\|Embark Actions\\|Org Agenda\\)\\*"
-           (display-buffer-reuse-mode-window display-buffer-at-bottom)
-           (window-height . fit-window-to-buffer)
-           (window-parameters . ((no-other-window . t)
-                                 ;; (mode-line-format . none)
-				 )))
-     ;; The junk drawer of *something* buffers.
-     ("\\*.*\\*"
-      (display-buffer-in-side-window)
-      (window-height . 0.40)
-      (side . bottom)
-      (slot . 0))
+     ;; ("\\*\\(elfeed\\|scratch\\).*"
+     ;;  (display-buffer-same-window))
+     ;; ;; Side Left
+     ;; ;;
+     ;; ;; I'd been using bufler with tabs.  However the tab behavior is not
+     ;; ;; something that I regularly leverage; in part because tab grouping is not
+     ;; ;; as predictable as I'd like.
+     ;; ("\\*Bufler\\*"
+     ;;  (display-buffer-in-side-window)
+     ;;  (window-width . 0.67)
+     ;;  (dedicated . t)
+     ;;  (window-parameters . ((mode-line-format . ("Select a Buffer"))))
+     ;;  (side . left)
+     ;;  (slot . 0))
+     ;; ;; Side Right
+     ;; ;;
+     ;; ;; Windows that provide supplementary context for the initiating buffer.
+
+     ;; ("\\*Embark Export.*"
+     ;;  (display-buffer-in-side-window)
+     ;;  (window-width . 0.4)
+     ;;  (dedicated . t)
+     ;;  (side . right)
+     ;;  (slot . 1))
+     ;; ;; Side bottom
+     ;; ;;
+     ;; ("\\*\\(Org Select\\)\\*" ; the `org-capture' key selection
+     ;;  (display-buffer-in-side-window)
+     ;;  (dedicated . t)
+     ;;  (side . bottom)
+     ;;  (slot . -1)
+     ;;  (window-height . fit-window-to-buffer))
+     ;; ;; Pop a new frame
+     ;; ((or . ((derived-mode . Man-mode)
+     ;;              (derived-mode . woman-mode)
+     ;;              "\\*\\(Man\\|woman\\).*"))
+     ;;       (display-buffer-reuse-window display-buffer-pop-up-frame)
+     ;;       (pop-up-frame-parameters . ((width . (text-pixels . 640))
+     ;;                                   (height . (text-pixels . 640)))))
+     ;; ("\\*\\(Agenda Commands\\|Embark Actions\\|Org Agenda\\)\\*"
+     ;;       (display-buffer-reuse-mode-window display-buffer-at-bottom)
+     ;;       (window-height . fit-window-to-buffer)
+     ;;       (window-parameters . ((no-other-window . t)
+     ;;                             ;; (mode-line-format . none)
+     ;; 				 )))
+     ;; ;; The junk drawer of *something* buffers.
+     ;; ("\\*.*\\*"
+     ;;  (display-buffer-in-side-window)
+     ;;  (window-height . 0.40)
+     ;;  (side . bottom)
+     ;;  (slot . 0))
      )))
+
+;; And now the theme.  I’ve chosen the modus themes (e.g. ~modus-vivendi~ and
+;; ~modus-operandi~).  They provide a light and dark theme with a focus on visual
+;; accessibility.
 
 ;; I love [[http://protesilaos.com][Prot]]’s attention to detail with the modus
 ;; themes.  Here’s my configuration for these two sibling themes.  There’s a
