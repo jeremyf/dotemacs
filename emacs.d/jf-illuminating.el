@@ -116,16 +116,6 @@
   (setq enable-recursive-minibuffers t)
   (recursion-indicator-mode))
 
-(use-package puni
-  :straight t
-  :after (region-bindings)
-  :hook ((emacs-lisp-mode . puni-mode))
-  :bind (:map region-bindings-mode-map
-          ("(" . puni-wrap-round)
-          ("[" . puni-wrap-square)
-          ("{" . puni-wrap-curly)
-          ("<" . puni-wrap-angle)))
-
 (use-package symbol-overlay
   ;; This warrants a lot more work.  See
   ;; https://github.com/wolray/symbol-overlay/tree/c439b73a5f9713bb3dce98986b589bb901e22130
