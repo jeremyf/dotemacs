@@ -530,7 +530,11 @@ Useful if you want a more robust view into the recommend candidates."
   ;; either locally or globally. `expand-abbrev' is bound to C-x '.
   ;; (add-hook 'prog-mode-hook #'tempel-abbrev-mode)
   ;; (tempel-global-abbrev-mode)
-  :init (tempel-key "C-c i" idiomatic org-mode-map))
+  :init
+  ;; Hyper Macro!
+  (tempel-key "H-m i" idiomatic org-mode-map)
+  (tempel-key "H-m k" keyboard org-mode-map)
+  )
 
 (use-package vertico
   :straight t
