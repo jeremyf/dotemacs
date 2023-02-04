@@ -48,7 +48,7 @@
     ]
    ["Tasks"
     ("c" "Capture region to clock…" (lambda (b e p) (interactive "r\nP") (jf/capture-region-contents-with-metadata b e p)))
-    ("f" "Deadgrep…" deadgrep)
+    ("d" "Deadgrep…" deadgrep)
     ("s" "Search note content…" consult-notes-search-in-all-notes)
     ("S" "Search note filename…" consult-notes)
     ("C-t" "Start a timer…" tmr-with-description)
