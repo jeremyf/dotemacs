@@ -534,8 +534,7 @@ Useful if you want a more robust view into the recommend candidates."
   ;; Hyper Macro!
   (tempel-key "H-m c" cite org-mode-map)
   (tempel-key "H-m i" idiomatic org-mode-map)
-  (tempel-key "H-m k" keyboard org-mode-map)
-  )
+  (tempel-key "H-m k" keyboard org-mode-map))
 
 (use-package vertico
   :straight t

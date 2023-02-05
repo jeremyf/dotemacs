@@ -25,20 +25,20 @@
   (add-to-list 'run-command-recipes 'jf/run-command-recipes))
 
 ;; From https://www.reddit.com/r/emacs/comments/10qo7vb/comment/j73idup/
-(defvar my/consult-buffer-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map "\C-k" #'my/consult-buffer-kill)
-    map))
-(consult-customize consult-buffer :keymap my/consult-buffer-map)
+;; (defvar my/consult-buffer-map
+;;   (let ((map (make-sparse-keymap)))
+;;     (define-key map "\C-k" #'my/consult-buffer-kill)
+;;     map))
+;; (consult-customize consult-buffer :keymap my/consult-buffer-map)
 
-(defun my/consult-buffer-kill ()
-  "In consult-buffer kill the current candidate"
-  (interactive)
-  (let ((marker (string #x200002)) ;; probably some internal detail :(
-        (candidate (vertico--candidate)))
-    (when (s-ends-with? marker candidate)
-      (kill-buffer (s-replace marker "" candidate))
-      (vertico-next))))
+;; (defun my/consult-buffer-kill ()
+;;   "In consult-buffer kill the current candidate"
+;;   (interactive)
+;;   (let ((marker (string #x200002)) ;; probably some internal detail :(
+;;         (candidate (vertico--candidate)))
+;;     (when (s-ends-with? marker candidate)
+;;       (kill-buffer (s-replace marker "" candidate))
+;;       (vertico-next))))
 
 
 (provide 'jf-experiments)
