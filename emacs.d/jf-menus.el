@@ -8,6 +8,9 @@
 
 ;;; Code
 
+(global-set-key (kbd "M-[") 'backward-paragraph)
+(global-set-key (kbd "M-]") 'forward-paragraph)
+
 ;; this suffix provides a dynamic description of the current host I want to use
 ;; for my blog.  And the prefix’s function toggles the host.
 
@@ -49,6 +52,7 @@
    ["Tasks"
     ("c" "Capture region to clock…" (lambda (b e p) (interactive "r\nP") (jf/capture-region-contents-with-metadata b e p)))
     ("d" "Deadgrep…" deadgrep)
+    ("r" "Run command…" run-command)
     ("s" "Search note content…" consult-notes-search-in-all-notes)
     ("S" "Search note filename…" consult-notes)
     ("C-t" "Start a timer…" tmr-with-description)

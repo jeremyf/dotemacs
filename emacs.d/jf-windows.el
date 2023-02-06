@@ -273,8 +273,8 @@
   :bind (:map bufler-list-mode-map
 	      ("s-3" . quit-window)
 	      ("s-\\" . quit-window))
-  :bind (("s-3" . bufler)
-	 ("s-\\" . bufler)
+  :bind (("s-3" . bufler-switch-buffer)
+	 ("s-\\" . bufler-sidebar)
 	 ;; ("s-\\" . jf/tab-bar-switch-prompt-for-tab)
 	 ;; ("s-]" . tab-line-switch-to-next-tab)
 	 ;; ("s-}" . tab-line-switch-to-next-tab)
@@ -282,41 +282,41 @@
 	 ;; ("s-{" . tab-line-switch-to-prev-tab)
 	 ))
 
-(defun jf/tab-bar-switch-to-next-tab ()
-  "Move to the next `tab-bar' tab and open the first buffer."
-  (interactive)
-  (call-interactively 'tab-bar-switch-to-next-tab)
-  (jf/tab-bar-activate-first-buffer))
+;; (defun jf/tab-bar-switch-to-next-tab ()
+;;   "Move to the next `tab-bar' tab and open the first buffer."
+;;   (interactive)
+;;   (call-interactively 'tab-bar-switch-to-next-tab)
+;;   (jf/tab-bar-activate-first-buffer))
 
-(defun jf/tab-bar-switch-to-prev-tab ()
-  "Move to the previous `tab-bar' tab and open the first buffer."
-  (interactive)
-  (call-interactively 'tab-bar-switch-to-prev-tab)
-  (jf/tab-bar-activate-first-buffer))
+;; (defun jf/tab-bar-switch-to-prev-tab ()
+;;   "Move to the previous `tab-bar' tab and open the first buffer."
+;;   (interactive)
+;;   (call-interactively 'tab-bar-switch-to-prev-tab)
+;;   (jf/tab-bar-activate-first-buffer))
 
-(defun jf/tab-bar-activate-first-buffer ()
-  "Switch to the first buffer in this buffer group.
+;; (defun jf/tab-bar-activate-first-buffer ()
+;;   "Switch to the first buffer in this buffer group.
 
-  This is cribbed from `bufler-switch-buffer'."
-  (let* ((path (frame-parameter nil 'bufler-workspace-path))
-	 (buffers (bufler-buffer-alist-at
-                   path :filter-fns bufler-workspace-switch-buffer-filter-fns)))
-    (switch-to-buffer (caar buffers)))
-  ;; A hack to ensure that I have the top tabs; I don't need it because I could
-  ;; use `jf/tab-bar-switch-prompt-for-tab'.
-  (jf/bufler/tab-configuration))
+;;   This is cribbed from `bufler-switch-buffer'."
+;;   (let* ((path (frame-parameter nil 'bufler-workspace-path))
+;; 	 (buffers (bufler-buffer-alist-at
+;;                    path :filter-fns bufler-workspace-switch-buffer-filter-fns)))
+;;     (switch-to-buffer (caar buffers)))
+;;   ;; A hack to ensure that I have the top tabs; I don't need it because I could
+;;   ;; use `jf/tab-bar-switch-prompt-for-tab'.
+;;   (jf/bufler/tab-configuration))
 
-(defun jf/tab-bar-switch-prompt-for-tab (name)
-  "Switch to the NAME tab and prompt for a buffer."
-  (interactive
-   (let* ((recent-tabs (mapcar (lambda (tab)
-                                 (alist-get 'name tab))
-                               (bufler-workspace-tabs))))
-     (list (completing-read "Select tab-bar: "
-                            recent-tabs nil nil nil nil recent-tabs))))
-  (tab-bar-select-tab (1+ (or (tab-bar--tab-index-by-name name) 0)))
-  (bufler-switch-buffer)
-  (jf/bufler/tab-configuration))
+;; (defun jf/tab-bar-switch-prompt-for-tab (name)
+;;   "Switch to the NAME tab and prompt for a buffer."
+;;   (interactive
+;;    (let* ((recent-tabs (mapcar (lambda (tab)
+;;                                  (alist-get 'name tab))
+;;                                (bufler-workspace-tabs))))
+;;      (list (completing-read "Select tab-bar: "
+;;                             recent-tabs nil nil nil nil recent-tabs))))
+;;   (tab-bar-select-tab (1+ (or (tab-bar--tab-index-by-name name) 0)))
+;;   (bufler-switch-buffer)
+;;   (jf/bufler/tab-configuration))
 
 (provide 'jf-windows)
 ;;; jf-windows.el ends here
