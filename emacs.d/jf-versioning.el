@@ -168,7 +168,8 @@
   (git-messenger:use-magit-popup t)
   :bind (:map git-messenger-map (("p" . 'jf/open-pull-request-for-current-line)
 				 ("l" . 'git-link)))
-  :bind (("C-x g b" . jf/git-messenger-popup))
+  :bind (("s-6" . jf/git-messenger-popup)
+	 ("C-x g b" . jf/git-messenger-popup))
   :straight t)
 
 ;; When working in code, I want different ways to view the metadata around the
