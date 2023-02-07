@@ -152,6 +152,7 @@
 ;; (use-package tree-sitter-langs :straight t)
 
 (use-package treesit
+  :custom (treesit-font-lock-level 4)
   :straight (:type  built-in))
 
 (use-package treesit-auto
