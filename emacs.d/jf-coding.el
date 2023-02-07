@@ -31,7 +31,7 @@
 
 (use-package eglot
   :hook ((css-mode
-          enh-ruby-mode
+          ruby-mode
           yaml-mode
           html-mode
           js-mode
@@ -41,7 +41,7 @@
   (setq eglot-ignored-server-capabilites (quote (:documentHighlightProvider))
         completion-category-overrides '((eglot (styles orderless))))
   (add-to-list 'eglot-server-programs
-               `(enh-ruby-mode . ("solargraph" "socket" "--port" :autoport)))
+               `(ruby-mode . ("solargraph" "socket" "--port" :autoport)))
 
   (defun jf/eglot-capf ()
     ;; https://stackoverflow.com/questions/72601990/how-to-show-suggestions-for-yasnippets-when-using-eglot
@@ -60,7 +60,7 @@
 
 (use-package emacs-refactor
   :straight (emacs-refactor :host github :repo "Wilfred/emacs-refactor")
-  :bind ((:map enh-ruby-mode-map ("M-RET" . emr-show-refactor-menu))
+  :bind ((:map ruby-mode-map ("M-RET" . emr-show-refactor-menu))
 	 (:map emacs-lisp-mode-map ("M-RET" . emr-show-refactor-menu))))
 
 (use-package emmet-mode
@@ -70,15 +70,9 @@
          (html-mode . emmet-mode)
          (css-mode . emmet-mode)))
 
-(use-package enh-ruby-mode
-  :straight t
-  :hook (enh-ruby-mode . (lambda () (setq fill-column 100)))
-  :hook (enh-ruby-mode . eldoc-mode)
-  :hook (enh-ruby-mode . enh-ruby-imenu-create-index)
-  :bind (:map enh-ruby-mode-map ("C-j" . jf/jump-to-agenda-or-mark)
-              ("M-h" . enh-ruby-mark-defun))
-  :mode ("\\(?:\\.rb\\|ru\\|rake\\|thor\\|jbuilder\\|gemspec\\|podspec\\|/\\(?:Gem\\|Rake\\|Cap\\|Thor\\|Vagrant\\|Guard\\|Pod\\)file\\)\\'" . enh-ruby-mode)
-  :init (add-to-list 'interpreter-mode-alist '("ruby" . enh-ruby-mode)))
+(use-package ruby-mode
+  :straight (:type built-in)
+  :hook (ruby-mode . (lambda () (setq fill-column 100))))
 
 (use-package go-mode :straight t)
 
@@ -120,8 +114,8 @@
 
 (use-package rspec-mode
   :straight t
-  ;; Ensure that we’re loading enh-ruby-mode before we do any rspec loading.
-  :after enh-ruby-mode
+  ;; Ensure that we’re loading ruby-mode before we do any rspec loading.
+  :after ruby-mode
   ;; :init (eval-after-load 'rspec-mode '(rspec-install-snippets))
   :custom
   (rspec-docker-container "web")
@@ -130,18 +124,13 @@
   (rspec-docker-cwd "./")
   (rspec-docker-command "docker compose exec")
   :bind (:map rspec-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
-  :bind (:map enh-ruby-mode-map (("s-." . 'rspec-toggle-spec-and-target))))
+  :bind (:map ruby-mode-map (("s-." . 'rspec-toggle-spec-and-target))))
 
 
 (use-package ruby-interpolation
   ;; Nice and simple package for string interpolation.
   :straight t
-  :hook (enh-ruby-mode . ruby-interpolation-mode))
-
-(use-package ruby-refactor
-  :straight t
-  :hook (enh-ruby-mode . ruby-refactor-mode-launch)
-  (ruby-mode . ruby-refactor-mode-launch))
+  :hook (ruby-mode . ruby-interpolation-mode))
 
 (use-package sql-indent
   :straight t
@@ -151,16 +140,25 @@
 
 (use-package typescript-mode :straight t)
 
-(use-package tree-sitter
-  ;; See https://github.com/emacs-tree-sitter/elisp-tree-sitter
-  :straight (tree-sitter :host github
-			 :repo "emacs-tree-sitter/elisp-tree-sitter")
-  :config
-  (add-to-list 'tree-sitter-major-mode-language-alist '(enh-ruby-mode . ruby))
-  :init (global-tree-sitter-mode)
-  (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
+;; (use-package tree-sitter
+;;   ;; See https://github.com/emacs-tree-sitter/elisp-tree-sitter
+;;   :straight (tree-sitter :host github
+;; 			 :repo "emacs-tree-sitter/elisp-tree-sitter")
+;;   :config
+;;   (add-to-list 'tree-sitter-major-mode-language-alist '(ruby-mode . ruby))
+;;   :init (global-tree-sitter-mode)
+;;   (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
 
-(use-package tree-sitter-langs :straight t)
+;; (use-package tree-sitter-langs :straight t)
+
+(use-package treesit
+  :straight (:type  built-in))
+
+(use-package treesit-auto
+  :straight (:host github :repo "renzmann/treesit-auto")
+  :config (setq treesit-auto-install 'prompt)
+  :config
+  (global-treesit-auto-mode))
 
 (use-package vterm :straight t)
 
@@ -178,7 +176,7 @@
 
 (use-package yard-mode
   :straight t
-  :hook (enh-ruby-mode . yard-mode))
+  :hook (ruby-mode . yard-mode))
 
 (provide 'jf-coding)
 ;;; jf-coding.el ends here
