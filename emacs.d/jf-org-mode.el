@@ -578,9 +578,11 @@ language name.")
 ;; This package gives a bit of visual chrome to org files.
 (use-package org-modern
   :straight (:host github :repo "minad/org-modern")
-  :custom (org-modern-star '("◉" "○" "◈" "◇" "•"))
-  :hook (org-mode . org-modern-mode))
-
+  :custom ((org-modern-star '("◉" "○" "◈" "◇" "•"))
+	   ;; Showing the depth of stars helps with the speed keys as well as
+	   ;; gives a clearer indicator of the depth of the outline.
+	   (org-modern-hide-stars nil))
+  :config (global-org-modern-mode))
 
 ;;; Org Export and Composition Functionality
 
