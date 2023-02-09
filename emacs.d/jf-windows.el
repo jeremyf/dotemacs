@@ -15,8 +15,6 @@
 
 (use-package window
   :straight (:type built-in)
-  :bind (("s-[" . next-buffer)
-	 ("s-]" . previous-buffer))
   :custom
   (display-buffer-alist
    '(;; no windows

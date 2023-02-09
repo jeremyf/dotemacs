@@ -9,7 +9,9 @@
 ;;; Code
 
 (global-set-key (kbd "M-[") 'backward-paragraph)
+(global-set-key (kbd "s-[") 'backward-paragraph)
 (global-set-key (kbd "M-]") 'forward-paragraph)
+(global-set-key (kbd "s-]") 'forward-paragraph)
 
 ;; this suffix provides a dynamic description of the current host I want to use
 ;; for my blog.  And the prefix’s function toggles the host.

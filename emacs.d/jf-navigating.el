@@ -12,7 +12,8 @@
 (use-package ace-window
   :straight t
   :custom (aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
-  :bind (("M-o" . ace-window)))
+  :bind (("C-x o" . ace-window)
+	 ("M-o" . ace-window)))
 
 (use-package avy
 ;; Pick a letter, avy finds all words with that at the beginning of it.  Narrow
@@ -60,7 +61,6 @@
           (t (progn
                (move-to-window-line 0)
                (recenter))))))
-
 
 (provide 'jf-navigating)
 ;;; jf-navigating.el ends here
