@@ -53,7 +53,7 @@ fundamental-mode
 (today (format-time-string "%Y-%m-%d"))
 
 ;;;; markdown-mode
-markdown-mode
+markdown-mode markdown-ts-mode
 
 (tor "[Take on Rules](https://takeonrules.com)")
 
@@ -105,7 +105,7 @@ web-mode
 ;;; Multi-Mode Entries
 
 ;;;; enh-ruby-mode ruby-mode
-enh-ruby-mode ruby-mode rspec-mode
+enh-ruby-mode ruby-mode rspec-mode ruby-ts-mode
 
 (bench "require \"benchmark\"" n "Benchmark.bmbm do |b|" n "  b.report(\"\") do" n "    # Stuff" n "  end" n "end")
 (db "require \"debug\"; binding.break" n)

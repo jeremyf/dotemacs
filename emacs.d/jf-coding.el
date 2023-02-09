@@ -31,10 +31,15 @@
 
 (use-package eglot
   :hook ((css-mode
+	  css-ts-mode
           ruby-mode
+	  ruby-ts-mode
           yaml-mode
+	  yaml-ts-mode
           html-mode
+	  html-ts-mode
           js-mode
+	  js-ts-mode
           scss-mode) . eglot-ensure)
   :hook (eglot-managed-mode . jf/eglot-capf)
   :config
@@ -42,6 +47,8 @@
         completion-category-overrides '((eglot (styles orderless))))
   (add-to-list 'eglot-server-programs
                `(ruby-mode . ("solargraph" "socket" "--port" :autoport)))
+  (add-to-list 'eglot-server-programs
+               `(ruby-ts-mode . ("solargraph" "socket" "--port" :autoport)))
 
   (defun jf/eglot-capf ()
     ;; https://stackoverflow.com/questions/72601990/how-to-show-suggestions-for-yasnippets-when-using-eglot
@@ -72,7 +79,7 @@
 
 (use-package ruby-mode
   :straight (:type built-in)
-  :hook (ruby-mode . (lambda () (setq fill-column 100))))
+  :hook ((ruby-mode ruby-ts-mode) . (lambda () (setq fill-column 100))))
 
 (use-package go-mode :straight t)
 
@@ -93,7 +100,7 @@
 
 (use-package markdown-mode
   :straight t
-  :hook ((markdown-mode . turn-on-visual-line-mode))
+  :hook (((markdown-mode markdown-ts-mode) . turn-on-visual-line-mode))
   :mode (("README\\.md\\'" . gfm-mode)
          ("\\.md\\'" . markdown-mode)
          ("\\.markdown\\'" . markdown-mode))
@@ -123,7 +130,10 @@
   (rspec-use-docker-when-possible t)
   (rspec-docker-cwd "./")
   (rspec-docker-command "docker compose exec")
+  :hook ((dired-mode . rspec-dired-mode)
+	 (ruby-ts-mode . rspec-dired-mode))
   :bind (:map rspec-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
+  :bind (:map ruby-ts-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
   :bind (:map ruby-mode-map (("s-." . 'rspec-toggle-spec-and-target))))
 
 
@@ -177,7 +187,8 @@
 
 (use-package yard-mode
   :straight t
-  :hook (ruby-mode . yard-mode))
+  :hook ((ruby-mode . yard-mode)
+	 (ruby-ts-mode . yard-mode)))
 
 (provide 'jf-coding)
 ;;; jf-coding.el ends here

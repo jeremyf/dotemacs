@@ -56,6 +56,7 @@
   :bind (:map org-mode-map ("C-j" . jf/jump-to-agenda-or-mark))
   :custom (org-use-speed-commands t)
   (org-time-stamp-rounding-minutes '(0 15))
+  (org-clock-rounding-minutes 15)
   :config
   (setq org-confirm-babel-evaluate #'jf/org-confirm-babel-evaluate
 	;; I'd prefer to use the executable, but that doe not appear to be the
