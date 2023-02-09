@@ -75,11 +75,19 @@
   :custom (deadgrep-display-buffer-function
 	   (lambda (buffer) (display-buffer-same-window buffer '())))
   :straight t
+  :config
+  (defun jf/deadgrep/exit-with-save ()
+    "Exit deadgrep edit mode and prompt to save buffers."
+    (interactive)
+    (when (eq major-mode #'deadgrep-edit-mode)
+      (progn
+	(deadgrep-mode)
+	(call-interactively 'save-some-buffers))))
   :bind (:map deadgrep-mode-map
 	      (("C-c C-p" . deadgrep-edit-mode)
 	       ("e" . deadgrep-edit-mode))
 	      :map deadgrep-edit-mode-map
-	      ("C-c C-c" . deadgrep-mode)))
+	      ("C-c C-c" . jf/deadgrep/exit-with-save)))
 
 ;; “Edit a grep buffer and apply those changes to the file buffer.”  In other
 ;; words, after “searching” for something, sending the results to a buffer
