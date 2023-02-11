@@ -496,6 +496,8 @@ Useful if you want a more robust view into the recommend candidates."
   :custom (tempel-path "~/git/dotemacs/templates")
   :bind (("M-+" . tempel-complete) ;; Alternative tempel-expand
 	 ("M-*" . tempel-insert))
+  :bind (:map tempel-map (([backtab] . tempel-previous)
+			  ("TAB" . tempel-next)))
 
   :init
   (cl-defun jf/org-macro-value-list (macro-name &key (dir org-directory))
