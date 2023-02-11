@@ -16,6 +16,9 @@
   "Am I working on my machine"
   (f-file? (file-truename "~/git/org/denote/scientist/20221021T221357--scientist-agenda__scientist.org")))
 
+(defvar jf/org-mode/bad-code-catalog-filename
+  "~/git/org/denote/melange/20230210T184422--the-bad-code-catalog__programming.org")
+
 (defvar jf/primary-agenda-filename-for-machine
   (if (jf/is-work-machine?)
       "~/git/org/denote/scientist/20221021T221357--scientist-agenda__scientist.org"
@@ -106,6 +109,12 @@
 	   :immediate-finish t
 	   :jump-to-captured t
 	   :empty-lines-after 1)
+	  ("B" "Bad Code Catalog"
+	   plain (file+function
+		  jf/org-mode/bad-code-catalog-filename
+		  jf/org-mode/bad-code-catalog/position-for-example-code-capture)
+	   "%i%?"
+	   :empty-lines 1)
 	  ("c" "Contents to Current Clocked Task"
 	   plain (clock)
 	   "%i%?"
@@ -801,6 +810,57 @@ When given the PREFIX arg, paste the content into TextEdit (for future copy)."
 	 (choice (completing-read "Headings: " headlines nil t))
 	 (desc (read-string "Description: " choice)))
     (org-insert-link buffer-file-name (concat "*" choice) desc)))
+
+(cl-defun jf/org-mode/bad-code-catalog/prompt-for-example (&optional given-mode &key (tag "example"))
+  (let* ((mode (or given-mode (completing-read "Context:" '("Prompt" "Immediate" "Stored")))))
+    (cond
+     ((string= mode "Prompt")
+      (with-current-buffer (find-file-noselect jf/org-mode/bad-code-catalog-filename)
+	(completing-read
+	 "Example: "
+	 (org-map-entries
+	  (lambda ()
+	    (org-element-property :title (org-element-at-point)))
+	  (concat "+LEVEL=2+" tag) 'file))))
+     ((string= mode "Immediate") (progn
+			    ;; Insert node in file and return
+			    (format-time-string "%Y-%m-%d %H:%M:%S")))
+     ((string= mode "Stored") "Exceptional Confusion"))))
+
+(cl-defun jf/org-mode/bad-code-catalog/position-for-example-code-capture
+    (&key
+     (tag "example")
+     (headline (jf/org-mode/bad-code-catalog/prompt-for-example))
+     (parent_headline "Examples"))
+  "Find and position the cursor at the end of HEADLINE.
+
+The HEADLINE must have the given TAG and is an ancestor of the given PARENT_HEADLINE.
+
+If the HEADLINE does not exist, write it at the end of the file."
+  ;; We need to be using the right agenda file.
+  (with-current-buffer (find-file-noselect jf/org-mode/bad-code-catalog-filename)
+    (let* ((existing-position (org-element-map
+				  (org-element-parse-buffer)
+				  'headline
+				(lambda (hl)
+				  (and (=(org-element-property :level hl) 2)
+				       (member tag (org-element-property :tags hl))
+				       (string= headline (org-element-property :raw-value hl))
+				       (string= parent_headline
+						(plist-get
+						 (cadr
+						  (car
+						   (org-element-lineage hl)))
+						 :raw-value))
+				       (org-element-property :end hl)))
+				nil t)))
+      (if existing-position
+	  ;; Go to the existing position for this project
+	  (goto-char existing-position)
+	(progn
+	  ;; Go to the end of the file and append the project to the end
+	  (end-of-buffer)
+	  (insert (concat "\n\n** TODO " headline " :" tag ":\n\n")))))))
 
 (provide 'jf-org-mode)
 ;;; jf-org-mode.el ends here
