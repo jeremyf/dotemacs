@@ -773,7 +773,7 @@ When given the PREFIX arg, paste the content into TextEdit (for future copy)."
 					       '("Existing" "New" "Stored")))))
     (cond
      ((string= mode "New")
-      (let ((headline (read-string "New Example Name: "
+      (let ((example (read-string "New Example Name: "
 				   nil
 				   nil
 				   (format-time-string "%Y-%m-%d %H:%M:%S"))))
@@ -782,8 +782,8 @@ When given the PREFIX arg, paste the content into TextEdit (for future copy)."
 	  (end-of-buffer)
 	  (insert (s-format jf/org-mode/capture/example-template
 			    'aget
-			    (list (cons "headline" headline) (cons "tag" tag))))
-	  headline)))
+			    (list (cons "example" example) (cons "tag" tag))))
+	  example)))
      ((string= mode "Existing")
       (with-current-buffer (find-file-noselect
 			    jf/org-mode/capture/filename)
@@ -799,7 +799,8 @@ When given the PREFIX arg, paste the content into TextEdit (for future copy)."
 	  (jf/org-mode/capture/prompt-for-example "Existing" :tag tag))))))
 
 (defvar jf/org-mode/capture/example-template
-  "\n\n** TODO ${headline} :${tag}:\n\n*** TODO Context\n\n*** Code :code:\n\n*** TODO Discussion\n\n*** COMMENT Refactoring\n")
+  (concat "\n\n** TODO ${example} :${tag}:\n\n*** TODO Context\n\n"
+	  "*** Code :code:\n\n*** TODO Discussion\n\n*** COMMENT Refactoring\n"))
 
 (defvar jf/org-mode/capture/stored-context
   nil
@@ -807,14 +808,14 @@ When given the PREFIX arg, paste the content into TextEdit (for future copy)."
 
 (cl-defun jf/org-mode/capture/set-position-file
     (&key
-     (tag "code")
      (headline (jf/org-mode/capture/prompt-for-example))
+     (tag "code")
      (parent_headline "Examples"))
   "Find and position the cursor at the end of HEADLINE.
 
-The HEADLINE must have the given TAG and is an ancestor of the given PARENT_HEADLINE.
-
-If the HEADLINE does not exist, write it at the end of the file."
+The HEADLINE must have the given TAG and be a descendent of the
+given PARENT_HEADLINE.  If the HEADLINE does not exist, write it
+at the end of the file."
   ;; We need to be using the right agenda file.
   (with-current-buffer (find-file-noselect jf/org-mode/capture/filename)
     (setq jf/org-mode/capture/stored-context headline)
@@ -823,7 +824,8 @@ If the HEADLINE does not exist, write it at the end of the file."
 				  'headline
 				(lambda (hl)
 				  (and (=(org-element-property :level hl) 3)
-				       (member tag (org-element-property :tags hl))
+				       (member tag
+					       (org-element-property :tags hl))
 				       (string= headline
 						(plist-get
 						 (cadr
