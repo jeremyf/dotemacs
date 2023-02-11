@@ -16,7 +16,7 @@
   "Am I working on my machine"
   (f-file? (file-truename "~/git/org/denote/scientist/20221021T221357--scientist-agenda__scientist.org")))
 
-(defvar jf/org-mode/bad-code-catalog-filename
+(defvar jf/org-mode/bad-code-catalog/filename
   "~/git/org/denote/melange/20230210T184422--the-bad-code-catalog__programming.org")
 
 (defvar jf/primary-agenda-filename-for-machine
@@ -111,7 +111,7 @@
 	   :empty-lines-after 1)
 	  ("B" "Bad Code Catalog"
 	   plain (file+function
-		  jf/org-mode/bad-code-catalog-filename
+		  jf/org-mode/bad-code-catalog/filename
 		  jf/org-mode/bad-code-catalog/position-for-example-code-capture)
 	   "%i%?"
 	   :empty-lines 1)
@@ -811,25 +811,43 @@ When given the PREFIX arg, paste the content into TextEdit (for future copy)."
 	 (desc (read-string "Description: " choice)))
     (org-insert-link buffer-file-name (concat "*" choice) desc)))
 
+;; If the example doesn't exist, create the example in the file
+
 (cl-defun jf/org-mode/bad-code-catalog/prompt-for-example (&optional given-mode &key (tag "example"))
-  (let* ((mode (or given-mode (completing-read "Context:" '("Prompt" "Immediate" "Stored")))))
+  "Prompt for the GIVEN-MODE example."
+  (let* ((mode (or given-mode (completing-read "Example:" '("Existing" "New" "Stored")))))
     (cond
-     ((string= mode "Prompt")
-      (with-current-buffer (find-file-noselect jf/org-mode/bad-code-catalog-filename)
-	(completing-read
-	 "Example: "
-	 (org-map-entries
-	  (lambda ()
-	    (org-element-property :title (org-element-at-point)))
-	  (concat "+LEVEL=2+" tag) 'file))))
-     ((string= mode "Immediate") (progn
-			    ;; Insert node in file and return
-			    (format-time-string "%Y-%m-%d %H:%M:%S")))
-     ((string= mode "Stored") "Exceptional Confusion"))))
+     ((string= mode "New")
+      (let ((headline (read-string "New Example Name: " nil nil (format-time-string "%Y-%m-%d %H:%M:%S"))))
+	(with-current-buffer (find-file-noselect jf/org-mode/bad-code-catalog/filename)
+	  (end-of-buffer)
+	  (insert (s-format jf/org-mode/bad-code-catalog/example-template
+			    'aget
+			    (list (cons "headline" headline) (cons "tag" tag))))
+	  headline)))
+     ((string= mode "Existing")
+      (with-current-buffer (find-file-noselect jf/org-mode/bad-code-catalog/filename)
+	(let ((examples (org-map-entries
+			 (lambda ()
+			   (org-element-property :title (org-element-at-point)))
+			 (concat "+LEVEL=2+" tag) 'file)))
+	  (if (s-blank? examples)
+	      (jf/org-mode/bad-code-catalog/prompt-for-example "New" :tag tag)
+	    (completing-read "Example: " examples nil t)))))
+     ((string= mode "Stored") (or
+			       jf/org-mode/bad-code-catalog/stored-context
+			       (jf/org-mode/bad-code-catalog/prompt-for-example "Existing" :tag tag))))))
+
+(defvar jf/org-mode/bad-code-catalog/example-template
+  "\n\n** TODO ${headline} :${tag}:\n\n*** TODO Context\n\n*** Code :code:\n\n*** TODO Discussion\n\n*** COMMENT Refactoring\n")
+
+(defvar jf/org-mode/bad-code-catalog/stored-context
+  nil
+  "A cached value to help quickly capture items.")
 
 (cl-defun jf/org-mode/bad-code-catalog/position-for-example-code-capture
     (&key
-     (tag "example")
+     (tag "code")
      (headline (jf/org-mode/bad-code-catalog/prompt-for-example))
      (parent_headline "Examples"))
   "Find and position the cursor at the end of HEADLINE.
@@ -838,15 +856,15 @@ The HEADLINE must have the given TAG and is an ancestor of the given PARENT_HEAD
 
 If the HEADLINE does not exist, write it at the end of the file."
   ;; We need to be using the right agenda file.
-  (with-current-buffer (find-file-noselect jf/org-mode/bad-code-catalog-filename)
+  (with-current-buffer (find-file-noselect jf/org-mode/bad-code-catalog/filename)
+    (setq jf/org-mode/bad-code-catalog/stored-context headline)
     (let* ((existing-position (org-element-map
 				  (org-element-parse-buffer)
 				  'headline
 				(lambda (hl)
-				  (and (=(org-element-property :level hl) 2)
+				  (and (=(org-element-property :level hl) 3)
 				       (member tag (org-element-property :tags hl))
-				       (string= headline (org-element-property :raw-value hl))
-				       (string= parent_headline
+				       (string= headline
 						(plist-get
 						 (cadr
 						  (car
@@ -854,13 +872,49 @@ If the HEADLINE does not exist, write it at the end of the file."
 						 :raw-value))
 				       (org-element-property :end hl)))
 				nil t)))
-      (if existing-position
-	  ;; Go to the existing position for this project
-	  (goto-char existing-position)
-	(progn
-	  ;; Go to the end of the file and append the project to the end
-	  (end-of-buffer)
-	  (insert (concat "\n\n** TODO " headline " :" tag ":\n\n")))))))
+      (goto-char existing-position))))
+
+(defun jf/org-mode/bad-code-catalog/code-get (start end)
+  "Get the text between START and END returning an `org-mode' formatted string."
+  (require 'magit)
+  (require 'git-link)
+  (let* ((file-name (buffer-file-name (current-buffer)))
+	 (org-src-mode (replace-regexp-in-string
+			"-\\(ts-\\)?mode"
+			""
+			(format "%s" major-mode)))
+	 (func-name (which-function))
+	 (type (cond
+		((eq major-mode 'nov-mode) "QUOTE")
+		((derived-mode-p 'prog-mode) "SRC")
+		(t "SRC" "EXAMPLE")))
+	 (code-snippet (buffer-substring-no-properties start end))
+	 (file-base (if file-name
+			(file-name-nondirectory file-name)
+		      (format "%s" (current-buffer))))
+	 (line-number (line-number-at-pos (region-beginning)))
+	 (remote-link (when (magit-list-remotes)
+			(progn
+			  (call-interactively 'git-link)
+			  (car kill-ring)))))
+    (concat
+     (format "\n**** %s" (or func-name (format-time-string "%Y-%m-%d %H:%M:%S")))
+     "\n:PROPERTIES:"
+     (format "\n:CAPTURED_AT: %s" (format-time-string "%Y-%m-%d %H:%M:%S"))
+     (format "\n:REMOTE_URL: [[%s]]" remote-link)
+     (format "\n:LOCAL_FILE: [[file:%s::%s]]" file-name line-number)
+     (when func-name (format "\n:FUNCTION_NAME: %s" func-name))
+     "\n:END:\n"
+     (format "\n#+BEGIN_%s %s" type org-src-mode)
+     (format "\n%s" code-snippet)
+     (format "\n#+END_%s\n" type))))
+
+(bind-key "s-9" 'jf/org-mode/bad-code-catalog/code-insert)
+(cl-defun jf/org-mode/bad-code-catalog/code-insert (start end &key (capture-template "B"))
+  "Capture the text between START and END to the given CAPTURE-TEMPLATE."
+  (interactive "r")
+  (let ((text (jf/org-mode/bad-code-catalog/code-get start end)))
+    (org-capture-string text capture-template)))
 
 (provide 'jf-org-mode)
 ;;; jf-org-mode.el ends here
