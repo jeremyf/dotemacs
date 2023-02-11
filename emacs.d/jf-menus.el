@@ -94,6 +94,7 @@
 
 (use-package file-info
   :straight (:host github :repo "artawower/file-info.el")
+  :bind ("C-x f" . file-info-show)
   :config
   (setq hydra-hint-display-type 'posframe)
   (setq hydra-posframe-show-params `(:poshandler posframe-poshandler-frame-center
@@ -101,8 +102,12 @@
 						 :internal-border-color "#61AFEF"
 						 :left-fringe 16
 						 :right-fringe 16)))
-
-(unbind-key "C-c d") ;; 'file-info-show
-(global-set-key (kbd "C-c d") 'jf/duplicate-current-line-or-lines-of-region)
+;; (add-to-list 'file-info-handlers `( :name "Git link"
+;; 				       :handler (git-link (current-buffer))
+;; 				       :cache t
+;; 				       :face font-lock-string-face
+;; 				       :bind "g"))
+;; (unbind-key "C-c d") ;; 'file-info-show
+;; (global-set-key (kbd "C-c d") 'jf/duplicate-current-line-or-lines-of-region)
 (provide 'jf-menus)
 ;;; jf-menus.el ends here
