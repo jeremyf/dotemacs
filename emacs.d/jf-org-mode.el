@@ -564,6 +564,9 @@ language name.")
 	       '("dfn" . "@@html:<dfn>@@$1@@html:</dfn>@@"))
 
   (add-to-list 'org-export-global-macros
+	       '("mark" . "@@html:<mark>@@$1@@html:</mark>@@"))
+
+  (add-to-list 'org-export-global-macros
 	       '("scene-date" . "#+begin_marginnote\nThe scene occurs on @@html:<span class=\"time\">@@$1@@html:</span>@@.\n#+end_marginnote")))
 
 (add-to-list 'org-export-global-macros

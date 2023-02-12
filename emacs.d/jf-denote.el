@@ -376,7 +376,7 @@ This function is intended for a global find of all notes."
 			   ;; TODO: Include a prompt of existing disclaimers
                            "#+CONTENT_DISCLAIMER:\n"
                            "#+DESCRIPTION:\n"
-                           (when is-a-game "#+GAME: " key "\n")
+                           (when is-a-game (concat "#+GAME: " key "\n"))
                            "#+ITEMID:\n"
                            "#+ITEMTYPE:\n"
                            "#+MENTION_AS:\n"
