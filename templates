@@ -114,3 +114,4 @@ enh-ruby-mode ruby-mode rspec-mode ruby-ts-mode
 (shell "#!/usr/bin/env ruby -w")
 (dc "described_class")
 (desc (when (rspec-top-level-desc-p) "RSpec.") "describe " q " do" n> n "end")
+(subject "subject(:" p ") { " p " }")

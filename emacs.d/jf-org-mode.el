@@ -17,7 +17,8 @@
   (f-file? (file-truename "~/git/org/denote/scientist/20221021T221357--scientist-agenda__scientist.org")))
 
 (defvar jf/org-mode/capture/filename
-  "~/git/org/denote/melange/20230210T184422--example-code__programming.org")
+  "~/git/org/denote/melange/20230210T184422--example-code__programming.org"
+  "The file where I'm capturing content.  By default this is my example code project.")
 
 (defvar jf/primary-agenda-filename-for-machine
   (if (jf/is-work-machine?)
