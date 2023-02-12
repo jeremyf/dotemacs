@@ -16,7 +16,7 @@
 (use-package ox-hugo
   :straight t
   :custom
-  (org-hugo-paired-shortcodes "marginnote poem inline_comments")
+  (org-hugo-paired-shortcodes "blockquote marginnote poem inline_comments")
   (hugo-use-code-for-kbd t)
   :config
   ;; I want to have backticks instead of indentations.

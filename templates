@@ -61,6 +61,13 @@ markdown-mode markdown-ts-mode
 org-mode
 
 (@ (p (jf/denote-link--people)))
+(bq "#+attr_shortcode:"
+    (p "Author (e.g. \"pre\" keyword): " pre t) (unless (s-blank? pre) (concat " :pre " pre))
+    (p "Cite: " cite t) (unless (s-blank? cite) (concat " :cite " cite))
+    (p "Cite URL: " cite_url t) (unless (s-blank? cite_url) (concat " :cite_url " cite_url))
+    n "#+begin_blockquote"
+    n q
+    n "#+end_blockquote" n)
 (cite "{{{cite(" p ")}}}")
 (keyboard "{{{kbd(" (p (completing-read "Keyboard: " (jf/org-macro-value-list "kbd"))) ")}}}")
 (idiomatic "{{{i(" (p (completing-read "Idiom: " (jf/org-macro-value-list "i"))) ")}}}")
