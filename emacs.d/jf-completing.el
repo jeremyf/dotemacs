@@ -239,7 +239,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
 
 (use-package corfu
   :straight t
-  :demand t
   ;; Optionally use TAB for cycling, default is `corfu-complete'.
   :bind (:map corfu-map
               ("M-m" . corfu-move-to-minibuffer)
@@ -282,11 +281,15 @@ Useful if you want a more robust view into the recommend candidates."
     (interactive)
     (let (completion-cycle-threshold completion-cycling)
       (apply #'consult-completion-in-region completion-in-region--data)))
-
   :init
+  ;; (corfu-indexed-mode)
   ;; Recommended: Enable Corfu globally.
   ;; This is recommended since dabbrev can be used globally (M-/).
-  (global-corfu-mode))
+  (global-corfu-mode)
+  (load "~/.emacs.d/straight/build/corfu/extensions/corfu-popupinfo.el"
+	nil
+	jf/silence-loading-log)
+  (corfu-popupinfo-mode))
 
 ;; (use-package corfu-doc
 ;;   ;; NOTE 2022-02-05: At the time of writing, `corfu-doc' is not yet on melpa
@@ -569,7 +572,6 @@ Useful if you want a more robust view into the recommend candidates."
         completion-ignore-case t)
   (setq vertico-cycle t)
   :init
-
   (load "~/.emacs.d/straight/build/vertico/extensions/vertico-indexed.elc"
 	nil
 	jf/silence-loading-log)

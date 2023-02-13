@@ -14,6 +14,8 @@
  '(dired-listing-switches "-laGhpX")
  '(dired-use-ls-dired t)
  '(global-display-line-numbers-mode t)
+ '(org-agenda-files
+   '("~/git/org/denote/melange/20230212T112800--inventory-of-worlds-without-number-subsystems__rpgs.org" "/Users/jfriesen/git/org/agenda.org" "/Users/jfriesen/git/takeonrules.source/agenda.org" "/Users/jfriesen/git/org/denote/scientist/20221021T221357--scientist-agenda__scientist.org"))
  '(org-export-backends '(ascii html icalendar latex md odt))
  '(safe-local-variable-values
    '((projectile-require-project-root)
