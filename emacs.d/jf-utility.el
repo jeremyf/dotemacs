@@ -290,10 +290,10 @@
   "Write this file to TARGET-DIRECTORY, and delete old one."
   (interactive "DTarget Directory: ")
   (let* ((source (expand-file-name (file-name-nondirectory
-				    (buffer-name))
+				    (buffer-file-name))
 				   default-directory))
          (target (f-join target-directory (file-name-nondirectory
-					   (buffer-name)))))
+					   (buffer-file-name)))))
     (save-buffer)
     (rename-file source target)
     (kill-current-buffer)))
