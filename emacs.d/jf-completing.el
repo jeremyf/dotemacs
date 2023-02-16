@@ -79,13 +79,12 @@
   ;; Replace bindings. Lazily loaded due by `use-package'.
   :bind (;; C-c bindings (mode-specific-map)
          ("C-c h" . consult-history)
-         ("C-c b" . consult-bookmark)
+         ("C-x b" . consult-bookmark)
          ("C-c k" . consult-kmacro)
          ;; C-x bindings (ctl-x-map)
 	 ("C-x M-:" . consult-complex-command)
-         ("C-x b" . consult-buffer)
+         ("C-c b" . consult-buffer)
          ("s-b" . consult-buffer)
-         ("s-r" . consult-buffer)
          ("C-x 4 b" . consult-buffer-other-window)
          ("C-s-b" . consult-buffer-other-window)
          ("C-x 5 b" . consult-buffer-other-frame)
@@ -229,13 +228,12 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
              :branch "master")
   :bind
   ;;; This overwrite `ns-open-file-using-panel'; the operating system's "Finder"
-  ("s-o" . consult-projectile)
+  ("C-c o" . consult-projectile)
   ;;; I have long had Cmd+t mapped to opening project files; however, I'm
   ;;; noticing the way I'm typing this and it is feeling wrong.  So now I won't
   ;;; have that way open.
-  ("s-t" . consult-projectile)
-  ("H-t" . consult-projectile)
-  ("s-p" . consult-projectile))
+  ("C-c t" . consult-projectile)
+  ("H-t" . consult-projectile))
 
 (use-package corfu
   :straight t
