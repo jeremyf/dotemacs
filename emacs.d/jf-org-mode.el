@@ -61,6 +61,11 @@
   :custom (org-use-speed-commands t)
   (org-time-stamp-rounding-minutes '(0 15))
   (org-clock-rounding-minutes 15)
+  (org-link-frame-setup '((vm . vm-visit-folder-other-frame)
+			  (vm-imap . vm-visit-imap-folder-other-frame)
+			  (gnus . org-gnus-no-new-news)
+			  (file . find-file)
+			  (wl . wl-other-frame)))
   :config
   (setq org-confirm-babel-evaluate #'jf/org-confirm-babel-evaluate
 	;; I'd prefer to use the executable, but that doe not appear to be the
