@@ -783,7 +783,9 @@ When given the PREFIX arg, paste the content into TextEdit (for future copy)."
 				   (format-time-string "%Y-%m-%d %H:%M:%S"))))
 	(with-current-buffer (find-file-noselect
 			      jf/org-mode/capture/filename)
-	  (end-of-buffer)
+	  (jf/org-mode/capture/set-position-file :headline nil
+						 :tag "examples"
+						 :depth 1)
 	  (insert (s-format jf/org-mode/capture/example-template
 			    'aget
 			    (list (cons "example" example) (cons "tag" tag))))
@@ -795,16 +797,16 @@ When given the PREFIX arg, paste the content into TextEdit (for future copy)."
 			 (lambda ()
 			   (org-element-property :title (org-element-at-point)))
 			 (concat "+LEVEL=2+" tag) 'file)))
-	  (if (s-blank? examples)
-	      (jf/org-mode/capture/prompt-for-example "New" :tag tag)
-	    (completing-read "Example: " examples nil t)))))
+	  (if examples
+	      (completing-read "Example: " examples nil t)
+	    (jf/org-mode/capture/prompt-for-example "New" :tag tag)))))
      ((string= mode "Stored")
       (or jf/org-mode/capture/stored-context
 	  (jf/org-mode/capture/prompt-for-example "Existing" :tag tag))))))
 
 (defvar jf/org-mode/capture/example-template
   (concat "\n\n** TODO ${example} :${tag}:\n\n*** TODO Context\n\n"
-	  "*** Code :code:\n\n*** TODO Discussion\n\n*** COMMENT Refactoring\n"))
+	  "*** Code :code:\n\n*** TODO Discussion\n\n*** COMMENT Refactoring\n\n"))
 
 (defvar jf/org-mode/capture/stored-context
   nil
@@ -814,7 +816,7 @@ When given the PREFIX arg, paste the content into TextEdit (for future copy)."
     (&key
      (headline (jf/org-mode/capture/prompt-for-example))
      (tag "code")
-     (parent_headline "Examples"))
+     (depth 3))
   "Find and position the cursor at the end of HEADLINE.
 
 The HEADLINE must have the given TAG and be a descendent of the
@@ -827,15 +829,17 @@ at the end of the file."
 				  (org-element-parse-buffer)
 				  'headline
 				(lambda (hl)
-				  (and (=(org-element-property :level hl) 3)
+				  (and (=(org-element-property :level hl) depth)
 				       (member tag
 					       (org-element-property :tags hl))
-				       (string= headline
+				       (if headline
+					   (string= headline
 						(plist-get
 						 (cadr
 						  (car
 						   (org-element-lineage hl)))
 						 :raw-value))
+					 t)
 				       (org-element-property :end hl)))
 				nil t)))
       (goto-char existing-position))))
