@@ -138,16 +138,19 @@
   (setq xref-show-xrefs-function #'consult-xref
         xref-show-definitions-function #'consult-xref)
 
+  :custom
   ;; Updating the default to include "--smart-case"
   ;; Leveraging ripgrep-all https://github.com/phiresky/ripgrep-all
-  (setq consult-ripgrep-command
+  (consult-ripgrep-command
 	(concat "rga --null --line-buffered --color=ansi --max-columns=1000 "
 		"--smart-case --no-heading --line-number --no-ignore-vcs . "
-		"--glob !vendor/ --glob !coverage/ -e ARG OPTS"))
-  (setq consult-ripgrep-args
+		"--glob !vendor/ --glob !coverage/ --glob !**/tmp/ --glob !**/log/ "
+		"-e ARG OPTS"))
+  (consult-ripgrep-args
 	(concat "rga --null --line-buffered --color=never --max-columns=1000 "
 		"--path-separator / --no-ignore-vcs --smart-case --no-heading "
-		"--glob !vendor/ --glob !coverage/ --line-number ."))
+		"--glob !vendor/ --glob !coverage/ --glob !**/tmp/ --glob !**/log/ "
+		"--line-number ."))
 
   ;; Configure other variables and modes in the :config section,
   ;; after lazily loading the package.
