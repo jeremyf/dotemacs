@@ -144,12 +144,14 @@
   (consult-ripgrep-command
 	(concat "rga --null --line-buffered --color=ansi --max-columns=1000 "
 		"--smart-case --no-heading --line-number --no-ignore-vcs . "
-		"--glob !vendor/ --glob !coverage/ --glob !**/tmp/ --glob !**/log/ "
+		"--glob !vendor/ --glob !coverage/ --glob !**/tmp/ --glob "
+		"!**/log/ --glob !public/ --glob !node_modules/ "
 		"-e ARG OPTS"))
   (consult-ripgrep-args
 	(concat "rga --null --line-buffered --color=never --max-columns=1000 "
 		"--path-separator / --no-ignore-vcs --smart-case --no-heading "
-		"--glob !vendor/ --glob !coverage/ --glob !**/tmp/ --glob !**/log/ "
+		"--glob !vendor/ --glob !coverage/ --glob !**/tmp/ --glob "
+		"!**/log/ --glob !public/ --glob !node_modules/ "
 		"--line-number ."))
 
   ;; Configure other variables and modes in the :config section,
