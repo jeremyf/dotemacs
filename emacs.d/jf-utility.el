@@ -221,11 +221,16 @@
           (if (equal major-mode 'dired-mode)
 	      default-directory
 	    (buffer-file-name)))
+	 (options '(("Basename" . (lambda (f) (file-name-nondirectory f)))
+		    ("Filename, Relative" . (lambda (f) (concat "./" (file-relative-name f (projectile-project-root)))))
+		    ("Dirname" . (lambda (f) (file-name-directory f)))
+		    ("Dirname, Relative" . (lambda (f) (concat "./" (file-relative-name (file-name-directory f) (projectile-project-root)))))))
          (filename
-          (cond
-           ((not prefix)  raw-filename)
-           ((= prefix 4)  (file-name-nondirectory raw-filename))
-           ((= prefix 16) (file-name-directory raw-filename)))))
+	  (if prefix
+	      (funcall (alist-get (completing-read "Option: " options nil t)
+				  options nil nil #'string=)
+		       raw-filename)
+	    raw-filename)))
     (when filename
       (kill-new filename)
       (message "Copied buffer file name '%s' to the clipboard." filename))))
