@@ -198,38 +198,34 @@
 
 
 (global-set-key (kbd "C-k") 'jf/kill-line-or-region)
-(defun jf/kill-line-or-region (&optional parg)
-  "Kill the selected region otherwise kill the PARG number of lines."
+(defun jf/kill-line-or-region (&optional arg)
+  "Kill the selected region otherwise kill the ARG number of lines."
   (interactive "P")
   (if (use-region-p)
       (kill-region (region-beginning) (region-end))
-    (kill-line parg)))
+    (kill-line arg)))
 
 (global-set-key (kbd "C-c n") 'jf/nab-file-name-to-clipboard)
-(defun jf/nab-file-name-to-clipboard (parg)
+(defun jf/nab-file-name-to-clipboard (arg)
   "Nab, I mean copy, the current buffer file name to the clipboard.
 
-  The PARG is the universal prefix argument.
-
-  If you pass no args, copy the filename with full path.
-  If you pass one arg, copy the filename without path.
-  If you pass two args, copy the path to the directory of the file."
+  When you pass the universal ARG prompt for different aspects of a file."
   ;; https://blog.sumtypeofway.com/posts/emacs-config.html
   (interactive "P")
-  (let* ((prefix (car parg))
+  (let* ((prefix (car arg))
          (raw-filename
           (if (equal major-mode 'dired-mode)
 	      default-directory
 	    (buffer-file-name)))
-	 (options '(("Basename" . (lambda (f) (file-name-nondirectory f)))
-		    ("Filename, Relative" . (lambda (f) (concat "./" (file-relative-name f (projectile-project-root)))))
-		    ("Dirname" . (lambda (f) (file-name-directory f)))
-		    ("Dirname, Relative" . (lambda (f) (concat "./" (file-relative-name (file-name-directory f) (projectile-project-root)))))))
+	 (options `(("Filename, Basename" . ,`(file-name-nondirectory raw-filename))
+		    ("Filename, Relative" . ,`(concat "./" (file-relative-name raw-filename (projectile-project-root))))
+		    ("Filename, Full" . raw-filename)
+		    ("Dirname" . ,`(file-name-directory raw-filename))
+		    ("Dirname, Relative" . ,`(concat "./" (file-relative-name (file-name-directory raw-filename) (projectile-project-root))))))
          (filename
 	  (if prefix
-	      (funcall (alist-get (completing-read "Option: " options nil t)
-				  options nil nil #'string=)
-		       raw-filename)
+	      (eval (alist-get (completing-read "Option: " options nil t)
+				  options nil nil #'string=))
 	    raw-filename)))
     (when filename
       (kill-new filename)
@@ -256,7 +252,7 @@
 
 (global-set-key (kbd "C-M-d") 'jf/duplicate-current-line-or-lines-of-region)
 (global-set-key (kbd "C-c d") 'jf/duplicate-current-line-or-lines-of-region)
-(defun jf/duplicate-current-line-or-lines-of-region (parg)
+(defun jf/duplicate-current-line-or-lines-of-region (arg)
   "Duplicate ARG times current line or the lines of the current region."
   (interactive "p")
   (if (use-region-p)
@@ -272,11 +268,11 @@
                (beg (point))
                (region
                 (buffer-substring-no-properties beg end)))
-          (dotimes (_i parg)
+          (dotimes (_i arg)
             (goto-char end)
             (insert region)
             (setq end (point)))))
-    (crux-duplicate-current-line-or-region parg)))
+    (crux-duplicate-current-line-or-region arg)))
 
 ;; A simple wrapper around scratch, that helps name it and sets the major mode
 ;; to `org-mode'.
@@ -304,7 +300,7 @@
     (kill-current-buffer)))
 
 (global-set-key (kbd "s-5") 'jf/org-insert-immediate-active-timestamp)
-(defun jf/org-insert-immediate-active-timestamp (parg)
+(defun jf/org-insert-immediate-active-timestamp (arg)
   "Insert an active date for today.
 
   One universal arg (e.g., prefix call with C-u) inserts timestamp.
@@ -312,7 +308,7 @@
   then insertes active date."
   ;; Insert an active timestamp, with a few options.
   (interactive "P")
-  (let ((prefix (car parg)))
+  (let ((prefix (car arg)))
     (cond
      ((not prefix)  (org-insert-time-stamp nil nil nil))
      ((= prefix 4)  (org-insert-time-stamp nil t nil))
