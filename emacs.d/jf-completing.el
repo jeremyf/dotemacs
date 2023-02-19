@@ -79,11 +79,11 @@
   ;; Replace bindings. Lazily loaded due by `use-package'.
   :bind (;; C-c bindings (mode-specific-map)
          ("C-c h" . consult-history)
-         ("C-x b" . consult-bookmark)
+         ("C-c b" . consult-buffer)
          ("C-c k" . consult-kmacro)
          ;; C-x bindings (ctl-x-map)
 	 ("C-x M-:" . consult-complex-command)
-         ("C-c b" . consult-buffer)
+         ("C-x b" . consult-bookmark)
          ("s-b" . consult-buffer)
          ("C-x 4 b" . consult-buffer-other-window)
          ("C-s-b" . consult-buffer-other-window)
