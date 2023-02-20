@@ -217,15 +217,16 @@
           (if (equal major-mode 'dired-mode)
 	      default-directory
 	    (buffer-file-name)))
-	 (options `(("Filename, Basename" . ,`(file-name-nondirectory raw-filename))
-		    ("Filename, Relative" . ,`(concat "./" (file-relative-name raw-filename (projectile-project-root))))
-		    ("Filename, Full" . raw-filename)
-		    ("Dirname" . ,`(file-name-directory raw-filename))
-		    ("Dirname, Relative" . ,`(concat "./" (file-relative-name (file-name-directory raw-filename) (projectile-project-root))))))
+	 (options '(("Filename, Basename" . (lambda (f) (file-name-nondirectory f)))
+		    ("Filename, Relative" . (lambda (f) (concat "./" (file-relative-name f (projectile-project-root)))))
+		    ("Filename, Full" . (lambda (f) (f)))
+		    ("Dirname" . (lambda (f) (file-name-directory f)))
+		    ("Dirname, Relative" . (lambda (f) (concat "./" (file-relative-name (file-name-directory f) (projectile-project-root)))))))
          (filename
 	  (if prefix
-	      (eval (alist-get (completing-read "Option: " options nil t)
-				  options nil nil #'string=))
+	      (funcall (alist-get (completing-read "Option: " options nil t)
+				  options nil nil #'string=)
+		       raw-filename)
 	    raw-filename)))
     (when filename
       (kill-new filename)
