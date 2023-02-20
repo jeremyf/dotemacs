@@ -21,7 +21,7 @@
      ("\\`\\*Async Shell Command\\*\\'"
       (display-buffer-no-window))
      ;; I like the slide out window for this "context-type menus"
-     ("\\*\\(Ilist\\|Embark Actions\\|helpful .*\\)\\*"
+     ("\\*\\(eldoc\\|Ilist\\|Embark Actions\\|helpful .*\\)\\*"
       (display-buffer-in-side-window)
       (window-width . 0.5)
       (side . right)
