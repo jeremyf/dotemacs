@@ -14,26 +14,26 @@
 ;;;; Pre-requisites
 (require 'jf-writing)
 
-;; (use-package tree-sitter
-;;   ;; See https://github.com/emacs-tree-sitter/elisp-tree-sitter
-;;   :straight (tree-sitter :host github
-;; 			 :repo "emacs-tree-sitter/elisp-tree-sitter")
-;;   :config
-;;   (add-to-list 'tree-sitter-major-mode-language-alist '(ruby-mode . ruby))
-;;   :init (global-tree-sitter-mode)
-;;   (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
-
-;; (use-package tree-sitter-langs :straight t)
-
-(use-package treesit
-  :custom (treesit-font-lock-level 4)
-  :straight (:type  built-in))
-
-(use-package treesit-auto
-  :straight (:host github :repo "renzmann/treesit-auto")
-  :config (setq treesit-auto-install 'prompt)
+(use-package tree-sitter
+  ;; See https://github.com/emacs-tree-sitter/elisp-tree-sitter
+  :straight (tree-sitter :host github
+			 :repo "emacs-tree-sitter/elisp-tree-sitter")
   :config
-  (global-treesit-auto-mode))
+  (add-to-list 'tree-sitter-major-mode-language-alist '(ruby-mode . ruby))
+  :init (global-tree-sitter-mode)
+  (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
+
+(use-package tree-sitter-langs :straight t)
+
+;; (use-package treesit
+;;   :custom (treesit-font-lock-level 4)
+;;   :straight (:type  built-in))
+
+;; (use-package treesit-auto
+;;   :straight (:host github :repo "renzmann/treesit-auto")
+;;   :config (setq treesit-auto-install 'prompt)
+;;   :config
+;;   (global-treesit-auto-mode))
 
 ;;;; Other packages and their configurations
 (use-package bundler
@@ -144,7 +144,6 @@
   :straight t
   ;; Ensure that we’re loading ruby-mode before we do any rspec loading.
   :after ruby-mode
-  ;; :init (eval-after-load 'rspec-mode '(rspec-install-snippets))
   :custom
   (rspec-docker-container "web")
   (rspec-use-spring-when-possible t)
@@ -152,7 +151,8 @@
   (rspec-docker-cwd "./")
   (rspec-docker-command "docker compose exec")
   :hook ((dired-mode . rspec-dired-mode)
-	 (ruby-ts-mode . rspec-dired-mode))
+	 (ruby-mode . rspec-mode)
+	 (ruby-ts-mode . rspec-mode))
   :bind (:map rspec-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
   :bind (:map ruby-mode-map (("s-." . 'rspec-toggle-spec-and-target))))
 
