@@ -887,16 +887,19 @@ at the end of the file."
      (format "\n%s" code-snippet)
      (format "\n#+END_%s\n" type))))
 
-(bind-key "s-8" 'jf/org-mode/capture/insert-content)
-(cl-defun jf/org-mode/capture/insert-content (start end prefix)
-  "Capture the text between START and END.  When given PREFIX capture to clock."
+(bind-key "s-8" 'jf/org-mode/capture/insert-content-dwim)
+(cl-defun jf/org-mode/capture/insert-content-dwim (start end prefix)
+  "Capture the text between START and END.
+
+Without PREFIX and not clocking capture clock otherwise capture to Backlog."
   (interactive "r\np")
-  (let* ((capture-template (if (= 1 prefix) "c" "C"))
-	 (include-header (if (= 1 prefix) t nil))
+  (let* ((to-clock-p (and (= 1 prefix) (org-clocking-p)))
+	 (capture-template (if to-clock-p "C" "c"))
 	 ;; When we're capturing to clock, we don't want a header.
+	 (include-header (if to-clock-p nil t))
 	 (text (jf/org-mode/capture/get-content start end
-						  :include-header
-						  include-header)))
+						:include-header
+						include-header)))
     (org-capture-string text capture-template)))
 
 (provide 'jf-org-mode)
