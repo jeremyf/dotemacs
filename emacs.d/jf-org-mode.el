@@ -620,7 +620,7 @@ only the description"
   (interactive)
   (save-excursion
     (let* ((day-project-task
-	    (jf/org-agenda-get-day-and-project-and-task-at-point))
+	    (jf/org-agenda/timesheet/get-day-and-project-and-task-at-point))
            (from-project (plist-get day-project-task :project))
            (from-task (plist-get day-project-task :task)))
       ;; Narrowing the region to perform quicker queries on the element
