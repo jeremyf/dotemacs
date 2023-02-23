@@ -662,7 +662,7 @@ When given PREFIX_ARG, clear the org-roam database (via
       ;; Prompt for the todo state of the original task.
       (call-interactively 'org-todo))))
 
-(defun jf/org-agenda-get-day-and-project-and-task-at-point ()
+(defun jf/org-agenda/timesheet/get-day-and-project-and-task-at-point ()
   "Return a plist of :day, :project, and :task for element at point."
   (let* ((task (jf/org-agenda-task-at-point))
 	 (project (progn
