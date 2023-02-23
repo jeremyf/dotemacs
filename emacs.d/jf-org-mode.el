@@ -850,8 +850,44 @@ at the end of the file."
       (goto-char existing-position))))
 
 ;; With Heavy inspiration from http://www.howardism.org/Technical/Emacs/capturing-content.html
-(cl-defun jf/org-mode/capture/get-content (start end &key (include-header t))
-  "Get the text between START and END returning an `org-mode' formatted string."
+
+
+(defvar jf/org-mode/capture/template/default
+  (concat "\n**** ${function-name}"
+	  "\n:PROPERTIES:"
+	  "\n:CAPTURED_AT: ${captured-at}"
+	  "\n:REMOTE_URL: [[${remote-url}][${function-name}]]"
+	  "\n:LOCAL_FILE: [[file:${file-name}::${line-number}]]"
+	  "\n:FUNCTION_NAME: ${function-name}"
+	  "\n:END:\n"
+	  "\n#+BEGIN_${block-type} ${block-mode}"
+	  "\n${block-text}"
+	  "\n#+END_${block-type}"))
+
+(defvar jf/org-mode/capture/template/while-clocking
+  (concat "\n:PROPERTIES:"
+	  "\n:CAPTURED_AT: ${captured-at}"
+	  "\n:REMOTE_URL: [[${remote-url}][${function-name}]]"
+	  "\n:LOCAL_FILE: [[file:${file-name}::${line-number}]]"
+	  "\n:FUNCTION_NAME: ${function-name}"
+	  "\n:END:\n"
+	  "\n#+BEGIN_${block-type} ${block-mode}"
+	  "\n${block-text}"
+	  "\n#+END_${block-type}"))
+
+(cl-defun jf/org-mode/capture/get-field-values (start end)
+  "Get the text between START and END returning a fields and values.
+
+The return value is a list of `cons' with the `car' values of:
+
+- function-name
+- captured-at
+- remote-url
+- file-name
+- line-number
+- block-type
+- block-mode
+- block-text"
   (require 'magit)
   (require 'git-link)
   (let* ((file-name (buffer-file-name (current-buffer)))
@@ -873,19 +909,14 @@ at the end of the file."
 			(progn
 			  (call-interactively 'git-link)
 			  (car kill-ring)))))
-    (concat
-     (when include-header
-       (format "\n**** %s" (or func-name
-			       (format-time-string "%Y-%m-%d %H:%M:%S"))))
-     "\n:PROPERTIES:"
-     (format "\n:CAPTURED_AT: %s" (format-time-string "%Y-%m-%d %H:%M:%S"))
-     (format "\n:REMOTE_URL: [[%s]]" remote-link)
-     (format "\n:LOCAL_FILE: [[file:%s::%s]]" file-name line-number)
-     (when func-name (format "\n:FUNCTION_NAME: %s" func-name))
-     "\n:END:\n"
-     (format "\n#+BEGIN_%s %s" type org-src-mode)
-     (format "\n%s" code-snippet)
-     (format "\n#+END_%s\n" type))))
+    `(("function-name" . ,(or func-name "Unknown"))
+      ("captured-at" . ,(format-time-string "%Y-%m-%d %H:%M"))
+      ("remote-url" . ,remote-link)
+      ("file-name" . ,file-name)
+      ("line-number" . ,line-number)
+      ("block-type" . ,type)
+      ("block-mode" . ,org-src-mode)
+      ("block-text" . , code-snippet))))
 
 (bind-key "s-8" 'jf/org-mode/capture/insert-content-dwim)
 (cl-defun jf/org-mode/capture/insert-content-dwim (start end prefix)
@@ -893,14 +924,16 @@ at the end of the file."
 
 Without PREFIX and not clocking capture clock otherwise capture to Backlog."
   (interactive "r\np")
+  ;; There is a data structure looking to exist.  That structure is:
+  ;; template
   (let* ((to-clock-p (and (= 1 prefix) (org-clocking-p)))
-	 (capture-template (if to-clock-p "C" "c"))
-	 ;; When we're capturing to clock, we don't want a header.
-	 (include-header (if to-clock-p nil t))
-	 (text (jf/org-mode/capture/get-content start end
-						:include-header
-						include-header)))
-    (org-capture-string text capture-template)))
+	 (org-capture-key (if to-clock-p "C" "c"))
+	 (text (s-format (if to-clock-p
+			     jf/org-mode/capture/template/while-clocking
+			   jf/org-mode/capture/template/default)
+			 'aget
+			 (jf/org-mode/capture/get-field-values start end))))
+    (org-capture-string text org-capture-key)))
 
 (provide 'jf-org-mode)
 ;;; jf-org-mode.el ends here
