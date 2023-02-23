@@ -602,21 +602,21 @@ only the description"
 	    (delete-region link-begin link-end)
 	    (insert (concat content " "))))))))
 
-(defun jf/force-org-rebuild-cache (prefix-arg)
-  "Call functions to rebuild the applicable `org-mode' and `org-roam' cache(s).
+;; (defun jf/force-org-rebuild-cache (prefix-arg)
+;;   "Call functions to rebuild the applicable `org-mode' and `org-roam' cache(s).
 
-When given PREFIX_ARG, clear the org-roam database (via
- `org-roam-db-clear-all') then sync.  This will slow down the sync."
-  (interactive "P")
-  (org-id-update-id-locations)
-  (when (fboundp 'org-roam-db-clear-all)
-    (progn
-      (when (car prefix-arg) (org-roam-db-clear-all))
-      (org-roam-db-sync)
-      (org-roam-update-org-id-locations))))
+;; When given PREFIX_ARG, clear the org-roam database (via
+;;  `org-roam-db-clear-all') then sync.  This will slow down the sync."
+;;   (interactive "P")
+;;   (org-id-update-id-locations)
+;;   (when (fboundp 'org-roam-db-clear-all)
+;;     (progn
+;;       (when (car prefix-arg) (org-roam-db-clear-all))
+;;       (org-roam-db-sync)
+;;       (org-roam-update-org-id-locations))))
 
-(cl-defun jf/org-agenda-carry-forward-task ()
-  "Carry an `org-mode' task node forward."
+(cl-defun jf/org-agenda-send-forward-task ()
+  "Send an `org-mode' task node forward."
   (interactive)
   (save-excursion
     (let* ((day-project-task
