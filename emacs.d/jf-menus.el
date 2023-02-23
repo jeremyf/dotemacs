@@ -42,7 +42,7 @@
    ;;  ]
    ["Jump to"
     ("j a" "Agenda" jf/jump-to-agenda-or-mark)
-    ("j b" "iBuffer" ibuffer)
+    ("j c" "Capture Backlog" (lambda () (interactive) (find-file jf/org-mode/capture/filename)))
     ("j g" "Global Mark" consult-global-mark)
     ("j h" "Hugo File" jf/jump_to_corresponding_hugo_file :if-derived org-mode)
     ("j m" "Mark" consult-mark)
