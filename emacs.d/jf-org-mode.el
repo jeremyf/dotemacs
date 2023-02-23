@@ -688,21 +688,6 @@ only the description"
         (org-back-to-heading)
         (jf/org-agenda-task-at-point)))))
 
-(defun jf/org-agenda-task-at-point ()
-  "Find the `org-mode' task at point."
-  (let ((element (org-element-at-point)))
-    (if (eq 'headline (org-element-type element))
-        (pcase (org-element-property :level element)
-          (1 (error "Selected element is a year"))
-          (2 (error "Selected element is a month"))
-          (3 (error "Selected element is a day"))
-          (4 (error "Selected element is a project"))
-          (5 (progn (message "Found %s" element) element))
-          (_ (progn (org-up-heading-safe) (jf/org-agenda-task-at-point))))
-      (progn
-        (org-back-to-heading)
-        (jf/org-agenda-task-at-point)))))
-
 (use-package htmlize
   :straight t
   :bind ("C-M-s-c" . jf/formatted-copy-org-to-html)
@@ -918,6 +903,15 @@ The return value is a list of `cons' with the `car' values of:
       ("block-mode" . ,org-src-mode)
       ("block-text" . , code-snippet))))
 
+(defun jf/org-mode/capture/parameters (prefix)
+  "A logic lookup table by prefix."
+  (cond
+   ;; When we're clocking and no prefix is given...
+   ((and (= 1 prefix) (org-clocking-p))
+    (list :key "C" :template jf/org-mode/capture/template/while-clocking))
+   ;; We're not clocking or we provided a prefix.
+   (t (list :key "c" :template jf/org-mode/capture/template/default))))
+
 (bind-key "s-8" 'jf/org-mode/capture/insert-content-dwim)
 (cl-defun jf/org-mode/capture/insert-content-dwim (start end prefix)
   "Capture the text between START and END.
@@ -925,15 +919,14 @@ The return value is a list of `cons' with the `car' values of:
 Without PREFIX and not clocking capture clock otherwise capture to Backlog."
   (interactive "r\np")
   ;; There is a data structure looking to exist.  That structure is:
-  ;; template
-  (let* ((to-clock-p (and (= 1 prefix) (org-clocking-p)))
-	 (org-capture-key (if to-clock-p "C" "c"))
-	 (text (s-format (if to-clock-p
-			     jf/org-mode/capture/template/while-clocking
-			   jf/org-mode/capture/template/default)
+  ;;
+  ;; - org-capture-key (default "c")
+  ;; - template jf/org-mode/capture/template/default
+  (let ((params (jf/org-mode/capture/parameters prefix)))
+    (org-capture-string (s-format (plist-get params :template)
 			 'aget
-			 (jf/org-mode/capture/get-field-values start end))))
-    (org-capture-string text org-capture-key)))
+			 (jf/org-mode/capture/get-field-values start end))
+			(plist-get params :key))))
 
 (provide 'jf-org-mode)
 ;;; jf-org-mode.el ends here
