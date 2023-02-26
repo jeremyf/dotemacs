@@ -934,7 +934,7 @@ Without PREFIX and not clocking capture clock otherwise capture to Backlog."
   "Capture TEXT to current file.
 
 I envision this function called from the command-line."
-  (if (org-clocking-p)
+  (if (and (fboundp 'org-clocking-p) (org-clocking-p))
       (org-capture-string text "I")
     (with-current-buffer (window-buffer)
       (goto-char (point-max))
