@@ -24,6 +24,10 @@
 ;;       (kill-buffer (s-replace marker "" candidate))
 ;;       (vertico-next))))
 
+;; https://github.com/abo-abo/org-download
+(use-package org-download
+  :straight t
+  :hook (dired-mode . org-download-enable))
 
 (provide 'jf-experiments)
 ;;; jf-experiments.el ends here

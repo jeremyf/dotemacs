@@ -43,6 +43,19 @@ CONTENTS is nil.  INFO is a plist holding contextual information."
 		    'md t '(:with-toc nil)))))
     (format "{{< sidenote >}}%s{{< /sidenote >}}" content)))
 
+
+;; In this function, I'm looking for exporting a "subtitle" while also
+;; preserving imenu functionality.  At present, if I don't have a level 1 heading,
+;; I don't get much of an imenu list.
+(defun jf/org-md--headline-title (md-fn style level title &optional anchor tags)
+  (if (and jf/exporting-org-to-tor (= 1 level))
+      (concat "\n#+subtitle: " title "\n\n")
+    (apply md-fn style level title anchor tags)))
+
+;; (advice-add #'org-md--headline-title
+;; 	    :around #'jf/org-md--headline-title
+;; 	    '((name . "wrapper")))
+
 (advice-add #'org-blackfriday-footnote-reference
 	    :override #'jf/org-hugo-sidenote
 	    '((name . "wrapper")))
