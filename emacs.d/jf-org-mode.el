@@ -131,6 +131,10 @@
 	   :empty-lines 1
 	   :time-prompt t
 	   :immediate-finish t)
+	  ("I" "Immediate to Clock"
+	   plain (clock)
+	   "%i%?"
+	   :immediate-finish t)
 	  ("m" "Merge Request"
 	   plain (file+function
 		  jf/primary-agenda-filename-for-machine
@@ -768,9 +772,9 @@ When given the PREFIX arg, paste the content into TextEdit (for future copy)."
     (cond
      ((string= mode "New")
       (let ((example (read-string "New Example Name: "
-				   nil
-				   nil
-				   (format-time-string "%Y-%m-%d %H:%M:%S"))))
+				  nil
+				  nil
+				  (format-time-string "%Y-%m-%d %H:%M:%S"))))
 	(with-current-buffer (find-file-noselect
 			      jf/org-mode/capture/filename)
 	  (jf/org-mode/capture/set-position-file :headline nil
@@ -824,19 +828,17 @@ at the end of the file."
 					       (org-element-property :tags hl))
 				       (if headline
 					   (string= headline
-						(plist-get
-						 (cadr
-						  (car
-						   (org-element-lineage hl)))
-						 :raw-value))
+						    (plist-get
+						     (cadr
+						      (car
+						       (org-element-lineage hl)))
+						     :raw-value))
 					 t)
 				       (org-element-property :end hl)))
 				nil t)))
       (goto-char existing-position))))
 
 ;; With Heavy inspiration from http://www.howardism.org/Technical/Emacs/capturing-content.html
-
-
 (defvar jf/org-mode/capture/template/default
   (concat "\n**** ${function-name}"
 	  "\n:PROPERTIES:"
@@ -924,9 +926,19 @@ Without PREFIX and not clocking capture clock otherwise capture to Backlog."
   ;; - template jf/org-mode/capture/template/default
   (let ((params (jf/org-mode/capture/parameters prefix)))
     (org-capture-string (s-format (plist-get params :template)
-			 'aget
-			 (jf/org-mode/capture/get-field-values start end))
+				  'aget
+				  (jf/org-mode/capture/get-field-values start end))
 			(plist-get params :key))))
+
+(defun jf/capture/text-from-stdin (text)
+  "Capture TEXT to current file.
+
+I envision this function called from the command-line."
+  (if (org-clocking-p)
+      (org-capture-string text "I")
+    (with-current-buffer (window-buffer)
+      (goto-char (point-max))
+      (insert "\n" text))))
 
 (provide 'jf-org-mode)
 ;;; jf-org-mode.el ends here
