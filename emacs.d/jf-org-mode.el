@@ -1,4 +1,4 @@
-;;; jf-org-mode.el --- Org-Mode configuratoino -*- lexical-binding: t -*-
+;;; jf-org-mode.el --- Org-Mode configuration -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2022  Jeremy Friesen
 ;; Author: Jeremy Friesen <jeremy@jeremyfriesen.com>
