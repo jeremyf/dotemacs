@@ -10,10 +10,38 @@
 
 (require 'modus-themes)
 
+;; The options that I'm considering are from the modus color palette:
+;;
+;; bg-red-intense
+;; bg-green-intense
+;; bg-yellow-intense
+;; bg-blue-intense
+;; bg-magenta-intense
+;; bg-cyan-intense
+;; bg-red-subtle
+;; bg-green-subtle
+;; bg-yellow-subtle
+;; bg-blue-subtle
+;; bg-magenta-subtle
+;; bg-cyan-subtle
+;; bg-red-nuanced
+;; bg-green-nuanced
+;; bg-yellow-nuanced
+;; bg-blue-nuanced
+;; bg-magenta-nuanced
+;; bg-cyan-nuanced
+;; bg-ochre
+;; bg-lavender
+;; bg-sage
 (defvar jf/project/theme-colors/table
-  '(("~/git/dotemacs/" . bg-green-nuanced)
+  '(("~/git/dotemacs/" . bg-green-subtle)
     ("~/git/dotzshrc/" . bg-green-nuanced)
-    ("~/git/takeonrules.source/" . bg-magenta-nuanced))
+    ("~/git/takeonrules.source/" . bg-magenta-subtle)
+    ("~/git/org/" . bg-sage)
+    ("~/git/britishlibrary/" . bg-blue-intense)
+    ("~/git/adventist-dl/" . bg-yellow-intense)
+    ("~/git/utk-hyku/" . bg-red-intense)
+    ("~/git/bulkrax/" . bg-sage))
   "The `car' of each list item should be of begin with \"~/\" and
  end with \"/\" (so as to conform to multiple machines and
  projectile's interface.")
