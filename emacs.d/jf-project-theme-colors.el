@@ -6,10 +6,6 @@
 ;; This file is NOT part of GNU Emacs.
 ;;; Commentary
 
-;;; Code
-
-(require 'modus-themes)
-
 ;; The options that I'm considering are from the modus color palette:
 ;;
 ;; bg-red-intense
@@ -33,6 +29,9 @@
 ;; bg-ochre
 ;; bg-lavender
 ;; bg-sage
+
+;;; Code
+(require 'modus-themes)
 (defvar jf/project/theme-colors/table
   '(("~/git/dotemacs/" . bg-green-subtle)
     ("~/git/dotzshrc/" . bg-green-nuanced)
