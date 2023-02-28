@@ -129,22 +129,6 @@
 	  (6 . (rainbow 1.15))
 	  (t . (rainbow 1.1)))))
 
-(setq mode-line-bg-color-name 'bg-blue-subtle)
-(defun jf/mode-line/set-active-mode-line-colors ()
-  (unless (active-minibuffer-window)
-    (progn
-      (face-remap-add-relative
-     'mode-line-active
-     `( :background ,(modus-themes-get-color-value mode-line-bg-color-name)
-	:foreground ,(face-attribute 'default :foreground))))))
-
-(add-hook 'buffer-list-update-hook #'jf/mode-line/set-active-mode-line-colors)
-(add-hook 'projectile-after-switch-project-hook #'jf/mode-line/set-active-mode-line-colors)
-
-(defun jf/term-color-for-directory (directory)
-  (with-current-buffer (find-file-noselect directory)
-    (modus-themes-get-color-value mode-line-bg-color-name)))
-
 (load-theme 'modus-vivendi-tinted t t)
 (load-theme 'modus-operandi-tinted t t)
 (defun jf/dark ()

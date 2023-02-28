@@ -19,6 +19,7 @@
 (require 'jf-navigating)
 (require 'jf-fonts-and-iconography)
 (require 'jf-windows)
+(require 'jf-project-theme-colors)
 (require 'jf-utility)
 (require 'jf-completing)
 (require 'jf-coding)
