@@ -33,11 +33,15 @@
        `( :background ,(jf/project/theme-colors/current)
 	  :foreground ,(face-attribute 'default :foreground))))))
 
-(add-hook 'buffer-list-update-hook
-	  #'jf/mode-line/set-active-mode-line-colors)
-
-(add-hook 'projectile-after-switch-project-hook
-	  #'jf/mode-line/set-active-mode-line-colors)
+;; I need to ensure that I'm not doing this while Emacs is initializing.  If I
+;; don't have the 'after-init-hook I experience significant drag/failure to
+;; initialize.
+(add-hook 'after-init-hook
+	  (lambda ()
+	    (add-hook 'buffer-list-update-hook
+		      #'jf/mode-line/set-active-mode-line-colors)
+	    (add-hook 'projectile-after-switch-project-hook
+		      #'jf/mode-line/set-active-mode-line-colors)))
 
 
 (provide 'jf-project-theme-colors)
