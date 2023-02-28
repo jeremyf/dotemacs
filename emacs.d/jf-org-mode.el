@@ -175,6 +175,8 @@
 					 (plantuml . t)
 					 (ruby . t))))
   (add-to-list 'org-structure-template-alist '("m" . "marginnote"))
+  (add-to-list 'org-structure-template-alist '("D" . "details"))
+  (add-to-list 'org-structure-template-alist '("S" . "summary"))
   (add-to-list 'org-structure-template-alist '("i" . "inline_comments"))
   :init
   (require 'ox)

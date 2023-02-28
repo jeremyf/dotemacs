@@ -32,6 +32,7 @@
 
 ;;; Code
 (require 'modus-themes)
+(require 'projectile)
 (defvar jf/project/theme-colors/table
   '(("~/git/dotemacs/" . bg-green-subtle)
     ("~/git/dotzshrc/" . bg-green-nuanced)
