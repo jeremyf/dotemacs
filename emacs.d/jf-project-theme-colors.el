@@ -46,14 +46,18 @@
  end with \"/\" (so as to conform to multiple machines and
  projectile's interface.")
 
-(defun jf/project/theme-colors/current ()
+(cl-defun jf/project/theme-colors/current (&key (default 'bg-blue-subtle))
+  "Returns a HEX color (e.g. \"#CCDDEE\") for the given project.
+
+The DEFAULT is a named color in the `modus-themes' palette."
   (let* ((project-dir (abbreviate-file-name (projectile-project-root)))
 	 (name (alist-get project-dir
 			  jf/project/theme-colors/table
-			  'bg-blue-subtle nil #'string=)))
+			  default nil #'string=)))
 	 (modus-themes-get-color-value name)))
 
-(defun jf/mode-line/set-active-mode-line-colors ()
+(defun jf/project/theme-colors/apply-to-buffer ()
+  "Apply the the project's colors to the buffer (e.g. 'mode-line-active)"
   (unless (active-minibuffer-window)
     (progn
       (face-remap-add-relative
@@ -67,9 +71,9 @@
 (add-hook 'after-init-hook
 	  (lambda ()
 	    (add-hook 'buffer-list-update-hook
-		      #'jf/mode-line/set-active-mode-line-colors)
+		      #'jf/project/theme-colors/apply-to-buffer)
 	    (add-hook 'projectile-after-switch-project-hook
-		      #'jf/mode-line/set-active-mode-line-colors)))
+		      #'jf/project/theme-colors/apply-to-buffer)))
 
 
 (provide 'jf-project-theme-colors)
