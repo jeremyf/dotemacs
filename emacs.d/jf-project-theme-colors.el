@@ -57,13 +57,12 @@ The DEFAULT is a named color in the `modus-themes' palette."
 	 (modus-themes-get-color-value name)))
 
 (defun jf/project/theme-colors/apply-to-buffer ()
-  "Apply the the project's colors to the buffer (e.g. 'mode-line-active)"
+  "Apply the the project's colors to the buffer (e.g. 'mode-line-active)."
   (unless (active-minibuffer-window)
-    (progn
-      (face-remap-add-relative
-       'mode-line-active
-       `( :background ,(jf/project/theme-colors/current)
-	  :foreground ,(face-attribute 'default :foreground))))))
+    (face-remap-add-relative
+     'mode-line-active
+     `( :background ,(jf/project/theme-colors/current)
+	:foreground ,(face-attribute 'default :foreground)))))
 
 ;; I need to ensure that I'm not doing this while Emacs is initializing.  If I
 ;; don't have the 'after-init-hook I experience significant drag/failure to
