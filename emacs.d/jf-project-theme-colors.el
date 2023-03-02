@@ -56,24 +56,31 @@ The DEFAULT is a named color in the `modus-themes' palette."
 			  default nil #'string=)))
 	 (modus-themes-get-color-value name)))
 
+(defvar jf/project/theme-colors/faces
+  (list 'line-number-current-line 'mode-line-active)
+  "The faces to update with the theme-colors.")
+
+(defvar jf/project/theme-colors/hooks
+  (list 'buffer-list-update-hook
+	'projectile-after-switch-project-hook)
+  "The hooks to call to set the theme colors.")
+
 (defun jf/project/theme-colors/apply-to-buffer ()
   "Apply the the project's colors to the buffer (e.g. 'mode-line-active)."
   (unless (active-minibuffer-window)
-    (face-remap-add-relative
-     'mode-line-active
-     `( :background ,(jf/project/theme-colors/current)
-	:foreground ,(face-attribute 'default :foreground)))))
+    (dolist (element jf/project/theme-colors/faces)
+      (face-remap-add-relative
+       element
+       `( :background ,(jf/project/theme-colors/current)
+	  :foreground ,(face-attribute 'default :foreground))))))
 
 ;; I need to ensure that I'm not doing this while Emacs is initializing.  If I
 ;; don't have the 'after-init-hook I experience significant drag/failure to
 ;; initialize.
 (add-hook 'after-init-hook
 	  (lambda ()
-	    (add-hook 'buffer-list-update-hook
-		      #'jf/project/theme-colors/apply-to-buffer)
-	    (add-hook 'projectile-after-switch-project-hook
-		      #'jf/project/theme-colors/apply-to-buffer)))
-
+	    (dolist (hook jf/project/theme-colors/hooks)
+	      (add-hook hook #'jf/project/theme-colors/apply-to-buffer))))
 
 (provide 'jf-project-theme-colors)
 ;;; jf-project-theme-colors.el ends here
