@@ -218,10 +218,10 @@
 	      default-directory
 	    (buffer-file-name)))
 	 (options '(("Filename, Basename" . (lambda (f) (file-name-nondirectory f)))
-		    ("Filename, Relative" . (lambda (f) (concat "./" (file-relative-name f (projectile-project-root)))))
+		    ("Filename, Project Relative" . (lambda (f) (concat "./" (file-relative-name f (projectile-project-root)))))
 		    ("Filename, Full" . (lambda (f) (f)))
 		    ("Dirname" . (lambda (f) (file-name-directory f)))
-		    ("Dirname, Relative" . (lambda (f) (concat "./" (file-relative-name (file-name-directory f) (projectile-project-root)))))))
+		    ("Dirname, Project Relative" . (lambda (f) (concat "./" (file-relative-name (file-name-directory f) (projectile-project-root)))))))
          (filename
 	  (if prefix
 	      (funcall (alist-get (completing-read "Option: " options nil t)
