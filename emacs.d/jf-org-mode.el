@@ -57,7 +57,8 @@
   ;;
   ;; (org-mode . org-indent-mode)
   :bind ("C-c C-j" . jf/jump-to-agenda-or-mark)
-  :bind (:map org-mode-map ("C-c C-j" . jf/jump-to-agenda-or-mark))
+  :bind (:map org-mode-map (("C-c C-j" . jf/jump-to-agenda-or-mark)
+			    ("C-j" . avy-goto-char-2)))
   :custom (org-use-speed-commands t)
   (org-time-stamp-rounding-minutes '(0 15))
   (org-clock-rounding-minutes 15)
@@ -292,7 +293,7 @@
 
 ;; I work on several different projects each day; helping folks get unstuck.  I
 ;; also need to track and record my time.
-(bind-key "C-j" 'jf/jump-to-agenda-or-mark)
+(bind-key "C-c C-j" 'jf/jump-to-agenda-or-mark)
 (cl-defun jf/jump-to-agenda-or-mark (prefix-arg)
   "Jump to and from current agenda item to mark.
 
