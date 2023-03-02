@@ -56,8 +56,8 @@
   ;; to have that work better by default.
   ;;
   ;; (org-mode . org-indent-mode)
-  :bind ("C-j" . jf/jump-to-agenda-or-mark)
-  :bind (:map org-mode-map ("C-j" . jf/jump-to-agenda-or-mark))
+  :bind ("C-c C-j" . jf/jump-to-agenda-or-mark)
+  :bind (:map org-mode-map ("C-c C-j" . jf/jump-to-agenda-or-mark))
   :custom (org-use-speed-commands t)
   (org-time-stamp-rounding-minutes '(0 15))
   (org-clock-rounding-minutes 15)
