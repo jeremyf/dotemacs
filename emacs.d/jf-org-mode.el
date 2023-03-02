@@ -79,6 +79,7 @@
 	org-use-fast-todo-selection 'expert
 	org-log-into-drawer t
 	org-imenu-depth 3
+	org-hide-emphasis-markers t
 	org-export-with-sub-superscripts nil
 	org-agenda-log-mode-items '(clock)
 	org-directory (file-truename "~/git/org")
@@ -558,6 +559,10 @@ language name.")
 	   ;; gives a clearer indicator of the depth of the outline.
 	   (org-modern-hide-stars nil))
   :config (global-org-modern-mode))
+
+(use-package org-appear
+  :straight (:type git :host github :repo "awth13/org-appear")
+  :hook (org-mode . org-appear-mode))
 
 ;;; Org Export and Composition Functionality
 
