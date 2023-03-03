@@ -71,8 +71,7 @@
 	     denote-file-prompt
 	     denote--title-prompt
 	     denote-get-path-by-id)
-  :bind ("H-f" . 'jf/denote-find-file)
-  ("H-l" . 'jf/denote-link-or-create)
+  :bind ("H-l" . 'jf/denote-link-or-create)
   ("H-i" . 'jf/denote-link-or-create)
   :hook (dired-mode . denote-dired-mode)
   :init
@@ -116,7 +115,7 @@
   :after (consult denote)
   :bind
   ("H-d s" . 'consult-notes-search-in-all-notes)
-  ("H-d f RET" . 'consult-notes)
+  ("H-f" . 'consult-notes)
   ;; Ensuring that I search my denote/scientist sub-directory, which is
   ;; excluded from it's containing project's git repository.
   :custom (consult-notes-ripgrep-args
