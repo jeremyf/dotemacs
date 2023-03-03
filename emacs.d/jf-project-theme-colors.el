@@ -50,7 +50,8 @@
   "Returns a HEX color (e.g. \"#CCDDEE\") for the given project.
 
 The DEFAULT is a named color in the `modus-themes' palette."
-  (let* ((project-dir (abbreviate-file-name (projectile-project-root)))
+
+  (let* ((project-dir (abbreviate-file-name (or (projectile-project-root) "~/")))
 	 (name (alist-get project-dir
 			  jf/project/theme-colors/table
 			  default nil #'string=)))
