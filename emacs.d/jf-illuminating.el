@@ -159,5 +159,9 @@
 
 (use-package yafolding :straight t)
 
+;; https://github.com/tarsius/keycast
+(use-package keycast
+  :straight t)
+
 (provide 'jf-illuminating)
 ;;; jf-illuminating.el ends here
