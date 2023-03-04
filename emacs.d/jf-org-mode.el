@@ -81,6 +81,9 @@
 	org-log-into-drawer t
 	org-imenu-depth 3
 	org-hide-emphasis-markers t
+	;; turning off org-elements cache speeds up input latency
+	;; See https://www.reddit.com/r/emacs/comments/11ey9ft/weekly_tips_tricks_c_thread/
+	org-element-use-cache nil
 	org-export-with-sub-superscripts nil
 	org-agenda-log-mode-items '(clock)
 	org-directory (file-truename "~/git/org")

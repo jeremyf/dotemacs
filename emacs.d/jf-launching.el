@@ -134,7 +134,8 @@
 
  ;; split-width-threshold nil ;; 160 * 8
 
- ;; split-height-threshold nil ;; 160 * 8
+ ;; https://github.com/maryrosecook/emacs/blob/6ef574e27f33f08a81b26970b5fb9b4c9c1f9eff/init.el#L745
+ split-height-threshold 99999999999999999 ;; make emacs only add vertical split panes
 
  vc-follow-symlinks t        ;; Follow symlinks instead of prompting.
 
