@@ -51,17 +51,13 @@
     (editorconfig-mode 1))
 
 (use-package eglot
-  :hook ((css-mode
-	  css-ts-mode
-          ruby-mode
-	  ruby-ts-mode
-          yaml-mode
-	  yaml-ts-mode
-          html-mode
-	  html-ts-mode
-          js-mode
-	  js-ts-mode
-          scss-mode) . eglot-ensure)
+  :hook ((css-mode css-ts-mode
+          ruby-mode ruby-ts-mode
+          yaml-mode yaml-ts-mode
+          html-mode html-ts-mode
+          js-mode js-ts-mode
+          scss-mode scss-ts-mode)
+	 . eglot-ensure)
   :hook (eglot-managed-mode . jf/eglot-capf)
   :config
   (setq eglot-ignored-server-capabilites (quote (:documentHighlightProvider))
@@ -100,7 +96,7 @@
 
 (use-package ruby-mode
   :straight (:type built-in)
-  :hook ((ruby-mode ruby-ts-mode) . (lambda () (setq fill-column 100))))
+  :hook ((ruby-mode ruby-ts-mode) . (lambda () (setq fill-column 80))))
 
 (use-package go-mode :straight t)
 
@@ -188,6 +184,10 @@
   :straight t
   :hook ((ruby-mode . yard-mode)
 	 (ruby-ts-mode . yard-mode)))
+
+;; Download and install documents from https://devdocs.io/
+(use-package devdocs
+  :straight t)
 
 (provide 'jf-coding)
 ;;; jf-coding.el ends here

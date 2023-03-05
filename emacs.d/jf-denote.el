@@ -112,7 +112,7 @@
   ;;search all files and start with a character (e.g. =b=) followed by <space> to
   ;;filter to the note source keyed as =s= (e.g. Scientist).
   :straight (:type git :host github :repo "mclear-tools/consult-notes")
-  :after (consult denote)
+  ;; :after (consult denote)
   :bind
   ("H-d s" . 'consult-notes-search-in-all-notes)
   ("H-f" . 'consult-notes)

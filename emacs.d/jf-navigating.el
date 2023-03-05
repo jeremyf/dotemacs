@@ -36,31 +36,29 @@
   ("C-c l c" . link-hint-copy-link))
 
 ;;;; Custom Functions
-(global-set-key (kbd "M-n") 'jf/scroll-down-half-page)
-(defun jf/scroll-down-half-page ()
-  "Scroll down half a page while keeping the cursor centered"
-  ;; See https://www.reddit.com/r/emacs/comments/r7l3ar/how_do_you_scroll_half_a_page/
-  (interactive)
-  (let ((ln (line-number-at-pos (point)))
-        (lmax (line-number-at-pos (point-max))))
-    (cond ((= ln 1) (move-to-window-line nil))
-          ((= ln lmax) (recenter (window-end)))
-          (t (progn
-               (move-to-window-line -1)
-               (recenter))))))
+;; (defun jf/scroll-down-half-page ()
+;;   "Scroll down half a page while keeping the cursor centered"
+;;   ;; See https://www.reddit.com/r/emacs/comments/r7l3ar/how_do_you_scroll_half_a_page/
+;;   (interactive)
+;;   (let ((ln (line-number-at-pos (point)))
+;;         (lmax (line-number-at-pos (point-max))))
+;;     (cond ((= ln 1) (move-to-window-line nil))
+;;           ((= ln lmax) (recenter (window-end)))
+;;           (t (progn
+;;                (move-to-window-line -1)
+;;                (recenter))))))
 
-(global-set-key (kbd "M-p") 'jf/scroll-up-half-page)
-(defun jf/scroll-up-half-page ()
-  "Scroll up half a page while keeping the cursor centered"
-  ;; See https://www.reddit.com/r/emacs/comments/r7l3ar/how_do_you_scroll_half_a_page/
-  (interactive)
-  (let ((ln (line-number-at-pos (point)))
-        (lmax (line-number-at-pos (point-max))))
-    (cond ((= ln 1) nil)
-          ((= ln lmax) (move-to-window-line nil))
-          (t (progn
-               (move-to-window-line 0)
-               (recenter))))))
+;; (defun jf/scroll-up-half-page ()
+;;   "Scroll up half a page while keeping the cursor centered"
+;;   ;; See https://www.reddit.com/r/emacs/comments/r7l3ar/how_do_you_scroll_half_a_page/
+;;   (interactive)
+;;   (let ((ln (line-number-at-pos (point)))
+;;         (lmax (line-number-at-pos (point-max))))
+;;     (cond ((= ln 1) nil)
+;;           ((= ln lmax) (move-to-window-line nil))
+;;           (t (progn
+;;                (move-to-window-line 0)
+;;                (recenter))))))
 
 (provide 'jf-navigating)
 ;;; jf-navigating.el ends here
