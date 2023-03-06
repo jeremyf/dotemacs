@@ -24,10 +24,9 @@
     (define-key map [remap narrow-to-region] #'logos-narrow-dwim)
     (define-key map [remap forward-page] #'logos-forward-page-dwim)
     (define-key map [remap backward-page] #'logos-backward-page-dwim))
-  ;; This is not the correct map; but it’s close to what I want.
-  (let ((map logos-focus-mode-map))
-    (define-key map [remap next-line] #'logos-forward-page-dwim)
-    (define-key map [remap previous-line] #'logos-backward-page-dwim))
+  ;; (let ((map logos-focus-mode-map))
+  ;;   (define-key map [remap next-line] #'logos-forward-page-dwim)
+  ;;   (define-key map [remap previous-line] #'logos-backward-page-dwim))
   (setq logos-outlines-are-pages t)
   (setq-default logos-hide-cursor t
 		logos-hide-mode-line t

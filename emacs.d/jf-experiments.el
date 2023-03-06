@@ -29,5 +29,18 @@
   :straight t
   :hook (dired-mode . org-download-enable))
 
+(use-package parsebib
+  :straight t)
+
+(use-package ebib
+  :straight t)
+
+(use-package citar
+  :custom (citar-bibliography '("~/git/org/bibliography.bib"))
+  :straight t)
+
+(use-package citar-denote
+  :straight t)
+
 (provide 'jf-experiments)
 ;;; jf-experiments.el ends here
