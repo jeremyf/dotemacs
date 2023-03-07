@@ -187,7 +187,9 @@
 
 ;; Download and install documents from https://devdocs.io/
 (use-package devdocs
-  :straight t)
+  :straight t
+  :commands (devdocs-install))
+
 
 (provide 'jf-coding)
 ;;; jf-coding.el ends here
