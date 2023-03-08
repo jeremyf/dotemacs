@@ -178,6 +178,10 @@
   (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
   (add-to-list `auto-mode-alist '("\\.svg\\'" . xml-mode)))
 
+(use-package xml-format
+  :straight t
+  :after nxml-mode)
+
 (use-package yaml-mode :straight t)
 
 (use-package yard-mode
