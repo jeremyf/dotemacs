@@ -152,6 +152,15 @@
   :bind (:map rspec-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
   :bind (:map ruby-mode-map (("s-." . 'rspec-toggle-spec-and-target))))
 
+(defun jf/rspec-spring-p ()
+  "Check the project for spring as part of the Gemfile.lock."
+  (let ((gemfile-lock (f-join (projectile-project-root) "Gemfile.lock")))
+    (and (f-exists? gemfile-lock)
+	 (s-present?
+	  (shell-command-to-string
+	   (concat "rg \"^ +spring \" " gemfile-lock))))))
+
+(advice-add #'rspec-spring-p :override #'jf/rspec-spring-p)
 
 (use-package ruby-interpolation
   ;; Nice and simple package for string interpolation.
