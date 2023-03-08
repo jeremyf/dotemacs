@@ -96,7 +96,7 @@
 
 (use-package ruby-mode
   :straight (:type built-in)
-  :hook ((ruby-mode ruby-ts-mode) . (lambda () (setq fill-column 80))))
+  :hook ((ruby-mode ruby-ts-mode) . (lambda () (setq fill-column 100))))
 
 (use-package go-mode :straight t)
 
