@@ -920,7 +920,7 @@ The return value is a list of `cons' with the `car' values of:
   "A logic lookup table by prefix."
   (cond
    ;; When we're clocking and no prefix is given...
-   ((and (= 1 prefix) (org-clocking-p))
+   ((and (= 1 prefix) (fboundp 'org-clocking-p) (org-clocking-p))
     (list :key "C" :template jf/org-mode/capture/template/while-clocking))
    ;; We're not clocking or we provided a prefix.
    (t (list :key "c" :template jf/org-mode/capture/template/default))))
