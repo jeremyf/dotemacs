@@ -92,10 +92,13 @@
 (defun jf/modus-themes-custom-faces ()
   (modus-themes-with-colors
     (custom-set-faces
-     `(font-lock-misc-punctuation-face ((,c :foreground ,green-warmer)))
-     `(font-lock-regexp-face ((,c :foreground ,red-cooler))))))
+     `(font-lock-misc-punctuation-face
+       ((,c :foreground ,green-warmer)))
+     `(font-lock-regexp-face
+       ((,c :foreground ,red-cooler))))))
 
-(add-hook 'modus-themes-after-load-theme-hook #'jf/modus-themes-custom-faces)
+(add-hook 'modus-themes-after-load-theme-hook
+	  #'jf/modus-themes-custom-faces)
 
 ;; I love [[http://protesilaos.com][Prot]]’s attention to detail with the modus
 ;; themes.  Here’s my configuration for these two sibling themes.  There’s a
@@ -145,8 +148,11 @@
   (jf/emacs-theme-by-osx-appearance))
 
 (defun jf/emacs-theme-by-osx-appearance ()
-  "Set theme based on OSX apperance state."
-  (if (equal "Dark" (substring (shell-command-to-string "defaults read -g AppleInterfaceStyle") 0 4))
+  "Set theme based on OSX appearance state."
+  (if (equal "Dark" (substring
+		     (shell-command-to-string
+		      "defaults read -g AppleInterfaceStyle")
+		     0 4))
       (modus-themes-load-theme 'modus-vivendi-tinted)
     (modus-themes-load-theme 'modus-operandi-tinted)))
 
