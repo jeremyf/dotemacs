@@ -88,6 +88,15 @@
 ;; ~modus-operandi~).  They provide a light and dark theme with a focus on visual
 ;; accessibility.
 
+
+(defun jf/modus-themes-custom-faces ()
+  (modus-themes-with-colors
+    (custom-set-faces
+     `(font-lock-misc-punctuation-face ((,c :foreground ,green-warmer)))
+     `(font-lock-regexp-face ((,c :foreground ,red-cooler))))))
+
+(add-hook 'modus-themes-after-load-theme-hook #'jf/modus-themes-custom-faces)
+
 ;; I love [[http://protesilaos.com][Prot]]’s attention to detail with the modus
 ;; themes.  Here’s my configuration for these two sibling themes.  There’s a
 ;; bit of chatter, but all told it sets things up how I like.
@@ -129,8 +138,6 @@
 	  (6 . (rainbow 1.15))
 	  (t . (rainbow 1.1)))))
 
-(load-theme 'modus-vivendi-tinted t t)
-(load-theme 'modus-operandi-tinted t t)
 (defun jf/dark ()
   "Toggle system-wide Dark or Light setting."
   (interactive)
@@ -140,8 +147,8 @@
 (defun jf/emacs-theme-by-osx-appearance ()
   "Set theme based on OSX apperance state."
   (if (equal "Dark" (substring (shell-command-to-string "defaults read -g AppleInterfaceStyle") 0 4))
-      (enable-theme 'modus-vivendi-tinted)
-    (enable-theme 'modus-operandi-tinted)))
+      (modus-themes-load-theme 'modus-vivendi-tinted)
+    (modus-themes-load-theme 'modus-operandi-tinted)))
 
 (jf/emacs-theme-by-osx-appearance)
 
