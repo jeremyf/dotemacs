@@ -50,7 +50,7 @@
 (use-package org
   :straight (org :type built-in)
   :hook (org-mode . turn-on-visual-line-mode)
-  (org-mode . jf/org-completion-at-point-functions)
+  (org-mode . jf/org-capf)
   ;; Disable org-indent-mode; it's easy enough to enable.  The primary reason is
   ;; that it does not play nice with the multi-cursor package.  And I'd prefer
   ;; to have that work better by default.
@@ -249,14 +249,31 @@
 	  cands))
       (when cands
 	(list (match-beginning 0) (match-end 0) cands)))))
-(defun jf/org-completion-at-point-functions ()
+
+(defun jf/org-completion-abbreviations ()
+  "Look for \"[[abbr...][word]]\" and allow completion of things like \" word\"."
+  (when (looking-back " [a-zA-Z1-9]+")
+    (let (cands)
+      (save-match-data
+	(save-excursion
+	  (goto-char (point-min))
+	  (while (re-search-forward "\\( \\[\\[abbr[^\]]*\\]\\[\\([a-zA-Z]+\\)\\]\\]\\)" nil t)
+	    (cl-pushnew
+	     (match-string-no-properties 1) cands :test 'equal))
+	  cands))
+      (when cands
+	(list (match-beginning 0) (match-end 0) cands)))))
+
+(defun jf/org-capf ()
   "The `completion-at-point-functions' I envision using for `org-mode'."
   (setq-local completion-at-point-functions
-	      (list  #'tempel-expand
+	      (list (cape-super-capf
+		     #'tempel-expand
 		     #'jf/org-completion-symbols
+		     #'jf/org-completion-abbreviations
 		     #'cape-dabbrev
 		     #'cape-file
-		     #'cape-history)))
+		     #'cape-history))))
 (defun jf/org-confirm-babel-evaluate (lang body) nil)
 
 ;;; Additionally Functionality for Org Mode
