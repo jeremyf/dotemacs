@@ -41,7 +41,7 @@
     ("~/git/britishlibrary/" . bg-blue-intense)
     ("~/git/adventist-dl/" . bg-yellow-intense)
     ("~/git/utk-hyku/" . bg-red-intense)
-    ("~/git/bulkrax/" . bg-sage))
+    ("~/git/bulkrax/" . bg-sage)
     ("~/git/hyrax/" . bg-sage))
   "The `car' of each list item should be of begin with \"~/\" and
  end with \"/\" (so as to conform to multiple machines and
