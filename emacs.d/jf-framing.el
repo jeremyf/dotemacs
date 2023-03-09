@@ -79,42 +79,6 @@
 (require 'jf-minor-mode-maker)
 
 (defvar jf/presenter-minor-mode-map (let ((map (make-sparse-keymap)))
-			       (dolist (key `("]" "RET" "SPC" "<right>" "<down>" "n" "C-n"))
-				 (define-key map (kbd key) #'logos-forward-page-dwim))
-			       (dolist (key `("[" "DEL" "<left>" "<up>" "C-p" "p"))
-				 (define-key map (kbd key) #'logos-backward-page-dwim))
-			       map))
-(jf/minor-mode-maker :title "Logos Presenter"
-		     :abbr "presenter"
-		     :keymap jf/presenter-minor-mode-map)
-
-(defcustom jf/presenter-minor-mode-on-hook
-  (lambda ()
-    (call-interactively 'logos-narrow-dwim)
-    (setq-local  org-hide-emphasis-markers t)
-    (display-line-numbers-mode -1)
-    (when (fboundp 'fontaine-set-preset) (fontaine-set-preset 'presenting))
-    (when (fboundp 'logos-focus-mode) (logos-focus-mode 1))
-    (when (fboundp 'vi-tilde-fringe-mode) (vi-tilde-fringe-mode -1))
-    (when (fboundp 'git-gutter-mode) (git-gutter-mode -1))
-    (when (fboundp 'centaur-tabs-local-mode) (centaur-tabs-local-mode -1)))
-  "Hook when `jf/presenter-minor-mode' activated."
-  :type 'hook)
-
-(defcustom jf/presenter-minor-mode-off-hook
-  (lambda ()
-    (call-interactively 'widen)
-    (setq-local  org-hide-emphasis-markers nil)
-    (logos-focus-mode -1)
-    (display-line-numbers-mode t)
-    (when (fboundp 'fontaine-set-preset) (fontaine-set-preset 'default))
-    (when (fboundp 'vi-tilde-fringe-mode) (vi-tilde-fringe-mode t))
-    (when (fboundp 'git-gutter-mode) (git-gutter-mode t))
-    (when (fboundp 'centaur-tabs-local-mode) (centaur-tabs-local-mode t)))
-  "Hook when `jf/presenter-minor-mode' deactivated."
-  :type 'hook)
-
-(defvar jf/interactive-presenter-minor-mode-map (let ((map (make-sparse-keymap)))
 					(define-key map (kbd "C-n") #'next-line)
 					(define-key map (kbd "C-p") #'previous-line)
 					(dolist (key `("M-]" "s-]"))
@@ -123,11 +87,11 @@
 					  (define-key map (kbd key) #'logos-backward-page-dwim))
 					map))
 
-(jf/minor-mode-maker :title "Logos Interactive Presenter"
-		     :abbr "interactive-presenter"
-		     :keymap jf/interactive-presenter-minor-mode-map)
+(jf/minor-mode-maker :title "Logos Presenter"
+		     :abbr "presenter"
+		     :keymap jf/presenter-minor-mode-map)
 
-(defcustom jf/interactive-presenter-minor-mode-on-hook
+(defcustom jf/presenter-minor-mode-on-hook
   (lambda ()
     (let ((logos-hide-cursor nil)
 	  (logos-buffer-read-only nil)
@@ -140,10 +104,10 @@
       (when (fboundp 'vi-tilde-fringe-mode) (vi-tilde-fringe-mode -1))
       (when (fboundp 'git-gutter-mode) (git-gutter-mode -1))
       (when (fboundp 'centaur-tabs-local-mode) (centaur-tabs-local-mode -1))))
-  "Hook when `jf/interactive-presenter-minor-mode' activated."
+  "Hook when `jf/presenter-minor-mode' activated."
   :type 'hook)
 
-(defcustom jf/interactive-presenter-minor-mode-off-hook
+(defcustom jf/presenter-minor-mode-off-hook
   (lambda ()
     (call-interactively 'widen)
     (olivetti-mode -1)
@@ -154,7 +118,7 @@
     (when (fboundp 'vi-tilde-fringe-mode) (vi-tilde-fringe-mode t))
     (when (fboundp 'git-gutter-mode) (git-gutter-mode t))
     (when (fboundp 'centaur-tabs-local-mode) (centaur-tabs-local-mode t)))
-  "Hook when `jf/interactive-presenter-minor-mode' deactivated."
+  "Hook when `jf/presenter-minor-mode' deactivated."
   :type 'hook)
 (provide 'jf-framing)
 ;;; jf-framing.el ends here
