@@ -268,10 +268,11 @@
   "The `completion-at-point-functions' I envision using for `org-mode'."
   (setq-local completion-at-point-functions
 	      (list (cape-super-capf
-		     #'tempel-expand
 		     #'jf/org-completion-symbols
 		     #'jf/org-completion-abbreviations
+		     #'tempel-expand
 		     #'cape-dabbrev
+		     #'cape-dict
 		     #'cape-file
 		     #'cape-history))))
 (defun jf/org-confirm-babel-evaluate (lang body) nil)

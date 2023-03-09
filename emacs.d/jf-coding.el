@@ -159,7 +159,6 @@
 	 (ruby-mode . rspec-mode)
 	 (ruby-ts-mode . rspec-mode))
   :bind (:map rspec-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
-  :bind (:map ruby-ts-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
   :bind (:map ruby-mode-map (("s-." . 'rspec-toggle-spec-and-target))))
 
 (defun jf/rspec-spring-p ()
