@@ -61,6 +61,7 @@ markdown-mode markdown-ts-mode
 org-mode
 
 (@ (p (jf/denote-link--people)))
+;; Blockquote structure for Emacs
 (bq "#+attr_shortcode:"
     (p "Author (e.g. \"pre\" keyword): " pre t) (unless (s-blank? pre) (concat " :pre " pre))
     (p "Cite: " cite t) (unless (s-blank? cite) (concat " :cite " cite))

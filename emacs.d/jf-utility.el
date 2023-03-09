@@ -217,11 +217,16 @@
           (if (equal major-mode 'dired-mode)
 	      default-directory
 	    (buffer-file-name)))
-	 (options '(("Filename, Basename" . (lambda (f) (file-name-nondirectory f)))
-		    ("Filename, Project Relative" . (lambda (f) (concat "./" (file-relative-name f (projectile-project-root)))))
-		    ("Filename, Full" . (lambda (f) (f)))
-		    ("Dirname" . (lambda (f) (file-name-directory f)))
-		    ("Dirname, Project Relative" . (lambda (f) (concat "./" (file-relative-name (file-name-directory f) (projectile-project-root)))))))
+	 (options '(("Filename, Basename" .
+		     (lambda (f) (file-name-nondirectory f)))
+		    ("Filename, Project Relative" .
+		     (lambda (f) (concat "./" (file-relative-name f (projectile-project-root)))))
+		    ("Filename, Full" .
+		     (lambda (f) (f)))
+		    ("Dirname" .
+		     (lambda (f) (file-name-directory f)))
+		    ("Dirname, Project Relative" .
+		     (lambda (f) (concat "./" (file-relative-name (file-name-directory f) (projectile-project-root)))))))
          (filename
 	  (if prefix
 	      (funcall (alist-get (completing-read "Option: " options nil t)
@@ -278,12 +283,21 @@
 ;; A simple wrapper around scratch, that helps name it and sets the major mode
 ;; to `org-mode'.
 (global-set-key (kbd "<f12>") 'jf/create-scratch-buffer)
-(cl-defun jf/create-scratch-buffer (&key (mode 'org-mode))
-  "Quickly open a scratch buffer and enable the given MODE."
-  (interactive)
+(cl-defun jf/create-scratch-buffer (arg)
+  "Quickly open a scratch buffer based on ARG.
+
+\"C-u\": `markdown-mode'
+\"C-u C-u\": `emacs-lisp-mode'
+More than 2 \"C-u C-u\": `ruby-mode'
+Otherwise: `org-mode'"
+  (interactive "p")
   (crux-create-scratch-buffer)
   (rename-buffer (concat "*scratch* at " (format-time-string "%Y-%m-%d %H:%M")))
-  (funcall mode))
+  (cond
+   ((>= arg 32) (ruby-mode))
+   ((>= arg 16) (emacs-lisp-mode))
+   ((>= arg 4) (markdown-mode))
+   (t (org-mode))))
 
 ;; Sometimes I want to move, without renaming, a file.  This function helps
 ;; make that easy.
@@ -304,17 +318,17 @@
 (defun jf/org-insert-immediate-active-timestamp (arg)
   "Insert an active date for today.
 
-  One universal arg (e.g., prefix call with C-u) inserts timestamp.
-  Two universal arsg (e.g., prefix call with C-u C-u) prompts for date
+  One universal arg (e.g., prefix call with C-u) prompts for date
+  Two universal args (e.g., prefix call with C-u C-u) inserts timestamp.
   then insertes active date."
   ;; Insert an active timestamp, with a few options.
   (interactive "P")
   (let ((prefix (car arg)))
     (cond
      ((not prefix)  (org-insert-time-stamp nil nil nil))
-     ((= prefix 4)  (org-insert-time-stamp nil t nil))
-     ((= prefix 16) (org-insert-time-stamp (org-read-date nil t nil "Date")
-					   nil nil)))))
+     ((= prefix 4) (org-insert-time-stamp (org-read-date nil t nil "Date")
+					  nil nil))
+     ((>= prefix 16)  (org-insert-time-stamp nil t nil)))))
 
 (global-set-key (kbd "C-w") 'jf/delete-region-or-backward-word)
 (global-set-key (kbd "M-DEL") 'jf/delete-region-or-backward-word)

@@ -14,6 +14,10 @@
 ;;;; Pre-requisites
 (require 'jf-writing)
 
+;; On <2023-03-08 Thu> I was noticing that `treesit' as implemented appeared to
+;; have notable latency.  I did some profiling and found that for a Ruby file
+;; Emacs spent quite a bit of time in the `treesit' functions.  I toggled back to
+;; `tree-sitter' and did not notice any slowness.
 (use-package tree-sitter
   ;; See https://github.com/emacs-tree-sitter/elisp-tree-sitter
   :straight (tree-sitter :host github
