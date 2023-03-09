@@ -283,21 +283,22 @@
 ;; A simple wrapper around scratch, that helps name it and sets the major mode
 ;; to `org-mode'.
 (global-set-key (kbd "<f12>") 'jf/create-scratch-buffer)
-(cl-defun jf/create-scratch-buffer (arg)
+(cl-defun jf/create-scratch-buffer (&optional arg)
   "Quickly open a scratch buffer based on ARG.
 
 \"C-u\": `markdown-mode'
 \"C-u C-u\": `emacs-lisp-mode'
 More than 2 \"C-u C-u\": `ruby-mode'
 Otherwise: `org-mode'"
-  (interactive "p")
+  (interactive "P")
   (crux-create-scratch-buffer)
   (rename-buffer (concat "*scratch* at " (format-time-string "%Y-%m-%d %H:%M")))
-  (cond
-   ((>= arg 32) (ruby-mode))
-   ((>= arg 16) (emacs-lisp-mode))
-   ((>= arg 4) (markdown-mode))
-   (t (org-mode))))
+  (let ((prefix (or (car arg) 1)))
+    (cond
+     ((>= prefix 32) (ruby-mode))
+     ((>= prefix 16) (emacs-lisp-mode))
+     ((>= prefix 4) (markdown-mode))
+     (t (org-mode)))))
 
 ;; Sometimes I want to move, without renaming, a file.  This function helps
 ;; make that easy.
