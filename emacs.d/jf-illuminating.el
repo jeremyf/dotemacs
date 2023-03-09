@@ -113,7 +113,7 @@
   ;; recursed buffer.
   :straight t
   :config
-  (setq enable-recursive-minibuffers nil)
+  (setq enable-recursive-minibuffers t)
   (recursion-indicator-mode))
 
 (use-package symbol-overlay

@@ -90,14 +90,17 @@
 
 
 (defun jf/modus-themes-custom-faces ()
+  "Set the various custom faces for both `treesit' and `tree-sitter'."
   (modus-themes-with-colors
     (custom-set-faces
+     `(tree-sitter-hl-face:method.call
+       ((,c :slant italic :foreground ,fg-alt)))
+     `(tree-sitter-hl-face:operator
+       ((,c :foreground ,red-faint)))
+     `(tree-sitter-hl-face:property
+       ((,c :inherit font-lock-variable-name-face)))
      `(font-lock-misc-punctuation-face
        ((,c :foreground ,green-warmer)))
-     `(tree-sitter-hl-face:operator
-       ((,c :foreground ,red-cooler)))
-     `(tree-sitter-hl-face:property
-       ((,c :foreground ,blue-warmer)))
      `(font-lock-regexp-face
        ((,c :foreground ,red-cooler))))))
 
