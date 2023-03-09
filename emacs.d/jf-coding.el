@@ -44,6 +44,8 @@
   :straight (bundler :type git :host github :repo "endofunky/bundler.el"))
 
 (use-package csv-mode :straight t
+  ;; By default I want to show the separator character.
+  :custom (csv-invisibility-default nil)
   ;; Always enter CSV mode in align mode; makes it easier to read.
   :hook (csv-mode . csv-align-mode))
 
@@ -86,10 +88,12 @@
 
 (use-package eldoc :straight t)
 
-(use-package emacs-refactor
-  :straight (emacs-refactor :host github :repo "Wilfred/emacs-refactor")
-  :bind ((:map ruby-mode-map ("M-RET" . emr-show-refactor-menu))
-	 (:map emacs-lisp-mode-map ("M-RET" . emr-show-refactor-menu))))
+;; I don't use this package
+;;
+;; (use-package emacs-refactor
+;;   :straight (emacs-refactor :host github :repo "Wilfred/emacs-refactor")
+;;   :bind ((:map ruby-mode-map ("M-RET" . emr-show-refactor-menu))
+;; 	 (:map emacs-lisp-mode-map ("M-RET" . emr-show-refactor-menu))))
 
 (use-package emmet-mode
   :straight t
@@ -138,6 +142,7 @@
 					      "/bin/plantuml")
                 org-plantuml-exec-mode 'executable)
   :mode (("\\.plantuml\\'" . plantuml-mode))
+  :mode (("\\.puml\\'" . plantuml-mode))
   :straight t)
 
 (use-package rspec-mode
@@ -154,6 +159,7 @@
 	 (ruby-mode . rspec-mode)
 	 (ruby-ts-mode . rspec-mode))
   :bind (:map rspec-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
+  :bind (:map ruby-ts-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
   :bind (:map ruby-mode-map (("s-." . 'rspec-toggle-spec-and-target))))
 
 (defun jf/rspec-spring-p ()
@@ -164,6 +170,9 @@
 	  (shell-command-to-string
 	   (concat "rg \"^ +spring \" " gemfile-lock))))))
 
+;; Out of the box, for my typical docker ecosystem, the `rspec-spring-p'
+;; function does not work.  So I'm overriding the default behavior to match my
+;; ecosystem.
 (advice-add #'rspec-spring-p :override #'jf/rspec-spring-p)
 
 (use-package ruby-interpolation
