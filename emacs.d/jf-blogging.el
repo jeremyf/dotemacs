@@ -69,22 +69,6 @@ CONTENTS is nil.  INFO is a plist holding contextual information."
   "~/git/dotemacs/lib/org-macros.setup"
   "The path to the file that has inline org macros.")
 
-(defun jf/org-html-verse-block (_verse-block contents info)
-  "Transcode a VERSE-BLOCK element from Org to HTML.
-  CONTENTS is verse block contents.  INFO is a plist holding
-  contextual information."
-  (format "<section class=\"verse\">\n%s</section>"
-	  ;; Replace leading white spaces with non-breaking spaces.
-	  (replace-regexp-in-string
-	   "^[ \t]+" (lambda (m) (org-html--make-string (length m) "&#xa0;"))
-	   ;; Replace each newline character with line break.  Also
-	   ;; remove any trailing "br" close-tag so as to avoid
-	   ;; duplicates.
-	   (let* ((br (org-html-close-tag "br" nil info))
-		  (re (format "\\(?:%s\\)?[ \t]*\n" (regexp-quote br))))
-	     (replace-regexp-in-string re (concat br "\n") contents)))))
-
-
 (cl-defun jf/org-markdown-export-format-link-for (&key node desc)
   "Return a \"link\" text based on the given NODE and DESC.
 
@@ -507,29 +491,6 @@ CONTENTS is nil.  INFO is a plist holding contextual information."
       (push hostname slugs))
     (browse-url (format "%s" (s-join "/" slugs)))))
 
-(defun jf/tor-create-post (title)
-  "Create and visit a new draft post.  Prompt for a TITLE.
-
-    The file for the blog post conforms to the path schema of posts
-    for TakeOnRules.com."
-  (interactive "sBlog Post Title: ")
-  (jf/tor-post---create-or-append :title title))
-
-(defun jf/tor-tag-post (tags)
-  "Apply the TAGS to the current TakeOnRules.com post.
-
-    No effort is made to check if this is a post."
-  (interactive (list (completing-read-multiple "Tags: " (jf/tor-tags-list))))
-  (let ((saved-point (point))
-	(to-insert (concat "\n- " (s-join "\n- " tags))))
-    (replace-regexp "^tags:$" (concat "tags:" to-insert) nil 0 (point-max))
-    (goto-char (+ saved-point (length to-insert)))))
-
-(defun jf/tor-insert-glossary-key (key)
-  "Insert the KEY at point."
-  (interactive (list (completing-read "Key: " (jf/tor-glossary-key-list))))
-  (insert key))
-
 (defun jf/tor-find-changelog-and-insert-entry ()
   "Find TakeOnRules glossary and begin entering a changelog entry."
   (interactive)
@@ -552,30 +513,6 @@ CONTENTS is nil.  INFO is a plist holding contextual information."
 	     (if (looking-at-p "^$") "" "\n")
 	     "- title: " title
 	     "\n  key: " key))))
-
-(defun jf/tor-find-glossary-and-insert-entry (title)
-  "Find TakeOnRules glossary and add an entry with TITLE."
-  (interactive "sGlossary Entry's Title: ")
-  (find-file (f-join jf/tor-home-directory "data" "glossary.yml"))
-  (let ((key (upcase (s-dashed-words title))))
-    (end-of-buffer)
-    (insert (concat
-	     (if (looking-at-p "^$") "" "\n")
-	     "- title: " title
-	     "\n  key: " key))))
-
-(defun jf/tor-insert-epigraph-entry ()
-  "Prompt for a new a new data/epigraphs.yml entry."
-  (interactive)
-  (find-file (f-join jf/tor-home-directory "data" "epigraphs.yml"))
-  (end-of-buffer)
-  (insert (concat
-	   (if (looking-at-p "^$") "" "\n")
-	   "epi"))
-  (end-of-buffer)
-  "Assumes that the 'epi' is the correct expansion for the snippet."
-  (yas-expand)
-  (message "Ready to insert a new epigraph"))
 
 ;; Note: I needed to use `fboundp' because if I invoked this functions
 ;; before other consult functions I got a method void error.
@@ -730,6 +667,7 @@ CONTENTS is nil.  INFO is a plist holding contextual information."
 	  (jf/matches-in-buffer "^#+ +.*$"))))
   (kill-new (jf/tor-convert-text-to-slug
 	     (replace-regexp-in-string "^#+ +" "" heading))))
+
 ;;******************************************************************************
 ;;
     ;;; END querying and list generation functions
