@@ -94,6 +94,10 @@
     (custom-set-faces
      `(font-lock-misc-punctuation-face
        ((,c :foreground ,green-warmer)))
+     `(tree-sitter-hl-face:operator
+       ((,c :foreground ,red-cooler)))
+     `(tree-sitter-hl-face:property
+       ((,c :foreground ,blue-warmer)))
      `(font-lock-regexp-face
        ((,c :foreground ,red-cooler))))))
 
