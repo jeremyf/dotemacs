@@ -317,6 +317,7 @@
 	  (org-capture-goto-target "p")))))
   (require 'pulsar)
   (pulsar-pulse-line))
+
 (defun jf/org-mode-agenda-project-prompt ()
   "Prompt for project based on existing projects in agenda file.
 
@@ -329,8 +330,8 @@
      (org-map-entries
       (lambda ()
 	(org-element-property :raw-value (org-element-at-point)))
-      "+LEVEL=4+projects" 'agenda)
-     ) #'string<)))
+      "+LEVEL=4+projects" 'agenda))
+    #'string<)))
 
 ;; When I jump to a new task for the day, I want to position that task within
 ;; the prompted project.  Inspiration from
