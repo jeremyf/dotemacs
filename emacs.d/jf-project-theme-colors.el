@@ -35,13 +35,14 @@
 (require 'projectile)
 (defvar jf/project/theme-colors/table
   '(("~/git/dotemacs/" . bg-green-subtle)
-    ("~/git/dotzshrc/" . bg-green-nuanced)
-    ("~/git/takeonrules.source/" . bg-magenta-subtle)
-    ("~/git/org/" . bg-sage)
+    ("~/git/dotzshrc/" . bg-green-subtle)
+    ("~/git/takeonrules.source/" . bg-green-nuanced)
+    ("~/git/org/" . bg-green-nuanced)
     ("~/git/britishlibrary/" . bg-blue-intense)
     ("~/git/adventist-dl/" . bg-yellow-intense)
     ("~/git/utk-hyku/" . bg-red-intense)
     ("~/git/bulkrax/" . bg-sage))
+    ("~/git/hyrax/" . bg-sage))
   "The `car' of each list item should be of begin with \"~/\" and
  end with \"/\" (so as to conform to multiple machines and
  projectile's interface.")
