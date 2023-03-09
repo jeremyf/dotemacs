@@ -102,7 +102,7 @@
      `(font-lock-misc-punctuation-face
        ((,c :foreground ,green-warmer)))
      `(font-lock-regexp-face
-       ((,c :foreground ,red-cooler))))))
+       ((,c :foreground ,magenta-warmer))))))
 
 (add-hook 'modus-themes-after-load-theme-hook
 	  #'jf/modus-themes-custom-faces)
