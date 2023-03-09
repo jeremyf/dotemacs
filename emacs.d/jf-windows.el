@@ -93,6 +93,8 @@
   "Set the various custom faces for both `treesit' and `tree-sitter'."
   (modus-themes-with-colors
     (custom-set-faces
+     `(tree-sitter-hl-face:constant
+       ((,c :slant italic :foreground ,magenta-cooler)))
      `(tree-sitter-hl-face:method.call
        ((,c :slant italic :foreground ,fg-alt)))
      `(tree-sitter-hl-face:operator
