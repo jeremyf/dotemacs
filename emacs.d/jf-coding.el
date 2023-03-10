@@ -89,24 +89,25 @@
 (use-package eldoc :straight t)
 
 ;; I don't use this package
-;;
 ;; (use-package emacs-refactor
 ;;   :straight (emacs-refactor :host github :repo "Wilfred/emacs-refactor")
 ;;   :bind ((:map ruby-mode-map ("M-RET" . emr-show-refactor-menu))
 ;; 	 (:map emacs-lisp-mode-map ("M-RET" . emr-show-refactor-menu))))
 
-(use-package emmet-mode
-  :straight t
-  :bind (("C-c C-e" . emmet-expand-yas ))
-  :hook ((sgml-mode . emmet-mode)
-         (html-mode . emmet-mode)
-         (css-mode . emmet-mode)))
+;; I don't use this package (I think...):
+;; (use-package emmet-mode
+;;   :straight t
+;;   :bind (("C-c C-e" . emmet-expand-yas ))
+;;   :hook ((sgml-mode . emmet-mode)
+;;          (html-mode . emmet-mode)
+;;          (css-mode . emmet-mode)))
 
 (use-package ruby-mode
   :straight (:type built-in)
   :hook ((ruby-mode ruby-ts-mode) . (lambda () (setq fill-column 100))))
 
-(use-package go-mode :straight t)
+;; I don't use this package
+;; (use-package go-mode :straight t)
 
 (require 'hide-comnt)
 
