@@ -547,7 +547,7 @@ Useful if you want a more robust view into the recommend candidates."
   (tempel-key "H-m k" keyboard org-mode-map))
 
 (use-package vertico
-  :straight t
+  :straight (:type git :host github :repo "minad/vertico")
   :config
   ;; https://github.com/minad/vertico/wiki#restrict-the-set-of-candidates
   (defun jf/vertico-restrict-to-matches ()
