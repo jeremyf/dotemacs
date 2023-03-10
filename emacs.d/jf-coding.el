@@ -49,6 +49,10 @@
   ;; Always enter CSV mode in align mode; makes it easier to read.
   :hook (csv-mode . csv-align-mode))
 
+;; https://github.com/Silex/docker.el
+(use-package docker
+  :straight t)
+
 (use-package dockerfile-mode :straight t)
 
 (use-package editorconfig
