@@ -240,6 +240,10 @@
   jf/tor-hostname-default-local
   "What is the current hostname for serving TakeOnRules content.")
 
+;; https://www.reddit.com/r/emacs/comments/112t0uo/comment/ja41lso/?utm_source=share&utm_medium=web2x&context=3
+(require 'info)
+(info-initialize)
+(push "/opt/homebrew/share/info" Info-directory-list)
 
 (provide 'jf-launching)
 ;;; jf-launching.el ends here
