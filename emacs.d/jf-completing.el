@@ -24,19 +24,15 @@
 
 (use-package emacs
   :init
-
   ;; Emacs 28: Hide commands in M-x which do not apply to the current mode.
   ;; Corfu commands are hidden, since they are not supposed to be used via M-x.
   (setq read-extended-command-predicate
         #'command-completion-default-include-p)
-
   ;; TAB cycle if there are only few candidates
   (setq completion-cycle-threshold 3)
-
   ;; Enable indentation+completion using the TAB key.
   ;; `completion-at-point' is often bound to M-TAB.
   (setq tab-always-indent 'complete)
-
   ;; Add prompt indicator to `completing-read-multiple'.
   ;; Alternatively try `consult-completing-read-multiple'.
     (defun crm-indicator (args)
@@ -50,7 +46,6 @@
                   (car args))
           (cdr args)))
   (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
-
   ;; Do not allow the cursor in the minibuffer prompt
   (setq minibuffer-prompt-properties
         '(read-only t cursor-intangible t face minibuffer-prompt))
@@ -128,16 +123,11 @@
          ("M-e" . consult-isearch)
          ("M-s e" . consult-isearch)
          ("M-s l" . consult-line))
-
   ;; The :init configuration is always executed (Not lazy)
   :init
-
-
-
   ;; Use Consult to select xref locations with preview
   (setq xref-show-xrefs-function #'consult-xref
         xref-show-definitions-function #'consult-xref)
-
   :custom
   ;; Updating the default to include "--smart-case"
   ;; Leveraging ripgrep-all https://github.com/phiresky/ripgrep-all
@@ -153,7 +143,6 @@
 		"--glob !vendor/ --glob !coverage/ --glob !**/tmp/ --glob "
 		"!**/log/ --glob !public/ --glob !node_modules/ "
 		"--line-number ."))
-
   ;; Configure other variables and modes in the :config section,
   ;; after lazily loading the package.
   :config
@@ -186,7 +175,6 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
                                (buffer-substring (region-beginning)
 						 (region-end)))))))
       (apply consult-fn dir initial)))
-
   (advice-add #'consult-line
               :around #'jf/consult-first-param-is-initial-text
               '((name . "wrapper")))
@@ -254,33 +242,27 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
               ([tab] . corfu-next)
               ("S-TAB" . corfu-previous)
               ([backtab] . corfu-previous))
-
   :custom
   ;; Works with `indent-for-tab-command'. Make sure tab doesn't indent when you
   ;; want to perform completion
   (tab-always-indent 'complete)
   (completion-cycle-threshold nil)      ; Always show candidates in menu
-
   (corfu-auto nil)
   (corfu-auto-prefix 2)
   (corfu-auto-delay 0.25)
-
   ;; (corfu-min-width 80)
   ;; (corfu-max-width corfu-min-width)     ; Always have the same width
   (corfu-count 14)
   (corfu-scroll-margin 4)
   (corfu-cycle nil)
-
   ;; (corfu-echo-documentation nil)        ; Already use corfu-doc
   (corfu-separator ?\s)                 ; Necessary for use with orderless
   (corfu-quit-no-match 'separator)
-
   (corfu-preview-current 'insert)       ; Preview current candidate?
   (corfu-preselect-first t)             ; Preselect first candidate?
   :config
   (defun corfu-move-to-minibuffer ()
     "Move \"popup\" completion candidates to minibuffer.
-
 Useful if you want a more robust view into the recommend candidates."
     (interactive)
     (let (completion-cycle-threshold completion-cycling)
@@ -294,37 +276,6 @@ Useful if you want a more robust view into the recommend candidates."
 	nil
 	jf/silence-loading-log)
   (corfu-popupinfo-mode))
-
-;; (use-package corfu-doc
-;;   ;; NOTE 2022-02-05: At the time of writing, `corfu-doc' is not yet on melpa
-;;   :straight (corfu-doc :type git :host github :repo "galeo/corfu-doc")
-;;   :bind (:map corfu-map
-;;               ;; This is a manual toggle for the documentation window.
-;; 	      ;; Remap the default doc command
-;;               ([remap corfu-show-documentation] . corfu-doc-toggle)
-;;               ;; Scroll in the documentation window
-;;               ("M-n" . corfu-doc-scroll-up)
-;;               ("M-p" . corfu-doc-scroll-down))
-;;   :hook (corfu-mode . corfu-doc-mode)
-;;   :custom
-;;   (corfu-doc-delay 0.1)
-;;   (corfu-doc-hide-threshold 10)
-;;   (corfu-doc-max-width 60)
-;;   (corfu-doc-max-height 10)
-
-;;   ;; NOTE 2022-02-05: I've also set this in the `corfu' use-package to be
-;;   ;; extra-safe that this is set when corfu-doc is loaded. I do not want
-;;   ;; documentation shown in both the echo area and in the `corfu-doc' popup.
-;;   ;; (corfu-echo-documentation nil)
-;;   :config
-;;   ;; NOTE 2022-02-05: This is optional. Enabling the mode means that every corfu
-;;   ;; popup will have corfu-doc already enabled. This isn't desirable for me
-;;   ;; since (i) most of the time I do not need to see the documentation and (ii)
-;;   ;; when scrolling through many candidates, corfu-doc makes the corfu popup
-;;   ;; considerably laggy when there are many candidates. Instead, I rely on
-;;   ;; manual toggling via `corfu-doc-toggle'.
-;;   (corfu-doc-mode))
-
 
 (use-package cape
   :straight t
@@ -351,7 +302,6 @@ Useful if you want a more robust view into the recommend candidates."
 		    "</cite>")
 	    url name))
   ;; The function advice to override the default behavior
-
   (advice-add 'grab-mac-link-make-html-link
 	      :override 'jf/grab-mac-link-make-html-link
 	      '((name . "jnf")))
@@ -469,13 +419,11 @@ Useful if you want a more robust view into the recommend candidates."
         (when-let (x (assq (aref pattern (1- (length pattern)))
 			   +orderless-dispatch-alist))
           (cons (cdr x) (substring pattern 0 -1)))))))
-
   ;; Define orderless style with initialism by default
   (orderless-define-completion-style +orderless-with-initialism
     (orderless-matching-styles '(orderless-initialism
 				 orderless-literal
 				 orderless-regexp)))
-
   ;; Certain dynamic completion tables (completion-table-dynamic) do not work
   ;; properly with orderless. One can add basic as a fallback.  Basic will only
   ;; be used when orderless fails, which happens only for these special tables.
@@ -502,11 +450,11 @@ Useful if you want a more robust view into the recommend candidates."
 (use-package tempel
   :straight (tempel :host github :repo "minad/tempel")
   :custom (tempel-path "~/git/dotemacs/templates")
+  :config (global-tempel-abbrev-mode)
   :bind (("M-+" . tempel-complete) ;; Alternative tempel-expand
 	 ("M-*" . tempel-insert))
   :bind (:map tempel-map (([backtab] . tempel-previous)
 			  ("TAB" . tempel-next)))
-
   :init
   (cl-defun jf/org-macro-value-list (macro-name &key (dir org-directory))
     "List the unique inner text of all uses of MACRO-NAME in given DIR."
@@ -532,10 +480,8 @@ Useful if you want a more robust view into the recommend candidates."
     (setq-local completion-at-point-functions
 		(cons #'tempel-expand
 		      completion-at-point-functions)))
-
   (add-hook 'prog-mode-hook 'tempel-setup-capf)
   (add-hook 'text-mode-hook 'tempel-setup-capf)
-
   ;; Optionally make the Tempel templates available to Abbrev,
   ;; either locally or globally. `expand-abbrev' is bound to C-x '.
   ;; (add-hook 'prog-mode-hook #'tempel-abbrev-mode)
@@ -561,7 +507,6 @@ Useful if you want a more robust view into the recommend candidates."
 				       read-only t
 				       cursor-intangible t
 				       rear-nonsticky t))))
-
   (define-key vertico-map (kbd "C-SPC") #'jf/vertico-restrict-to-matches)
   (vertico-mode)
   ;; Use `consult-completion-in-region' if Vertico is enabled.
@@ -581,7 +526,9 @@ Useful if you want a more robust view into the recommend candidates."
 	nil
 	jf/silence-loading-log)
   (vertico-indexed-mode)
-
+  (load "~/.emacs.d/straight/build/vertico/extensions/vertico-directory.elc"
+	nil
+	jf/silence-loading-log)
   (load "~/.emacs.d/straight/build/vertico/extensions/vertico-repeat.elc"
 	nil
 	jf/silence-loading-log)
