@@ -118,13 +118,14 @@
   ("H-f" . 'consult-notes)
   ;; Ensuring that I search my denote/scientist sub-directory, which is
   ;; excluded from it's containing project's git repository.
-  :custom (consult-notes-ripgrep-args
+  :custom (consult-notes-use-rg t)
+  (consult-notes-ripgrep-args
 	   (concat
 	    "rg --null --line-buffered --color=never --max-columns=1000 "
 	    "--path-separator / --ignore-case --no-heading --line-number "
-	    "--hidden --glob=!.git/ -L --sortr=accessed")
-	   :commands (consult-notes
-		      consult-notes-search-in-all-notes)))
+	    "--hidden --glob=!.git/ -L --sortr=accessed"))
+  :commands (consult-notes
+	     consult-notes-search-in-all-notes))
 
 ;;;; Note taking configurations
 
@@ -162,7 +163,6 @@ This function is the plural version of `jf/denote-org-property-from-id'."
   ;; (message "%s" (jf/denote-org-keywords-from-id
   ;; 		 :identifier "20220930T215235"
   ;; 		 :properties '("TITLE" "ABBR")))
-
   (when-let ((filename (denote-get-path-by-id identifier)))
     (when (string= (file-name-extension filename) "org")
       (with-current-buffer (find-file-noselect filename)
@@ -476,8 +476,8 @@ This function is intended for a global find of all notes."
     FORMAT is an Org export backend. We will discard the given
     DESCRIPTION.  PROTOCOL is ignored."
   (let* ((keyword-alist (jf/denote-org-keywords-from-id
-                     :identifier link
-                     :keywords (list "TITLE" keyword  "GLOSSARY_KEY")))
+			 :identifier link
+			 :keywords (list "TITLE" keyword  "GLOSSARY_KEY")))
          (title (car (alist-get "TITLE" keyword-alist nil nil #'string=)))
          (keyword-value (car (alist-get keyword keyword-alist nil nil #'string=)))
          (key (car (alist-get "GLOSSARY_KEY" keyword-alist nil nil #'string=))))
@@ -582,9 +582,9 @@ This function is intended for a global find of all notes."
   (let ((filename (denote-get-path-by-id identifier)))
     (with-current-buffer (find-file-noselect filename)
       (let ((text (s-join "\n\n" (org-element-map
-				   (org-element-parse-buffer)
-				   'paragraph
-				 (lambda (p) (caddr p))))))
+				     (org-element-parse-buffer)
+				     'paragraph
+				   (lambda (p) (caddr p))))))
 	(if (cadar (org-collect-keywords '("POEM")))
 	    (format "<pre class=\"poem\">\n%s\n</pre>" text)
 	  (format "%s" text))))))
@@ -603,7 +603,7 @@ This function is intended for a global find of all notes."
                          :follow #'denote-link-ol-follow)
 
 (defface jf/org-faces-date '((default :inherit link
-			       :underline nil)
+				      :underline nil)
 			     (((class color) (min-colors 88) (background light))
 			      :foreground "#125458")
 			     (((class color) (min-colors 88) (background dark))
@@ -613,19 +613,19 @@ This function is intended for a global find of all notes."
   :package-version '(denote . "0.5.0"))
 
 (defface jf/org-faces-epigraph '((default :inherit link
-					    :underline nil
-					    :slant oblique)
-					 (((class color) (min-colors 88) (background light))
-					  :foreground "#2a486a")
-					 (((class color) (min-colors 88) (background dark))
-					 :foreground "#b0d6f5"))
+					  :underline nil
+					  :slant oblique)
+				 (((class color) (min-colors 88) (background light))
+				  :foreground "#2a486a")
+				 (((class color) (min-colors 88) (background dark))
+				  :foreground "#b0d6f5"))
   "Face used to style `org-mode' epigraph links in the buffer."
   :group 'denote-faces
   :package-version '(denote . "0.5.0"))
 
 (defface jf/org-faces-abbr '((default :inherit link
-			       :underline t
-			       :slant oblique)
+				      :underline t
+				      :slant oblique)
 			     (((class color) (min-colors 88) (background light))
 			      :foreground "#505050")
 			     (((class color) (min-colors 88) (background dark))

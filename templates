@@ -89,6 +89,12 @@ org-mode
 	 n "#+PROJECT_PATHS: (\"Issues\" . \"" (s remote) "issues/\")"
 	 n "#+PROJECT_PATHS: (\"Pull Requests\" . \"" (s remote) "pulls/\")")
 
+(update "#+attr_shortcode: :date " (format-time-string "%Y-%m-%d")
+	" :mode " (p (completing-read "Mode: " '(inline paragraph sidenote section fallback) nil t) mode)
+    n "#+begin_update"
+    n q
+    n "#+end_update" n)
+
 ;;;;; Consider "The One Ring" minor mode to inject these.
 (rune "{{{rune(" (completing-read "Rune: " jf/gaming/runes) ")}}}")
 (asl "As {{{i(Loremaster)}}}, ")
