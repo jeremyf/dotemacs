@@ -80,7 +80,9 @@ Determine the PROJECT by querying `jf/project/list-projects'."
      ((f-dir-p path)
       (dired path))
      ((f-file-p path)
-      (find-file path))
+      (if (string= "pdf" (f-ext path))
+	  (shell-command (concat "open " path))
+	(find-file path)))
      (t (progn
 	  (message "WARNING: Project %s missing path name \"%s\" (with path %s)"
 		   project path-name path)
