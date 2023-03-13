@@ -23,6 +23,7 @@
   :hook (text-mode . abbrev-mode))
 
 (use-package emacs
+  :bind ("C-M-i" . completion-at-point)
   :init
   ;; Emacs 28: Hide commands in M-x which do not apply to the current mode.
   ;; Corfu commands are hidden, since they are not supposed to be used via M-x.
