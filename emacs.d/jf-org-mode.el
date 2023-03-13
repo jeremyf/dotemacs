@@ -464,7 +464,11 @@ tasks within projects are headline 5."
 			       (org-element-lineage hl)))
 			 (pcase (org-element-property :level hl)
 			   (4 (concat "\n" (plist-get (cadr hl) :raw-value)))
-			   (5 (concat "- " (plist-get (cadr hl) :raw-value)))
+			   (5 (if (and
+				   (member "mergerequest" (org-element-property :tags hl))
+				   (eq 'done (org-element-property :todo-type hl)))
+				  nil
+				  (concat "- " (plist-get (cadr hl) :raw-value))))
 			   (_ nil)))))))))
 	(jf/create-scratch-buffer)
 	(yank)))))
