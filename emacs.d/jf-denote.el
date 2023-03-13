@@ -602,34 +602,17 @@ This function is intended for a global find of all notes."
                          :face #'jf/org-faces-epigraph
                          :follow #'denote-link-ol-follow)
 
-(defface jf/org-faces-date '((default :inherit link
-				      :underline nil)
-			     (((class color) (min-colors 88) (background light))
-			      :foreground "#125458")
-			     (((class color) (min-colors 88) (background dark))
-			      :foreground "#a4d0bb"))
+(defface jf/org-faces-date '((default :inherit link))
   "Face used to style `org-mode' date links in the buffer."
   :group 'denote-faces
   :package-version '(denote . "0.5.0"))
 
-(defface jf/org-faces-epigraph '((default :inherit link
-					  :underline nil
-					  :slant oblique)
-				 (((class color) (min-colors 88) (background light))
-				  :foreground "#2a486a")
-				 (((class color) (min-colors 88) (background dark))
-				  :foreground "#b0d6f5"))
+(defface jf/org-faces-epigraph '((default :inherit link))
   "Face used to style `org-mode' epigraph links in the buffer."
   :group 'denote-faces
   :package-version '(denote . "0.5.0"))
 
-(defface jf/org-faces-abbr '((default :inherit link
-				      :underline t
-				      :slant oblique)
-			     (((class color) (min-colors 88) (background light))
-			      :foreground "#505050")
-			     (((class color) (min-colors 88) (background dark))
-			      :foreground "#a8a8a8"))
+(defface jf/org-faces-abbr '((default :inherit link))
   "Face used to style `org-mode' abbr links in the buffer."
   :group 'denote-faces
   :package-version '(denote . "0.5.0"))
