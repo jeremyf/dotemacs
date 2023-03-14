@@ -223,13 +223,12 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
              :branch "master")
   :bind
   ;;; This overwrite `ns-open-file-using-panel'; the operating system's "Finder"
-  ("C-c o" . consult-projectile)
+  ;; ("C-c o" . consult-projectile)
   ;;; I have long had Cmd+t mapped to opening project files; however, I'm
   ;;; noticing the way I'm typing this and it is feeling wrong.  So now I won't
   ;;; have that way open.
-  ("C-c t" . consult-projectile)
-  ("s-t" . consult-projectile)
-  ("H-t" . consult-projectile))
+  ("s-p" . consult-projectile)
+  ("H-p" . consult-projectile))
 
 (use-package corfu
   :straight t
