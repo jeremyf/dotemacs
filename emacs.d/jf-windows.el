@@ -27,9 +27,9 @@
       (side . right)
       (slot . 0)
       (window-parameters . ((mode-line-format . (" %b")))))
+     ("*Register Preview*" (display-buffer-reuse-window))
      ;; Maybe I want re-use
      (t (display-buffer-reuse-window display-buffer-same-window))
-     ;; (t (display-buffer-same-window))
      ;; These I want as part of the "default" windowing experience
      ;; ("\\*\\(elfeed\\|scratch\\).*"
      ;;  (display-buffer-same-window))

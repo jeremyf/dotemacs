@@ -78,6 +78,7 @@
          ("C-c h" . consult-history)
          ("C-c b" . consult-buffer)
          ("C-c k" . consult-kmacro)
+	 ("C-c o" . consult-org-agenda)
          ;; C-x bindings (ctl-x-map)
 	 ("C-x M-:" . consult-complex-command)
          ("C-x b" . consult-bookmark)
@@ -95,6 +96,7 @@
          ;; M-g bindings (goto-map)
          ("M-g e" . consult-compile-error)
          ("M-g g" . consult-goto-line)
+	 ("M-g M-o" . consult-org-agenda)
          ("M-g M-g" . consult-goto-line)
          ("s-l" . consult-goto-line)
          ("M-g o" . consult-outline)
@@ -111,6 +113,7 @@
          ("M-s r" . consult-ripgrep)
          ("C-c f" . consult-ripgrep)
          ("M-s l" . consult-line)
+	 ("M-s L" . consult-line-multi)
          ("M-s m" . consult-multi-occur)
          ("M-s k" . consult-keep-lines)
          ("M-s u" . consult-focus-lines)
@@ -130,7 +133,19 @@
   ;; Use Consult to select xref locations with preview
   (setq xref-show-xrefs-function #'consult-xref
         xref-show-definitions-function #'consult-xref)
+
+  ;; Optionally configure the register formatting. This improves the register
+  ;; preview for `consult-register', `consult-register-load',
+  ;; `consult-register-store' and the Emacs built-ins.
+  (setq register-preview-delay 0.5
+        register-preview-function #'consult-register-format)
+
+  ;; Optionally tweak the register preview window.
+  ;; This adds thin lines, sorting and hides the mode line of the window.
+  (advice-add #'register-preview :override #'consult-register-window)
+
   :custom
+  (consult-narrow-key "<")
   ;; Updating the default to include "--smart-case"
   ;; Leveraging ripgrep-all https://github.com/phiresky/ripgrep-all
   (consult-ripgrep-command
@@ -182,8 +197,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
               '((name . "wrapper")))
   (advice-add #'consult-ripgrep
               :around #'jf/consult-ripgrep-wrapper
-              '((name . "wrapper")))
-  )
+              '((name . "wrapper"))))
 
 
 (use-package embark-consult
@@ -227,6 +241,7 @@ DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
   ;;; I have long had Cmd+t mapped to opening project files; however, I'm
   ;;; noticing the way I'm typing this and it is feeling wrong.  So now I won't
   ;;; have that way open.
+  ("s-t" . consult-projectile)
   ("s-p" . consult-projectile)
   ("H-p" . consult-projectile))
 
