@@ -14,6 +14,7 @@
 ;;;; Other packages and their configurations
 
 (require 'jf-org-mode)
+
 (use-package abbrev
   ;; The =abbrev= package is simple and powerful, providing an auto-correct
   ;; that I configure.  No more “teh” in my text.
@@ -133,13 +134,13 @@
   ;; Updating the default to include "--smart-case"
   ;; Leveraging ripgrep-all https://github.com/phiresky/ripgrep-all
   (consult-ripgrep-command
-	(concat "rga --null --line-buffered --color=ansi --max-columns=1000 "
+	(concat "rga --null --hidden --line-buffered --color=ansi --max-columns=1000 "
 		"--smart-case --no-heading --line-number --no-ignore-vcs . "
 		"--glob !vendor/ --glob !coverage/ --glob !**/tmp/ --glob "
 		"!**/log/ --glob !public/ --glob !node_modules/ "
 		"-e ARG OPTS"))
   (consult-ripgrep-args
-	(concat "rga --null --line-buffered --color=never --max-columns=1000 "
+	(concat "rga --null --hidden q--line-buffered --color=never --max-columns=1000 "
 		"--path-separator / --no-ignore-vcs --smart-case --no-heading "
 		"--glob !vendor/ --glob !coverage/ --glob !**/tmp/ --glob "
 		"!**/log/ --glob !public/ --glob !node_modules/ "
@@ -273,6 +274,13 @@ Useful if you want a more robust view into the recommend candidates."
   ;; Recommended: Enable Corfu globally.
   ;; This is recommended since dabbrev can be used globally (M-/).
   (global-corfu-mode)
+  (load "~/.emacs.d/straight/build/corfu/extensions/corfu-indexed.el"
+	nil
+	jf/silence-loading-log)
+  (corfu-indexed-mode)
+  (load "~/.emacs.d/straight/build/corfu/extensions/corfu-info.el"
+	nil
+	jf/silence-loading-log)
   (load "~/.emacs.d/straight/build/corfu/extensions/corfu-popupinfo.el"
 	nil
 	jf/silence-loading-log)
