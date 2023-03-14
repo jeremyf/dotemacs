@@ -135,9 +135,9 @@
   ;; Leveraging ripgrep-all https://github.com/phiresky/ripgrep-all
   (consult-ripgrep-command
 	(concat "rga --null --hidden --line-buffered --color=ansi --max-columns=1000 "
-		"--smart-case --no-heading --line-number --no-ignore-vcs . "
+		"--smart-case --no-heading --line-number --no-ignore-vcs "
 		"--glob !vendor/ --glob !coverage/ --glob !**/tmp/ --glob "
-		"!**/log/ --glob !public/ --glob !node_modules/ "
+		"!**/log/ --glob !public/ --glob !node_modules/ ."
 		"-e ARG OPTS"))
   (consult-ripgrep-args
 	(concat "rga --null --hidden q--line-buffered --color=never --max-columns=1000 "
