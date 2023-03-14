@@ -107,7 +107,6 @@
 ;; 				       :cache t
 ;; 				       :face font-lock-string-face
 ;; 				       :bind "g"))
-;; (unbind-key "C-c d") ;; 'file-info-show
 ;; (global-set-key (kbd "C-c d") 'jf/duplicate-current-line-or-lines-of-region)
 (provide 'jf-menus)
 ;;; jf-menus.el ends here

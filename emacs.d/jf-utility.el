@@ -371,6 +371,9 @@ With argument, do this that many times."
 	 (list :command-name "run-command-samvera-versions"
 	       :command-line (format "cd %s; rg \"^ +((bulk|hy)rax|\\(*.\\)iiif\\(*.\\)|rails|qa|blacklight(-.*)?) \\(\\d+\\.\\d+\\.\\d+\" Gemfile.lock" dir)
 	       :display (format "Samvera gem versions for %s" dir))))
+     (list :command-name "install-dotzshrc-files"
+	   :command-line "cd ~/git/dotzshrc; ruby install.rb"
+	   :display "Install dotzshrc files")
      (list :command-name "run-command-takeonrules-server"
 	   :command-line "cd ~/git/takeonrules.source/; bin/rake knowledge_manager:pull"
 	   :display "Serve takeonrules.com locally")))
