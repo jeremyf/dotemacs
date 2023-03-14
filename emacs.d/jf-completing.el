@@ -163,42 +163,17 @@
   ;; Configure other variables and modes in the :config section,
   ;; after lazily loading the package.
   :config
+  (defun jf/region-text ()
+    "Get the active region's text"
+    (when (use-region-p)
+      (buffer-substring (region-beginning) (region-end))))
+  ;; When highlighting a word, choose that for the initial line filter.
+  (consult-customize consult-line :initial #'jf/region-text)
+  ;; When highlighting a word, choose that for the initial ripgrep search.
+  (consult-customize consult-ripgrep :initial #'jf/region-text)
   (consult-customize consult-theme :preview-key '(:debounce 0.5 any))
   (autoload 'projectile-project-root "projectile")
-  (setq consult-project-root-function #'projectile-project-root)
-
-  (defun jf/consult-first-param-is-initial-text (consult-fn &rest rest)
-    "Advising function around CONSULT-FN.
-
-The CONSULT-FN's first parameter should be the initial text.
-
-When there's an active region, use that as the first parameter
-for CONSULT-FN.  Otherwise, use an empty string the first
-parameter.  This function handles the REST of the parameters."
-    (interactive)
-    (apply consult-fn
-           (when (use-region-p)
-             (buffer-substring
-              (region-beginning) (region-end)))
-           rest))
-
-  (defun jf/consult-ripgrep-wrapper (consult-fn &optional dir given-initial)
-    "Advising function around CONSULT-FN.
-
-DIR and GIVEN-INITIAL match the method signature of `consult-wrapper'."
-    (interactive "P")
-    (let ((initial (list (or given-initial
-                             (when (use-region-p)
-                               (buffer-substring (region-beginning)
-						 (region-end)))))))
-      (apply consult-fn dir initial)))
-  (advice-add #'consult-line
-              :around #'jf/consult-first-param-is-initial-text
-              '((name . "wrapper")))
-  (advice-add #'consult-ripgrep
-              :around #'jf/consult-ripgrep-wrapper
-              '((name . "wrapper"))))
-
+  (setq consult-project-root-function #'projectile-project-root))
 
 (use-package embark-consult
   ;; I use ~embark.el~ and ~consult.el~, let’s add a little bit more connective
