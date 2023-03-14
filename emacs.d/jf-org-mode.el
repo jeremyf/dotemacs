@@ -68,6 +68,7 @@
 			  (file . find-file)
 			  (wl . wl-other-frame)))
   :config
+  (setq org-clock-persist t)
   (setq org-confirm-babel-evaluate #'jf/org-confirm-babel-evaluate
 	;; I'd prefer to use the executable, but that doe not appear to be the
 	;; implementation of org-babel.
@@ -235,6 +236,9 @@
 	 ("C-c a" . org-agenda)
 	 ("C-c c" . org-capture)
 	 ("C-s-t" . org-toggle-link-display)))
+
+(with-eval-after-load 'org
+  (org-clock-persistence-insinuate))
 
 ;; From https://oremacs.com/2017/10/04/completion-at-point/
 (defun jf/org-completion-symbols ()

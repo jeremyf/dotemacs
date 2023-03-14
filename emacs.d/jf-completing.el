@@ -163,15 +163,54 @@
   ;; Configure other variables and modes in the :config section,
   ;; after lazily loading the package.
   :config
-  (defun jf/region-text ()
-    "Get the active region's text"
-    (when (use-region-p)
-      (buffer-substring (region-beginning) (region-end))))
-  ;; When highlighting a word, choose that for the initial line filter.
-  (consult-customize consult-line :initial #'jf/region-text)
-  ;; When highlighting a word, choose that for the initial ripgrep search.
-  (consult-customize consult-ripgrep :initial #'jf/region-text)
-  (consult-customize consult-theme :preview-key '(:debounce 0.5 any))
+  (defun consult-clock-in (&optional match scope resolve)
+    "Clock into an Org heading."
+    (interactive (list nil nil current-prefix-arg))
+    (require 'org-clock)
+    (org-clock-load)
+    (save-window-excursion
+      (consult-org-heading
+       match
+       (or scope
+           (thread-last org-clock-history
+			(mapcar 'marker-buffer)
+			(mapcar 'buffer-file-name)
+			(delete-dups)
+			(delq nil))
+           (user-error "No recent clocked tasks")))
+      (org-clock-in nil (when resolve
+                          (org-resolve-clocks)
+                          (org-read-date t t)))))
+  (defvar jf/consult-filter-map
+    (let ((map (make-sparse-keymap)))
+      (define-key map (kbd "C-[") #'previous-history-element)
+      (define-key map (kbd "C-]") #'next-history-element)
+      map))
+  ;; Customizations
+  (consult-customize
+   ;; When highlighting a word, choose that for the initial line filter.
+   consult-line
+   :initial (when (use-region-p)
+	      (buffer-substring-no-properties
+	       (region-beginning) (region-end)))
+   :keymap jf/consult-filter-map
+   ;; When highlighting a word, choose that for the initial ripgrep search.
+   consult-ripgrep :initial (when (use-region-p)
+			      (buffer-substring-no-properties
+			       (region-beginning) (region-end)))
+   :keymap jf/consult-filter-map
+   ;; https://github.com/minad/consult/wiki#org-clock
+   consult-clock-in
+                   :prompt "Clock in: "
+                   :preview-key "M-."
+                   :group
+                   (lambda (cand transform)
+                     (let* ((marker (get-text-property 0 'consult--candidate cand))
+                            (name (if (member marker org-clock-history)
+                                      "*Recent*"
+                                    (buffer-name (marker-buffer marker)))))
+                       (if transform (substring cand (1+ (length name))) name)))
+   consult-theme :preview-key '(:debounce 0.5 any))
   (autoload 'projectile-project-root "projectile")
   (setq consult-project-root-function #'projectile-project-root))
 
