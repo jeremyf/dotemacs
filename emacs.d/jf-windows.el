@@ -93,6 +93,13 @@
   "Set the various custom faces for both `treesit' and `tree-sitter'."
   (modus-themes-with-colors
     (custom-set-faces
+     ;; `(org-meta-line
+     ;;   ((,c (:foreground ,yellow-faint))))
+     `(denote-faces-link
+       ((,c (:inherit link
+		      :box (:line-width (1 . 1)
+					:color ,border-mode-line-inactive
+					:style released-button)))))
      `(jf/org-faces-date
        ((,c :underline nil :foreground ,cyan-faint)))
      `(jf/org-faces-epigraph
