@@ -719,7 +719,7 @@ This function is intended for a global find of all notes."
   (if-let ((element (org-element-lineage (org-element-context) '(link) t)))
       ;; Change type
       (message "%s" element)
-    (error "Point is not an org-link.")))
+    (user-error "Point is not an org-link.")))
 
 ;;;;; Capturing functions for applications
 (defun jf/menu--org-capture-firefox ()

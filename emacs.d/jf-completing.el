@@ -185,7 +185,8 @@
     (let ((map (make-sparse-keymap)))
       (define-key map (kbd "C-[") #'previous-history-element)
       (define-key map (kbd "C-]") #'next-history-element)
-      map))
+      map)
+    "From https://github.com/minad/consult README")
   ;; Customizations
   (consult-customize
    consult-line consult-ripgrep consult-find
@@ -202,8 +203,7 @@
             (name (if (member marker org-clock-history)
                       "*Recent*"
                     (buffer-name (marker-buffer marker)))))
-       (if transform (substring cand (1+ (length name))) name)))
-   consult-theme :preview-key '(:debounce 0.5 any))
+       (if transform (substring cand (1+ (length name))) name))))
   (autoload 'projectile-project-root "projectile")
   (setq consult-project-root-function #'projectile-project-root))
 

@@ -131,7 +131,7 @@ Determine the PROJECT by querying `jf/project/list-projects'."
 	    (pulsar-pulse-line))
 	(progn
 	  (end-of-buffer)
-	  (error "No \"%s\" timesheet entry for today" project))))))
+	  (user-error "No \"%s\" timesheet entry for today" project))))))
 
 ;;;; Support Functions
 (cl-defun jf/project/list-projects (&key (project ".+")

@@ -133,7 +133,7 @@ When the SOURCE is a string, use `s-format' to expand the
    ;; Inclined to go with the following: "On the horizon you see ${table-name}."
    ((stringp source)
     (s-format source #'jf/roll-on-table/interpolate))
-   (t (error (format "Unable to handle %s." source)))))
+   (t (user-error (format "Unable to handle %s." source)))))
 
 
 ;;;;; Strider Mode
