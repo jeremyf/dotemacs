@@ -188,13 +188,7 @@
       map))
   ;; Customizations
   (consult-customize
-   ;; When highlighting a word, choose that for the initial line filter.
-   consult-line
-   :initial (when (use-region-p)
-	      (buffer-substring-no-properties (region-beginning) (region-end)))
-   :keymap jf/consult-filter-map
-   ;; When highlighting a word, choose that for the initial ripgrep search.
-   consult-ripgrep
+   consult-line consult-ripgrep consult-find
    :initial (when (use-region-p)
 	      (buffer-substring-no-properties (region-beginning) (region-end)))
    :keymap jf/consult-filter-map
