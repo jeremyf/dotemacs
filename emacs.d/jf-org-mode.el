@@ -145,7 +145,7 @@
 	   plain (file+function
 		  jf/primary-agenda-filename-for-machine
 		  jf/org-mode-agenda-find-merge-request-node)
-	   "***** IN-PROGRESS %^{URL of Merge Request} :mergerequest:"
+	   "***** IN-PROGRESS [#B] %^{URL of Merge Request} :mergerequest:"
 	   :immediate-finish t
 	   :jump-to-captured t
 	   :empty-lines-after 1
@@ -166,7 +166,7 @@
 		  jf/org-mode-agenda-find-project-node)
 	   ;; The five ***** is due to the assumptive depth of the projects and
 	   ;; tasks.
-	   "***** TODO %^{Describe the task} :tasks:\n\n"
+	   "***** TODO [#A] %^{Describe the task} :tasks:\n\n"
 	   :jump-to-captured t
 	   :immediate-finish t
 	   :clock-in t)))
