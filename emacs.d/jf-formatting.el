@@ -13,13 +13,9 @@
 
 ;;; Code
 
-(use-package ethan-wspace
-  ;; Whitespace hygene package.  The author's documentation and commentary
-  ;; echoes my sentiments.
+(use-package ws-butler
   :straight t
-  :hook (before-save . delete-trailing-whitespace)
-  :init (setq-default mode-require-final-newline nil)
-  :config (global-ethan-wspace-mode 1))
+  :hook (prog-mode . ws-butler-mode))
 
 (use-package fill-sentences-correctly
   ;; `fill-sentences-correctly-mode' ensures that `fill-paragraph' (e.g. M-q)

@@ -90,6 +90,7 @@
          ("M-'" . consult-register-store)
          ("M-`" . consult-register)
          ;; Other custom bindings
+         ("C-y" . consult-yank-from-kill-ring)
          ("M-y" . consult-yank-from-kill-ring)
          ("<help> a" . consult-apropos)
          ("M-s k" . consult-keep-lines)
@@ -207,6 +208,31 @@
   (autoload 'projectile-project-root "projectile")
   (setq consult-project-root-function #'projectile-project-root))
 
+
+(defun consult-org--narrow ()
+  "Narrowing configuration for `consult-org' commands."
+  (let ((todo-kws
+         (seq-filter
+          (lambda (x) (<= ?a (car x) ?z))
+          (mapcar (lambda (s)
+                    (pcase-let ((`(,a ,b) (split-string s "(")))
+                      (cons (downcase (string-to-char (or b a))) a)))
+                  (apply #'append (mapcar #'cdr org-todo-keywords))))))
+    (list :predicate
+          (lambda (cand)
+            (pcase-let ((`(,level ,todo . ,prio)
+                         (get-text-property 0 'consult-org--heading cand)))
+              (cond
+               ((<= ?1 consult--narrow ?9) (= level (- consult--narrow ?0)))
+               ((<= ?A consult--narrow ?Z) (eq prio consult--narrow))
+               (t (equal todo (alist-get consult--narrow todo-kws))))))
+          :keys
+          (nconc (mapcar (lambda (c) (cons c (format "Level %c" c)))
+                         (number-sequence ?1 ?9))
+                 (mapcar (lambda (c) (cons c (format "Priority %c" c)))
+                         (number-sequence (max ?A org-highest-priority)
+                                          (min ?Z org-lowest-priority)))
+                 todo-kws))))
 (use-package embark-consult
   ;; I use ~embark.el~ and ~consult.el~, let’s add a little bit more connective
   ;;  tissue.

@@ -15,7 +15,7 @@
  '(dired-use-ls-dired t)
  '(global-display-line-numbers-mode t)
  '(org-agenda-files
-   '("~/git/org/denote/melange/20230212T112800--inventory-of-worlds-without-number-subsystems__rpgs.org" "~/git/org/agenda.org" "~/git/takeonrules.source/agenda.org" "~/git/org/denote/scientist/20221021T221357--scientist-agenda__scientist.org"))
+   '(~/git/org/agenda.org" "~/git/takeonrules.source/agenda.org" "~/git/org/denote/scientist/20221021T221357--scientist-agenda__scientist.org"))
  '(org-export-backends '(ascii html icalendar latex md odt))
  '(safe-local-variable-values
    '((projectile-require-project-root)
@@ -32,3 +32,19 @@
  '(use-package-always-ensure t)
  '(warning-suppress-log-types '((comp)))
  '(warning-suppress-types '((comp))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(denote-faces-link ((((class color) (min-colors 256)) (:inherit link :box (:line-width (1 . 1) :color "#a59a94" :style released-button)))))
+ '(font-lock-misc-punctuation-face ((((class color) (min-colors 256)) :foreground "#316500")))
+ '(font-lock-regexp-face ((((class color) (min-colors 256)) :foreground "#8f0075")))
+ '(jf/org-faces-abbr ((((class color) (min-colors 256)) :underline t :slant oblique :foreground "#595959")))
+ '(jf/org-faces-date ((((class color) (min-colors 256)) :underline nil :foreground "#005077")))
+ '(jf/org-faces-epigraph ((((class color) (min-colors 256)) :underline nil :slant oblique :foreground "#193668")))
+ '(org-list-dt ((((class color) (min-colors 256)) :bold t :slant italic :foreground "#193668")))
+ '(tree-sitter-hl-face:constant ((((class color) (min-colors 256)) :slant italic :foreground "#531ab6")))
+ '(tree-sitter-hl-face:method.call ((((class color) (min-colors 256)) :slant italic :foreground "#193668")))
+ '(tree-sitter-hl-face:operator ((((class color) (min-colors 256)) :foreground "#7f0000")))
+ '(tree-sitter-hl-face:property ((((class color) (min-colors 256)) :inherit font-lock-variable-name-face))))
