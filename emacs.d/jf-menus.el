@@ -46,7 +46,7 @@
     ("j g" "Global Mark" consult-global-mark)
     ("j h" "Hugo File" jf/jump_to_corresponding_hugo_file :if-derived org-mode)
     ("j m" "Mark" consult-mark)
-    ;; ("j P" "Jump in PDF" doc-view-goto-page :if-derived doc-view-mode)
+    ("j p" "Jump in Pull requests" jf/org-mode/open-all-unresolved-pull-requests)
     ("j l" "Jump to List of Projects" magit-list-repositories)
     ;; ("j s" "Jump to Shortdoc" shortdoc-display-group)
     ("j v" "Jump to Violet Sprint Board" (lambda () (interactive) (eww-browse-with-external-browser "https://github.com/orgs/scientist-softserv/projects/43") ))

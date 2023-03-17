@@ -513,7 +513,7 @@ Assumes that I'm on a :projects: headline.
 			 (when (org-goto-first-child)
 			   (cl-loop collect (concat "- "
 						    (org-no-properties
-						     (org-get-heading t t)))
+						     (org-get-heading t t t t)))
 				    while (outline-get-next-sibling))))))
 	 (hours (/ (org-clock-sum-current-item) 60.0))
 	 (output (format "Tasks:\n%s\nProject: %s\nHours: %s\n"
@@ -978,6 +978,16 @@ I envision this function called from the command-line."
     (with-current-buffer (window-buffer)
       (goto-char (point-max))
       (insert "\n" text))))
+
+(defun jf/org-mode/open-all-unresolved-pull-requests ()
+  "Opens all unresolved pull requests identified in agenda."
+  (interactive)
+  (dolist (url (-distinct
+		(org-map-entries
+		 (lambda ()
+		   (org-element-property :raw-value (org-element-at-point)))
+		 "+LEVEL=5+mergerequests+TODO=\"IN-REVIEW\"" 'agenda)))
+    (eww-browse-with-external-browser url)))
 
 (provide 'jf-org-mode)
 ;;; jf-org-mode.el ends here
