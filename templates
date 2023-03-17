@@ -79,7 +79,7 @@ org-mode
 (today "[[date:" (format-time-string "%Y-%m-%d") "][today]]")
 (Today "[[date:" (format-time-string "%Y-%m-%d") "][Today]]")
 (tor "[[https://takeonrules.com][Take on Rules]]")
-(uml "#+begin_src plantuml" n> "@startuml" n> "!theme amiga" n> q n> "@enduml" n> "#+end_src" n>)
+(puml "#+begin_src plantuml" n> "@startuml" n> "!theme amiga" n> q n> "@enduml" n> "#+end_src" n>)
 (project n "#+PROJECT_NAME: " (p "Project Name: " project-name)
 	 n "#+PROJECT_PATHS: (\"Code, Local\" . \"" p "\")"
 	 n "#+PROJECT_PATHS: (\"Notes, " (s project-name) "\" . \"" (buffer-file-name)  "\")"
