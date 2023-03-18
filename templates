@@ -81,13 +81,7 @@ org-mode
 (tor "[[https://takeonrules.com][Take on Rules]]")
 (puml "#+begin_src plantuml" n> "@startuml" n> "!theme amiga" n> q n> "@enduml" n> "#+end_src" n>)
 (project n "#+PROJECT_NAME: " (p "Project Name: " project-name)
-	 n "#+PROJECT_PATHS: (\"Code, Local\" . \"" p "\")"
-	 n "#+PROJECT_PATHS: (\"Notes, " (s project-name) "\" . \"" (buffer-file-name)  "\")"
-	 n "#+PROJECT_PATHS: (\"Project Board\" . \"" p "\")"
-	 n "#+PROJECT_PATHS: (\"Code, Remote\" . \"" (p "Remote Code: " remote) "\")"
-	 n "#+PROJECT_PATHS: (\"Actions\" . \"" (s remote) "actions/\")"
-	 n "#+PROJECT_PATHS: (\"Issues\" . \"" (s remote) "issues/\")"
-	 n "#+PROJECT_PATHS: (\"Pull Requests\" . \"" (s remote) "pulls/\")")
+	 n "#+PROJECT_PATHS: (\"Notes, " (s project-name) "\" . \"" (buffer-file-name)  "\")")
 
 (update "#+attr_shortcode: :date " (format-time-string "%Y-%m-%d")
 	" :mode " (p (completing-read "Mode: " '(inline paragraph sidenote section fallback) nil t) mode)
