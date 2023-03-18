@@ -27,7 +27,9 @@
   :init (global-tree-sitter-mode)
   (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
 
-(use-package tree-sitter-langs :straight t)
+(use-package tree-sitter-langs
+  ;; Provides the languages "dictionaries" for tree-sitter highlighting.
+  :straight t)
 
 ;; (use-package treesit
 ;;   :custom (treesit-font-lock-level 4)
@@ -66,6 +68,8 @@
     (editorconfig-mode 1))
 
 (use-package eglot
+  ;; The Language Server Protocol (LSP) is a game changer; having access to that
+  ;; tooling is very much a nice to have.
   :hook ((css-mode css-ts-mode
           ruby-mode ruby-ts-mode
           yaml-mode yaml-ts-mode
@@ -83,6 +87,9 @@
                `(ruby-ts-mode . ("solargraph" "socket" "--port" :autoport)))
 
   (defun jf/eglot-capf ()
+    ;; I don't want `eglot-completion-at-point' to trample my other completion
+    ;; options.
+    ;;
     ;; https://stackoverflow.com/questions/72601990/how-to-show-suggestions-for-yasnippets-when-using-eglot
     (setq-local completion-at-point-functions
 		(list (cape-super-capf
@@ -92,10 +99,13 @@
   :straight t)
 
 (use-package eglot-tempel
+  ;; I use `tempel' and I use `eglot'; having some glue between those helps.
   :after (eglot)
   :straight (eglot-tempel :host github :repo "fejfighter/eglot-tempel"))
 
-(use-package eldoc :straight t)
+(use-package eldoc
+  ;; Helps with rendering documentation
+  :straight t)
 
 ;; I don't use this package
 ;; (use-package emacs-refactor
@@ -112,15 +122,20 @@
 ;;          (css-mode . emmet-mode)))
 
 (use-package ruby-mode
+  ;; My language of choice for professional work.
   :straight (:type built-in)
   :hook ((ruby-mode ruby-ts-mode) . (lambda () (setq fill-column 100))))
 
 ;; I don't use this package
 ;; (use-package go-mode :straight t)
 
+;; An odd little creature, hide all comment lines.  Sometimes this can be a
+;; useful tool for viewing implementation details.
 (require 'hide-comnt)
 
-(use-package json-mode :straight t)
+(use-package json-mode
+  ;; The web's data structure of choice is JSON.
+  :straight t)
 
 (use-package json-reformat
   ;; Because JSON can be quite ugly, I want something to help tidy it up.
@@ -143,6 +158,8 @@
 
 (use-package plantuml-mode
   ;; A mode for working with PlantUML.  See https://plantuml.com
+  ;;
+  ;;
   :config (setq plantuml-executable-path (concat
 					  (getenv "HB_PATH")
 					  "/bin/plantuml")
@@ -156,6 +173,8 @@
   :straight t)
 
 (use-package rspec-mode
+  ;; I write most of my Ruby tests using rspec.  This tool helps manage that
+  ;; process.
   :straight t
   ;; Ensure that we’re loading ruby-mode before we do any rspec loading.
   :after ruby-mode
@@ -168,21 +187,24 @@
   :hook ((dired-mode . rspec-dired-mode)
 	 (ruby-mode . rspec-mode)
 	 (ruby-ts-mode . rspec-mode))
+  ;; Dear reader, make sure that you can jump from spec and definition.  And in
+  ;; Ruby land when you have lib/my_file.rb, the corresponding spec should be in
+  ;; spec/my_file_spec.rb; and when you have app/models/my_file.rb, the spec
+  ;; should be in spec/models/my_file_spec.rb
   :bind (:map rspec-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
-  :bind (:map ruby-mode-map (("s-." . 'rspec-toggle-spec-and-target))))
-
-(defun jf/rspec-spring-p ()
-  "Check the project for spring as part of the Gemfile.lock."
-  (let ((gemfile-lock (f-join (projectile-project-root) "Gemfile.lock")))
-    (and (f-exists? gemfile-lock)
-	 (s-present?
-	  (shell-command-to-string
-	   (concat "rg \"^ +spring \" " gemfile-lock))))))
-
-;; Out of the box, for my typical docker ecosystem, the `rspec-spring-p'
-;; function does not work.  So I'm overriding the default behavior to match my
-;; ecosystem.
-(advice-add #'rspec-spring-p :override #'jf/rspec-spring-p)
+  :bind (:map ruby-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
+  :init
+  (defun jf/rspec-spring-p ()
+    "Check the project for spring as part of the Gemfile.lock."
+    (let ((gemfile-lock (f-join (projectile-project-root) "Gemfile.lock")))
+      (and (f-exists? gemfile-lock)
+	   (s-present?
+	    (shell-command-to-string
+	     (concat "rg \"^ +spring \" " gemfile-lock))))))
+  ;; Out of the box, for my typical docker ecosystem, the `rspec-spring-p'
+  ;; function does not work.  So I'm overriding the default behavior to match my
+  ;; ecosystem.
+  (advice-add #'rspec-spring-p :override #'jf/rspec-spring-p))
 
 (use-package ruby-interpolation
   ;; Nice and simple package for string interpolation.
@@ -190,16 +212,25 @@
   :hook (ruby-mode . ruby-interpolation-mode))
 
 (use-package sql-indent
+  ;; SQL, oh how I love thee and wish I worked more with thee.
   :straight t
   :hook (sql-mode . sqlind-minor-mode))
 
-(use-package string-inflection :straight t)
+(use-package string-inflection
+  ;; A quick way to change case and separators for words.
+  :straight t)
 
-(use-package typescript-mode :straight t)
+(use-package typescript-mode
+  ;; I have this for the work I once did a few years ago.  I am happiest when
+  ;; I'm not working in Javascript.
+  :straight t)
 
-(use-package vterm :straight t)
+(use-package vterm
+  ;; A terminal in Emacs.
+  :straight t)
 
 (use-package web-mode
+  ;; Help consistently edit web documents of SGML markup dialetcs.
   :straight t
   :config (setq web-mode-markup-indent-offset 2
                 web-mode-css-indent-offset 2
@@ -210,18 +241,25 @@
   (add-to-list `auto-mode-alist '("\\.svg\\'" . xml-mode)))
 
 (use-package xml-format
+  ;; Encountering unformatted XML is jarring; this package helps formatt it for
+  ;; human legibility.
   :straight t
   :after nxml-mode)
 
-(use-package yaml-mode :straight t)
+(use-package yaml-mode
+  ;; Oh yaml, I once thought you better than XML.  Now, you are ubiquitous and a
+  ;; bit imprecise.  Still better than JSON; which doesn't allow for comments.
+  :straight t)
 
 (use-package yard-mode
+  ;; My prefered Ruby documentation syntax
   :straight t
   :hook ((ruby-mode . yard-mode)
 	 (ruby-ts-mode . yard-mode)))
 
-;; Download and install documents from https://devdocs.io/
 (use-package devdocs
+  ;; Download and install documents from https://devdocs.io/
+  ;; Useful for having local inline docs
   :straight t
   :commands (devdocs-install))
 
