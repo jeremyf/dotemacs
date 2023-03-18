@@ -277,7 +277,7 @@
   ("s-t" . consult-projectile)
   ("s-p" . consult-projectile)
   ("H-t" . consult-projectile)
-  ("h-p" . consult-projectile))
+  ("H-p" . consult-projectile))
 
 (use-package corfu
   :straight t
