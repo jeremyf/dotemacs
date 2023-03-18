@@ -34,7 +34,7 @@ The files and directories:
 
 * The emacs.d Directory
 
-There are two “primary” files to consider in ~./emacs.d~:
+There are two “primary” files to consider in =./emacs.d=:
 
 - [[file:emacs.d/init.el][init.el]] :: The file evaluated when Emacs launches.
 - early-init.el :: The file evaluated early on when Emacs launches.
