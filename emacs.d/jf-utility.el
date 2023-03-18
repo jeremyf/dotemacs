@@ -133,8 +133,6 @@
 
 ;;;; Hammerspoon --------------------------------------------------------------
 
-
-
 ;; Hammerspoon is Lua application that provides a consistent API for
 ;; interacting with MacOS.  The editWithEmacs.spoon allows me to copy text from
 ;; one region, edit it in Emacs, and paste it back into the Application.
@@ -159,9 +157,6 @@
 		    'face 'transient-argument)))
   (interactive)
   (hammerspoon-toggle-mode))
-
-
-
 
 ;; The following function facilitates a best of both worlds.  By default, I
 ;; want Option to be Meta (e.g. \"M-\") in Emacs.  However, I can toggle that
@@ -195,7 +190,6 @@
       (message "Evaluating region...")
       (eval-region (region-beginning) (region-end)))
     (setq-local deactivate-mark t)))
-
 
 (global-set-key (kbd "C-k") 'jf/kill-line-or-region)
 (defun jf/kill-line-or-region (&optional arg)
@@ -253,9 +247,8 @@
   (delete-duplicate-lines beg end reverse adjacent keep-blanks interactive))
 
 ;; Sometimes I just want to duplicate an area without copy and paste.  This
-  ;; helps that process.  It’s not as smart as TextMate’s equivalent function,
-  ;; but it’s close enough.
-
+;; helps that process.  It’s not as smart as TextMate’s equivalent function,
+;; but it’s close enough.
 (global-set-key (kbd "C-M-d") 'jf/duplicate-current-line-or-lines-of-region)
 (global-set-key (kbd "C-c d") 'jf/duplicate-current-line-or-lines-of-region)
 (defun jf/duplicate-current-line-or-lines-of-region (arg)
