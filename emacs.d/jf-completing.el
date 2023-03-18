@@ -54,6 +54,7 @@
   (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode))
 
 (use-package embark
+  ;; The "missing" context menu; a bit like the right-click but more.
   :straight t
   :bind
   (("C-." . embark-act)       ;; pick some comfortable binding
@@ -72,6 +73,8 @@
 	embark-become-indicator embark-action-indicator))
 
 (use-package consult
+  ;; Extensions for the numerous `completing-read' functions.  Highly extensible
+  ;; and customizable.
   :straight t
   ;; Replace bindings. Lazily loaded due by `use-package'.
   :bind (;; C-c bindings (mode-specific-map)
@@ -134,17 +137,14 @@
   ;; Use Consult to select xref locations with preview
   (setq xref-show-xrefs-function #'consult-xref
         xref-show-definitions-function #'consult-xref)
-
   ;; Optionally configure the register formatting. This improves the register
   ;; preview for `consult-register', `consult-register-load',
   ;; `consult-register-store' and the Emacs built-ins.
   (setq register-preview-delay 0.5
         register-preview-function #'consult-register-format)
-
   ;; Optionally tweak the register preview window.
   ;; This adds thin lines, sorting and hides the mode line of the window.
   (advice-add #'register-preview :override #'consult-register-window)
-
   :custom
   (consult-narrow-key "<")
   ;; Updating the default to include "--smart-case"
@@ -209,30 +209,6 @@
   (setq consult-project-root-function #'projectile-project-root))
 
 
-(defun consult-org--narrow ()
-  "Narrowing configuration for `consult-org' commands."
-  (let ((todo-kws
-         (seq-filter
-          (lambda (x) (<= ?a (car x) ?z))
-          (mapcar (lambda (s)
-                    (pcase-let ((`(,a ,b) (split-string s "(")))
-                      (cons (downcase (string-to-char (or b a))) a)))
-                  (apply #'append (mapcar #'cdr org-todo-keywords))))))
-    (list :predicate
-          (lambda (cand)
-            (pcase-let ((`(,level ,todo . ,prio)
-                         (get-text-property 0 'consult-org--heading cand)))
-              (cond
-               ((<= ?1 consult--narrow ?9) (= level (- consult--narrow ?0)))
-               ((<= ?A consult--narrow ?Z) (eq prio consult--narrow))
-               (t (equal todo (alist-get consult--narrow todo-kws))))))
-          :keys
-          (nconc (mapcar (lambda (c) (cons c (format "Level %c" c)))
-                         (number-sequence ?1 ?9))
-                 (mapcar (lambda (c) (cons c (format "Priority %c" c)))
-                         (number-sequence (max ?A org-highest-priority)
-                                          (min ?Z org-lowest-priority)))
-                 todo-kws))))
 (use-package embark-consult
   ;; I use ~embark.el~ and ~consult.el~, let’s add a little bit more connective
   ;;  tissue.
@@ -280,6 +256,7 @@
   ("H-p" . consult-projectile))
 
 (use-package corfu
+  ;; Completion overlay; a narrower intreface than the more verbose company.
   :straight t
   ;; Optionally use TAB for cycling, default is `corfu-complete'.
   :bind (:map corfu-map
@@ -335,6 +312,8 @@ Useful if you want a more robust view into the recommend candidates."
   (corfu-popupinfo-mode))
 
 (use-package cape
+  ;; Completion at point functions, with the amazing `cape-super-capf' for
+  ;; granular configuration of specific mode completion behavior.
   :straight t
   :init (add-to-list 'completion-at-point-functions #'cape-dabbrev)
   (add-to-list 'completion-at-point-functions #'cape-file)
@@ -365,8 +344,7 @@ Useful if you want a more robust view into the recommend candidates."
   :bind (("C-c g" . grab-mac-link)))
 
 (use-package helpful
-  ;; Similar to `grab-mac-link' this specifically grabs a link and inserts in
-  ;; `org-mode' format.
+  ;; Help me lookup definitions and details.
   :init
   (use-package transient :straight t)
   ;; I'm going to talk about this later, but I'm adding this to the menu, so I
@@ -396,14 +374,20 @@ Useful if you want a more robust view into the recommend candidates."
   ("C-s-h" . jf/helpful-menu))
 
 (use-package hippie-exp
+  ;; A composable expansion tool that I find compliments `corfu' in that it
+  ;; looks in a different manner for completions.
+  ;;
+  ;; TODO: Perhaps I should spend a bit time investigating removing `hippie-exp'
+  ;; in favor of `corfu' behavior.  Definitely spend a bit of time exploring
+  ;; this option.
   :straight t
   :config
   (setq hippie-expand-try-functions-list '(try-expand-dabbrev-visible
 					   try-expand-dabbrev
 					   try-expand-dabbrev-all-buffers
 					   try-expand-dabbrev-from-kill
-					   try-complete-file-name-partially
 					   try-complete-file-name
+					   try-complete-file-name-partially
 					   try-expand-all-abbrevs
 					   try-expand-list
 					   try-expand-line
@@ -413,6 +397,11 @@ Useful if you want a more robust view into the recommend candidates."
   :init (global-set-key [remap dabbrev-expand] 'hippie-expand))
 
 (use-package marginalia
+  ;; Given that my blog has lots of "writing in the margins" this is the package
+  ;; for me.
+  ;;
+  ;; It provides annotations for completions; in particular I rely on showing
+  ;; the docstring of `M-x' results.
   :straight t
   :config (setq marginalia-max-relative-age 0) ;; Set absolute value
   ;; /Note:/ The declaration of `marginalia-mode' must be in the :init
@@ -501,10 +490,15 @@ Useful if you want a more robust view into the recommend candidates."
         orderless-style-dispatchers '(+orderless-dispatch)))
 
 (use-package org-mac-link
+  ;; Similar to `grab-mac-link' but a bit specific to `org-mode'.
   :straight (org-mac-link :type git :host github :repo "jeremyf/org-mac-link")
   :bind (:map org-mode-map (("C-c g" . org-mac-grab-link))))
 
 (use-package tempel
+  ;; For awhile, I'd used yasnippets; themselves inspired by my beloved
+  ;; TextMate.  However, I've found `tempel' to be both more than adequate and
+  ;; has a narrower implementation foot-print, cleaving closer to emacs-lisp;
+  ;; thus likely easing it's maintenance burden.
   :straight (tempel :host github :repo "minad/tempel")
   :custom (tempel-path "~/git/dotemacs/templates")
   :config (global-tempel-abbrev-mode)
@@ -550,6 +544,10 @@ Useful if you want a more robust view into the recommend candidates."
   (tempel-key "H-m k" keyboard org-mode-map))
 
 (use-package vertico
+  ;; Another one of minad's packages which improves my day to day experience.  I
+  ;; find the user experience wonderful when pairing vertical candidate
+  ;; selection with `marginalia' and then having the `vertico-indexed-mode'
+  ;; option for quick numerical selection.
   :straight (:type git :host github :repo "minad/vertico")
   :config
   ;; https://github.com/minad/vertico/wiki#restrict-the-set-of-candidates
@@ -579,6 +577,7 @@ Useful if you want a more robust view into the recommend candidates."
         completion-ignore-case t)
   (setq vertico-cycle t)
   :init
+  ;; Type "C-3 return" and select the 3rd candidate in the list.
   (load "~/.emacs.d/straight/build/vertico/extensions/vertico-indexed.elc"
 	nil
 	jf/silence-loading-log)
@@ -593,6 +592,12 @@ Useful if you want a more robust view into the recommend candidates."
   (add-hook 'minibuffer-setup-hook #'vertico-repeat-save))
 
 (use-package which-key
+  ;; This package helps me begin typing a key sequence and seeing what options
+  ;; are available to complete the sequence.
+  ;;
+  ;; For example, I type "C-c", wait a moment and get a menu that shows me what
+  ;; key bindings start with "C-c"; and then I can type the following key and
+  ;; execute that command.
   :straight t
   :custom
   (which-key-side-window-max-width 70)
