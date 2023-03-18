@@ -66,14 +66,6 @@
   ;; (See https://github.com/magnars/s.el/)
   :straight t)
 
-(use-package editorconfig
-  ;; “EditorConfig helps maintain consistent coding styles for multiple
-  ;; developers working on the same project across various editors and IDEs.”
-  ;; See https://editorconfig.org/#overview for more details.
-  :straight t
-  :config
-  (editorconfig-mode 1))
-
 (use-package deadgrep
   ;; Where consult-rg provides a live search feature, deadgrep provides a
   ;; resulting search buffer.  You submit your search term and get the metadata

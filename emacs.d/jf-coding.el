@@ -63,9 +63,12 @@
   :straight t)
 
 (use-package editorconfig
-    :straight t
-    :config
-    (editorconfig-mode 1))
+  ;; “EditorConfig helps maintain consistent coding styles for multiple
+  ;; developers working on the same project across various editors and IDEs.”
+  ;; See https://editorconfig.org/#overview for more details.
+  :straight t
+  :config
+  (editorconfig-mode 1))
 
 (use-package eglot
   ;; The Language Server Protocol (LSP) is a game changer; having access to that
