@@ -14,6 +14,7 @@
 ;;; Code
 
 (use-package ws-butler
+  ;; Keep white space tidy.
   :straight t
   :hook (prog-mode . ws-butler-mode))
 
@@ -26,6 +27,9 @@
   :hook (fundamental-mode . fill-sentences-correctly-mode))
 
 (use-package tomelr
+  ;; Emacs-Lisp Library for converting S-expressions to TOML.  I'll likely be
+  ;; using this as I move my Hugo front-matter from YAML to TOML, as per the
+  ;; changes described by `ox-hugo'.
   :straight (tomelr :host github :repo "kaushalmodi/tomelr"))
 
 (provide 'jf-formatting)

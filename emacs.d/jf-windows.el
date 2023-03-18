@@ -14,6 +14,7 @@
 (mapc #'disable-theme custom-enabled-themes)
 
 (use-package window
+  ;; Wrangle up how windows and buffers display.
   :straight (:type built-in)
   :custom
   (display-buffer-alist
@@ -124,11 +125,10 @@
 (add-hook 'modus-themes-after-load-theme-hook
 	  #'jf/modus-themes-custom-faces)
 
-;; I love [[http://protesilaos.com][Prot]]’s attention to detail with the modus
-;; themes.  Here’s my configuration for these two sibling themes.  There’s a
-;; bit of chatter, but all told it sets things up how I like.
 (use-package modus-themes
-  ;; :straight (modus-themes :type built-in)
+  ;; I love [[http://protesilaos.com][Prot]]’s attention to detail with the modus
+  ;; themes.  Here’s my configuration for these two sibling themes.  There’s a
+  ;; bit of chatter, but all told it sets things up how I like.
   :straight (:type git :host gitlab :repo "protesilaos/modus-themes" :branch "main")
   :init
   (setq modus-themes-italic-constructs t
@@ -180,13 +180,13 @@
 (jf/emacs-theme-by-osx-appearance)
 
 ;;;; Buffers and Tabs
-;; https://github.com/alphapapa/bufler.el
-;;
-;; Why this instead of Centaur Tabs?  `bufler' integrates with `tab-bar-mode'
-;; and `tab-lines-mode'.  Why is this important?  Because `centaur-tabs-mode'
-;; hack the buffer to add the tabs; the impact was that popped buffers would
-;; have sizing issues.
+
 (use-package bufler
+  ;; https://github.com/alphapapa/bufler.el
+  ;; Why this instead of Centaur Tabs?  `bufler' integrates with `tab-bar-mode'
+  ;; and `tab-lines-mode'.  Why is this important?  Because `centaur-tabs-mode'
+  ;; hack the buffer to add the tabs; the impact was that popped buffers would
+  ;; have sizing issues.
   :straight t
   :hook (after-init . (bufler-mode))
   :custom (bufler-columns '("Name" "VC" "Path"))
@@ -206,7 +206,6 @@
   (defun jf/bufler-list-buffer-switch (&rest args)
     (kill-buffer "*Bufler*"))
   (advice-add 'bufler-list-buffer-switch :after 'jf/bufler-list-buffer-switch)
-
   :bind (:map bufler-list-mode-map
 	      ("s-3" . quit-window)
 	      ("s-\\" . quit-window))

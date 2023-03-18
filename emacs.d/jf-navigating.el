@@ -10,18 +10,20 @@
 
 ;;;; Packages
 (use-package ace-window
+  ;; Quick navigation from window to window.
   :straight t
   :custom (aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
   :bind (("C-x o" . ace-window)
 	 ("M-o" . ace-window)))
 
 (use-package avy
-;; Pick a letter, avy finds all words with that at the beginning of it.  Narrow
-;; results from there.
+  ;; Pick a letter, avy finds all words with that at the beginning of it.  Narrow
+  ;; results from there.
   :bind (("C-j" . avy-goto-char-2))
   :straight t)
 
 (use-package imenu-list
+  ;; Show an outline summary of the current buffer.
   :custom (imenu-list-focus-after-activation t)
   (imenu-list-size 0.4)
   (imenu-list-position 'right)
@@ -30,6 +32,9 @@
   :straight t)
 
 (use-package link-hint
+  ;; I use this more and more and more.  Invoking `link-hint-open-link'
+  ;; highlights the visible URLs, providing quick keys to then open those URLs.
+  ;; If there's only one candidate, the function opens that URL.
   :straight t
   :bind
   ("C-c l o" . link-hint-open-link)

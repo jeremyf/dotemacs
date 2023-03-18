@@ -8,6 +8,7 @@
 
 ;;; Code
 (use-package doc-view
+  ;; A package for improving the in Emacs viewing experience of PDFs.
   :straight (doc-view :type built-in)
   :bind (:map doc-view-mode-map
               ("C-c g" . doc-view-goto-page)))

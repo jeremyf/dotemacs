@@ -64,6 +64,9 @@
 
 ;;;; Loading dependencies
 (use-package denote
+  ;; A narrow focus tool for organizing notes.  I appreciate the design
+  ;; constraints and lack of external dependencies.  This package provides
+  ;; portability.  It sits as an alternate to the amazing `org-roam' package.
   :straight (denote :host nil
 		    :type git
 		    :repo "https://git.sr.ht/~protesilaos/denote")

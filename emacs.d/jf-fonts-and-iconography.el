@@ -13,6 +13,8 @@
 
 ;;;; Fonts
 (use-package fontaine
+  ;; A narrow focus package for naming font configurations and then selecting
+  ;; them.
   :straight t
   :config
   (setq fontaine-presets
@@ -57,7 +59,7 @@
 ;;;; Icons
 
 (use-package all-the-icons
-  ;; Useful for referential icons.
+  ;; It's nice to see icons as a quick visual helper.
   :straight t
   :config
   (cl-defmacro jf/all-the-icons--with(&key name)
@@ -88,6 +90,9 @@
 
 ;;;; Typography
 (use-package typopunct
+  ;; A package that provides some automatic replacement of strings of keys.  For
+  ;; example in text-mode, when I type three periods (e.g. “.”) typopunct
+  ;; replaces that with an ellipsis (e.g. “…”)
   :straight t
   :config
   (add-hook 'org-mode-hook 'jf/typopunct-init)
@@ -96,7 +101,6 @@
     (typopunct-change-language 'english)
     (typopunct-mode 1))
   (setq typopunct-buffer-language 'english)
-
   ;; To insert a typographical ellipsis sign (…) on three consecutive
   ;; dots, or a middle dot (·) on ‘^.’
   (defconst typopunct-ellipsis (decode-char 'ucs #x2026))
@@ -117,14 +121,11 @@
      (t
       (self-insert-command arg))))
   (define-key typopunct-map "." 'typopunct-insert-ellipsis-or-middot)
-
-
   ;; feet, arcminutes, derivatives
   (defconst typopunct-prime  (decode-char 'ucs #x2032))
   ;; inches, arcseconds, double derivatives
   (defconst typopunct-dprime (decode-char 'ucs #x2033))
   (defconst typopunct-tprime (decode-char 'ucs #x2034))
-
   ;; The minus sign (−) is separate from the hyphen (-), en dash (–) and
   ;; em dash (—). To build upon the clever behavior of the ‘-’ key
   (defconst typopunct-minus (decode-char 'ucs #x2212))
@@ -159,7 +160,6 @@
 	       (insert typopunct-times))
       (self-insert-command arg)))
   (define-key typopunct-map "x" 'typopunct-insert-times)
-
   (defadvice typopunct-insert-quotation-mark (around wrap-region activate)
     (let* ((lang (or (get-text-property (point) 'typopunct-language)
 		     typopunct-buffer-language))

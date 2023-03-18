@@ -10,10 +10,13 @@
 
 ;;; Code
 (use-package project
+  ;; I'm unclear why I have this and projectile declared/required.
+  ;;
+  ;; TODO: Can I not require this?
   :straight t)
 
 (use-package projectile
-  ;; Convenient organization and commands
+  ;; Convenient organization and commands for projects.
   :straight t
   :config (projectile-mode 1)
   :custom (projectile-project-search-path '("~/git/"))

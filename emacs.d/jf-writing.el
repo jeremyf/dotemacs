@@ -14,6 +14,7 @@
 (require 'jf-denote)
 
 (use-package emojify
+  ;; All the people using emojiis; why not
   :straight t
   :config
   (defun --set-emoji-font (frame)
@@ -31,20 +32,24 @@
 			(font-spec :family "Symbola")
 			frame
 			'prepend)))
-
   ;; For when Emacs is started in GUI mode:
   (--set-emoji-font nil)
   ;; Hook for when a frame is created with emacsclient
   ;; see https://www.gnu.org/software/emacs/manual/html_node/elisp/Creating-Frames.html
   (add-hook 'after-make-frame-functions '--set-emoji-font))
 
-;; This follows from
-;; http://mbork.pl/2017-01-14_I'm_now_using_the_right_dictionary
 (use-package sdcv-mode
+  ;; This follows from
+  ;; http://mbork.pl/2017-01-14_I'm_now_using_the_right_dictionary
+  ;;
+  ;; Namely I want to use a more inspiring dictionary for the poetry and prose.
   :straight (sdcv-mode :type git :host github :repo "gucong/emacs-sdcv")
   :bind ("C-c C-'" . sdcv-search))
 
-(use-package flymake-proselint :straight t)
+(use-package flymake-proselint
+  ;; I don't have much in the way of flymake actually running; this may be
+  ;; superfluous.
+  :straight t)
 
 ;; (use-package flymake-vale
 ;;   :straight (flymake-value :type git
@@ -57,38 +62,41 @@
 ;;          (message-mode    . flymake-vale-load)))
 
 (use-package unicode-fonts
+  ;; Before the emojii...
   :straight t
   :config (unicode-fonts-setup))
 
 
-;; Provides the reverse of ~fill-paragraph~, and a toggle fill and unfill.
 (use-package unfill
+  ;; Provides the reverse of ~fill-paragraph~, and a toggle fill and unfill.  In
+  ;; fact, the unfill/fill function of Emacs was the first editor function I saw
+  ;; (shown to me by a friend in 2005) that had me strongly consider Emacs. Alas
+  ;; I was not prepared for Emacs.
   :bind ("M-q" . unfill-toggle)
   :straight t)
 
-
-;; Delete multiple spaces in one delete stroke.
 (use-package hungry-delete
+  ;; Delete multiple spaces in one delete stroke.
   :straight t
   :config (global-hungry-delete-mode))
 
-;; A simple package ability to move lines up and down.
 (use-package move-text
+  ;; A simple package ability to move lines up and down.
   :straight t
   :bind (([C-s-down] . move-text-down)
          ([C-s-up] . move-text-up)))
 
-;; The rules of “titlecase” are confounding.  The ~titlecase.el~ package
-;; provides numerous ways to cast a string to “titlecase.”  I chose wikipedia
-;; style as a quasi-opinionated compromise.
 (use-package titlecase
+  ;; The rules of “titlecase” are confounding.  The ~titlecase.el~ package
+  ;; provides numerous ways to cast a string to “titlecase.”  I chose wikipedia
+  ;; style as a quasi-opinionated compromise.
   :straight (titlecase :host github :repo "duckwork/titlecase.el")
   :custom (titlecase-style 'wikipedia))
 
-;; Allow Emacs to work with multiple cursors.  See
-;; https://melpa.org/#/multiple-cursors
 (use-package multiple-cursors
-:bind (("C-M-SPC" . set-rectangular-region-anchor)
+  ;; Allow Emacs to work with multiple cursors.  See
+  ;; https://melpa.org/#/multiple-cursors
+  :bind (("C-M-SPC" . set-rectangular-region-anchor)
          ("C->" . mc/mark-next-like-this)
          ("C-<" . mc/mark-previous-like-this)
          ("C-s-<mouse-1>" . mc/add-cursor-on-click)
@@ -96,9 +104,10 @@
          ("C-c C-SPC" . mc/edit-lines)) ;; CTRL+CMD+c
   :straight t)
 
-;; Type \"C-;\" to select current symbol and all matches; Then edit at multiple
-;; points.
-(use-package iedit :straight t)
+(use-package iedit
+  ;; Type \"C-;\" to select current symbol and all matches; Then edit at multiple
+  ;; points.
+  :straight t)
 
 (provide 'jf-writing)
 ;;; jf-writing.el ends here

@@ -7,19 +7,23 @@
 ;;; Commentary
 
 ;;; Code
-(use-package git-modes :straight t)
+(use-package git-modes
+  ;; A mode for editing gitconfig files.
+  :straight t)
+
 (use-package magit
+  ;; A fantastic UI for git commands; the interactive rebase is an absolute
+  ;; wonder tool (see
+  ;; https://takeonrules.com/2023/01/12/using-the-git-interactive-staging-as-a-moment-to-facilitate-synthesis/).
+  ;; Also the progenitor of `transient'
   :straight t
   :commands (magit-process-git)
   :init (use-package with-editor :straight t)
-
   ;; Adding format to git-commit-fill-column of 72 as best practice.
   (setq git-commit-fill-column 72)
-
   ;; Keeping the summary terse helps with legibility when you run a
   ;; report with only summary.
   (setq git-commit-summary-max-length 50)
-
   ;; Set the tabular display columns for the `magit-list-repositories'
   (setq magit-repolist-columns
 	'(("Name"    25 magit-repolist-column-ident ())
@@ -33,7 +37,6 @@
 	    (:help-echo "Local changes not in upstream")))
 	  ("Branch"  25 magit-repolist-column-branch ())
 	  ("Path"    99 magit-repolist-column-path ())))
-
   ;; Have magit-status go full screen and quit to previous
   ;; configuration.  Taken from
   ;; http://whattheemacsd.com/setup-magit.el-01.html#comment-748135498
@@ -117,14 +120,14 @@
 
 ;; (define-key magit-status-mode-map (kbd "#") #'jf/magit-aux-commands)
 
-;; With the time machine, travel back and forth through a files history.
 (use-package git-timemachine
+  ;; With the time machine, travel back and forth through a files history.
   :straight (:host github :repo "emacsmirror/git-timemachine"))
 
-;; Show the current git state in the gutter.  As you edit a line in a file
-;; track by git, the indicators change to reflect if this is a modification,
-;; addition, or deletion.
 (use-package git-gutter
+  ;; Show the current git state in the gutter.  As you edit a line in a file
+  ;; track by git, the indicators change to reflect if this is a modification,
+  ;; addition, or deletion.
   :straight t
   :custom (git-gutter:update-interval 0.25)
   :bind ("C-x g =" . git-gutter:popup-hunk)
@@ -135,11 +138,11 @@
 	git-gutter:added-sign "+"
 	git-gutter:deleted-sign "-"))
 
-;; Type ~M-x git-link~ and the function pushes the Git forge URL to the kill
-;; ring; I’ve configured the URL to use the SHA of the commit of the line on
-;; which I called `git-link'.  This is helpful for sharing links with other
-;; folks.  I use this /all of the time./ See https://github.com/sshaw/git-link.
 (use-package git-link
+  ;; Type ~M-x git-link~ and the function pushes the Git forge URL to the kill
+  ;; ring; I’ve configured the URL to use the SHA of the commit of the line on
+  ;; which I called `git-link'.  This is helpful for sharing links with other
+  ;; folks.  I use this /all of the time./ See https://github.com/sshaw/git-link.
   :config
   (defun jf/git-browse-to-repository (remote)
     "Open in external browser the current repository's given REMOTE."
@@ -149,10 +152,10 @@
   (setq git-link-use-commit t) ;; URL will be SHA instead of branch
   :straight t)
 
-;; Sometimes I want to see more ~git~ information regarding the current line.
-;; `git-messenger' provides a popup that shows the information and provides
-;; some additional options.
 (use-package git-messenger
+  ;; Sometimes I want to see more ~git~ information regarding the current line.
+  ;; `git-messenger' provides a popup that shows the information and provides
+  ;; some additional options.
   :config (setq git-messenger:show-detail t)
   (defun jf/git-messenger-popup ()
     "Open `git-messenger' or github PR.
@@ -172,11 +175,11 @@
 	 ("C-x g b" . jf/git-messenger-popup))
   :straight t)
 
-;; When working in code, I want different ways to view the metadata around the
-;; code.  This adds a quick annotation to the current line; When did the last
-;; person touch this and what was the message.  It's most useful aspect is
-;; seeing multiple lines without relying on the blame.
 (use-package blamer
+  ;; When working in code, I want different ways to view the metadata around the
+  ;; code.  This adds a quick annotation to the current line; When did the last
+  ;; person touch this and what was the message.  It's most useful aspect is
+  ;; seeing multiple lines without relying on the blame.
   :straight (blamer :host github :repo "Artawower/blamer.el")
   :custom
   ;; Set to 0 because I don’t enable by default.  So I’m in a mindset of show
@@ -189,20 +192,21 @@
   (blamer-max-commit-message-length 20))
 
 (use-package savehist
+  ;; Save my history.
   :init
   (savehist-mode))
 
-;; Write "kill" command inputs to disk.
-(use-package savekill :straight t)
+(use-package savekill
+  ;; Write "kill" command inputs to disk.
+  :straight t)
 
-;; Provides a UI for undo trees.  I'm not certain what I want to do with this.
 (use-package undo-tree
+  ;; Provides a UI for undo trees.  I'm not certain what I want to do with this.
   :straight t
   :bind (("C-z" . undo)
          ("C-s-z" . undo-tree-redo))
   :config
   (global-undo-tree-mode +1))
-
 
 (provide 'jf-versioning)
 ;;; jf-versioning.el ends here

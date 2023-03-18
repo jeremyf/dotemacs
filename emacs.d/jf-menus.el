@@ -94,6 +94,8 @@
 
 
 (use-package file-info
+  ;; Show the metadata of the current buffer's file; and then copy those values.
+  ;; The package also appears highly extensible.
   :straight (:host github :repo "artawower/file-info.el")
   :bind ("C-x f" . file-info-show)
   :config

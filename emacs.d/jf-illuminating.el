@@ -23,6 +23,8 @@
          ("C-+" . er/contract-region)))
 
 (use-package fill-column-indicator
+  ;; It's nice to have a gentle reminder showing me the recommended column width
+  ;; for the current buffer.
   :straight t
   :hook (prog-mode . fci-mode)
   :config
@@ -37,6 +39,8 @@
   :hook (prog-mode . highlight-indent-guides-mode))
 
 (use-package kind-icon
+  ;; This packages helps provide additional icons for functions and variables in
+  ;; the completion candidates.
   :straight t
   :after corfu
   :custom
@@ -46,7 +50,6 @@
   (kind-icon-blend-background nil)  ; Use midpoint color between foreground and
 				    ; background colors ("blended")?
   (kind-icon-blend-frac 0.08)
-
   ;; directory that defaults to the `user-emacs-directory'. Here, I change that
   ;; directory to a location appropriate to `no-littering' conventions, a
   ;; package which moves directories of other packages to sane locations.
@@ -55,7 +58,6 @@
   :config
 					; Enable `kind-icon'
   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)
-
   ;; Add hook to reset cache so the icon colors match my theme
   ;; NOTE 2022-02-05: This is a hook which resets the cache whenever I switch
   ;; the theme using my custom defined command for switching themes. If I don't
@@ -101,6 +103,9 @@
   :bind (("C-l" . jf/pulse)))
 
 (use-package rainbow-mode
+  ;; When I toggle on Rainbow mode, it colorizes the text that is color names
+  ;; and hex declarations (e.g. "#0000ff" ).  Most useful when working with CSS,
+  ;; but sometimes non-CSS files have those declarations as well.
   :straight t)
 
 (use-package rainbow-delimiters
@@ -117,7 +122,10 @@
   (recursion-indicator-mode))
 
 (use-package symbol-overlay
-  ;; This warrants a lot more work.  See
+  ;; When point is on a symbol, highlight that symbol throughout the visible
+  ;; buffer.  From that concept, expose jump commands and renaming.
+  ;;
+  ;; See
   ;; https://github.com/wolray/symbol-overlay/tree/c439b73a5f9713bb3dce98986b589bb901e22130
   :straight t
   :commands (symbol-overlay-jump-next symbol-overlay-jump-prev)
@@ -161,10 +169,15 @@
   :straight t
   :config (whole-line-or-region-global-mode))
 
-(use-package yafolding :straight t)
+(use-package yafolding
+  ;; It can be helpful to fold regions; I don't do it much but it can be
+  ;; helpful.
+  :straight t)
 
-;; https://github.com/tarsius/keycast
 (use-package keycast
+  ;; When I turn on `keycast-mode-line' each key press will echo in the
+  ;; mode-line.  There are other options for logging which could be conceptually
+  ;; useful for feeding a macro.
   :straight t)
 
 (provide 'jf-illuminating)

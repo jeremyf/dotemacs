@@ -15,9 +15,15 @@
 ;; To enter presentation mode: "M-x jf/presenter-minor-mode"
 
 ;;; Code
-(use-package edit-indirect :straight t)
+(use-package edit-indirect
+  ;; A nice package for editing regions in separate buffers.  It doesn't appear
+  ;; to get the mode guess right.  I haven't used this as much as
+  ;; `narrow-region'.  Perhaps it can go?
+  :straight t)
 
 (use-package logos
+  ;; A `narrow-region' extension that moves towards providing a
+  ;; presentation-type experience.
   :straight t
   :config
   (let ((map global-map))
@@ -40,7 +46,6 @@
 		`((emacs-lisp-mode . "^;;;+ ")
 		  (org-mode . "^\\*+ +")
 		  (markdown-mode . "^\\#+ +")))
-
   (defun logos--reveal-entry ()
     "Reveal Org or Outline entry."
     (cond
@@ -53,14 +58,16 @@
   :init
   (add-hook 'logos-page-motion-hook #'logos--reveal-entry))
 
-(use-package "nov.el" :straight t
-	     :init (use-package esxml :straight t)
-	     :config
-	     (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
-	     :custom (nov-text-width 80))
+(use-package "nov.el"
+  ;; A package to help in reading epubs.
+  :straight t
+  :init (use-package esxml :straight t)
+  :config
+  (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
+  :custom (nov-text-width 80))
 
 (use-package so-long
-  :defer t
+  ;; Switch to `so-long' when the file gets too long for normal processing.
   :straight t
   :bind
   (:map so-long-mode-map

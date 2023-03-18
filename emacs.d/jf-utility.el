@@ -16,8 +16,9 @@
   (xref-file-name-display 'project-relative)
   (xref-search-program 'ripgrep))
 
-;; Set some timers.
 (use-package tmr
+  ;; A timer package.
+  ;;
   ;; My dbus install is not behaving so I'm cheating with a bit of AppleScript
   :config (defun jf/tmr-notification-notify (timer)
 	    "Dispatch a notification for TIMER."
@@ -34,14 +35,19 @@
   :straight (tmr :host nil :type git
 		 :repo "https://git.sr.ht/~protesilaos/tmr"))
 
-(use-package transient :straight t)
+(use-package transient
+  ;; A package for creating turbo-charged menus.  It is the backbone for the
+  ;; menu-like dispatch of `magit' functionality.
+  :straight t)
 
-(use-package ts :straight t)
+(use-package ts
+  :straight t)
 
 ;;; Support packages
 
-;; Load keychain environment
 (use-package keychain-environment
+  ;; Help me manage my secrets via the OS
+  ;; Load keychain environment
   :straight t
   :config (keychain-refresh-environment))
 
@@ -68,10 +74,10 @@
   :config
   (editorconfig-mode 1))
 
-;; Where consult-rg provides a live search feature, deadgrep provides a
-;; resulting search buffer.  You submit your search term and get the metadata
-;; and the matches.
 (use-package deadgrep
+  ;; Where consult-rg provides a live search feature, deadgrep provides a
+  ;; resulting search buffer.  You submit your search term and get the metadata
+  ;; and the matches.
   :custom (deadgrep-display-buffer-function
 	   (lambda (buffer) (display-buffer-same-window buffer '())))
   :straight t
@@ -112,13 +118,14 @@
 	      ("e" . wgrep-change-to-wgrep-mode)))
 
 (use-package rg
+  ;; A highly performant successor to the venerable grep.
   :after (wgrep)
   :config (rg-enable-menu)
   ;; :init (setq ripgrep-arguments "--ignore-case")
   :straight t)
 
-;; A mix of a few odd and useful functions.
 (use-package crux
+  ;; A mix of a few odd and useful functions.
   :straight t
   :bind (("C-a" . crux-move-beginning-of-line)
 	 ("<C-s-return>" . crux-smart-open-line-above)
@@ -127,6 +134,7 @@
 	 ("<f9>" . crux-kill-other-buffers)))
 
 (use-package math-at-point
+  ;; Sometimes you just want to do math
   :straight (math-at-point :type git :host github
 			   :repo "shankar2k/math-at-point")
   :bind ("C-c =" . math-at-point))
@@ -361,6 +369,7 @@ With argument, do this that many times."
 (add-to-list 'find-file-not-found-functions #'jf/auto-create-missing-dirs)
 
 (use-package run-command
+  ;; A means of registering shell commands that I can easily run in Emacs.
   :straight t
   :config
   (defun jf/run-command-recipes ()
@@ -369,6 +378,7 @@ With argument, do this that many times."
      (let ((dir (projectile-project-root)))
        (when (f-exists? (f-join (projectile-project-root) "Gemfile.lock"))
 	 (list :command-name "run-command-samvera-versions"
+	       ;; TODO: Extract some of this as a command.
 	       :command-line (format "cd %s; rg \"^ +((bulk|hy)rax|\\(*.\\)iiif\\(*.\\)|rails|qa|blacklight(-.*)?) \\(\\d+\\.\\d+\\.\\d+\" Gemfile.lock" dir)
 	       :display (format "Samvera gem versions for %s" dir))))
      (list :command-name "install-dotzshrc-files"
