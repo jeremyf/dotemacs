@@ -41,6 +41,7 @@
 
 ;;;; Other packages and their configurations
 (use-package bundler
+  ;; For Ruby package management
   :straight (bundler :type git :host github :repo "endofunky/bundler.el"))
 
 (use-package csv-mode :straight t
@@ -51,9 +52,13 @@
 
 ;; https://github.com/Silex/docker.el
 (use-package docker
+  ;; A reality of modern development is that things happen in Docker.
   :straight t)
 
-(use-package dockerfile-mode :straight t)
+(use-package dockerfile-mode
+  ;; Given that I interact with docker files, I should have some syntax
+  ;; awareness.
+  :straight t)
 
 (use-package editorconfig
     :straight t
