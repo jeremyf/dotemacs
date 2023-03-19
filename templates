@@ -80,10 +80,10 @@ org-mode
 (Today "[[date:" (format-time-string "%Y-%m-%d") "][Today]]")
 (tor "[[https://takeonrules.com][Take on Rules]]")
 (puml "#+begin_src plantuml" n> "@startuml" n> "!theme amiga" n> q n> "@enduml" n> "#+end_src" n>)
-(project n "#+PROJECT_NAME: " (p "Project Name: " project-name)
+(proj n "#+PROJECT_NAME: " (p "Project Name: " project-name)
 	 n "#+PROJECT_PATHS: (\"Notes, " (s project-name) "\" . \"" (buffer-file-name)  "\")")
 
-(update "#+attr_shortcode: :date " (format-time-string "%Y-%m-%d")
+(upd "#+attr_shortcode: :date " (format-time-string "%Y-%m-%d")
 	" :mode " (p (completing-read "Mode: " '(inline paragraph sidenote section fallback) nil t) mode)
     n "#+begin_update"
     n q

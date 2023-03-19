@@ -259,28 +259,39 @@
   :straight t
   :init
   (defun jf/ruby-mode/yardoc-ify ()
-    "Add parameter yarddoc stubs for the current method."
-    (interactive)
-    (save-excursion
+  "Add parameter yarddoc stubs for the current method."
+  (interactive)
+  ;; Remember where we started.
+  (save-excursion
+    ;; Goto the beginning of the function
+    (ruby-beginning-of-defun)
+    ;; Move to just after the first (
+    (search-forward "(")
+    ;; Move back to just before the (
+    (backward-char)
+    ;; Select parameters declaration
+    (mark-sexp)
+    ;; Copy that
+    (copy-region-as-kill (point) (mark))
+    ;; Split apart the parameters into their identifiers
+    (let ((identifiers (mapcar (lambda (token)
+			    (replace-regexp-in-string
+			     "[^a-z|_]" ""
+			     (car (s-split " "
+					   (s-trim token)))))
+			  (s-split "," (substring-no-properties
+					(car kill-ring))))))
+      ;; Go to the beginning of the function again
       (ruby-beginning-of-defun)
-      (search-forward "(")
-      (backward-char)
-      (mark-sexp)
-      (copy-region-as-kill (point) (mark))
-      (let ((params (mapcar (lambda (token)
-			      (replace-regexp-in-string
-			       "[^a-z|_]" ""
-			       (car (s-split " " (s-trim token)))))
-			    (s-split "," (substring-no-properties
-					  (car kill-ring))))))
-	(ruby-beginning-of-defun)
-	(insert "##\n"
-		(s-join "\n" (mapcar
-			      (lambda (param) (concat "# @param "
-						      param
-						      " [Object]"))
-			      params))
-		"\n"))))
+      ;; Now insert the identifiers as yardoc
+      (insert "##\n"
+	      (s-join "\n" (mapcar
+			    (lambda (param)
+			      (concat "# @param "
+				      param
+				      " [Object]"))
+			    identifiers))
+	      "\n"))))
   :bind (:map ruby-mode-map (("C-c C-y" . jf/ruby-mode/yardoc-ify)))
   :hook ((ruby-mode . yard-mode)
 	 (ruby-ts-mode . yard-mode)))
