@@ -16,16 +16,26 @@
 (use-package ox-hugo
   :straight t
   :custom
+  ;; - blockquote :: for chunks of text that I attribute to other folks.
+  ;; - marginnote :: a "dangling" note that is only partially part of the
+  ;;                 conversation.
+  ;; - poem :: because poetic spacing is critical.
+  ;; - inline_comments :: a concession that I need different comments based on
+  ;;                      context; and that marginalia may be too much in some
+  ;;                      cases.
+  ;; - update :: I write updates for my blog posts; corrections or additions
+  ;;             based on new information.
   (org-hugo-paired-shortcodes "blockquote marginnote poem inline_comments update")
   (hugo-use-code-for-kbd t)
   :config
-  ;; I want to have backticks instead of indentations.
+  ;; I want to have backticks instead of indentations;  The backticks also
   (advice-add #'org-md-example-block :override #'org-blackfriday-src-block)
   :after ox)
 
-;; These functions work to aggressively.  The types of lists (ordered,
+;; These functions work too aggressively.  The types of lists (ordered,
 ;; definition, and unordered) are co-mingled.  This co-mingling means that I'm
-;; not getting the behavior I want.  So I'll proceed.g
+;; not getting the behavior I want.  So I'll proceed with the default ox-hugo
+;; behavior.
 ;;
 ;; (advice-add #'org-blackfriday-plain-list :override #'org-html-plain-list '((name . "wrapper")))
 ;; (advice-add #'org-blackfriday-item :override #'org-html-item '((name . "wrapper")))
