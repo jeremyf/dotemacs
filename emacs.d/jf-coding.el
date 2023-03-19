@@ -257,6 +257,31 @@
 (use-package yard-mode
   ;; My prefered Ruby documentation syntax
   :straight t
+  :init
+  (defun jf/ruby-mode/yardoc-ify ()
+    "Add parameter yarddoc stubs for the current method."
+    (interactive)
+    (save-excursion
+      (ruby-beginning-of-defun)
+      (search-forward "(")
+      (backward-char)
+      (mark-sexp)
+      (copy-region-as-kill (point) (mark))
+      (let ((params (mapcar (lambda (token)
+			      (replace-regexp-in-string
+			       "[^a-z|_]" ""
+			       (car (s-split " " (s-trim token)))))
+			    (s-split "," (substring-no-properties
+					  (car kill-ring))))))
+	(ruby-beginning-of-defun)
+	(insert "##\n"
+		(s-join "\n" (mapcar
+			      (lambda (param) (concat "# @param "
+						      param
+						      " [Object]"))
+			      params))
+		"\n"))))
+  :bind (:map ruby-mode-map (("C-c C-y" . jf/ruby-mode/yardoc-ify)))
   :hook ((ruby-mode . yard-mode)
 	 (ruby-ts-mode . yard-mode)))
 
