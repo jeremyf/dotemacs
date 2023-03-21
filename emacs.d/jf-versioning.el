@@ -204,7 +204,10 @@
   ;; Provides a UI for undo trees.  I'm not certain what I want to do with this.
   :straight t
   :bind (("C-z" . undo)
-         ("C-s-z" . undo-tree-redo))
+          ("C-s-z" . undo-tree-redo))
+  :custom (undo-tree-history-directory-alist ("." . "~/.emacs.d/undo-tree/"))
+  :init
+  (mkdir "~/.emacs.d/undo-tree/")
   :config
   (global-undo-tree-mode +1))
 

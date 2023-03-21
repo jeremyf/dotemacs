@@ -276,9 +276,9 @@
 		     #'jf/org-completion-symbols
 		     #'jf/org-completion-abbreviations
 		     #'tempel-expand
+		     #'cape-file
 		     #'cape-dabbrev
 		     #'cape-dict
-		     #'cape-file
 		     #'cape-history))))
 (defun jf/org-confirm-babel-evaluate (lang body) nil)
 
