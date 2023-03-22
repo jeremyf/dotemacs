@@ -46,10 +46,6 @@
   :straight (sdcv-mode :type git :host github :repo "gucong/emacs-sdcv")
   :bind ("C-c C-'" . sdcv-search))
 
-(use-package flymake-proselint
-  ;; I don't have much in the way of flymake actually running; this may be
-  ;; superfluous.
-  :straight t)
 
 ;; (use-package flymake-vale
 ;;   :straight (flymake-value :type git
