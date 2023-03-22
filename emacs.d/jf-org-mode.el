@@ -109,7 +109,7 @@
 	'(("@"
 	   "All Todo"
 	   entry (file+olp
-		  jf/primary-agenda-filename-for-machine
+		  "~/git/org/agenda.org"
 		  "General Todo Items")
 	   "* TODO %?\n  %i\n  %a"
 	   :empty-lines-before 1)
