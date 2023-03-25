@@ -18,28 +18,65 @@
 ;; have notable latency.  I did some profiling and found that for a Ruby file
 ;; Emacs spent quite a bit of time in the `treesit' functions.  I toggled back to
 ;; `tree-sitter' and did not notice any slowness.
-(use-package tree-sitter
-  ;; See https://github.com/emacs-tree-sitter/elisp-tree-sitter
-  :straight (tree-sitter :host github
-			 :repo "emacs-tree-sitter/elisp-tree-sitter")
-  :config
-  (add-to-list 'tree-sitter-major-mode-language-alist '(ruby-mode . ruby))
-  :init (global-tree-sitter-mode)
-  (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
-
-(use-package tree-sitter-langs
-  ;; Provides the languages "dictionaries" for tree-sitter highlighting.
-  :straight t)
-
-;; (use-package treesit
-;;   :custom (treesit-font-lock-level 4)
-;;   :straight (:type  built-in))
-
-;; (use-package treesit-auto
-;;   :straight (:host github :repo "renzmann/treesit-auto")
-;;   :config (setq treesit-auto-install 'prompt)
+;;
+;; On <2023-03-25 Sat> I read the `tree-sitter' README and they encouraged Emacs
+;; 29.x to use the built-in `treesit' package.
+;; (use-package tree-sitter
+;;   ;; See https://github.com/emacs-tree-sitter/elisp-tree-sitter
+;;   :straight (tree-sitter :host github
+;; 			 :repo "emacs-tree-sitter/elisp-tree-sitter")
 ;;   :config
-;;   (global-treesit-auto-mode))
+;;   (add-to-list 'tree-sitter-major-mode-language-alist '(ruby-mode . ruby))
+;;   :init (global-tree-sitter-mode)
+;;   (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
+
+;; (use-package tree-sitter-langs
+;;   ;; Provides the languages "dictionaries" for tree-sitter highlighting.
+;;   :straight t)
+
+(use-package treesit
+  :custom (treesit-font-lock-level 4)
+  :init
+  ;; This function, tested against Ruby, will return the module space qualified
+  ;; method name (e.g. Hello::World#method_name).
+  (defun jf/treesit/qualified_method_name ()
+    "Get the fully qualified name of method at point."
+    (interactive)
+    (when-let ((func (treesit-defun-at-point)))
+      ;; Instance method or class method?
+      (let* ((method_type (if (string= "method"
+                                (treesit-node-type func))
+                            "#" "."))
+	      (method_name (treesit-node-text (car (treesit-filter-child
+			                                   func
+			                                   (lambda (node)
+			                                     (string= "identifier"
+                                             (treesit-node-type node)))))))
+              (scoped_name (format "%s%s%s"
+                             (s-join "::"
+                               (-flatten
+                                 (jf/treesit/module_space func)))
+                             method_type method_name)))
+        (message scoped_name)
+        (kill-new (substring-no-properties scoped_name)))))
+
+  (defun jf/treesit/module_space (node)
+    (if-let* ((parent (treesit-parent-until node
+                        (lambda (n) (member (treesit-node-type n)
+                                      '("class" "module")))))
+               (parent_name (treesit-node-text
+                              (car (treesit-filter-child
+					               parent (lambda (n)
+					                        (string= "constant"
+                                    (treesit-node-type n))))))))
+      (list (jf/treesit/module_space parent) parent_name)
+      nil))
+  :straight (:type  built-in))
+
+(use-package treesit-auto
+  :straight (:host github :repo "renzmann/treesit-auto")
+  :config (setq treesit-auto-install 'prompt)
+  (global-treesit-auto-mode))
 
 ;;;; Other packages and their configurations
 (use-package bundler
@@ -141,6 +178,8 @@
 (use-package ruby-mode
   ;; My language of choice for professional work.
   :straight (:type built-in)
+  :bind (:map ruby-mode-map ("C-c C-f" . jf/treesit/qualified_method_name))
+  (:map ruby-ts-mode-map ("C-c C-f" . jf/treesit/qualified_method_name))
   :hook ((ruby-mode ruby-ts-mode) . (lambda () (setq fill-column 100))))
 
 ;; I don't use this package
@@ -307,8 +346,8 @@
 			    identifiers))
 	      "\n"))))
   :bind (:map ruby-mode-map (("C-c C-y" . jf/ruby-mode/yardoc-ify)))
-  :hook ((ruby-mode . yard-mode)
-	 (ruby-ts-mode . yard-mode)))
+  (:map ruby-ts-mode-map (("C-c C-y" . jf/ruby-mode/yardoc-ify)))
+  :hook ((ruby-mode ruby-ts-mode) . yard-mode))
 
 (use-package devdocs
   ;; Download and install documents from https://devdocs.io/
