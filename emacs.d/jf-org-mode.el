@@ -58,6 +58,7 @@
   ;; (org-mode . org-indent-mode)
   :bind ("C-c C-j" . jf/jump-to-agenda-or-mark)
   :bind (:map org-mode-map (("C-c C-j" . jf/jump-to-agenda-or-mark)
+                             ("C-x n t" . jf/org-mode/narrow-to-date)
 			    ("C-j" . avy-goto-char-2)))
   :custom (org-use-speed-commands t)
   (org-time-stamp-rounding-minutes '(0 15))
@@ -145,7 +146,7 @@
 	   plain (file+function
 		  jf/primary-agenda-filename-for-machine
 		  jf/org-mode-agenda-find-merge-request-node)
-	   "***** IN-PROGRESS [#B] %^{URL of Merge Request} :mergerequest:"
+	   "***** IN-PROGRESS %^{URL of Merge Request} :mergerequest:"
 	   :immediate-finish t
 	   :jump-to-captured t
 	   :empty-lines-after 1
@@ -166,7 +167,7 @@
 		  jf/org-mode-agenda-find-project-node)
 	   ;; The five ***** is due to the assumptive depth of the projects and
 	   ;; tasks.
-	   "***** TODO [#A] %^{Describe the task} :tasks:\n\n"
+	   "***** TODO %^{Describe the task} :tasks:\n\n"
 	   :jump-to-captured t
 	   :immediate-finish t
 	   :clock-in t)))
@@ -267,7 +268,7 @@
 	     (match-string-no-properties 1) cands :test 'equal))
 	  cands))
       (when cands
-	(list (match-beginning 0) (match-end 0) cands)))))
+	      (list (match-beginning 0) (match-end 0) cands)))))
 
 (defun jf/org-capf ()
   "The `completion-at-point-functions' I envision using for `org-mode'."
@@ -475,7 +476,19 @@ tasks within projects are headline 5."
 				  (concat "- " (plist-get (cadr hl) :raw-value))))
 			   (_ nil)))))))))
 	(jf/create-scratch-buffer)
-	(yank)))))
+	      (yank)))))
+
+
+(defun jf/org-mode/narrow-to-date (date)
+  "Narrow agenda to given DATE agenda subtree."
+  (interactive (list (if current-prefix-arg
+                       (org-read-date nil nil nil "Pick a day:")
+                       (format-time-string "%Y-%m-%d"))))
+  (widen)
+  (beginning-of-buffer)
+  (re-search-forward (concat "^\*\*\* " date))
+  (org-narrow-to-subtree)
+  (message "Narrowing to %s agenda" date))
 
 ;; I’m responsible for tracking my work time.  I want a way to quickly see what
 ;; that is for the current week.

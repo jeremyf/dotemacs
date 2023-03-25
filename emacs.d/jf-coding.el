@@ -46,7 +46,8 @@
   ;; For Ruby package management
   :straight (bundler :type git :host github :repo "endofunky/bundler.el"))
 
-(use-package csv-mode :straight t
+(use-package csv-mode
+  :straight t
   ;; By default I want to show the separator character.
   :custom (csv-invisibility-default nil)
   ;; Always enter CSV mode in align mode; makes it easier to read.
@@ -123,6 +124,19 @@
 ;;   :hook ((sgml-mode . emmet-mode)
 ;;          (html-mode . emmet-mode)
 ;;          (css-mode . emmet-mode)))
+
+(define-derived-mode gherkin-mode prog-mode
+  "GK"
+  :group 'gherkin-mode
+  (make-local-variable 'comment-start)
+  (setq comment-start "# "))
+
+(font-lock-add-keywords 'gherkin-mode
+  '(("^[[:space:]]*\\(Given\\|When\\|Then\\|But\\|And\\)" . 'font-lock-keyword-face)
+     ("^[[:space:]]*\\(Feature\\|Background\\|Scenario\\|Scenario Outline\\|Examples\\|Scenarios\\):.*" . 'font-lock-doc-face)
+     ("<[^>]*>" . 'font-lock-variable-name-face)
+     ("^[[:space:]]*@.*"  . 'font-lock-preprocessor-face)
+     ("^[[:space:]]*#.*"  . 'font-lock-comment-face)))
 
 (use-package ruby-mode
   ;; My language of choice for professional work.
