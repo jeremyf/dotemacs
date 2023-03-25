@@ -39,12 +39,12 @@
   :init
   ;; This function, tested against Ruby, will return the module space qualified
   ;; method name (e.g. Hello::World#method_name).
-  (defun jf/treesit/qualified_method_name ()
+  (cl-defun jf/treesit/qualified_method_name (&key (type "method"))
     "Get the fully qualified name of method at point."
     (interactive)
-    (when-let ((func (treesit-defun-at-point)))
+    (if-let ((func (treesit-defun-at-point)))
       ;; Instance method or class method?
-      (let* ((method_type (if (string= "method"
+      (let* ((method_type (if (string= type
                                 (treesit-node-type func))
                             "#" "."))
 	            (method_name (treesit-node-text
@@ -59,11 +59,12 @@
                                     (jf/treesit/module_space func)))
                                 method_type method_name)))
         (message qualified_name)
-        (kill-new (substring-no-properties qualified_name)))))
+        (kill-new (substring-no-properties qualified_name)))
+      (user-error "No %s at point." type)))
   ;; An ugly bit of code to recurse upwards from the node to the "oldest"
   ;; parent.  And collect all module/class nodes along the way.
   (defun jf/treesit/module_space (node)
-    (if-let* ((parent (treesit-parent-until node
+    (when-let* ((parent (treesit-parent-until node
                         (lambda (n) (member (treesit-node-type n)
                                       '("class" "module")))))
                (parent_name (treesit-node-text
@@ -71,8 +72,7 @@
 					               parent (lambda (n)
 					                        (string= "constant"
                                     (treesit-node-type n))))))))
-      (list (jf/treesit/module_space parent) parent_name)
-      nil))
+      (list (jf/treesit/module_space parent) parent_name)))
   :straight (:type  built-in))
 
 (use-package treesit-auto
