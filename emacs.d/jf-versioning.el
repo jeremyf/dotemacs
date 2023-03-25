@@ -207,7 +207,7 @@
           ("C-s-z" . undo-tree-redo))
   :custom (undo-tree-history-directory-alist ("." . "~/.emacs.d/undo-tree/"))
   :init
-  (mkdir "~/.emacs.d/undo-tree/")
+  (unless (f-dir? "~/.emacs.d/undo-tree/") (mkdir "~/.emacs.d/undo-tree/"))
   :config
   (global-undo-tree-mode +1))
 
