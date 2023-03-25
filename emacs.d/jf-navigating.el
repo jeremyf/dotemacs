@@ -65,5 +65,51 @@
 ;;                (move-to-window-line 0)
 ;;                (recenter))))))
 
+
+;; https://github.com/baron42bba/.emacs.d/blob/master/bba.org
+(defvar jf/bracket/brackets nil "string of left/right brackets pairs.")
+(setq jf/bracket/brackets "()[]{}<>（）［］｛｝⦅⦆〚〛⦃⦄“”‘’‹›«»「」〈〉《》【】〔〕⦗⦘『』〖〗〘〙｢｣⟦⟧⟨⟩⟪⟫⟮⟯⟬⟭⌈⌉⌊⌋⦇⦈⦉⦊❛❜❝❞❨❩❪❫❴❵❬❭❮❯❰❱❲❳〈〉⦑⦒⧼⧽﹙﹚﹛﹜﹝﹞⁽⁾₍₎⦋⦌⦍⦎⦏⦐⁅⁆⸢⸣⸤⸥⟅⟆⦓⦔⦕⦖⸦⸧⸨⸩｟｠⧘⧙⧚⧛⸜⸝⸌⸍⸂⸃⸄⸅⸉⸊᚛᚜༺༻༼༽⏜⏝⎴⎵⏞⏟⏠⏡﹁﹂﹃﹄︹︺︻︼︗︘︿﹀︽︾﹇﹈︷︸")
+
+(defvar jf/bracket/left-brackets '("(" "{" "[" "<" "〔" "【" "〖" "〈" "《" "「" "『" "“" "‘" "‹" "«" )
+  "List of left bracket chars.")
+
+(progn
+  ;; make jf/bracket/left-brackets based on jf/bracket/brackets
+  (setq jf/bracket/left-brackets '())
+  (dotimes (-x (- (length jf/bracket/brackets) 1))
+    (when (= (% -x 2) 0)
+	    (push (char-to-string (elt jf/bracket/brackets -x))
+        jf/bracket/left-brackets)))
+  (setq jf/bracket/left-brackets (reverse jf/bracket/left-brackets)))
+
+(defvar jf/bracket/right-brackets '(")" "]" "}" ">" "〕" "】" "〗" "〉" "》" "」" "』" "”" "’" "›" "»")
+  "list of right bracket chars.")
+(progn
+  (setq jf/bracket/right-brackets '())
+  (dotimes (-x (- (length jf/bracket/brackets) 1))
+    (when (= (% -x 2) 1)
+	    (push (char-to-string (elt jf/bracket/brackets -x))
+        jf/bracket/right-brackets)))
+  (setq jf/bracket/right-brackets (reverse jf/bracket/right-brackets)))
+
+(defun jf/bracket/backward-left-bracket ()
+  "Move cursor to the previous occurrence of left bracket.
+ The list of brackets to jump to is defined by `jf/bracket/left-brackets'.
+ URL `http://ergoemacs.org/emacs/emacs_navigating_keys_for_brackets.html'
+ Version 2015-10-01"
+  (interactive)
+  (search-backward-regexp (regexp-opt jf/bracket/left-brackets) nil t))
+
+(defun jf/bracket/forward-right-bracket ()
+  "Move cursor to the next occurrence of right bracket.
+ The list of brackets to jump to is defined by `jf/bracket/right-brackets'.
+ URL `http://ergoemacs.org/emacs/emacs_navigating_keys_for_brackets.html'
+ Version 2015-10-01"
+  (interactive)
+  (re-search-forward (regexp-opt jf/bracket/right-brackets) nil t))
+
+(define-key global-map (kbd "C-c C-<left>") 'jf/bracket/backward-left-bracket)
+(define-key global-map (kbd "C-c C-<right>") 'jf/bracket/forward-right-bracket)
+
 (provide 'jf-navigating)
 ;;; jf-navigating.el ends here
