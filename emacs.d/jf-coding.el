@@ -47,19 +47,21 @@
       (let* ((method_type (if (string= "method"
                                 (treesit-node-type func))
                             "#" "."))
-	      (method_name (treesit-node-text (car (treesit-filter-child
-			                                   func
-			                                   (lambda (node)
-			                                     (string= "identifier"
-                                             (treesit-node-type node)))))))
-              (scoped_name (format "%s%s%s"
-                             (s-join "::"
-                               (-flatten
-                                 (jf/treesit/module_space func)))
-                             method_type method_name)))
-        (message scoped_name)
-        (kill-new (substring-no-properties scoped_name)))))
-
+	            (method_name (treesit-node-text
+                             (car (treesit-filter-child
+			                              func
+			                              (lambda (node)
+			                                (string= "identifier"
+                                        (treesit-node-type node)))))))
+              (qualified_name (format "%s%s%s"
+                                (s-join "::"
+                                  (-flatten
+                                    (jf/treesit/module_space func)))
+                                method_type method_name)))
+        (message qualified_name)
+        (kill-new (substring-no-properties qualified_name)))))
+  ;; An ugly bit of code to recurse upwards from the node to the "oldest"
+  ;; parent.  And collect all module/class nodes along the way.
   (defun jf/treesit/module_space (node)
     (if-let* ((parent (treesit-parent-until node
                         (lambda (n) (member (treesit-node-type n)
