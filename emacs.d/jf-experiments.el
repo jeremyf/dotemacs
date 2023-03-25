@@ -42,5 +42,12 @@
 (use-package citar-denote
   :straight t)
 
+;; https://github.com/ruediger/qrencode-el/
+;;
+;; Generate an plain text QRCode (or PNG but really why not use those UTF
+;; characters)
+(use-package qrencode
+  :straight t)
+
 (provide 'jf-experiments)
 ;;; jf-experiments.el ends here
