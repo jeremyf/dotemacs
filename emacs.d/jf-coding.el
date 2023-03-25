@@ -53,11 +53,10 @@
 			                              (lambda (node)
 			                                (string= "identifier"
                                         (treesit-node-type node)))))))
-              (qualified_name (format "%s%s%s"
-                                (s-join "::"
+              (module_space (s-join "::"
                                   (-flatten
-                                    (jf/treesit/module_space func)))
-                                method_type method_name)))
+                                    (jf/treesit/module_space func))))
+              (qualified_name (concat module_space method_type method_name)))
         (message qualified_name)
         (kill-new (substring-no-properties qualified_name)))
       (user-error "No %s at point." type)))
