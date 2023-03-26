@@ -46,7 +46,6 @@
         (call-interactively #'set-mark-command)
         (goto-char (treesit-node-end func)))
       (user-error "No function to select.")))
-
   ;; This function, tested against Ruby, will return the module space qualified
   ;; method name (e.g. Hello::World#method_name).
   (cl-defun jf/treesit/qualified_method_name (&key (type "method"))
@@ -143,7 +142,6 @@
                `(ruby-mode . ("solargraph" "socket" "--port" :autoport)))
   (add-to-list 'eglot-server-programs
                `(ruby-ts-mode . ("solargraph" "socket" "--port" :autoport)))
-
   (defun jf/eglot-capf ()
     ;; I don't want `eglot-completion-at-point' to trample my other completion
     ;; options.
@@ -364,7 +362,6 @@
 			    identifiers))
 	      "\n"))))
   :bind (:map ruby-mode-map (("C-c C-y" . jf/ruby-mode/yardoc-ify)))
-
   :hook ((ruby-mode ruby-ts-mode) . yard-mode))
 
 (defun jf/ruby-ts-mode-map-keys ()
