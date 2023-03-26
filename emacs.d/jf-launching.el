@@ -197,7 +197,6 @@
         gcmh-high-cons-threshold (* 16 1024 1024))  ; 16mb
   :config (gcmh-mode))
 
-
 ;;; Connective Tissue and oddity functions:
 (defvar server-visit-files-custom-find:buffer-count
   "A counter for assisting with opening multiple files via a single
