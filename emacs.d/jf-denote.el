@@ -74,8 +74,8 @@
 	     denote-file-prompt
 	     denote--title-prompt
 	     denote-get-path-by-id)
-  :bind ("H-l" . 'jf/denote-link-or-create)
-  ("H-i" . 'jf/denote-link-or-create)
+  :bind ("H-l" . 'jf/denote/link-or-create)
+  ("H-i" . 'jf/denote/link-or-create)
   :hook (dired-mode . denote-dired-mode)
   :init
   (require 'denote-org-dblock)
@@ -133,7 +133,7 @@
 ;;;; Note taking configurations
 
 ;;;;; `denote' and `org-mode' integration
-(cl-defun jf/denote-org-property-from-id (&key identifier property)
+(cl-defun jf/denote/org-property-from-id (&key identifier property)
   ;; This function helps me retrieve Org-Mode properties from the given Denote
   ;; ID.
   "Given an IDENTIFIER and PROPERTY return it's value or nil.
@@ -148,7 +148,7 @@
       (with-current-buffer (find-file-noselect filename)
         (cadar (org-collect-keywords (list property)))))))
 
-(cl-defun jf/denote-org-keywords-from-id (&key identifier keywords)
+(cl-defun jf/denote/org-keywords-from-id (&key identifier keywords)
   "Given an IDENTIFIER and KEYWORDS list return an a-list of values.
 
     Return nil when:
@@ -157,13 +157,13 @@
     - IDENTIFIER leads to a non `org-mode' file
     - KEYWORD does not exist on the file.
 
-This function is the plural version of `jf/denote-org-property-from-id'."
-  ;; ;; Testing jf/denote-org-property-from-id
-  ;; (message "%s" (jf/denote-org-property-from-id
+This function is the plural version of `jf/denote/org-property-from-id'."
+  ;; ;; Testing jf/denote/org-property-from-id
+  ;; (message "%s" (jf/denote/org-property-from-id
   ;; 		 :identifier "20220930T215235"
   ;;		 :property "ABBR"))
-  ;; ;; Testing jf/denote-org-keywords-from-id
-  ;; (message "%s" (jf/denote-org-keywords-from-id
+  ;; ;; Testing jf/denote/org-keywords-from-id
+  ;; (message "%s" (jf/denote/org-keywords-from-id
   ;; 		 :identifier "20220930T215235"
   ;; 		 :properties '("TITLE" "ABBR")))
   (when-let ((filename (denote-get-path-by-id identifier)))
@@ -171,7 +171,7 @@ This function is the plural version of `jf/denote-org-property-from-id'."
       (with-current-buffer (find-file-noselect filename)
         (org-collect-keywords keywords)))))
 
-(defun jf/denote-plist-for-export-of-id (identifier)
+(defun jf/denote/plist-for-export-of-id (identifier)
   "Given an IDENTIFIER export a `plist' with the following properties:
 
     - :title
@@ -183,7 +183,7 @@ This function is the plural version of `jf/denote-org-property-from-id'."
     - is not a denote file
     - IDENTIFIER leads to a non `org-mode' file"
   ;; Testing
-  ;; (message "%s" (jf/denote-plist-for-export-of-id "20221009T115949"))
+  ;; (message "%s" (jf/denote/plist-for-export-of-id "20221009T115949"))
   (when-let ((filename (denote-get-path-by-id identifier)))
     (when (string= (file-name-extension filename) "org")
       (with-current-buffer (find-file-noselect filename)
@@ -200,20 +200,20 @@ This function is the plural version of `jf/denote-org-property-from-id'."
 
 ;;;;; `denote' file finding functions
 
-(defun jf/denote-link-or-create (target &optional id-only)
+(defun jf/denote/link-or-create (target &optional id-only)
   "Use `denote-link' on TARGET file, creating it if necessary.
 
-As `denote-link-or-create' but use `jf/denote-file-prompt' instead of `denote-file-prompt'.
+As `denote-link-or-create' but use `jf/denote/file-prompt' instead of `denote-file-prompt'.
 
 This function is intended for a global find of all notes."
-  (interactive (list (jf/denote-file-prompt)
+  (interactive (list (jf/denote/file-prompt)
 		     current-prefix-arg))
   (if (file-exists-p target)
       (denote-link target id-only)
     (denote--push-extracted-title-to-history)
     (call-interactively #'denote-link-after-creating)))
 
-(defun jf/denote-file-prompt ()
+(defun jf/denote/file-prompt ()
   ;; I’m not looking at active silo-ing and want to be able to search
   ;; specifically from the top-level and all subdirectories.
   (let* ((vc-dirs-ignores (mapcar
@@ -226,14 +226,14 @@ This function is intended for a global find of all notes."
 						     (denote-directory)
 						     sub-dir)
 						    vc-dirs-ignores))
-		     jf/denote-subdirectories)))
+		     jf/denote/subdirectories)))
     (funcall project-read-file-name-function
 	     "Find file" all-files nil 'file-name-history)))
 
 (setq consult-notes-sources (list))
-(setq jf/denote-subdirectories (list))
+(setq jf/denote/subdirectories (list))
 
-(defun jf/denote-find-file ()
+(defun jf/denote/find-file ()
   "Find file in the current `denote-directory'."
   (interactive)
   (require 'consult-projectile)
@@ -245,37 +245,37 @@ This function is intended for a global find of all notes."
     (consult-projectile--file (denote-directory))))
 
 ;;;;; Note taking Domains
-(cl-defmacro jf/denote-create-functions-for (&key domain key (create-fn nil))
+(cl-defmacro jf/denote/create-functions-for (&key domain key (create-fn nil))
   "A macro to create functions for the given DOMAIN.
 
           The KEY is the ASCII value of the binding key.
 
           Creates:
 
-          - Wrapping function of `jf/denote-find-file' that narrows results
+          - Wrapping function of `jf/denote/find-file' that narrows results
           to the given DOMAIN.
           - Create linking function for DOMAIN.
-          - Add the domain to the `jf/denote-subdirectories'.
+          - Add the domain to the `jf/denote/subdirectories'.
           - Adds DOMAIN to `consult-notes-sources'."
-  (let* ((finder-fn (intern (concat "jf/denote-find-file--" domain)))
+  (let* ((finder-fn (intern (concat "jf/denote/find-file--" domain)))
          (subdirectory (f-join "~/git/org/denote" domain))
          (finder-docstring (concat "Find file in \""
                                    domain
                                    "\" subdirectory of `denote-directory'."))
-         (default-create-fn (intern (concat "jf/denote-create--"
+         (default-create-fn (intern (concat "jf/denote/create--"
 					    domain
 					    "--default")))
          (default-create-docstring (concat "Create denote in \""
                                            domain
                                            "\" subdirectory of "
 					   "`denote-directory'."))
-         (link-or-creator-fn (intern (concat "jf/denote-link-or-create--" domain)))
+         (link-or-creator-fn (intern (concat "jf/denote/link-or-create--" domain)))
          (link-or-creator-docstring (concat "Link to denote in \""
 					    domain
 					    "\" subdirectory of "
 					    "`denote-directory'.")))
     `(progn
-       (add-to-list 'jf/denote-subdirectories ,domain)
+       (add-to-list 'jf/denote/subdirectories ,domain)
        (when (boundp 'consult-notes-sources)
          (add-to-list 'consult-notes-sources '(,domain ,key ,subdirectory)))
        (defun ,default-create-fn ()
@@ -290,7 +290,7 @@ This function is intended for a global find of all notes."
          ,finder-docstring
          (interactive)
          (let ((denote-directory (f-join (denote-directory) ,domain)))
-           (call-interactively #'jf/denote-find-file)))
+           (call-interactively #'jf/denote/find-file)))
        (bind-key (format "H-d l %c" ,key) ',link-or-creator-fn)
        (defun ,link-or-creator-fn ()
          ,link-or-creator-docstring
@@ -302,15 +302,26 @@ This function is intended for a global find of all notes."
 ;;;;;; Blog Posts
 ;; The blog-post domain is for things that I have, will, or might publish to
 ;; https://takeonrules.com
-(jf/denote-create-functions-for :domain "blog-posts"
+(jf/denote/create-functions-for :domain "blog-posts"
                                 :key ?b)
 
+(defun jf/denote/find-file--blog-posts-draft (filename)
+  "Find a draft FILENAME in the \"blog-posts\" sub-directory of `denote-directory'."
+  (interactive
+    (list (jf/find-file-via-matching
+	          :prompt "Draft filename: "
+	          :matching "^#\\+ROAM_REFS:"
+            :matches "--files-without-match"
+	          :in (f-join (denote-directory) "blog-posts"))))
+  (find-file filename))
+(bind-key "H-d f B" #'jf/denote/find-file--blog-posts-draft)
+
 ;;;;;; Scientist
-(jf/denote-create-functions-for :domain "scientist"
+(jf/denote/create-functions-for :domain "scientist"
                                 :key ?s)
 
 ;;;;;; Epigraphs
-(cl-defun jf/denote-create-epigraph (&key
+(cl-defun jf/denote/create-epigraph (&key
                                      (body (read-from-minibuffer
 					    "Epigraph Text: "))
                                      ;; Todo prompt for Author Name
@@ -355,12 +366,12 @@ This function is intended for a global find of all notes."
             nil
             template)))
 
-(jf/denote-create-functions-for :domain "epigraphs"
+(jf/denote/create-functions-for :domain "epigraphs"
                                 :key ?e
-                                :create-fn 'jf/denote-create-epigraph)
+                                :create-fn 'jf/denote/create-epigraph)
 
 ;;;;;; Glossary Entries
-(cl-defun jf/denote-create-glossary-entry
+(cl-defun jf/denote/create-glossary-entry
     (&key
      (title (read-from-minibuffer "Name the Entry: "))
      (is-a-game (yes-or-no-p "Is this a game?"))
@@ -401,30 +412,30 @@ This function is intended for a global find of all notes."
             nil
             template)))
 
-(jf/denote-create-functions-for :domain "glossary"
+(jf/denote/create-functions-for :domain "glossary"
 				:key ?g
-				:create-fn 'jf/denote-create-glossary-entry)
-;; Testing jf/denote-org-property-from-id
-;; (message "%s" (jf/denote-org-property-from-id :id "20220930T215235"
+				:create-fn 'jf/denote/create-glossary-entry)
+;; Testing jf/denote/org-property-from-id
+;; (message "%s" (jf/denote/org-property-from-id :id "20220930T215235"
 ;; 					      :property "ABBR"))
 
 ;;;;;; Melange
 ;; All the other things; perhaps they could become blog posts, but for now they
 ;; remain part of the mixture and medley.
-(jf/denote-create-functions-for :domain "melange"
+(jf/denote/create-functions-for :domain "melange"
 				:key ?m)
 
 ;;;;;; People
 ;; I do write notes about people I interact with.  Technically I have glossary
 ;; entries for people.  But those entries are for folks I don’t interact with.
-(jf/denote-create-functions-for :domain "people"
+(jf/denote/create-functions-for :domain "people"
 				:key ?p)
 
 ;;;;;; Indices
 
 ;; On my site I write https://takeonrules.com/series/.  I track this data in a
 ;; YAML file; I’d like to treat this data similar to my glossary.
-(cl-defun jf/denote-create-indices-entry (&key
+(cl-defun jf/denote/create-indices-entry (&key
                                           (title (read-from-minibuffer
 						  "Name the index: "))
                                           (is-a-series
@@ -444,9 +455,9 @@ This function is intended for a global find of all notes."
             nil
             template)))
 
-(jf/denote-create-functions-for :domain "indices"
+(jf/denote/create-functions-for :domain "indices"
 				:key ?i
-				:create-fn 'jf/denote-create-indices-entry)
+				:create-fn 'jf/denote/create-indices-entry)
 
 ;;;;; `org-link-parameters'
 (cl-defun jf/org-link-complete-link-for (parg &key scheme filter subdirectory)
@@ -465,7 +476,7 @@ This function is intended for a global find of all notes."
             (denote-retrieve-filename-identifier
 	     (denote-file-prompt filter)))))
 
-(cl-defun jf/denote-link-ol-abbr-with-property (link
+(cl-defun jf/denote/link-ol-abbr-with-property (link
 						description
 						format
 						protocol
@@ -478,7 +489,7 @@ This function is intended for a global find of all notes."
 
     FORMAT is an Org export backend. We will discard the given
     DESCRIPTION.  PROTOCOL is ignored."
-  (let* ((keyword-alist (jf/denote-org-keywords-from-id
+  (let* ((keyword-alist (jf/denote/org-keywords-from-id
 			 :identifier link
 			 :keywords (list "TITLE" keyword  "GLOSSARY_KEY")))
          (title (car (alist-get "TITLE" keyword-alist nil nil #'string=)))
@@ -505,7 +516,7 @@ This function is intended for a global find of all notes."
 				      :filter " _abbr*"
 				      :subdirectory "glossary"))
 			 :export (lambda (link description format protocol)
-				   (jf/denote-link-ol-abbr-with-property
+				   (jf/denote/link-ol-abbr-with-property
 				    link description format protocol
 				    :keyword "ABBR"
 				    :additional-hugo-parameters "abbr=\"t\""))
@@ -521,7 +532,7 @@ This function is intended for a global find of all notes."
 				      :filter " _abbr*"
 				      :subdirectory "glossary"))
 			 :export (lambda (link description format protocol)
-				   (jf/denote-link-ol-abbr-with-property
+				   (jf/denote/link-ol-abbr-with-property
 				    link description format protocol
 				    :keyword "PLURAL_ABBR"
 				    :additional-hugo-parameters "abbr=\"t\" plural=\"t\""))
@@ -532,12 +543,12 @@ This function is intended for a global find of all notes."
 			 )
 
 (org-link-set-parameters "date"
-                         :complete #'jf/denote-link-complete-date
-                         :export #'jf/denote-link-export-date
+                         :complete #'jf/denote/link-complete-date
+                         :export #'jf/denote/link-export-date
                          :face #'jf/org-faces-date
-                         :follow #'jf/denote-link-follow-date)
+                         :follow #'jf/denote/link-follow-date)
 
-(cl-defun jf/denote-link-complete-date (&optional parg)
+(cl-defun jf/denote/link-complete-date (&optional parg)
   "Prompt for the given DATE.
 
     While we are prompting for a year, month, and day; a reminder
@@ -546,21 +557,21 @@ This function is intended for a global find of all notes."
     months; and most often year, month, and days."
   (format "date:%s" (org-read-date)))
 
-(cl-defun jf/denote-link-export-date (link description format protocol)
+(cl-defun jf/denote/link-export-date (link description format protocol)
   "Export a date for the given LINK, DESCRIPTION, FORMAT, and PROTOCOL."
   (cond
    ((or (eq format 'html) (eq format 'md))
     (format "<time datetime=\"%s\">%s</time>" link description))
    (t (format "%s (%s)" description link))))
 
-(cl-defun jf/denote-link-follow-date (date &optional parg)
+(cl-defun jf/denote/link-follow-date (date &optional parg)
   "Follow the given DATE; uncertain what that means."
   (message "TODO, implement link for %s" date))
 
 ;; I want to be able to link and export my epigraph entries.  For now, I'm
 ;; going to focus on the HTML and Markdown version; as most often when I
 ;; include an epigraph it is for my blog posts.
-(cl-defun jf/denote-link-ol-epigraph-link (link
+(cl-defun jf/denote/link-ol-epigraph-link (link
 					   description format protocol
 					   &key
 					   additional-hugo-parameters
@@ -599,7 +610,7 @@ This function is intended for a global find of all notes."
                                       :filter ""
                                       :subdirectory "epigraphs"))
                          :export (lambda (link description format protocol)
-                                   (jf/denote-link-ol-epigraph-link
+                                   (jf/denote/link-ol-epigraph-link
 				    link description format protocol))
                          :face #'jf/org-faces-epigraph
                          :follow #'denote-link-ol-follow)
@@ -619,7 +630,7 @@ This function is intended for a global find of all notes."
   :group 'denote-faces
   :package-version '(denote . "0.5.0"))
 
-(cl-defun jf/denote-link-ol-export (link
+(cl-defun jf/denote/link-ol-export (link
 				    description
 				    format
 				    protocol
@@ -637,7 +648,7 @@ This function is intended for a global find of all notes."
   {{< glossary key=\"GLOSSARY_KEY\" >}}."
   (let* ((path-id (denote-link--ol-resolve-link-to-target link :path-id))
          (path (file-name-nondirectory (car path-id)))
-         (export-plist (jf/denote-plist-for-export-of-id link))
+         (export-plist (jf/denote/plist-for-export-of-id link))
          (title (plist-get export-plist :title))
          (url (plist-get export-plist :url))
          (glossary_key (plist-get export-plist :key))
@@ -663,7 +674,7 @@ This function is intended for a global find of all notes."
       desc)))
 
 (advice-add #'denote-link-ol-export
-	    :override #'jf/denote-link-ol-export
+	    :override #'jf/denote/link-ol-export
 	    '((name . "wrapper")))
 
 ;; When I link to glossary entries, I want to use their URLs.  I have several
@@ -678,7 +689,7 @@ This function is intended for a global find of all notes."
 ;; - SAME_AS :: This could be the primary URL; however due to past
 ;;   implementations, I was extracting the SAME_AS URL from the ITEMID; which
 ;;   was typically the Wikidata URL.
-(defun jf/denote-export-url-from-id (identifier)
+(defun jf/denote/export-url-from-id (identifier)
   "Return the appropriate url for the given `denote' identifier."
   ;; TODO: Remove function
   (when-let ((filename (denote-get-path-by-id identifier)))
@@ -695,13 +706,13 @@ This function is intended for a global find of all notes."
            ((lax-plist-get kw-plist "SAME_AS"))))))))
 
 ;;  ;; Should be: https://www.worldcat.org link
-;; (message "%s" (jf/denote-export-url-from-id "20221009T115949"))
+;; (message "%s" (jf/denote/export-url-from-id "20221009T115949"))
 ;;  ;; Should be https://samvera.org
-;; (message "%s" (jf/denote-export-url-from-id "20221009T120341"))
+;; (message "%s" (jf/denote/export-url-from-id "20221009T120341"))
 ;;  ;; Should be https://en.wikipedia.org/wiki/Jira_(software)
-;; (message "%s" (jf/denote-export-url-from-id "20221009T120152"))
+;; (message "%s" (jf/denote/export-url-from-id "20221009T120152"))
 ;;  ;; Should be nil
-;;(message "%s" (jf/denote-export-url-from-id "20221009T120712"))
+;;(message "%s" (jf/denote/export-url-from-id "20221009T120712"))
 
 (defun jf/associate-blog-post-url-with-identifier (url identifier)
   "Associate given URL with the `denote' IDENTIFIER."
@@ -731,7 +742,7 @@ This function is intended for a global find of all notes."
   (let* ((link-title-pair (grab-mac-link-firefox-1))
          (url (car link-title-pair))
          (title (cadr link-title-pair)))
-    (jf/denote-capture-reference :url url :title title)))
+    (jf/denote/capture-reference :url url :title title)))
 
 (defun jf/menu--org-capture-safari ()
   "Create an `denote' entry from Safari page."
@@ -740,23 +751,23 @@ This function is intended for a global find of all notes."
   (let* ((link-title-pair (grab-mac-link-safari-1))
          (url (car link-title-pair))
          (title (cadr link-title-pair)))
-    (jf/denote-capture-reference :url url :title title)))
+    (jf/denote/capture-reference :url url :title title)))
 
 (defun jf/menu--org-capture-eww ()
   "Create an `denote' entry from `eww' data."
   (interactive)
   (let* ((url (plist-get eww-data :url))
          (title (plist-get eww-data :title)))
-    (jf/denote-capture-reference :url url :title title)))
+    (jf/denote/capture-reference :url url :title title)))
 
 (cl-defun jf/menu--org-capture-elfeed-show (&key (entry elfeed-show-entry))
   "Create a `denote' from `elfeed' ENTRY."
   (interactive)
   (let* ((url (elfeed-entry-link entry))
          (title (elfeed-entry-title entry)))
-    (jf/denote-capture-reference :url url :title title)))
+    (jf/denote/capture-reference :url url :title title)))
 
-(cl-defun jf/denote-capture-reference (&key
+(cl-defun jf/denote/capture-reference (&key
 				       title
 				       url
 				       (keywords (denote-keywords-prompt))
