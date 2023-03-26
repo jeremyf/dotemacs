@@ -526,14 +526,14 @@ CONTENTS is nil.  INFO is a plist holding contextual information."
 
 ;; Note: I needed to use `fboundp' because if I invoked this functions
 ;; before other consult functions I got a method void error.
-(cl-defun jf/find-file-via-matching (&key prompt matching in)
+(cl-defun jf/find-file-via-matching (&key prompt matching in (matches "--files-with-matches"))
   "PROMPT for files IN the directory with MATCHING content.
 
     If `consult--read' is defined, use that.  Otherwise fallback to `completing-read'."
   (if (fboundp 'consult--read)
       (consult--read
        (consult--with-increased-gc
-	(jf/list-full-filenames-with-file-text :matching matching :in in))
+	       (jf/list-full-filenames-with-file-text :matching matching :in in :matches matches))
        :prompt prompt
        :sort nil
        :require-match t
@@ -636,13 +636,13 @@ CONTENTS is nil.  INFO is a plist holding contextual information."
        "| tr '\n' '@'"))
      "@")))
 
-(cl-defun jf/list-full-filenames-with-file-text (&key matching in)
+(cl-defun jf/list-full-filenames-with-file-text (&key matching in (matches "--files-with-matches"))
   "Build a list of filenames MATCHING the pattern IN the given directory."
   (split-string-and-unquote
    (shell-command-to-string
     (concat
      "rg \""
-     matching "\" " in " --only-matching --files-with-matches --sortr modified"
+     matching "\" " in " --only-matching " matches " --sortr modified"
      "| tr '\n' '@'"))
    "@"))
 
