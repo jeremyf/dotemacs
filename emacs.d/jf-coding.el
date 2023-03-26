@@ -90,13 +90,8 @@
   (global-treesit-auto-mode))
 
 (use-package scopeline
-  :straight (:host github :repo "meain/scopeline.el")
-  :init
-  (require 'scopeline)
-  (add-to-list 'scopeline-targets
-    '(ruby-ts-mode . ("block" "case" "do_block" "if" "method" "singleton_method" "unless")))
-  (add-to-list 'scopeline-targets
-    '(ruby-mode . ("block" "case" "do_block" "if" "method" "singleton_method" "unless")))
+  ;; On <2023-03-25 Sat> I submitted https://github.com/meain/scopeline.el/pull/12
+  :straight (:host github :repo "jeremyf/scopeline.el")
   :hook ((ruby-mode ruby-ts-mode) . scopeline-mode))
 
 ;;;; Other packages and their configurations
