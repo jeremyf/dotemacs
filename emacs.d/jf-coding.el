@@ -89,6 +89,7 @@
   :config (setq treesit-auto-install 'prompt)
   (global-treesit-auto-mode))
 
+;; Show the scope info of methods, blocks, if/case statements
 (use-package scopeline
   ;; On <2023-03-25 Sat> I submitted https://github.com/meain/scopeline.el/pull/12
   :straight (:host github :repo "jeremyf/scopeline.el")
