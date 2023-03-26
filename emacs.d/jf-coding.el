@@ -35,8 +35,9 @@
 ;;   :straight t)
 
 (use-package treesit
-  :custom (treesit-font-lock-level 4)
+  ;; :custom
   :init
+  (setq treesit-font-lock-level 4)
   (defun jf/treesit/function-select ()
     "Select the current function at point."
     (interactive)

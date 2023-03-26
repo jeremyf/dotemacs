@@ -535,8 +535,7 @@ This function is intended for a global find of all notes."
                          :complete #'jf/denote-link-complete-date
                          :export #'jf/denote-link-export-date
                          :face #'jf/org-faces-date
-                         :follow #'jf/denote-link-follow-date
-                         )
+                         :follow #'jf/denote-link-follow-date)
 
 (cl-defun jf/denote-link-complete-date (&optional parg)
   "Prompt for the given DATE.
