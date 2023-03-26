@@ -37,6 +37,16 @@
 (use-package treesit
   :custom (treesit-font-lock-level 4)
   :init
+  (defun jf/treesit/function-select ()
+    "Select the current function at point."
+    (interactive)
+    (if-let ((func (treesit-defun-at-point)))
+      (progn
+        (goto-char (treesit-node-start func))
+        (call-interactively #'set-mark-command)
+        (goto-char (treesit-node-end func)))
+      (user-error "No function to select.")))
+
   ;; This function, tested against Ruby, will return the module space qualified
   ;; method name (e.g. Hello::World#method_name).
   (cl-defun jf/treesit/qualified_method_name (&key (type "method"))
@@ -78,6 +88,16 @@
   :straight (:host github :repo "renzmann/treesit-auto")
   :config (setq treesit-auto-install 'prompt)
   (global-treesit-auto-mode))
+
+(use-package scopeline
+  :straight (:host github :repo "meain/scopeline.el")
+  :init
+  (require 'scopeline)
+  (add-to-list 'scopeline-targets
+    '(ruby-ts-mode . ("block" "case" "do_block" "if" "method" "singleton_method" "unless")))
+  (add-to-list 'scopeline-targets
+    '(ruby-mode . ("block" "case" "do_block" "if" "method" "singleton_method" "unless")))
+  :hook ((ruby-mode ruby-ts-mode) . scopeline-mode))
 
 ;;;; Other packages and their configurations
 (use-package bundler
@@ -179,8 +199,9 @@
 (use-package ruby-mode
   ;; My language of choice for professional work.
   :straight (:type built-in)
-  :bind (:map ruby-mode-map ("C-c C-f" . jf/treesit/qualified_method_name))
-  (:map ruby-ts-mode-map ("C-c C-f" . jf/treesit/qualified_method_name))
+  :bind
+  (:map ruby-mode-map (("C-M-h" . jf/treesit/function-select)
+                        ("C-c C-f" . jf/treesit/qualified_method_name)))
   :hook ((ruby-mode ruby-ts-mode) . (lambda () (setq fill-column 100))))
 
 ;; I don't use this package
@@ -347,9 +368,17 @@
 			    identifiers))
 	      "\n"))))
   :bind (:map ruby-mode-map (("C-c C-y" . jf/ruby-mode/yardoc-ify)))
-  (:map ruby-ts-mode-map (("C-c C-y" . jf/ruby-mode/yardoc-ify)))
+
   :hook ((ruby-mode ruby-ts-mode) . yard-mode))
 
+(defun jf/ruby-ts-mode-map-keys ()
+  (local-set-key (kbd "C-M-h") 'jf/treesit/function-select)
+  (local-set-key (kbd "C-c C-f") 'jf/treesit/qualified_method_name)
+  (local-set-key (kbd "C-c C-y") 'jf/ruby-mode/yardoc-ify))
+
+(add-hook 'ruby-ts-mode-hook #'jf/ruby-ts-mode-map-keys)
+
+;; (:map ruby-ts-mode-map ())
 (use-package devdocs
   ;; Download and install documents from https://devdocs.io/
   ;; Useful for having local inline docs
