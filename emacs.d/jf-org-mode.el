@@ -13,8 +13,8 @@
 ;; org-mode” files.  The `jf/org-agenda-files' reads the file system to gather
 ;; sources for `org-mode' agenda.
 (defun jf/is-work-machine? ()
-  "Am I working on my machine"
-  (f-file? (file-truename "~/git/org/denote/scientist/20221021T221357--scientist-agenda__scientist.org")))
+  "Am I working on my company machine machine"
+  (string= (getenv "USER") "jeremy"))
 
 (defvar jf/org-mode/capture/filename
   "~/git/org/denote/melange/20230210T184422--example-code__programming.org"
