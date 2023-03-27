@@ -60,6 +60,7 @@ markdown-mode markdown-ts-mode
 ;;;; org-mode
 org-mode
 
+(local-var "# -*- " (p "Variable name: ")": " (p "Value: ") "; -*-")
 (@ (p (jf/denote/link--people)))
 ;; Blockquote structure for Emacs
 (bq "#+attr_shortcode:"
@@ -81,7 +82,7 @@ org-mode
 	 n "#+PROJECT_PATHS: (\"Notes, " (s project-name) "\" . \"" (buffer-file-name)  "\")")
 
 (upd "#+attr_shortcode: :date " (format-time-string "%Y-%m-%d")
-	" :mode " (p (completing-read "Mode: " '(inline paragraph sidenote section fallback) nil t) mode)
+	" :mode " (p (completing-read "Mode: " '(inline paragraph marginnote sidenote section fallback) nil t) mode)
     n "#+begin_update"
     n q
     n "#+end_update" n)

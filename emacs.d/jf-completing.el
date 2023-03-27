@@ -156,7 +156,7 @@
 		"!**/log/ --glob !public/ --glob !node_modules/ --glob !.git/ ."
 		"-e ARG OPTS"))
   (consult-ripgrep-args
-	(concat "rga --null --hidden q--line-buffered --color=never --max-columns=1000 "
+	(concat "rga --null --hidden --line-buffered --color=never --max-columns=1000 "
 		"--path-separator / --no-ignore-vcs --smart-case --no-heading "
 		"--glob !vendor/ --glob !coverage/ --glob !**/tmp/ --glob "
 		"!**/log/ --glob !public/ --glob !node_modules/ --glob !.git/ "

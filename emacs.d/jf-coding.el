@@ -225,9 +225,12 @@
   :straight t
   :hook (((markdown-mode markdown-ts-mode) . turn-on-visual-line-mode))
   :mode (("README\\.md\\'" . gfm-mode)
-         ("\\.md\\'" . markdown-mode)
-         ("\\.markdown\\'" . markdown-mode))
-  :init (setq markdown-command "/opt/homebrew/bin/pandoc"))
+          ("\\.md\\'" . markdown-mode)
+          ("\\.markdown\\'" . markdown-mode))
+  :init
+  (setq markdown-command "/opt/homebrew/bin/pandoc")
+  (font-lock-add-keywords 'markdown-mode
+    '(("{{[^}]+}}" . 'font-lock-function-name-face))))
 
 (use-package plantuml-mode
   ;; A mode for working with PlantUML.  See https://plantuml.com

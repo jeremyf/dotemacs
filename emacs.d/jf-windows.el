@@ -94,33 +94,33 @@
   "Set the various custom faces for both `treesit' and `tree-sitter'."
   (modus-themes-with-colors
     (custom-set-faces
-     ;; `(org-meta-line
-     ;;   ((,c (:foreground ,yellow-faint))))
-     `(denote-faces-link
-       ((,c (:inherit link
-		      :box (:line-width (1 . 1)
-					:color ,border-mode-line-inactive
-					:style released-button)))))
-     `(jf/org-faces-date
-       ((,c :underline nil :foreground ,cyan-faint)))
-     `(jf/org-faces-epigraph
-       ((,c :underline nil :slant oblique :foreground ,fg-alt)))
-     `(jf/org-faces-abbr
-       ((,c :underline t :slant oblique :foreground ,fg-dim)))
-     `(org-list-dt
-       ((,c :bold t :slant italic :foreground ,fg-alt)))
-     `(tree-sitter-hl-face:constant
-       ((,c :slant italic :foreground ,magenta-cooler)))
-     `(tree-sitter-hl-face:method.call
-       ((,c :slant italic :foreground ,fg-alt)))
-     `(tree-sitter-hl-face:operator
-       ((,c :foreground ,red-faint)))
-     `(tree-sitter-hl-face:property
-       ((,c :inherit font-lock-variable-name-face)))
-     `(font-lock-misc-punctuation-face
-       ((,c :foreground ,green-warmer)))
-     `(font-lock-regexp-face
-       ((,c :foreground ,magenta-warmer))))))
+      ;; `(org-meta-line
+      ;;   ((,c (:foreground ,yellow-faint))))
+      `(denote-faces-link
+         ((,c (:inherit link
+		            :box (:line-width (1 . 1)
+					             :color ,border-mode-line-inactive
+					             :style released-button)))))
+      `(jf/org-faces-date
+         ((,c :underline nil :foreground ,cyan-faint)))
+      `(jf/org-faces-epigraph
+         ((,c :underline nil :slant oblique :foreground ,fg-alt)))
+      `(jf/org-faces-abbr
+         ((,c :underline t :slant oblique :foreground ,fg-dim)))
+      `(org-list-dt
+         ((,c :bold t :slant italic :foreground ,fg-alt)))
+      `(tree-sitter-hl-face:constant
+         ((,c :slant italic :foreground ,magenta-cooler)))
+      `(tree-sitter-hl-face:method.call
+         ((,c :slant italic :foreground ,fg-alt)))
+      `(tree-sitter-hl-face:operator
+         ((,c :foreground ,red-faint)))
+      `(tree-sitter-hl-face:property
+         ((,c :inherit font-lock-variable-name-face)))
+      `(font-lock-misc-punctuation-face
+         ((,c :foreground ,green-warmer)))
+      `(font-lock-regexp-face
+         ((,c :foreground ,magenta-warmer))))))
 
 (add-hook 'modus-themes-after-load-theme-hook
 	  #'jf/modus-themes-custom-faces)
