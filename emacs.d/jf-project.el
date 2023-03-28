@@ -263,6 +263,17 @@ repositories that are generally available on both machines.")
 
 (setq magit-repository-directories jf/git-project-paths)
 
+(defun jf/space_stone/related-to-text ()
+  "A throw away function but one I'm going to be using for several days."
+  (interactive)
+  (insert
+    "Related to:\n"
+    "\n"
+    "- https://github.com/scientist-softserv/iiif_print/issues/194\n"
+    "- https://github.com/samvera-labs/bulkrax/issues/760\n"
+    "- https://github.com/scientist-softserv/utk-hyku/issues/343\n"
+    "- https://github.com/scientist-softserv/adventist-dl/issues/330\n"))
+
 
 (provide 'jf-project)
 ;;; jf-project.el ends here
