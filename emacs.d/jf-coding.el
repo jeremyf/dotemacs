@@ -376,7 +376,7 @@
 				      " [Object]"))
 			    identifiers))
 	      "\n"))))
-  :bind (:map ruby-mode-map (("C-c C-f" . jf/current-scoped-function-name)
+  :bind* (:map ruby-mode-map (("C-c C-f" . jf/current-scoped-function-name)
                               ("C-c C-y" . jf/ruby-mode/yardoc-ify)))
   :hook ((ruby-mode ruby-ts-mode) . yard-mode))
 
