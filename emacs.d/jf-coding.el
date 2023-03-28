@@ -64,23 +64,36 @@
 			                                (string= "identifier"
                                         (treesit-node-type node)))))))
               (module_space (s-join "::"
-                                  (-flatten
-                                    (jf/treesit/module_space func))))
+                              (-flatten
+                                (jf/treesit/module_space func))))
               (qualified_name (concat module_space method_type method_name)))
         (message qualified_name)
         (kill-new (substring-no-properties qualified_name)))
       (user-error "No %s at point." type)))
   ;; An ugly bit of code to recurse upwards from the node to the "oldest"
   ;; parent.  And collect all module/class nodes along the way.
+  ;;
+  ;; Handles the following Ruby code:
+  ;;
+  ;;   module A::B
+  ;;     module C
+  ;;     end
+  ;;     C::D = Struct.new do
+  ;;       def call
+  ;;       end
+  ;;     end
+  ;;   end
   (defun jf/treesit/module_space (node)
     (when-let* ((parent (treesit-parent-until node
-                        (lambda (n) (member (treesit-node-type n)
-                                      '("class" "module")))))
-               (parent_name (treesit-node-text
-                              (car (treesit-filter-child
-					               parent (lambda (n)
-					                        (string= "constant"
-                                    (treesit-node-type n))))))))
+                          (lambda (n) (member (treesit-node-type n)
+                                        '("class" "module" "assignment")))))
+                 (parent_name (treesit-node-text
+                                (car
+                                  (treesit-filter-child
+                                    parent
+                                    (lambda (n)
+		                                  (member (treesit-node-type n)
+                                        '("constant" "scope_resolution"))))))))
       (list (jf/treesit/module_space parent) parent_name)))
   :straight (:type  built-in))
 
