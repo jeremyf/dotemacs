@@ -49,10 +49,8 @@
       (user-error "No function to select.")))
   ;; This function, tested against Ruby, will return the module space qualified
   ;; method name (e.g. Hello::World#method_name).
-  (cl-defun jf/treesit/qualified_method_name (prefix &key (type "method"))
-    "Get the fully qualified name of method at point.  When PREFIX is
-given, return only the class scope."
-    (interactive "P")
+  (cl-defun jf/treesit/qualified_method_name (&key (type "method"))
+    "Return the fully qualified name of method at point."
     (if-let ((func (treesit-defun-at-point)))
       ;; Instance method or class method?
       (let* ((method_type (if (string= type
@@ -66,12 +64,10 @@ given, return only the class scope."
                                         (treesit-node-type node)))))))
               (module_space (s-join "::"
                               (-flatten
-                                (jf/treesit/module_space func))))
-              (qualified_name (if prefix
-                                module_space
-                                (concat module_space method_type method_name))))
-        (message qualified_name)
-        (kill-new (substring-no-properties qualified_name)))
+                                (jf/treesit/module_space func)))))
+        (if current-prefix-arg
+          module_space
+          (concat module_space method_type method_name)))
       (user-error "No %s at point." type)))
   ;; An ugly bit of code to recurse upwards from the node to the "oldest"
   ;; parent.  And collect all module/class nodes along the way.
@@ -107,8 +103,7 @@ given, return only the class scope."
 
 ;; Show the scope info of methods, blocks, if/case statements
 (use-package scopeline
-  ;; On <2023-03-25 Sat> I submitted https://github.com/meain/scopeline.el/pull/12
-  :straight (:host github :repo "jeremyf/scopeline.el")
+  :straight (:host github :repo "meain/scopeline.el")
   :hook ((ruby-mode ruby-ts-mode) . scopeline-mode))
 
 ;;;; Other packages and their configurations
@@ -381,23 +376,37 @@ given, return only the class scope."
 				      " [Object]"))
 			    identifiers))
 	      "\n"))))
-  :bind (:map ruby-mode-map (("C-c C-y" . jf/ruby-mode/yardoc-ify)))
+  :bind (:map ruby-mode-map (("C-c C-f" . jf/current-scoped-function-name)
+                              ("C-c C-y" . jf/ruby-mode/yardoc-ify)))
   :hook ((ruby-mode ruby-ts-mode) . yard-mode))
 
-(defun jf/ruby-ts-mode-map-keys ()
-  (local-set-key (kbd "C-M-h") 'jf/treesit/function-select)
-  (local-set-key (kbd "C-c C-f") 'jf/treesit/qualified_method_name)
-  (local-set-key (kbd "C-c C-y") 'jf/ruby-mode/yardoc-ify))
+(defun jf/ruby-ts-mode-configurator ()
+  (setq-local add-log-current-defun-function #'jf/treesit/qualified_method_name)
+  (define-key ruby-ts-mode-map (kbd "C-M-h") #'jf/treesit/function-select)
+  (define-key ruby-ts-mode-map (kbd "C-c C-f") #'jf/current-scoped-function-name)
+  (define-key ruby-ts-mode-map (kbd "C-c C-y") #'jf/ruby-mode/yardoc-ify))
+(add-hook 'ruby-ts-mode-hook #'jf/ruby-ts-mode-configurator)
 
-(add-hook 'ruby-ts-mode-hook #'jf/ruby-ts-mode-map-keys)
+;; I didn't know about `add-log-current-defun-function' until a blog reader
+;; reached out.  Now, I'm making a general function for different modes.
+(defun jf/current-scoped-function-name ()
+  "Echo and kill the current scoped function name.
 
-;; (:map ruby-ts-mode-map ())
+See `add-log-current-defun-function'."
+  (interactive)
+  (if-let ((text (funcall add-log-current-defun-function)))
+    (progn
+      (message "%s" text)
+      (kill-new (substring-no-properties text)))
+    (user-error "Warning: Point not on function.")))
+(bind-key "C-c C-f" #'jf/current-scoped-function-name prog-mode-map)
+(bind-key "C-c C-f" #'jf/current-scoped-function-name emacs-lisp-mode-map)
+
 (use-package devdocs
   ;; Download and install documents from https://devdocs.io/
   ;; Useful for having local inline docs
   :straight t
   :commands (devdocs-install))
-
 
 (provide 'jf-coding)
 ;;; jf-coding.el ends here
