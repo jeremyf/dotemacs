@@ -485,8 +485,9 @@ tasks within projects are headline 5."
                        (org-read-date nil nil nil "Pick a day:")
                        (format-time-string "%Y-%m-%d"))))
   (widen)
-  (beginning-of-buffer)
-  (re-search-forward (concat "^\*\*\* " date))
+  (end-of-buffer)
+  (re-search-backward (concat "^\*\*\* " date))
+  (end-of-line)
   (org-narrow-to-subtree)
   (message "Narrowing to %s agenda" date))
 
