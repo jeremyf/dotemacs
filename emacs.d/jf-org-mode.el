@@ -56,8 +56,8 @@
   ;; to have that work better by default.
   ;;
   ;; (org-mode . org-indent-mode)
-  :bind ("C-c C-j" . jf/jump-to-agenda-or-mark)
-  :bind (:map org-mode-map (("C-c C-j" . jf/jump-to-agenda-or-mark)
+  :bind ("C-c C-j" . jf/org-mode/jump-to-agenda-or-mark)
+  :bind (:map org-mode-map (("C-c C-j" . jf/org-mode/jump-to-agenda-or-mark)
                              ("C-x n t" . jf/org-mode/narrow-to-date)
 			    ("C-j" . avy-goto-char-2)))
   :custom (org-use-speed-commands t)
@@ -320,8 +320,8 @@
 
 ;; I work on several different projects each day; helping folks get unstuck.  I
 ;; also need to track and record my time.
-(bind-key "C-c C-j" 'jf/jump-to-agenda-or-mark)
-(cl-defun jf/jump-to-agenda-or-mark (prefix-arg)
+(bind-key "C-c C-j" 'jf/org-mode/jump-to-agenda-or-mark)
+(cl-defun jf/org-mode/jump-to-agenda-or-mark (prefix-arg)
   "Jump to and from current agenda item to mark.
 
   With PREFIX_ARG go to beginning of today's headline."
@@ -671,7 +671,7 @@ only the description"
 ;;       (org-roam-db-sync)
 ;;       (org-roam-update-org-id-locations))))
 
-(cl-defun jf/org-agenda-send-forward-task ()
+(cl-defun jf/org-agenda/send-forward-task ()
   "Send an `org-mode' task node forward."
   (interactive)
   (save-excursion
