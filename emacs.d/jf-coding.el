@@ -140,30 +140,30 @@
   ;; The Language Server Protocol (LSP) is a game changer; having access to that
   ;; tooling is very much a nice to have.
   :hook ((css-mode css-ts-mode
-          ruby-mode ruby-ts-mode
-          yaml-mode yaml-ts-mode
-          html-mode html-ts-mode
-          js-mode js-ts-mode
-          scss-mode scss-ts-mode)
-	 . eglot-ensure)
+           ruby-mode ruby-ts-mode
+           yaml-mode yaml-ts-mode
+           html-mode html-ts-mode
+           js-mode js-ts-mode
+           json-mode json-ts-mode
+           scss-mode scss-ts-mode)
+	        . eglot-ensure)
   :hook (eglot-managed-mode . jf/eglot-capf)
   :config
-  (setq eglot-ignored-server-capabilites (quote (:documentHighlightProvider))
-        completion-category-overrides '((eglot (styles orderless))))
+  (setq completion-category-overrides '((eglot (styles orderless))))
   (add-to-list 'eglot-server-programs
-               `(ruby-mode . ("solargraph" "socket" "--port" :autoport)))
+    `(ruby-mode . ("solargraph" "socket" "--port" :autoport)))
   (add-to-list 'eglot-server-programs
-               `(ruby-ts-mode . ("solargraph" "socket" "--port" :autoport)))
+    `(ruby-ts-mode . ("solargraph" "socket" "--port" :autoport)))
   (defun jf/eglot-capf ()
     ;; I don't want `eglot-completion-at-point' to trample my other completion
     ;; options.
     ;;
     ;; https://stackoverflow.com/questions/72601990/how-to-show-suggestions-for-yasnippets-when-using-eglot
     (setq-local completion-at-point-functions
-		(list (cape-super-capf
-                       #'eglot-completion-at-point
-                       #'tempel-expand
-		       #'cape-file))))
+		  (list (cape-super-capf
+              #'eglot-completion-at-point
+              #'tempel-expand
+		          #'cape-file))))
   :straight t)
 
 (use-package eglot-tempel
@@ -248,13 +248,13 @@
   ;;
   ;;
   :config (setq plantuml-executable-path (concat
-					  (getenv "HB_PATH")
-					  "/bin/plantuml")
-                plantuml-default-exec-mode 'executable
-                org-plantuml-executable-path (concat
-					      (getenv "HB_PATH")
-					      "/bin/plantuml")
-                org-plantuml-exec-mode 'executable)
+					                                 (getenv "HB_PATH")
+					                                 "/bin/plantuml")
+            plantuml-default-exec-mode 'executable
+            org-plantuml-executable-path (concat
+					                                 (getenv "HB_PATH")
+					                                 "/bin/plantuml")
+            org-plantuml-exec-mode 'executable)
   :mode (("\\.plantuml\\'" . plantuml-mode))
   :mode (("\\.puml\\'" . plantuml-mode))
   :straight t)
@@ -272,8 +272,8 @@
   (rspec-docker-cwd "./")
   (rspec-docker-command "docker compose exec")
   :hook ((dired-mode . rspec-dired-mode)
-	 (ruby-mode . rspec-mode)
-	 (ruby-ts-mode . rspec-mode))
+	        (ruby-mode . rspec-mode)
+	        (ruby-ts-mode . rspec-mode))
   ;; Dear reader, make sure that you can jump from spec and definition.  And in
   ;; Ruby land when you have lib/my_file.rb, the corresponding spec should be in
   ;; spec/my_file_spec.rb; and when you have app/models/my_file.rb, the spec
@@ -285,9 +285,9 @@
     "Check the project for spring as part of the Gemfile.lock."
     (let ((gemfile-lock (f-join (projectile-project-root) "Gemfile.lock")))
       (and (f-exists? gemfile-lock)
-	   (s-present?
-	    (shell-command-to-string
-	     (concat "rg \"^ +spring \" " gemfile-lock))))))
+	      (s-present?
+	        (shell-command-to-string
+	          (concat "rg \"^ +spring \" " gemfile-lock))))))
   ;; Out of the box, for my typical docker ecosystem, the `rspec-spring-p'
   ;; function does not work.  So I'm overriding the default behavior to match my
   ;; ecosystem.
@@ -320,8 +320,8 @@
   ;; Help consistently edit web documents of SGML markup dialetcs.
   :straight t
   :config (setq web-mode-markup-indent-offset 2
-                web-mode-css-indent-offset 2
-                web-mode-code-indent-offset 2)
+            web-mode-css-indent-offset 2
+            web-mode-code-indent-offset 2)
   :init
   (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
   (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
@@ -343,41 +343,41 @@
   :straight t
   :init
   (defun jf/ruby-mode/yardoc-ify ()
-  "Add parameter yarddoc stubs for the current method."
-  (interactive)
-  ;; Remember where we started.
-  (save-excursion
-    ;; Goto the beginning of the function
-    (ruby-beginning-of-defun)
-    ;; Move to just after the first (
-    (search-forward "(")
-    ;; Move back to just before the (
-    (backward-char)
-    ;; Select parameters declaration
-    (mark-sexp)
-    ;; Copy that
-    (copy-region-as-kill (point) (mark))
-    ;; Split apart the parameters into their identifiers
-    (let ((identifiers (mapcar (lambda (token)
-			    (replace-regexp-in-string
-			     "[^a-z|_]" ""
-			     (car (s-split " "
-					   (s-trim token)))))
-			  (s-split "," (substring-no-properties
-					(car kill-ring))))))
-      ;; Go to the beginning of the function again
+    "Add parameter yarddoc stubs for the current method."
+    (interactive)
+    ;; Remember where we started.
+    (save-excursion
+      ;; Goto the beginning of the function
       (ruby-beginning-of-defun)
-      ;; Now insert the identifiers as yardoc
-      (insert "##\n"
-	      (s-join "\n" (mapcar
-			    (lambda (param)
-			      (concat "# @param "
-				      param
-				      " [Object]"))
-			    identifiers))
-	      "\n"))))
+      ;; Move to just after the first (
+      (search-forward "(")
+      ;; Move back to just before the (
+      (backward-char)
+      ;; Select parameters declaration
+      (mark-sexp)
+      ;; Copy that
+      (copy-region-as-kill (point) (mark))
+      ;; Split apart the parameters into their identifiers
+      (let ((identifiers (mapcar (lambda (token)
+                                   (replace-regexp-in-string
+			                               "[^a-z|_]" ""
+			                               (car (s-split " "
+					                                  (s-trim token)))))
+			                     (s-split "," (substring-no-properties
+					                                (car kill-ring))))))
+        ;; Go to the beginning of the function again
+        (ruby-beginning-of-defun)
+        ;; Now insert the identifiers as yardoc
+        (insert "##\n"
+	        (s-join "\n" (mapcar
+                         (lambda (param)
+                           (concat "# @param "
+                             param
+                             " [Object]"))
+                         identifiers))
+	        "\n"))))
   :bind* (:map ruby-mode-map (("C-c C-f" . jf/current-scoped-function-name)
-                              ("C-c C-y" . jf/ruby-mode/yardoc-ify)))
+                               ("C-c C-y" . jf/ruby-mode/yardoc-ify)))
   :hook ((ruby-mode ruby-ts-mode) . yard-mode))
 
 (defun jf/ruby-ts-mode-configurator ()

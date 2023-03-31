@@ -187,6 +187,7 @@
 
 (use-package minions
   :straight t
+  :custom (minions-prominent-modes '(flymake-mode))
   :config (minions-mode 1))
 
 (use-package gcmh

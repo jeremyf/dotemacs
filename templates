@@ -134,3 +134,5 @@ enh-ruby-mode ruby-mode rspec-mode ruby-ts-mode
 		"attr_accessor " (s-join ", " symbols) "\n"
 		"private " (s-join ", " symbols) "\n"
 		"private " (s-join "=, " symbols) "=\n")))
+
+(it_is "it { is_expected.to " q " }")

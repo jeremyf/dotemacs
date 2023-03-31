@@ -181,42 +181,42 @@
 
 ;;;; Buffers and Tabs
 
-(use-package bufler
-  ;; https://github.com/alphapapa/bufler.el
-  ;; Why this instead of Centaur Tabs?  `bufler' integrates with `tab-bar-mode'
-  ;; and `tab-lines-mode'.  Why is this important?  Because `centaur-tabs-mode'
-  ;; hack the buffer to add the tabs; the impact was that popped buffers would
-  ;; have sizing issues.
-  :straight t
-  :hook (after-init . (bufler-mode))
-  :custom (bufler-columns '("Name" "VC" "Path"))
-  :config
-  (defun jf/bufler/tab-configuration ()
-    (bufler-tabs-mode 1)
-    (tab-bar-mode -1)
-    (bufler-workspace-tabs))
-  (setq tab-line-switch-cycling t)
-  (defun jf/bufler-workspace-mode-lighter ()
-    "Return the lighter string mode line."
-    "Bflr")
-  (advice-add #'bufler-workspace-mode-lighter
-	      :override #'jf/bufler-workspace-mode-lighter
-	      '((name . "wrapper")))
-  ;; Ensuring that when I make a selection, it closes the bufler buffer.
-  (defun jf/bufler-list-buffer-switch (&rest args)
-    (kill-buffer "*Bufler*"))
-  (advice-add 'bufler-list-buffer-switch :after 'jf/bufler-list-buffer-switch)
-  :bind (:map bufler-list-mode-map
-	      ("s-3" . quit-window)
-	      ("s-\\" . quit-window))
-  :bind (("s-3" . bufler-switch-buffer)
-	 ("s-\\" . bufler-sidebar)
-	 ;; ("s-\\" . jf/tab-bar-switch-prompt-for-tab)
-	 ;; ("s-]" . tab-line-switch-to-next-tab)
-	 ;; ("s-}" . tab-line-switch-to-next-tab)
-	 ;; ("s-[" . tab-line-switch-to-prev-tab)
-	 ;; ("s-{" . tab-line-switch-to-prev-tab)
-	 ))
+;; (use-package bufler
+;;   ;; https://github.com/alphapapa/bufler.el
+;;   ;; Why this instead of Centaur Tabs?  `bufler' integrates with `tab-bar-mode'
+;;   ;; and `tab-lines-mode'.  Why is this important?  Because `centaur-tabs-mode'
+;;   ;; hack the buffer to add the tabs; the impact was that popped buffers would
+;;   ;; have sizing issues.
+;;   :straight t
+;;   :hook (after-init . (bufler-mode))
+;;   :custom (bufler-columns '("Name" "VC" "Path"))
+;;   :config
+;;   (defun jf/bufler/tab-configuration ()
+;;     (bufler-tabs-mode 1)
+;;     (tab-bar-mode -1)
+;;     (bufler-workspace-tabs))
+;;   (setq tab-line-switch-cycling t)
+;;   (defun jf/bufler-workspace-mode-lighter ()
+;;     "Return the lighter string mode line."
+;;     "Bflr")
+;;   (advice-add #'bufler-workspace-mode-lighter
+;; 	      :override #'jf/bufler-workspace-mode-lighter
+;; 	      '((name . "wrapper")))
+;;   ;; Ensuring that when I make a selection, it closes the bufler buffer.
+;;   (defun jf/bufler-list-buffer-switch (&rest args)
+;;     (kill-buffer "*Bufler*"))
+;;   (advice-add 'bufler-list-buffer-switch :after 'jf/bufler-list-buffer-switch)
+;;   :bind (:map bufler-list-mode-map
+;; 	      ("s-3" . quit-window)
+;; 	      ("s-\\" . quit-window))
+;;   :bind (("s-3" . bufler-switch-buffer)
+;; 	 ("s-\\" . bufler-sidebar)
+;; 	 ;; ("s-\\" . jf/tab-bar-switch-prompt-for-tab)
+;; 	 ;; ("s-]" . tab-line-switch-to-next-tab)
+;; 	 ;; ("s-}" . tab-line-switch-to-next-tab)
+;; 	 ;; ("s-[" . tab-line-switch-to-prev-tab)
+;; 	 ;; ("s-{" . tab-line-switch-to-prev-tab)
+;; 	 ))
 
 ;; (defun jf/tab-bar-switch-to-next-tab ()
 ;;   "Move to the next `tab-bar' tab and open the first buffer."

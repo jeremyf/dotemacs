@@ -153,14 +153,14 @@
 	(concat "rga --null --hidden --line-buffered --color=ansi --max-columns=1000 "
 		"--smart-case --no-heading --line-number --no-ignore-vcs "
 		"--glob !vendor/ --glob !coverage/ --glob !**/tmp/ --glob "
-		"!**/log/ --glob !public/ --glob !node_modules/ --glob !.git/ ."
-		"-e ARG OPTS"))
+		"!**/log/ --glob !public/ --glob !node_modules/ --glob !.git/ --glob !doc/"
+		" . -e ARG OPTS"))
   (consult-ripgrep-args
 	(concat "rga --null --hidden --line-buffered --color=never --max-columns=1000 "
 		"--path-separator / --no-ignore-vcs --smart-case --no-heading "
 		"--glob !vendor/ --glob !coverage/ --glob !**/tmp/ --glob "
-		"!**/log/ --glob !public/ --glob !node_modules/ --glob !.git/ "
-		"--line-number ."))
+		"!**/log/ --glob !public/ --glob !node_modules/ --glob !.git/ --glob !doc/"
+		" --line-number ."))
   ;; Configure other variables and modes in the :config section,
   ;; after lazily loading the package.
   :config

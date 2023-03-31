@@ -121,39 +121,39 @@
   (setq enable-recursive-minibuffers t)
   (recursion-indicator-mode))
 
-(use-package symbol-overlay
-  ;; When point is on a symbol, highlight that symbol throughout the visible
-  ;; buffer.  From that concept, expose jump commands and renaming.
-  ;;
-  ;; See
-  ;; https://github.com/wolray/symbol-overlay/tree/c439b73a5f9713bb3dce98986b589bb901e22130
-  :straight t
-  :commands (symbol-overlay-jump-next symbol-overlay-jump-prev)
-  :hook (prog-mode . symbol-overlay-mode)
-  :config
-  (use-package transient :straight t)
-  (transient-define-prefix symbol-overlay-transient ()
-    "Symbol Overlay transient"
-    ["Symbol Overlay"
-     ["Overlays"
-      ("." "Add/Remove at point" symbol-overlay-put)
-      ("k" "Remove All" symbol-overlay-remove-all)
-      ]
-     ["Jump to Symbol"
-      ("n" "Next" symbol-overlay-jump-next)
-      ("p" "Previous" symbol-overlay-jump-prev)
-      ]
-     ["Other"
-      ("m" "Highlight symbol-at-point" symbol-overlay-mode)
-      ("q" "Query and replace" symbol-overlay-query-replace)
-      ("r" "Rename" symbol-overlay-rename)
-      ]
-     ]
-    )
-  :bind (:map symbol-overlay-mode-map
-	      ("H-." . symbol-overlay-transient)
-	      ("M-n" . symbol-overlay-jump-next)
-	      ("M-p" . symbol-overlay-jump-prev)))
+;; (use-package symbol-overlay
+;;   ;; When point is on a symbol, highlight that symbol throughout the visible
+;;   ;; buffer.  From that concept, expose jump commands and renaming.
+;;   ;;
+;;   ;; See
+;;   ;; https://github.com/wolray/symbol-overlay/tree/c439b73a5f9713bb3dce98986b589bb901e22130
+;;   :straight t
+;;   :commands (symbol-overlay-jump-next symbol-overlay-jump-prev)
+;;   :hook (prog-mode . symbol-overlay-mode)
+;;   :config
+;;   (use-package transient :straight t)
+;;   (transient-define-prefix symbol-overlay-transient ()
+;;     "Symbol Overlay transient"
+;;     ["Symbol Overlay"
+;;      ["Overlays"
+;;       ("." "Add/Remove at point" symbol-overlay-put)
+;;       ("k" "Remove All" symbol-overlay-remove-all)
+;;       ]
+;;      ["Jump to Symbol"
+;;       ("n" "Next" symbol-overlay-jump-next)
+;;       ("p" "Previous" symbol-overlay-jump-prev)
+;;       ]
+;;      ["Other"
+;;       ("m" "Highlight symbol-at-point" symbol-overlay-mode)
+;;       ("q" "Query and replace" symbol-overlay-query-replace)
+;;       ("r" "Rename" symbol-overlay-rename)
+;;       ]
+;;      ]
+;;     )
+;;   :bind (:map symbol-overlay-mode-map
+;; 	      ("H-." . symbol-overlay-transient)
+;; 	      ("M-n" . symbol-overlay-jump-next)
+;; 	      ("M-p" . symbol-overlay-jump-prev)))
 
 (use-package vi-tilde-fringe
   ;; Show tilde (e.g. ~\~~) on empty trailing lines.  This is a feature ported
