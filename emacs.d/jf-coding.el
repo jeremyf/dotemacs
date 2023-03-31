@@ -24,7 +24,7 @@
 ;; (use-package tree-sitter
 ;;   ;; See https://github.com/emacs-tree-sitter/elisp-tree-sitter
 ;;   :straight (tree-sitter :host github
-;; 			 :repo "emacs-tree-sitter/elisp-tree-sitter")
+;;       :repo "emacs-tree-sitter/elisp-tree-sitter")
 ;;   :config
 ;;   (add-to-list 'tree-sitter-major-mode-language-alist '(ruby-mode . ruby))
 ;;   :init (global-tree-sitter-mode)
@@ -56,11 +56,11 @@
       (let* ((method_type (if (string= type
                                 (treesit-node-type func))
                             "#" "."))
-	            (method_name (treesit-node-text
+              (method_name (treesit-node-text
                              (car (treesit-filter-child
-			                              func
-			                              (lambda (node)
-			                                (string= "identifier"
+                                    func
+                                    (lambda (node)
+                                      (string= "identifier"
                                         (treesit-node-type node)))))))
               (module_space (s-join "::"
                               (-flatten
@@ -91,7 +91,7 @@
                                   (treesit-filter-child
                                     parent
                                     (lambda (n)
-		                                  (member (treesit-node-type n)
+                                      (member (treesit-node-type n)
                                         '("constant" "scope_resolution"))))))))
       (list (jf/treesit/module_space parent) parent_name)))
   :straight (:type  built-in))
@@ -146,7 +146,7 @@
            js-mode js-ts-mode
            json-mode json-ts-mode
            scss-mode scss-ts-mode)
-	        . eglot-ensure)
+          . eglot-ensure)
   :hook (eglot-managed-mode . jf/eglot-capf)
   :config
   (setq completion-category-overrides '((eglot (styles orderless))))
@@ -160,10 +160,10 @@
     ;;
     ;; https://stackoverflow.com/questions/72601990/how-to-show-suggestions-for-yasnippets-when-using-eglot
     (setq-local completion-at-point-functions
-		  (list (cape-super-capf
+      (list (cape-super-capf
               #'eglot-completion-at-point
               #'tempel-expand
-		          #'cape-file))))
+              #'cape-file))))
   :straight t)
 
 (use-package eglot-tempel
@@ -179,7 +179,7 @@
 ;; (use-package emacs-refactor
 ;;   :straight (emacs-refactor :host github :repo "Wilfred/emacs-refactor")
 ;;   :bind ((:map ruby-mode-map ("M-RET" . emr-show-refactor-menu))
-;; 	 (:map emacs-lisp-mode-map ("M-RET" . emr-show-refactor-menu))))
+;;   (:map emacs-lisp-mode-map ("M-RET" . emr-show-refactor-menu))))
 
 ;; I don't use this package (I think...):
 ;; (use-package emmet-mode
@@ -248,12 +248,12 @@
   ;;
   ;;
   :config (setq plantuml-executable-path (concat
-					                                 (getenv "HB_PATH")
-					                                 "/bin/plantuml")
+                                           (getenv "HB_PATH")
+                                           "/bin/plantuml")
             plantuml-default-exec-mode 'executable
             org-plantuml-executable-path (concat
-					                                 (getenv "HB_PATH")
-					                                 "/bin/plantuml")
+                                           (getenv "HB_PATH")
+                                           "/bin/plantuml")
             org-plantuml-exec-mode 'executable)
   :mode (("\\.plantuml\\'" . plantuml-mode))
   :mode (("\\.puml\\'" . plantuml-mode))
@@ -272,8 +272,8 @@
   (rspec-docker-cwd "./")
   (rspec-docker-command "docker compose exec")
   :hook ((dired-mode . rspec-dired-mode)
-	        (ruby-mode . rspec-mode)
-	        (ruby-ts-mode . rspec-mode))
+          (ruby-mode . rspec-mode)
+          (ruby-ts-mode . rspec-mode))
   ;; Dear reader, make sure that you can jump from spec and definition.  And in
   ;; Ruby land when you have lib/my_file.rb, the corresponding spec should be in
   ;; spec/my_file_spec.rb; and when you have app/models/my_file.rb, the spec
@@ -285,9 +285,9 @@
     "Check the project for spring as part of the Gemfile.lock."
     (let ((gemfile-lock (f-join (projectile-project-root) "Gemfile.lock")))
       (and (f-exists? gemfile-lock)
-	      (s-present?
-	        (shell-command-to-string
-	          (concat "rg \"^ +spring \" " gemfile-lock))))))
+        (s-present?
+          (shell-command-to-string
+            (concat "rg \"^ +spring \" " gemfile-lock))))))
   ;; Out of the box, for my typical docker ecosystem, the `rspec-spring-p'
   ;; function does not work.  So I'm overriding the default behavior to match my
   ;; ecosystem.
@@ -360,22 +360,22 @@
       ;; Split apart the parameters into their identifiers
       (let ((identifiers (mapcar (lambda (token)
                                    (replace-regexp-in-string
-			                               "[^a-z|_]" ""
-			                               (car (s-split " "
-					                                  (s-trim token)))))
-			                     (s-split "," (substring-no-properties
-					                                (car kill-ring))))))
+                                     "[^a-z|_]" ""
+                                     (car (s-split " "
+                                            (s-trim token)))))
+                           (s-split "," (substring-no-properties
+                                          (car kill-ring))))))
         ;; Go to the beginning of the function again
         (ruby-beginning-of-defun)
         ;; Now insert the identifiers as yardoc
         (insert "##\n"
-	        (s-join "\n" (mapcar
+          (s-join "\n" (mapcar
                          (lambda (param)
                            (concat "# @param "
                              param
                              " [Object]"))
                          identifiers))
-	        "\n"))))
+          "\n"))))
   :bind* (:map ruby-mode-map (("C-c C-f" . jf/current-scoped-function-name)
                                ("C-c C-y" . jf/ruby-mode/yardoc-ify)))
   :hook ((ruby-mode ruby-ts-mode) . yard-mode))
