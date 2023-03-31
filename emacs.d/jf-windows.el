@@ -89,6 +89,13 @@
 ;; ~modus-operandi~).  They provide a light and dark theme with a focus on visual
 ;; accessibility.
 
+(defface jf/tabs-face '((default :inherit font-lock-misc-punctuation-face))
+  "Help me see tabs; they are tricky creatures.")
+
+(add-hook 'prog-mode-hook
+	   (lambda () (font-lock-add-keywords nil '(("\t" . 'jf/tabs-face)))))
+(add-hook 'text-mode-hook
+	   (lambda () (font-lock-add-keywords nil '(("\t" . 'jf/tabs-face)))))
 
 (defun jf/modus-themes-custom-faces ()
   "Set the various custom faces for both `treesit' and `tree-sitter'."
@@ -101,6 +108,8 @@
 		            :box (:line-width (1 . 1)
 					             :color ,border-mode-line-inactive
 					             :style released-button)))))
+      `(jf/tabs-face
+         ((,c :underline (:style wave :color ,bg-blue-intense))))
       `(jf/org-faces-date
          ((,c :underline nil :foreground ,cyan-faint)))
       `(jf/org-faces-epigraph
