@@ -48,11 +48,12 @@
       (user-error "No function to select.")))
   ;; This function, tested against Ruby, will return the module space qualified
   ;; method name (e.g. Hello::World#method_name).
-  (cl-defun jf/treesit/qualified_method_name (&key (type "method"))
-    "Return the fully qualified name of method at point."
+  (cl-defun jf/treesit/qualified_method_name ()
+    "Return the fully qualified name of method at point.  If not on a
+method, get the containing class."
     (if-let ((func (treesit-defun-at-point)))
       ;; Instance method or class method?
-      (let* ((method_type (if (string= type
+      (let* ((method_type (if (string= "method"
                                 (treesit-node-type func))
                             "#" "."))
               (method_name (treesit-node-text
@@ -65,7 +66,8 @@
         (if current-prefix-arg
           module_space
           (concat module_space method_type method_name)))
-      (user-error "No %s at point." type)))
+      (let ((current-node (treesit-node-at (point))))
+              (s-join "::" (jf/treesit/module_space current-node)))))
   ;; Handles the following Ruby code:
   ;;
   ;;   module A::B
