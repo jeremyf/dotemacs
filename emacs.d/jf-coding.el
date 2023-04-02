@@ -35,7 +35,6 @@
 ;;   :straight t)
 
 (use-package treesit
-  ;; :custom
   :init
   (setq treesit-font-lock-level 4)
   (defun jf/treesit/function-select ()
@@ -62,16 +61,11 @@
                                     (lambda (node)
                                       (string= "identifier"
                                         (treesit-node-type node)))))))
-              (module_space (s-join "::"
-                              (-flatten
-                                (jf/treesit/module_space func)))))
+              (module_space (s-join "::" (jf/treesit/module_space func))))
         (if current-prefix-arg
           module_space
           (concat module_space method_type method_name)))
       (user-error "No %s at point." type)))
-  ;; An ugly bit of code to recurse upwards from the node to the "oldest"
-  ;; parent.  And collect all module/class nodes along the way.
-  ;;
   ;; Handles the following Ruby code:
   ;;
   ;;   module A::B
@@ -82,18 +76,21 @@
   ;;       end
   ;;     end
   ;;   end
-  (defun jf/treesit/module_space (node)
-    (when-let* ((parent (treesit-parent-until node
-                          (lambda (n) (member (treesit-node-type n)
-                                        '("class" "module" "assignment")))))
-                 (parent_name (treesit-node-text
-                                (car
-                                  (treesit-filter-child
-                                    parent
-                                    (lambda (n)
-                                      (member (treesit-node-type n)
-                                        '("constant" "scope_resolution"))))))))
-      (list (jf/treesit/module_space parent) parent_name)))
+  ;; Special thanks to https://eshelyaron.com/posts/2023-04-01-take-on-recursion.html
+  (defun jf/treesit/module_space (node &optional acc)
+    (if-let ((parent (treesit-parent-until
+                       node
+                       (lambda (n) (member (treesit-node-type n)
+                                     '("class" "module" "assignment")))))
+              (parent_name (treesit-node-text
+                             (car
+                               (treesit-filter-child
+                                 parent
+                                 (lambda (n)
+                                   (member (treesit-node-type n)
+                                     '("constant" "scope_resolution"))))))))
+      (jf/treesit/module_space parent (cons parent_name acc))
+      acc))
   :straight (:type  built-in))
 
 (use-package treesit-auto
@@ -103,7 +100,7 @@
 
 ;; Show the scope info of methods, blocks, if/case statements
 (use-package scopeline
-  :straight (:host github :repo "meain/scopeline.el")
+  :straight (:host github :repo "jeremyf/scopeline.el")
   :hook ((ruby-mode ruby-ts-mode) . scopeline-mode))
 
 ;;;; Other packages and their configurations

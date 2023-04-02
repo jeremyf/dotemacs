@@ -49,5 +49,11 @@
 (use-package qrencode
   :straight t)
 
+(use-package org-tufte
+  :straight (org-tufte :host github :repo "Zilong-Li/org-tufte")
+  :config
+  (require 'org-tufte)
+  (setq org-tufte-htmlize-code t))
+
 (provide 'jf-experiments)
 ;;; jf-experiments.el ends here
