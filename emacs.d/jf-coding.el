@@ -53,13 +53,17 @@
     (interactive)
     (if (string= (treesit-node-type (treesit-node-at (point))) "comment")
       (save-excursion
-        (forward-line)
+        ;; Because a blank line before comments registers as a comment in
+        ;; tree-sitter, we need to ensure we're in a comment block.
+        (beginning-of-line)
+        (search-forward "#")
         (backward-paragraph)
         (forward-line)
         (call-interactively #'jf/treesit/tidy-ruby-docs))
       (unfill-toggle)))
 
-  ;; A
+  ;; A function to tidy up the yardocs in the comment section.  It falls in upon
+  ;; itself when the function has already been called.
   (defun jf/treesit/tidy-ruby-docs (cursor)
     "Tidy the ruby yardoc at CURSOR."
     (interactive "d")
