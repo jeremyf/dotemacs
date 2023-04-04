@@ -374,5 +374,15 @@ With argument, do this that many times."
 	   :display "Serve takeonrules.com locally")))
   (add-to-list 'run-command-recipes 'jf/run-command-recipes))
 
+(defun jf/get-line-text ()
+  "Copy the current line text."
+  (save-excursion
+    (beginning-of-line)
+    (set-mark (point))
+    (end-of-line)
+    (copy-region-as-kill (mark) (point)))
+  (let ((text (substring-no-properties (car kill-ring))))
+    text))
+
 (provide 'jf-utility)
 ;;; jf-utility.el ends here
