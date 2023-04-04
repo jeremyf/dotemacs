@@ -255,6 +255,15 @@
   ("H-t" . consult-projectile)
   ("H-p" . consult-projectile))
 
+;; A dirty little hack for choosing either to search or find a file.
+(defun jf/consult-projectile--file (fn &optional dir &rest rest)
+  "Create a view for selecting project files for the project at SELECTED-PROJECT."
+  (if (string= "Open file" (completing-read (format "Open file or search %s?" dir) '("Open file" "Search") nil t))
+    (apply fn dir rest)
+    (consult-ripgrep selected-project)))
+
+(advice-add #'consult-projectile--file :around #'jf/consult-projectile--file '((name . "wrapper")))
+
 (use-package corfu
   ;; Completion overlay; a narrower intreface than the more verbose company.
   :straight t
