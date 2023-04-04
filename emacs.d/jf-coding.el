@@ -46,6 +46,50 @@
         (call-interactively #'set-mark-command)
         (goto-char (treesit-node-end func)))
       (user-error "No function to select.")))
+  ;; I love M-q and also have some opinions about how my yard docs should look.
+  ;; This allows both of those to peacefully coexist.
+  (defun jf/ruby-mode/unfill-toggle ()
+    "Either `unfill-toggle' or `tidy-ruby-docs'."
+    (interactive)
+    (if (string= (treesit-node-type (treesit-node-at (point))) "comment")
+      (save-excursion
+        (forward-line)
+        (backward-paragraph)
+        (forward-line)
+        (call-interactively #'jf/treesit/tidy-ruby-docs))
+      (unfill-toggle)))
+
+  ;; A
+  (defun jf/treesit/tidy-ruby-docs (cursor)
+    "Tidy the ruby yardoc at CURSOR."
+    (interactive "d")
+    (call-interactively #'whole-line-or-region-copy-region-as-kill)
+    (let* ((line (substring-no-properties (car kill-ring)))
+            (keyword_length (length (car (s-match "@\\w+" line)))))
+      (when (or (> keyword_length 0) (s-starts-with? "#" (s-trim line)))
+        (if (> (length line) fill-column)
+          (progn
+            (pulsar-pulse-line)
+            (beginning-of-line)
+            (newline)
+            (end-of-line)
+            (newline)
+            (previous-line)
+            (unfill-toggle)
+            ;; There's a weird bug I encountered where next line skips over a
+            ;; line.  Then previous restores it.
+            (forward-char)
+            (search-forward "#")
+            (dotimes (i (+ 1 keyword_length))
+              (insert " "))
+            (unfill-toggle)
+            (backward-paragraph)
+            (hungry-delete-forward 1)
+            (forward-paragraph)
+            (hungry-delete-forward 1))
+          (next-line))
+        (jf/treesit/tidy-ruby-docs (point))
+        )))
   ;; This function, tested against Ruby, will return the module space qualified
   ;; method name (e.g. Hello::World#method_name).
   (cl-defun jf/treesit/qualified_method_name ()
@@ -206,6 +250,7 @@ method, get the containing class."
   :straight (:type built-in)
   :bind
   (:map ruby-mode-map (("C-M-h" . jf/treesit/function-select)
+                        ("M-q" . jf/ruby-mode/unfill-toggle)
                         ("C-c C-f" . jf/treesit/qualified_method_name)))
   :hook ((ruby-mode ruby-ts-mode) . (lambda () (setq fill-column 100))))
 
