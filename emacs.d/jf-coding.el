@@ -63,37 +63,49 @@
       (unfill-toggle)))
 
   ;; A function to tidy up the yardocs in the comment section.  It falls in upon
-  ;; itself when the function has already been called.
+  ;; itself when the function has already been called.  I'm working on adjusting
+  ;; the method.
   (defun jf/treesit/tidy-ruby-docs (cursor)
     "Tidy the ruby yardoc at CURSOR."
     (interactive "d")
-    (call-interactively #'whole-line-or-region-copy-region-as-kill)
-    (let* ((line (substring-no-properties (car kill-ring)))
+    (let* ((line (jf/get-line-text nil))
             (keyword_length (length (car (s-match "@\\w+" line)))))
       (when (or (> keyword_length 0) (s-starts-with? "#" (s-trim line)))
         (if (> (length line) fill-column)
           (progn
-            (pulsar-pulse-line)
+            ;; Ensure that we isolate the comment line.  Without that we'll
+            ;; hopelessly garble things with `unfill-toggle'
             (beginning-of-line)
             (newline)
             (end-of-line)
             (newline)
             (previous-line)
+            ;; Perform the first round of magic.  The results will have the @ symbol
+            ;; and further lines all outdented at the same level.
             (unfill-toggle)
             ;; There's a weird bug I encountered where next line skips over a
-            ;; line.  Then previous restores it.
-            (forward-char)
-            (search-forward "#")
+            ;; line.  Then previous restores it; instead we'll look for the "@"
+            ;; then jump to the next line after that.
+            (search-forward "@")
+            ;; This is not very verbose and will need more test cases.
+            (search-forward-regexp "^ *#")
+            ;; Now pad that next line
             (dotimes (i (+ 1 keyword_length))
               (insert " "))
+            ;; And perform the `unfill-toggle' which will honor the padding that
+            ;; We set in the above `dotimes'
             (unfill-toggle)
+            ;; Now let's unwind what we did in the beginning-of-line call up
+            ;; earlier.
             (backward-paragraph)
             (hungry-delete-forward 1)
             (forward-paragraph)
             (hungry-delete-forward 1))
           (next-line))
-        (jf/treesit/tidy-ruby-docs (point))
+        ;; (jf/treesit/tidy-ruby-docs (point))
         )))
+
+
   ;; This function, tested against Ruby, will return the module space qualified
   ;; method name (e.g. Hello::World#method_name).
   (cl-defun jf/treesit/qualified_method_name ()
@@ -254,8 +266,7 @@ method, get the containing class."
   :straight (:type built-in)
   :bind
   (:map ruby-mode-map (("C-M-h" . jf/treesit/function-select)
-                        ("M-q" . jf/ruby-mode/unfill-toggle)
-                        ("C-c C-f" . jf/treesit/qualified_method_name)))
+                           ("C-c C-f" . jf/treesit/qualified_method_name)))
   :hook ((ruby-mode ruby-ts-mode) . (lambda () (setq fill-column 100))))
 
 ;; I don't use this package
