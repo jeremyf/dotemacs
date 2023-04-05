@@ -375,15 +375,19 @@ With argument, do this that many times."
   (add-to-list 'run-command-recipes 'jf/run-command-recipes))
 
 (defun jf/get-line-text (&optional delta)
-  "Copy the text of the line at DELTA lines from `point'.
+  "Copy the text of the line at DELTA lines from point.
 
-When DELTA is not given, copy the current line.  Note: this will pollute the
-kill ring."
+TODO: This function pollutes the mark-ring and kill-ring; I think
+I'm okay with that behavior, but I'm putting it here to mention it “out loud”."
   (interactive "P")
   (save-excursion
-    (when delta (forward-line (car delta)))
-    (call-interactively #'whole-line-or-region-copy-region-as-kill nil)
-    (substring-no-properties (car kill-ring))))
+    (when delta (forward-line (if (numberp delta) delta (car delta))))
+    (beginning-of-line)
+    (set-mark (point))
+    (end-of-line)
+    (copy-region-as-kill (mark) (point)))
+  (let ((text (substring-no-properties (car kill-ring))))
+    text))
 
 (provide 'jf-utility)
 ;;; jf-utility.el ends here

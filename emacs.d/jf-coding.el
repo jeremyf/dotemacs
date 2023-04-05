@@ -53,58 +53,57 @@
     (interactive)
     (if (string= (treesit-node-type (treesit-node-at (point))) "comment")
       (save-excursion
-        ;; Because a blank line before comments registers as a comment in
-        ;; tree-sitter, we need to ensure we're in a comment block.
-        (beginning-of-line)
-        (search-forward "#")
-        (backward-paragraph)
-        (forward-line)
-        (call-interactively #'jf/treesit/tidy-ruby-docs))
+        ;; Grab the first non-comment line
+        (jf/treesit/tidy-ruby-docs (point)))
       (unfill-toggle)))
 
-  ;; A function to tidy up the yardocs in the comment section.  It falls in upon
-  ;; itself when the function has already been called.  I'm working on adjusting
-  ;; the method.
+  ;; A function to tidy up the yardocs in the comment section the method.
   (defun jf/treesit/tidy-ruby-docs (cursor)
     "Tidy the ruby yardoc at CURSOR."
     (interactive "d")
-    (let* ((line (jf/get-line-text nil))
-            (keyword_length (length (car (s-match "@\\w+" line)))))
-      (when (or (> keyword_length 0) (s-starts-with? "#" (s-trim line)))
-        (if (> (length line) fill-column)
-          (progn
-            ;; Ensure that we isolate the comment line.  Without that we'll
-            ;; hopelessly garble things with `unfill-toggle'
-            (beginning-of-line)
-            (newline)
-            (end-of-line)
-            (newline)
-            (previous-line)
-            ;; Perform the first round of magic.  The results will have the @ symbol
-            ;; and further lines all outdented at the same level.
-            (unfill-toggle)
-            ;; There's a weird bug I encountered where next line skips over a
-            ;; line.  Then previous restores it; instead we'll look for the "@"
-            ;; then jump to the next line after that.
-            (search-forward "@")
-            ;; This is not very verbose and will need more test cases.
-            (search-forward-regexp "^ *#")
-            ;; Now pad that next line
-            (dotimes (i (+ 1 keyword_length))
-              (insert " "))
-            ;; And perform the `unfill-toggle' which will honor the padding that
-            ;; We set in the above `dotimes'
-            (unfill-toggle)
-            ;; Now let's unwind what we did in the beginning-of-line call up
-            ;; earlier.
-            (backward-paragraph)
-            (hungry-delete-forward 1)
-            (forward-paragraph)
-            (hungry-delete-forward 1))
-          (next-line))
-        ;; (jf/treesit/tidy-ruby-docs (point))
-        )))
-
+    (end-of-line)
+    (search-backward-regexp "^ *# +@")
+    (if (s-match "^ *# +@example" (jf/get-line-text))
+      ;; Move past the example line.
+      (progn (next-line) (search-forward-regexp "^ *# +@\\w+"))
+      (progn
+        (newline)
+        (set-mark (point))
+        (let* ((oldmark (mark))
+                ;; Determine the size of the keyword.
+                (line (jf/get-line-text nil))
+                (keyword_length (length (car (s-match "@\\w+" line)))))
+          (search-forward-regexp "^ *# +@\\w+")
+          (while (s-match "^ *# [^@]" (jf/get-line-text 1))
+            (next-line))
+          (end-of-line)
+          (newline)
+          (backward-char)
+          (end-of-line)
+          (fill-region oldmark (point))
+          (search-backward-regexp "^ *# +@")
+          (when (s-match "^ *# [^@]" (jf/get-line-text 1))
+            (progn
+              (next-line)
+              (beginning-of-line)
+              (search-forward-regexp "^ *#")
+              ;; Now pad that next line
+              (let ((padding (s-repeat (+ 1 keyword_length) " ")))
+                (unless (s-match (concat "^ *#" padding) (jf/get-line-text))
+                  (insert padding)))
+              (deactivate-mark)
+              (unfill-toggle))))
+        (forward-paragraph)
+        (hungry-delete-backward 1)
+        (set-mark (point))
+        (backward-paragraph)
+        (delete-char 1)
+        (goto-char (mark))))
+    ;; While we're still in the same comment section; move to the next
+    ;; interesting element (e.g. non-empty lines)
+    (when (string= "comment" (treesit-node-type (treesit-node-at (point))))
+      (progn (search-forward-regexp "^ *#[^ ]+")
+        (jf/treesit/tidy-ruby-docs (point)))))
 
   ;; This function, tested against Ruby, will return the module space qualified
   ;; method name (e.g. Hello::World#method_name).
@@ -442,6 +441,7 @@ method, get the containing class."
 (defun jf/ruby-ts-mode-configurator ()
   (setq-local add-log-current-defun-function #'jf/treesit/qualified_method_name)
   (define-key ruby-ts-mode-map (kbd "C-M-h") #'jf/treesit/function-select)
+  (define-key ruby-ts-mode-map (kbd "M-q") #'jf/treesit/tidy-ruby-docs)
   (define-key ruby-ts-mode-map (kbd "C-c C-f") #'jf/current-scoped-function-name)
   (define-key ruby-ts-mode-map (kbd "C-c C-y") #'jf/ruby-mode/yardoc-ify))
 (add-hook 'ruby-ts-mode-hook #'jf/ruby-ts-mode-configurator)
