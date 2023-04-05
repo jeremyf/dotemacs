@@ -98,7 +98,7 @@
               (deactivate-mark)
               (unfill-toggle))))
         (forward-paragraph)
-        (hungry-delete-backward 1)
+        (delete-char -1)
         (set-mark (point))
         (backward-paragraph)
         (delete-char 1)
