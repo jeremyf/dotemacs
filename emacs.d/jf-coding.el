@@ -108,7 +108,7 @@
     ;; While we're still in the same comment section; move to the next
     ;; interesting element (e.g. non-empty lines)
     (when (string= "comment" (treesit-node-type (treesit-node-at (point))))
-      (progn (search-forward-regexp "^ *#[^ ]+")
+      (progn (search-forward-regexp "^ *# ?[^ ]+")
         (jf/treesit/tidy-ruby-docs (point)))))
 
   ;; This function, tested against Ruby, will return the module space qualified
