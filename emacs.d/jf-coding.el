@@ -57,7 +57,9 @@
         (jf/treesit/tidy-ruby-docs (point)))
       (unfill-toggle)))
 
-  ;; A function to tidy up the yardocs in the comment section the method.
+  ;; A function to tidy up the yardocs in the comment section the method.  This
+  ;; is a mostly idempotent script that will format a yardoc comment section to
+  ;; my preferred structure/indentation.
   (defun jf/treesit/tidy-ruby-docs (cursor)
     "Tidy the ruby yardoc at CURSOR."
     (interactive "d")
