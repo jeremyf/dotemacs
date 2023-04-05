@@ -61,12 +61,16 @@
   (defun jf/treesit/tidy-ruby-docs (cursor)
     "Tidy the ruby yardoc at CURSOR."
     (interactive "d")
+    ;; Ensure that we position at the beginning of the keyword declaration.
     (end-of-line)
     (search-backward-regexp "^ *# +@")
     (if (s-match "^ *# +@example" (jf/get-line-text))
       ;; Move past the example line.
       (progn (next-line) (search-forward-regexp "^ *# +@\\w+"))
+      ;; Otherwise
       (progn
+        ;; Because the `unfill-toggle' treats comments as the same area, we need
+        ;; to add blank lines around the keyword section.
         (newline)
         (set-mark (point))
         (let* ((oldmark (mark))
