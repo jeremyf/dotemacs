@@ -51,6 +51,7 @@
   :straight (org :type built-in)
   :hook (org-mode . turn-on-visual-line-mode)
   (org-mode . jf/org-capf)
+  (org-mode . (lambda () (electric-pair-mode -1)))
   ;; Disable org-indent-mode; it's easy enough to enable.  The primary reason is
   ;; that it does not play nice with the multi-cursor package.  And I'd prefer
   ;; to have that work better by default.
@@ -240,8 +241,6 @@
 
 (with-eval-after-load 'org
   (org-clock-persistence-insinuate))
-
-(use-package org-tempo)
 
 ;; From https://oremacs.com/2017/10/04/completion-at-point/
 (defun jf/org-completion-symbols ()
@@ -535,8 +534,7 @@ Assumes that I'm on a :projects: headline.
 	 (output (format "Tasks:\n%s\nProject: %s\nHours: %s\n"
 			 tasks
 			 project
-			 hours
-			 )))
+			 hours)))
     (kill-new tasks)
     (message output)))
 
@@ -557,37 +555,7 @@ Assumes that I'm on a :projects: headline.
 ;; smartquote handling.
 (require 'jf-formatting)
 
-;; (define-key org-mode-map (kbd "~") #'org-insert-backtick)
-;; (defun org-insert-backtick ()
-;;   "Insert a backtick using `org-self-insert-command'."
-;;   (interactive)
-;;   (setq last-command-event ?`)
-;;   (call-interactively #'org-self-insert-command))
-
-(defvar-local org-insert-tilde-language nil
-  "Default language name in the current Org file.
-If nil, `org-insert-tilde' after 2 tildes inserts an \"example\"
-block.  If a string, it inserts a \"src\" block with the given
-language name.")
-
-;; (define-key org-mode-map (kbd "`") #'org-insert-tilde)
-;; (defun org-insert-tilde ()
-;;   "Insert a tilde using `org-self-insert-command'."
-;;   (interactive)
-;;   (if (string= (buffer-substring-no-properties (- (point) 3) (point))
-;; 	       "\n~~")
-;;       (progn (delete-char -2)
-;; 	     (if org-insert-tilde-language
-;; 		 (insert (format "#+begin_src %s\n#+end_src"
-;; 				 org-insert-tilde-language))
-;; 	       (insert "#+begin_example\n#+end_example"))
-;; 	     (forward-line -1)
-;; 	     (if (string= org-insert-tilde-language "")
-;; 		 (move-end-of-line nil)
-;; 	       (org-edit-special)))
-;;     (setq last-command-event ?~)
-;;     (call-interactively #'org-self-insert-command)))
-
+(require 'dig-my-grave)
 ;; In
 ;; https://takeonrules.com/2022/02/26/note-taking-with-org-roam-and-transclusion/,
 ;; I wrote about ~org-transclusion~.  The quick version, ~org-transclusion~

@@ -1,0 +1,62 @@
+Welcome to the graveyard; I'm not ready to fully say good-bye, but these are not part of my required code.
+
+** My Collection of Org Roam interactions
+
+The =node-id= below is an [[denote:20221009T115044][Org-Roam]] node, something I’ve moved away from in favor of Denote.  My reason for keeping this is a reminder of the =seq-mapcat= function.
+
+#+begin_src emacs-lisp
+(defun jf/blockquote-hugo (node-id)
+  "Export the blockquote for the given NODE-ID"
+  (let ((data (jf/org-mode-extract-body-and-properties node-id)))
+    (concat
+     "\n{{{< blockquote " (jf/hugo-blockquote-attributes-for (plist-get data :properties)) ">}}}\n"
+     (format "%s" (plist-get data :body))
+     "\n{{{< /blockquote >}}}\n")))
+
+(defun jf/hugo-blockquote-attributes-for (properties)
+  "Map the PROPERTIES to attributes."
+  (seq-mapcat (lambda (element)
+		(let ((key (car element))
+		      (text (cadr element)))
+		  (pcase key
+		    ("ID" (format "orgId=\"%s\" " text))
+		    ("TITLE" (format "cite=\"%s\" " text))
+		    ("CITE_URL" (format "citeUrl=\"%s\" " text))
+		    ("AUTHOR" (format "pre=\"%s\" " text))
+		    ("CITE_POST" (format "post=\"%s\" " text))
+		    (_ ""))))
+	      properties))
+#+end_src
+
+Related are the following commands:
+
+#+begin_src emacs_lisp
+(cl-defun jf/org-mode-extract-body-and-properties (node-id)
+  "Extract quotable body and properties from NODE-ID."
+  (with-current-buffer (find-file-noselect (org-id-find-id-file node-id))
+    (list :properties (org-element-map (org-element-parse-buffer 'object)
+			  '(keyword node-property)
+			#'jf/org-mode-get-keyword-key-value)
+	  :body (jf/org-mode-extract-body-from-current-buffer))))
+
+
+(defun jf/org-mode-extract-body-from-current-buffer ()
+  "Extract the body from the current org-mode body"
+  (buffer-substring (save-excursion
+		      (jf/org-mode-find-point-that-starts-body t)
+		      (point))
+		    (org-entry-end-position)))
+
+(defun jf/org-mode-find-point-that-starts-body (&optional unsafe)
+  "Skip headline, planning line, and all drawers in current entry.
+    If UNSAFE is non-nil, assume point is on headline."
+  (unless unsafe
+    ;; To improve performance in loops (e.g. with `org-map-entries')
+    (org-back-to-heading))
+  (cl-loop for element = (org-element-at-point)
+	   for pos = (pcase element
+		       (`(headline . ,_) (org-element-property :contents-begin element))
+		       (`(,(or 'planning 'property-drawer 'node-property 'keyword 'drawer) . ,_) (org-element-property :end element)))
+	   while pos
+	   do (goto-char pos)))
+#+end_src
