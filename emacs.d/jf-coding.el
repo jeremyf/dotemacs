@@ -60,6 +60,9 @@
   ;; A function to tidy up the yardocs in the comment section the method.  This
   ;; is a mostly idempotent script that will format a yardoc comment section to
   ;; my preferred structure/indentation.
+  ;;
+  ;; TODO: At present this does not handle comment lines of the form:
+  ;; "^ *# \w"
   (defun jf/treesit/tidy-ruby-docs (cursor)
     "Tidy the ruby yardoc at CURSOR."
     (interactive "d")
@@ -447,7 +450,6 @@ method, get the containing class."
 (defun jf/ruby-ts-mode-configurator ()
   (setq-local add-log-current-defun-function #'jf/treesit/qualified_method_name)
   (define-key ruby-ts-mode-map (kbd "C-M-h") #'jf/treesit/function-select)
-  (define-key ruby-ts-mode-map (kbd "M-q") #'jf/treesit/tidy-ruby-docs)
   (define-key ruby-ts-mode-map (kbd "C-c C-f") #'jf/current-scoped-function-name)
   (define-key ruby-ts-mode-map (kbd "C-c C-y") #'jf/ruby-mode/yardoc-ify))
 (add-hook 'ruby-ts-mode-hook #'jf/ruby-ts-mode-configurator)
@@ -472,6 +474,8 @@ See `add-log-current-defun-function'."
   ;; Useful for having local inline docs
   :straight t
   :commands (devdocs-install))
+
+(add-hook 'prog-mode-hook #'electric-pair-mode)  ;; https://blog.sumtypeofway.com/posts/emacs-config.html
 
 (provide 'jf-coding)
 ;;; jf-coding.el ends here

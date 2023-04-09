@@ -238,28 +238,6 @@ CONTENTS is nil.  INFO is a plist holding contextual information."
     (next-line)
     (insert (concat "\n{{{scene-date(" date ")}}}\n"))))
 
-(defun jf/blockquote-hugo (node-id)
-  "Export the blockquote for the given NODE-ID"
-  (let ((data (jf/org-mode-extract-body-and-properties node-id)))
-    (concat
-     "\n{{{< blockquote " (jf/hugo-blockquote-attributes-for (plist-get data :properties)) ">}}}\n"
-     (format "%s" (plist-get data :body))
-     "\n{{{< /blockquote >}}}\n")))
-
-(defun jf/hugo-blockquote-attributes-for (properties)
-  "Map the PROPERTIES to attributes."
-  (seq-mapcat (lambda (element)
-		(let ((key (car element))
-		      (text (cadr element)))
-		  (pcase key
-		    ("ID" (format "orgId=\"%s\" " text))
-		    ("TITLE" (format "cite=\"%s\" " text))
-		    ("CITE_URL" (format "citeUrl=\"%s\" " text))
-		    ("AUTHOR" (format "pre=\"%s\" " text))
-		    ("CITE_POST" (format "post=\"%s\" " text))
-		    (_ ""))))
-	      properties))
-
 (defun jf/org-mode-get-keyword-key-value (kwd)
   "Map KWD to list."
   (let ((data (cadr kwd)))

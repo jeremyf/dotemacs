@@ -152,15 +152,17 @@
   (consult-ripgrep-command
 	(concat "rga --null --hidden --line-buffered --color=ansi --max-columns=1000 "
 		"--smart-case --no-heading --line-number --no-ignore-vcs "
-		"--glob !vendor/ --glob !coverage/ --glob !**/tmp/ --glob "
-		"!**/log/ --glob !public/ --glob !node_modules/ --glob !.git/ --glob !doc/"
+		"--glob !vendor/ --glob !coverage/ --glob !**/tmp/ --glob !**/log/ "
+    "--glob !public/ --glob !node_modules/ --glob !.git/ --glob !doc/ "
+    "--glob !.yardoc/ "
 		" . -e ARG OPTS"))
   (consult-ripgrep-args
 	(concat "rga --null --hidden --line-buffered --color=never --max-columns=1000 "
 		"--path-separator / --no-ignore-vcs --smart-case --no-heading "
-		"--glob !vendor/ --glob !coverage/ --glob !**/tmp/ --glob "
-		"!**/log/ --glob !public/ --glob !node_modules/ --glob !.git/ --glob !doc/"
-		" --line-number ."))
+		"--glob !vendor/ --glob !coverage/ --glob !**/tmp/ --glob !**/log/ "
+    "--glob !public/ --glob !node_modules/ --glob !.git/ --glob !doc/ "
+    "--glob !.yardoc/ "
+    "--line-number ."))
   ;; Configure other variables and modes in the :config section,
   ;; after lazily loading the package.
   :config
@@ -254,15 +256,6 @@
   ("s-p" . consult-projectile)
   ("H-t" . consult-projectile)
   ("H-p" . consult-projectile))
-
-;; A dirty little hack for choosing either to search or find a file.
-(defun jf/consult-projectile--file (fn &optional dir &rest rest)
-  "Create a view for selecting project files for the project at SELECTED-PROJECT."
-  (if (string= "Open file" (completing-read (format "Open file or search %s?" dir) '("Open file" "Search") nil t))
-    (apply fn dir rest)
-    (consult-ripgrep selected-project)))
-
-(advice-add #'consult-projectile--file :around #'jf/consult-projectile--file '((name . "wrapper")))
 
 (use-package corfu
   ;; Completion overlay; a narrower intreface than the more verbose company.

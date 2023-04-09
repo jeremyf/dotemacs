@@ -20,20 +20,6 @@
 (transient-define-prefix jf/menu ()
   "A context specific \"mega\" menu."
   ;; Todo, can I get this section into a function so I can duplicate it in the jf/menu--tor?
-  [["Markdown Utilities"
-    ("k h" "Kill slug version of given heading…" jf/kill-new-markdown-heading-as-slug :if-derived (or markdown-mode html-mode))
-    ("w a" "A-tag at point or region…" jf/tor-wrap-link-active-region-dwim  :if-derived (or markdown-mode html-mode))
-    ("w c" "CITE-tag point or region…" jf/tor-wrap-cite-active-region-dwim  :if-derived (or markdown-mode html-mode))
-    ("w d" "DATETIME-tag point or region…" jf/tor-wrap-date  :if-derived (or markdown-mode html-mode))
-    ("w f" "Wrap word or region in pseudo-DFN…" jf/tor-wrap-as-pseudo-dfn  :if-derived (or markdown-mode html-mode))
-    ]
-   [
-    "" ;; Deliberate space for menu
-    ("w m" "Margin-note line or region…" jf/tor-wrap-as-marginnote-dwim  :if-derived (or markdown-mode html-mode))
-    ("w p" "Wrap point or region as Poem…" jf/tor-wrap-in-poem  :if-derived (or markdown-mode html-mode))
-    ("w s" "Side-note sentence or region…" jf/tor-wrap-as-sidenote-dwim  :if-derived (or markdown-mode html-mode))
-    ("w w" "Wrap point or region in html…" jf/tor-wrap-in-html-tag  :if-derived (or markdown-mode html-mode))
-    ]]
   [
    ;; ["Contexts"
    ;;  ("-b" "Burning Wheel…"  jf/menu--bwg)
@@ -49,7 +35,7 @@
     ("j p" "Jump in Pull requests" jf/org-mode/open-all-unresolved-pull-requests)
     ("j l" "Jump to List of Projects" magit-list-repositories)
     ;; ("j s" "Jump to Shortdoc" shortdoc-display-group)
-    ("j v" "Jump to Violet Sprint Board" (lambda () (interactive) (eww-browse-with-external-browser "https://github.com/orgs/scientist-softserv/projects/43") ))
+    ("j v" "Jump to 💜 Violet 💜" (lambda () (interactive) (eww-browse-with-external-browser "https://github.com/orgs/scientist-softserv/projects/43") ))
     ]
    ["Tasks"
     ("c" "Capture region to clock…" (lambda (b e p) (interactive "r\nP") (jf/capture-region-contents-with-metadata b e p)))

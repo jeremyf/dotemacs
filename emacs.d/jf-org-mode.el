@@ -241,6 +241,8 @@
 (with-eval-after-load 'org
   (org-clock-persistence-insinuate))
 
+(use-package org-tempo)
+
 ;; From https://oremacs.com/2017/10/04/completion-at-point/
 (defun jf/org-completion-symbols ()
   "Look for \"=word=\" and allow completion of things like \"=wo\"."
