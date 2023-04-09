@@ -26,7 +26,13 @@
   ;; Because I sometimes want to jump to the source code.  And in looking at
   ;; this I learned about vc-annotate; a better blame than what I've had before.
   ;; `bar-browse' is faster than `browse-at-remote'.
-  :straight t)
+  :straight t
+  :bind
+  ;; Note this is in the same prefix space as `link-hint'
+  ("C-c l r" . browse-at-remote)
+  ("C-c l a" . vc-annotate)
+  ("C-c l n" . jf/project/jump-to/notes)
+  ("C-c l t" . git-timemachine))
 
 (use-package imenu-list
   ;; Show an outline summary of the current buffer.
@@ -43,6 +49,7 @@
   ;; If there's only one candidate, the function opens that URL.
   :straight t
   :bind
+  ;; Note this is in the same prefix space as `browse-at-remote'
   ("C-c l o" . link-hint-open-link)
   ("C-c l c" . link-hint-copy-link))
 

@@ -59,7 +59,8 @@
 
 Determine the PROJECT by querying `jf/project/list-projects'."
   (interactive)
-  (let* ((project (or (s-presence project) (jf/project/find-dwim)))
+  (let* ((project (or (s-presence project)
+                    (jf/project/find-dwim)))
 	 (filename (cdar (jf/project/list-projects :project project))))
     (find-file filename)))
 
@@ -68,25 +69,26 @@ Determine the PROJECT by querying `jf/project/list-projects'."
   "Prompt for PROJECT then workspace and open that workspace."
   (interactive (list (jf/project/find-dwim)))
   (let*
-      ;; Get the project's file name
-      ((filename (cdar (jf/project/list-projects :project project)))
-       (paths-cons-list (with-current-buffer (find-file-noselect filename)
-			  (cl-maplist #'read (cdar (org-collect-keywords '("PROJECT_PATHS"))))))
-       (path-name (completing-read "Path: " paths-cons-list nil t))
-       (path (alist-get path-name paths-cons-list nil nil #'string=)))
+    ;; Get the project's file name
+    ((filename (cdar (jf/project/list-projects :project project)))
+      (paths-cons-list (with-current-buffer (find-file-noselect filename)
+			                   (cl-maplist #'read (cdar (org-collect-keywords '("PROJECT_PATHS"))))))
+      (path-name (completing-read "Path: " paths-cons-list nil t))
+      (path (alist-get path-name paths-cons-list nil nil #'string=)))
     (cond
-     ((s-starts-with? "http" path)
-      (eww-browse-with-external-browser path))
-     ((f-dir-p path)
-      (dired path))
-     ((f-file-p path)
-      (if (string= "pdf" (f-ext path))
-	  (shell-command (concat "open " path))
-	(find-file path)))
-     (t (progn
-	  (message "WARNING: Project %s missing path name \"%s\" (with path %s)"
-		   project path-name path)
-	  (jf/project/jump-to/notes :project project))))))
+      ((s-starts-with? "http" path)
+        (eww-browse-with-external-browser path))
+      ((f-dir-p path)
+        (dired path))
+      ((f-file-p path)
+        (if (string= "pdf" (f-ext path))
+	        (shell-command (concat "open " path))
+	        (find-file path)))
+      ;; Add handling for org-mode style links!
+      (t (progn
+	         (message "WARNING: Project %s missing path name \"%s\" (with path %s)"
+		         project path-name path)
+	         (jf/project/jump-to/notes :project project))))))
 
 (cl-defun jf/project/jump-to/timesheet (&key
 					project
@@ -165,12 +167,12 @@ Noted projects would be found within the given DIRECTORY."
     (let ((project_path_to_code (string-replace
 				 (getenv "HOME")
 				 "~"
-				 project_path_to_code_truename)))
+				                          project_path_to_code_truename)))
       ;; How to handle multiple projects?  Prompt to pick one
       (let ((filename (s-trim (shell-command-to-string
 			       (concat
 				"rg \"^#\\+PROJECT_PATHS: .*"
-				project_path_to_code " *$\" "
+				project_path_to_code " *\\\"\" "
 				directory " --files-with-matches "
 				" --no-ignore-vcs --ignore-case")))))
 	(unless (string-equal "" filename)
