@@ -8,10 +8,19 @@
 
 ;;; Code
 
-(global-set-key (kbd "M-[") 'backward-paragraph)
-(global-set-key (kbd "s-[") 'backward-paragraph)
-(global-set-key (kbd "M-]") 'forward-paragraph)
-(global-set-key (kbd "s-]") 'forward-paragraph)
+(bind-key "M-[" #'backward-paragraph)
+(bind-key "s-[" #'backward-paragraph)
+(bind-key "M-]" #'forward-paragraph)
+(bind-key "s-]" #'forward-paragraph)
+
+(transient-define-suffix jf/jump-to/violet-board ()
+  "Jump to 💜 Violet 💜"
+  :description "Jump to 💜 Violet 💜"
+  (interactive)
+  (require 'eww)
+  (eww-browse-with-external-browser "https://github.com/orgs/scientist-softserv/projects/43"))
+
+(bind-key "C-c l v" #'jf/jump-to/violet-board)
 
 ;; this suffix provides a dynamic description of the current host I want to use
 ;; for my blog.  And the prefix’s function toggles the host.
@@ -35,7 +44,7 @@
     ("j p" "Jump in Pull requests" jf/org-mode/open-all-unresolved-pull-requests)
     ("j l" "Jump to List of Projects" magit-list-repositories)
     ;; ("j s" "Jump to Shortdoc" shortdoc-display-group)
-    ("j v" "Jump to 💜 Violet 💜" (lambda () (interactive) (eww-browse-with-external-browser "https://github.com/orgs/scientist-softserv/projects/43") ))
+    ("j v" jf/jump-to/violet-board)
     ]
     ["Tasks"
       ("a" "Git Annotation" vc-annotate)
