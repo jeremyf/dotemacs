@@ -60,3 +60,47 @@ Related are the following commands:
 	   while pos
 	   do (goto-char pos)))
 #+end_src
+
+** Logic for Parsing My Local Post
+
+#+begin_src emacs-lisp
+  (cl-defun jf/tor-view-blog-post (&key
+                                    (hostname jf/tor-hostname-current))
+    "Browse the url for the HOSTNAME
+
+      The front matter of blog posts contains YAML, with two
+      attributes: slug and date.  Based on the site configuration, the
+      URLs for one of those posts is: hostname/year/month/day/slug"
+    (interactive)
+    (let ((slugs))
+      (save-excursion
+        ;; Remember we are making a list and pushing to the beginning of
+        ;; the list.  Hence we start with the last slug in mind.
+        (goto-char 1)
+        (re-search-forward "^slug: \\(.*\\)$" nil t)
+        (push (match-string 1) slugs)
+        (goto-char 1)
+        (re-search-forward
+          "^date: \\([[:digit:]]+\\)-\\([[:digit:]]+\\)-\\([[:digit:]]+\\) "
+          nil t)
+        ;; Then move to day, month, then year.
+        (push (match-string 3) slugs)
+        (push (match-string 2) slugs)
+        (push (match-string 1) slugs)
+        ;; And finally the host name.
+        (push hostname slugs))
+      (browse-url (format "%s" (s-join "/" slugs)))))
+#+end_src
+
+** Finding Draft File
+
+#+begin_src emacs-lisp
+  (defun jf/tor-find-file-draft (filename)
+    "Find a draft FILENAME in the TakeOnRules content directory."
+    (interactive
+      (list (jf/find-file-via-matching
+              :prompt "Draft filename: "
+              :matching "^draft: true"
+              :in (f-join jf/tor-home-directory "content"))))
+    (find-file filename))
+#+end_src
