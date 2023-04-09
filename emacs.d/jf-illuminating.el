@@ -30,13 +30,13 @@
   :config
   (setq fci-rule-width 1))
 
-(use-package highlight-indent-guides
-  ;; provides column highlighting.  Useful when you start seeing too many nested
-  ;; layers.
-  :straight t
-  :custom (highlight-indent-guides-method 'character)
-  (highlight-indent-guides-responsive 'top)
-  :hook (prog-mode . highlight-indent-guides-mode))
+;; (use-package highlight-indent-guides
+;;   ;; provides column highlighting.  Useful when you start seeing too many nested
+;;   ;; layers.
+;;   :straight t
+;;   :custom (highlight-indent-guides-method 'character)
+;;   (highlight-indent-guides-responsive 'top)
+;;   :hook (prog-mode . highlight-indent-guides-mode))
 
 (use-package kind-icon
   ;; This packages helps provide additional icons for functions and variables in
