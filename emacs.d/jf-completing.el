@@ -604,9 +604,11 @@ Useful if you want a more robust view into the recommend candidates."
   ;; execute that command.
   :straight t
   :custom
-  (which-key-side-window-max-width 70)
-  (which-key-min-column-description-width 50)
-  (which-key-max-description-length 50)
+  (which-key-side-window-max-width 90)
+  (which-key-min-column-description-width 60)
+  (which-key-max-description-length 60)
+  (which-key-show-docstrings t)
+  (which-key-add-column-padding 2)
   :config
   (which-key-mode)
   (which-key-setup-side-window-right)
