@@ -22,6 +22,12 @@
   :bind (("C-j" . avy-goto-char-2))
   :straight t)
 
+(use-package browse-at-remote
+  ;; Because I sometimes want to jump to the source code.  And in looking at
+  ;; this I learned about vc-annotate; a better blame than what I've had before.
+  ;; `bar-browse' is faster than `browse-at-remote'.
+  :straight t)
+
 (use-package imenu-list
   ;; Show an outline summary of the current buffer.
   :custom (imenu-list-focus-after-activation t)
