@@ -84,11 +84,18 @@ Determine the PROJECT by querying `jf/project/list-projects'."
         (if (string= "pdf" (f-ext path))
 	        (shell-command (concat "open " path))
 	        (find-file path)))
-      ;; Add handling for org-mode style links!
-      (t (progn
-	         (message "WARNING: Project %s missing path name \"%s\" (with path %s)"
-		         project path-name path)
-	         (jf/project/jump-to/notes :project project))))))
+      ;; Try the path as an org-link (e.g. path == "denote:20230328T093100")
+      (t (when-let* ((type-target (s-split ":" path))
+                      ;; There's a registered handler for the protocol
+                      ;; (e.g. "denote")
+                      (follow-func (org-link-get-parameter
+                                     (car type-target) :follow)))
+           (funcall follow-func (cadr type-target))
+           ;; We tried...and don't know how to handle this.
+           (progn
+	           (message "WARNING: Project %s missing path name \"%s\" (with path %s)"
+		           project path-name path)
+	           (jf/project/jump-to/notes :project project)))))))
 
 (cl-defun jf/project/jump-to/timesheet (&key
 					project
