@@ -252,7 +252,6 @@ method, get the containing class."
     '("^\\*eldoc for" display-buffer-at-bottom
        (window-height . 4)))
   (setq eldoc-documentation-strategy 'eldoc-documentation-compose-eagerly)
-
   :straight t)
 
 ;; I don't use this package (I think...):

@@ -76,7 +76,7 @@
      ;;       (window-height . fit-window-to-buffer)
      ;;       (window-parameters . ((no-other-window . t)
      ;;                             ;; (mode-line-format . none)
-     ;; 				 )))
+     ;;          )))
      ;; ;; The junk drawer of *something* buffers.
      ;; ("\\*.*\\*"
      ;;  (display-buffer-in-side-window)
@@ -85,18 +85,18 @@
      ;;  (slot . 0))
      )))
 
-;; And now the theme.  I’ve chosen the modus themes (e.g. ~modus-vivendi~ and
-;; ~modus-operandi~).  They provide a light and dark theme with a focus on visual
-;; accessibility.
-
+;; Show tabs as they are tricky little creatures
 (defface jf/tabs-face '((default :inherit font-lock-misc-punctuation-face))
   "Help me see tabs; they are tricky creatures.")
 
 (add-hook 'prog-mode-hook
-	   (lambda () (font-lock-add-keywords nil '(("\t" . 'jf/tabs-face)))))
+     (lambda () (font-lock-add-keywords nil '(("\t" . 'jf/tabs-face)))))
 (add-hook 'text-mode-hook
-	   (lambda () (font-lock-add-keywords nil '(("\t" . 'jf/tabs-face)))))
+     (lambda () (font-lock-add-keywords nil '(("\t" . 'jf/tabs-face)))))
 
+;; And now the theme.  I’ve chosen the modus themes (e.g. ~modus-vivendi~ and
+;; ~modus-operandi~).  They provide a light and dark theme with a focus on visual
+;; accessibility.
 (defun jf/modus-themes-custom-faces ()
   "Set the various custom faces for both `treesit' and `tree-sitter'."
   (modus-themes-with-colors
@@ -105,9 +105,9 @@
       ;;   ((,c (:foreground ,yellow-faint))))
       `(denote-faces-link
          ((,c (:inherit link
-		            :box (:line-width (1 . 1)
-					             :color ,border-mode-line-inactive
-					             :style released-button)))))
+                :box (:line-width (1 . 1)
+                       :color ,border-mode-line-inactive
+                       :style released-button)))))
       `(jf/tabs-face
          ((,c :underline (:style wave :color ,bg-blue-intense))))
       `(jf/org-faces-date
@@ -132,7 +132,7 @@
          ((,c :foreground ,magenta-warmer))))))
 
 (add-hook 'modus-themes-after-load-theme-hook
-	  #'jf/modus-themes-custom-faces)
+    #'jf/modus-themes-custom-faces)
 
 (use-package modus-themes
   ;; I love [[http://protesilaos.com][Prot]]’s attention to detail with the modus
@@ -141,35 +141,35 @@
   :straight (:type git :host gitlab :repo "protesilaos/modus-themes" :branch "main")
   :init
   (setq modus-themes-italic-constructs t
-	modus-themes-bold-constructs t
-	modus-themes-mixed-fonts t
-	modus-themes-variable-pitch-ui nil
-	modus-themes-custom-auto-reload t
-	modus-themes-disable-other-themes t
-	modus-themes-common-palette-overrides '((builtin magenta)
-						(comment yellow-faint)
-						(constant magenta-cooler)
-						(docstring green-faint)
-						(docmarkup magenta-faint)
-						(fnname magenta-warmer)
-						(keyword cyan)
-						(preprocessor cyan-cooler)
-						(string green-cooler)
-						(type magenta-cooler)
-						(variable blue-warmer)
-						(rx-construct magenta-warmer)
-						(rx-backslash blue-cooler))
-	modus-themes-completions '((matches . (extrabold))
-				   (selection . (semibold accented))
-				   (popup . (accented intense)))
-	modus-themes-headings
-	'((1 . (variable-pitch light 1.6))
-	  (2 . (overline semibold 1.5))
-	  (3 . (monochrome overline 1.4 background))
-	  (4 . (overline 1.3))
-	  (5 . (rainbow 1.2))
-	  (6 . (rainbow 1.15))
-	  (t . (rainbow 1.1)))))
+  modus-themes-bold-constructs t
+  modus-themes-mixed-fonts t
+  modus-themes-variable-pitch-ui nil
+  modus-themes-custom-auto-reload t
+  modus-themes-disable-other-themes t
+  modus-themes-common-palette-overrides '((builtin magenta)
+            (comment yellow-faint)
+            (constant magenta-cooler)
+            (docstring green-faint)
+            (docmarkup magenta-faint)
+            (fnname magenta-warmer)
+            (keyword cyan)
+            (preprocessor cyan-cooler)
+            (string green-cooler)
+            (type magenta-cooler)
+            (variable blue-warmer)
+            (rx-construct magenta-warmer)
+            (rx-backslash blue-cooler))
+  modus-themes-completions '((matches . (extrabold))
+           (selection . (semibold accented))
+           (popup . (accented intense)))
+  modus-themes-headings
+  '((1 . (variable-pitch light 1.6))
+    (2 . (overline semibold 1.5))
+    (3 . (monochrome overline 1.4 background))
+    (4 . (overline 1.3))
+    (5 . (rainbow 1.2))
+    (6 . (rainbow 1.15))
+    (t . (rainbow 1.1)))))
 
 (defun jf/dark ()
   "Toggle system-wide Dark or Light setting."
@@ -180,9 +180,9 @@
 (defun jf/emacs-theme-by-osx-appearance ()
   "Set theme based on OSX appearance state."
   (if (equal "Dark" (substring
-		     (shell-command-to-string
-		      "defaults read -g AppleInterfaceStyle")
-		     0 4))
+         (shell-command-to-string
+          "defaults read -g AppleInterfaceStyle")
+         0 4))
       (modus-themes-load-theme 'modus-vivendi-tinted)
     (modus-themes-load-theme 'modus-operandi-tinted)))
 
@@ -209,23 +209,23 @@
 ;;     "Return the lighter string mode line."
 ;;     "Bflr")
 ;;   (advice-add #'bufler-workspace-mode-lighter
-;; 	      :override #'jf/bufler-workspace-mode-lighter
-;; 	      '((name . "wrapper")))
+;;        :override #'jf/bufler-workspace-mode-lighter
+;;        '((name . "wrapper")))
 ;;   ;; Ensuring that when I make a selection, it closes the bufler buffer.
 ;;   (defun jf/bufler-list-buffer-switch (&rest args)
 ;;     (kill-buffer "*Bufler*"))
 ;;   (advice-add 'bufler-list-buffer-switch :after 'jf/bufler-list-buffer-switch)
 ;;   :bind (:map bufler-list-mode-map
-;; 	      ("s-3" . quit-window)
-;; 	      ("s-\\" . quit-window))
+;;        ("s-3" . quit-window)
+;;        ("s-\\" . quit-window))
 ;;   :bind (("s-3" . bufler-switch-buffer)
-;; 	 ("s-\\" . bufler-sidebar)
-;; 	 ;; ("s-\\" . jf/tab-bar-switch-prompt-for-tab)
-;; 	 ;; ("s-]" . tab-line-switch-to-next-tab)
-;; 	 ;; ("s-}" . tab-line-switch-to-next-tab)
-;; 	 ;; ("s-[" . tab-line-switch-to-prev-tab)
-;; 	 ;; ("s-{" . tab-line-switch-to-prev-tab)
-;; 	 ))
+;;   ("s-\\" . bufler-sidebar)
+;;   ;; ("s-\\" . jf/tab-bar-switch-prompt-for-tab)
+;;   ;; ("s-]" . tab-line-switch-to-next-tab)
+;;   ;; ("s-}" . tab-line-switch-to-next-tab)
+;;   ;; ("s-[" . tab-line-switch-to-prev-tab)
+;;   ;; ("s-{" . tab-line-switch-to-prev-tab)
+;;   ))
 
 ;; (defun jf/tab-bar-switch-to-next-tab ()
 ;;   "Move to the next `tab-bar' tab and open the first buffer."
@@ -244,7 +244,7 @@
 
 ;;   This is cribbed from `bufler-switch-buffer'."
 ;;   (let* ((path (frame-parameter nil 'bufler-workspace-path))
-;; 	 (buffers (bufler-buffer-alist-at
+;;   (buffers (bufler-buffer-alist-at
 ;;                    path :filter-fns bufler-workspace-switch-buffer-filter-fns)))
 ;;     (switch-to-buffer (caar buffers)))
 ;;   ;; A hack to ensure that I have the top tabs; I don't need it because I could

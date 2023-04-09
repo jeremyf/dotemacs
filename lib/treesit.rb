@@ -2,9 +2,9 @@
 # @param hello [World] When the work type does not have =part_of= we When
 #        thework type does not have =part_of= weWhen the work type does not have
 #        =part_of= we When the work type does not have =part_of= we
-# @param world
-# @param hello [World] When the work type does not have =part_of= we When the
+# @param world [World] When the work type does not have =part_of= we When the
 #        work type does not have =part_of= weWhen the work type does not have
 #        =part_of= we When the work type does not have =part_of= we
-def hello
+def method(hello:, world:)
+
 end
