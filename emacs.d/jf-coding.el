@@ -242,12 +242,6 @@ method, get the containing class."
   ;; Helps with rendering documentation
   :straight t)
 
-;; I don't use this package
-;; (use-package emacs-refactor
-;;   :straight (emacs-refactor :host github :repo "Wilfred/emacs-refactor")
-;;   :bind ((:map ruby-mode-map ("M-RET" . emr-show-refactor-menu))
-;;   (:map emacs-lisp-mode-map ("M-RET" . emr-show-refactor-menu))))
-
 ;; I don't use this package (I think...):
 ;; (use-package emmet-mode
 ;;   :straight t
@@ -265,9 +259,6 @@ method, get the containing class."
   (:map ruby-mode-map (("C-M-h" . jf/treesit/function-select)
                            ("C-c C-f" . jf/treesit/qualified_method_name)))
   :hook ((ruby-mode ruby-ts-mode) . (lambda () (setq fill-column 100))))
-
-;; I don't use this package
-;; (use-package go-mode :straight t)
 
 ;; An odd little creature, hide all comment lines.  Sometimes this can be a
 ;; useful tool for viewing implementation details.
