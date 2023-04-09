@@ -37,7 +37,8 @@
     ;; ("j s" "Jump to Shortdoc" shortdoc-display-group)
     ("j v" "Jump to 💜 Violet 💜" (lambda () (interactive) (eww-browse-with-external-browser "https://github.com/orgs/scientist-softserv/projects/43") ))
     ]
-   ["Tasks"
+    ["Tasks"
+      ("a" "Git Annotation" vc-annotate)
     ("c" "Capture region to clock…" (lambda (b e p) (interactive "r\nP") (jf/capture-region-contents-with-metadata b e p)))
     ("d" "Deadgrep…" deadgrep)
     ("i" "Clock in…" consult-clock-in)
