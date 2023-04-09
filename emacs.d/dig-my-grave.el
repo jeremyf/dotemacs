@@ -50,13 +50,7 @@
   "Three consecutive graves (e.g. “`”) at the start of the line prompts for
  inserting content.  See `dig-my-grave/templates-alist/org-mode'."
   (interactive)
-  (if (or (and (> (point) 3)
-            (string= (buffer-substring-no-properties
-                       (- (point) 3) (point)) "\n``"))
-        ;; Account for starting on the first line
-        (and (= (point) 3)
-          (string= (buffer-substring-no-properties
-                     (- (point) 2) (point)) "``")))
+  (if (and (= (current-column) 2) (looking-back "``" (- (point) 2)))
     ;; We have just hit our third backtick at the beginning of the line.
     (progn
       (delete-char -2)
