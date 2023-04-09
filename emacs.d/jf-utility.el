@@ -389,5 +389,8 @@ I'm okay with that behavior, but I'm putting it here to mention it â€œout loudâ€
   (let ((text (substring-no-properties (car kill-ring))))
     text))
 
+(defun jf/filename/tilde-based (filename)
+  (string-replace (getenv "HOME") "~" filename))
+
 (provide 'jf-utility)
 ;;; jf-utility.el ends here

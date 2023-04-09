@@ -65,7 +65,7 @@ Determine the PROJECT by querying `jf/project/list-projects'."
     (find-file filename)))
 
 (bind-key "s-2" 'jf/project/jump-to/project-work-space)
-(cl-defun jf/project/jump-to/project-work-space (project)
+(defun jf/project/jump-to/project-work-space (project)
   "Prompt for PROJECT then workspace and open that workspace."
   (interactive (list (jf/project/find-dwim)))
   (let*
@@ -171,10 +171,8 @@ Return nil if the current buffer is not part of a noted project.
 
 Noted projects would be found within the given DIRECTORY."
   (when-let ((project_path_to_code_truename (cdr (project-current))))
-    (let ((project_path_to_code (string-replace
-				 (getenv "HOME")
-				 "~"
-				                          project_path_to_code_truename)))
+    (let ((project_path_to_code (jf/filename/tilde-based
+                                  project_path_to_code_truename)))
       ;; How to handle multiple projects?  Prompt to pick one
       (let ((filename (s-trim (shell-command-to-string
 			       (concat
