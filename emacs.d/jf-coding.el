@@ -214,7 +214,13 @@ method, get the containing class."
            json-mode json-ts-mode
            scss-mode scss-ts-mode)
           . eglot-ensure)
-  :hook (eglot-managed-mode . jf/eglot-capf)
+  :hook ((eglot-managed-mode . jf/eglot-eldoc)
+          (eglot-managed-mode . jf/eglot-capf))
+  :preface
+  (defun jf/eglot-eldoc ()
+    ;; https://www.masteringemacs.org/article/seamlessly-merge-multiple-documentation-sources-eldoc
+    (setq eldoc-documentation-strategy
+            'eldoc-documentation-compose-eagerly))
   :config
   (setq completion-category-overrides '((eglot (styles orderless))))
   (add-to-list 'eglot-server-programs
@@ -240,6 +246,13 @@ method, get the containing class."
 
 (use-package eldoc
   ;; Helps with rendering documentation
+  ;; https://www.masteringemacs.org/article/seamlessly-merge-multiple-documentation-sources-eldoc
+  :preface
+  (add-to-list 'display-buffer-alist
+    '("^\\*eldoc for" display-buffer-at-bottom
+       (window-height . 4)))
+  (setq eldoc-documentation-strategy 'eldoc-documentation-compose-eagerly)
+
   :straight t)
 
 ;; I don't use this package (I think...):
@@ -258,7 +271,10 @@ method, get the containing class."
   :bind
   (:map ruby-mode-map (("C-M-h" . jf/treesit/function-select)
                            ("C-c C-f" . jf/treesit/qualified_method_name)))
-  :hook ((ruby-mode ruby-ts-mode) . (lambda () (setq fill-column 100))))
+  :hook ((ruby-mode ruby-ts-mode) .
+          (lambda ()
+            (eldoc-mode)
+            (setq fill-column 100))))
 
 ;; An odd little creature, hide all comment lines.  Sometimes this can be a
 ;; useful tool for viewing implementation details.
@@ -389,6 +405,8 @@ method, get the containing class."
   ;; My prefered Ruby documentation syntax
   :straight t
   :init
+  ;; This is not working as I had tested; it's very dependent on the little
+  ;; details.  I think I may want to revisit to just work on the current line.
   (defun jf/ruby-mode/yardoc-ify ()
     "Add parameter yarddoc stubs for the current method."
     (interactive)
@@ -428,6 +446,9 @@ method, get the containing class."
   :hook ((ruby-mode ruby-ts-mode) . yard-mode))
 
 (defun jf/ruby-ts-mode-configurator ()
+  "Configure the `treesit' provided `ruby-ts-mode'."
+  ;; I encountered some loading issues where ruby-ts-mode was not available
+  ;; during my understanding of the use-package life-cycle.
   (setq-local add-log-current-defun-function #'jf/treesit/qualified_method_name)
   (define-key ruby-ts-mode-map (kbd "C-M-h") #'jf/treesit/function-select)
   (define-key ruby-ts-mode-map (kbd "C-c C-f") #'jf/current-scoped-function-name)
@@ -451,7 +472,8 @@ See `add-log-current-defun-function'."
 
 (use-package devdocs
   ;; Download and install documents from https://devdocs.io/
-  ;; Useful for having local inline docs
+  ;; Useful for having local inline docs.  Perhaps not always in the format that
+  ;; I want, but can't have everything.
   :straight t
   :commands (devdocs-install))
 
