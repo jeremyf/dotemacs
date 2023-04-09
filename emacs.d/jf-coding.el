@@ -135,7 +135,7 @@ method, get the containing class."
           module_space
           (concat module_space method_type method_name)))
       (let ((current-node (treesit-node-at (point))))
-              (s-join "::" (jf/treesit/module_space current-node)))))
+        (s-join "::" (jf/treesit/module_space current-node)))))
   ;; Handles the following Ruby code:
   ;;
   ;;   module A::B
@@ -220,7 +220,7 @@ method, get the containing class."
   (defun jf/eglot-eldoc ()
     ;; https://www.masteringemacs.org/article/seamlessly-merge-multiple-documentation-sources-eldoc
     (setq eldoc-documentation-strategy
-            'eldoc-documentation-compose-eagerly))
+      'eldoc-documentation-compose-eagerly))
   :config
   (setq completion-category-overrides '((eglot (styles orderless))))
   (add-to-list 'eglot-server-programs
@@ -269,7 +269,7 @@ method, get the containing class."
   :straight (:type built-in)
   :bind
   (:map ruby-mode-map (("C-M-h" . jf/treesit/function-select)
-                           ("C-c C-f" . jf/treesit/qualified_method_name)))
+                        ("C-c C-f" . jf/treesit/qualified_method_name)))
   :hook ((ruby-mode ruby-ts-mode) .
           (lambda ()
             (eldoc-mode)
@@ -476,7 +476,11 @@ See `add-log-current-defun-function'."
   :straight t
   :commands (devdocs-install))
 
-(add-hook 'prog-mode-hook #'electric-pair-mode)  ;; https://blog.sumtypeofway.com/posts/emacs-config.html
+(defun jf/prog-mode-configurator ()
+  (electric-pair-mode)
+  (which-function-mode))
+
+(add-hook 'prog-mode-hook #'jf/prog-mode-configurator)
 
 (provide 'jf-coding)
 ;;; jf-coding.el ends here
