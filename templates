@@ -127,10 +127,8 @@ enh-ruby-mode ruby-mode rspec-mode ruby-ts-mode
 	     (symbols (mapcar (lambda (el) (concat ":" el)) params)))
 	(dolist (param params) (insert "# @param " param " [Object]\n"))
 	(insert "def initialize(" (s-join ", " kwargs) ")\n")
-	(dolist (param params) (insert "  self." param " = " param "\n"))
+	(dolist (param params) (insert "  @" param " = " param "\n"))
 	(insert "end\n\n"
-		"attr_accessor " (s-join ", " symbols) "\n"
-		"private " (s-join ", " symbols) "\n"
-		"private " (s-join "=, " symbols) "=\n")))
+		"attr_reader " (s-join ", " symbols) "\n")))
 
 (it_is "it { is_expected.to " q " }")
