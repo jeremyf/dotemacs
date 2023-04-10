@@ -42,6 +42,7 @@
      ("Plant UML" . "#+begin_src plantuml\n@startuml\n!theme amiga\n\n@enduml\n#+end_src")
      ("Ruby" . "#+begin_src ruby\n#+end_src")
      ("Update" . tempel-insert-update_block))
+
   "A list of `cons' cells with `car' as the label and `cdr' as
  the value that we'll insert.  Used as the collection for the
  `dig-my-grave' `completing-read'.")
