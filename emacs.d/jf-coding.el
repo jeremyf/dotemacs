@@ -477,7 +477,7 @@ See `add-log-current-defun-function'."
   :commands (devdocs-install))
 
 (defun jf/prog-mode-configurator ()
-  (electric-pair-mode)
+  ;; (electric-pair-mode)
   (which-function-mode))
 
 (add-hook 'prog-mode-hook #'jf/prog-mode-configurator)

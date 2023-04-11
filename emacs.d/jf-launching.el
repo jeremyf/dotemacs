@@ -76,7 +76,6 @@
      This flag allowed me to more easily troubleshoot those load
      attempts.")
 
-(electric-pair-mode)  ;; https://blog.sumtypeofway.com/posts/emacs-config.html
 (make-directory "~/.emacs.d/autosaves/" t) ;; Ensuring I have an autosave
 ;; directory.
 (recentf-mode 1) ;; Track recent

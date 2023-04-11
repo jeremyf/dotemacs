@@ -51,6 +51,7 @@ emacs-lisp-mode
 fundamental-mode
 
 (today (format-time-string "%Y-%m-%d"))
+(dir-r "Derivative::Rodeo::")
 
 ;;;; markdown-mode
 markdown-mode markdown-ts-mode
