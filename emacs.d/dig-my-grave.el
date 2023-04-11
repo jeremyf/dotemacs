@@ -21,14 +21,14 @@
 ;; See the License for the specific language governing permissions and
 ;; limitations under the License.
 
-;;; Commentary
+;;; Commentary:
 
 ;; I used to write a lot of Markdown.  And the triple grave character
 ;; (e.g. “```”) is a wonderful convenience for indicating code blocks.  This
 ;; package builds on that idea and repurposes the triple backtick to a quick
 ;; prompt that feels idiomatic to Markdown's triple backtick.
 
-;;; Code
+;;; Code:
 
 (require 'org)
 
@@ -39,25 +39,25 @@
      ("Emacs Lisp" . "#+begin_src emacs-lisp\n#+end_src")
      ("Gherkin" . "#+begin_src gherkin\n#+end_src")
      ("Org Structure" . org-insert-structure-template)
-     ("Plant UML" . "#+begin_src plantuml\n@startuml\n!theme amiga\n\n@enduml\n#+end_src")
+     ("Plant UML (puml)" . "#+begin_src plantuml\n@startuml\n!theme amiga\n\n@enduml\n#+end_src")
      ("Ruby" . "#+begin_src ruby\n#+end_src")
      ("Update" . tempel-insert-update_block))
 
-  "A list of `cons' cells with `car' as the label and `cdr' as
- the value that we'll insert.  Used as the collection for the
- `dig-my-grave' `completing-read'.")
+  "A list of `cons' cells used for `dig-my-grave' `completing-read'.
+The `car' as the label and `cdr' as the value that we'll insert.")
 
 (define-key org-mode-map (kbd "`") #'dig-my-grave)
 (defun dig-my-grave ()
-  "Three consecutive graves (e.g. “`”) at the start of the line prompts for
- inserting content.  See `dig-my-grave/templates-alist/org-mode'."
+  "Prompt to `insert' block when 3 consecutive graves (e.g. “`”) start line.
+
+See `dig-my-grave/templates-alist/org-mode'."
   (interactive)
   (if (and (= (current-column) 2) (looking-back "``" (- (point) 2)))
     ;; We have just hit our third backtick at the beginning of the line.
     (progn
       (delete-char -2)
       ;; I use the alist-get pattern a lot...perhaps a function?
-      (let ((value (alist-get (completing-read "Special Content: "
+      (let ((value (alist-get (completing-read "Block Type: "
                                   dig-my-grave/templates-alist/org-mode nil t)
                      dig-my-grave/templates-alist/org-mode nil nil #'string=)))
         (cond
@@ -67,7 +67,6 @@
           ;; Trust the function
           ((commandp value) (call-interactively value))
           ((functionp value) (funcall value))
-          ((ad-lambda-p) (funcall value))
           ;; Time for a pull request
           (t (error "Unprocessable value %s for #'dig-my-grave" value)))))
     (setq last-command-event ?`)
