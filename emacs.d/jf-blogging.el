@@ -265,15 +265,6 @@ CONTENTS is nil.  INFO is a plist holding contextual information."
 ;;; BEGIN Non-Interactive Utility Functions
 ;;
 ;;******************************************************************************
-(cl-defun jf/convert-text-to-key (text &key (length 5))
-  "Convert the given TEXT to an epigraph key.
-
-  The LENGTH is how many words to use for the key."
-  (let ((list-of-words (s-split-words text)))
-    (if (> (length list-of-words) length)
-      (upcase (s-join "-" (subseq list-of-words 0 length)))
-      "")))
-
 (defun jf/tor-convert-text-to-post-title (title)
   "Convert TITLE to correct format."
   (message "Titleizing...")
@@ -286,95 +277,6 @@ CONTENTS is nil.  INFO is a plist holding contextual information."
 (defun jf/tor-convert-text-to-slug (&optional string)
   "Convert STRING to appropriate slug."
   (s-replace "'" "" (s-dashed-words (s-downcase string))))
-
-(defun jf/slugify ()
-  "Convert the active region or line to a URL friendly slug."
-  (interactive)
-  (let* ((range (if (region-active-p)
-                  (list (region-beginning) (region-end))
-                  (list (point-at-bol) (point-at-eol))))
-          (text (buffer-substring-no-properties (car range) (cadr range))))
-    (save-excursion
-      (delete-region (car range) (cadr range))
-      (goto-char (car range))
-      (insert (jf/tor-convert-text-to-slug text)))))
-
-(cl-defun jf/tor-post---create-or-append (&key
-                                           title subheading
-                                           (tags '("null")) series toc
-                                           citeTitle citeURL citeAuthor)
-  "Create or append a post with TITLE.
-
-    The following keys are optional:
-
-    :SUBHEADING if you have an active region, use this header.
-    :TAGS one or more tags, as a list or string, to add to the
-      frontmatter.
-    :SERIES the series to set in the frontmatter.
-    :TOC whether to include a table of contents in the post.
-    :CITETITLE the title of the URL cited (if any)
-    :CITEURL the URL cited (if any)
-    :CITEAUTHOR the author cited (if any)
-
-    If there's an active region, select that text and place it."
-  (let* ((default-directory (f-join jf/tor-home-directory
-                              "content" "posts"
-                              (format-time-string "%Y/")))
-
-          (slug (jf/tor-convert-text-to-slug title))
-          (fpath (expand-file-name
-                   (concat default-directory slug ".md"))))
-    ;; If the file does not exist, create the file with the proper
-    ;; frontmatter.
-    (if (not (file-exists-p fpath))
-      (write-region
-        (concat "---"
-          "\ndate: " (format-time-string "%Y-%m-%d %H:%M:%S %z")
-          "\ndraft: true"
-          "\nlayout: post"
-          "\nlicenses:\n- all-rights-reserved"
-          "\nslug: " (format "%s" slug)
-          "\ntitle: '" (jf/tor-convert-text-to-post-title title) "'"
-          "\ntype: post"
-          (when series (concat "\nseries: " series))
-          (when toc (concat "\ntoc: true"))
-          "\ntags:"
-          (if tags
-            (concat (mapconcat
-                      (lambda (tag) (concat "\n- " tag))
-                      (flatten-tree tags) ""))
-            "\n- null")
-          "\n---\n")
-        nil fpath))
-    ;; If we have an active region, append that region's content to
-    ;; the given file.
-    (if (use-region-p)
-      (write-region
-        (concat
-          (if subheading
-            (concat "\n## " subheading "\n")
-            (when citeTitle (concat "\n## " citeTitle "\n")))
-          (when citeURL (concat
-                          "\n{{< blockquote"
-                          (when citeAuthor
-                            (concat " pre=\"" citeAuthor "\""))
-                          " cite=\"" citeTitle
-                          "\" cite_url=\"" citeURL "\" >}}\n"))
-          (buffer-substring (region-beginning) (region-end))
-          (when citeURL "\n{{< /blockquote >}}"))
-        nil fpath t)
-      ;; Without an active region, if we have a citeURL insert a link
-      ;; to it.
-      (when citeURL
-        (write-region
-          (concat
-            "\n<cite><a href=\"" citeURL
-            "\" class=\"u-url p-name\" rel=\"cite\">"
-            (or (citeTitle) (citeURL)) "</a></cite>\n")
-          nil fpath t)))
-    ;; Finally open that file for editing.
-    (find-file fpath)
-    (end-of-buffer)))
 ;;******************************************************************************
 ;;
   ;;; END Non-Interactive Utility Functions

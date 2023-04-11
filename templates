@@ -1,5 +1,5 @@
 ;; -*- mode: lisp -*-
-	;;; Commentary
+  ;;; Commentary
 ;;
 ;; Organize this file by mode then by abbreviation.  Multi-modes have their own
 ;; section
@@ -36,16 +36,16 @@ emacs-lisp-mode
 (loop "(cl-loop for " p " in " p " do" n> r> ")")
 (command "(defun " p " (" p ")\n  \"" p "\"" n> "(interactive" p ")" n> r> ")")
 (advice "(defun " (p "adv" name) " (&rest app)" n> p n> "(apply app))" n>
-	"(advice-add #'" (p "fun") " " (p ":around") " #'" (s name) ")")
+  "(advice-add #'" (p "fun") " " (p ":around") " #'" (s name) ")")
 (package ";;; " (file-name-base (or (buffer-file-name) (buffer-name))) " --- " p " -*- lexical-binding: t -*-"
-	 n n
-	 ";; Copyright (C) " (format-time-string "%Y") " Jeremy Friesen" n
-	 ";; Author: Jeremy Friesen <jeremy@jeremyfriesen.com>" n n
-	 ";; This file is NOT part of GNU Emacs." n
-	 ";;; Commentary" n p n
-	 ";;; Code" n p n
-	 "(provide '" (file-name-base (or (buffer-file-name) (buffer-name))) ")" n
-	 ";;; " (file-name-nondirectory (or (buffer-file-name) (buffer-name))) " ends here" n)
+   n n
+   ";; Copyright (C) " (format-time-string "%Y") " Jeremy Friesen" n
+   ";; Author: Jeremy Friesen <jeremy@jeremyfriesen.com>" n n
+   ";; This file is NOT part of GNU Emacs." n
+   ";;; Commentary:" n p n
+   ";;; Code:" n p n
+   "(provide '" (file-name-base (or (buffer-file-name) (buffer-name))) ")" n
+   ";;; " (file-name-nondirectory (or (buffer-file-name) (buffer-name))) " ends here" n)
 
 ;;;; fundamental-mode
 fundamental-mode
@@ -78,10 +78,10 @@ org-mode
 (Today "[[date:" (format-time-string "%Y-%m-%d") "][Today]]")
 (tor "[[https://takeonrules.com][Take on Rules]]")
 (proj n "#+PROJECT_NAME: " (p "Project Name: " project-name)
-	 n "#+PROJECT_PATHS: (\"Notes, " (s project-name) "\" . \"" (jf/filename/tilde-based (buffer-file-name))  "\")")
+   n "#+PROJECT_PATHS: (\"Notes, " (s project-name) "\" . \"" (jf/filename/tilde-based (buffer-file-name))  "\")")
 
 (update_block "#+attr_shortcode: :date " (format-time-string "%Y-%m-%d")
-	" :mode " (p (completing-read "Mode: " '(inline paragraph marginnote sidenote section fallback) nil t) mode)
+  " :mode " (p (completing-read "Mode: " '(inline paragraph marginnote sidenote section fallback) nil t) mode)
     n "#+begin_update"
     n q
     n "#+end_update" n)
@@ -96,8 +96,8 @@ text-mode
 ;; This is an example of using the value of `(s str)' to populate the above and
 ;; below line!
 (asciibox "+-" (make-string (length str) ?-) "-+" n
-	  "| " (s str)                       " |" n
-	  "+-" (make-string (length str) ?-) "-+" n)
+    "| " (s str)                       " |" n
+    "+-" (make-string (length str) ?-) "-+" n)
 
 (banner comment-start (make-string (length title) ?=) n comment-start (p "Title: " title) n comment-start (make-string (length title) ?=))
 
@@ -124,12 +124,12 @@ enh-ruby-mode ruby-mode rspec-mode ruby-ts-mode
 ;; A little experiment in mixing tempel behavior and multiple values.
 (init (p "Parameters (comma separated): " given-params t)
       (let* ((params (mapcar #'s-trim (s-split "," given-params)))
-	     (kwargs (mapcar (lambda (el) (concat el ":")) params))
-	     (symbols (mapcar (lambda (el) (concat ":" el)) params)))
-	(dolist (param params) (insert "# @param " param " [Object]\n"))
-	(insert "def initialize(" (s-join ", " kwargs) ")\n")
-	(dolist (param params) (insert "  @" param " = " param "\n"))
-	(insert "end\n\n"
-		"attr_reader " (s-join ", " symbols) "\n")))
+       (kwargs (mapcar (lambda (el) (concat el ":")) params))
+       (symbols (mapcar (lambda (el) (concat ":" el)) params)))
+  (dolist (param params) (insert "# @param " param " [Object]\n"))
+  (insert "def initialize(" (s-join ", " kwargs) ")\n")
+  (dolist (param params) (insert "  @" param " = " param "\n"))
+  (insert "end\n\n"
+    "attr_reader " (s-join ", " symbols) "\n")))
 
 (it_is "it { is_expected.to " q " }")

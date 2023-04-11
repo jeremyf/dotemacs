@@ -10,7 +10,8 @@
 ;; Coding is writing, but not all writing is coding.  This configures and
 ;; extends packages specifically here for helping with my coding activities.
 
-;;; Code
+;;; Code:
+
 ;;;; Pre-requisites
 (require 'jf-writing)
 
@@ -37,6 +38,7 @@
 (use-package treesit
   :init
   (setq treesit-font-lock-level 4)
+  :preface
   (defun jf/treesit/function-select ()
     "Select the current function at point."
     (interactive)
@@ -45,7 +47,7 @@
         (goto-char (treesit-node-start func))
         (call-interactively #'set-mark-command)
         (goto-char (treesit-node-end func)))
-      (user-error "No function to select.")))
+      (user-error "No function to select")))
   ;; I love M-q and also have some opinions about how my yard docs should look.
   ;; This allows both of those to peacefully coexist.
   (defun jf/ruby-mode/unfill-toggle ()
@@ -160,8 +162,8 @@ method, get the containing class."
                                    (member (treesit-node-type n)
                                      '("constant" "scope_resolution"))))))))
       (jf/treesit/module_space parent (cons parent_name acc))
-      acc))
-  :straight (:type  built-in))
+      acc)))
+
 
 (use-package treesit-auto
   :straight (:host github :repo "renzmann/treesit-auto")
@@ -342,7 +344,7 @@ method, get the containing class."
   ;; should be in spec/models/my_file_spec.rb
   :bind (:map rspec-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
   :bind (:map ruby-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
-  :init
+  :preface
   (defun jf/rspec-spring-p ()
     "Check the project for spring as part of the Gemfile.lock."
     (let ((gemfile-lock (f-join (projectile-project-root) "Gemfile.lock")))
@@ -403,7 +405,7 @@ method, get the containing class."
 (use-package yard-mode
   ;; My prefered Ruby documentation syntax
   :straight t
-  :init
+  :preface
   ;; This is not working as I had tested; it's very dependent on the little
   ;; details.  I think I may want to revisit to just work on the current line.
   (defun jf/ruby-mode/yardoc-ify ()
@@ -465,7 +467,7 @@ See `add-log-current-defun-function'."
     (progn
       (message "%s" text)
       (kill-new (substring-no-properties text)))
-    (user-error "Warning: Point not on function.")))
+    (user-error "Warning: Point not on function")))
 (bind-key "C-c C-f" #'jf/current-scoped-function-name prog-mode-map)
 (bind-key "C-c C-f" #'jf/current-scoped-function-name emacs-lisp-mode-map)
 
@@ -477,7 +479,9 @@ See `add-log-current-defun-function'."
   :commands (devdocs-install))
 
 (defun jf/prog-mode-configurator ()
+  "Do the configuration of all the things."
   ;; (electric-pair-mode)
+  (flymake-mode 1)
   (which-function-mode))
 
 (add-hook 'prog-mode-hook #'jf/prog-mode-configurator)
