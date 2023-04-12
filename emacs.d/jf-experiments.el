@@ -42,7 +42,7 @@
   (setq org-tufte-htmlize-code t))
 
 ;; Let's give the more fluid scrolling a chance
-(pixel-scroll-precision-mode)
+
 
 (provide 'jf-experiments)
 ;;; jf-experiments.el ends here
