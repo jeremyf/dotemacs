@@ -5,11 +5,11 @@
 
 ;; This file is NOT part of GNU Emacs.
 
-;;; Commentary
+;;; Commentary:
 
 ;; This package provides font, theme, and window support.
 
-;;; Code
+;;; Code:
 
 ;;;; Fonts
 (use-package fontaine
@@ -18,42 +18,42 @@
   :straight t
   :config
   (setq fontaine-presets
-	;; I'm naming the presets as "actions"; the mindset that I'm using when
-	;; wanting that font.
-        '((overviewing
-           :default-height 110)
-          (default
-            :default-height 160)
-          (coding
-           :default-height 160)
-          (presenting
-           :default-weight semilight
-           :default-height 220
-           :bold-weight extrabold)
-          (reading
-           :default-weight semilight
-	   :default-family "ETBembo"
-           :default-height 220
-           :bold-weight extrabold)
-          (t
-           ;; Following Prot’s example, keeping these for for didactic purposes.
-           :default-family "Iosevka Comfy Motion Fixed"
-           :default-weight regular
-           :default-height 160
-           :fixed-pitch-family nil ; falls back to :default-family
-           :fixed-pitch-weight nil ; falls back to :default-weight
-           :fixed-pitch-height 1.0
-           :fixed-pitch-serif-family nil ; falls back to :default-family
-           :fixed-pitch-serif-weight nil ; falls back to :default-weight
-           :fixed-pitch-serif-height 1.0
-           :variable-pitch-family "ETBembo"
-           :variable-pitch-weight nil
-           :variable-pitch-height 1.0
-           :bold-family nil ; use whatever the underlying face has
-           :bold-weight bold
-           :italic-family nil
-           :italic-slant italic
-           :line-spacing nil)))
+    ;; I'm naming the presets as "actions"; the mindset that I'm using when
+    ;; wanting that font.
+    '((overviewing
+        :default-height 110)
+       (default
+         :default-height 160)
+       (coding
+         :default-height 160)
+       (presenting
+         :default-weight semilight
+         :default-height 220
+         :bold-weight extrabold)
+       (reading
+         :default-weight semilight
+         :default-family "ETBembo"
+         :default-height 220
+         :bold-weight extrabold)
+       (t
+         ;; Following Prot’s example, keeping these for for didactic purposes.
+         :default-family "Iosevka Comfy Motion Fixed"
+         :default-weight regular
+         :default-height 160
+         :fixed-pitch-family nil ; falls back to :default-family
+         :fixed-pitch-weight nil ; falls back to :default-weight
+         :fixed-pitch-height 1.0
+         :fixed-pitch-serif-family nil ; falls back to :default-family
+         :fixed-pitch-serif-weight nil ; falls back to :default-weight
+         :fixed-pitch-serif-height 1.0
+         :variable-pitch-family "ETBembo"
+         :variable-pitch-weight nil
+         :variable-pitch-height 1.0
+         :bold-family nil ; use whatever the underlying face has
+         :bold-weight bold
+         :italic-family nil
+         :italic-slant italic
+         :line-spacing nil)))
   (fontaine-set-preset 'default))
 
 ;;;; Icons
@@ -65,16 +65,16 @@
   (cl-defmacro jf/all-the-icons--with(&key name)
     "A macro to provide functions for icon names."
     (let ((defun-fn (intern (concat "jf/all-the-icons--with-" name)))
-          (icon-fn (intern (concat "all-the-icons-" name)))
-          (docstring (concat
-		      "Displays an ICON from `all-the-icons-" name "'.")))
+           (icon-fn (intern (concat "all-the-icons-" name)))
+           (docstring (concat
+                        "Displays an ICON from `all-the-icons-" name "'.")))
       `(defun ,defun-fn (icon str &optional height v-adjust)
          ,docstring
          (s-concat (,icon-fn
-                    icon
-                    :v-adjust (or v-adjust 0)
-                    :height (or height 1))
-                   " " str))))
+                     icon
+                     :v-adjust (or v-adjust 0)
+                     :height (or height 1))
+           " " str))))
   (jf/all-the-icons--with :name "faicon")
   (jf/all-the-icons--with :name "material")
   (jf/all-the-icons--with :name "octicon")
@@ -109,17 +109,17 @@
     "Change three consecutive dots to a typographical ellipsis mark."
     (interactive "p")
     (cond
-     ((and (= 1 arg)
-	   (eq (char-before) ?^))
-      (delete-char -1)
-      (insert typopunct-middot))
-     ((and (= 1 arg)
-	   (eq this-command last-command)
-	   (looking-back "\\.\\." 1))
-      (replace-match "")
-      (insert typopunct-ellipsis))
-     (t
-      (self-insert-command arg))))
+      ((and (= 1 arg)
+         (eq (char-before) ?^))
+        (delete-char -1)
+        (insert typopunct-middot))
+      ((and (= 1 arg)
+         (eq this-command last-command)
+         (looking-back "\\.\\." 1))
+        (replace-match "")
+        (insert typopunct-ellipsis))
+      (t
+        (self-insert-command arg))))
   (define-key typopunct-map "." 'typopunct-insert-ellipsis-or-middot)
   ;; feet, arcminutes, derivatives
   (defconst typopunct-prime  (decode-char 'ucs #x2032))
@@ -132,23 +132,23 @@
   (defconst typopunct-pm    (decode-char 'ucs #xB1))
   (defconst typopunct-mp    (decode-char 'ucs #x2213))
   (defadvice typopunct-insert-typographical-dashes
-      (around minus-or-pm activate)
+    (around minus-or-pm activate)
     (cond
-     ((or (eq (char-before) typopunct-em-dash)
-	  (looking-back "\\([[:blank:]]\\|^\\)\\^" 2))
-      (delete-char -1)
-      (insert typopunct-minus))
-     ((looking-back "[^[:blank:]]\\^" 1)
-      (insert typopunct-minus))
-     ((looking-back "+/" 1)
-      (progn (replace-match "")
-	     (insert typopunct-pm)))
-     (t ad-do-it)))
+      ((or (eq (char-before) typopunct-em-dash)
+         (looking-back "\\([[:blank:]]\\|^\\)\\^" 2))
+        (delete-char -1)
+        (insert typopunct-minus))
+      ((looking-back "[^[:blank:]]\\^" 1)
+        (insert typopunct-minus))
+      ((looking-back "+/" 1)
+        (progn (replace-match "")
+          (insert typopunct-pm)))
+      (t ad-do-it)))
   (defun typopunct-insert-mp (arg)
     (interactive "p")
     (if (and (= 1 arg) (looking-back "-/" 2))
-	(progn (replace-match "")
-	       (insert typopunct-mp))
+      (progn (replace-match "")
+        (insert typopunct-mp))
       (self-insert-command arg)))
   (define-key typopunct-map "+" 'typopunct-insert-mp)
   (defconst typopunct-times (decode-char 'ucs #xD7))
@@ -156,35 +156,35 @@
     "Insert multiplication sign at ARG."
     (interactive "p")
     (if (and (= 1 arg) (looking-back "\\([[:blank:]]\\|^\\)\\^"))
-	(progn (delete-char -1)
-	       (insert typopunct-times))
+      (progn (delete-char -1)
+        (insert typopunct-times))
       (self-insert-command arg)))
   (define-key typopunct-map "x" 'typopunct-insert-times)
   (defadvice typopunct-insert-quotation-mark (around wrap-region activate)
     (let* ((lang (or (get-text-property (point) 'typopunct-language)
-		     typopunct-buffer-language))
-	   (omark (if single
-		      (typopunct-opening-single-quotation-mark lang)
-		    (typopunct-opening-quotation-mark lang)))
-	   (qmark (if single
-		      (typopunct-closing-single-quotation-mark lang)
-		    (typopunct-closing-quotation-mark lang))))
+                   typopunct-buffer-language))
+            (omark (if single
+                     (typopunct-opening-single-quotation-mark lang)
+                     (typopunct-opening-quotation-mark lang)))
+            (qmark (if single
+                     (typopunct-closing-single-quotation-mark lang)
+                     (typopunct-closing-quotation-mark lang))))
       (cond
-       (mark-active
-	(let ((skeleton-end-newline nil)
-	      (singleo (typopunct-opening-single-quotation-mark lang))
-	      (singleq (typopunct-closing-single-quotation-mark lang)))
-	  (if (> (point) (mark))
-	      (exchange-point-and-mark))
-	  (save-excursion
-	    (while (re-search-forward (regexp-quote (string omark)) (mark) t)
-	      (replace-match (regexp-quote (string singleo)) nil nil)))
-	  (save-excursion
-	    (while (re-search-forward (regexp-quote (string qmark)) (mark) t)
-	      (replace-match (regexp-quote (string singleq)) nil nil)))
-	  (skeleton-insert (list nil omark '_ qmark) -1)))
-       ((looking-at (regexp-opt (list (string omark) (string qmark))))
-	(forward-char 1))
-       (t ad-do-it)))))
+        (mark-active
+          (let ((skeleton-end-newline nil)
+                 (singleo (typopunct-opening-single-quotation-mark lang))
+                 (singleq (typopunct-closing-single-quotation-mark lang)))
+            (if (> (point) (mark))
+              (exchange-point-and-mark))
+            (save-excursion
+              (while (re-search-forward (regexp-quote (string omark)) (mark) t)
+                (replace-match (regexp-quote (string singleo)) nil nil)))
+            (save-excursion
+              (while (re-search-forward (regexp-quote (string qmark)) (mark) t)
+                (replace-match (regexp-quote (string singleq)) nil nil)))
+            (skeleton-insert (list nil omark '_ qmark) -1)))
+        ((looking-at (regexp-opt (list (string omark) (string qmark))))
+          (forward-char 1))
+        (t ad-do-it)))))
 (provide 'jf-fonts-and-iconography)
 ;;; jf-fonts-and-iconography.el ends here

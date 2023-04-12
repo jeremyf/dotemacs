@@ -5,12 +5,12 @@
 
 ;; This file is NOT part of GNU Emacs.
 
-;;; Commentary
+;;; Commentary:
 
 ;; Within this package are tools for highlighting and illuminating the current
 ;; moment.
 
-;;; Code
+;;; Code:
 (use-package expand-region
   ;; A simple package that does two related things really well; expands and
   ;; contracts the current region.  I use this all the time.
@@ -100,7 +100,7 @@
     (if (car parg)
 	(pulsar--pulse nil nil (point) (mark))
       (pulsar-pulse-line)))
-  :bind (("C-l" . jf/pulse)))
+  :bind (("C-c C-l" . jf/pulse)))
 
 (use-package rainbow-mode
   ;; When I toggle on Rainbow mode, it colorizes the text that is color names
