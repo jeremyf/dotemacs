@@ -224,6 +224,7 @@ method, get the containing class."
     (setq eldoc-documentation-strategy
       'eldoc-documentation-compose-eagerly))
   :config
+  (add-to-list 'eglot-stay-out-of 'flymake)
   (setq completion-category-overrides '((eglot (styles orderless))))
   (add-to-list 'eglot-server-programs
     `(ruby-mode . ("solargraph" "socket" "--port" :autoport)))

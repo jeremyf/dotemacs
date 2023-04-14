@@ -102,9 +102,15 @@
   ;;   5.  Save (via ~C-x C-s~) or Cancel (via ~C-c C-k~).
   :after (embark-consult ripgrep)
   :straight (:type git :host github :repo "jeremyf/Emacs-wgrep" :branch "main")
+  :preface
+  (defun jf/wgrep-finish-edit ()
+    "Finish a `wgrep' edit session."
+    (interactive)
+    (wgrep-finish-edit)
+    (call-interactively #'save-some-buffers))
   :bind (:map wgrep-mode-map
           ;; Added keybinding to echo Magit behavior
-          ("C-c C-c" . wgrep-finish-edit)
+          ("C-c C-c" . jf/wgrep-finish-edit)
           :map grep-mode-map
           ("e" . wgrep-change-to-wgrep-mode)
           :map ripgrep-search-mode-map

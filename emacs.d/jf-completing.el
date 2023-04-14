@@ -163,7 +163,7 @@
     "--glob !vendor/ --glob !coverage/ --glob !**/tmp/ --glob !**/log/ "
     "--glob !public/ --glob !node_modules/ --glob !.git/ --glob !doc/ "
     "--glob !.yardoc/ "
-    "--line-number ."))
+    "--line-number "))
   ;; Configure other variables and modes in the :config section,
   ;; after lazily loading the package.
   :preface
@@ -174,14 +174,14 @@
     (org-clock-load)
     (save-window-excursion
       (consult-org-heading
-       match
-       (or scope
-           (thread-last org-clock-history
-      (mapcar 'marker-buffer)
-      (mapcar 'buffer-file-name)
-      (delete-dups)
-      (delq nil))
-           (user-error "No recent clocked tasks")))
+        match
+        (or scope
+          (thread-last org-clock-history
+            (mapcar 'marker-buffer)
+            (mapcar 'buffer-file-name)
+            (delete-dups)
+            (delq nil))
+          (user-error "No recent clocked tasks")))
       (org-clock-in nil (when resolve
                           (org-resolve-clocks)
                           (org-read-date t t)))))
