@@ -97,16 +97,12 @@
         org-directory
         "/captured-notes.org")
   org-log-done 'time
-  org-todo-keywords '((type "TODO(t)"
-          "IN-PROGRESS(i!)"
-          "BLOCKED(b@/!)"
-          "IN-REVIEW(r!)"
-          "|"
-          "DONE(d!)"
-          "DELEGATED(g@/!)"
-          "HOLD(h@/!)"
-          "SENT-FORWARD(s!)"
-          "CANCELLED(c@)")))
+    org-todo-keywords '((type "TODO(t)"
+                          "STARTED(s!)"
+                          "|"
+                          "WAITING(w@/!)"
+                          "CANCELED(c@/!)"
+                          "DONE(d!)")))
   (setq org-capture-templates
   '(("@"
      "All Todo"
@@ -119,7 +115,7 @@
      plain (file+function
       jf/primary-agenda-filename-for-machine
       jf/org-mode-agenda-find-blocked-node)
-     "***** BLOCKED %^{Describe the blocker} :blocker:"
+     "***** WAITING %^{Describe the blocker} :blocker:"
      :immediate-finish t
      :jump-to-captured t
      :empty-lines-after 1)
@@ -147,7 +143,7 @@
      plain (file+function
       jf/primary-agenda-filename-for-machine
       jf/org-mode-agenda-find-merge-request-node)
-     "***** IN-PROGRESS %^{URL of Merge Request} :mergerequest:"
+     "***** WAITING %^{URL of Merge Request} :mergerequest:"
      :immediate-finish t
      :jump-to-captured t
      :empty-lines-after 1
@@ -168,7 +164,7 @@
       jf/org-mode-agenda-find-project-node)
      ;; The five ***** is due to the assumptive depth of the projects and
      ;; tasks.
-     "***** TODO %^{Describe the task} :tasks:\n\n"
+     "***** %^{State|STARTED|TODO} %^{Describe the task} :tasks:\n\n"
      :jump-to-captured t
      :immediate-finish t
      :clock-in t)))
