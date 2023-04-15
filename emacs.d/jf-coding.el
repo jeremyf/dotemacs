@@ -479,6 +479,11 @@ See `add-log-current-defun-function'."
   :straight t
   :commands (devdocs-install))
 
+(use-package flymake
+  :straight t
+  ;; Don't be so hasty in syntax checking.
+  :custom (flymake-no-changes-timeout 3))
+
 (defun jf/prog-mode-configurator ()
   "Do the configuration of all the things."
   ;; (electric-pair-mode)
@@ -486,6 +491,22 @@ See `add-log-current-defun-function'."
   (which-function-mode))
 
 (add-hook 'prog-mode-hook #'jf/prog-mode-configurator)
+
+;; From https://emacs.dyerdwelling.family/emacs/20230414111409-emacs--indexing-emacs-init/
+;;
+;; Creating some outline modes.  Which has me thinking about an outline mode for
+;; my agenda file.
+(add-hook 'emacs-lisp-mode-hook
+  (lambda ()
+    (setq imenu-sort-function 'imenu--sort-by-name)
+    (setq imenu-generic-expression
+      '((nil "^;;[[:space:]]+-> \\(.*\\)$" 1)
+         ("defun" "^.*([[:space:]]*\\(cl-\\)?defun[[:space:]]+\\([^(]+\\)" 2)
+         ("macro" "^.*([[:space:]]*\\(cl-\\)?defmacro[[:space:]]+\\([^(]+\\)" 2)
+         ("vars" "^.*([[:space:]]*def\\(var|custom|constant\\)[[:space:]]+\\([^(]+\\)" 2)
+         ("bind-key" "^.*([[:space:]]*bind-key[[:space:]]+\"\\([^\"]+\\)" 1)
+         ("use-package" "^.*([[:space:]]*use-package[[:space:]]+\\([[:word:]-]+\\)" 1)))
+    (imenu-add-menubar-index)))
 
 (provide 'jf-coding)
 ;;; jf-coding.el ends here
