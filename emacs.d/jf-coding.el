@@ -495,7 +495,6 @@ See `add-log-current-defun-function'."
     (flymake-mode 1)
     (which-function-mode)))
 
-
 ;; From https://emacs.dyerdwelling.family/emacs/20230414111409-emacs--indexing-emacs-init/
 ;;
 ;; Creating some outline modes.  Which has me thinking about an outline mode for
@@ -507,7 +506,6 @@ See `add-log-current-defun-function'."
       '((nil "^;;[[:space:]]+-> \\(.*\\)$" 1)
          ("defun" "^.*([[:space:]]*\\(cl-\\)?defun[[:space:]]+\\([^(]+\\)" 2)
          ("macro" "^.*([[:space:]]*\\(cl-\\)?defmacro[[:space:]]+\\([^(]+\\)" 2)
-         ("vars" "^.*([[:space:]]*def\\(var|custom|constant\\)[[:space:]]+\\([^(]+\\)" 2)
          ("use-package" "^.*([[:space:]]*use-package[[:space:]]+\\([[:word:]-]+\\)" 1)))
     (imenu-add-menubar-index)))
 
