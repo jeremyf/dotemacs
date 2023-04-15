@@ -5,7 +5,7 @@
 
 ;; This file is NOT part of GNU Emacs.
 
-;;; Commentary
+;;; Commentary:
 
 ;; Coding is writing, but not all writing is coding.  This configures and
 ;; extends packages specifically here for helping with my coding activities.
@@ -485,13 +485,16 @@ See `add-log-current-defun-function'."
   ;; Don't be so hasty in syntax checking.
   :custom (flymake-no-changes-timeout 3))
 
-(defun jf/prog-mode-configurator ()
-  "Do the configuration of all the things."
-  ;; (electric-pair-mode)
-  (flymake-mode 1)
-  (which-function-mode))
+(use-package prog-mode
+  :straight (:type built-in)
+  :hook (prog-mode . jf/prog-mode-configurator)
+  :preface
+  (defun jf/prog-mode-configurator ()
+    "Do the configuration of all the things."
+    ;; (electric-pair-mode)
+    (flymake-mode 1)
+    (which-function-mode)))
 
-(add-hook 'prog-mode-hook #'jf/prog-mode-configurator)
 
 ;; From https://emacs.dyerdwelling.family/emacs/20230414111409-emacs--indexing-emacs-init/
 ;;
@@ -505,7 +508,6 @@ See `add-log-current-defun-function'."
          ("defun" "^.*([[:space:]]*\\(cl-\\)?defun[[:space:]]+\\([^(]+\\)" 2)
          ("macro" "^.*([[:space:]]*\\(cl-\\)?defmacro[[:space:]]+\\([^(]+\\)" 2)
          ("vars" "^.*([[:space:]]*def\\(var|custom|constant\\)[[:space:]]+\\([^(]+\\)" 2)
-         ("bind-key" "^.*([[:space:]]*bind-key[[:space:]]+\"\\([^\"]+\\)" 1)
          ("use-package" "^.*([[:space:]]*use-package[[:space:]]+\\([[:word:]-]+\\)" 1)))
     (imenu-add-menubar-index)))
 
