@@ -270,6 +270,7 @@ method, get the containing class."
 (use-package ruby-mode
   ;; My language of choice for professional work.
   :straight (:type built-in)
+  :custom (ruby-flymake-use-rubocop-if-available nil)
   :bind
   (:map ruby-mode-map (("C-M-h" . jf/treesit/function-select)
                         ("C-c C-f" . jf/treesit/qualified_method_name)))
