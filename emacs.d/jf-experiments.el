@@ -41,8 +41,5 @@
   (require 'org-tufte)
   (setq org-tufte-htmlize-code t))
 
-;; Let's give the more fluid scrolling a chance
-
-
 (provide 'jf-experiments)
 ;;; jf-experiments.el ends here
