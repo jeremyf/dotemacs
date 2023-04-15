@@ -50,7 +50,8 @@ setting up an IDE-like layout)."
                    :side (pcase current-prefix-arg
                            ('nil 'right)
                            ('(4) 'left)
-                           (_ (intern (completing-read "Side: " '(left right top bottom) nil t))))
+                           (_ (intern (completing-read "Side: "
+                                        '(left right top bottom) nil t))))
                    :size (pcase current-prefix-arg
                            ('nil 0.4)
                            ('(4) 0.4)
@@ -64,14 +65,19 @@ setting up an IDE-like layout)."
                              ('right 'window-width)
                              ('left 'window-width)
                              (_ 'window-height))))
-      (pop-to-buffer buffer
+      ;; Question: Do I assume that I'll be focused in that new window?  If so,
+      ;; consider `pop-to-buffer'.  Otherwise `display-buffer' will open the
+      ;; buffer but leave focus in the originating window.
+      (display-buffer buffer
         `(display-buffer-in-side-window
            (,size-direction . ,size)
            (side . ,side)
            (slot . ,slot)
              (window-parameters
                (mode-line-format . (" %b"))
-               (no-delete-other-windows . t)))))))
+               (no-delete-other-windows . t))))
+      ;; The pulse makes sense when I'm using `display-buffer'.
+      (pulsar-pulse-line-green))))
 
 ;; Show tabs as they are tricky little creatures
 (defface jf/tabs-face '((default :inherit font-lock-misc-punctuation-face))
