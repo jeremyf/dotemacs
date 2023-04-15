@@ -18,72 +18,60 @@
   :straight (:type built-in)
   :custom
   (display-buffer-alist
-   '(;; no windows
-     ("\\`\\*Async Shell Command\\*\\'"
-      (display-buffer-no-window))
-     ;; I like the slide out window for this "context-type menus"
-     ("\\*\\(eldoc\\|Ilist\\|Embark Actions\\|helpful .*\\)\\*"
-      (display-buffer-in-side-window)
-      (window-width . 0.5)
-      (side . right)
-      (slot . 0)
-      (window-parameters . ((mode-line-format . (" %b")))))
-     ("*Register Preview*" (display-buffer-reuse-window))
-     ;; Maybe I want re-use
-     (t (display-buffer-reuse-window display-buffer-same-window))
-     ;; These I want as part of the "default" windowing experience
-     ;; ("\\*\\(elfeed\\|scratch\\).*"
-     ;;  (display-buffer-same-window))
-     ;; ;; Side Left
-     ;; ;;
-     ;; ;; I'd been using bufler with tabs.  However the tab behavior is not
-     ;; ;; something that I regularly leverage; in part because tab grouping is not
-     ;; ;; as predictable as I'd like.
-     ;; ("\\*Bufler\\*"
-     ;;  (display-buffer-in-side-window)
-     ;;  (window-width . 0.67)
-     ;;  (dedicated . t)
-     ;;  (window-parameters . ((mode-line-format . ("Select a Buffer"))))
-     ;;  (side . left)
-     ;;  (slot . 0))
-     ;; ;; Side Right
-     ;; ;;
-     ;; ;; Windows that provide supplementary context for the initiating buffer.
+    '(;; no windows
+       ("\\`\\*Async Shell Command\\*\\'"
+         (display-buffer-no-window))
+       ;; I like the slide out window for this "context-type menus"
+       ("\\*\\(eldoc\\|Ilist\\|Embark Actions\\|helpful .*\\)\\*"
+         (display-buffer-in-side-window)
+         (window-width . 0.4)
+         (side . right)
+         (slot . 0)
+         (window-parameters . ((mode-line-format . (" %b")))))
+       ("*Register Preview*" (display-buffer-reuse-window))))
+  :bind ("s-\\" . #'jf/side-window-toggle)
+  :preface
+  (cl-defun jf/side-window-toggle ()
+    "Either bury the dedicated buffer or open one based on `current-buffer'."
+    (interactive)
+    (if (window-dedicated-p)
+      (bury-buffer)
+      (call-interactively #'jf/display-buffer-in-side-window)))
+  ;; Inspired by
+  ;; https://www.reddit.com/r/emacs/comments/12l6c19/comment/jg98fk4/
+  (cl-defun jf/display-buffer-in-side-window (&optional (buffer (current-buffer))
+                                               &key (side 'right) (size 0.4) (slot 0))
+    "Display BUFFER in dedicated side window.
 
-     ;; ("\\*Embark Export.*"
-     ;;  (display-buffer-in-side-window)
-     ;;  (window-width . 0.4)
-     ;;  (dedicated . t)
-     ;;  (side . right)
-     ;;  (slot . 1))
-     ;; ;; Side bottom
-     ;; ;;
-     ;; ("\\*\\(Org Select\\)\\*" ; the `org-capture' key selection
-     ;;  (display-buffer-in-side-window)
-     ;;  (dedicated . t)
-     ;;  (side . bottom)
-     ;;  (slot . -1)
-     ;;  (window-height . fit-window-to-buffer))
-     ;; ;; Pop a new frame
-     ;; ((or . ((derived-mode . Man-mode)
-     ;;              (derived-mode . woman-mode)
-     ;;              "\\*\\(Man\\|woman\\).*"))
-     ;;       (display-buffer-reuse-window display-buffer-pop-up-frame)
-     ;;       (pop-up-frame-parameters . ((width . (text-pixels . 640))
-     ;;                                   (height . (text-pixels . 640)))))
-     ;; ("\\*\\(Agenda Commands\\|Embark Actions\\|Org Agenda\\)\\*"
-     ;;       (display-buffer-reuse-mode-window display-buffer-at-bottom)
-     ;;       (window-height . fit-window-to-buffer)
-     ;;       (window-parameters . ((no-other-window . t)
-     ;;                             ;; (mode-line-format . none)
-     ;;          )))
-     ;; ;; The junk drawer of *something* buffers.
-     ;; ("\\*.*\\*"
-     ;;  (display-buffer-in-side-window)
-     ;;  (window-height . 0.40)
-     ;;  (side . bottom)
-     ;;  (slot . 0))
-     )))
+With universal prefix, use left SIDE instead of right.  With two
+universal prefixes, prompt for SIDE and SLOT and SIZE (which allows
+setting up an IDE-like layout)."
+    (interactive (list (current-buffer)
+                   :side (pcase current-prefix-arg
+                           ('nil 'right)
+                           ('(4) 'left)
+                           (_ (intern (completing-read "Side: " '(left right top bottom) nil t))))
+                   :size (pcase current-prefix-arg
+                           ('nil 0.4)
+                           ('(4) 0.4)
+                           (_ (read-number "Size: " 0.4)))
+                   :slot (pcase current-prefix-arg
+                           ('nil 0)
+                           ('(4) 0)
+                           (_ (read-number "Slot: ")))))
+    (let ((display-buffer-mark-dedicated t)
+           (size-direction (pcase side
+                             ('right 'window-width)
+                             ('left 'window-width)
+                             (_ 'window-height))))
+      (pop-to-buffer buffer
+        `(display-buffer-in-side-window
+           (,size-direction . ,size)
+           (side . ,side)
+           (slot . ,slot)
+             (window-parameters
+               (mode-line-format . (" %b"))
+               (no-delete-other-windows . t)))))))
 
 ;; Show tabs as they are tricky little creatures
 (defface jf/tabs-face '((default :inherit font-lock-misc-punctuation-face))
@@ -187,81 +175,6 @@
     (modus-themes-load-theme 'modus-operandi-tinted)))
 
 (jf/emacs-theme-by-osx-appearance)
-
-;;;; Buffers and Tabs
-
-;; (use-package bufler
-;;   ;; https://github.com/alphapapa/bufler.el
-;;   ;; Why this instead of Centaur Tabs?  `bufler' integrates with `tab-bar-mode'
-;;   ;; and `tab-lines-mode'.  Why is this important?  Because `centaur-tabs-mode'
-;;   ;; hack the buffer to add the tabs; the impact was that popped buffers would
-;;   ;; have sizing issues.
-;;   :straight t
-;;   :hook (after-init . (bufler-mode))
-;;   :custom (bufler-columns '("Name" "VC" "Path"))
-;;   :config
-;;   (defun jf/bufler/tab-configuration ()
-;;     (bufler-tabs-mode 1)
-;;     (tab-bar-mode -1)
-;;     (bufler-workspace-tabs))
-;;   (setq tab-line-switch-cycling t)
-;;   (defun jf/bufler-workspace-mode-lighter ()
-;;     "Return the lighter string mode line."
-;;     "Bflr")
-;;   (advice-add #'bufler-workspace-mode-lighter
-;;        :override #'jf/bufler-workspace-mode-lighter
-;;        '((name . "wrapper")))
-;;   ;; Ensuring that when I make a selection, it closes the bufler buffer.
-;;   (defun jf/bufler-list-buffer-switch (&rest args)
-;;     (kill-buffer "*Bufler*"))
-;;   (advice-add 'bufler-list-buffer-switch :after 'jf/bufler-list-buffer-switch)
-;;   :bind (:map bufler-list-mode-map
-;;        ("s-3" . quit-window)
-;;        ("s-\\" . quit-window))
-;;   :bind (("s-3" . bufler-switch-buffer)
-;;   ("s-\\" . bufler-sidebar)
-;;   ;; ("s-\\" . jf/tab-bar-switch-prompt-for-tab)
-;;   ;; ("s-]" . tab-line-switch-to-next-tab)
-;;   ;; ("s-}" . tab-line-switch-to-next-tab)
-;;   ;; ("s-[" . tab-line-switch-to-prev-tab)
-;;   ;; ("s-{" . tab-line-switch-to-prev-tab)
-;;   ))
-
-;; (defun jf/tab-bar-switch-to-next-tab ()
-;;   "Move to the next `tab-bar' tab and open the first buffer."
-;;   (interactive)
-;;   (call-interactively 'tab-bar-switch-to-next-tab)
-;;   (jf/tab-bar-activate-first-buffer))
-
-;; (defun jf/tab-bar-switch-to-prev-tab ()
-;;   "Move to the previous `tab-bar' tab and open the first buffer."
-;;   (interactive)
-;;   (call-interactively 'tab-bar-switch-to-prev-tab)
-;;   (jf/tab-bar-activate-first-buffer))
-
-;; (defun jf/tab-bar-activate-first-buffer ()
-;;   "Switch to the first buffer in this buffer group.
-
-;;   This is cribbed from `bufler-switch-buffer'."
-;;   (let* ((path (frame-parameter nil 'bufler-workspace-path))
-;;   (buffers (bufler-buffer-alist-at
-;;                    path :filter-fns bufler-workspace-switch-buffer-filter-fns)))
-;;     (switch-to-buffer (caar buffers)))
-;;   ;; A hack to ensure that I have the top tabs; I don't need it because I could
-;;   ;; use `jf/tab-bar-switch-prompt-for-tab'.
-;;   (jf/bufler/tab-configuration))
-
-;; (defun jf/tab-bar-switch-prompt-for-tab (name)
-;;   "Switch to the NAME tab and prompt for a buffer."
-;;   (interactive
-;;    (let* ((recent-tabs (mapcar (lambda (tab)
-;;                                  (alist-get 'name tab))
-;;                                (bufler-workspace-tabs))))
-;;      (list (completing-read "Select tab-bar: "
-;;                             recent-tabs nil nil nil nil recent-tabs))))
-;;   (tab-bar-select-tab (1+ (or (tab-bar--tab-index-by-name name) 0)))
-;;   (bufler-switch-buffer)
-;;   (jf/bufler/tab-configuration))
 
 (provide 'jf-windows)
 ;;; jf-windows.el ends here
