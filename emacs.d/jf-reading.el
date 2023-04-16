@@ -4,9 +4,9 @@
 ;; Author: Jeremy Friesen <jeremy@jeremyfriesen.com>
 
 ;; This file is NOT part of GNU Emacs.
-;;; Commentary
+;;; Commentary:
 
-;;; Code
+;;; Code:
 (use-package doc-view
   ;; A package for improving the in Emacs viewing experience of PDFs.
   :straight (doc-view :type built-in)
@@ -27,17 +27,17 @@
   :config
   (setq-default elfeed-search-filter "@2-days-ago +unread ")
   :bind ((:map elfeed-search-mode-map
-	       ("q" . jf/elfeed-save-db-and-bury))))
+         ("q" . jf/elfeed-save-db-and-bury))))
 
 (defun jf/elfeed-save-db-and-bury ()
-  "Wrapper to save the elfeed db to disk before burying buffer"
+  "Wrapper to save the elfeed db to disk before burying buffer."
   ;;write to disk when quiting
   (interactive)
   (elfeed-db-save)
   (quit-window))
 
 (defun jf/elfeed-load-db-and-open ()
-  "Load the elfeed db from disk before opening"
+  "Load the elfeed db from disk before opening."
   (interactive)
   (elfeed)
   (elfeed-update)
@@ -47,8 +47,9 @@
 
 ;; From https://karthinks.com/blog/lazy-elfeed/
 (defun elfeed-search-show-entry-pre (&optional lines)
-  "Returns a function to scroll forward or back in the Elfeed
-  search results, displaying entries without switching to them."
+  "Return a function that will scroll n LINES in `elfeed' search results.
+
+It will display entries without switching to them."
   (lambda (times)
     (interactive "p")
     (forward-line (* times (or lines 0)))
@@ -111,16 +112,16 @@ Alternative suggestions are: - '(\"\\\"“\" . \"\\\"\")"
   ;; Drawing inspiration from shr-tag-abbr
   (defun shr-tag-time (dom)
     (when-let* ((datetime (or
-			   (dom-attr dom 'title)
-			   (dom-attr dom 'datetime)))
-		(start (point)))
+         (dom-attr dom 'title)
+         (dom-attr dom 'datetime)))
+    (start (point)))
       (shr-generic dom)
       (shr-add-font start (point) 'shr-time)
       (add-text-properties
        start (point)
        (list
-	'help-echo datetime
-	'mouse-face 'highlight))))
+  'help-echo datetime
+  'mouse-face 'highlight))))
 
 
   ;; EWW lacks a style for article
