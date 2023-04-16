@@ -15,7 +15,7 @@
 ;; org-mode” files.  The `jf/org-agenda-files' reads the file system to gather
 ;; sources for `org-mode' agenda.
 (defun jf/is-work-machine? ()
-  "Am I working on my company machine machine"
+  "Am I working on my company machine machine."
   (string= (getenv "USER") "jeremy"))
 
 (defvar jf/org-mode/capture/filename
@@ -245,7 +245,7 @@ By default this is my example code project.")
 ;; From https://oremacs.com/2017/10/04/completion-at-point/
 (defun jf/org-completion-symbols ()
   "Look for \"=word=\" and allow completion of things like \"=wo\"."
-  (when (looking-back "=[a-zA-Z]+")
+  (when (looking-back "=[a-zA-Z]+" (point))
     (let (cands)
       (save-match-data
   (save-excursion
@@ -259,7 +259,7 @@ By default this is my example code project.")
 
 (defun jf/org-completion-abbreviations ()
   "Look for \"[[abbr...][word]]\" and allow completion of things like \" word\"."
-  (when (looking-back " [a-zA-Z1-9]+")
+  (when (looking-back " [a-zA-Z1-9]+" (point))
     (let (cands)
       (save-match-data
   (save-excursion
@@ -282,14 +282,16 @@ By default this is my example code project.")
          #'cape-dabbrev
          #'cape-dict
          #'cape-history))))
-(defun jf/org-confirm-babel-evaluate (lang body) nil)
+(defun jf/org-confirm-babel-evaluate (lang body)
+  "Regardless of LANG and BODY approve it."
+  nil)
 
 ;;; Additionally Functionality for Org Mode
 ;; Cribbed from https://xenodium.com/emacs-dwim-do-what-i-mean/
 (defun jf/org-insert-link-dwim (parg &rest args)
   "Like `org-insert-link' but with personal dwim preferences.
 
-  With PARG, skip personal dwim preferences."
+  With PARG, skip personal dwim preferences.  Pass ARGS."
   (interactive "P")
   (let* ((point-in-link (org-in-regexp org-link-any-re 1))
    (clipboard-url (when (string-match-p "^http" (current-kill 0))
@@ -322,13 +324,13 @@ By default this is my example code project.")
 ;; I work on several different projects each day; helping folks get unstuck.  I
 ;; also need to track and record my time.
 (bind-key "C-c C-j" 'jf/org-mode/jump-to-agenda-or-mark)
-(cl-defun jf/org-mode/jump-to-agenda-or-mark (prefix-arg)
+(cl-defun jf/org-mode/jump-to-agenda-or-mark (parg)
   "Jump to and from current agenda item to mark.
 
-  With PREFIX_ARG go to beginning of today's headline."
+  With PARG go to beginning of today's headline."
   (interactive "P")
   (require 'org-capture)
-  (if (car prefix-arg)
+  (if (car parg)
       ;; Jump to where we would put a project were we to capture it.
       (org-capture-goto-target "p")
     (if (string= (buffer-file-name) (file-truename
@@ -367,8 +369,9 @@ By default this is my example code project.")
      (project (jf/org-mode-agenda-project-prompt))
      ;; The `file+olp+datetree` directive creates a headline like “2022-09-03 Saturday”.
      (within_headline (format-time-string "%Y-%m-%d %A")))
-  "Find and position the cursor at the end of
-    the given PROJECT WITHIN_HEADLINE."
+  "Position `point' at the end of the given PROJECT WITHIN_HEADLINE.
+
+And use the given TAG."
   ;; We need to be using the right agenda file.
   (with-current-buffer (find-file-noselect
       jf/primary-agenda-filename-for-machine)
@@ -406,7 +409,7 @@ By default this is my example code project.")
     (goto-char existing-position)
   (progn
     ;; Go to the end of the file and append the project to the end
-    (end-of-buffer)
+    (goto-char (point-max))
     ;; Ensure we have a headline for the given day
     (unless (org-element-map
           (org-element-parse-buffer)
@@ -439,7 +442,7 @@ By default this is my example code project.")
 (defun jf/org-mode-agenda-to-stand-up-summary (parg)
   "Copy to the kill ring the day's time-tracked summary.
 
-When given PREFIX-ARG, prompt for the day of interest.
+When given PARG, prompt for the day of interest.
 
 NOTE: This follows the convention that projects are on headline 4 and
 tasks within projects are headline 5."
@@ -486,7 +489,7 @@ tasks within projects are headline 5."
                        (org-read-date nil nil nil "Pick a day:")
                        (format-time-string "%Y-%m-%d"))))
   (widen)
-  (end-of-buffer)
+  (goto-char (point-max))
   (re-search-backward (concat "^\*\*\* " date))
   (end-of-line)
   (org-narrow-to-subtree)
@@ -512,15 +515,14 @@ for the week."
 ;; =org-clock-report=, I want to copy the headlines of each of the tasks.  I
 ;; fill out my time sheets one day at a time.
 (defun jf/org-mode-time-entry-for-project-and-day ()
-  "Function to help report time for Scientist.com
+  "Function to help report time for Scientist.com.
 
 Assumes that I'm on a :projects: headline.
 
 - Sum the hours (in decimal form) for the tasks.
 - Create a list of the tasks.
 - Write this information to the message buffer.
-- Then move to the next heading level.
-"
+- Then move to the next heading level."
   (interactive)
   (let* ((project (plist-get (cadr (org-element-at-point)) :raw-value))
    (tasks (s-join "\n"
@@ -614,8 +616,7 @@ Assumes that I'm on a :projects: headline.
        '("linkToSeries" . "@@hugo:{{< linkToSeries \"@@$1@@hugo:\" >}}@@"))'
 
 (defun jf/org-link-delete-link ()
-  "Remove the link part of an org-mode link at point and keep
-only the description"
+  "Remove the link part of `org-mode' keeping only description."
   (interactive)
   (let ((elem (org-element-context)))
     (when (eq (car elem) 'link)
@@ -770,10 +771,12 @@ When given the PREFIX arg, paste the content into TextEdit (for future copy)."
   ))))
 
 ;; https://www.reddit.com/r/emacs/comments/yjobc2/what_method_do_you_use_to_create_internal_links/
-(defun jf/org-parse-headline (x)
-  (plist-get (cadr x) :raw-value))
+(defun jf/org-parse-headline (headline)
+  "Raw value of the given HEADLINE plist."
+  (plist-get (cadr headline) :raw-value))
 
 (defun jf/org-get-headlines ()
+  "Get a plist of `org-mode' headlines within the current buffer."
   (org-element-map (org-element-parse-buffer)
       'headline #'jf/org-parse-headline))
 
@@ -789,7 +792,7 @@ When given the PREFIX arg, paste the content into TextEdit (for future copy)."
 
 (cl-defun jf/org-mode/capture/prompt-for-example
     (&optional given-mode &key (tag "example"))
-  "Prompt for the GIVEN-MODE example."
+  "Prompt for the GIVEN-MODE example with given TAG."
   (let* ((mode (or given-mode (completing-read "Example:"
                  '("Existing" "New" "Stored")))))
     (cond
@@ -834,11 +837,11 @@ When given the PREFIX arg, paste the content into TextEdit (for future copy)."
      (headline (jf/org-mode/capture/prompt-for-example))
      (tag "code")
      (depth 3))
-  "Find and position the cursor at the end of HEADLINE.
+  "Position `point' at the end of HEADLINE.
 
-The HEADLINE must have the given TAG and be a descendent of the
-given PARENT_HEADLINE.  If the HEADLINE does not exist, write it
-at the end of the file."
+The HEADLINE must have the given TAG and be at the given DEPTH
+and be a descendent of the given PARENT_HEADLINE.  If the
+HEADLINE does not exist, write it at the end of the file."
   ;; We need to be using the right agenda file.
   (with-current-buffer (find-file-noselect jf/org-mode/capture/filename)
     (setq jf/org-mode/capture/stored-context headline)
@@ -929,7 +932,7 @@ The return value is a list of `cons' with the `car' values of:
       ("block-text" . , code-snippet))))
 
 (defun jf/org-mode/capture/parameters (prefix)
-  "A logic lookup table by prefix."
+  "A logic lookup table by PREFIX."
   (cond
    ;; When we're clocking and no prefix is given...
    ((and (= 1 prefix) (fboundp 'org-clocking-p) (org-clocking-p))
