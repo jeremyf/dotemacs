@@ -4,8 +4,9 @@
 ;; Author: Jeremy Friesen <jeremy@jeremyfriesen.com>
 
 ;; This file is NOT part of GNU Emacs.
+;;; Commentary:
 
-;;; Code
+;;; Code:
 
 ;;;; Dependencies
 (require 'jf-minor-mode-maker)
@@ -23,10 +24,10 @@
   (defun jf/roll-expression-dwim (expression &optional)
     "Roll the EXPRESSION, check `thing-at-point' then prompt."
     (interactive (list (if (string-match
-			    "[dD][0-9]"
-			    (format "%s" (thing-at-point 'sexp t)))
-			   (thing-at-point 'sexp t)
-			 (read-string "Dice Expression: "))))
+          "[dD][0-9]"
+          (format "%s" (thing-at-point 'sexp t)))
+         (thing-at-point 'sexp t)
+       (read-string "Dice Expression: "))))
     (-let* (((rolls . result) (org-d20--roll expression)))
       (message "%s => %s" expression result)))
   :straight (org-d20 :host github :repo "spwhitton/org-d20"))
@@ -40,13 +41,13 @@
     ))
 ;;;; Burning Wheel Code
 (jf/minor-mode-maker :title "Burning Wheel Gold"
-		     ;; Being a programmer and someone who plays table top
-		     ;; role-playing games (TTRPG), I’ve often used the TTRPG
-		     ;; rules-set or systems to explore programming languages
-		     ;; and processes.  After all, I understand the TTRPG rules
-		     ;; well enough (or the algorithm’s description) that I can
-		     ;; spend time thinking through my approach in a
-		     ;; programming language.
+         ;; Being a programmer and someone who plays table top
+         ;; role-playing games (TTRPG), I’ve often used the TTRPG
+         ;; rules-set or systems to explore programming languages
+         ;; and processes.  After all, I understand the TTRPG rules
+         ;; well enough (or the algorithm’s description) that I can
+         ;; spend time thinking through my approach in a
+         ;; programming language.
                      :abbr "bwg"
                      :hooks (list 'org-mode-hook 'markdown-mode-hook))
 
@@ -277,12 +278,12 @@ Note, this assumes Black or Grey shade only."
                                     :scale scale))))
 
 (cl-defun jf/bwg-qh-ptgs--render-popup (&key power forte round-up scale)
-  "Render PTGS help for given POWER, FORTE, ROUND-UP, and SCALE
+  "Render PTGS help for given POWER, FORTE, ROUND-UP, and SCALE.
 
   Where SCALE is a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
   (jf/quick-help
    :header (concat "BWG PTGS (p98, p546) Forte:"
-		   forte ", Power: " power (when round-up " (Rounded up)"))
+       forte ", Power: " power (when round-up " (Rounded up)"))
    :body (format (concat
                   "Su %s; Li %s; Mi %s; Se %s; Tr %s; Mo %s"
                   "\n\nForte: %s\nPower: %s"
@@ -297,11 +298,11 @@ Note, this assumes Black or Grey shade only."
                  (upcase power))))
 
 (cl-defun jf/bwg-qh-ptgs--shade-black (forte power
-					     &optional round-up
-					     &key (add 0))
+               &optional round-up
+               &key (add 0))
   "Calculate Black shade PTGS (BWGR p98, p546).
 
-This requires FORTE, POWER, and ROUND-UP.
+This requires FORTE, POWER, ROUND-UP, and ADD.
 
 Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
   (interactive "nForte: \nnPower: \nP")
@@ -355,12 +356,11 @@ Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
   ;; see what other lifepaths are of comparable station (a common need when
   ;; testing Circles).
   "~/git/org/assets/burning-wheel.html"
-  "The path to an HTML")
+  "The path to an HTML.")
 
 (defconst jf/bwg-lifepath--narrowing-regexp
   "data-lifepath="
-  "All lines in `jf/bwg-lifepath--path-to-html-file' that have this substring
- contain filterable data.")
+  "All lines in `jf/bwg-lifepath--path-to-html-file' that have this substring contain filterable data.")
 
 (global-set-key (kbd "C-M-s-b") 'jf/menu--bwg)
 (transient-define-prefix jf/menu--bwg ()

@@ -4,11 +4,11 @@
 ;; Author: Jeremy Friesen <jeremy@jeremyfriesen.com>
 
 ;; This file is NOT part of GNU Emacs.
-;;; Commentary
+;;; Commentary:
 
 ;; Packages specifically here for helping with my writing activities.
 
-;;; Code
+;;; Code:
 (require 'ox)
 
 (require 'jf-formatting)

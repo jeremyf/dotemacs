@@ -10,7 +10,8 @@
 ;;
 ;; This package provides a simple way to register quick help function.
 
-;;; Code
+;;; Code:
+(require 'cl-lib)
 (cl-defun jf/quick-help (&key header body)
   "Create a help window with HEADER and BODY."
   (let ((qh-buff (concat "*Quick Help: " header "*")))

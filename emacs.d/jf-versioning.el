@@ -4,9 +4,9 @@
 ;; Author: Jeremy Friesen <jeremy@jeremyfriesen.com>
 
 ;; This file is NOT part of GNU Emacs.
-;;; Commentary
+;;; Commentary:
 
-;;; Code
+;;; Code:
 (use-package git-modes
   ;; A mode for editing gitconfig files.
   :straight t)
