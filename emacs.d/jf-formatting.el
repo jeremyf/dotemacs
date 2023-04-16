@@ -5,13 +5,13 @@
 
 ;; This file is NOT part of GNU Emacs.
 
-;;; Commentary
+;;; Commentary:
 
 ;; This package is on shaky grounds; I don't know if it makes sense.  There's
 ;; whitespace and sentence considerations.  There's also `htmlize' which is for
 ;; exporting a region as markdown or HTML.
 
-;;; Code
+;;; Code:
 
 (use-package ws-butler
   ;; Keep white space tidy.
@@ -22,9 +22,9 @@
   ;; `fill-sentences-correctly-mode' ensures that `fill-paragraph' (e.g. M-q)
   ;; preserves two spaces.
   :straight (fill-sentences-correctly
-	     :host github
-	     :repo "duckwork/fill-sentences-correctly.el")
-  :hook (fundamental-mode . fill-sentences-correctly-mode))
+       :host github
+       :repo "duckwork/fill-sentences-correctly.el")
+  :config (fill-sentences-correctly-mode))
 
 (use-package tomelr
   ;; Emacs-Lisp Library for converting S-expressions to TOML.  I'll likely be

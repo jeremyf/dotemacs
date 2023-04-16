@@ -111,7 +111,7 @@
 (use-package rainbow-delimiters
   ;; A quick and useful visual queue for paranthesis.
   :straight t
-  :hook ((fundamental-mode) . rainbow-delimiters-mode))
+  :hook ((prog-mode) . rainbow-delimiters-mode))
 
 (use-package recursion-indicator
   ;; I vascilate between yes and no; but invariably find myself stuck in a
