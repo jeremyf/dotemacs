@@ -145,14 +145,14 @@ CONTENTS is nil.  INFO is a plist holding contextual information."
         :value (or default (read-from-minibuffer (format "%s: " key)))))))
 
 (cl-defun jf/export-org-to-tor--global-buffer-prop-set (&key key value)
-  "Set the global property named KEY to the VALUE for the current buffer"
+  "Set the global property named KEY to the VALUE for the current buffer."
   (goto-char (point-min))
   (forward-line 4)
   (insert (format "\n#+%s: %s" (upcase key) value)))
 
 (defvar jf/tor-session-report-location
   '("around the table" "via Zoom" "via Discord and Roll20" "via Discord" "in my living room")
-  "TakeOnRules session report locations")
+  "TakeOnRules session report locations.")
 
 (cl-defun jf/org-tag-as-session-report (&key (buffer (current-buffer)))
   "Set the current BUFFER as a \"session-report\"."
@@ -214,7 +214,7 @@ CONTENTS is nil.  INFO is a plist holding contextual information."
 
 
 (defun jf/org-mode-extract-body-from-current-buffer ()
-  "Extract the body from the current org-mode body"
+  "Extract the body from the current `org-mode' body."
   (buffer-substring (save-excursion
                       (jf/org-mode-find-point-that-starts-body t)
                       (point))
@@ -321,7 +321,7 @@ If UNSAFE is non-nil, assume point is on headline."
   (find-file (f-join jf/tor-home-directory "data" "changelog.yml"))
   ;; The changelog is structured in date descending order.  The first
   ;; line is the YAML preamble indicating a data object (e.g. "---")
-  (beginning-of-buffer)
+  (goto-char (point-min))
   (end-of-line)
   (insert (concat "\n- date: "
             (format-time-string "%Y-%m-%d")
@@ -332,7 +332,7 @@ If UNSAFE is non-nil, assume point is on headline."
   (interactive "sSeries Entry's Title: ")
   (find-file (f-join jf/tor-home-directory "data" "series.yml"))
   (let ((key (downcase (s-dashed-words title))))
-    (end-of-buffer)
+    (goto-char (point-max))
     (insert (concat
               (if (looking-at-p "^$") "" "\n")
               "- title: " title
