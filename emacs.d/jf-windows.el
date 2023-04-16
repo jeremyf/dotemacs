@@ -112,18 +112,10 @@ setting up an IDE-like layout)."
          ((,c :underline t :slant oblique :foreground ,fg-dim)))
       `(org-list-dt
          ((,c :bold t :slant italic :foreground ,fg-alt)))
-      `(tree-sitter-hl-face:constant
-         ((,c :slant italic :foreground ,magenta-cooler)))
-      `(tree-sitter-hl-face:method.call
-         ((,c :slant italic :foreground ,fg-alt)))
-      `(tree-sitter-hl-face:operator
-         ((,c :foreground ,red-faint)))
-      `(tree-sitter-hl-face:property
-         ((,c :inherit font-lock-variable-name-face)))
       `(font-lock-misc-punctuation-face
          ((,c :foreground ,green-warmer)))
       `(font-lock-regexp-face
-         ((,c :foreground ,magenta-warmer))))))
+         ((,c :foreground ,red-faint))))))
 
 (add-hook 'modus-themes-after-load-theme-hook
     #'jf/modus-themes-custom-faces)
@@ -135,35 +127,38 @@ setting up an IDE-like layout)."
   :straight (:type git :host gitlab :repo "protesilaos/modus-themes" :branch "main")
   :init
   (setq modus-themes-italic-constructs t
-  modus-themes-bold-constructs t
-  modus-themes-mixed-fonts t
-  modus-themes-variable-pitch-ui nil
-  modus-themes-custom-auto-reload t
-  modus-themes-disable-other-themes t
-  modus-themes-common-palette-overrides '((builtin magenta)
-            (comment yellow-faint)
-            (constant magenta-cooler)
-            (docstring green-faint)
-            (docmarkup magenta-faint)
-            (fnname magenta-warmer)
-            (keyword cyan)
-            (preprocessor cyan-cooler)
-            (string green-cooler)
-            (type magenta-cooler)
-            (variable blue-warmer)
-            (rx-construct magenta-warmer)
-            (rx-backslash blue-cooler))
-  modus-themes-completions '((matches . (extrabold))
-           (selection . (semibold accented))
-           (popup . (accented intense)))
-  modus-themes-headings
-  '((1 . (variable-pitch light 1.6))
-    (2 . (overline semibold 1.5))
-    (3 . (monochrome overline 1.4 background))
-    (4 . (overline 1.3))
-    (5 . (rainbow 1.2))
-    (6 . (rainbow 1.15))
-    (t . (rainbow 1.1)))))
+    modus-themes-bold-constructs t
+    modus-themes-mixed-fonts t
+    modus-themes-variable-pitch-ui nil
+    modus-themes-custom-auto-reload t
+    modus-themes-disable-other-themes t
+    modus-themes-common-palette-overrides
+    '(
+       (builtin magenta)
+       (comment yellow-faint)
+       (constant magenta-cooler)
+       (docstring green-faint)
+       (docmarkup magenta-faint)
+       (fnname magenta-warmer)
+       (keyword cyan)
+       (preprocessor cyan-cooler)
+       (string green-cooler)
+       (type magenta-cooler)
+       (variable blue-warmer)
+       (rx-construct red-faint)
+       (rx-backslash blue-cooler)
+       )
+    modus-themes-completions '((matches . (extrabold))
+                                (selection . (semibold accented))
+                                (popup . (accented intense)))
+    modus-themes-headings
+    '((1 . (variable-pitch light 1.6))
+       (2 . (overline semibold 1.5))
+       (3 . (monochrome overline 1.4 background))
+       (4 . (overline 1.3))
+       (5 . (rainbow 1.2))
+       (6 . (rainbow 1.15))
+       (t . (rainbow 1.1)))))
 
 (defun jf/dark ()
   "Toggle system-wide Dark or Light setting."
