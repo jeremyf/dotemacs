@@ -123,13 +123,13 @@ enh-ruby-mode ruby-mode rspec-mode ruby-ts-mode
 (subject "subject(:" p ") { " p " }")
 ;; A little experiment in mixing tempel behavior and multiple values.
 (init (p "Parameters (comma separated): " given-params t)
-      (let* ((params (mapcar #'s-trim (s-split "," given-params)))
-       (kwargs (mapcar (lambda (el) (concat el ":")) params))
-       (symbols (mapcar (lambda (el) (concat ":" el)) params)))
-  (dolist (param params) (insert "# @param " param " [Object]\n"))
-  (insert "def initialize(" (s-join ", " kwargs) ")\n")
-  (dolist (param params) (insert "  @" param " = " param "\n"))
-  (insert "end\n\n"
-    "attr_reader " (s-join ", " symbols) "\n")))
+  (let* ((params (mapcar #'s-trim (s-split "," given-params)))
+          (kwargs (mapcar (lambda (el) (concat el ":")) params))
+          (symbols (mapcar (lambda (el) (concat ":" el)) params)))
+    (dolist (param params) (insert "# @param " param " [Object]\n"))
+    (insert "def initialize(" (s-join ", " kwargs) ")\n")
+    (dolist (param params) (insert "  @" param " = " param "\n"))
+    (insert "end\n\n"
+      "attr_reader " (s-join ", " symbols) "\n")))
 
 (it_is "it { is_expected.to " q " }")

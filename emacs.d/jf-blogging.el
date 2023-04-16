@@ -67,30 +67,11 @@ CONTENTS is nil.  INFO is a plist holding contextual information."
   "~/git/dotemacs/lib/org-macros.setup"
   "The path to the file that has inline org macros.")
 
-(cl-defun jf/org-markdown-export-format-link-for (&key node desc)
-  "Return a \"link\" text based on the given NODE and DESC.
-
-  This relates to my glossary.html Hugo short-code."
-  (when-let (url (jf/org-roam-external-url-for :node node))
-    (let ((key (jf/org-roam-node-get-org-mode-property :node node :property "GLOSSARY_KEY")))
-      (cond
-        ((jf/org-roam-node-get-org-mode-property :node node :property "OFFER")
-          (format "{{< glossary key=\"%s\" >}}" key))
-        ((jf/org-roam-node-get-org-mode-property :node node :property "SAME_AS")
-          (format "{{< glossary key=\"%s\" link=\"sameAs\" >}}" key))
-        (t (format "[%s](%s)" desc url))))))
-
-  ;;; For testing:
-;;
-;; (message "%s" (jf/org-markdown-export-format-link-for :node (org-roam-node-from-id "FC017488-D8EC-43DE-A35D-4D10A87B6A0D") :desc "Burning Wheel Gold"))
-;; (message "%s" (jf/org-markdown-export-format-link-for :node (org-roam-node-from-id "86F3E44F-AA0E-4B08-B0D8-30A764B4CD13") :desc "Org Roam"))
-
-
 (defcustom jf/exporting-org-to-tor nil
-  "True while performing the export of org file to Take on Rules")
+  "Not nil while performing the export of org file to Take on Rules.")
 
 (cl-defun jf/export-org-to-tor (&key (buffer (current-buffer)))
-  "Export current org buffer for TakeOnRules post."
+  "Export current org BUFFER for TakeOnRules post."
   (interactive)
   ;; Ensure that we have an ID property.
   (setq jf/exporting-org-to-tor t)
@@ -112,8 +93,8 @@ CONTENTS is nil.  INFO is a plist holding contextual information."
               (subtitle (jf/export-org-to-tor--global-buffer-prop-ensure
                           :key "SUBTITLE"
                           :plist export-global-plist))
-              (title (lax-plist-get export-global-plist "TITLE"))
-              (identifier (lax-plist-get export-global-plist "IDENTIFIER")))
+              (title (plist-get export-global-plist "TITLE"))
+              (identifier (plist-get export-global-plist "IDENTIFIER")))
         (save-buffer)
         (jf/export-org-to-tor--inject-additional-front-matter
           :subtitle subtitle
@@ -133,7 +114,7 @@ CONTENTS is nil.  INFO is a plist holding contextual information."
 
     We want to ensure that we export the IDENTIFIER, SUBTITLE, and TITLE.
     And add relevant metadata."
-  (beginning-of-buffer)
+  (goto-char (point-min))
   (search-forward-regexp "#\\+HUGO_FRONT_MATTER_FORMAT: yaml")
   (insert (concat
             "\n#+HUGO_CUSTOM_FRONT_MATTER: :slug " (jf/tor-convert-text-to-slug title)
@@ -151,13 +132,13 @@ CONTENTS is nil.  INFO is a plist holding contextual information."
     (insert
       (format
         "\n#+HUGO_CUSTOM_FRONT_MATTER: :sessionReport '((date . \"%s\") (game . \"%s\") (location . \"%s\"))"
-        (lax-plist-get kw-plist "SESSION_REPORT_DATE")
-        (lax-plist-get kw-plist "SESSION_REPORT_GAME")
-        (lax-plist-get kw-plist "SESSION_REPORT_LOCATION")))))
+        (plist-get kw-plist "SESSION_REPORT_DATE")
+        (plist-get kw-plist "SESSION_REPORT_GAME")
+        (plist-get kw-plist "SESSION_REPORT_LOCATION")))))
 
 (cl-defun jf/export-org-to-tor--global-buffer-prop-ensure (&key key plist (default nil))
   "Ensure the current buffer has the given KEY in the global PLIST, if not set the DEFAULT or prompt for it."
-  (let ((value (lax-plist-get plist key)))
+  (let ((value (plist-get plist key)))
     (if value value
       (jf/export-org-to-tor--global-buffer-prop-set
         :key key
@@ -165,7 +146,8 @@ CONTENTS is nil.  INFO is a plist holding contextual information."
 
 (cl-defun jf/export-org-to-tor--global-buffer-prop-set (&key key value)
   "Set the global property named KEY to the VALUE for the current buffer"
-  (goto-line 5)
+  (goto-char (point-min))
+  (forward-line 4)
   (insert (format "\n#+%s: %s" (upcase key) value)))
 
 (defvar jf/tor-session-report-location
@@ -178,8 +160,8 @@ CONTENTS is nil.  INFO is a plist holding contextual information."
   (with-current-buffer buffer
     (save-excursion
       (denote-keywords-add '("sessions"))
-      (beginning-of-buffer)
-      (goto-line 5)
+      (goto-char (point-min))
+      (forward-line 4)
       (let* ((date (org-read-date nil nil nil "Session Date"))
               (game (completing-read "Game: " (jf/tor-game-list)))
               (location (completing-read "Location: "
@@ -197,7 +179,7 @@ CONTENTS is nil.  INFO is a plist holding contextual information."
               (jf/org-global-props keywords-regexp))))
 
 (defun jf/org-global-props (&optional property)
-  "Get the plists of global org properties of current buffer."
+  "Get the plist of global org PROPERTY of current buffer."
   (unless property (setq property "PROPERTY"))
   (org-element-map
     (org-element-parse-buffer)
@@ -210,21 +192,11 @@ CONTENTS is nil.  INFO is a plist holding contextual information."
   (interactive)
   (with-current-buffer buffer
     (save-excursion
-      (beginning-of-buffer)
+      (goto-char (point-min))
       (save-match-data
         (if (re-search-forward "\n:ROAM_REFS:.+\\(https?://takeonrules\.com[^ \n]*\\)" nil t)
           (jf/tor-find-hugo-file-by-url (match-string 1))
           (message "Unable to find Take on Rules URL in buffer."))))))
-
-(cl-defun jf/org-tag-session-scene-with-date (date &key (tags '("scene")) (buffer (current-buffer)))
-  "Tag the BUFFER with the TAGS and prompt for the DATE in which the scene occurred."
-  (interactive (list (completing-read "Scene Date: " (jf/org-macro-value-list "scene-date"))))
-  (save-excursion
-    (org-roam-tag-add tags)
-    (beginning-of-buffer)
-    (search-forward "#+FILETAGS:")
-    (next-line)
-    (insert (concat "\n{{{scene-date(" date ")}}}\n"))))
 
 (defun jf/org-mode-get-keyword-key-value (kwd)
   "Map KWD to list."
@@ -250,7 +222,8 @@ CONTENTS is nil.  INFO is a plist holding contextual information."
 
 (defun jf/org-mode-find-point-that-starts-body (&optional unsafe)
   "Skip headline, planning line, and all drawers in current entry.
-    If UNSAFE is non-nil, assume point is on headline."
+
+If UNSAFE is non-nil, assume point is on headline."
   (unless unsafe
     ;; To improve performance in loops (e.g. with `org-map-entries')
     (org-back-to-heading))
@@ -291,7 +264,7 @@ CONTENTS is nil.  INFO is a plist holding contextual information."
 (cl-defun jf/tor-toggle-hugo-server (&key
                                       (directory jf/tor-home-directory)
                                       (buffer-name "*Hugo Server*"))
-  "This will start or stop a Hugo server in the given DIRECTORY for TakeOnRules.com.
+  "This will start or stop a Hugo server in the given DIRECTORY.
 
   The BUFFER-NAME is where we'll run the Hugo process."
   (interactive)
@@ -367,14 +340,18 @@ CONTENTS is nil.  INFO is a plist holding contextual information."
 
 ;; Note: I needed to use `fboundp' because if I invoked this functions
 ;; before other consult functions I got a method void error.
-(cl-defun jf/find-file-via-matching (&key prompt matching in (matches "--files-with-matches"))
-  "PROMPT for files IN the directory with MATCHING content.
+(cl-defun jf/find-file-via-matching (&key prompt matching in (switch "--files-with-matches"))
+  "PROMPT for files IN the directory with MATCHING content with given SWITCH.
 
-    If `consult--read' is defined, use that.  Otherwise fallback to `completing-read'."
+If `consult--read' is defined, use that.  Otherwise fallback to
+`completing-read'."
   (if (fboundp 'consult--read)
     (consult--read
       (consult--with-increased-gc
-        (jf/list-full-filenames-with-file-text :matching matching :in in :matches matches))
+        (jf/list-full-filenames-with-file-text
+          :matching matching
+          :in in
+          :switch switch))
       :prompt prompt
       :sort nil
       :require-match t
@@ -461,13 +438,13 @@ CONTENTS is nil.  INFO is a plist holding contextual information."
           "| tr '\n' '@'"))
       "@")))
 
-(cl-defun jf/list-full-filenames-with-file-text (&key matching in (matches "--files-with-matches"))
-  "Build a list of filenames MATCHING the pattern IN the given directory."
+(cl-defun jf/list-full-filenames-with-file-text (&key matching in (switch "--files-with-matches"))
+  "List of filenames MATCHING with SWITCH the pattern IN the given directory."
   (split-string-and-unquote
     (shell-command-to-string
       (concat
         "rg \""
-        matching "\" " in " --only-matching " matches " --sortr modified"
+        matching "\" " in " --only-matching " switch " --sortr modified"
         "| tr '\n' '@'"))
     "@"))
 

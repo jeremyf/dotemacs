@@ -312,10 +312,10 @@ ID-ONLY link without title."
   "Find a draft FILENAME in the \"blog-posts\" sub-directory of denote-directory."
   (interactive
     (list (jf/find-file-via-matching
-            :prompt "Draft filename: "
-            :matching "^#\\+ROAM_REFS:"
-            :matches "--files-without-match"
-            :in (f-join (denote-directory) "blog-posts"))))
+	          :prompt "Draft filename: "
+	          :matching "^#\\+ROAM_REFS:"
+            :switch "--files-without-match"
+	          :in (f-join (denote-directory) "blog-posts"))))
   (find-file filename))
 (bind-key "H-d f B" #'jf/denote/find-file--blog-posts-draft)
 

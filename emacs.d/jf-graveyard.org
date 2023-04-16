@@ -187,3 +187,26 @@ A massive function for helping make the preliminaries of a blog post.
       (find-file fpath)
       (end-of-buffer)))
 #+end_src
+
+
+** Some Org Roam Note Exporting
+
+#+begin_src emacs-lisp
+  (cl-defun jf/org-markdown-export-format-link-for (&key node desc)
+    "Return a \"link\" text based on the given NODE and DESC.
+
+    This relates to my glossary.html Hugo short-code."
+    (when-let (url (jf/org-roam-external-url-for :node node))
+      (let ((key (jf/org-roam-node-get-org-mode-property :node node :property "GLOSSARY_KEY")))
+        (cond
+         ((jf/org-roam-node-get-org-mode-property :node node :property "OFFER")
+          (format "{{< glossary key=\"%s\" >}}" key))
+         ((jf/org-roam-node-get-org-mode-property :node node :property "SAME_AS")
+          (format "{{< glossary key=\"%s\" link=\"sameAs\" >}}" key))
+         (t (format "[%s](%s)" desc url))))))
+
+    ;;; For testing:
+  ;;
+  ;; (message "%s" (jf/org-markdown-export-format-link-for :node (org-roam-node-from-id "FC017488-D8EC-43DE-A35D-4D10A87B6A0D") :desc "Burning Wheel Gold"))
+  ;; (message "%s" (jf/org-markdown-export-format-link-for :node (org-roam-node-from-id "86F3E44F-AA0E-4B08-B0D8-30A764B4CD13") :desc "Org Roam"))
+#+end_src
