@@ -155,7 +155,7 @@
 ;; `hammerspoon-edit-minor-mode' buffer.  And the prefix’s function toggles
 ;; that mode.
 (transient-define-suffix jf/hammerspoon-toggle-mode ()
-  "Set the hammerspoon mode"
+  "Set the hammerspoon mode."
   :description '(lambda ()
                   (concat
                     "Hammerspoon Mode: "
@@ -186,8 +186,9 @@
 ;; `eval-region'.
 (define-key emacs-lisp-mode-map (kbd "C-c C-c") 'jf/eval-region-dwim)
 (defun jf/eval-region-dwim ()
-  "When region is active, evaluate it and kill the mark. Else,
-      evaluate the whole buffer."
+  "When region is active, evaluate it and kill the mark.
+
+Else, evaluate the whole buffer."
   (interactive)
   (if (not (region-active-p))
     (progn
@@ -286,10 +287,7 @@
 (cl-defun jf/create-scratch-buffer (&optional arg)
   "Quickly open a scratch buffer based on ARG.
 
-\"C-u\": `markdown-mode'
-\"C-u C-u\": `emacs-lisp-mode'
-More than 2 \"C-u C-u\": `ruby-mode'
-Otherwise: `org-mode'"
+Defaults to `org-mode': `org-mode'"
   (interactive "P")
   (crux-create-scratch-buffer)
   (rename-buffer (concat "*scratch* at " (format-time-string "%Y-%m-%d %H:%M")))
@@ -319,8 +317,8 @@ Otherwise: `org-mode'"
 (defun jf/org-insert-immediate-active-timestamp (arg)
   "Insert an active date for today.
 
-  One universal arg (e.g., prefix call with C-u) prompts for date
-  Two universal args (e.g., prefix call with C-u C-u) inserts timestamp.
+  One universal ARG prompts for date
+  Two universal ARG inserts timestamp.
   then insertes active date."
   ;; Insert an active timestamp, with a few options.
   (interactive "P")
@@ -343,7 +341,8 @@ Otherwise: `org-mode'"
 
 (defun jf/delete-word (arg)
   "Delete characters forward until encountering the end of a word.
-With argument, do this that many times."
+
+With ARG, do this that many times."
   (interactive "p")
   (if (use-region-p)
     (delete-region (region-beginning) (region-end))
@@ -385,7 +384,7 @@ With argument, do this that many times."
 (defun jf/get-line-text (&optional delta)
   "Copy the text of the line at DELTA lines from point.
 
-TODO: This function pollutes the mark-ring and kill-ring; I think
+TODO: This function pollutes the `mark-ring' and `kill-ring'; I think
 I'm okay with that behavior, but I'm putting it here to mention it “out loud”."
   (interactive "P")
   (save-excursion
@@ -398,6 +397,7 @@ I'm okay with that behavior, but I'm putting it here to mention it “out loud�
     text))
 
 (defun jf/filename/tilde-based (filename)
+  "Return ~/ relative FILENAME."
   (string-replace (getenv "HOME") "~" filename))
 
 (provide 'jf-utility)

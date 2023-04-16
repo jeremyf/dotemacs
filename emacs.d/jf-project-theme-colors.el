@@ -4,7 +4,7 @@
 ;; Author: Jeremy Friesen <jeremy@jeremyfriesen.com>
 
 ;; This file is NOT part of GNU Emacs.
-;;; Commentary
+;;; Commentary:
 
 ;; The options that I'm considering are from the modus color palette:
 ;;
@@ -30,7 +30,8 @@
 ;; bg-lavender
 ;; bg-sage
 
-;;; Code
+;;; Code:
+
 (require 'modus-themes)
 (require 'projectile)
 (defvar jf/project/theme-colors/table
@@ -45,20 +46,22 @@
     ("~/git/space_stone/" . bg-magenta-nuanced)
     ("~/git/derivative-rodeo/" . bg-red-intense)
     ("~/git/hyrax/" . bg-sage))
-  "The `car' of each list item should be of begin with \"~/\" and
+  "A list of projects and their colors.
+
+The `car' of each list item should be of begin with \"~/\" and
  end with \"/\" (so as to conform to multiple machines and
  projectile's interface.")
 
 (cl-defun jf/project/theme-colors/current (&key (default 'bg-blue-subtle))
-  "Returns a HEX color (e.g. \"#CCDDEE\") for the given project.
+  "Return a HEX color (e.g. \"#CCDDEE\") for the given project.
 
 The DEFAULT is a named color in the `modus-themes' palette."
 
   (let* ((project-dir (abbreviate-file-name (or (projectile-project-root) "~/")))
-	 (name (alist-get project-dir
-			  jf/project/theme-colors/table
-			  default nil #'string=)))
-	 (modus-themes-get-color-value name)))
+   (name (alist-get project-dir
+        jf/project/theme-colors/table
+        default nil #'string=)))
+   (modus-themes-get-color-value name)))
 
 (defvar jf/project/theme-colors/faces
   (list 'line-number-current-line 'mode-line-active)
@@ -66,7 +69,7 @@ The DEFAULT is a named color in the `modus-themes' palette."
 
 (defvar jf/project/theme-colors/hooks
   (list 'buffer-list-update-hook
-	'projectile-after-switch-project-hook)
+  'projectile-after-switch-project-hook)
   "The hooks to call to set the theme colors.")
 
 (defun jf/project/theme-colors/apply-to-buffer ()
@@ -76,15 +79,15 @@ The DEFAULT is a named color in the `modus-themes' palette."
       (face-remap-add-relative
        element
        `( :background ,(jf/project/theme-colors/current)
-	  :foreground ,(face-attribute 'default :foreground))))))
+    :foreground ,(face-attribute 'default :foreground))))))
 
 ;; I need to ensure that I'm not doing this while Emacs is initializing.  If I
 ;; don't have the 'after-init-hook I experience significant drag/failure to
 ;; initialize.
 (add-hook 'after-init-hook
-	  (lambda ()
-	    (dolist (hook jf/project/theme-colors/hooks)
-	      (add-hook hook #'jf/project/theme-colors/apply-to-buffer))))
+    (lambda ()
+      (dolist (hook jf/project/theme-colors/hooks)
+        (add-hook hook #'jf/project/theme-colors/apply-to-buffer))))
 
 (provide 'jf-project-theme-colors)
 ;;; jf-project-theme-colors.el ends here

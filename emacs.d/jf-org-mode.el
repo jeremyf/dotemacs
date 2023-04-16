@@ -4,10 +4,12 @@
 ;; Author: Jeremy Friesen <jeremy@jeremyfriesen.com>
 
 ;; This file is NOT part of GNU Emacs.
-;;; Commentary
+;;; Commentary:
 
-;;; Code
 ;; Pre-amble to prepare for `org-mode'
+
+;;; Code:
+(require 'cl-lib)
 
 ;; I maintain a list of data directories, each might have “relevant to
 ;; org-mode” files.  The `jf/org-agenda-files' reads the file system to gather
@@ -18,7 +20,9 @@
 
 (defvar jf/org-mode/capture/filename
   "~/git/org/denote/melange/20230210T184422--example-code__programming.org"
-  "The file where I'm capturing content.  By default this is my example code project.")
+  "The file where I'm capturing content.
+
+By default this is my example code project.")
 
 (defvar jf/primary-agenda-filename-for-machine
   (if (jf/is-work-machine?)

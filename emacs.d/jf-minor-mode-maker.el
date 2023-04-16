@@ -5,17 +5,20 @@
 
 ;; This file is NOT part of GNU Emacs.
 
-;;; Commentary
+;;; Commentary:
 
 ;; Provides a macro for personal minor mode declaration.  Why the macro?  As a
 ;; matter of practice and documentation.  I also want to get better at writing.
+
+;;; Code:
 (require 'cl-macs)
 (cl-defmacro jf/minor-mode-maker (&key title abbr hooks keymap)
     "A macro to declare a minor mode.
 
   Use TITLE to derive the docstring.
   Use ABBR to derive the mode-name lighter.
-  Add hook to each HOOKS provided."
+  Add hook to each HOOKS provided.
+And assign a KEYMAP."
     (let ((mode-name (intern (s-downcase (concat "jf/" abbr "-minor-mode"))))
           (lighter (concat " " abbr))
           (docstring (concat "Minor mode for " title ".")))

@@ -4,11 +4,11 @@
 ;; Author: Jeremy Friesen <jeremy@jeremyfriesen.com>
 
 ;; This file is NOT part of GNU Emacs.
-;;; Commentary
+;;; Commentary:
 
 ;; Packages specifically here for helping with my writing activities.
 
-;;; Code
+;;; Code:
 
 (require 'jf-org-mode)
 (require 'jf-denote)
@@ -20,18 +20,18 @@
   (defun --set-emoji-font (frame)
     "Adjust the font settings of FRAME so Emacs can display emoji properly."
     (if (eq system-type 'darwin)
-	;; For NS/Cocoa
-	(set-fontset-font t
-			  'symbol
-			  (font-spec :family "Apple Color Emoji")
-			  frame
-			  'prepend)
+  ;; For NS/Cocoa
+  (set-fontset-font t
+        'symbol
+        (font-spec :family "Apple Color Emoji")
+        frame
+        'prepend)
       ;; For Linux
       (set-fontset-font t
-			'symbol
-			(font-spec :family "Symbola")
-			frame
-			'prepend)))
+      'symbol
+      (font-spec :family "Symbola")
+      frame
+      'prepend)))
   ;; For when Emacs is started in GUI mode:
   (--set-emoji-font nil)
   ;; Hook for when a frame is created with emacsclient
@@ -49,8 +49,8 @@
 
 ;; (use-package flymake-vale
 ;;   :straight (flymake-value :type git
-;; 			   :host github
-;; 			   :repo "tpeacock19/flymake-vale")
+;;         :host github
+;;         :repo "tpeacock19/flymake-vale")
 ;;   :hook ((text-mode       . flymake-vale-load)
 ;;          (latex-mode      . flymake-vale-load)
 ;;          (org-mode        . flymake-vale-load)

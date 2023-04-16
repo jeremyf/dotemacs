@@ -4,12 +4,12 @@
 ;; Author: Jeremy Friesen <jeremy@jeremyfriesen.com>
 
 ;; This file is NOT part of GNU Emacs.
-;;; Commentary
+;;; Commentary:
 
 ;; These packages help configure the "completing" activity in coding.  The
 ;; general idea of find me something.
 
-;;; Code
+;;; Code:
 
 ;;;; Other packages and their configurations
 

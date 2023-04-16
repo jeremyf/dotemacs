@@ -4,14 +4,15 @@
 ;; Author: Jeremy Friesen <jeremy@jeremyfriesen.com>
 
 ;; This file is NOT part of GNU Emacs.
-;;; Commentary
+;;; Commentary:
 
-;;; Code
 
 ;; BEGIN Core Configuration
 ;; I have chosen to adopt \"straight.el\" for my package management.  The fact
 ;; that it seamlessly works with `use-package' has help me keep my code more
 ;; organized.
+
+;;; Code:
 ;;
 ;; https://www.reddit.com/r/emacs/comments/mtb05k/emacs_init_time_decreased_65_after_i_realized_the/
 (setq straight-check-for-modifications '(check-on-save find-when-checking))

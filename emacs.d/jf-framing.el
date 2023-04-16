@@ -4,7 +4,7 @@
 ;; Author: Jeremy Friesen <jeremy@jeremyfriesen.com>
 
 ;; This file is NOT part of GNU Emacs.
-;;; Commentary
+;;; Commentary:
 
 ;;
 ;; This personal package provides logic for both a focus mode and presentation
@@ -14,7 +14,7 @@
 ;; To enter focus mode: "M-x logos-focus-mode"
 ;; To enter presentation mode: "M-x jf/presenter-minor-mode"
 
-;;; Code
+;;; Code:
 (use-package edit-indirect
   ;; A nice package for editing regions in separate buffers.  It doesn't appear
   ;; to get the mode guess right.  I haven't used this as much as
@@ -35,25 +35,25 @@
   ;;   (define-key map [remap previous-line] #'logos-backward-page-dwim))
   (setq logos-outlines-are-pages t)
   (setq-default logos-hide-cursor t
-		logos-hide-mode-line t
-		logos-hide-buffer-boundaries t
-		logos-hide-fringe t
-		logos-variable-pitch t
-		logos-buffer-read-only t
-		logos-scroll-lock nil
-		logos-olivetti t
-		logos-outline-regexp-alist
-		`((emacs-lisp-mode . "^;;;+ ")
-		  (org-mode . "^\\*+ +")
-		  (markdown-mode . "^\\#+ +")))
+    logos-hide-mode-line t
+    logos-hide-buffer-boundaries t
+    logos-hide-fringe t
+    logos-variable-pitch t
+    logos-buffer-read-only t
+    logos-scroll-lock nil
+    logos-olivetti t
+    logos-outline-regexp-alist
+    `((emacs-lisp-mode . "^;;;+ ")
+      (org-mode . "^\\*+ +")
+      (markdown-mode . "^\\#+ +")))
   (defun logos--reveal-entry ()
     "Reveal Org or Outline entry."
     (cond
      ((and (eq major-mode 'org-mode)
-	   (org-at-heading-p))
+     (org-at-heading-p))
       (org-show-subtree))
      ((or (eq major-mode 'outline-mode)
-	  (bound-and-true-p outline-minor-mode))
+    (bound-and-true-p outline-minor-mode))
       (outline-show-subtree))))
   :init
   (add-hook 'logos-page-motion-hook #'logos--reveal-entry))
@@ -86,23 +86,23 @@
 (require 'jf-minor-mode-maker)
 
 (defvar jf/presenter-minor-mode-map (let ((map (make-sparse-keymap)))
-					(define-key map (kbd "C-n") #'next-line)
-					(define-key map (kbd "C-p") #'previous-line)
-					(dolist (key `("M-]" "s-]"))
-					  (define-key map (kbd key) #'logos-forward-page-dwim))
-					(dolist (key `("M-[" "s-["))
-					  (define-key map (kbd key) #'logos-backward-page-dwim))
-					map))
+          (define-key map (kbd "C-n") #'next-line)
+          (define-key map (kbd "C-p") #'previous-line)
+          (dolist (key `("M-]" "s-]"))
+            (define-key map (kbd key) #'logos-forward-page-dwim))
+          (dolist (key `("M-[" "s-["))
+            (define-key map (kbd key) #'logos-backward-page-dwim))
+          map))
 
 (jf/minor-mode-maker :title "Logos Presenter"
-		     :abbr "presenter"
-		     :keymap jf/presenter-minor-mode-map)
+         :abbr "presenter"
+         :keymap jf/presenter-minor-mode-map)
 
 (defcustom jf/presenter-minor-mode-on-hook
   (lambda ()
     (let ((logos-hide-cursor nil)
-	  (logos-buffer-read-only nil)
-	  (org-hide-emphasis-markers t))
+    (logos-buffer-read-only nil)
+    (org-hide-emphasis-markers t))
       (call-interactively 'logos-narrow-dwim)
       (olivetti-mode t)
       (keycast-mode-line-mode t)
