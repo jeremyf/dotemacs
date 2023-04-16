@@ -205,7 +205,7 @@
 
 (defadvice server-visit-files
     (around server-visit-files-custom-find
-	    activate compile)
+      activate compile)
   "Maintain a counter of visited files from a single client call."
   (let ((server-visit-files-custom-find:buffer-count 0))
     ad-do-it))
@@ -213,14 +213,14 @@
   "Arrange to visit the files from a client call in separate windows."
   (if (zerop server-visit-files-custom-find:buffer-count)
       (progn
-	(delete-other-windows)
-	(switch-to-buffer (current-buffer)))
+  (delete-other-windows)
+  (switch-to-buffer (current-buffer)))
     (let ((buffer (current-buffer))
-	  (window (split-window-sensibly)))
+    (window (split-window-sensibly)))
       (switch-to-buffer buffer)
       (balance-windows)))
   (setq server-visit-files-custom-find:buffer-count
-	(1+ server-visit-files-custom-find:buffer-count)))
+  (1+ server-visit-files-custom-find:buffer-count)))
 (add-hook 'server-visit-hook 'server-visit-hook-custom-find)
 
 
