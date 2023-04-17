@@ -274,19 +274,19 @@ By default this is my example code project.")
 (defun jf/org-capf ()
   "The `completion-at-point-functions' I envision using for `org-mode'."
   (setq-local completion-at-point-functions
-        (list (cape-super-capf
-         #'jf/org-completion-symbols
-         #'jf/org-completion-abbreviations
-         #'tempel-expand
-         #'cape-file
-         #'cape-dabbrev
-         #'cape-dict
-         #'cape-history))))
+    (list (cape-super-capf
+            #'jf/org-completion-symbols
+            #'jf/org-completion-abbreviations
+            #'tempel-expand
+            #'cape-file
+            ;; #'cape-dabbrev
+            #'cape-dict
+            #'cape-history))))
 (defun jf/org-confirm-babel-evaluate (lang body)
   "Regardless of LANG and BODY approve it."
   nil)
 
-;;; Additionally Functionality for Org Mode
+;;; Additional Functionality for Org Mode
 ;; Cribbed from https://xenodium.com/emacs-dwim-do-what-i-mean/
 (defun jf/org-insert-link-dwim (parg &rest args)
   "Like `org-insert-link' but with personal dwim preferences.

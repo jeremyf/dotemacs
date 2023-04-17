@@ -239,7 +239,7 @@ method, get the containing class."
       (list (cape-super-capf
               #'eglot-completion-at-point
               #'tempel-expand
-              #'cape-file))))
+              #'cape-keyword))))
   :straight t)
 
 (use-package eglot-tempel

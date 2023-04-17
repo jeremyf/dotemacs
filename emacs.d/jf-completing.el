@@ -212,7 +212,7 @@
    consult-line consult-ripgrep consult-find
    :initial (when (use-region-p)
         (buffer-substring-no-properties (region-beginning) (region-end)))
-   :keymap jf/consult-filter-map
+   ;; :keymap jf/consult-filter-map
    ;; https://github.com/minad/consult/wiki#org-clock
    consult-clock-in
    :prompt "Clock in: "
@@ -334,12 +334,16 @@ Useful if you want a more robust view into the recommend candidates."
   ;; Completion at point functions, with the amazing `cape-super-capf' for
   ;; granular configuration of specific mode completion behavior.
   :straight t
-  :init (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  :init
+  ;; (add-to-list 'completion-at-point-functions #'cape-dabbrev)
   (add-to-list 'completion-at-point-functions #'cape-file)
+  (add-to-list 'completion-at-point-functions #'cape-keyword)
   :bind (("C-c p d" . cape-dabbrev)
-         ("C-c p f" . cape-file)
-         ("C-c p s" . cape-symbol)
-         ("C-c p i" . cape-ispell)))
+          ("C-c p e" . cape-elisp-block)
+          ("C-c p f" . cape-file)
+          ("C-c p h" . cape-history)
+          ("C-c p s" . cape-symbol)
+          ("C-c p w" . cape-dict)))
 
 (use-package grab-mac-link
   ;; Grab a link from a variety of MacOS applications.
@@ -525,7 +529,7 @@ Useful if you want a more robust view into the recommend candidates."
    ("M-*" . tempel-insert))
   :bind (:map tempel-map (([backtab] . tempel-previous)
         ("TAB" . tempel-next)))
-  :init
+  :preface
   (cl-defun jf/org-macro-value-list (macro-name &key (dir org-directory))
     "List the unique inner text of all uses of MACRO-NAME in given DIR."
     (s-split
@@ -550,13 +554,13 @@ Useful if you want a more robust view into the recommend candidates."
     (setq-local completion-at-point-functions
     (cons #'tempel-expand
           completion-at-point-functions)))
-  (add-hook 'prog-mode-hook 'tempel-setup-capf)
-  (add-hook 'text-mode-hook 'tempel-setup-capf)
   ;; Optionally make the Tempel templates available to Abbrev,
   ;; either locally or globally. `expand-abbrev' is bound to C-x '.
   ;; (add-hook 'prog-mode-hook #'tempel-abbrev-mode)
   ;; (tempel-global-abbrev-mode)
   :init
+  (add-hook 'prog-mode-hook 'tempel-setup-capf)
+  (add-hook 'text-mode-hook 'tempel-setup-capf)
   ;; Hyper Macro!
   (tempel-key "H-r b" blockquote_block org-mode-map)
   (tempel-key "H-r u" update_block org-mode-map)
@@ -570,7 +574,7 @@ Useful if you want a more robust view into the recommend candidates."
   ;; selection with `marginalia' and then having the `vertico-indexed-mode'
   ;; option for quick numerical selection.
   :straight (:type git :host github :repo "minad/vertico")
-  :config
+  :preface
   ;; https://github.com/minad/vertico/wiki#restrict-the-set-of-candidates
   (defun jf/vertico-restrict-to-matches ()
     "Restrict set of candidates to visible candidates"
@@ -582,7 +586,8 @@ Useful if you want a more robust view into the recommend candidates."
                            '(invisible t
                read-only t
                cursor-intangible t
-               rear-nonsticky t))))
+                              rear-nonsticky t))))
+  :config
   (define-key vertico-map (kbd "C-SPC") #'jf/vertico-restrict-to-matches)
   (vertico-mode)
   ;; Use `consult-completion-in-region' if Vertico is enabled.
