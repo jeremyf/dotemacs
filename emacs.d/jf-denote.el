@@ -62,6 +62,7 @@
 
 ;;; Code:
 
+(require 'cl-lib)
 ;;;; Loading dependencies
 (use-package denote
   ;; A narrow focus tool for organizing notes.  I appreciate the design

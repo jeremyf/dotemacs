@@ -115,7 +115,7 @@ setting up an IDE-like layout)."
       `(font-lock-misc-punctuation-face
          ((,c :foreground ,green-warmer)))
       `(font-lock-regexp-face
-         ((,c :foreground ,red-faint))))))
+         ((,c :foreground ,red))))))
 
 (add-hook 'modus-themes-after-load-theme-hook
     #'jf/modus-themes-custom-faces)
@@ -134,19 +134,22 @@ setting up an IDE-like layout)."
     modus-themes-disable-other-themes t
     modus-themes-common-palette-overrides
     '(
-       (builtin magenta)
        (comment yellow-faint)
-       (constant magenta-cooler)
-       (docstring green-faint)
-       (docmarkup magenta-faint)
-       (fnname magenta-warmer)
-       (keyword cyan)
-       (preprocessor cyan-cooler)
-       (string green-cooler)
-       (type magenta-cooler)
-       (variable blue-warmer)
-       (rx-construct red-faint)
-       (rx-backslash blue-cooler)
+       (string green)
+       ;; Favoring more of the defaults; below is some settings I've used for
+       ;; quite a while (paired with the above)
+       ;;
+       ;;    (builtin magenta)
+       ;;    (constant magenta-cooler)
+       ;;    (docstring green-warmer)
+       ;;    (docmarkup magenta-faint)
+       ;;    (fnname magenta-warmer)
+       ;;    (keyword cyan)
+       ;;    (preprocessor cyan-cooler)
+       ;;    (type magenta-cooler)
+       ;;    (variable blue-warmer)
+       ;;    (rx-construct red-faint)
+       ;;    (rx-backslash blue-cooler)
        )
     modus-themes-completions '((matches . (extrabold))
                                 (selection . (semibold accented))
