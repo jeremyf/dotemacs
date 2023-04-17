@@ -68,7 +68,11 @@ CONTENTS is nil.  INFO is a plist holding contextual information."
   "The path to the file that has inline org macros.")
 
 (defcustom jf/exporting-org-to-tor nil
+<<<<<<< Updated upstream
   "Not nil while performing the export of org file to Take on Rules.")
+=======
+  "Non-nil while performing the export of org file to Take on Rules.")
+>>>>>>> Stashed changes
 
 (cl-defun jf/export-org-to-tor (&key (buffer (current-buffer)))
   "Export current org BUFFER for TakeOnRules post."
