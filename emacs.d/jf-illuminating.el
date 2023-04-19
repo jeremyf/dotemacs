@@ -91,14 +91,16 @@
   :config
   (pulsar-global-mode 1)
   (setq pulsar-face 'pulsar-magenta
-	pulsar-delay 0.05)
-  (defun jf/pulse (parg)
+	  pulsar-delay 0.05)
+  (setq ring-bell-function 'jf/pulse)
+  :preface
+  (defun jf/pulse (&optional parg)
     "Pulse the current line.
 
   If PARG (given as universal prefix), pulse between `point' and `mark'."
     (interactive "P")
     (if (car parg)
-	(pulsar--pulse nil nil (point) (mark))
+	    (pulsar--pulse nil nil (point) (mark))
       (pulsar-pulse-line)))
   :bind (("C-c C-l" . jf/pulse)))
 

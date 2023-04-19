@@ -129,8 +129,6 @@
 
  recentf-max-saved-items 50
 
- ring-bell-function 'ignore  ;; Stop ringing any bell
-
  switch-to-buffer-obey-display-actions t ;; https://www.masteringemacs.org/article/demystifying-emacs-window-manager
 
  ;; split-width-threshold nil ;; 160 * 8
