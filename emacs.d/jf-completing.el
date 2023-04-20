@@ -20,7 +20,7 @@
   ;; that I configure.  No more “teh” in my text.
   :straight (:type built-in)
   :custom (abbrev-file-name (file-truename
-           "~/git/dotemacs/emacs.d/abbrev_defs"))
+                              "~/git/dotemacs/emacs.d/abbrev_defs"))
   :hook (text-mode . abbrev-mode))
 
 (use-package emacs
@@ -29,7 +29,7 @@
   ;; Emacs 28: Hide commands in M-x which do not apply to the current mode.
   ;; Corfu commands are hidden, since they are not supposed to be used via M-x.
   (setq read-extended-command-predicate
-        #'command-completion-default-include-p)
+    #'command-completion-default-include-p)
   ;; TAB cycle if there are only few candidates
   (setq completion-cycle-threshold 3)
   ;; Enable indentation+completion using the TAB key.
@@ -37,20 +37,20 @@
   (setq tab-always-indent 'complete)
   ;; Add prompt indicator to `completing-read-multiple'.
   ;; Alternatively try `consult-completing-read-multiple'.
-    (defun crm-indicator (args)
+  (defun crm-indicator (args)
     (cons (format "[%s %s] %s"
-                  (propertize "CRM" 'face 'error)
-                  (propertize
-                   (replace-regexp-in-string
-                    "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
-                    crm-separator)
-                   'face 'success)
-                  (car args))
-          (cdr args)))
+            (propertize "CRM" 'face 'error)
+            (propertize
+              (replace-regexp-in-string
+                "\\`\\[.*?]\\*\\|\\[.*?]\\*\\'" ""
+                crm-separator)
+              'face 'success)
+            (car args))
+      (cdr args)))
   (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
   ;; Do not allow the cursor in the minibuffer prompt
   (setq minibuffer-prompt-properties
-        '(read-only t cursor-intangible t face minibuffer-prompt))
+    '(read-only t cursor-intangible t face minibuffer-prompt))
   (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode))
 
 (use-package embark
@@ -58,19 +58,19 @@
   :straight t
   :bind
   (("C-." . embark-act)       ;; pick some comfortable binding
-   ("M-." . embark-dwim)
-   ("C-s-e" . embark-export)
-   ("H-e" . embark-export)
-   ("C-h b" . embark-bindings))
+    ("M-." . embark-dwim)
+    ("C-s-e" . embark-export)
+    ("H-e" . embark-export)
+    ("C-h b" . embark-bindings))
   :init
   ;; Optionally replace the key help with a completing-read interface
   (setq prefix-help-command #'embark-prefix-help-command)
   :config
   (setq embark-action-indicator
-  (lambda (map &optional _target)
-    (which-key--show-keymap "Embark" map nil nil 'no-paging)
-    #'which-key--hide-popup-ignore-command)
-  embark-become-indicator embark-action-indicator))
+    (lambda (map &optional _target)
+      (which-key--show-keymap "Embark" map nil nil 'no-paging)
+      #'which-key--hide-popup-ignore-command)
+    embark-become-indicator embark-action-indicator))
 
 (use-package consult
   ;; Extensions for the numerous `completing-read' functions.  Highly extensible
@@ -78,71 +78,71 @@
   :straight t
   ;; Replace bindings. Lazily loaded due by `use-package'.
   :bind (;; C-c bindings (mode-specific-map)
-         ("C-c h" . consult-history)
-         ("C-c b" . consult-buffer)
-         ("C-c k" . consult-kmacro)
-   ;; C-x bindings (ctl-x-map)
-   ("C-x M-:" . consult-complex-command)
-         ("C-x b" . consult-bookmark)
-         ("s-b" . consult-buffer)
-         ("C-x 4 b" . consult-buffer-other-window)
-         ("C-s-b" . consult-buffer-other-window)
-         ("C-x 5 b" . consult-buffer-other-frame)
-         ;; Custom M-# bindings for fast register access
-         ("M-#" . consult-register-load)
-         ("M-'" . consult-register-store)
-         ("M-`" . consult-register)
-         ;; Other custom bindings
-         ("C-y" . consult-yank-from-kill-ring)
-         ("M-y" . consult-yank-from-kill-ring)
-         ("<help> a" . consult-apropos)
-         ("M-s k" . consult-keep-lines)
-         ("M-s u" . consult-focus-lines)
-         ;; M-g bindings (goto-map)
-         ("M-g e" . consult-compile-error)
-         ("M-g g" . consult-goto-line)
-   ("H-o" . consult-org-agenda)
-   ("C-c o" . consult-org-agenda)
-   ("M-g M-o" . consult-org-agenda)
-         ("M-g M-g" . consult-goto-line)
-         ("s-l" . consult-goto-line)
-         ("C-l" . consult-goto-line)
-         ("M-g o" . consult-outline)
-         ("M-g m" . consult-mark)
-         ("M-g M" . consult-global-mark)
-         ("C-x C-SPC" . consult-global-mark)
-         ("M-i" . consult-imenu)
-         ("M-g i" . consult-imenu)
-         ("M-g I" . consult-imenu-multi)
-         ;; M-s bindings (search-map)
-         ("M-s f" . consult-find)
-         ("M-s L" . consult-locate)
-         ;; ("M-s g" . consult-grep)
-         ("M-s G" . consult-git-grep)
-         ("M-s r" . consult-ripgrep)
-         ("C-c f" . consult-ripgrep)
-         ("M-s l" . consult-line)
-   ("M-s L" . consult-line-multi)
-         ;; Customizations that map to ivy
-         ("C-c r" . consult-recent-file)
-         ;; ("C-c o" . consult-file-externally)
-         ("C-s" . consult-line) ;; I've long favored Swiper mapped to c-s
-         ;; Isearch integration
-         ("M-s e" . consult-isearch-history)
-         :map isearch-mode-map
-         ("M-e" . consult-isearch-history)
-         ("M-s e" . consult-isearch-history)
-         ("M-s l" . consult-line))
+          ("C-c h" . consult-history)
+          ("C-c b" . consult-buffer)
+          ("C-c k" . consult-kmacro)
+          ;; C-x bindings (ctl-x-map)
+          ("C-x M-:" . consult-complex-command)
+          ("C-x b" . consult-bookmark)
+          ("s-b" . consult-buffer)
+          ("C-x 4 b" . consult-buffer-other-window)
+          ("C-s-b" . consult-buffer-other-window)
+          ("C-x 5 b" . consult-buffer-other-frame)
+          ;; Custom M-# bindings for fast register access
+          ("M-#" . consult-register-load)
+          ("M-'" . consult-register-store)
+          ("M-`" . consult-register)
+          ;; Other custom bindings
+          ("C-y" . consult-yank-from-kill-ring)
+          ("M-y" . consult-yank-from-kill-ring)
+          ("<help> a" . consult-apropos)
+          ("M-s k" . consult-keep-lines)
+          ("M-s u" . consult-focus-lines)
+          ;; M-g bindings (goto-map)
+          ("M-g e" . consult-compile-error)
+          ("M-g g" . consult-goto-line)
+          ("H-o" . consult-org-agenda)
+          ("C-c o" . consult-org-agenda)
+          ("M-g M-o" . consult-org-agenda)
+          ("M-g M-g" . consult-goto-line)
+          ("s-l" . consult-goto-line)
+          ("C-l" . consult-goto-line)
+          ("M-g o" . consult-outline)
+          ("M-g m" . consult-mark)
+          ("M-g M" . consult-global-mark)
+          ("C-x C-SPC" . consult-global-mark)
+          ("M-i" . consult-imenu)
+          ("M-g i" . consult-imenu)
+          ("M-g I" . consult-imenu-multi)
+          ;; M-s bindings (search-map)
+          ("M-s f" . consult-find)
+          ("M-s L" . consult-locate)
+          ;; ("M-s g" . consult-grep)
+          ("M-s G" . consult-git-grep)
+          ("M-s r" . consult-ripgrep)
+          ("C-c f" . consult-ripgrep)
+          ("M-s l" . consult-line)
+          ("M-s L" . consult-line-multi)
+          ;; Customizations that map to ivy
+          ("C-c r" . consult-recent-file)
+          ;; ("C-c o" . consult-file-externally)
+          ("C-s" . consult-line) ;; I've long favored Swiper mapped to c-s
+          ;; Isearch integration
+          ("M-s e" . consult-isearch-history)
+          :map isearch-mode-map
+          ("M-e" . consult-isearch-history)
+          ("M-s e" . consult-isearch-history)
+          ("M-s l" . consult-line))
   ;; The :init configuration is always executed (Not lazy)
   :init
   ;; Use Consult to select xref locations with preview
   (setq xref-show-xrefs-function #'consult-xref
-        xref-show-definitions-function #'consult-xref)
+    xref-show-definitions-function #'consult-xref)
   ;; Optionally configure the register formatting. This improves the register
   ;; preview for `consult-register', `consult-register-load',
   ;; `consult-register-store' and the Emacs built-ins.
   (setq register-preview-delay 0.5
-        register-preview-function #'consult-register-format)
+    register-preview-function #'consult-register-format)
   ;; Optionally tweak the register preview window.
   ;; This adds thin lines, sorting and hides the mode line of the window.
   (advice-add #'register-preview :override #'consult-register-window)
@@ -151,19 +151,19 @@
   ;; Updating the default to include "--smart-case"
   ;; Leveraging ripgrep-all https://github.com/phiresky/ripgrep-all
   (consult-ripgrep-command
-  (concat "rga --null --hidden --line-buffered --color=ansi --max-columns=1000 "
-    "--smart-case --no-heading --line-number --no-ignore-vcs "
-    "--glob !vendor/ --glob !coverage/ --glob !**/tmp/ --glob !**/log/ "
-    "--glob !public/ --glob !node_modules/ --glob !.git/ --glob !doc/ "
-    "--glob !.yardoc/ "
-    " . -e ARG OPTS"))
+    (concat "rg --null --hidden --line-buffered --color=ansi --max-columns=1000 "
+      "--smart-case --no-heading --line-number --no-ignore-vcs "
+      "--glob !vendor/ --glob !coverage/ --glob !**/tmp/ --glob !**/log/ "
+      "--glob !public/ --glob !node_modules/ --glob !.git/ --glob !doc/ "
+      "--glob !.yardoc/ "
+      " . -e ARG OPTS"))
   (consult-ripgrep-args
-  (concat "rga --null --hidden --line-buffered --color=never --max-columns=1000 "
-    "--path-separator / --no-ignore-vcs --smart-case --no-heading "
-    "--glob !vendor/ --glob !coverage/ --glob !**/tmp/ --glob !**/log/ "
-    "--glob !public/ --glob !node_modules/ --glob !.git/ --glob !doc/ "
-    "--glob !.yardoc/ "
-    "--line-number "))
+    (concat "rg --null --hidden --line-buffered --color=never --max-columns=1000 "
+      "--path-separator / --no-ignore-vcs --smart-case --no-heading "
+      "--glob !vendor/ --glob !coverage/ --glob !**/tmp/ --glob !**/log/ "
+      "--glob !public/ --glob !node_modules/ --glob !.git/ --glob !doc/ "
+      "--glob !.yardoc/ "
+      "--line-number "))
   ;; Configure other variables and modes in the :config section,
   ;; after lazily loading the package.
   :preface
@@ -209,21 +209,21 @@
   :config
   (consult-customize consult-buffer :keymap jf/consult-buffer-map)
   (consult-customize
-   consult-line consult-ripgrep consult-find
-   :initial (when (use-region-p)
-        (buffer-substring-no-properties (region-beginning) (region-end)))
-   ;; :keymap jf/consult-filter-map
-   ;; https://github.com/minad/consult/wiki#org-clock
-   consult-clock-in
-   :prompt "Clock in: "
-   :preview-key "M-."
-   :group
-   (lambda (cand transform)
-     (let* ((marker (get-text-property 0 'consult--candidate cand))
-            (name (if (member marker org-clock-history)
+    consult-line consult-ripgrep consult-find
+    :initial (when (use-region-p)
+               (buffer-substring-no-properties (region-beginning) (region-end)))
+    :keymap jf/consult-filter-map
+    ;; https://github.com/minad/consult/wiki#org-clock
+    consult-clock-in
+    :prompt "Clock in: "
+    :preview-key "M-."
+    :group
+    (lambda (cand transform)
+      (let* ((marker (get-text-property 0 'consult--candidate cand))
+              (name (if (member marker org-clock-history)
                       "*Recent*"
-                    (buffer-name (marker-buffer marker)))))
-       (if transform (substring cand (1+ (length name))) name))))
+                      (buffer-name (marker-buffer marker)))))
+        (if transform (substring cand (1+ (length name))) name))))
   (autoload 'projectile-project-root "projectile")
   (setq consult-project-root-function #'projectile-project-root))
 
@@ -247,9 +247,9 @@
   :straight t
   :after (consult)
   :bind (("C-x C-d" . consult-dir)
-         :map minibuffer-local-completion-map
-         ("C-x C-d" . consult-dir)
-         ("C-x C-j" . consult-dir-jump-file)))
+          :map minibuffer-local-completion-map
+          ("C-x C-d" . consult-dir)
+          ("C-x C-j" . consult-dir-jump-file)))
 
 (use-package consult-projectile
   ;; package provides a function I use everyday: ~M-x consult-projectile~.  When
@@ -259,10 +259,10 @@
   ;; then select a file within that project.
   :commands (consult-projectile)
   :straight (consult-projectile
-             :type git
-             :host gitlab
-             :repo "OlMon/consult-projectile"
-             :branch "master")
+              :type git
+              :host gitlab
+              :repo "OlMon/consult-projectile"
+              :branch "master")
   :bind
   ;;; This overwrite `ns-open-file-using-panel'; the operating system's "Finder"
   ;; ("C-c o" . consult-projectile)
@@ -279,15 +279,15 @@
   :straight t
   ;; Optionally use TAB for cycling, default is `corfu-complete'.
   :bind (:map corfu-map
-              ("M-m" . corfu-move-to-minibuffer)
-              ("<escape>". corfu-quit)
-              ("<return>" . corfu-insert)
-              ("M-d" . corfu-show-documentation)
-              ("M-l" . 'corfu-show-location)
-              ("TAB" . corfu-next)
-              ([tab] . corfu-next)
-              ("S-TAB" . corfu-previous)
-              ([backtab] . corfu-previous))
+          ("M-m" . corfu-move-to-minibuffer)
+          ("<escape>". corfu-quit)
+          ("<return>" . corfu-insert)
+          ("M-d" . corfu-show-documentation)
+          ("M-l" . 'corfu-show-location)
+          ("TAB" . corfu-next)
+          ([tab] . corfu-next)
+          ("S-TAB" . corfu-previous)
+          ([backtab] . corfu-previous))
   :custom
   ;; Works with `indent-for-tab-command'. Make sure tab doesn't indent when you
   ;; want to perform completion
@@ -319,15 +319,15 @@ Useful if you want a more robust view into the recommend candidates."
   ;; This is recommended since dabbrev can be used globally (M-/).
   (global-corfu-mode)
   (load "~/.emacs.d/straight/build/corfu/extensions/corfu-indexed.el"
-  nil
-  jf/silence-loading-log)
+    nil
+    jf/silence-loading-log)
   (corfu-indexed-mode)
   (load "~/.emacs.d/straight/build/corfu/extensions/corfu-info.el"
-  nil
-  jf/silence-loading-log)
+    nil
+    jf/silence-loading-log)
   (load "~/.emacs.d/straight/build/corfu/extensions/corfu-popupinfo.el"
-  nil
-  jf/silence-loading-log)
+    nil
+    jf/silence-loading-log)
   (corfu-popupinfo-mode))
 
 (use-package cape
@@ -335,7 +335,7 @@ Useful if you want a more robust view into the recommend candidates."
   ;; granular configuration of specific mode completion behavior.
   :straight t
   :init
-  ;; (add-to-list 'completion-at-point-functions #'cape-dabbrev)
+  (add-to-list 'completion-at-point-functions #'cape-dabbrev)
   (add-to-list 'completion-at-point-functions #'cape-file)
   (add-to-list 'completion-at-point-functions #'cape-keyword)
   :bind (("C-c p d" . cape-dabbrev)
@@ -355,15 +355,15 @@ Useful if you want a more robust view into the recommend candidates."
   (defun jf/grab-mac-link-make-html-link (url name)
     "Using HTML syntax, link to and cite the URL with the NAME."
     (format (concat "<cite>"
-        "<a href=\"%s\" class=\"u-url p-name\" rel=\"cite\">"
-        "%s"
-        "</a>"
-        "</cite>")
+              "<a href=\"%s\" class=\"u-url p-name\" rel=\"cite\">"
+              "%s"
+              "</a>"
+              "</cite>")
       url name))
   ;; The function advice to override the default behavior
   (advice-add 'grab-mac-link-make-html-link
-        :override 'jf/grab-mac-link-make-html-link
-        '((name . "jnf")))
+    :override 'jf/grab-mac-link-make-html-link
+    '((name . "jnf")))
   :bind (("C-c g" . grab-mac-link)))
 
 (use-package helpful
@@ -378,21 +378,21 @@ Useful if you want a more robust view into the recommend candidates."
   (transient-define-prefix jf/helpful-menu ()
     "Return a `transient' compliant list to apply to different transients."
     ["Help"
-     ""
-     ("Q" "Kill Helpful Buffers" helpful-kill-buffers)
-     ""
-     ("b" "Bindings" embark-bindings)
-     ("c" "Command" helpful-command)
-     ("d" "Docs" devdocs-lookup)
-     ("f" "Function (interactive)" helpful-callable)
-     ("F" "Function (all)" helpful-function)
-     ("k" "Key" helpful-key)
-     ("l" "Library" find-library)
-     ("m" "Macro" helpful-macro)
-     ("p" "Thing at point" helpful-at-point)
-     ("." "Thing at point" helpful-at-point)
-     ("t" "Text properties" describe-text-properties)
-     ("v" "Variable" helpful-variable)])
+      ""
+      ("Q" "Kill Helpful Buffers" helpful-kill-buffers)
+      ""
+      ("b" "Bindings" embark-bindings)
+      ("c" "Command" helpful-command)
+      ("d" "Docs" devdocs-lookup)
+      ("f" "Function (interactive)" helpful-callable)
+      ("F" "Function (all)" helpful-function)
+      ("k" "Key" helpful-key)
+      ("l" "Library" find-library)
+      ("m" "Macro" helpful-macro)
+      ("p" "Thing at point" helpful-at-point)
+      ("." "Thing at point" helpful-at-point)
+      ("t" "Text properties" describe-text-properties)
+      ("v" "Variable" helpful-variable)])
   :bind ("H-h" . jf/helpful-menu)
   ("C-s-h" . jf/helpful-menu))
 
@@ -406,16 +406,16 @@ Useful if you want a more robust view into the recommend candidates."
   :straight t
   :config
   (setq hippie-expand-try-functions-list '(try-expand-dabbrev-visible
-             try-expand-dabbrev
-             try-expand-dabbrev-all-buffers
-             try-expand-dabbrev-from-kill
-             try-complete-file-name
-             try-complete-file-name-partially
-             try-expand-all-abbrevs
-             try-expand-list
-             try-expand-line
-             try-complete-lisp-symbol-partially
-             try-complete-lisp-symbol))
+                                            try-expand-dabbrev
+                                            try-expand-dabbrev-all-buffers
+                                            try-expand-dabbrev-from-kill
+                                            try-complete-file-name
+                                            try-complete-file-name-partially
+                                            try-expand-all-abbrevs
+                                            try-expand-list
+                                            try-expand-line
+                                            try-complete-lisp-symbol-partially
+                                            try-complete-lisp-symbol))
   :bind (("M-SPC" . hippie-expand))
   :init (global-set-key [remap dabbrev-expand] 'hippie-expand))
 
@@ -460,57 +460,57 @@ Useful if you want a more robust view into the recommend candidates."
   :config
   (defvar +orderless-dispatch-alist
     '((?% . char-fold-to-regexp)
-      (?! . orderless-without-literal)
-      (?`. orderless-initialism)
-      (?= . orderless-literal)
-      (?~ . orderless-flex)))
+       (?! . orderless-without-literal)
+       (?`. orderless-initialism)
+       (?= . orderless-literal)
+       (?~ . orderless-flex)))
   (defun +orderless-dispatch (pattern index _total)
     (cond
-     ;; Ensure that $ works with Consult commands, which add disambiguation
-     ;; suffixes
-     ((string-suffix-p "$" pattern)
-      `(orderless-regexp . ,(concat (substring pattern 0 -1)
-            "[\x100000-\x10FFFD]*$")))
-     ;; File extensions
-     ((and
-       ;; Completing filename or eshell
-       (or minibuffer-completing-file-name
+      ;; Ensure that $ works with Consult commands, which add disambiguation
+      ;; suffixes
+      ((string-suffix-p "$" pattern)
+        `(orderless-regexp . ,(concat (substring pattern 0 -1)
+                                "[\x100000-\x10FFFD]*$")))
+      ;; File extensions
+      ((and
+         ;; Completing filename or eshell
+         (or minibuffer-completing-file-name
            (derived-mode-p 'eshell-mode))
-       ;; File extension
-       (string-match-p "\\`\\.." pattern))
-      `(orderless-regexp . ,(concat "\\." (substring pattern 1)
-            "[\x100000-\x10FFFD]*$")))
-     ;; Ignore single !
-     ((string= "!" pattern) `(orderless-literal . ""))
-     ;; Prefix and suffix
-     ((if-let (x (assq (aref pattern 0) +orderless-dispatch-alist))
-          (cons (cdr x) (substring pattern 1))
-        (when-let (x (assq (aref pattern (1- (length pattern)))
-         +orderless-dispatch-alist))
-          (cons (cdr x) (substring pattern 0 -1)))))))
+         ;; File extension
+         (string-match-p "\\`\\.." pattern))
+        `(orderless-regexp . ,(concat "\\." (substring pattern 1)
+                                "[\x100000-\x10FFFD]*$")))
+      ;; Ignore single !
+      ((string= "!" pattern) `(orderless-literal . ""))
+      ;; Prefix and suffix
+      ((if-let (x (assq (aref pattern 0) +orderless-dispatch-alist))
+         (cons (cdr x) (substring pattern 1))
+         (when-let (x (assq (aref pattern (1- (length pattern)))
+                        +orderless-dispatch-alist))
+           (cons (cdr x) (substring pattern 0 -1)))))))
   ;; Define orderless style with initialism by default
   (orderless-define-completion-style +orderless-with-initialism
     (orderless-matching-styles '(orderless-initialism
-         orderless-literal
-         orderless-regexp)))
+                                  orderless-literal
+                                  orderless-regexp)))
   ;; Certain dynamic completion tables (completion-table-dynamic) do not work
   ;; properly with orderless. One can add basic as a fallback.  Basic will only
   ;; be used when orderless fails, which happens only for these special tables.
   (setq completion-styles '(orderless basic)
-        completion-category-defaults nil
+    completion-category-defaults nil
           ;;; Enable partial-completion for files.
           ;;; Either give orderless precedence or partial-completion.
           ;;; Note that completion-category-overrides is not really an override,
           ;;; but rather prepended to the default completion-styles.
-        ;; completion-category-overrides '((file (styles orderless
-        ;; partial-completion))) ;; orderless is tried first
-        completion-category-overrides '((file (styles partial-completion))
-                                        ;; enable initialism by default for symbols
-                                        (command (styles +orderless-with-initialism))
-                                        (variable (styles +orderless-with-initialism))
-                                        (symbol (styles +orderless-with-initialism)))
-        orderless-component-separator #'orderless-escapable-split-on-space
-        orderless-style-dispatchers '(+orderless-dispatch)))
+    ;; completion-category-overrides '((file (styles orderless
+    ;; partial-completion))) ;; orderless is tried first
+    completion-category-overrides '((file (styles partial-completion))
+                                     ;; enable initialism by default for symbols
+                                     (command (styles +orderless-with-initialism))
+                                     (variable (styles +orderless-with-initialism))
+                                     (symbol (styles +orderless-with-initialism)))
+    orderless-component-separator #'orderless-escapable-split-on-space
+    orderless-style-dispatchers '(+orderless-dispatch)))
 
 (use-package org-mac-link
   ;; Similar to `grab-mac-link' but a bit specific to `org-mode'.
@@ -526,23 +526,23 @@ Useful if you want a more robust view into the recommend candidates."
   :custom (tempel-path "~/git/dotemacs/templates")
   :config (global-tempel-abbrev-mode)
   :bind (("M-+" . tempel-complete) ;; Alternative tempel-expand
-   ("M-*" . tempel-insert))
+          ("M-*" . tempel-insert))
   :bind (:map tempel-map (([backtab] . tempel-previous)
         ("TAB" . tempel-next)))
   :preface
   (cl-defun jf/org-macro-value-list (macro-name &key (dir org-directory))
     "List the unique inner text of all uses of MACRO-NAME in given DIR."
     (s-split
-     "\n"
-     (s-trim
-      (shell-command-to-string
-       (concat
-  "rg \"\\{\\{\\{"
-  macro-name
-  "\\((.+?)\\)\\}\\}\\}"
-  "\" --only-matching --no-filename -r '$1' "
-  dir
-  " | sort | uniq")))))
+      "\n"
+      (s-trim
+        (shell-command-to-string
+          (concat
+            "rg \"\\{\\{\\{"
+            macro-name
+            "\\((.+?)\\)\\}\\}\\}"
+            "\" --only-matching --no-filename -r '$1' "
+            dir
+            " | sort | uniq")))))
   ;; Setup completion at point
   (defun tempel-setup-capf ()
     ;; Add the Tempel Capf to `completion-at-point-functions'. `tempel-expand'
@@ -552,8 +552,10 @@ Useful if you want a more robust view into the recommend candidates."
     ;; NOTE: We add `tempel-expand' *before* the main programming mode Capf,
     ;; such that it will be tried first.
     (setq-local completion-at-point-functions
-    (cons #'tempel-expand
-          completion-at-point-functions)))
+      (cons #'tempel-expand
+        completion-at-point-functions)))
+  (add-hook 'prog-mode-hook 'tempel-setup-capf)
+  (add-hook 'text-mode-hook 'tempel-setup-capf)
   ;; Optionally make the Tempel templates available to Abbrev,
   ;; either locally or globally. `expand-abbrev' is bound to C-x '.
   ;; (add-hook 'prog-mode-hook #'tempel-abbrev-mode)
@@ -583,37 +585,37 @@ Useful if you want a more robust view into the recommend candidates."
       (goto-char (point-max))
       (insert " ")
       (add-text-properties (minibuffer-prompt-end) (point-max)
-                           '(invisible t
-               read-only t
-               cursor-intangible t
-                              rear-nonsticky t))))
+        '(invisible t
+           read-only t
+           cursor-intangible t
+           rear-nonsticky t))))
   :config
   (define-key vertico-map (kbd "C-SPC") #'jf/vertico-restrict-to-matches)
   (vertico-mode)
   ;; Use `consult-completion-in-region' if Vertico is enabled.
   ;; Otherwise use the default `completion--in-region' function.
   (setq completion-in-region-function
-        (lambda (&rest args)
-          (apply (if vertico-mode
-                     #'consult-completion-in-region
-                   #'completion--in-region)
-                 args)))
+    (lambda (&rest args)
+      (apply (if vertico-mode
+               #'consult-completion-in-region
+               #'completion--in-region)
+        args)))
   (setq read-file-name-completion-ignore-case t
-        read-buffer-completion-ignore-case t
-        completion-ignore-case t)
+    read-buffer-completion-ignore-case t
+    completion-ignore-case t)
   (setq vertico-cycle t)
   :init
   ;; Type "C-3 return" and select the 3rd candidate in the list.
   (load "~/.emacs.d/straight/build/vertico/extensions/vertico-indexed.elc"
-  nil
-  jf/silence-loading-log)
+    nil
+    jf/silence-loading-log)
   (vertico-indexed-mode)
   (load "~/.emacs.d/straight/build/vertico/extensions/vertico-directory.elc"
-  nil
-  jf/silence-loading-log)
+    nil
+    jf/silence-loading-log)
   (load "~/.emacs.d/straight/build/vertico/extensions/vertico-repeat.elc"
-  nil
-  jf/silence-loading-log)
+    nil
+    jf/silence-loading-log)
   (global-set-key (kbd "M-r") #'vertico-repeat)
   (add-hook 'minibuffer-setup-hook #'vertico-repeat-save))
 
