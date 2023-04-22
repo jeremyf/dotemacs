@@ -68,9 +68,9 @@ setting up an IDE-like layout)."
                            (_ (intern (completing-read "Side: "
                                         '(left right top bottom) nil t))))
                    :size (pcase current-prefix-arg
-                           ('nil 0.4)
-                           ('(4) 0.4)
-                           (_ (read-number "Size: " 0.4)))
+                           ('nil 0.45)
+                           ('(4) 0.45)
+                           (_ (read-number "Size: " 0.45)))
                    :slot (pcase current-prefix-arg
                            ('nil 0)
                            ('(4) 0)
@@ -89,7 +89,7 @@ setting up an IDE-like layout)."
            (side . ,side)
            (slot . ,slot)
            (window-parameters
-             (mode-line-format . (" %b"))
+             (mode-line-format . (" Dedicate: %b"))
              (no-delete-other-windows . t))))
       ;; The pulse makes sense when I'm using `display-buffer'.
       (pulsar-pulse-line-green))))
