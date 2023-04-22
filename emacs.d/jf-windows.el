@@ -29,8 +29,22 @@
          (slot . 0)
          (window-parameters . ((mode-line-format . (" %b")))))
        ("*Register Preview*" (display-buffer-reuse-window))))
-  :bind ("s-\\" . #'jf/side-window-toggle)
+  :bind (("s-\\" . #'jf/side-window-toggle)
+          ("s-q" . #'jf/bury-or-unbury-buffer))
   :preface
+  (defun jf/bury-or-unbury-buffer (&optional prefix)
+    "Without PREFIX `bury-buffer' a buffer.
+
+With one universal PREFIX, `unbury-buffer'.
+With two universal PREFIX `delete-frame'.
+With three or more universal PREFIX `save-buffers-kill-emacs'."
+    (interactive "p")
+    (cond
+      ((eq prefix nil) (bury-buffer))
+      ((>= prefix 64) (save-buffers-kill-emacs))
+      ((>= prefix 16) (delete-frame))
+      ((>= prefix 4) (unbury-buffer))
+      (t (bury-buffer))))
   (cl-defun jf/side-window-toggle ()
     "Either bury the dedicated buffer or open one based on `current-buffer'."
     (interactive)
@@ -73,9 +87,9 @@ setting up an IDE-like layout)."
            (,size-direction . ,size)
            (side . ,side)
            (slot . ,slot)
-             (window-parameters
-               (mode-line-format . (" %b"))
-               (no-delete-other-windows . t))))
+           (window-parameters
+             (mode-line-format . (" %b"))
+             (no-delete-other-windows . t))))
       ;; The pulse makes sense when I'm using `display-buffer'.
       (pulsar-pulse-line-green))))
 
@@ -84,9 +98,9 @@ setting up an IDE-like layout)."
   "Help me see tabs; they are tricky creatures.")
 
 (add-hook 'prog-mode-hook
-     (lambda () (font-lock-add-keywords nil '(("\t" . 'jf/tabs-face)))))
+  (lambda () (font-lock-add-keywords nil '(("\t" . 'jf/tabs-face)))))
 (add-hook 'text-mode-hook
-     (lambda () (font-lock-add-keywords nil '(("\t" . 'jf/tabs-face)))))
+  (lambda () (font-lock-add-keywords nil '(("\t" . 'jf/tabs-face)))))
 
 ;; And now the theme.  I’ve chosen the modus themes (e.g. ~modus-vivendi~ and
 ;; ~modus-operandi~).  They provide a light and dark theme with a focus on visual
@@ -118,7 +132,7 @@ setting up an IDE-like layout)."
          ((,c :foreground ,red))))))
 
 (add-hook 'modus-themes-after-load-theme-hook
-    #'jf/modus-themes-custom-faces)
+  #'jf/modus-themes-custom-faces)
 
 (use-package modus-themes
   ;; I love [[http://protesilaos.com][Prot]]’s attention to detail with the modus
@@ -172,10 +186,10 @@ setting up an IDE-like layout)."
 (defun jf/emacs-theme-by-osx-appearance ()
   "Set theme based on OSX appearance state."
   (if (equal "Dark" (substring
-         (shell-command-to-string
-          "defaults read -g AppleInterfaceStyle")
-         0 4))
-      (modus-themes-load-theme 'modus-vivendi-tinted)
+                      (shell-command-to-string
+                        "defaults read -g AppleInterfaceStyle")
+                      0 4))
+    (modus-themes-load-theme 'modus-vivendi-tinted)
     (modus-themes-load-theme 'modus-operandi-tinted)))
 
 (jf/emacs-theme-by-osx-appearance)

@@ -196,9 +196,9 @@
   :init
   (savehist-mode))
 
-(use-package savekill
-  ;; Write "kill" command inputs to disk.
-  :straight t)
+;; (use-package savekill
+;;   ;; Write "kill" command inputs to disk.
+;;   :straight t)
 
 (use-package undo-tree
   ;; Provides a UI for undo trees.  I'm not certain what I want to do with this.
