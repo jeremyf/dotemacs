@@ -31,6 +31,7 @@
        ("*Register Preview*" (display-buffer-reuse-window))))
   :bind (("s-\\" . #'jf/side-window-toggle)
           ("s-q" . #'jf/bury-or-unbury-buffer))
+  :config (setq confirm-kill-emacs #'yes-or-no-p)
   :preface
   (defun jf/bury-or-unbury-buffer (&optional prefix)
     "Without PREFIX `bury-buffer' a buffer.
@@ -41,7 +42,7 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
     (interactive "p")
     (cond
       ((eq prefix nil) (bury-buffer))
-      ((>= prefix 64) (save-buffers-kill-emacs))
+      ((>= prefix 64) (save-buffers-kill-emacs t))
       ((>= prefix 16) (delete-frame))
       ((>= prefix 4) (unbury-buffer))
       (t (bury-buffer))))
