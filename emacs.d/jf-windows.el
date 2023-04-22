@@ -33,6 +33,7 @@
           ("s-q" . #'jf/bury-or-unbury-buffer))
   :config (setq confirm-kill-emacs #'yes-or-no-p)
   :preface
+  ;; For some reason, the C-x 5 0
   (defun jf/bury-or-unbury-buffer (&optional prefix)
     "Without PREFIX `bury-buffer' a buffer.
 
@@ -41,7 +42,7 @@ With two universal PREFIX `delete-frame'.
 With three or more universal PREFIX `save-buffers-kill-emacs'."
     (interactive "p")
     (cond
-      ((eq prefix nil) (bury-buffer))
+      ((eq prefix nil) (if buffer-read-only (kill-current-buffer) (bury-buffer)))
       ((>= prefix 64) (save-buffers-kill-emacs t))
       ((>= prefix 16) (delete-frame))
       ((>= prefix 4) (unbury-buffer))
