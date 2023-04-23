@@ -93,7 +93,7 @@
           ("M-'" . consult-register-store)
           ("M-`" . consult-register)
           ;; Other custom bindings
-          ("C-y" . consult-yank-from-kill-ring)
+          ("C-y" . yank)
           ("M-y" . consult-yank-from-kill-ring)
           ("<help> a" . consult-apropos)
           ("M-s k" . consult-keep-lines)
