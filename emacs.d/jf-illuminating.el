@@ -20,7 +20,7 @@
   ;; leverages sexp.
   :straight t
   :bind (("C-=" . er/expand-region)
-         ("C-+" . er/contract-region)))
+          ("C-+" . er/contract-region)))
 
 (use-package fill-column-indicator
   ;; It's nice to have a gentle reminder showing me the recommended column width
@@ -30,13 +30,6 @@
   :config
   (setq fci-rule-width 1))
 
-;; (use-package highlight-indent-guides
-;;   ;; provides column highlighting.  Useful when you start seeing too many nested
-;;   ;; layers.
-;;   :straight t
-;;   :custom (highlight-indent-guides-method 'character)
-;;   (highlight-indent-guides-responsive 'top)
-;;   :hook (prog-mode . highlight-indent-guides-mode))
 
 (use-package kind-icon
   ;; This packages helps provide additional icons for functions and variables in
@@ -46,9 +39,9 @@
   :custom
   (kind-icon-use-icons t)
   (kind-icon-default-face 'corfu-default) ; Have background color be the same as
-					  ; `corfu' face background
+                                        ; `corfu' face background
   (kind-icon-blend-background nil)  ; Use midpoint color between foreground and
-				    ; background colors ("blended")?
+                                        ; background colors ("blended")?
   (kind-icon-blend-frac 0.08)
   ;; directory that defaults to the `user-emacs-directory'. Here, I change that
   ;; directory to a location appropriate to `no-littering' conventions, a
@@ -56,7 +49,7 @@
   ;; (svg-lib-icons-dir (no-littering-expand-var-file-name "svg-lib/cache/")) ;
   ;; Change cache dir
   :config
-					; Enable `kind-icon'
+                                        ; Enable `kind-icon'
   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)
   ;; Add hook to reset cache so the icon colors match my theme
   ;; NOTE 2022-02-05: This is a hook which resets the cache whenever I switch
@@ -66,7 +59,7 @@
   ;; since I have a light theme and dark theme I switch between. This has no
   ;; function unless you use something similar
   (add-hook 'kb/themes-hooks
-	    #'(lambda () (interactive) (kind-icon-reset-cache))))
+    #'(lambda () (interactive) (kind-icon-reset-cache))))
 
 (use-package lin
   ;;  “LIN locally remaps the hl-line face to a style that is optimal for major
@@ -91,7 +84,7 @@
   :config
   (pulsar-global-mode 1)
   (setq pulsar-face 'pulsar-magenta
-	  pulsar-delay 0.05)
+    pulsar-delay 0.05)
   (setq ring-bell-function 'jf/pulse)
   :preface
   (defun jf/pulse (&optional parg)
@@ -100,7 +93,7 @@
   If PARG (given as universal prefix), pulse between `point' and `mark'."
     (interactive "P")
     (if (car parg)
-	    (pulsar--pulse nil nil (point) (mark))
+      (pulsar--pulse nil nil (point) (mark))
       (pulsar-pulse-line)))
   :bind (("C-c C-l" . jf/pulse)))
 
@@ -122,40 +115,6 @@
   :config
   (setq enable-recursive-minibuffers t)
   (recursion-indicator-mode))
-
-;; (use-package symbol-overlay
-;;   ;; When point is on a symbol, highlight that symbol throughout the visible
-;;   ;; buffer.  From that concept, expose jump commands and renaming.
-;;   ;;
-;;   ;; See
-;;   ;; https://github.com/wolray/symbol-overlay/tree/c439b73a5f9713bb3dce98986b589bb901e22130
-;;   :straight t
-;;   :commands (symbol-overlay-jump-next symbol-overlay-jump-prev)
-;;   :hook (prog-mode . symbol-overlay-mode)
-;;   :config
-;;   (use-package transient :straight t)
-;;   (transient-define-prefix symbol-overlay-transient ()
-;;     "Symbol Overlay transient"
-;;     ["Symbol Overlay"
-;;      ["Overlays"
-;;       ("." "Add/Remove at point" symbol-overlay-put)
-;;       ("k" "Remove All" symbol-overlay-remove-all)
-;;       ]
-;;      ["Jump to Symbol"
-;;       ("n" "Next" symbol-overlay-jump-next)
-;;       ("p" "Previous" symbol-overlay-jump-prev)
-;;       ]
-;;      ["Other"
-;;       ("m" "Highlight symbol-at-point" symbol-overlay-mode)
-;;       ("q" "Query and replace" symbol-overlay-query-replace)
-;;       ("r" "Rename" symbol-overlay-rename)
-;;       ]
-;;      ]
-;;     )
-;;   :bind (:map symbol-overlay-mode-map
-;; 	      ("H-." . symbol-overlay-transient)
-;; 	      ("M-n" . symbol-overlay-jump-next)
-;; 	      ("M-p" . symbol-overlay-jump-prev)))
 
 (use-package vi-tilde-fringe
   ;; Show tilde (e.g. ~\~~) on empty trailing lines.  This is a feature ported
