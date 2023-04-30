@@ -29,6 +29,7 @@
   ;; Todo, can I get this section into a function so I can duplicate it in the jf/menu--tor?
   [["Jump to"
      ("j a" "Agenda" jf/org-mode/jump-to-agenda-or-mark)
+     ("j A" "Agenda, Personal" (lambda () (interactive) (find-file "~/git/org/agenda.org")))
      ("j c" "Capture Backlog" (lambda () (interactive) (find-file jf/org-mode/capture/filename)))
      ("j g" "Global Mark" consult-global-mark)
      ("j h" "Hugo File" jf/jump_to_corresponding_hugo_file :if-derived org-mode)

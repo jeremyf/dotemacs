@@ -33,7 +33,7 @@
           ("s-q" . #'jf/bury-or-unbury-buffer))
   :config (setq confirm-kill-emacs #'yes-or-no-p)
   :preface
-  ;; For some reason, the C-x 5 0
+  ;; For some reason, the C-x 5 0 keybindings don't set in my brain.
   (defun jf/bury-or-unbury-buffer (&optional prefix)
     "Without PREFIX `bury-buffer' a buffer.
 
