@@ -46,7 +46,7 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
       ((>= prefix 64) (save-buffers-kill-emacs t))
       ((>= prefix 16) (delete-frame))
       ((>= prefix 4) (unbury-buffer))
-      (t (bury-buffer))))
+      (t (if buffer-read-only (kill-current-buffer) (bury-buffer)))))
   (cl-defun jf/side-window-toggle ()
     "Either bury the dedicated buffer or open one based on `current-buffer'."
     (interactive)

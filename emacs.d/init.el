@@ -38,6 +38,7 @@
 (require 'jf-project)
 (require 'jf-menus)
 (require 'jf-experiments)
+(require 'git-related)
 
 
 (setq jf/artist-mode-spraycan "🞄⁛◌🞆⊖⊗⁛●◯⦿⬤")
