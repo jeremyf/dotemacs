@@ -133,24 +133,28 @@
       (git-related--replay graph))))
 
 ;;;###autoload
-(defun git-related-find-file ()
+(defun consult-git-related ()
   "Find files related through commit history."
   (interactive)
   (if (buffer-file-name)
     (let ((default-directory (project-root (project-current))))
       (find-file
-        (let* ((selection
-                 (completing-read  "Related files: "
-                   (mapcar #'git-related--convert-to-completion-format
-                     (git-related--similar-files
-                       (cl-getf git-related--graphs (intern (project-name (project-current))))
-                       (file-relative-name (buffer-file-name) (project-root (project-current)))))
-                   nil t)))
-          (when selection
-            (format "%s" (s-trim (car (cdr (s-split git-related--separator selection)))))))))
-            ;; (let ((filename (get-text-property 0 'path selection)))
-            ;;   (find-file filename))))))
-    (message "Current buffer has no file")))
+        (when-let ((selection (consult-git-related--read)))
+            (format "%s" (s-trim (car (cdr (s-split git-related--separator selection))))))))
+    (user-error "Current buffer has no file")))
+
+(defun consult-git-related--read ()
+  (consult--read
+    (consult--slow-operation "Building Git Relationships..."
+      (mapcar #'git-related--convert-to-completion-format
+        (git-related--similar-files
+          (cl-getf git-related--graphs (intern (project-name (project-current))))
+          (file-relative-name (buffer-file-name) (project-root (project-current))))))
+    :prompt "Related files in Git history: "
+    :category 'consult-git-related
+    :sort nil
+    :require-match t
+    :history t))
 
 (provide 'git-related)
 
