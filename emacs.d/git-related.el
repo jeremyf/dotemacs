@@ -4,6 +4,7 @@
 
 ;; Author: Nthcdr <nthcdr@macroexpand.net>
 ;; Maintainer: Nthcdr <nthcdr@macroexpand.net>
+;; Contributions: Jeremy Friesen <jeremy@jeremyfriesen.com>
 ;; URL: https://macroexpand.net/el/git-related.el
 ;; Version: 1.0
 ;; Package-Requires: ((emacs "28.1"))
@@ -26,9 +27,14 @@
 ;; Find files by recommendation based on git commit history.
 
 ;; Usage: Visiting a git versioned file run once (and then only when
-;; you feel the need to refresh) `git-related-update` than you will get
+;; you feel the need to refresh) `consult-git-related-update' than you will get
 ;; suggestions based on the current file through invocations to
-;; `git-related-find-file`
+;; `consult-git-related-find-file'
+
+;;; Todo:
+
+;; Test that the graph exists, if not, run the command for the graph then
+;; proceed.
 
 ;;; Code:
 
@@ -36,9 +42,9 @@
 (require 'subr-x)
 (require 'project)
 (require 'vc-git)
+(require 'consult)
 
 (defvar git-related--graphs nil)
-(defvar git-related--separator " ---> " "The separator between distance and file name")
 
 (cl-defstruct git-related--graph files commits)
 (cl-defstruct git-related--file (name "" :type string) (commits nil :type list))
@@ -89,28 +95,30 @@
   (unless (git-related--graph-p graph)
     (user-error "You need to index this project first"))
   (when-let ((file (gethash filename (git-related--graph-files graph))))
-    (cl-sort
-      (progn
-        (let ((file-sqrt (sqrt (length (git-related--file-commits file))))
-               (neighbor-sqrts (make-hash-table :test 'equal :size 100))
-               (hits (make-hash-table :test 'equal :size 100)))
 
-          (dolist (commit (git-related--file-commits file))
-            (dolist (neighbor (remove file (git-related--commit-files commit)))
-              (let ((count (cl-incf (gethash (git-related--file-name neighbor) hits 0))))
-                (when (= count 1)
-                  (setf (gethash (git-related--file-name neighbor) neighbor-sqrts)
-                    (sqrt (length (git-related--file-commits neighbor))))))))
+    (let ((file-sqrt (sqrt (length (git-related--file-commits file))))
+           (neighbor-sqrts (make-hash-table :test 'equal :size 100))
+           (hits (make-hash-table :test 'equal :size 100)))
 
-          (let (ranked-neighbors)
-            (maphash
-              (lambda (neighbor-name neighbor-sqrt)
-                (let ((axb (* file-sqrt neighbor-sqrt))
-                       (n (gethash neighbor-name hits)))
-                  (push (list (if (cl-plusp axb) (/ n axb) 0.0) neighbor-name) ranked-neighbors)))
-              neighbor-sqrts)
-            (cl-remove-if-not #'git-related--file-exists-p ranked-neighbors :key #'cadr))))
-      #'> :key #'car)))
+      (dolist (commit (git-related--file-commits file))
+        (dolist (neighbor (remove file (git-related--commit-files commit)))
+          (let ((count (cl-incf (gethash (git-related--file-name neighbor) hits 0))))
+            (when (= count 1)
+              (setf (gethash (git-related--file-name neighbor) neighbor-sqrts)
+                (sqrt (length (git-related--file-commits neighbor))))))))
+
+      (let (ranked-neighbors)
+        (maphash
+          (lambda (neighbor-name neighbor-sqrt)
+            (let ((axb (* file-sqrt neighbor-sqrt))
+                   (n (gethash neighbor-name hits)))
+              (push (list (if (cl-plusp axb) (/ n axb) 0.0) neighbor-name) ranked-neighbors)))
+          neighbor-sqrts)
+        ;; We want to sort in descending score order.  Thus the more "related"
+        ;; files are at the beginning of the list.
+        (cl-sort
+          (cl-remove-if-not #'git-related--file-exists-p ranked-neighbors :key #'cadr)
+          #'> :key #'car)))))
 
 (defun git-related--file-exists-p (relative-filename)
   "Determine if RELATIVE-FILENAME currently exists."
@@ -118,12 +126,15 @@
     (expand-file-name relative-filename
       (project-root (project-current)))))
 
-(defun git-related--convert-to-completion-format (hit)
+(defun consult-git-related--propertize-hit (hit)
   "Given the cons HIT return a rendered representation for completion."
-  (format "%2.2f %s %s" (car hit) git-related--separator (cadr hit)))
+  (propertize
+    (cadr hit)
+    'score (car hit)
+    'path (cadr hit)))
 
 ;;;###autoload
-(defun git-related-update ()
+(defun consult-git-related-update ()
   "Update graph for the current project."
   (interactive)
   (let* ((default-directory (project-root (project-current)))
@@ -133,28 +144,38 @@
       (git-related--replay graph))))
 
 ;;;###autoload
-(defun consult-git-related ()
+(defun consult-git-related-find-file ()
   "Find files related through commit history."
   (interactive)
   (if (buffer-file-name)
     (let ((default-directory (project-root (project-current))))
       (find-file
         (when-let ((selection (consult-git-related--read)))
-            (format "%s" (s-trim (car (cdr (s-split git-related--separator selection))))))))
+          (format "%s"  selection))))
     (user-error "Current buffer has no file")))
 
 (defun consult-git-related--read ()
+  "A completing read function leveraging `consult-read'."
   (consult--read
     (consult--slow-operation "Building Git Relationships..."
-      (mapcar #'git-related--convert-to-completion-format
+      (mapcar #'consult-git-related--propertize-hit
         (git-related--similar-files
           (cl-getf git-related--graphs (intern (project-name (project-current))))
           (file-relative-name (buffer-file-name) (project-root (project-current))))))
     :prompt "Related files in Git history: "
     :category 'consult-git-related
+    ;; This should be nil so we leverage the sort of the `git-related--similar-files'
     :sort nil
+    :annotate #'consult-git-related--annotator
     :require-match t
     :history t))
+
+(defun consult-git-related--annotator (cand)
+  "Annotate the given CAND with it's score and modified date."
+  (consult--annotate-align cand
+    (format "%3.3f · %s"
+      (get-text-property 0 'score cand)
+      (format-time-string "%Y-%m-%d" (f-change-time cand)))))
 
 (provide 'git-related)
 

@@ -133,6 +133,7 @@
           ("M-e" . consult-isearch-history)
           ("M-s e" . consult-isearch-history)
           ("M-s l" . consult-line))
+  :commands (consult--read)
   ;; The :init configuration is always executed (Not lazy)
   :init
   ;; Use Consult to select xref locations with preview
