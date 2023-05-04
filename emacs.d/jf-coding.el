@@ -413,37 +413,34 @@ method, get the containing class."
   (defun jf/ruby-mode/yardoc-ify ()
     "Add parameter yarddoc stubs for the current method."
     (interactive)
-    ;; Remember where we started.
     (save-excursion
-      ;; Goto the beginning of the function
-      (ruby-beginning-of-defun)
-      ;; Move to just after the first (
-      (search-forward "(")
-      ;; Move back to just before the (
-      (backward-char)
-      ;; Select parameters declaration
-      (mark-sexp)
-      ;; Copy that
-      (copy-region-as-kill (point) (mark))
-      ;; Split apart the parameters into their identifiers
-      (let ((identifiers (mapcar (lambda (token)
-                                   (replace-regexp-in-string
-                                     "[^a-z|_]" ""
-                                     (car (s-split " "
-                                            (s-trim token)))))
-                           (s-split "," (substring-no-properties
-                                          (car kill-ring))))))
-        ;; Go to the beginning of the function again
-        (ruby-beginning-of-defun)
-        ;; Now insert the identifiers as yardoc
-        (insert "##\n"
-          (s-join "\n" (mapcar
-                         (lambda (param)
-                           (concat "# @param "
-                             param
-                             " [Object]"))
-                         identifiers))
-          "\n"))))
+      (when-let* ((func (treesit-defun-at-point))
+                   (method_parameters_text
+                     (treesit-node-text (car
+                                          (treesit-filter-child
+                                            func
+                                            (lambda (node)
+                                              (string= "method_parameters"
+                                                (treesit-node-type node))))))))
+        (goto-char (treesit-node-start func))
+        ;; Grab the parameter names.
+        (let* ((identifiers (mapcar (lambda (token)
+                                      (replace-regexp-in-string
+                                        "[^a-z|_]" ""
+                                        (car (s-split " "
+                                               (s-trim token)))))
+                              (s-split "," method_parameters_text)))
+                (indentation (s-repeat (current-column) " ")))
+          (previous-line)
+          (end-of-line)
+          (insert
+            (concat "\n" indentation "##\n")
+            (s-join "\n" (mapcar
+                           (lambda (param)
+                             (concat indentation "# @param "
+                               param
+                               " [Object]"))
+                           identifiers))))))))
   :bind* (:map ruby-mode-map (("C-c C-f" . jf/current-scoped-function-name)
                                ("C-c C-y" . jf/ruby-mode/yardoc-ify)))
   :hook ((ruby-mode ruby-ts-mode) . yard-mode))
