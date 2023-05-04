@@ -440,7 +440,7 @@ method, get the containing class."
                              (concat indentation "# @param "
                                param
                                " [Object]"))
-                           identifiers))))))))
+                           identifiers)))))))
   :bind* (:map ruby-mode-map (("C-c C-f" . jf/current-scoped-function-name)
                                ("C-c C-y" . jf/ruby-mode/yardoc-ify)))
   :hook ((ruby-mode ruby-ts-mode) . yard-mode))
