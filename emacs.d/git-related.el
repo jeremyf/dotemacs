@@ -90,7 +90,7 @@
         (progress-reporter-done progress-reporter)))
     graph))
 
-(defun git-related--similar-files (graph filename)
+(cl-defun git-related--similar-files (&key graph filename)
   "Return files in GRAPH that are similar to FILENAME."
   (unless (git-related--graph-p graph)
     (user-error "You need to index this project first"))
@@ -160,8 +160,8 @@
     (consult--slow-operation "Building Git Relationships..."
       (mapcar #'consult-git-related--propertize-hit
         (git-related--similar-files
-          (cl-getf git-related--graphs (intern (project-name (project-current))))
-          (file-relative-name (buffer-file-name) (project-root (project-current))))))
+          :graph (cl-getf git-related--graphs (intern (project-name (project-current))))
+          :filename (file-relative-name (buffer-file-name) (project-root (project-current))))))
     :prompt "Related files in Git history: "
     :category 'consult-git-related
     ;; This should be nil so we leverage the sort of the `git-related--similar-files'
