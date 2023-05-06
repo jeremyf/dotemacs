@@ -55,7 +55,7 @@ By default this is my example code project.")
   "The `completion-at-point-functions' I envision using for `org-mode'."
   (setq-local completion-at-point-functions
     (list (cape-super-capf
-            #'jf/org-completion-abbreviations
+            ;; #'jf/org-completion-abbreviations
             #'tempel-expand
             #'cape-file))))
 

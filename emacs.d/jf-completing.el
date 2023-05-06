@@ -186,18 +186,6 @@
       (org-clock-in nil (when resolve
                           (org-resolve-clocks)
                           (org-read-date t t)))))
-  (defvar jf/consult-filter-map
-    (let ((map (make-sparse-keymap)))
-      (define-key map (kbd "C-[") #'previous-history-element)
-      (define-key map (kbd "C-]") #'next-history-element)
-      map)
-    "From https://github.com/minad/consult README")
-  ;; From https://www.reddit.com/r/emacs/comments/10qo7vb/comment/j73idup/
-  (defvar jf/consult-buffer-map
-    (let ((map (make-sparse-keymap)))
-      (define-key map "\C-k" #'jf/consult-buffer-kill)
-      map))
-
   (defun jf/consult-buffer-kill ()
     "In `consult-buffer' kill the current candidate"
     (interactive)
@@ -208,7 +196,6 @@
         (vertico-next))))
   ;; Customizations
   :config
-  (consult-customize consult-buffer :keymap jf/consult-buffer-map)
   (consult-customize
     consult-line consult-ripgrep consult-find
     :initial (when (use-region-p)
@@ -619,6 +606,9 @@ Useful if you want a more robust view into the recommend candidates."
     jf/silence-loading-log)
   (global-set-key (kbd "M-r") #'vertico-repeat)
   (add-hook 'minibuffer-setup-hook #'vertico-repeat-save))
+
+(keymap-set vertico-map "C-<" #'previous-history-element)
+(keymap-set vertico-map "C->" #'next-history-element)
 
 (use-package which-key
   ;; This package helps me begin typing a key sequence and seeing what options

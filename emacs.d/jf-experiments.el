@@ -77,7 +77,5 @@
      ("r s" "/r/swn" (lambda () (interactive) (reddigg-view-sub "swn")))
      ("r w" "/r/wwn" (lambda () (interactive) (reddigg-view-sub "wwn")))]])
 
-
-
 (provide 'jf-experiments)
 ;;; jf-experiments.el ends here

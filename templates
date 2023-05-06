@@ -115,7 +115,7 @@ enh-ruby-mode ruby-mode rspec-mode ruby-ts-mode
 
 (bench "require \"benchmark\"" n "Benchmark.bmbm do |b|" n "  b.report(\"\") do" n "    # Stuff" n "  end" n "end")
 (db "require \"debug\"; binding.break" n)
-(bye "byebug" n)
+(bye "require 'byebug'; byebug" n)
 (frozen "# frozen_string_literal: true")
 (shell "#!/usr/bin/env ruby -w")
 (dc "described_class")
