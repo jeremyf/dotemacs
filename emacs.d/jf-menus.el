@@ -43,7 +43,7 @@
       ("a" "Git Annotation" vc-annotate)
       ("c" "Capture region to clock…" (lambda (b e p) (interactive "r\nP") (jf/capture-region-contents-with-metadata b e p)))
       ("d" "Deadgrep…" deadgrep)
-      ;; ("i" "Clock in…" consult-clock-in)
+      ("i" "Clock in…" consult-clock-in)
       ("r" "Run command…" run-command)
       ("s" "Search note content…" consult-notes-search-in-all-notes)
       ("S" "Search note filename…" consult-notes)

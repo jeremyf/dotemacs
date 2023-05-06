@@ -24,7 +24,7 @@
        ;; I like the slide out window for this "context-type menus"
        ("\\*\\(eldoc\\|Ilist\\|Embark Actions\\|helpful .*\\)\\*"
          (display-buffer-in-side-window)
-         (window-width . 0.4)
+         (window-width . 0.5)
          (side . right)
          (slot . 0)
          (window-parameters . ((mode-line-format . (" %b")))))

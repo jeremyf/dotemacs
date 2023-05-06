@@ -168,24 +168,17 @@
   ;; Configure other variables and modes in the :config section,
   ;; after lazily loading the package.
   :preface
-  (defun consult-clock-in (&optional match scope resolve)
-    "Clock into an Org heading."
-    (interactive (list nil nil current-prefix-arg))
-    (require 'org-clock)
-    (org-clock-load)
-    (save-window-excursion
-      (consult-org-heading
-        match
-        (or scope
-          (thread-last org-clock-history
-            (mapcar 'marker-buffer)
-            (mapcar 'buffer-file-name)
-            (delete-dups)
-            (delq nil))
-          (user-error "No recent clocked tasks")))
-      (org-clock-in nil (when resolve
-                          (org-resolve-clocks)
-                          (org-read-date t t)))))
+  (defun consult-clock-in (prefix &optional match)
+    "Clock into an Org agenda heading picking from MATCH.
+
+With a PREFIX jump to the agenda without starting the clock."
+    (interactive "P")
+    (let ((the-match (or match "TODO=\"STARTED\"|TODO=\"TODO\"")))
+      (if prefix
+        (consult-org-agenda the-match)
+        (save-window-excursion
+          (consult-org-agenda the-match)
+          (org-clock-in)))))
   (defun jf/consult-buffer-kill ()
     "In `consult-buffer' kill the current candidate"
     (interactive)
@@ -200,7 +193,6 @@
     consult-line consult-ripgrep consult-find
     :initial (when (use-region-p)
                (buffer-substring-no-properties (region-beginning) (region-end)))
-    :keymap jf/consult-filter-map
     ;; https://github.com/minad/consult/wiki#org-clock
     consult-clock-in
     :prompt "Clock in: "
@@ -564,6 +556,16 @@ Useful if you want a more robust view into the recommend candidates."
   ;; selection with `marginalia' and then having the `vertico-indexed-mode'
   ;; option for quick numerical selection.
   :straight (:type git :host github :repo "minad/vertico")
+  :bind (:map vertico-map
+          (("<tab>" . #'vertico-insert)
+            ("<escape>" . #'minibuffer-keyboard-quit)
+            ("M-p" . #'previous-history-element)
+            ("M-n" . #'next-history-element)
+            ;; I've been using more groupings, and being able to move through
+            ;; those is nice.
+            ("C-M-n" . #'vertico-next-group)
+            ("C-M-p" . #'vertico-previous-group)
+            ("C-SPC" . #'jf/vertico-restrict-to-matches)))
   :preface
   ;; https://github.com/minad/vertico/wiki#restrict-the-set-of-candidates
   (defun jf/vertico-restrict-to-matches ()
@@ -607,8 +609,6 @@ Useful if you want a more robust view into the recommend candidates."
   (global-set-key (kbd "M-r") #'vertico-repeat)
   (add-hook 'minibuffer-setup-hook #'vertico-repeat-save))
 
-(keymap-set vertico-map "C-<" #'previous-history-element)
-(keymap-set vertico-map "C->" #'next-history-element)
 
 (use-package which-key
   ;; This package helps me begin typing a key sequence and seeing what options
