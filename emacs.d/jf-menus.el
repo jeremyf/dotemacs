@@ -48,6 +48,7 @@
       ("s" "Search note content…" consult-notes-search-in-all-notes)
       ("S" "Search note filename…" consult-notes)
       ("C-t" "Start a timer…" tmr-with-description)
+      ("t" "Todo for project…" magit-todo-list)
       ("u" "Copy stand-up to kill ring" jf/org-mode-agenda-to-stand-up-summary)
       ("w" "Weekly hours report" jf/org-mode-weekly-report)
       ("x" "Export to TakeOnRules…" jf/export-org-to-tor :if-derived org-mode)]]

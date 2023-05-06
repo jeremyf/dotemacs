@@ -293,6 +293,20 @@ method, get the containing class."
   :after json-mode
   :init (setq json-reformat:indent-width 2))
 
+(use-package hl-todo
+  :straight t
+  :config (global-hl-todo-mode)
+  (setq hl-todo-keyword-faces
+    '(("TODO"   . "#7f0000") ;; red-intense
+       ("FIXME"  . "#7f0000")))) ;; red-intense
+
+;;
+;; https://github.com/alphapapa/magit-todos.git
+(use-package magit-todos
+  :config (magit-todos-mode)
+  :commands (magit-todo-list)
+  :straight (:host github :repo "alphapapa/magit-todos"))
+
 (use-package lua-mode
   ;; For working with https://www.hammerspoon.org; which provides me the
   ;; wonderful https://github.com/dmgerman/editWithEmacs.spoon/

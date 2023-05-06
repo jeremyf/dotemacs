@@ -94,6 +94,7 @@
           ("M-`" . consult-register)
           ;; Other custom bindings
           ("C-y" . yank)
+          ("C-c C-/" . #'consult-clock-in)
           ("M-y" . consult-yank-from-kill-ring)
           ("<help> a" . consult-apropos)
           ("M-s k" . consult-keep-lines)

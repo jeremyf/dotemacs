@@ -130,6 +130,8 @@ setting up an IDE-like layout)."
          ((,c :bold t :slant italic :foreground ,fg-alt)))
       `(font-lock-misc-punctuation-face
          ((,c :foreground ,green-warmer)))
+      `(hl-todo
+         ((,c :foreground ,red-faint)))
       `(font-lock-regexp-face
          ((,c :foreground ,red))))))
 
