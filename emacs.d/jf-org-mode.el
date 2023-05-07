@@ -84,7 +84,7 @@ By default this is my example code project.")
 Return a list of each link in the buffer.  Each element will have
  the text of the link and a 'link property of the :raw-link.
 
-When GIVEN-LINK provided."
+When GIVEN-LINK provided return that link."
   (org-element-map
     (org-element-parse-buffer)
     'link
