@@ -51,6 +51,21 @@ By default this is my example code project.")
         (add-to-list 'returning-list (f-join path basename)))))
   returning-list)
 
+
+;; (defun jf/org-completion-abbreviations ()
+;;   "Look for \"[[abbr...][word]]\" and allow completion of things like \" word\"."
+;;   (when (looking-back " [a-zA-Z1-9]+" (point))
+;;     (let (cands)
+;;       (save-match-data
+;;         (save-excursion
+;;           (goto-char (point-min))
+;;           (while (re-search-forward "\\( \\[\\[abbr[^\]+]*\\]\\[\\([a-zA-Z]+\\)\\]\\]\\)" nil t)
+;;             (cl-pushnew
+;;               (match-string-no-properties 1) cands :test 'equal))
+;;           cands))
+;;       (when cands
+;;         (list (match-beginning 0) (match-end 0) cands)))))q
+
 (defun jf/org-capf ()
   "The `completion-at-point-functions' I envision using for `org-mode'."
   (setq-local completion-at-point-functions

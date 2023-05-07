@@ -93,8 +93,8 @@ CONTENTS is nil.  INFO is a plist holding contextual information."
               (subtitle (jf/export-org-to-tor--global-buffer-prop-ensure
                           :key "SUBTITLE"
                           :plist export-global-plist))
-              (title (plist-get export-global-plist "TITLE"))
-              (identifier (plist-get export-global-plist "IDENTIFIER")))
+              (title (lax-plist-get export-global-plist "TITLE"))
+              (identifier (lax-plist-get export-global-plist "IDENTIFIER")))
         (save-buffer)
         (jf/export-org-to-tor--inject-additional-front-matter
           :subtitle subtitle
@@ -138,7 +138,7 @@ CONTENTS is nil.  INFO is a plist holding contextual information."
 
 (cl-defun jf/export-org-to-tor--global-buffer-prop-ensure (&key key plist (default nil))
   "Ensure the current buffer has the given KEY in the global PLIST, if not set the DEFAULT or prompt for it."
-  (let ((value (plist-get plist key)))
+  (let ((value (plist-get plist key #'string=)))
     (if value value
       (jf/export-org-to-tor--global-buffer-prop-set
         :key key
