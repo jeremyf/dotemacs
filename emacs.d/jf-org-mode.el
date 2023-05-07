@@ -108,19 +108,21 @@ the text of the link and the \"link\" property will be the :raw-link.
 When provided a GIVEN-LINK stop processing when we encounter the
 first matching link."
   (let ((links (org-element-map
-                     (org-element-parse-buffer)
-                     'link
-                     (lambda (link)
-                       (let ((returning (propertize
-                                          (buffer-substring-no-properties
-                                            (org-element-property :contents-begin link)
-                                            (org-element-property :contents-end link))
-                                          'link (org-element-property :raw-link link))))
-                         (if given-link
-                           (when (string= given-link returning) returning)
-                           returning)))
-                     nil
-                     given-link)))
+                 (org-element-parse-buffer)
+                 'link
+                 (lambda (link)
+                   (when (and (org-element-property :contents-begin link)
+                           (org-element-property :contents-end link))
+                   (let ((returning (propertize
+                                      (buffer-substring-no-properties
+                                          (org-element-property :contents-begin link)
+                                          (org-element-property :contents-end link))
+                                      'link (org-element-property :raw-link link))))
+                       (if given-link
+                         (when (string= given-link returning) returning)
+                         returning))))
+                 nil
+                 given-link)))
     ;; Ensure that we have a distinct list.
     (if (listp links)
       (-distinct links)
