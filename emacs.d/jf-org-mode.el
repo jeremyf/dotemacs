@@ -51,21 +51,6 @@ By default this is my example code project.")
         (add-to-list 'returning-list (f-join path basename)))))
   returning-list)
 
-
-;; (defun jf/org-completion-abbreviations ()
-;;   "Look for \"[[abbr...][word]]\" and allow completion of things like \" word\"."
-;;   (when (looking-back " [a-zA-Z1-9]+" (point))
-;;     (let (cands)
-;;       (save-match-data
-;;         (save-excursion
-;;           (goto-char (point-min))
-;;           (while (re-search-forward "\\( \\[\\[abbr[^\]+]*\\]\\[\\([a-zA-Z]+\\)\\]\\]\\)" nil t)
-;;             (cl-pushnew
-;;               (match-string-no-properties 1) cands :test 'equal))
-;;           cands))
-;;       (when cands
-;;         (list (match-beginning 0) (match-end 0) cands)))))q
-
 (defun jf/org-capf ()
   "The `completion-at-point-functions' I envision using for `org-mode'."
   (setq-local completion-at-point-functions
@@ -111,12 +96,12 @@ first matching link."
                  (org-element-parse-buffer)
                  'link
                  (lambda (link)
-                   (when (and (org-element-property :contents-begin link)
-                           (org-element-property :contents-end link))
+                   (when-let* ((left (org-element-property :contents-begin link))
+                                (right (org-element-property :contents-end link)))
                    (let ((returning (propertize
                                       (buffer-substring-no-properties
-                                          (org-element-property :contents-begin link)
-                                          (org-element-property :contents-end link))
+                                        left
+                                        right)
                                       'link (org-element-property :raw-link link))))
                        (if given-link
                          (when (string= given-link returning) returning)
@@ -132,9 +117,10 @@ first matching link."
 (use-package org
   :straight (org :type built-in)
   :hook
-  (org-mode . turn-on-visual-line-mode)
-  (org-mode . jf/org-capf)
-  (org-mode . (lambda () (electric-pair-mode -1)))
+  (org-mode . (lambda ()
+                (jf/org-capf)
+                (turn-on-visual-line-mode)
+                (electric-pair-mode -1)))
   ;; Disable org-indent-mode; it's easy enough to enable.  The primary reason is
   ;; that it does not play nice with the multi-cursor package.  And I'd prefer
   ;; to have that work better by default.
@@ -251,7 +237,6 @@ first matching link."
          :jump-to-captured t
          :immediate-finish t
          :clock-in t)))
-
 
   (setq org-latex-default-class "jf/article")
 
@@ -521,7 +506,6 @@ tasks within projects are headline 5."
         (jf/create-scratch-buffer)
         (yank)))))
 
-
 (defun jf/org-mode/narrow-to-date (date)
   "Narrow agenda to given DATE agenda subtree."
   (interactive (list (if current-prefix-arg
@@ -622,26 +606,20 @@ Assumes that I'm on a :projects: headline.
   :hook (org-mode . org-appear-mode))
 
 ;;; Org Export and Composition Functionality
-
 (setq org-export-global-macros (list))
 (use-package ox
   :straight (ox :type built-in)
   :config
   (add-to-list 'org-export-global-macros
     '("kbd" . "@@html:<kbd>@@$1@@html:</kbd>@@"))
-
   (add-to-list 'org-export-global-macros
     '("cite" . "@@html:<cite>@@$1@@html:</cite>@@"))
-
   (add-to-list 'org-export-global-macros
     '("dfn" . "@@html:<dfn>@@$1@@html:</dfn>@@"))
-
   (add-to-list 'org-export-global-macros
     '("mark" . "@@html:<mark>@@$1@@html:</mark>@@"))
-
   (add-to-list 'org-export-global-macros
     '("scene-date" . "#+begin_marginnote\nThe scene occurs on @@html:<span class=\"time\">@@$1@@html:</span>@@.\n#+end_marginnote")))
-
 (add-to-list 'org-export-global-macros
   '("mention" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" >}}@@"))
 (add-to-list 'org-export-global-macros
@@ -650,7 +628,6 @@ Assumes that I'm on a :projects: headline.
   '("abbr-plural" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" abbr=\"t\" plural=\"t\" >}}@@"))
 (add-to-list 'org-export-global-macros
   '("i" . "@@html:<i class=\"dfn\">@@$1@@html:</i>@@"))
-
 (add-to-list 'org-export-global-macros
   '("linkToSeries" . "@@hugo:{{< linkToSeries \"@@$1@@hugo:\" >}}@@"))'
 
