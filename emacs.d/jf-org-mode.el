@@ -62,43 +62,54 @@ By default this is my example code project.")
 ;; Cribbed from `org-roam' org-roam-complete-link-at-point
 (defun jf/org-capf-links ()
   "Complete links."
-  (when (and (thing-at-point 'word)
+  (when (and (thing-at-point 'symbol)
           (not (org-in-src-block-p))
           (not (save-match-data (org-in-regexp org-link-any-re))))
-    (let ((bounds (bounds-of-thing-at-point 'word)))
+    ;; We want the symbol so that links such performing completion on "org-mode"
+    ;; will look for links with the text of org-mode and then replace the text
+    ;; "org-mode" with the returned link.
+    (let ((bounds (bounds-of-thing-at-point 'symbol)))
       (list (car bounds) (cdr bounds)
-        (-distinct (jf/org-links-with-text))
+        ;; Call without parameters, getting a links (filtered by CAPF magic)
+        (jf/org-links-with-text)
         :exit-function
-        (lambda (str _status)
-          (let ((link (jf/org-links-with-text str)))
-            (delete-char (- (length str)))
-            (insert "[[" (get-text-property 0 'link link) "][" str "]]")))
+        (lambda (text _status)
+          ;; We want the properties of that link.  In the case of one match, the
+          ;; provided text will have the 'link property.  However if the
+          (let ((link (car (jf/org-links-with-text text))))
+            (delete-char (- (length text)))
+            (insert "[[" (get-text-property 0 'link link) "][" text "]]")))
         ;; Proceed with the next completion function if the returned titles
         ;; do not match. This allows the default Org capfs or custom capfs
         ;; of lower priority to run.
         :exclusive 'no))))
 
 (defun jf/org-links-with-text (&optional given-link)
-  "Find all of the `org-mode' links in the `current-buffer'.
+  "Return the `distinct-' `org-mode' links in the `current-buffer'.
 
-Return a list of each link in the buffer.  Each element will have
- the text of the link and a 'link property of the :raw-link.
+Each element of the list will be a `propertize' string where the string value is
+the text of the link and the \"link\" property will be the :raw-link.
 
-When GIVEN-LINK provided return that link."
-  (org-element-map
-    (org-element-parse-buffer)
-    'link
-    (lambda (link)
-      (let ((returning (propertize
-                         (buffer-substring-no-properties
-                           (org-element-property :contents-begin link)
-                           (org-element-property :contents-end link))
-                         'link (org-element-property :raw-link link))))
-        (if given-link
-          (when (string= given-link returning) returning)
-          returning)))
-    nil
-    given-link))
+When provided a GIVEN-LINK stop processing when we encounter the
+first matching link."
+  (let ((returning (org-element-map
+                     (org-element-parse-buffer)
+                     'link
+                     (lambda (link)
+                       (let ((returning (propertize
+                                          (buffer-substring-no-properties
+                                            (org-element-property :contents-begin link)
+                                            (org-element-property :contents-end link))
+                                          'link (org-element-property :raw-link link))))
+                         (if given-link
+                           (when (string= given-link returning) returning)
+                           returning)))
+                     nil
+                     given-link)))
+    ;; Ensure that we have a distinct list.
+    (if (listp returning)
+      (-distinct returning)
+      (list returning))))
 
 ;;; Begin Org Mode (all it's glory)
 (use-package org
