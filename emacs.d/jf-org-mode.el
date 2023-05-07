@@ -92,7 +92,7 @@ the text of the link and the \"link\" property will be the :raw-link.
 
 When provided a GIVEN-LINK stop processing when we encounter the
 first matching link."
-  (let ((returning (org-element-map
+  (let ((links (org-element-map
                      (org-element-parse-buffer)
                      'link
                      (lambda (link)
@@ -107,9 +107,9 @@ first matching link."
                      nil
                      given-link)))
     ;; Ensure that we have a distinct list.
-    (if (listp returning)
-      (-distinct returning)
-      (list returning))))
+    (if (listp links)
+      (-distinct links)
+      (list links))))
 
 ;;; Begin Org Mode (all it's glory)
 (use-package org
