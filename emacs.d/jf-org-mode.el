@@ -67,30 +67,38 @@ By default this is my example code project.")
           (not (save-match-data (org-in-regexp org-link-any-re))))
     (let ((bounds (bounds-of-thing-at-point 'word)))
       (list (car bounds) (cdr bounds)
-        (jf/org-links-with-text)
+        (-distinct (jf/org-links-with-text))
         :exit-function
         (lambda (str _status)
-          (delete-char (- (length str)))
-          (insert "[[" (get-text-property 0 'link str) "][" str "]]"))
+          (let ((link (jf/org-links-with-text str)))
+            (delete-char (- (length str)))
+            (insert "[[" (get-text-property 0 'link link) "][" str "]]")))
         ;; Proceed with the next completion function if the returned titles
         ;; do not match. This allows the default Org capfs or custom capfs
         ;; of lower priority to run.
         :exclusive 'no))))
 
-(defun jf/org-links-with-text ()
+(defun jf/org-links-with-text (&optional given-link)
   "Find all of the `org-mode' links in the `current-buffer'.
 
 Return a list of each link in the buffer.  Each element will have
- the text of the link and a 'link property of the :raw-link."
-  (-distinct (org-element-map
-               (org-element-parse-buffer)
-               'link
-               (lambda (link)
-                 (propertize
-                   (buffer-substring-no-properties
-                     (org-element-property :contents-begin link)
-                     (org-element-property :contents-end link))
-                   'link (org-element-property :raw-link link))))))
+ the text of the link and a 'link property of the :raw-link.
+
+When GIVEN-LINK provided."
+  (org-element-map
+    (org-element-parse-buffer)
+    'link
+    (lambda (link)
+      (let ((returning (propertize
+                         (buffer-substring-no-properties
+                           (org-element-property :contents-begin link)
+                           (org-element-property :contents-end link))
+                         'link (org-element-property :raw-link link))))
+        (if given-link
+          (when (string= given-link returning) returning)
+          returning)))
+    nil
+    given-link))
 
 ;;; Begin Org Mode (all it's glory)
 (use-package org
