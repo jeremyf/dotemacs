@@ -304,7 +304,7 @@ method, get the containing class."
 ;; https://github.com/alphapapa/magit-todos.git
 (use-package magit-todos
   :config (magit-todos-mode)
-  :commands (magit-todo-list)
+  :commands (magit-todos-list)
   :straight (:host github :repo "alphapapa/magit-todos"))
 
 (use-package lua-mode

@@ -382,7 +382,7 @@ Useful if you want a more robust view into the recommend candidates."
   ;; looks in a different manner for completions.
   ;;
   ;; TODO: Perhaps I should spend a bit time investigating removing `hippie-exp'
-  ;; in favor of `corfu' behavior.  Definitely spend a bit of time exploring
+  ;; in favor of `corfu' and `cape' behavior.  Definitely spend a bit of time exploring
   ;; this option.
   :straight t
   :config
