@@ -74,6 +74,7 @@ org-mode
 (cite "{{{cite(" (p (completing-read "Cite: " (jf/org-macro-value-list "cite"))) ")}}}")
 (keyboard "{{{kbd(" (p (completing-read "Keyboard: " (jf/org-macro-value-list "kbd"))) ")}}}")
 (idiomatic "{{{i(" (p (completing-read "Idiom: " (jf/org-macro-value-list "i"))) ")}}}")
+(marginnote_block "#+begin_marginnote" n q n "#+end_marginnote")
 (today "[[date:" (format-time-string "%Y-%m-%d") "][today]]")
 (Today "[[date:" (format-time-string "%Y-%m-%d") "][Today]]")
 (tor "[[https://takeonrules.com][Take on Rules]]")

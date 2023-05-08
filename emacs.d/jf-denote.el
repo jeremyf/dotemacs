@@ -777,19 +777,33 @@ When USE_HUGO_SHORTCODE is given use glossary based exporting."
     (jf/denote/capture-reference :url url :title title)))
 
 (cl-defun jf/denote/capture-reference (&key
-               title
-               url
-               (keywords (denote-keywords-prompt))
-               (domain "melange"))
+                                        title
+                                        url
+                                        (keywords (denote-keywords-prompt))
+                                        (domain "melange"))
   "Create a `denote' entry for the TITLE and URL.
 
 Capturing for the given DOMAIN and KEYWORDS prompt."
   (denote title
-          keywords
-          'org
-          (f-join (denote-directory) domain)
-          nil
-          (concat "#+ROAM_REFS: " url "\n")))
+    keywords
+    'org
+    (f-join (denote-directory) domain)
+    nil
+    (concat "#+ROAM_REFS: " url "\n")))
+
+(defun jf/denote/archive-timesheet-month ()
+  "Cut the month agenda and create a `denote' note."
+  (interactive)
+  (let* ((headline (jf/org-agenda-headline-for-level :level 2))
+          (title (org-element-property :title headline)))
+    ;; (org-cut-subtree)
+    (org-copy-subtree)
+    (denote (concat " Scientist Time Sheet")
+      '("timesheet" "scientist")
+      'org
+      (f-join (denote-directory) "scientist"))
+    (yank)
+    (save-buffer))
 
 (provide 'jf-denote)
 ;;; jf-denote.el ends here

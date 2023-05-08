@@ -708,7 +708,7 @@ Assumes that I'm on a :projects: headline.
 
 (defun jf/org-agenda/timesheet/get-day-and-project-and-task-at-point ()
   "Return a plist of :day, :project, and :task for element at point."
-  (let* ((task (jf/org-agenda-task-at-point))
+  (let* ((task (jf/org-agenda-headline-for-level :level 5))
           (project (progn
                      (org-up-heading-safe)
                      (org-element-at-point)))
@@ -717,20 +717,21 @@ Assumes that I'm on a :projects: headline.
                  (org-element-at-point))))
     (list :project project :task task :day day)))
 
-(defun jf/org-agenda-task-at-point ()
-  "Find the `org-mode' task at point."
+(cl-defun jf/org-agenda-headline-for-level (&key (level 5))
+  "Find the `org-mode' ancestor headline with LEVEL."
   (let ((element (org-element-at-point)))
     (if (eq 'headline (org-element-type element))
-      (pcase (org-element-property :level element)
-        (1 (user-error "Selected element is a year"))
-        (2 (user-error "Selected element is a month"))
-        (3 (user-error "Selected element is a day"))
-        (4 (user-error "Selected element is a project"))
-        (5 (progn (message "Found %s" element) element))
-        (_ (progn (org-up-heading-safe) (jf/org-agenda-task-at-point))))
+      (let ((element-level (org-element-property :level element)))
+        (cond
+          ((= level element-level)
+            (progn (message "Found %s" element) element))
+          ((> level element-level)
+            (user-error "Selected element %s is higher level." element-level))
+          ((< level element-level)
+            (progn (org-up-heading-safe) (jf/org-agenda-headline-for-level :level level)))))
       (progn
         (org-back-to-heading)
-        (jf/org-agenda-task-at-point)))))
+        (jf/org-agenda-headline-for-level :level level)))))
 
 (use-package htmlize
   :straight t
