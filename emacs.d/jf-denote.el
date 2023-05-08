@@ -796,14 +796,13 @@ Capturing for the given DOMAIN and KEYWORDS prompt."
   (interactive)
   (let* ((headline (jf/org-agenda-headline-for-level :level 2))
           (title (org-element-property :title headline)))
-    ;; (org-cut-subtree)
-    (org-copy-subtree)
+    (org-cut-subtree)
     (denote (concat " Scientist Time Sheet")
       '("timesheet" "scientist")
       'org
       (f-join (denote-directory) "scientist"))
     (yank)
-    (save-buffer))
+    (save-buffer)))
 
 (provide 'jf-denote)
 ;;; jf-denote.el ends here
