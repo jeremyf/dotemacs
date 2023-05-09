@@ -23,6 +23,12 @@
                               "~/git/dotemacs/emacs.d/abbrev_defs"))
   :hook (text-mode . abbrev-mode))
 
+;; https://github.com/ChanderG/lam
+;;
+;; Create a buffer specific `abbrev'
+(use-package lam
+  :straight (:host github :repo "ChanderG/lam"))
+
 (use-package emacs
   :bind ("C-M-i" . completion-at-point)
   :init
