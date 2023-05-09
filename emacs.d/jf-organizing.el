@@ -15,12 +15,12 @@
   ;; TODO: Can I not require this?
   :straight t)
 
-(use-package projectile
-  ;; Convenient organization and commands for projects.
-  :straight t
-  :config (projectile-mode 1)
-  :custom (projectile-project-search-path '("~/git/"))
-  :bind ("s-." . projectile-toggle-between-implementation-and-test))
+;; (use-package projectile
+;;   ;; Convenient organization and commands for projects.
+;;   :straight t
+;;   :config (projectile-mode 1)
+;;   :custom (projectile-project-search-path '("~/git/"))
+;;   :bind ("s-." . projectile-toggle-between-implementation-and-test))
 
 (provide 'jf-organizing)
 ;;; jf-organizing.el ends here

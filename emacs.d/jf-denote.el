@@ -240,13 +240,13 @@ ID-ONLY link without title."
 (defun jf/denote/find-file ()
   "Find file in the current denote directory."
   (interactive)
-  (require 'consult-projectile)
+  (require 'project)
   (require 'denote)
-  ;; For this query, override the `projectile-git-command' so that I can
+  ;; For this query, override the `project-vc-include-untracked' so that I can
   ;; include my "denote/scientist" notes.
-  (let ((projectile-git-command
-   "git ls-files -zco --exclude-from=.projectile.gitignore"))
-    (consult-projectile--file (denote-directory))))
+  (let ((project-vc-include-untracked
+   "--exclude-from=.projectile.gitignore"))
+    (consult-project-extra--file (denote-directory))))
 
 ;;;;; Note taking Domains
 (cl-defmacro jf/denote/create-functions-for (&key domain key (create-fn nil))

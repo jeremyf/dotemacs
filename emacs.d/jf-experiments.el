@@ -77,5 +77,14 @@
      ("r s" "/r/swn" (lambda () (interactive) (reddigg-view-sub "swn")))
      ("r w" "/r/wwn" (lambda () (interactive) (reddigg-view-sub "wwn")))]])
 
+
+(use-package consult-project-extra
+  :straight (consult-project-extra :type git :host github :repo "Qkessler/consult-project-extra")
+  :bind
+  ("s-t" . consult-project-extra-find)
+  ("s-p" . consult-project-extra-find)
+  ("H-t" . consult-project-extra-find)
+  ("H-p" . consult-project-extra-find))
+
 (provide 'jf-experiments)
 ;;; jf-experiments.el ends here

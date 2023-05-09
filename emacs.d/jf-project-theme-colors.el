@@ -57,7 +57,7 @@ The `car' of each list item should be of begin with \"~/\" and
 
 The DEFAULT is a named color in the `modus-themes' palette."
 
-  (let* ((project-dir (abbreviate-file-name (or (projectile-project-root) "~/")))
+  (let* ((project-dir (abbreviate-file-name (or (consult--project-root) "~/")))
    (name (alist-get project-dir
         jf/project/theme-colors/table
         default nil #'string=)))
@@ -68,8 +68,8 @@ The DEFAULT is a named color in the `modus-themes' palette."
   "The faces to update with the theme-colors.")
 
 (defvar jf/project/theme-colors/hooks
-  (list 'buffer-list-update-hook
-  'projectile-after-switch-project-hook)
+  (list 'buffer-list-update-hook)
+  ;; 'projectile-after-switch-project-hook)
   "The hooks to call to set the theme colors.")
 
 (defun jf/project/theme-colors/apply-to-buffer ()

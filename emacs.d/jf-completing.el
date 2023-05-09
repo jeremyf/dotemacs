@@ -211,8 +211,7 @@ With a PREFIX jump to the agenda without starting the clock."
                       "*Recent*"
                       (buffer-name (marker-buffer marker)))))
         (if transform (substring cand (1+ (length name))) name))))
-  (autoload 'projectile-project-root "projectile")
-  (setq consult-project-root-function #'projectile-project-root))
+  (setq consult-project-root-function #'project-root))
 
 
 (use-package embark-consult
@@ -237,29 +236,6 @@ With a PREFIX jump to the agenda without starting the clock."
           :map minibuffer-local-completion-map
           ("C-x C-d" . consult-dir)
           ("C-x C-j" . consult-dir-jump-file)))
-
-(use-package consult-projectile
-  ;; package provides a function I use everyday: ~M-x consult-projectile~.  When
-  ;; I invoke ~consult-projectile~, I have the file completion for the current
-  ;; project.  I can also type =b= + =SPACE= to narrow my initial search to open
-  ;; buffers in the project.  Or =p= + =space= to narrow to other projects; and
-  ;; then select a file within that project.
-  :commands (consult-projectile)
-  :straight (consult-projectile
-              :type git
-              :host gitlab
-              :repo "OlMon/consult-projectile"
-              :branch "master")
-  :bind
-  ;;; This overwrite `ns-open-file-using-panel'; the operating system's "Finder"
-  ;; ("C-c o" . consult-projectile)
-  ;;; I have long had Cmd+t mapped to opening project files; however, I'm
-  ;;; noticing the way I'm typing this and it is feeling wrong.  So now I won't
-  ;;; have that way open.
-  ("s-t" . consult-projectile)
-  ("s-p" . consult-projectile)
-  ("H-t" . consult-projectile)
-  ("H-p" . consult-projectile))
 
 (use-package corfu
   ;; Completion overlay; a narrower intreface than the more verbose company.

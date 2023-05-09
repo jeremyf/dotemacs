@@ -363,7 +363,7 @@ method, get the containing class."
   :preface
   (defun jf/rspec-spring-p ()
     "Check the project for spring as part of the Gemfile.lock."
-    (let ((gemfile-lock (f-join (projectile-project-root) "Gemfile.lock")))
+    (let ((gemfile-lock (f-join (consult--project-root) "Gemfile.lock")))
       (and (f-exists? gemfile-lock)
         (s-present?
           (shell-command-to-string

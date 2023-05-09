@@ -222,13 +222,13 @@ Else, evaluate the whole buffer."
           (options '(("Filename, Basename" .
                        (lambda (f) (file-name-nondirectory f)))
                       ("Filename, Project Relative" .
-                        (lambda (f) (concat "./" (file-relative-name f (projectile-project-root)))))
+                        (lambda (f) (concat "./" (file-relative-name f (consult--project-root)))))
                       ("Filename, Full" .
                         (lambda (f) (f)))
                       ("Dirname" .
                         (lambda (f) (file-name-directory f)))
                       ("Dirname, Project Relative" .
-                        (lambda (f) (concat "./" (file-relative-name (file-name-directory f) (projectile-project-root)))))))
+                        (lambda (f) (concat "./" (file-relative-name (file-name-directory f) (consult--project-root)))))))
           (filename
             (if prefix
               (funcall (alist-get (completing-read "Option: " options nil t)
@@ -366,8 +366,8 @@ With ARG, do this that many times."
   (defun jf/run-command-recipes ()
     "Run command recipes"
     (list
-      (let ((dir (projectile-project-root)))
-        (when (f-exists? (f-join (projectile-project-root) "Gemfile.lock"))
+      (let ((dir (consult--project-root)))
+        (when (f-exists? (f-join (consult--project-root) "Gemfile.lock"))
           (list :command-name "run-command-samvera-versions"
             ;; TODO: Extract some of this as a command.
             :command-line (format "cd %s; rg \"^ +((bulk|hy)rax|\\(*.\\)iiif\\(*.\\)|rails|qa|blacklight(-.*)?) \\(\\d+\\.\\d+\\.\\d+\" Gemfile.lock" dir)
