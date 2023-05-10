@@ -163,14 +163,14 @@
       "--smart-case --no-heading --line-number --no-ignore-vcs "
       "--glob !vendor/ --glob !coverage/ --glob !**/tmp/ --glob !**/log/ "
       "--glob !public/ --glob !node_modules/ --glob !.git/ --glob !doc/ "
-      "--glob !.yardoc/ "
+      "--glob !.yardoc/ --glob !.byebug_history "
       " . -e ARG OPTS"))
   (consult-ripgrep-args
     (concat "rg --null --hidden --line-buffered --color=never --max-columns=1000 "
       "--path-separator / --no-ignore-vcs --smart-case --no-heading "
       "--glob !vendor/ --glob !coverage/ --glob !**/tmp/ --glob !**/log/ "
       "--glob !public/ --glob !node_modules/ --glob !.git/ --glob !doc/ "
-      "--glob !.yardoc/ "
+      "--glob !.yardoc/ --glob !.byebug_history "
       "--line-number "))
   ;; Configure other variables and modes in the :config section,
   ;; after lazily loading the package.
