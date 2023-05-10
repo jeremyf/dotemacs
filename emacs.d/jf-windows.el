@@ -151,6 +151,7 @@ setting up an IDE-like layout)."
     modus-themes-variable-pitch-ui nil
     modus-themes-custom-auto-reload t
     modus-themes-disable-other-themes t
+    modus-themes-org-blocks 'tinted-background
     modus-themes-common-palette-overrides
     '(
        (comment yellow-faint)
