@@ -68,18 +68,18 @@
       ("g w" "Eww" jf/menu--org-capture-eww :if-derived eww-mode)
       ]])
 
-(use-package file-info
-  ;; Show the metadata of the current buffer's file; and then copy those values.
-  ;; The package also appears highly extensible.
-  :straight (:host github :repo "artawower/file-info.el")
-  :bind ("C-x f" . file-info-show)
-  :config
-  (setq hydra-hint-display-type 'posframe)
-  (setq hydra-posframe-show-params `(:poshandler posframe-poshandler-frame-center
-						 :internal-border-width 2
-						 :internal-border-color "#61AFEF"
-						 :left-fringe 16
-						 :right-fringe 16)))
+;; (use-package file-info
+;;   ;; Show the metadata of the current buffer's file; and then copy those values.
+;;   ;; The package also appears highly extensible.
+;;   :straight (:host github :repo "artawower/file-info.el")
+;;   :bind ("C-x f" . file-info-show)
+;;   :config
+;;   (setq hydra-hint-display-type 'posframe)
+;;   (setq hydra-posframe-show-params `(:poshandler posframe-poshandler-frame-center
+;; 						 :internal-border-width 2
+;; 						 :internal-border-color "#61AFEF"
+;; 						 :left-fringe 16
+;; 						 :right-fringe 16)))
 
 (provide 'jf-menus)
 ;;; jf-menus.el ends here
