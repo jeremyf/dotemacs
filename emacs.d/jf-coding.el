@@ -48,6 +48,35 @@
         (call-interactively #'set-mark-command)
         (goto-char (treesit-node-end func)))
       (user-error "No function to select")))
+
+  (defun jf/treesit/wrap-rubocop (&optional given-cops)
+    "Wrap the current ruby function by disabling/enabling the GIVEN-COPS."
+    (interactive)
+    (if (derived-mode-p 'ruby-ts-mode 'ruby-mode)
+      (if-let ((func (treesit-defun-at-point)))
+        (let ((cops (or given-cops
+                      (completing-read-multiple "Cops to Disable: "
+                        (jf/rubocop/list-all-cops) nil t))))
+          (save-excursion
+            (goto-char (treesit-node-start func))
+            (let ((indentation (s-repeat (current-column) " ")))
+              (kill-region (treesit-node-start func) (treesit-node-end func))
+              (beginning-of-line)
+              (insert
+                (s-join "\n"
+                  (mapcar (lambda (cop)
+                            (concat indentation "# rubocop:disable " cop))
+                    cops))
+                "\n" indentation)
+              (yank)
+              (insert "\n"
+                (s-join "\n"
+                  (mapcar (lambda (cop)
+                            (concat indentation "# rubocop:enable " cop))
+                    cops))))))
+        (user-error "Not in a function"))
+      (user-error "%s is not derived from a ruby mode" major-mode)))
+
   ;; I love M-q and also have some opinions about how my yard docs should look.
   ;; This allows both of those to peacefully coexist.
   (defun jf/ruby-mode/unfill-toggle ()
@@ -273,7 +302,8 @@ method, get the containing class."
   :custom (ruby-flymake-use-rubocop-if-available nil)
   :bind
   (:map ruby-mode-map (("C-M-h" . jf/treesit/function-select)
-                        ("C-c C-f" . jf/treesit/qualified_method_name)))
+                        ("C-c C-f" . jf/treesit/qualified_method_name)
+                        ("C-c C-r" . jf/treesit/wrap-rubocop)))
   :hook ((ruby-mode ruby-ts-mode) .
           (lambda ()
             (eldoc-mode)
@@ -466,7 +496,8 @@ method, get the containing class."
   (setq-local add-log-current-defun-function #'jf/treesit/qualified_method_name)
   (define-key ruby-ts-mode-map (kbd "C-M-h") #'jf/treesit/function-select)
   (define-key ruby-ts-mode-map (kbd "C-c C-f") #'jf/current-scoped-function-name)
-  (define-key ruby-ts-mode-map (kbd "C-c C-y") #'jf/ruby-mode/yardoc-ify))
+  (define-key ruby-ts-mode-map (kbd "C-c C-y") #'jf/ruby-mode/yardoc-ify)
+  (define-key ruby-ts-mode-map (kbd "C-c C-r") #'jf/treesit/wrap-rubocop))
 (add-hook 'ruby-ts-mode-hook #'jf/ruby-ts-mode-configurator)
 
 ;; I didn't know about `add-log-current-defun-function' until a blog reader
