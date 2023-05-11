@@ -120,7 +120,7 @@ enh-ruby-mode ruby-mode rspec-mode ruby-ts-mode
 (frozen "# frozen_string_literal: true")
 (shell "#!/usr/bin/env ruby -w")
 (dc "described_class")
-(desc "# frozen_string_literal: true" n n "require 'spec_helper'" n n "RSpec.describe " q " do" n n "end")
+(rspec "# frozen_string_literal: true" n n "require 'spec_helper'" n n "RSpec.describe " q " do" n n "end")
 (subject "subject(:" p ") { " p " }")
 ;; A little experiment in mixing tempel behavior and multiple values.
 (init (p "Parameters (comma separated): " given-params t)
