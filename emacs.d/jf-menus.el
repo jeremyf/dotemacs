@@ -21,6 +21,24 @@
   (eww-browse-with-external-browser "https://github.com/orgs/scientist-softserv/projects/43"))
 (bind-key "C-c l v" #'jf/jump-to/violet-board)
 
+(transient-define-suffix jf/jump-to/agenda-personal ()
+  "Jump to personal agenda"
+  :description "Agenda, Personal"
+  (interactive)
+  (find-file "~/git/org/agenda.org"))
+
+(transient-define-suffix jf/jump-to/code-backlog ()
+  "Jump to coding backlog"
+  :description "Capture Backlog"
+  (interactive)
+  (find-file jf/org-mode/capture/filename))
+
+;; (transient-define-suffix jf/capture-region-to-clock (b e p)
+;;   "Capture region to clock…"
+;;   :description "Capture region to clock…"
+;;   (interactive "r\nP")
+;;   (jf/org-mode/capture/insert-content-dwim b e p))
+
 ;; this suffix provides a dynamic description of the current host I want to use
 ;; for my blog.  And the prefix’s function toggles the host.
 (global-set-key (kbd "s-1") 'jf/menu)
@@ -29,8 +47,8 @@
   ;; Todo, can I get this section into a function so I can duplicate it in the jf/menu--tor?
   [["Jump to"
      ("j a" "Agenda" jf/org-mode/jump-to-agenda-or-mark)
-     ("j A" "Agenda, Personal" (lambda () (interactive) (find-file "~/git/org/agenda.org")))
-     ("j c" "Capture Backlog" (lambda () (interactive) (find-file jf/org-mode/capture/filename)))
+     ("j A" jf/jump-to/agenda-personal)
+     ("j c" "Capture Backlog" jf/jump-to/code-backlog)
      ("j g" "Global Mark" consult-global-mark)
      ("j h" "Hugo File" jf/jump_to_corresponding_hugo_file :if-derived org-mode)
      ("j m" "Mark" consult-mark)
@@ -41,7 +59,7 @@
      ("j v" jf/jump-to/violet-board)]
     ["Tasks"
       ("a" "Git Annotation" vc-annotate)
-      ("c" "Capture region to clock…" (lambda (b e p) (interactive "r\nP") (jf/capture-region-contents-with-metadata b e p)))
+      ;; ("c" jf/capture-region-to-clock)
       ("d" "Deadgrep…" deadgrep)
       ("i" "Clock in…" consult-clock-in)
       ("r" "Run command…" run-command)

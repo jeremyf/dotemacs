@@ -66,16 +66,34 @@
 
 ;; May as well make a menu for this experiment.
 (bind-key "s-3" #'jf/browsing-menu)
+
+(defmacro jf/reddigg/create-view-function-for (sub)
+  (let* ((fn (intern (concat "jf/reddigg/view-" sub)))
+          (doc (concat "View /r/" sub))
+          (desc (concat "/r/" sub)))
+    `(transient-define-suffix ,fn ()
+      ,doc
+      :description ,desc
+      (interactive)
+       (reddigg-view-sub ,sub))))
+
+(jf/reddigg/create-view-function-for "orgmode")
+(jf/reddigg/create-view-function-for "planetemacs")
+(jf/reddigg/create-view-function-for "ruby")
+(jf/reddigg/create-view-function-for "rubyonrails")
+(jf/reddigg/create-view-function-for "swn")
+(jf/reddigg/create-view-function-for "wwn")
+
 (transient-define-prefix jf/browsing-menu ()
   "For browsing things."
   [["Reddit"
-     ("r e" "/r/emacs" (lambda () (interactive) (reddigg-view-sub "emacs")))
-     ("r o" "/r/orgmode" (lambda () (interactive) (reddigg-view-sub "orgmode")))
-     ("r p" "/r/planetemacs" (lambda () (interactive) (reddigg-view-sub "planetemacs")))
-     ("r r" "/r/ruby" (lambda () (interactive) (reddigg-view-sub "ruby")))
-     ("r R" "/r/rubyonrails" (lambda () (interactive) (reddigg-view-sub "rubyonrails")))
-     ("r s" "/r/swn" (lambda () (interactive) (reddigg-view-sub "swn")))
-     ("r w" "/r/wwn" (lambda () (interactive) (reddigg-view-sub "wwn")))]])
+     ("r e" jf/reddigg/view-emacs)
+     ("r o" jf/reddigg/view-orgmode)
+     ("r p" jf/reddigg/view-planetemacs)
+     ("r r" jf/reddigg/view-ruby)
+     ("r R" jf/reddigg/view-rubyonrails)
+     ("r s" jf/reddigg/view-swn)
+     ("r w" jf/reddigg/view-wwn)]])
 
 
 (defun jf/rubocop/list-all-cops ()
