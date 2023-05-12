@@ -30,8 +30,7 @@
          (window-parameters . ((mode-line-format . (" %b")))))
        ("*Register Preview*" (display-buffer-reuse-window))
        (t (display-buffer-reuse-window display-buffer-same-window))))
-  :bind (("s-\\" . #'jf/side-window-toggle)
-          ("s-q" . #'jf/bury-or-unbury-buffer))
+  :bind (("s-q" . #'jf/bury-or-unbury-buffer))
   :config (setq confirm-kill-emacs #'yes-or-no-p)
   :preface
   ;; For some reason, the C-x 5 0 keybindings don't set in my brain.
