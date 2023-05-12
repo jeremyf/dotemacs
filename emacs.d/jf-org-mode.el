@@ -348,25 +348,26 @@ first matching link."
 ;; I work on several different projects each day; helping folks get unstuck.  I
 ;; also need to track and record my time.
 (bind-key "C-c C-j" 'jf/org-mode/jump-to-agenda-or-mark)
-(cl-defun jf/org-mode/jump-to-agenda-or-mark (parg)
+(cl-defun jf/org-mode/jump-to-agenda-or-mark (&optional prefix)
   "Jump to and from current agenda item to mark.
 
-  With PARG go to beginning of today's headline."
-  (interactive "P")
+With one PREFIX go to personal agenda.
+With two PREFIX go to place where we would jump on capture."
+  (interactive "p")
   (require 'org-capture)
-  (if (car parg)
-    ;; Jump to where we would put a project were we to capture it.
-    (org-capture-goto-target "p")
-    (if (string= (buffer-file-name) (file-truename
-                                      jf/primary-agenda-filename-for-machine))
-      (call-interactively #'consult-global-mark)
-      (progn
-        (call-interactively #'set-mark-command)
-        (if (when (and (fboundp 'org-clocking-p) (org-clocking-p)) t)
-          (org-clock-goto)
-          ;; Jump to where we would put a project were we to capture it.
-          (org-capture-goto-target "p")))))
   (require 'pulsar)
+  (cond
+    ((>= prefix 16) (org-capture-goto-target "p"))
+    ((>= prefix 4) (find-file "~/git/org/agenda.org"))
+    (t (if (string= (buffer-file-name) (file-truename
+                                                       jf/primary-agenda-filename-for-machine))
+                       (call-interactively #'consult-global-mark)
+                       (progn
+                         (call-interactively #'set-mark-command)
+                         (if (when (and (fboundp 'org-clocking-p) (org-clocking-p)) t)
+                           (org-clock-goto)
+                           ;; Jump to where we would put a project were we to capture it.
+                           (org-capture-goto-target "p"))))))
   (pulsar-pulse-line))
 
 (defun jf/org-mode-agenda-project-prompt ()
