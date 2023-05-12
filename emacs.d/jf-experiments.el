@@ -77,6 +77,7 @@
       (interactive)
        (reddigg-view-sub ,sub))))
 
+(jf/reddigg/create-view-function-for "emacs")
 (jf/reddigg/create-view-function-for "orgmode")
 (jf/reddigg/create-view-function-for "planetemacs")
 (jf/reddigg/create-view-function-for "ruby")
@@ -910,7 +911,7 @@ This uses `split-window-right' but follows with the cursor."
   (other-window 1))
 
 
-(global-set-key (kbd "C-c \\") #'jf/nav-toggle-split-direction)
+(global-set-key (kbd "s-\\") #'jf/nav-toggle-split-direction)
 (defun jf/nav-toggle-split-direction ()
   "Toggle window split from vertical to horizontal.
 This work the other way around as well.
