@@ -105,9 +105,36 @@
           ("C-x g f" . magit-file-dispatch)
           ("C-x g d" . magit-dispatch))
   ;; In other situations I bind s-6 to `git-messenger:popup-message'
-  :bind (:map magit-log-mode-map ("C-x g b" . 'jf/magit-browse-pull-request))
-  :hook ((with-editor-post-finish . magit-status)
+  :bind (:map magit-log-mode-map ("C-x g b" . #'jf/magit-browse-pull-request))
+  :hook ((with-editor-post-finish . #'magit-status)
           (git-commit-mode . (lambda () (setq fill-column git-commit-fill-column)))))
+
+(defvar jf/version-control/valid-commit-title-prefixes
+  '("feat: A new feature"
+     "fix: A bug fix"
+     "docs: Changes to documentation"
+     "style: Formatting, missing semi colons, etc; no code change"
+     "refactor: Refactoring production code"
+     "test: Adding tests, refactoring test; no production code change"
+     "chore: Updating build tasks, package manager configs, etc; no production code change")
+  "Proposed as part of Team 💜 Violet 💜 's commit message
+ guidelines on <2023-05-12 Fri>.  These are directly pulled from
+ http://udacity.github.io/git-styleguide/")
+
+(defun jf/git-commit-mode-hook ()
+  "If the first line is empty, prompt for commit type and insert it."
+  (when (and (eq major-mode 'text-mode)
+             (string= (buffer-name) "COMMIT_EDITMSG")
+             (save-excursion
+               (goto-char (point-min))
+               (beginning-of-line-text)
+               (looking-at-p "^$")))
+    (let ((commit-type (completing-read "Commit title prefix: "
+                         jf/version-control/valid-commit-title-prefixes nil t)))
+      (goto-char (point-min))
+        (insert (car (s-split ":" commit-type)) ": " ))))
+
+(add-hook 'find-file-hook 'jf/git-commit-mode-hook)
 
 ;; COMMENTED OUT FOR FUTURE REFERENCE
 ;; (transient-define-prefix jf/magit-aux-commands ()
