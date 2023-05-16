@@ -928,5 +928,8 @@ Credit: https://github.com/olivertaylor/dotfiles/blob/master/emacs/init.el"
         (other-window 1)
         (switch-to-buffer (other-buffer))))))
 
+(use-package breadcrumb
+  :straight (:host github :repo "joaotavora/breadcrumb")
+  :config (breadcrumb-mode))
 (provide 'jf-experiments)
 ;;; jf-experiments.el ends here
