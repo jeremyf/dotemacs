@@ -89,5 +89,8 @@ Ignoring _STATUS."
               (jf/version-control/unfurl-project-as-issue-url-template project)
               issue))))
 
+(add-to-list 'completion-at-point-functions #'jf/version-control/issue-capf)
+(add-to-list 'completion-at-point-functions #'jf/version-control/project-capf)
+
 (provide 'jf-capf-hacking)
 ;;; jf-capf-hacking.el ends here

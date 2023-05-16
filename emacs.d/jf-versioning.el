@@ -141,15 +141,20 @@ Add PADDING between inserted commit type and start of title.  For
 the `completing-read' show the whole message.  But use the
 SPLITTER to determine the prefix to include."
   (when (and (eq major-mode 'text-mode)
-             (string= (buffer-name) "COMMIT_EDITMSG")
-             (save-excursion
-               (goto-char (point-min))
-               (beginning-of-line-text)
-               (looking-at-p "^$")))
+          (string= (buffer-name) "COMMIT_EDITMSG")
+          (local-set-key (kbd "TAB") #'completion-at-point)
+          (setq-local completion-at-point-functions
+            (cons #'jf/version-control/issue-capf
+              (cons #'jf/version-control/project-capf
+                completion-at-point-functions)))
+          (save-excursion
+            (goto-char (point-min))
+            (beginning-of-line-text)
+            (looking-at-p "^$")))
     (let ((commit-type (completing-read "Commit title prefix: "
                          jf/version-control/valid-commit-title-prefixes nil t)))
       (goto-char (point-min))
-        (insert (car (s-split splitter commit-type)) padding))))
+      (insert (car (s-split splitter commit-type)) padding))))
 
 (add-hook 'find-file-hook 'jf/git-commit-mode-hook)
 
