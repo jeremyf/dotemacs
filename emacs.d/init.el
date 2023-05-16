@@ -37,9 +37,9 @@
 (require 'jf-blogging)
 (require 'jf-project)
 (require 'jf-menus)
+(require 'jf-capf-hacking)
 (require 'jf-experiments)
 (require 'git-related)
-
 
 (setq jf/artist-mode-spraycan "🞄⁛◌🞆⊖⊗⁛●◯⦿⬤")
 (load (concat user-emacs-directory "hide-comnt.el") :noerror)
