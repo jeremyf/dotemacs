@@ -1,41 +1,27 @@
+;;; jf-capf-hacking ---  -*- lexical-binding: t -*-
 
-(defun jf/version-control/issue-capf ()
-    "Complete links."
-    (cond
-      ((looking-back "/[[:word:][:digit:]_\-]+#[[:digit:]]+" 40)
-        (message "Project and issue"))
-      ((looking-back "/[[:word:][:digit:]_\-]+" 40)
-        (message "Project"))
-      ((looking-back "#[[:digit:]]+" 40)
-        (message "Issue")))
-    ;; (when (looking-back "\\(/[[:word:][:digit:]_\-]+\\)?#[[:digit:]]+" 40)
-      (let ((right (point))
-             (left (or
-                     (save-excursion
-                       ;; First check for the project
-                       (search-backward-regexp "/[[:word:][:digit:]_\-]+#[[:digit:]]+" (- (point) 40) nil) (point))
-                     (save-excursion
-                       ;; Now check for simply the issue number
-                       (search-backward-regexp "#[[:digit:]]+" (- (point) 40)) (point)))))
-        (list left right
-          ;; Call without parameters, getting a links (filtered by CAPF magic)
-          (jf/version-control/text)
-          :exit-function
-          #'jf/version-control/unfurl-issue-to-url
-          ;; Proceed with the next completion function if the returned titles
-          ;; do not match. This allows the default Org capfs or custom capfs
-          ;; of lower priority to run.
-          :exclusive 'yes))
-  (defun jf/version-control/text ()
-   (s-match-strings-all "\\(/[[:word:][:digit:]_\-]+\\)?#[[:digit:]]+" (buffer-string)))
-  (defun jf/version-control/unfurl-issue-to-url (text _status)
-    (let* ((parts (s-split "#" text))
-            (issue (cadr parts))
-            (project-dir (if (s-present? (car parts))
-                           (format "%s/git%s" (getenv "HOME") (car parts))
-                           (cdr (project-current)))))
-    (delete-char (- (length text)))
-      (insert (format "%s #%s" project-dir issue))))
+;; Copyright (C) 2023 Jeremy Friesen
+;; Author: Jeremy Friesen <jeremy@jeremyfriesen.com>
+
+;; This file is NOT part of GNU Emacs.
+
+;;; Commentary:
+
+;; Allow for completion of projects and then issues.  Likely something I want to
+;; include in commit messages.  This behaves in a two step fashion:
+
+;; - Type in the project (/project)
+;; - Tab and select the project
+;; - It fills in /project#
+;; - Then type a number (e.g. /project#123)
+;; - Tab and it will unfurl to a github issue URL
+
+;;; Code:
+
+(cl-defun jf/capf-max-bounds (&key (window-size 40))
+  "Return the max bounds for `point' based on given WINDOW-SIZE."
+  (let ((boundary (- (point) window-size)))
+    (if (> 0 boundary) 1 boundary)))
 
 (cl-defun jf/version-control/known-project-names (&key (prefix "/"))
   "Return a list of project, prepending PREFIX to each."
@@ -46,7 +32,7 @@
 (cl-defun jf/version-control/unfurl-project-as-issue-url-template (project &key (prefix "/"))
   "Return the issue URL template for the given PROJECT.
 
-Use the provided PREFIX for checks."
+Use the provided PREFIX to help compare against `projectile-known-projects'."
   (let* ((project-path
            (car (seq-filter (lambda (el)
                               (or
@@ -57,3 +43,51 @@ Use the provided PREFIX for checks."
             (s-trim (shell-command-to-string
                       (format "cd %s && git remote get-url origin" project-path)))))
     (s-replace ".git" "/issues/%s" remote)))
+
+(defun jf/version-control/project-capf ()
+  (when (thing-at-point 'symbol)
+    (let ((bounds (bounds-of-thing-at-point 'symbol)))
+      (list (car bounds) (cdr bounds)
+        (jf/version-control/known-project-names)
+        :exit-function
+        (lambda (text _status)
+          (delete-char (- (length text)))
+          (insert text "#"))
+        :exclusive 'yes))))
+
+(add-to-list 'completion-at-point-functions #'jf/version-control/project-capf)
+(add-to-list 'completion-at-point-functions #'jf/version-control/issue-capf)
+
+;; TODO
+(defun jf/version-control/issue-capf ()
+  "Complete links."
+  (when (looking-back "/[[:word:][:digit:]_\-]+#[[:digit:]]+" (jf/capf-max-bounds))
+    (let ((right (point))
+           (left (save-excursion
+                     ;; First check for the project
+                     (search-backward-regexp "/[[:word:][:digit:]_\-]+#[[:digit:]]+" (jf/capf-max-bounds) t) (point))))
+      (list left right
+        ;; Call without parameters, getting a links (filtered by CAPF magic)
+        (jf/version-control/text)
+        :exit-function
+        #'jf/version-control/unfurl-issue-to-url
+        :exclusive 'yes))))
+
+(defun jf/version-control/text ()
+  "Find all matches for project and issue."
+  (s-match-strings-all "/[[:word:][:digit:]_\-]+#[[:digit:]]+" (buffer-string)))
+
+(defun jf/version-control/unfurl-issue-to-url (text _status)
+  "Unfurl the given TEXT to a URL
+
+Ignoring _STATUS."
+  (delete-char (- (length text)))
+  (let* ((parts (s-split "#" text))
+          (issue (cadr parts))
+          (project (or (car parts) (cdr (project-current)))))
+    (insert (format
+              (jf/version-control/unfurl-project-as-issue-url-template project)
+              issue))))
+
+(provide 'jf-capf-hacking)
+;;; jf-capf-hacking.el ends here
