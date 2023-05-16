@@ -541,8 +541,6 @@ Useful if you want a more robust view into the recommend candidates."
     (setq-local completion-at-point-functions
       (cons #'tempel-expand
         completion-at-point-functions)))
-  (add-hook 'prog-mode-hook 'tempel-setup-capf)
-  (add-hook 'text-mode-hook 'tempel-setup-capf)
   ;; Optionally make the Tempel templates available to Abbrev,
   ;; either locally or globally. `expand-abbrev' is bound to C-x '.
   ;; (add-hook 'prog-mode-hook #'tempel-abbrev-mode)
