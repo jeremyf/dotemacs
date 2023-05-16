@@ -110,19 +110,36 @@
           (git-commit-mode . (lambda () (setq fill-column git-commit-fill-column)))))
 
 (defvar jf/version-control/valid-commit-title-prefixes
-  '("feat: A new feature"
-     "fix: A bug fix"
-     "docs: Changes to documentation"
-     "style: Formatting, missing semi colons, etc; no code change"
-     "refactor: Refactoring production code"
-     "test: Adding tests, refactoring test; no production code change"
-     "chore: Updating build tasks, package manager configs, etc; no production code change")
-  "Proposed as part of Team 💜 Violet 💜 's commit message
- guidelines on <2023-05-12 Fri>.  These are directly pulled from
- http://udacity.github.io/git-styleguide/")
+  '("🎁: feature"
+     "🐛: bug fix"
+     "📚: documentation"
+     "💄: style changes"
+     "♻️: refactor"
+     "☑️: tests"
+     "🧹: chore"
+     "🚀: performance"
+     "🛠: build"
+     "🔄: revert"
+     "⚙️: config changes"
+     "🎬: initial commit or setup of project/component"
+     "🤖: continuous integration (CI) changes")
+  ;; The following list was pulled from http://udacity.github.io/git-styleguide/
+  ;;
+  ;; '("feat: A new feature"
+  ;;    "fix: A bug fix"
+  ;;    "docs: Changes to documentation"
+  ;;    "style: Formatting, missing semi colons, etc; no code change"
+  ;;    "refactor: Refactoring production code"
+  ;;    "test: Adding tests, refactoring test; no production code change"
+  ;;    "chore: Updating build tasks, package manager configs, etc; no production code change")
+  "Team 💜 Violet 💜 's commit message guidelines on <2023-05-12 Fri>.")
 
-(defun jf/git-commit-mode-hook ()
-  "If the first line is empty, prompt for commit type and insert it."
+(cl-defun jf/git-commit-mode-hook (&key (splitter ":") (padding " "))
+  "If the first line is empty, prompt for commit type and insert it.
+
+Add PADDING between inserted commit type and start of title.  For
+the `completing-read' show the whole message.  But use the
+SPLITTER to determine the prefix to include."
   (when (and (eq major-mode 'text-mode)
              (string= (buffer-name) "COMMIT_EDITMSG")
              (save-excursion
@@ -132,7 +149,7 @@
     (let ((commit-type (completing-read "Commit title prefix: "
                          jf/version-control/valid-commit-title-prefixes nil t)))
       (goto-char (point-min))
-        (insert (car (s-split ":" commit-type)) ": " ))))
+        (insert (car (s-split splitter commit-type)) padding))))
 
 (add-hook 'find-file-hook 'jf/git-commit-mode-hook)
 
