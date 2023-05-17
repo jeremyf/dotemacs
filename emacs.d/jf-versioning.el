@@ -147,6 +147,7 @@ SPLITTER to determine the prefix to include."
             (cons #'jf/version-control/issue-capf
               (cons #'jf/version-control/project-capf
                 completion-at-point-functions)))
+          ;; Is the first line empty?
           (save-excursion
             (goto-char (point-min))
             (beginning-of-line-text)

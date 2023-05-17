@@ -55,6 +55,8 @@ By default this is my example code project.")
   "The `completion-at-point-functions' I envision using for `org-mode'."
   (setq-local completion-at-point-functions
     (list (cape-super-capf
+            #'jf/version-control/issue-capf
+            #'jf/version-control/project-capf
             #'jf/org-capf-links
             #'tempel-expand
             #'cape-file))))
