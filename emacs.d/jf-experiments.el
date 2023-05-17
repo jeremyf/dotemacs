@@ -59,10 +59,7 @@
            ;; This seems like a good idea to limit behavior to only reddit.
            (setq-local org-confirm-elisp-link-function nil)
            ;; It's rather odd to consider adding GET request
-           (read-only-mode)
-           ;; Given that we're in read mode, I like the q key to bury the
-           ;; buffer.
-           (local-set-key "q" #'jf/bury-or-unbury-buffer)))
+           (read-only-mode)))
 
 ;; May as well make a menu for this experiment.
 (bind-key "s-3" #'jf/browsing-menu)
