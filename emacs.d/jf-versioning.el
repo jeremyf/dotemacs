@@ -110,14 +110,13 @@
           (git-commit-mode . (lambda () (setq fill-column git-commit-fill-column)))))
 
 (defvar jf/version-control/valid-commit-title-prefixes
-  '("🎁: feature"
-     "🐛: bug fix"
-     "📚: documentation"
-     "💄: style changes"
-     "♻️: refactor"
-     "☑️: tests"
-     "🧹: chore"
-     "🚀: performance"
+  '("🎁: feature (A new feature)"
+     "🐛: bug fix (A bug fix)"
+     "📚: docs (Changes to documentation)"
+     "💄: style (Formatting, missing semi colons, etc; no code change)"
+     "♻️: refactor (Refactoring production code)"
+     "☑️: tests (Adding tests, refactoring test; no production code change)"
+     "🧹: chore (Updating build tasks, package manager configs, etc; no production code change)"
      "🛠: build"
      "🔄: revert"
      "⚙️: config changes"
