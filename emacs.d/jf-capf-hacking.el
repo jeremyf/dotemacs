@@ -61,7 +61,7 @@
 (cl-defun jf/capf-max-bounds (&key (window-size 40))
   "Return the max bounds for `point' based on given WINDOW-SIZE."
   (let ((boundary (- (point) window-size)))
-    (if (> 0 boundary) 1 boundary)))
+    (if (> 0 boundary) (point-min) boundary)))
 
 (cl-defun jf/version-control/known-project-names (&key (prefix "/"))
   "Return a list of project, prepending PREFIX to each."
