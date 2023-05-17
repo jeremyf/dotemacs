@@ -27,11 +27,14 @@
 
 (defun jf/version-control/project-capf ()
   "Complete project links."
+  ;; While I'm going to replace "/project" I want to make sure that I don't
+  ;; have any odd hits (for example /path/to/file)
   (when (looking-back "[^[:word:]]/[[:word:][:digit:]_\-]+" (jf/capf-max-bounds))
     (let ((right (point))
            (left (save-excursion
-                     ;; First check for the project
-                     (search-backward-regexp "/[[:word:][:digit:]_\-]+" (jf/capf-max-bounds) t) (point))))
+                   (search-backward-regexp "/[[:word:][:digit:]_\-]+"
+                     (jf/capf-max-bounds) t)
+                   (point))))
       (list left right
         (jf/version-control/known-project-names)
         :exit-function
@@ -41,11 +44,12 @@
         :exclusive 'no))))
 
 (defun jf/version-control/issue-capf ()
-  "Complete links."
+  "Complete project issue links."
+  ;; While I'm going to replace "/project" I want to make sure that I don't
+  ;; have any odd hits (for example /path/to/file)
   (when (looking-back "[^[:word:]]/[[:word:][:digit:]_\-]+#[[:digit:]]+" (jf/capf-max-bounds))
     (let ((right (point))
            (left (save-excursion
-                     ;; First check for the project
                      (search-backward-regexp "/[[:word:][:digit:]_\-]+#[[:digit:]]+" (jf/capf-max-bounds) t) (point))))
       (list left right
         (jf/version-control/text)
