@@ -18,6 +18,11 @@
 
 ;;; Code:
 
+;;;; Dependencies
+
+(require 'project)
+(require 'projectile)
+
 ;;;; Primary Functions:
 
 (defun jf/version-control/project-capf ()
