@@ -266,6 +266,8 @@ method, get the containing class."
     ;; https://stackoverflow.com/questions/72601990/how-to-show-suggestions-for-yasnippets-when-using-eglot
     (setq-local completion-at-point-functions
       (list (cape-super-capf
+              #'jf/version-control/project-capf
+              #'jf/version-control/issue-capf
               #'eglot-completion-at-point
               #'tempel-expand
               #'cape-keyword))))

@@ -18,6 +18,41 @@
 
 ;;; Code:
 
+;;;; Primary Functions:
+
+(defun jf/version-control/project-capf ()
+  "Complete project links."
+  (when (looking-back "/[[:word:][:digit:]_\-]+" (jf/capf-max-bounds))
+    (let ((right (point))
+           (left (save-excursion
+                     ;; First check for the project
+                     (search-backward-regexp "/[[:word:][:digit:]_\-]+" (jf/capf-max-bounds) t) (point))))
+      (list left right
+        (jf/version-control/known-project-names)
+        :exit-function
+        (lambda (text _status)
+          (delete-char (- (length text)))
+          (insert text "#"))
+        :exclusive 'no))))
+
+(defun jf/version-control/issue-capf ()
+  "Complete links."
+  (when (looking-back "/[[:word:][:digit:]_\-]+#[[:digit:]]+" (jf/capf-max-bounds))
+    (let ((right (point))
+           (left (save-excursion
+                     ;; First check for the project
+                     (search-backward-regexp "/[[:word:][:digit:]_\-]+#[[:digit:]]+" (jf/capf-max-bounds) t) (point))))
+      (list left right
+        (jf/version-control/text)
+        :exit-function
+        #'jf/version-control/unfurl-issue-to-url
+        :exclusive 'no))))
+
+(add-to-list 'completion-at-point-functions #'jf/version-control/issue-capf)
+(add-to-list 'completion-at-point-functions #'jf/version-control/project-capf)
+
+;;;; Service classes
+
 (cl-defun jf/capf-max-bounds (&key (window-size 40))
   "Return the max bounds for `point' based on given WINDOW-SIZE."
   (let ((boundary (- (point) window-size)))
@@ -44,41 +79,12 @@ Use the provided PREFIX to help compare against `projectile-known-projects'."
                       (format "cd %s && git remote get-url origin" project-path)))))
     (s-replace ".git" "/issues/%s" remote)))
 
-(defun jf/version-control/project-capf ()
-  (when (thing-at-point 'symbol)
-    (let ((bounds (bounds-of-thing-at-point 'symbol)))
-      (list (car bounds) (cdr bounds)
-        (jf/version-control/known-project-names)
-        :exit-function
-        (lambda (text _status)
-          (delete-char (- (length text)))
-          (insert text "#"))
-        :exclusive 'yes))))
-
-(add-to-list 'completion-at-point-functions #'jf/version-control/project-capf)
-(add-to-list 'completion-at-point-functions #'jf/version-control/issue-capf)
-
-;; TODO
-(defun jf/version-control/issue-capf ()
-  "Complete links."
-  (when (looking-back "/[[:word:][:digit:]_\-]+#[[:digit:]]+" (jf/capf-max-bounds))
-    (let ((right (point))
-           (left (save-excursion
-                     ;; First check for the project
-                     (search-backward-regexp "/[[:word:][:digit:]_\-]+#[[:digit:]]+" (jf/capf-max-bounds) t) (point))))
-      (list left right
-        ;; Call without parameters, getting a links (filtered by CAPF magic)
-        (jf/version-control/text)
-        :exit-function
-        #'jf/version-control/unfurl-issue-to-url
-        :exclusive 'yes))))
-
 (defun jf/version-control/text ()
   "Find all matches for project and issue."
   (s-match-strings-all "/[[:word:][:digit:]_\-]+#[[:digit:]]+" (buffer-string)))
 
 (defun jf/version-control/unfurl-issue-to-url (text _status)
-  "Unfurl the given TEXT to a URL
+  "Unfurl the given TEXT to a URL.
 
 Ignoring _STATUS."
   (delete-char (- (length text)))
@@ -88,9 +94,6 @@ Ignoring _STATUS."
     (insert (format
               (jf/version-control/unfurl-project-as-issue-url-template project)
               issue))))
-
-(add-to-list 'completion-at-point-functions #'jf/version-control/issue-capf)
-(add-to-list 'completion-at-point-functions #'jf/version-control/project-capf)
 
 (provide 'jf-capf-hacking)
 ;;; jf-capf-hacking.el ends here
