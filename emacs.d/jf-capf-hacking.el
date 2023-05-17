@@ -22,7 +22,7 @@
 
 (defun jf/version-control/project-capf ()
   "Complete project links."
-  (when (looking-back "/[[:word:][:digit:]_\-]+" (jf/capf-max-bounds))
+  (when (looking-back "[^[:word:]]/[[:word:][:digit:]_\-]+" (jf/capf-max-bounds))
     (let ((right (point))
            (left (save-excursion
                      ;; First check for the project
@@ -37,7 +37,7 @@
 
 (defun jf/version-control/issue-capf ()
   "Complete links."
-  (when (looking-back "/[[:word:][:digit:]_\-]+#[[:digit:]]+" (jf/capf-max-bounds))
+  (when (looking-back "[^[:word:]]/[[:word:][:digit:]_\-]+#[[:digit:]]+" (jf/capf-max-bounds))
     (let ((right (point))
            (left (save-excursion
                      ;; First check for the project
@@ -51,7 +51,7 @@
 (add-to-list 'completion-at-point-functions #'jf/version-control/issue-capf)
 (add-to-list 'completion-at-point-functions #'jf/version-control/project-capf)
 
-;;;; Service classes
+;;;; Service functions
 
 (cl-defun jf/capf-max-bounds (&key (window-size 40))
   "Return the max bounds for `point' based on given WINDOW-SIZE."
