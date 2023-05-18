@@ -91,7 +91,9 @@ Use the provided PREFIX to help compare against `projectile-known-projects'."
           (remote
             (s-trim (shell-command-to-string
                       (format "cd %s && git remote get-url origin" project-path)))))
-    (s-replace ".git" "/issues/%s" remote)))
+    (if (s-ends-with? ".git" remote)
+      (s-replace ".git" "/issues/%s" remote)
+      (concat remote "/issues/%s"))))
 
 (defun jf/version-control/text ()
   "Find all matches for project and issue."
