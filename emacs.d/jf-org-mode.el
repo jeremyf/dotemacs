@@ -214,7 +214,7 @@ first matching link."
          plain (file+function
                  jf/primary-agenda-filename-for-machine
                  jf/org-mode-agenda-find-merge-request-node)
-         "***** WAITING %^{URL of Merge Request} :mergerequest:"
+         "***** STARTED %^{URL of Merge Request} :mergerequest:"
          :immediate-finish t
          :jump-to-captured t
          :empty-lines-after 1
@@ -993,7 +993,7 @@ I envision this function called from the command-line."
                  (org-map-entries
                    (lambda ()
                      (org-element-property :raw-value (org-element-at-point)))
-                   "+LEVEL=5+mergerequests+TODO=\"IN-REVIEW\"" 'agenda)))
+                   "+LEVEL=5+mergerequests+TODO=\"STARTED\"" 'agenda)))
     (eww-browse-with-external-browser url)))
 
 (provide 'jf-org-mode)
