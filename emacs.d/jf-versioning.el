@@ -11,12 +11,15 @@
   ;; A mode for editing gitconfig files.
   :straight t)
 
+(use-package emacsql
+  :straight (:host github :repo "magit/emacsql"))
+
 (use-package magit
   ;; A fantastic UI for git commands; the interactive rebase is an absolute
   ;; wonder tool (see
   ;; https://takeonrules.com/2023/01/12/using-the-git-interactive-staging-as-a-moment-to-facilitate-synthesis/).
   ;; Also the progenitor of `transient'
-  :straight t
+  :straight (:host github :repo "magit/magit")
   :commands (magit-process-git)
   :init (use-package with-editor :straight t)
   ;; Adding format to git-commit-fill-column of 72 as best practice.
@@ -109,6 +112,12 @@
   :hook ((with-editor-post-finish . #'magit-status)
           (git-commit-mode . (lambda () (setq fill-column git-commit-fill-column)))))
 
+(setq auth-sources (list "~/.authinfo.gpg" 'macos-keychain-internet 'macos-keychain-generic))
+
+(use-package forge
+  :after (magit emacsql)
+  :straight (:host github :repo "magit/forge"))
+
 (defvar jf/version-control/valid-commit-title-prefixes
   '("🎁: feature (A new feature)"
      "🐛: bug fix (A bug fix)"
@@ -119,6 +128,8 @@
      "🧹: chore (Updating build tasks, package manager configs, etc; no production code change)"
      "🛠: build"
      "🔄: revert"
+     "🦄: spike (Indicates research task; usually creates more tickets)"
+     "☄️: epic (Enumeration of lots of other issues/tasks)"
      "⚙️: config changes"
      "🎬: initial commit or setup of project/component"
      "🤖: continuous integration (CI) changes")
@@ -153,6 +164,7 @@ SPLITTER to determine the prefix to include."
             (looking-at-p "^$")))
     (jf/insert-task-type-at-point :at (point-min))))
 
+(global-set-key (kbd "s-7") #'jf/insert-task-type-at-point)
 (cl-defun jf/insert-task-type-at-point (&key (splitter ":") (padding " ") (at nil))
   "Select and insert task type.
 
