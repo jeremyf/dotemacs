@@ -151,10 +151,18 @@ SPLITTER to determine the prefix to include."
             (goto-char (point-min))
             (beginning-of-line-text)
             (looking-at-p "^$")))
-    (let ((commit-type (completing-read "Commit title prefix: "
-                         jf/version-control/valid-commit-title-prefixes nil t)))
-      (goto-char (point-min))
-      (insert (car (s-split splitter commit-type)) padding))))
+    (jf/insert-task-type-at-point :at (point-min))))
+
+(cl-defun jf/insert-task-type-at-point (&key (splitter ":") (padding " ") (at nil))
+  "Select and insert task type.
+
+Split result on SPLITTER and insert result plus PADDING.  When
+provided AT, insert character there."
+  (interactive)
+  (let ((commit-type (completing-read "Commit title prefix: "
+                       jf/version-control/valid-commit-title-prefixes nil t)))
+    (when at (goto-char at))
+    (insert (car (s-split splitter commit-type)) padding)))
 
 (add-hook 'find-file-hook 'jf/git-commit-mode-hook)
 
