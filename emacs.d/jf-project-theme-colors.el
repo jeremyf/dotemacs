@@ -44,7 +44,7 @@
     ("~/git/utk-hyku/" . bg-red-intense)
     ("~/git/bulkrax/" . bg-sage)
     ("~/git/space_stone/" . bg-magenta-nuanced)
-    ("~/git/derivative-rodeo/" . bg-red-intense)
+    ("~/git/derivative_rodeo/" . bg-ochre)
     ("~/git/hyrax/" . bg-sage))
   "A list of projects and their colors.
 

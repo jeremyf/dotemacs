@@ -21,7 +21,11 @@
   ;; Also the progenitor of `transient'
   :straight (:host github :repo "magit/magit")
   :commands (magit-process-git)
-  :init (use-package with-editor :straight t)
+  ;; My "~/bin/editor" script was causing problems in that it was asking to wait.
+  :init (use-package with-editor
+          :straight t
+          :custom (with-editor-emacsclient-executable (file-truename "~/bin/git_editor")))
+  ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;; Adding format to git-commit-fill-column of 72 as best practice.
   (setq git-commit-fill-column 72)
   ;; Keeping the summary terse helps with legibility when you run a
@@ -112,10 +116,13 @@
   :hook ((with-editor-post-finish . #'magit-status)
           (git-commit-mode . (lambda () (setq fill-column git-commit-fill-column)))))
 
-(setq auth-sources (list "~/.authinfo.gpg" 'macos-keychain-internet 'macos-keychain-generic))
+(setq auth-sources (list "~/.authinfo.gpg" 'macos-keychain-internet 'macos-keychain-generic "~/.authinfo"))
 
 (use-package forge
   :after (magit emacsql)
+  ;; :commands (forge-mode)
+  ;; :hook ((magit-status-sections . #'forge-insert-pullreqs)
+  ;;         (magit-status-sections . #'forge-insert-assigned-issues))
   :straight (:host github :repo "magit/forge"))
 
 (defvar jf/version-control/valid-commit-title-prefixes
