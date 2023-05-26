@@ -104,7 +104,7 @@ text-mode
 
 ;;;; web-mode
 web-mode
-(bye "<% byebug %>" n)
+(bb "<% byebug %>" n)
 (db "<% require \"debug\"; binding.break %>" n)
 (tor "<cite><a href=\"https://takeonrules.com\">Take on Rules</a></cite>")
 (today "<time datetime=\"" (format-time-string "%Y-%m-%d") "\">today</time>")
@@ -115,8 +115,17 @@ web-mode
 enh-ruby-mode ruby-mode rspec-mode ruby-ts-mode
 
 (bench "require \"benchmark\"" n "Benchmark.bmbm do |b|" n "  b.report(\"\") do" n "    # Stuff" n "  end" n "end")
-(db "require \"debug\"; binding.break" n)
-(bye "require 'byebug'; byebug" n)
+(cattr > "##" n>
+  "# @!group Class Attributes" n>
+  "#" n>
+  "# @!attribute " (s attr) n>
+  "#   " p n>
+  "class_attribute :" attr ", " q n>
+  "# @!endgroup Class Attributes" n>
+  "##")
+
+(debug "require \"debug\"; binding.break" n)
+(db "require 'byebug'; byebug" n)
 (frozen "# frozen_string_literal: true")
 (shell "#!/usr/bin/env ruby -w")
 (dc "described_class")

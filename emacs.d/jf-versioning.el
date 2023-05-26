@@ -116,13 +116,14 @@
   :hook ((with-editor-post-finish . #'magit-status)
           (git-commit-mode . (lambda () (setq fill-column git-commit-fill-column)))))
 
-(setq auth-sources (list "~/.authinfo.gpg" 'macos-keychain-internet 'macos-keychain-generic "~/.authinfo"))
+(setq auth-sources (list "~/.authinfo.gpg"))
 
 (use-package forge
   :after (magit emacsql)
   ;; :commands (forge-mode)
   ;; :hook ((magit-status-sections . #'forge-insert-pullreqs)
   ;;         (magit-status-sections . #'forge-insert-assigned-issues))
+  :bind ("C-s-f" . #'forge-dispatch)
   :straight (:host github :repo "magit/forge"))
 
 (defvar jf/version-control/valid-commit-title-prefixes
