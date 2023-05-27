@@ -281,7 +281,7 @@ method, get the containing class."
 (use-package eldoc
   ;; Helps with rendering documentation
   ;; https://www.masteringemacs.org/article/seamlessly-merge-multiple-documentation-sources-eldoc
-  :preface
+  :config
   (add-to-list 'display-buffer-alist
     '("^\\*eldoc for" display-buffer-at-bottom
        (window-height . 4)))

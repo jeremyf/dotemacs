@@ -608,7 +608,7 @@ Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
 
 ;;;; The One Ring
 
-(require 'jf-the-one-ring)
+;; (require 'jf-the-one-ring)
 
 ;; TODO: Consider how I might "lookup" my character sheet for Solo Play.
 (provide 'jf-gaming)
