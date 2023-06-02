@@ -928,5 +928,23 @@ Credit: https://github.com/olivertaylor/dotfiles/blob/master/emacs/init.el"
 (use-package breadcrumb
   :straight (:host github :repo "joaotavora/breadcrumb")
   :config (breadcrumb-mode))
+
+(defun toggle-transparency ()
+  "Toggle on and off transparency.
+
+I'm uncertain if this is useful/practical.  However there is
+ literature regarding the benefits of transparency of files."
+   (interactive)
+   (let ((alpha (frame-parameter nil 'alpha)))
+     (set-frame-parameter
+      nil 'alpha
+      (if (eql (cond ((numberp alpha) alpha)
+                     ((numberp (cdr alpha)) (cdr alpha))
+                     ;; Also handle undocumented (<active> <inactive>) form.
+                     ((numberp (cadr alpha)) (cadr alpha)))
+               100)
+          '(75 . 50) '(100 . 100)))))
+
+
 (provide 'jf-experiments)
 ;;; jf-experiments.el ends here
