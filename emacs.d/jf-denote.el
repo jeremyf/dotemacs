@@ -798,7 +798,7 @@ Capturing for the given DOMAIN and KEYWORDS prompt."
   (let* ((headline (jf/org-agenda-headline-for-level :level 2))
           (title (org-element-property :title headline)))
     (org-cut-subtree)
-    (denote (concat " Scientist Time Sheet")
+    (denote (concat title " Time Sheet")
       '("timesheet" "scientist")
       'org
       (f-join (denote-directory) "scientist"))
