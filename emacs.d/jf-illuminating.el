@@ -18,7 +18,7 @@
   ;; In writing, with the cursor at point, when I expand it selects the word.
   ;; The next expand the sentence, then paragraph, then page.  In programming it
   ;; leverages sexp.
-  :straight t
+  :straight (:host github :repo "jeremyf/expand-region.el")
   :bind (("C-=" . er/expand-region)
           ("C-+" . er/contract-region)))
 
