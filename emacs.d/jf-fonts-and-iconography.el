@@ -20,12 +20,14 @@
   (setq fontaine-presets
     ;; I'm naming the presets as "actions"; the mindset that I'm using when
     ;; wanting that font.
-    '((overviewing
+    '((compact
         :default-height 110)
        (default
+         :default-height 140)
+       (comfy
          :default-height 160)
        (coding
-         :default-height 160)
+         :default-height 140)
        (presenting
          :default-weight semilight
          :default-height 220
@@ -39,7 +41,7 @@
          ;; Following Prot’s example, keeping these for for didactic purposes.
          :default-family "Iosevka Comfy Motion Fixed"
          :default-weight regular
-         :default-height 160
+         :default-height 140
          :fixed-pitch-family nil ; falls back to :default-family
          :fixed-pitch-weight nil ; falls back to :default-weight
          :fixed-pitch-height 1.0
