@@ -49,7 +49,7 @@
 
 ;; A package to browse/read reddit in emacs and `org-mode' format.
 (use-package reddigg
-  :straight (:host github :repo "thanhvg/emacs-reddigg")
+  :straight (:host github :repo "jeremyf/emacs-reddigg")
   :config (setq reddigg--sub-url "https://www.reddit.com/r/%s/new.json?count=25")
   :custom (reddigg-subs '(emacs planetemacs orgmode wwn swn ruby rubyonrails)))
 
