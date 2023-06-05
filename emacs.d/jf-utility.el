@@ -101,13 +101,15 @@
   ;;   4.  Edit the grep buffer as you would anywhere else.
   ;;   5.  Save (via ~C-x C-s~) or Cancel (via ~C-c C-k~).
   :after (embark-consult ripgrep)
-  :straight (:type git :host github :repo "jeremyf/Emacs-wgrep" :branch "main")
+  :config (setq wgrep-auto-save-buffer t)
+  (setq wgrep-change-readonly-file t)
+  :straight t
   :preface
   (defun jf/wgrep-finish-edit ()
     "Finish a `wgrep' edit session."
     (interactive)
-    (wgrep-finish-edit)
-    (call-interactively #'save-some-buffers))
+    (wgrep-save-all-buffers)
+    (wgrep-finish-edit))
   :bind (:map wgrep-mode-map
           ;; Added keybinding to echo Magit behavior
           ("C-c C-c" . jf/wgrep-finish-edit)
