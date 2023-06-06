@@ -253,9 +253,9 @@ method, get the containing class."
     (setq eldoc-documentation-strategy
       'eldoc-documentation-compose-eagerly))
   :config
-  (use-package eglot-tempel
-  ;; I use `tempel' and I use `eglot'; having some glue between those helps.
-  :straight (eglot-tempel :host github :repo "fejfighter/eglot-tempel"))
+  ;; (use-package eglot-tempel
+  ;; ;; I use `tempel' and I use `eglot'; having some glue between those helps.
+  ;; :straight (eglot-tempel :host github :repo "fejfighter/eglot-tempel"))
   (add-to-list 'eglot-stay-out-of 'flymake)
   (setq completion-category-overrides '((eglot (styles orderless))))
   (add-to-list 'eglot-server-programs
@@ -552,6 +552,8 @@ See `add-log-current-defun-function'."
          ("macro" "^.*([[:space:]]*\\(cl-\\)?defmacro[[:space:]]+\\([^(]+\\)" 2)
          ("use-package" "^.*([[:space:]]*use-package[[:space:]]+\\([[:word:]-]+\\)" 1)))
     (imenu-add-menubar-index)))
+
+(require 'jf-copilot)
 
 (provide 'jf-coding)
 ;;; jf-coding.el ends here
