@@ -157,19 +157,20 @@
 Add PADDING between inserted commit type and start of title.  For
 the `completing-read' show the whole message.  But use the
 SPLITTER to determine the prefix to include."
-  (when (and (eq major-mode 'text-mode)
-          (string= (buffer-name) "COMMIT_EDITMSG")
-          (local-set-key (kbd "TAB") #'completion-at-point)
-          (setq-local completion-at-point-functions
-            (cons #'jf/version-control/issue-capf
-              (cons #'jf/version-control/project-capf
-                completion-at-point-functions)))
-          ;; Is the first line empty?
-          (save-excursion
-            (goto-char (point-min))
-            (beginning-of-line-text)
-            (looking-at-p "^$")))
-    (jf/insert-task-type-at-point :at (point-min))))
+  (when (string= (buffer-name) "COMMIT_EDITMSG"))
+    (progn
+      (when (fboundp 'copilot-mode) (copilot-mode -1))
+      (local-set-key (kbd "TAB") #'completion-at-point)
+      (setq-local completion-at-point-functions
+		  (cons #'jf/version-control/issue-capf
+			(cons #'jf/version-control/project-capf
+			      completion-at-point-functions)))
+      ;; Is the first line empty?
+      (save-excursion
+        (goto-char (point-min))
+        (beginning-of-line-text)
+        (looking-at-p "^$"))
+      (jf/insert-task-type-at-point :at (point-min)))))
 
 (global-set-key (kbd "s-7") #'jf/insert-task-type-at-point)
 (cl-defun jf/insert-task-type-at-point (&key (splitter ":") (padding " ") (at nil))
@@ -183,7 +184,7 @@ provided AT, insert character there."
     (when at (goto-char at))
     (insert (car (s-split splitter commit-type)) padding)))
 
-(add-hook 'find-file-hook 'jf/git-commit-mode-hook)
+(add-hook 'find-file-hook #'jf/git-commit-mode-hook)
 
 ;; COMMENTED OUT FOR FUTURE REFERENCE
 ;; (transient-define-prefix jf/magit-aux-commands ()
