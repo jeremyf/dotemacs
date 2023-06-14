@@ -139,6 +139,7 @@
      "☄️: epic (Enumeration of lots of other issues/tasks)"
      "⚙️: config changes"
      "🎬: initial commit or setup of project/component"
+     "🚧: work in progress"
      "🤖: continuous integration (CI) changes")
   ;; The following list was pulled from http://udacity.github.io/git-styleguide/
   ;;
@@ -157,10 +158,9 @@
 Add PADDING between inserted commit type and start of title.  For
 the `completing-read' show the whole message.  But use the
 SPLITTER to determine the prefix to include."
-  (when (string= (buffer-name) "COMMIT_EDITMSG"))
+  (when (string= (buffer-name) "COMMIT_EDITMSG")
     (progn
       (when (fboundp 'copilot-mode) (copilot-mode -1))
-      (local-set-key (kbd "TAB") #'completion-at-point)
       (setq-local completion-at-point-functions
 		  (cons #'jf/version-control/issue-capf
 			(cons #'jf/version-control/project-capf
@@ -169,8 +169,9 @@ SPLITTER to determine the prefix to include."
       (save-excursion
         (goto-char (point-min))
         (beginning-of-line-text)
-        (looking-at-p "^$"))
-      (jf/insert-task-type-at-point :at (point-min)))))
+        (when (looking-at-p "^$")
+          (jf/insert-task-type-at-point :at (point-min))))
+      (local-set-key (kbd "TAB") #'completion-at-point))))
 
 (global-set-key (kbd "s-7") #'jf/insert-task-type-at-point)
 (cl-defun jf/insert-task-type-at-point (&key (splitter ":") (padding " ") (at nil))
