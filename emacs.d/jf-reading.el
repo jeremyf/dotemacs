@@ -80,6 +80,7 @@ It will display entries without switching to them."
   ;; become.
   :straight t
   :config
+  (setq shr-cookie-policy nil)
   (defun shr-tag-dfn (dom)
     (shr-fontize-dom dom 'italic))
 

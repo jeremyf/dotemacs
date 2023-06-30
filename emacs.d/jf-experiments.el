@@ -946,5 +946,10 @@ I'm uncertain if this is useful/practical.  However there is
           '(75 . 50) '(100 . 100)))))
 
 
+;; Going to experiment a moment with this.
+
+(setq gnus-select-method '(nntp "campaignwiki.org"))
+;; (add-to-list 'gnus-secondary-select-methods '(nnml ""))
+
 (provide 'jf-experiments)
 ;;; jf-experiments.el ends here

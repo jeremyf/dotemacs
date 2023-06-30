@@ -341,7 +341,7 @@ Default the note’s title to the first NTH-WORDS of the BODY."
   (interactive)
   (let* ((body-as-list (s-split-words body))
          (title (s-join " " (if (> (length body-as-list) nth-words)
-                                (subseq body-as-list 0 nth-words)
+                                (cl-subseq body-as-list 0 nth-words)
             body-as-list)))
          (template (concat
                     ;; The name of the author
