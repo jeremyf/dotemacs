@@ -12,7 +12,7 @@
 
 (use-package mastodon
     :straight t
-    :config (setq mastodon-instance-url "https://tabletop.social"
+    :config (setq mastodon-instance-url "https://dice.camp"
 		  mastodon-active-user "takeonrules"))
 
 (provide 'jf-communicating)

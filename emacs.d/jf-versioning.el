@@ -134,6 +134,7 @@
      "☑️: tests (Adding tests, refactoring test; no production code change)"
      "🧹: chore (Updating build tasks, package manager configs, etc; no production code change)"
      "🛠: build"
+     "💸: minting a new version"
      "🔄: revert"
      "🦄: spike (Indicates research task; usually creates more tickets)"
      "☄️: epic (Enumeration of lots of other issues/tasks)"

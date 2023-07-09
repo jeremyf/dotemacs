@@ -98,11 +98,17 @@ setting up an IDE-like layout)."
 ;; Show tabs as they are tricky little creatures
 (defface jf/tabs-face '((default :inherit font-lock-misc-punctuation-face))
   "Help me see tabs; they are tricky creatures.")
+(defface jf/bom-face '((default :inherit font-lock-misc-punctuation-face))
+  "Help me see BOM characters \"﻿\"; they are tricky!")
 
 (add-hook 'prog-mode-hook
-  (lambda () (font-lock-add-keywords nil '(("\t" . 'jf/tabs-face)))))
+  (lambda () (font-lock-add-keywords nil '(("\t" . 'jf/tabs-face)))
+    (font-lock-add-keywords nil '(("﻿" . 'jf/bom-face)))
+    ))
 (add-hook 'text-mode-hook
-  (lambda () (font-lock-add-keywords nil '(("\t" . 'jf/tabs-face)))))
+  (lambda () (font-lock-add-keywords nil '(("\t" . 'jf/tabs-face)))
+    (font-lock-add-keywords nil '(("﻿" . 'jf/bom-face)))
+    ))
 
 ;; And now the theme.  I’ve chosen the modus themes (e.g. ~modus-vivendi~ and
 ;; ~modus-operandi~).  They provide a light and dark theme with a focus on visual
@@ -117,6 +123,10 @@ setting up an IDE-like layout)."
          ((,c (:inherit link
                 :box (:line-width (1 . 1)
                        :color ,border-mode-line-inactive
+                       :style released-button)))))
+      `(jf/bom-face
+         ((,c (:width ultra-expanded :box (:line-width (2 . 2)
+                       :color ,underline-err
                        :style released-button)))))
       `(jf/tabs-face
          ((,c :underline (:style wave :color ,bg-blue-intense))))
