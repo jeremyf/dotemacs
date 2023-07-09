@@ -153,26 +153,21 @@
   ;;    "chore: Updating build tasks, package manager configs, etc; no production code change")
   "Team 💜 Violet 💜 's commit message guidelines on <2023-05-12 Fri>.")
 
-(cl-defun jf/git-commit-mode-hook (&key (splitter ":") (padding " "))
-  "If the first line is empty, prompt for commit type and insert it.
-
-Add PADDING between inserted commit type and start of title.  For
-the `completing-read' show the whole message.  But use the
-SPLITTER to determine the prefix to include."
-  (when (string= (buffer-name) "COMMIT_EDITMSG")
-    (progn
-      (when (fboundp 'copilot-mode) (copilot-mode -1))
-      (setq-local completion-at-point-functions
+(use-package git-commit
+  :straight t
+  :hook ((git-commit-mode . jf/git-commit-mode-setup))
+  :bind (:map git-commit-mode (("TAB" .  #'completion-at-point)))
+  :preface
+  (defun jf/git-commit-mode-setup ()
+    ;; Specify config capf
+    (setq-local completion-at-point-functions
 		  (cons #'jf/version-control/issue-capf
-			(cons #'jf/version-control/project-capf
-			      completion-at-point-functions)))
-      ;; Is the first line empty?
-      (save-excursion
-        (goto-char (point-min))
-        (beginning-of-line-text)
-        (when (looking-at-p "^$")
-          (jf/insert-task-type-at-point :at (point-min))))
-      (local-set-key (kbd "TAB") #'completion-at-point))))
+			  (cons #'jf/version-control/project-capf
+			    completion-at-point-functions)))
+    (goto-char (point-min))
+    (beginning-of-line-text)
+    (when (looking-at-p "^$")
+      (jf/insert-task-type-at-point :at (point-min)))))
 
 (global-set-key (kbd "s-7") #'jf/insert-task-type-at-point)
 (cl-defun jf/insert-task-type-at-point (&key (splitter ":") (padding " ") (at nil))
@@ -185,8 +180,6 @@ provided AT, insert character there."
                        jf/version-control/valid-commit-title-prefixes nil t)))
     (when at (goto-char at))
     (insert (car (s-split splitter commit-type)) padding)))
-
-(add-hook 'find-file-hook #'jf/git-commit-mode-hook)
 
 ;; COMMENTED OUT FOR FUTURE REFERENCE
 ;; (transient-define-prefix jf/magit-aux-commands ()
