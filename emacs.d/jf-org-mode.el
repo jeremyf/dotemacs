@@ -143,6 +143,7 @@ first matching link."
   :config
   (setq org-clock-persist 'history)
   (setq org-confirm-babel-evaluate #'jf/org-confirm-babel-evaluate
+    org-fontify-quote-and-verse-blocks t
     ;; I'd prefer to use the executable, but that doe not appear to be the
     ;; implementation of org-babel.
     org-plantuml-jar-path (concat
