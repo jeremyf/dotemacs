@@ -188,16 +188,16 @@ This function is the plural version of `jf/denote/org-property-from-id'."
   (when-let ((filename (denote-get-path-by-id identifier)))
     (when (string= (file-name-extension filename) "org")
       (with-current-buffer (find-file-noselect filename)
-  (let ((kw-plist (jf/org-keywords-as-plist
-       :keywords-regexp "\\(TITLE\\|GLOSSARY_KEY\\|OFFER\\|ROAM_REFS\\|SAME_AS\\)")))
-    (list
-     :title (plist-get kw-plist "TITLE")
-     :key (plist-get kw-plist "GLOSSARY_KEY")
-     :url (or
-     (plist-get kw-plist "OFFER")
-     (when-let ((refs (plist-get kw-plist "ROAM_REFS")))
-       (first (s-split " " refs t)))
-     (plist-get kw-plist "SAME_AS"))))))))
+        (let ((kw-plist (jf/org-keywords-as-plist
+                          :keywords-regexp "\\(TITLE\\|GLOSSARY_KEY\\|OFFER\\|ROAM_REFS\\|SAME_AS\\)")))
+          (list
+            :title (lax-plist-get kw-plist "TITLE")
+            :key (lax-plist-get kw-plist "GLOSSARY_KEY")
+            :url (or
+                   (lax-plist-get kw-plist "OFFER")
+                   (when-let ((refs (lax-plist-get kw-plist "ROAM_REFS")))
+                     (first (s-split " " refs t)))
+                   (lax-plist-get kw-plist "SAME_AS"))))))))
 
 ;;;;; `denote' file finding functions
 
