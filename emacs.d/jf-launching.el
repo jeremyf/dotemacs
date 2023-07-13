@@ -123,6 +123,8 @@
 
  kill-ring-max 120           ;; Set a generous kill ring size.
 
+  load-prefer-newer t ;; Favor new bit code
+
  read-process-output-max (* 6 512 1024)  ;; Increase read size per process
 
  recentf-max-menu-items 50
