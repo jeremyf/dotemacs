@@ -238,7 +238,7 @@ first matching link."
                  jf/org-mode-agenda-find-project-node)
          ;; The five ***** is due to the assumptive depth of the projects and
          ;; tasks.
-         "***** %^{State|STARTED|TODO} %^{Describe the task} :tasks:\n\n"
+         "***** TODO %^{Describe the task} :tasks:\n\n"
          :jump-to-captured t
          :immediate-finish t
          :clock-in t)))
