@@ -15,7 +15,7 @@
 
 (transient-define-suffix jf/jump-to/violet-board ()
   "Jump to 💜 Violet 💜"
-  :description "Jump to 💜 Violet 💜"
+  :description "Jump to Violet"
   (interactive)
   (require 'eww)
   (eww-browse-with-external-browser "https://github.com/orgs/scientist-softserv/projects/43"))
