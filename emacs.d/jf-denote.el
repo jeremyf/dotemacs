@@ -198,7 +198,9 @@ This function is the plural version of `jf/denote/org-property-from-id'."
             :url (or
                    (lax-plist-get kw-plist "OFFER")
                    (when-let ((refs (lax-plist-get kw-plist "ROAM_REFS")))
-                     (first (s-split " " refs t)))
+                     (if (listp refs)
+                       (first (s-split " " refs t))
+                       refs))
                    (lax-plist-get kw-plist "SAME_AS"))))))))
 
 ;;;;; `denote' file finding functions
@@ -703,19 +705,9 @@ When USE_HUGO_SHORTCODE is given use glossary based exporting."
 ;;   was typically the Wikidata URL.
 (defun jf/denote/export-url-from-id (id)
   "Return the appropriate url for the given `denote' ID."
-  ;; TODO: Remove function
-  (when-let ((filename (denote-get-path-by-id id)))
-    (when (string= (file-name-extension filename) "org")
-      (with-current-buffer (find-file-noselect filename)
-        (let* ((kw-plist
-    (jf/org-keywords-as-plist
-     :keywords-regexp "\\(OFFER\\|ROAM_REFS\\|SAME_AS\\)")))
-          (cond
-           ;; Favor affiliate links
-           ((plist-get kw-plist "OFFER"))
-           ((when-let ((refs (plist-get kw-plist "ROAM_REFS")))
-        (first (s-split " " refs t))))
-           ((plist-get kw-plist "SAME_AS"))))))))
+  ;; TODO: Remove function?
+  (when-let ((the-plist (jf/denote/plist-for-export-of-id id)))
+    (plist-get the-plist :url)))
 
 ;;  ;; Should be: https://www.worldcat.org link
 ;; (message "%s" (jf/denote/export-url-from-id "20221009T115949"))
