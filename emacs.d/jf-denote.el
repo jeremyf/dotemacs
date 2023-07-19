@@ -78,6 +78,8 @@
   :bind ("H-l" . 'jf/denote/link-or-create)
   ("H-i" . 'jf/denote/link-or-create)
   :hook (dired-mode . denote-dired-mode)
+  :custom (denote-org-capture-specifiers
+            "%(jf/denote/capture-wrap :link \"%L\" :content \"%i\")")
   :init
   (require 'denote-org-dblock)
   :custom

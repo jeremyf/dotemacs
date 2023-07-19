@@ -129,6 +129,7 @@ first matching link."
   ;;
   ;; (org-mode . org-indent-mode)
   :bind ("C-c C-j" . jf/org-mode/jump-to-agenda-or-mark)
+  ("C-c C-x C-j" . org-clock-goto)
   :bind (:map org-mode-map (("C-c C-j" . jf/org-mode/jump-to-agenda-or-mark)
                              ("C-x n t" . jf/org-mode/narrow-to-date)
                              ("C-j" . avy-goto-char-2)))
@@ -191,15 +192,16 @@ first matching link."
          :immediate-finish t
          :jump-to-captured t
          :empty-lines-after 1)
-       ("c" "Content to Backlog"
-         plain (file+function
-                 jf/org-mode/capture/filename
-                 jf/org-mode/capture/set-position-file)
-         "%i%?"
-         :empty-lines 1)
+       ("c" "Content to Denote"
+         plain (file denote-last-path)
+         #'jf/denote-org-capture
+         :no-save t
+         :immediate-finish nil
+         :kill-buffer t
+         :jump-to-captured t)
        ("C" "Content to Clock"
          plain (clock)
-         "%i%?"
+         "%(jf/denote/capture-wrap :link \"%L\" :content \"%i\")"
          :empty-lines 1)
        ("d" "Day with plain entry"
          plain (file+olp+datetree jf/primary-agenda-filename-for-machine)
@@ -240,6 +242,10 @@ first matching link."
          :jump-to-captured t
          :immediate-finish t
          :clock-in t)))
+
+  (defun jf/denote-org-capture ()
+    (let ((denote-directory (f-join denote-directory "blog-posts")))
+      (denote-org-capture)))
 
   (setq org-latex-default-class "jf/article")
 
@@ -909,7 +915,7 @@ HEADLINE does not exist, write it at the end of the file."
     "\n${block-text}"
     "\n#+END_${block-type}"))
 
-(cl-defun jf/org-mode/capture/get-field-values (start end)
+(cl-defun jf/org-mode/capture/get-field-values (block-text)
   "Get the text between START and END returning a fields and values.
 
 The return value is a list of `cons' with the `car' values of:
@@ -934,7 +940,6 @@ The return value is a list of `cons' with the `car' values of:
                   ((eq major-mode 'nov-mode) "QUOTE")
                   ((derived-mode-p 'prog-mode) "SRC")
                   (t "SRC" "EXAMPLE")))
-          (code-snippet (buffer-substring-no-properties start end))
           (file-base (if file-name
                        (file-name-nondirectory file-name)
                        (format "%s" (current-buffer))))
@@ -950,7 +955,35 @@ The return value is a list of `cons' with the `car' values of:
        ("line-number" . ,line-number)
        ("block-type" . ,type)
        ("block-mode" . ,org-src-mode)
-       ("block-text" . , code-snippet))))
+       ("block-text" . , block-text))))
+
+(cl-defun jf/denote/capture-wrap (&key link content)
+  "Given the LINK and CONTENT return a string to insert into the capture."
+  ;; We must do funny business with the link to discern the type.
+  (let* ((elements (s-split "::" (string-replace "]]" "" (string-replace "[[" "" link))))
+          (parts (s-split ":" (car elements)))
+          (type (car parts))
+          (path (s-join ":" (cdr parts))))
+    (message "Opening %s with %s" path type)
+    (cond
+      ((string= "elfeed" type)
+        (save-excursion
+          (funcall (org-link-get-parameter type :follow) path)
+          (let ((url (elfeed-entry-link elfeed-show-entry))
+                 (title (elfeed-entry-title elfeed-show-entry))
+                 (author (plist-get (car (plist-get (elfeed-entry-meta elfeed-show-entry) :authors)) :name)))
+            (concat "#+attr_shortcode:"
+              (when author (concat " :pre " author))
+              (when title (concat " :cite " title))
+              (when url (concat " :cite_url " url))
+              "\n#+begin_blockquote\n" content "\n#+end_blockquote\n%?"))))
+      ((string= "file" type)
+        (save-excursion
+          (org-link-open-as-file path nil)
+          (s-format jf/org-mode/capture/template/while-clocking
+            'aget
+            (jf/org-mode/capture/get-field-values content))))
+      (t "\n#+begin_example\n" content "\n#+end_example"))))
 
 (defun jf/org-mode/capture/parameters (prefix)
   "A logic lookup table by PREFIX."
@@ -971,10 +1004,11 @@ Without PREFIX and not clocking capture clock otherwise capture to Backlog."
   ;;
   ;; - org-capture-key (default "c")
   ;; - template jf/org-mode/capture/template/default
-  (let ((params (jf/org-mode/capture/parameters prefix)))
+  (let ((params (jf/org-mode/capture/parameters prefix))
+         (block-text (buffer-substring-no-properties start end)))
     (org-capture-string (s-format (plist-get params :template)
                           'aget
-                          (jf/org-mode/capture/get-field-values start end))
+                          (jf/org-mode/capture/get-field-values block-text))
       (plist-get params :key))))
 
 (defun jf/capture/text-from-stdin (text)
