@@ -59,6 +59,7 @@
      ("j v" jf/jump-to/violet-board)]
     ["Tasks"
       ("a" "Git Annotation" vc-annotate)
+      ("c c" jf/denote-org-capture/filename-set)
       ("d" "Deadgrep…" deadgrep)
       ("i" "Clock in…" consult-clock-in)
       ("r" "Run command…" run-command)

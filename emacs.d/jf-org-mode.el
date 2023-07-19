@@ -243,9 +243,26 @@ first matching link."
          :immediate-finish t
          :clock-in t)))
 
+  (transient-define-suffix jf/denote-org-capture/filename-set ()
+    "Work with `jf/denote-org-capture/filename'"
+	 :description '(lambda ()
+			 (concat
+			   "Denote Capture Filename: "
+         (propertize (format "%s" (and denote-last-path
+                                    (string-replace (denote-directory) "./" denote-last-path)))
+           'face 'transient-argument)))
+	  (interactive)
+    (if denote-last-path
+      (setq denote-last-path nil)
+      (let ((fname (buffer-file-name (current-buffer))))
+        (setq denote-last-path (and (denote-file-is-note-p  fname) fname)))))
+
   (defun jf/denote-org-capture ()
-    (let ((denote-directory (f-join denote-directory "blog-posts")))
-      (denote-org-capture)))
+    "An org-capture conformant function for capturing to a blog-post."
+    (if denote-last-path
+      denote-org-capture-specifiers
+      (let ((denote-directory (f-join denote-directory "blog-posts")))
+        (denote-org-capture))))
 
   (setq org-latex-default-class "jf/article")
 
