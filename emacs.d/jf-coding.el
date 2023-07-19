@@ -239,7 +239,7 @@ method, get the containing class."
   ;; tooling is very much a nice to have.
   :hook ((css-mode css-ts-mode
            ruby-mode ruby-ts-mode
-           yaml-mode yaml-ts-mode
+           ;; yaml-mode yaml-ts-mode
            html-mode html-ts-mode
            js-mode js-ts-mode
            json-mode json-ts-mode
