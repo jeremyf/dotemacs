@@ -25,7 +25,7 @@
   ;;                      cases.
   ;; - update :: I write updates for my blog posts; corrections or additions
   ;;             based on new information.
-  (org-hugo-paired-shortcodes "blockquote marginnote poem inline_comments update")
+  (org-hugo-paired-shortcodes "blockquote marginnote poem inlinecomment update")
   (hugo-use-code-for-kbd t)
   :config
   ;; I want to have backticks instead of indentations;  The backticks also

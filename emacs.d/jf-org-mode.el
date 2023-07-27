@@ -216,7 +216,7 @@ first matching link."
     org-catch-invisible-edits 'show-and-error
     org-use-fast-todo-selection 'expert
     org-log-into-drawer t
-    org-imenu-depth 3
+    org-imenu-depth 4
     org-hide-emphasis-markers t
     ;; turning off org-elements cache speeds up input latency
     ;; See https://www.reddit.com/r/emacs/comments/11ey9ft/weekly_tips_tricks_c_thread/
@@ -335,7 +335,7 @@ first matching link."
   (add-to-list 'org-structure-template-alist '("D" . "details"))
   (add-to-list 'org-structure-template-alist '("S" . "summary"))
   (add-to-list 'org-structure-template-alist '("U" . "update"))
-  (add-to-list 'org-structure-template-alist '("i" . "inline_comments"))
+  (add-to-list 'org-structure-template-alist '("i" . "inlinecomment"))
   :init
   (require 'ox)
   ;; I grabbed from the following LaTeX class from
