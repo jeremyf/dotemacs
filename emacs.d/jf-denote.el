@@ -214,9 +214,9 @@ instead of `denote-file-prompt'.
 This function is intended for a global find of all notes.  With
 ID-ONLY link without title."
   (interactive (list (jf/denote/file-prompt)
-         current-prefix-arg))
-  (if (file-exists-p target)
-      (denote-link target id-only)
+                 current-prefix-arg))
+  (if (and target (file-exists-p target))
+    (denote-link-or-create target id-only)
     (denote--push-extracted-title-to-history)
     (call-interactively #'denote-link-after-creating)))
 
