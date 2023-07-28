@@ -79,6 +79,7 @@ From https://d12frosted.io/posts/2021-01-16-task-management-with-roam-vol5.html"
           (message "Adjusting \"%s\" keyword for %s" jf/org-mode/agenda-keyword file)
           (denote-rewrite-keywords file new-keywords file-type)t))))
 (add-hook 'before-save-hook #'jf/org-mode/denote-update-project-update-tag)
+(add-hook 'file-file-hook #'jf/org-mode/denote-update-project-update-tag)
 
 (defvar jf/org-mode/directory-for-agendas
   "~/git")
@@ -86,7 +87,11 @@ From https://d12frosted.io/posts/2021-01-16-task-management-with-roam-vol5.html"
 (defun jf/org-mode/agenda-files ()
   "Return a list of note files containing 'agenda' tag.
 
-Uses the fd command (see https://github.com/sharkdp/fd)"
+Uses the fd command (see https://github.com/sharkdp/fd)
+
+We want files either begin with the `jf/org-mode/agenda-keyword'
+or by `denote' conventions have the keyword.  Hence the complex
+regular expression."
   (let ((default-directory (file-truename jf/org-mode/directory-for-agendas)))
     (s-split "\n"
       (s-trim
@@ -99,10 +104,6 @@ Uses the fd command (see https://github.com/sharkdp/fd)"
   (setq org-agenda-files (jf/org-mode/agenda-files)))
 (advice-add 'org-agenda :before #'jf/org-mode/agenda-files-update)
 (advice-add 'org-todo-list :before #'jf/org-mode/agenda-files-update)
-
-(defun jf/org-mode/find-file-hook ()
-  (jf/org-mode/denote-update-project-update-tag))
-(add-hook 'find-file-hook #'jf/org-mode/find-file-hook)
 
 (defun jf/org-mode/kill-buffer-hook ()
   (when-let* ((_proceed (not (active-minibuffer-window)))
