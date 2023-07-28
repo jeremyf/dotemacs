@@ -12,7 +12,7 @@
 (require 'cl-lib)
 
 ;; I maintain a list of data directories, each might have “relevant to
-;; org-mode” files.  The `jf/org-agenda-files' reads the file system to gather
+;; org-mode” files.  The `jf/org-mode/agenda-files' reads the file system to gather
 ;; sources for `org-mode' agenda.
 (defun jf/is-work-machine? ()
   "Am I working on my company machine machine."
@@ -24,32 +24,92 @@
 
 By default this is my example code project.")
 
+(defconst jf/agenda-filename/scientist
+  "~/git/org/denote/scientist/20221021T221357--scientist-agenda__agenda_scientist.org")
+
+(defconst jf/agenda-filename/personal
+  "~/git/org/agenda.org")
+
 (defvar jf/primary-agenda-filename-for-machine
   (if (jf/is-work-machine?)
-    "~/git/org/denote/scientist/20221021T221357--scientist-agenda__scientist.org"
-    "~/git/org/agenda.org"))
+    jf/agenda-filename/scientist
+    jf/agenda-filename/personal))
 
-(defconst jf/data-directories
-  (list
-    jf/tor-home-directory
-    "~/git/org/scientist/"
-    "~/git/org/denote/scientist"
-    "~/git/dotzshrc/"
-    "~/git/dotemacs/"
-    "~/git/org/")
-  "Relevant data directories for my day to day work.")
+(defvar jf/org-mode/agenda-keyword
+  "agenda"
+  "The `denote' keyword that identifies a note as part of `org-mode' agenda.")
 
-(cl-defun jf/org-agenda-files (&key
-                                (paths jf/data-directories)
-                                (basenames '("agenda.org")))
-  "Return the list of filenames where BASENAMES exists in PATHS."
-  ;; I want to include my configuration file in my agenda querying.
-  (setq returning-list '("~/git/org/denote/scientist/20221021T221357--scientist-agenda__scientist.org"))
-  (dolist (path paths)
-    (dolist (basename basenames)
-      (when (f-exists-p (f-join path basename))
-        (add-to-list 'returning-list (f-join path basename)))))
-  returning-list)
+(defun jf/org-mode/agenda-p ()
+  "Return non-nil if current buffer has any todo entry.
+
+TODO entries marked as done are ignored, meaning the this
+function returns nil if current buffer contains only completed
+tasks.
+
+From https://d12frosted.io/posts/2021-01-16-task-management-with-roam-vol5.html"
+  (when (derived-mode-p 'org-mode)
+    (org-element-map
+      (org-element-parse-buffer 'headline)
+      'headline
+      (lambda (h)
+        (eq (org-element-property :todo-type h)
+          'todo))
+      nil 'first-match)))
+
+(defun jf/org-mode/denote-update-project-update-tag ()
+  "Update `jf/org-mode/agenda-keyword' tag in the current buffer."
+  (when-let* ((_proceed (not (active-minibuffer-window)))
+               (file (buffer-file-name))
+               (_proceed (denote-file-is-note-p file))
+               (file-type (denote-filetype-heuristics file))
+               (new-keywords (denote-retrieve-keywords-value file file-type))
+               (keywords new-keywords))
+    (save-excursion
+      (goto-char (point-min))
+      (if (jf/org-mode/agenda-p)
+        (setq new-keywords (cons jf/org-mode/agenda-keyword new-keywords))
+        (setq new-keywords (remove jf/org-mode/agenda-keyword new-keywords)))
+
+        ;; cleanup duplicates
+        (setq new-keywords (seq-uniq new-keywords))
+
+        ;; update tags if changed
+        (when (or (seq-difference keywords new-keywords)
+                (seq-difference new-keywords keywords))
+          (message "Adjusting \"%s\" keyword for %s" jf/org-mode/agenda-keyword file)
+          (denote-rewrite-keywords file new-keywords file-type)t))))
+(add-hook 'before-save-hook #'jf/org-mode/denote-update-project-update-tag)
+
+(defvar jf/org-mode/directory-for-agendas
+  "~/git")
+
+(defun jf/org-mode/agenda-files ()
+  "Return a list of note files containing 'agenda' tag.
+
+Uses the fd command (see https://github.com/sharkdp/fd)"
+  (let ((default-directory (file-truename jf/org-mode/directory-for-agendas)))
+    (s-split "\n"
+      (s-trim
+        (shell-command-to-string
+          (concat "fd --no-ignore --absolute-path --extension org "
+            "'(^|_)" jf/org-mode/agenda-keyword "[_\\.]'"))))))
+
+(defun jf/org-mode/agenda-files-update (&rest _)
+  "Update the value of `org-agenda-files'."
+  (setq org-agenda-files (jf/org-mode/agenda-files)))
+(advice-add 'org-agenda :before #'jf/org-mode/agenda-files-update)
+(advice-add 'org-todo-list :before #'jf/org-mode/agenda-files-update)
+
+(defun jf/org-mode/find-file-hook ()
+  (jf/org-mode/denote-update-project-update-tag))
+(add-hook 'find-file-hook #'jf/org-mode/find-file-hook)
+
+(defun jf/org-mode/kill-buffer-hook ()
+  (when-let* ((_proceed (not (active-minibuffer-window)))
+               (file (buffer-file-name))
+               (_proceed (denote-file-is-note-p file)))
+    (call-interactively #'denote-rename-file-using-front-matter file)))
+(add-hook 'kill-buffer-hook #'jf/org-mode/kill-buffer-hook)
 
 (defun jf/org-capf ()
   "The `completion-at-point-functions' I envision using for `org-mode'."
@@ -163,9 +223,7 @@ first matching link."
     org-export-with-sub-superscripts nil
     org-agenda-log-mode-items '(clock)
     org-directory (file-truename "~/git/org")
-    org-agenda-files (jf/org-agenda-files
-                       :paths jf/data-directories
-                       :basenames '("agenda.org"))
+    org-agenda-files (jf/org-mode/agenda-files)
     org-default-notes-file (concat
                              org-directory
                              "/captured-notes.org")
