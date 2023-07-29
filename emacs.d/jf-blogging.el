@@ -90,14 +90,10 @@ CONTENTS is nil.  INFO is a plist holding contextual information."
                         :key "HUGO_FRONT_MATTER_FORMAT"
                         :plist export-global-plist
                         :default "yaml"))
-              (subtitle (jf/export-org-to-tor--global-buffer-prop-ensure
-                          :key "SUBTITLE"
-                          :plist export-global-plist))
               (title (lax-plist-get export-global-plist "TITLE"))
               (identifier (lax-plist-get export-global-plist "IDENTIFIER")))
         (save-buffer)
         (jf/export-org-to-tor--inject-additional-front-matter
-          :subtitle subtitle
           :title title
           :identifier identifier)
         ;; Write metadata
@@ -109,16 +105,15 @@ CONTENTS is nil.  INFO is a plist holding contextual information."
 (fset 'jf/tidy-ox-hugo-header-export
   (kmacro-lambda-form [?\C-c ?\C-n ?\s-f ?\{ return ?\C-b ?\C-b ?\C-k] 0 "%d"))
 
-(cl-defun jf/export-org-to-tor--inject-additional-front-matter (&key identifier subtitle title)
+(cl-defun jf/export-org-to-tor--inject-additional-front-matter (&key identifier title)
   "Export additional front matter.
 
-    We want to ensure that we export the IDENTIFIER, SUBTITLE, and TITLE.
+    We want to ensure that we export the IDENTIFIER and TITLE.
     And add relevant metadata."
   (goto-char (point-min))
   (search-forward-regexp "#\\+HUGO_FRONT_MATTER_FORMAT: yaml")
   (insert (concat
             "\n#+HUGO_CUSTOM_FRONT_MATTER: :slug " (jf/tor-convert-text-to-slug title)
-            "\n#+HUGO_CUSTOM_FRONT_MATTER: :headline " subtitle
             ;; 2022-02-26 07:46:15.000000000 -04:00
             "\n#+HUGO_CUSTOM_FRONT_MATTER: :date " (format-time-string "%Y-%m-%d %H:%M:%S %z")
             "\n#+HUGO_CUSTOM_FRONT_MATTER: :type post"

@@ -39,6 +39,22 @@
 ;;   (interactive "r\nP")
 ;;   (jf/org-mode/capture/insert-content-dwim b e p))
 
+(transient-define-suffix jf/org-mode/add-abstract (abstract)
+  "Add abstract to `org-mode'"
+  :description "Add Abstract"
+  (interactive (list (read-string "Abstract: ")))
+  (when (jf/org-mode/blog-entry?)
+    (save-excursion
+      (goto-char (point-min))
+      (re-search-forward "^$")
+      (insert "\n#+HUGO_CUSTOM_FRONT_MATTER: :abstract " abstract))))
+
+(defun jf/org-mode/blog-entry? (&optional buffer)
+  (when-let* ((buffer (or buffer (current-buffer)))
+               (file (buffer-file-name buffer)))
+    (and (denote-file-is-note-p file)
+      (string-match-p "\\/blog-posts\\/" file))))
+
 ;; this suffix provides a dynamic description of the current host I want to use
 ;; for my blog.  And the prefix’s function toggles the host.
 (global-set-key (kbd "s-1") 'jf/menu)
@@ -69,8 +85,10 @@
       ("C-M-s-t" "Archive month as timesheet…" jf/denote/archive-timesheet-month)
       ("t" "Todo for project…" magit-todos-list)
       ("u" "Copy stand-up to kill ring" jf/org-mode-agenda-to-stand-up-summary)
-      ("w" "Weekly hours report" jf/org-mode-weekly-report)
-      ("x" "Export to TakeOnRules…" jf/export-org-to-tor :if-derived org-mode)]]
+      ("w" "Weekly hours report" jf/org-mode-weekly-report)]
+    ["Blogging"
+      ("b a" jf/org-mode/add-abstract :if jf/org-mode/blog-entry?)
+      ("b x" "Export to TakeOnRules…" jf/export-org-to-tor :if jf/org-mode/blog-entry?)]]
   [["Modes"
      ;; I could write functions for these, but this is concise enough
      ("m h" jf/hammerspoon-toggle-mode  :if-non-nil hammerspoon-edit-minor-mode)
