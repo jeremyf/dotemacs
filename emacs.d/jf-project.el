@@ -71,9 +71,8 @@ Determine the PROJECT by querying `jf/project/list-projects'."
   (let*
     ;; Get the project's file name
     ((filename (cdar (jf/project/list-projects :project project)))
-      (paths-cons-list (with-current-buffer (find-file-noselect filename)
-			                   (cl-maplist #'read (cdar (org-collect-keywords '("PROJECT_PATHS"))))))
-      (path-name (completing-read "Path: " paths-cons-list nil t))
+      (paths-cons-list (jf/project/project-paths-for filename))
+      (path-name (completing-read (format "Links for %s: " project) paths-cons-list nil t))
       (path (alist-get path-name paths-cons-list nil nil #'string=)))
     (cond
       ((s-starts-with? "http" path)
@@ -96,6 +95,14 @@ Determine the PROJECT by querying `jf/project/list-projects'."
 	           (message "WARNING: Project %s missing path name \"%s\" (with path %s)"
 		           project path-name path)
 	           (jf/project/jump-to/notes :project project)))))))
+
+(defun jf/project/project-paths-for (filename)
+  "Find the project paths for the given FILENAME.
+
+Added in cases where we want to inject the actual file."
+  (with-current-buffer (find-file-noselect filename)
+    (let ((paths (cl-maplist #'read (cdar (org-collect-keywords '("PROJECT_PATHS"))))))
+      (setq paths (cons (cons "Notes" filename) paths)))))
 
 (cl-defun jf/project/jump-to/timesheet (&key
 					project
