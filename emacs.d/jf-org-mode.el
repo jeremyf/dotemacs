@@ -300,7 +300,45 @@ first matching link."
          "***** TODO %^{Describe the task} :tasks:\n\n"
          :jump-to-captured t
          :immediate-finish t
-         :clock-in t)))
+         :clock-in t)
+       ("e" "Existing Task"
+         plain (function jf/org-mode/capture/project-task/find)
+         "%i\n%?"
+         :empty-lines-before 1
+         :empty-lines-after 1
+         :jump-to-capture t)))
+
+  (defun jf/org-mode/capture/project-task/find ()
+    "Find the project file and position to the selected task."
+    (let* ((project (jf/project/find-dwim))
+            (filename (cdar (jf/project/list-projects :project project)))
+            (tasks (jf/org-mode/existing-tasks filename))
+            (task-name (completing-read (format "Task for %s: " project) tasks)))
+      ;; Defer finding this file as long as possible.
+      (find-file filename)
+      (if-let (task (alist-get task-name tasks nil nil #'string=))
+        (goto-char (org-element-property :contents-end task))
+        (progn
+          (goto-char (point-max))
+          (insert "** TODO " task-name "\n\n")))))
+
+  (defun jf/org-mode/existing-tasks (&optional filename)
+    "Return an alist of existing tasks in given FILENAME.
+
+Each member's `car' is title and `cdr' is `org-mode' element.
+
+Members of the sequence either have a tag 'tasks' or are in a todo state."
+    (with-current-buffer (or (and filename (find-file-noselect filename)) (current-buffer))
+      (mapcar (lambda (headline)
+                (cons (org-element-property :title headline) headline))
+        (org-element-map
+          (org-element-parse-buffer 'headline)
+          'headline
+          (lambda (headline)
+            (and
+              (or (eq (org-element-property :todo-type headline) 'todo)
+                (member "tasks" (org-element-property :tags headline)))
+              headline))))))
 
   (transient-define-suffix jf/denote-org-capture/filename-set ()
     "Work with `jf/denote-org-capture/filename'"
