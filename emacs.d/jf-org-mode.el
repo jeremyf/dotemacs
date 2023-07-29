@@ -35,82 +35,22 @@ By default this is my example code project.")
     jf/agenda-filename/scientist
     jf/agenda-filename/personal))
 
-(defvar jf/org-mode/agenda-keyword
-  "agenda"
-  "The `denote' keyword that identifies a note as part of `org-mode' agenda.")
-
-(defun jf/org-mode/agenda-p ()
-  "Return non-nil if current buffer has any todo entry.
-
-TODO entries marked as done are ignored, meaning the this
-function returns nil if current buffer contains only completed
-tasks.
-
-From https://d12frosted.io/posts/2021-01-16-task-management-with-roam-vol5.html"
-  (when (derived-mode-p 'org-mode)
-    (org-element-map
-      (org-element-parse-buffer 'headline)
-      'headline
-      (lambda (h)
-        (eq (org-element-property :todo-type h)
-          'todo))
-      nil 'first-match)))
-
-(defun jf/org-mode/denote-update-project-update-tag ()
-  "Update `jf/org-mode/agenda-keyword' tag in the current buffer."
-  (when-let* ((_proceed (not (active-minibuffer-window)))
-               (file (buffer-file-name))
-               (_proceed (denote-file-is-note-p file))
-               (file-type (denote-filetype-heuristics file))
-               (new-keywords (denote-retrieve-keywords-value file file-type))
-               (keywords new-keywords))
-    (save-excursion
-      (goto-char (point-min))
-      (if (jf/org-mode/agenda-p)
-        (setq new-keywords (cons jf/org-mode/agenda-keyword new-keywords))
-        (setq new-keywords (remove jf/org-mode/agenda-keyword new-keywords)))
-
-        ;; cleanup duplicates
-        (setq new-keywords (seq-uniq new-keywords))
-
-        ;; update tags if changed
-        (when (or (seq-difference keywords new-keywords)
-                (seq-difference new-keywords keywords))
-          (message "Adjusting \"%s\" keyword for %s" jf/org-mode/agenda-keyword file)
-          (denote-rewrite-keywords file new-keywords file-type)t))))
-(add-hook 'before-save-hook #'jf/org-mode/denote-update-project-update-tag)
-(add-hook 'file-file-hook #'jf/org-mode/denote-update-project-update-tag)
-
-(defvar jf/org-mode/directory-for-agendas
-  "~/git")
-
 (defun jf/org-mode/agenda-files ()
   "Return a list of note files containing 'agenda' tag.
 
 Uses the fd command (see https://github.com/sharkdp/fd)
 
-We want files either begin with the `jf/org-mode/agenda-keyword'
-or by `denote' conventions have the keyword.  Hence the complex
-regular expression."
-  (let ((default-directory (file-truename jf/org-mode/directory-for-agendas)))
-    (s-split "\n"
-      (s-trim
-        (shell-command-to-string
-          (concat "fd --no-ignore --absolute-path --extension org "
-            "'(^|_)" jf/org-mode/agenda-keyword "[_\\.]'"))))))
+We want files to have the 'projects' `denote' keyword."
+  (let ((projects (mapcar (lambda (el) (cdr el)) (jf/project/list-projects))))
+    (when (file-exists-p jf/agenda-filename/scientist) (setq projects (cons jf/agenda-filename/scientist projects)))
+    (when (file-exists-p jf/agenda-filename/personal) (setq projects (cons jf/agenda-filename/personal projects)))
+    projects))
 
 (defun jf/org-mode/agenda-files-update (&rest _)
   "Update the value of `org-agenda-files'."
   (setq org-agenda-files (jf/org-mode/agenda-files)))
 (advice-add 'org-agenda :before #'jf/org-mode/agenda-files-update)
 (advice-add 'org-todo-list :before #'jf/org-mode/agenda-files-update)
-
-(defun jf/org-mode/kill-buffer-hook ()
-  (when-let* ((_proceed (not (active-minibuffer-window)))
-               (file (buffer-file-name))
-               (_proceed (denote-file-is-note-p file)))
-    (call-interactively #'denote-rename-file-using-front-matter file)))
-(add-hook 'kill-buffer-hook #'jf/org-mode/kill-buffer-hook)
 
 (defun jf/org-capf ()
   "The `completion-at-point-functions' I envision using for `org-mode'."
@@ -224,7 +164,7 @@ first matching link."
     org-export-with-sub-superscripts nil
     org-agenda-log-mode-items '(clock)
     org-directory (file-truename "~/git/org")
-    org-agenda-files (jf/org-mode/agenda-files)
+    ;; org-agenda-files (jf/org-mode/agenda-files)
     org-default-notes-file (concat
                              org-directory
                              "/captured-notes.org")
