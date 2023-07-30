@@ -116,7 +116,7 @@ first matching link."
   ("C-c C-x C-j" . org-clock-goto)
   :bind (:map org-mode-map (("C-c C-j" . jf/org-mode/jump-to-agenda-or-mark)
                              ("C-x n t" . jf/org-mode/narrow-to-date)
-                             ("C-j" . avy-goto-char-2)))
+                             ("C-j" . avy-goto-char-timer)))
   :custom (org-use-speed-commands t)
   (org-time-stamp-rounding-minutes '(0 15))
   (org-clock-rounding-minutes 15)

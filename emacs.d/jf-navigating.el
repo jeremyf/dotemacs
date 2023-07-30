@@ -19,7 +19,7 @@
 (use-package avy
   ;; Pick a letter, avy finds all words with that at the beginning of it.  Narrow
   ;; results from there.
-  :bind (("C-j" . avy-goto-char-2))
+  :bind (("C-j" . avy-goto-char-timer))
   :straight t)
 
 (use-package browse-at-remote

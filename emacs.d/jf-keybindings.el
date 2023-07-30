@@ -58,7 +58,7 @@
 ;; emacs.d/jf-org-mode.el:237:  :bind (("C-c l s" . org-store-link)
 ;; emacs.d/jf-org-mode.el:720:  :bind ("C-M-s-c" . jf/formatted-copy-org-to-html)
 ;; emacs.d/jf-navigating.el:16:  :bind (("C-x o" . ace-window)
-;; emacs.d/jf-navigating.el:22:  :bind (("C-j" . avy-goto-char-2))
+;; emacs.d/jf-navigating.el:22:  :bind (("C-j" . avy-goto-char-timer))
 ;; emacs.d/jf-navigating.el:42:  :bind ("s-4" . 'imenu-list-smart-toggle)
 ;; emacs.d/jf-navigating.el:43:  :bind (:map imenu-list-major-mode-map ("o" . 'imenu-list-goto-entry))
 ;; emacs.d/jf-windows.el:218:;;   :bind (:map bufler-list-mode-map
