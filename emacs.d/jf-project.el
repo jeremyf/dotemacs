@@ -64,6 +64,26 @@ Determine the PROJECT by querying `jf/project/list-projects'."
 	        (filename (cdar (jf/project/list-projects :project project))))
     (find-file filename)))
 
+;; I work on several different projects each day; helping folks get unstuck.  I
+;; also need to track and record my time.
+(bind-key "C-c C-j" 'jf/project/jump-to-task)
+(cl-defun jf/project/jump-to-task (&optional prefix)
+  "Jump to task.
+
+With one PREFIX go to place where we would jump on capture."
+  (interactive "p")
+  (require 'org-capture)
+  (require 'pulsar)
+  (if (>= prefix 4)
+    (org-capture-goto-target "t")
+    (progn
+      (call-interactively #'set-mark-command)
+      (if (when (and (fboundp 'org-clocking-p) (org-clocking-p)) t)
+        (org-clock-goto)
+        ;; Jump to where we would put a project were we to capture it.
+        (org-capture-goto-target "t"))))
+  (pulsar-pulse-line))
+
 (bind-key "s-2" 'jf/project/jump-to/project-work-space)
 (defun jf/project/jump-to/project-work-space (project)
   "Prompt for PROJECT then workspace and open that workspace."
@@ -227,7 +247,7 @@ We want files to have the 'projects' `denote' keyword."
 
 (defun jf/org-mode/capture/project-task/find ()
   "Find the project file and position to the selected task."
-  (let* ((project (jf/project/find-dwim))
+  (let* ((project (completing-read "Project: " (jf/project/list-projects)))
           (filename (cdar (jf/project/list-projects :project project)))
           (tasks (jf/org-mode/existing-tasks filename))
           (task-name (completing-read (format "Task for %s: " project) tasks)))
