@@ -74,9 +74,6 @@
      ;; ("j s" "Jump to Shortdoc" shortdoc-display-group)
      ("j v" jf/jump-to/violet-board)]
     ["Tasks"
-      ("a" "Git Annotation" vc-annotate)
-      ("c c" jf/denote-org-capture/filename-set)
-      ("d" "Deadgrep…" deadgrep)
       ("i" "Clock in…" consult-clock-in)
       ("r" "Run command…" run-command)
       ("s" "Search note content…" consult-notes-search-in-all-notes)
@@ -86,6 +83,9 @@
       ("t" "Todo for project…" magit-todos-list)
       ("u" "Copy stand-up to kill ring" jf/org-mode-agenda-to-stand-up-summary)
       ("w" "Weekly hours report" jf/org-mode-weekly-report)]
+    ["Denote"
+      ("d c" jf/denote-org-capture/filename-set)
+      ("d p" jf/project/convert-document-to-project :if jf/denote?)]
     ["Blogging"
       ("b a" jf/org-mode/add-abstract :if jf/org-mode/blog-entry?)
       ("b x" "Export to TakeOnRules…" jf/export-org-to-tor :if jf/org-mode/blog-entry?)]]

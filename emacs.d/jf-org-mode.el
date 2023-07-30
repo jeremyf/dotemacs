@@ -35,23 +35,6 @@ By default this is my example code project.")
     jf/agenda-filename/scientist
     jf/agenda-filename/personal))
 
-(defun jf/org-mode/agenda-files ()
-  "Return a list of note files containing 'agenda' tag.
-
-Uses the fd command (see https://github.com/sharkdp/fd)
-
-We want files to have the 'projects' `denote' keyword."
-  (let ((projects (mapcar (lambda (el) (cdr el)) (jf/project/list-projects))))
-    (when (file-exists-p jf/agenda-filename/scientist) (setq projects (cons jf/agenda-filename/scientist projects)))
-    (when (file-exists-p jf/agenda-filename/personal) (setq projects (cons jf/agenda-filename/personal projects)))
-    projects))
-
-(defun jf/org-mode/agenda-files-update (&rest _)
-  "Update the value of `org-agenda-files'."
-  (setq org-agenda-files (jf/org-mode/agenda-files)))
-(advice-add 'org-agenda :before #'jf/org-mode/agenda-files-update)
-(advice-add 'org-todo-list :before #'jf/org-mode/agenda-files-update)
-
 (defun jf/org-capf ()
   "The `completion-at-point-functions' I envision using for `org-mode'."
   (setq-local completion-at-point-functions
@@ -176,22 +159,7 @@ first matching link."
                           "CANCELED(c@/!)"
                           "DONE(d!)")))
   (setq org-capture-templates
-    '(("@"
-        "All Todo"
-        entry (file+olp
-                "~/git/org/agenda.org"
-                "General Todo Items")
-        "* TODO %?\n  %i\n  %a"
-        :empty-lines-before 1)
-       ("b" "Blocker"
-         plain (file+function
-                 jf/primary-agenda-filename-for-machine
-                 jf/org-mode-agenda-find-blocked-node)
-         "***** WAITING %^{Describe the blocker} :blocker:"
-         :immediate-finish t
-         :jump-to-captured t
-         :empty-lines-after 1)
-       ("c" "Content to Denote"
+    '(("c" "Content to Denote"
          plain (file denote-last-path)
          #'jf/denote-org-capture
          :no-save t
@@ -202,83 +170,10 @@ first matching link."
          plain (clock)
          "%(jf/denote/capture-wrap :link \"%L\" :content \"%i\")"
          :empty-lines 1)
-       ("d" "Day with plain entry"
-         plain (file+olp+datetree jf/primary-agenda-filename-for-machine)
-         "%i"
-         :empty-lines 1
-         :time-prompt t
-         :immediate-finish t)
        ("I" "Immediate to Clock"
          plain (clock)
          "%i%?"
-         :immediate-finish t)
-       ("m" "Merge Request"
-         plain (file+function
-                 jf/primary-agenda-filename-for-machine
-                 jf/org-mode-agenda-find-merge-request-node)
-         "***** STARTED %^{URL of Merge Request} :mergerequest:"
-         :immediate-finish t
-         :jump-to-captured t
-         :empty-lines-after 1
-         )
-       ;; Needed for the first project of the day; to ensure the datetree is
-       ;; properly generated.
-       ("p" "Project"
-         entry (file+olp+datetree jf/primary-agenda-filename-for-machine)
-         "* %(jf/org-mode-agenda-project-prompt) :projects:\n\n%?"
-         :empty-lines-before 1
-         :immediate-finish t
-         :empty-lines-after 1)
-       ("t" "Task"
-         ;; I tried this as a node, but that created headaches.  Instead I'm
-         ;; making the assumption about project/task depth.
-         plain (file+function
-                 jf/primary-agenda-filename-for-machine
-                 jf/org-mode-agenda-find-project-node)
-         ;; The five ***** is due to the assumptive depth of the projects and
-         ;; tasks.
-         "***** TODO %^{Describe the task} :tasks:\n\n"
-         :jump-to-captured t
-         :immediate-finish t
-         :clock-in t)
-       ("e" "Existing Task"
-         plain (function jf/org-mode/capture/project-task/find)
-         "%i\n%?"
-         :empty-lines-before 1
-         :empty-lines-after 1
-         :jump-to-capture t)))
-
-  (defun jf/org-mode/capture/project-task/find ()
-    "Find the project file and position to the selected task."
-    (let* ((project (jf/project/find-dwim))
-            (filename (cdar (jf/project/list-projects :project project)))
-            (tasks (jf/org-mode/existing-tasks filename))
-            (task-name (completing-read (format "Task for %s: " project) tasks)))
-      ;; Defer finding this file as long as possible.
-      (find-file filename)
-      (if-let (task (alist-get task-name tasks nil nil #'string=))
-        (goto-char (org-element-property :contents-end task))
-        (progn
-          (goto-char (point-max))
-          (insert "** TODO " task-name "\n\n")))))
-
-  (defun jf/org-mode/existing-tasks (&optional filename)
-    "Return an alist of existing tasks in given FILENAME.
-
-Each member's `car' is title and `cdr' is `org-mode' element.
-
-Members of the sequence either have a tag 'tasks' or are in a todo state."
-    (with-current-buffer (or (and filename (find-file-noselect filename)) (current-buffer))
-      (mapcar (lambda (headline)
-                (cons (org-element-property :title headline) headline))
-        (org-element-map
-          (org-element-parse-buffer 'headline)
-          'headline
-          (lambda (headline)
-            (and
-              (or (eq (org-element-property :todo-type headline) 'todo)
-                (member "tasks" (org-element-property :tags headline)))
-              headline))))))
+         :immediate-finish t)))
 
   (transient-define-suffix jf/denote-org-capture/filename-set ()
     "Work with `jf/denote-org-capture/filename'"

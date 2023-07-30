@@ -78,8 +78,6 @@ org-mode
 (today "[[date:" (format-time-string "%Y-%m-%d") "][today]]")
 (Today "[[date:" (format-time-string "%Y-%m-%d") "][Today]]")
 (tor "[[https://takeonrules.com][Take on Rules]]")
-(proj n "#+PROJECT_NAME: " (p "Project Name: " project-name)
-   n "#+PROJECT_PATHS: (\"Notes, " (s project-name) "\" . \"" (jf/filename/tilde-based (buffer-file-name))  "\")")
 
 (update_block "#+attr_shortcode: :date " (format-time-string "%Y-%m-%d")
   " :mode " (p (completing-read "Mode: " '(inline paragraph marginnote sidenote section fallback) nil t) mode)
