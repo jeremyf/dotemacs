@@ -241,8 +241,8 @@ We want files to have the 'projects' `denote' keyword."
 (defun jf/org-mode/agenda-files-update (&rest _)
   "Update the value of `org-agenda-files'."
   (setq org-agenda-files (jf/org-mode/agenda-files)))
-(advice-add 'org-agenda :before #'jf/org-mode/agenda-files-update)
-(advice-add 'org-todo-list :before #'jf/org-mode/agenda-files-update)
+;; (advice-add 'org-agenda :before #'jf/org-mode/agenda-files-update)
+;; (advice-add 'org-todo-list :before #'jf/org-mode/agenda-files-update)
 (add-hook 'after-init-hook #'jf/org-mode/agenda-files-update)
 
 (defun jf/org-mode/capture/project-task/find ()
@@ -278,15 +278,6 @@ Members of the sequence either have a tag 'tasks' or are in a todo state."
             (or (eq (org-element-property :todo-type headline) 'todo)
               (member "tasks" (org-element-property :tags headline)))
             headline))))))
-
-(add-to-list 'org-capture-templates
-  '("t" "Task (for Project)"
-     plain (function jf/org-mode/capture/project-task/find)
-     "%i\n%?"
-     :empty-lines-before 1
-     :empty-lines-after 1
-     :clock-in t
-     :jump-to-capture t))
 
 (defun jf/org-mode/blog-entry? (&optional buffer)
   (when-let* ((buffer (or buffer (current-buffer)))

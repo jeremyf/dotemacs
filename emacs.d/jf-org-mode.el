@@ -112,9 +112,9 @@ first matching link."
   ;; to have that work better by default.
   ;;
   ;; (org-mode . org-indent-mode)
-  :bind ("C-c C-j" . jf/org-mode/jump-to-agenda-or-mark)
+  :bind ("C-c C-j" . jf/project/jump-to-task)
   ("C-c C-x C-j" . org-clock-goto)
-  :bind (:map org-mode-map (("C-c C-j" . jf/org-mode/jump-to-agenda-or-mark)
+  :bind (:map org-mode-map (("C-c C-j" . jf/project/jump-to-task)
                              ("C-x n t" . jf/org-mode/narrow-to-date)
                              ("C-j" . avy-goto-char-timer)))
   :custom (org-use-speed-commands t)
@@ -160,12 +160,12 @@ first matching link."
                           "DONE(d!)")))
   (setq org-capture-templates
     '(("c" "Content to Denote"
-         plain (file denote-last-path)
-         #'jf/denote-org-capture
-         :no-save t
-         :immediate-finish nil
-         :kill-buffer t
-         :jump-to-captured t)
+        plain (file denote-last-path)
+        #'jf/denote-org-capture
+        :no-save t
+        :immediate-finish nil
+        :kill-buffer t
+        :jump-to-captured t)
        ("C" "Content to Clock"
          plain (clock)
          "%(jf/denote/capture-wrap :link \"%L\" :content \"%i\")"
@@ -173,7 +173,15 @@ first matching link."
        ("I" "Immediate to Clock"
          plain (clock)
          "%i%?"
-         :immediate-finish t)))
+         :immediate-finish t)
+       ("t" "Task (for Project)"
+         plain (function jf/org-mode/capture/project-task/find)
+         "%i\n%?"
+         :empty-lines-before 1
+         :empty-lines-after 1
+         :immediate-finish nil
+         :clock-in t
+         :jump-to-capture t)))
 
   (transient-define-suffix jf/denote-org-capture/filename-set ()
     "Work with `jf/denote-org-capture/filename'"
@@ -181,7 +189,8 @@ first matching link."
 			 (concat
 			   "Denote Capture Filename: "
          (propertize (format "%s" (and denote-last-path
-                                    (string-replace (denote-directory) "./" denote-last-path)))
+                                    (file-exists-p denote-last-path)
+                                    (denote-retrieve-filename-title denote-last-path)))
            'face 'transient-argument)))
 	  (interactive)
     (if denote-last-path

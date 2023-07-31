@@ -52,8 +52,8 @@
 ;; emacs.d/jf-coding.el:348:  :bind (:map ruby-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
 ;; emacs.d/jf-menus.el:71:  :bind ("C-x f" . file-info-show)
 ;; emacs.d/jf-organizing.el:23:  :bind ("s-." . projectile-toggle-between-implementation-and-test))
-;; emacs.d/jf-org-mode.el:60:  :bind ("C-c C-j" . jf/org-mode/jump-to-agenda-or-mark)
-;; emacs.d/jf-org-mode.el:61:  :bind (:map org-mode-map (("C-c C-j" . jf/org-mode/jump-to-agenda-or-mark)
+;; emacs.d/jf-org-mode.el:60:  :bind ("C-c C-j" . jf/project/jump-to-task)
+;; emacs.d/jf-org-mode.el:61:  :bind (:map org-mode-map (("C-c C-j" . jf/project/jump-to-task)
 ;; emacs.d/jf-org-mode.el:234:  :bind (:map org-mode-map
 ;; emacs.d/jf-org-mode.el:237:  :bind (("C-c l s" . org-store-link)
 ;; emacs.d/jf-org-mode.el:720:  :bind ("C-M-s-c" . jf/formatted-copy-org-to-html)

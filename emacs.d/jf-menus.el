@@ -62,7 +62,7 @@
   "A context specific \"mega\" menu."
   ;; Todo, can I get this section into a function so I can duplicate it in the jf/menu--tor?
   [["Jump to"
-     ("j a" "Agenda" jf/org-mode/jump-to-agenda-or-mark)
+     ("j a" "Agenda" jf/project/jump-to-task)
      ("j A" jf/jump-to/agenda-personal)
      ("j c" "Capture Backlog" jf/jump-to/code-backlog)
      ("j g" "Global Mark" consult-global-mark)
