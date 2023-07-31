@@ -56,7 +56,20 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
      "Ruins" "Knowledge" "Cave" "Dream" "Hamlet" "Outlaws"
      "Healers" "Cult" "Guardian" "Settlers" "Monument" "Food"
      "Judges" "Storm" "Demon" "Court" "Theatre" "Assassins")
-  "See page 98 of /The Black Sword Hack/.")
+  "See page 98 of /The Black Sword Hack: Ultimate Chaos Edition//.")
+
+(defconst jf/gaming/black-sword-hack/table/travel-theme
+  '("Aggression" "Exchange" "Discovery" "Revelation" "Pursuit"
+     "Lost" "Isolation" "Death" "Escape" "Change")
+  "See page 76 of /The Black Sword Hack: Ultimate Chaos Edition/")
+
+
+(defconst jf/gaming/black-sword-hack/table/travel-theme
+  '("Antagonist" "Animal" "Hermit" "Spirit" "Potentate"
+     "Demon" "Explorer" "Merchant" "Caves" "Messenger"
+     "Ruins" "Cult" "Community" "Ghost" "Outlaws"
+     "Artists" "Soldiers" "Sorcerer" "Vagrant" "Natural disaster")
+  "See page 76 of /The Black Sword Hack: Ultimate Chaos Edition/")
 
 (transient-define-suffix jf/gaming/black-sword-hack/table/oracle-response (question likelihood)
   "The Dark God's Oracle answers the QUESTION for the LIKELIHOOD."
