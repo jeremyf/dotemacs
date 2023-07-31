@@ -158,30 +158,6 @@ first matching link."
                           "WAITING(w@/!)"
                           "CANCELED(c@/!)"
                           "DONE(d!)")))
-  (setq org-capture-templates
-    '(("c" "Content to Denote"
-        plain (file denote-last-path)
-        #'jf/denote-org-capture
-        :no-save t
-        :immediate-finish nil
-        :kill-buffer t
-        :jump-to-captured t)
-       ("C" "Content to Clock"
-         plain (clock)
-         "%(jf/denote/capture-wrap :link \"%L\" :content \"%i\")"
-         :empty-lines 1)
-       ("I" "Immediate to Clock"
-         plain (clock)
-         "%i%?"
-         :immediate-finish t)
-       ("t" "Task (for Project)"
-         plain (function jf/org-mode/capture/project-task/find)
-         "%i\n%?"
-         :empty-lines-before 1
-         :empty-lines-after 1
-         :immediate-finish nil
-         :clock-in t
-         :jump-to-capture t)))
 
   (transient-define-suffix jf/denote-org-capture/filename-set ()
     "Work with `jf/denote-org-capture/filename'"
@@ -964,5 +940,30 @@ I envision this function called from the command-line."
                    "+LEVEL=5+mergerequests+TODO=\"STARTED\"" 'agenda)))
     (eww-browse-with-external-browser url)))
 
+
+(setq org-capture-templates
+    '(("c" "Content to Denote"
+        plain (file denote-last-path)
+        #'jf/denote-org-capture
+        :no-save t
+        :immediate-finish nil
+        :kill-buffer t
+        :jump-to-captured t)
+       ("C" "Content to Clock"
+         plain (clock)
+         "%(jf/denote/capture-wrap :link \"%L\" :content \"%i\")"
+         :empty-lines 1)
+       ("I" "Immediate to Clock"
+         plain (clock)
+         "%i%?"
+         :immediate-finish t)
+       ("t" "Task (for Project)"
+         plain (function jf/org-mode/capture/project-task/find)
+         "%i\n%?"
+         :empty-lines-before 1
+         :empty-lines-after 1
+         :immediate-finish nil
+         :clock-in t
+         :jump-to-capture t)))
 (provide 'jf-org-mode)
 ;;; jf-org-mode.el ends here
