@@ -281,10 +281,11 @@ Members of the sequence either have a tag 'tasks' or are in a todo state."
 
 (add-to-list 'org-capture-templates
   '("t" "Task (for Project)"
-    plain (function jf/org-mode/capture/project-task/find)
-    "%i\n%?"
-    :empty-lines-before 1
-    :empty-lines-after 1
+     plain (function jf/org-mode/capture/project-task/find)
+     "%i\n%?"
+     :empty-lines-before 1
+     :empty-lines-after 1
+     :clock-in t
      :jump-to-capture t))
 
 (defun jf/org-mode/blog-entry? (&optional buffer)
