@@ -892,7 +892,7 @@ The return value is a list of `cons' with the `car' values of:
           (s-format jf/org-mode/capture/template/while-clocking
             'aget
             (jf/org-mode/capture/get-field-values content))))
-      (t "\n#+begin_example\n" content "\n#+end_example"))))
+      (t (concat "\n#+begin_example\n" content "\n#+end_example")))))
 
 (defun jf/org-mode/capture/parameters (prefix)
   "A logic lookup table by PREFIX."
@@ -959,11 +959,16 @@ I envision this function called from the command-line."
          :immediate-finish t)
        ("t" "Task (for Project)"
          plain (function jf/org-mode/capture/project-task/find)
-         "%i\n%?"
+         "- %T :: %?"
          :empty-lines-before 1
          :empty-lines-after 1
-         :immediate-finish nil
          :clock-in t
-         :jump-to-capture t)))
+         :clock-keep t
+         :jump-to-capture t)
+       ("n" "Note for project task"
+         plain (function jf/org-mode/capture/project-task/find)
+         "- %T :: %?"
+         :empty-lines-before 1
+         :empty-lines-after 1))
 (provide 'jf-org-mode)
 ;;; jf-org-mode.el ends here

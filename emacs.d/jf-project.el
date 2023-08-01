@@ -74,14 +74,19 @@ With one PREFIX go to place where we would jump on capture."
   (interactive "p")
   (require 'org-capture)
   (require 'pulsar)
-  (if (>= prefix 4)
-    (org-capture-goto-target "t")
-    (progn
-      (call-interactively #'set-mark-command)
-      (if (when (and (fboundp 'org-clocking-p) (org-clocking-p)) t)
-        (org-clock-goto)
-        ;; Jump to where we would put a project were we to capture it.
-        (org-capture-goto-target "t"))))
+  (cond
+    ((>= prefix 16)
+      (if-let ((filename (cdar (jf/project/list-projects :project "SoftServ"))))
+        ((find-file filename)
+        (org-capture-goto-target "t")))
+    ((>= prefix 4)
+      (org-capture-goto-target "t"))
+    (t (progn
+         (call-interactively #'set-mark-command)
+         (if (when (and (fboundp 'org-clocking-p) (org-clocking-p)) t)
+           (org-clock-goto)
+           ;; Jump to where we would put a project were we to capture it.
+           (org-capture-goto-target "t")))))
   (pulsar-pulse-line))
 
 (bind-key "s-2" 'jf/project/jump-to/project-work-space)
