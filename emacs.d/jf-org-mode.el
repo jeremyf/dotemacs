@@ -969,6 +969,6 @@ I envision this function called from the command-line."
          plain (function jf/org-mode/capture/project-task/find)
          "- %T :: %?"
          :empty-lines-before 1
-         :empty-lines-after 1))
+         :empty-lines-after 1)))
 (provide 'jf-org-mode)
 ;;; jf-org-mode.el ends here
