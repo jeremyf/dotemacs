@@ -144,7 +144,9 @@ first matching link."
     ;; turning off org-elements cache speeds up input latency
     ;; See https://www.reddit.com/r/emacs/comments/11ey9ft/weekly_tips_tricks_c_thread/
     org-element-use-cache nil
-    org-export-with-sub-superscripts nil
+    org-export-with-sub-superscripts '{}
+    org-pretty-entities t
+    org-pretty-entities-include-sub-superscripts t
     org-agenda-log-mode-items '(clock)
     org-directory (file-truename "~/git/org")
     ;; org-agenda-files (jf/org-mode/agenda-files)

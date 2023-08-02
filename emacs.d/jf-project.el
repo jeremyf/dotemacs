@@ -77,9 +77,7 @@ With one PREFIX go to place where we would jump on capture."
   (cond
     ((>= prefix 16)
       (if-let ((filename (cdar (jf/project/list-projects :project "SoftServ"))))
-        (progn
-          (org-link-open-as-file (concat filename "::*Timeblock") nil)
-          (call-interactively #'org-clock-report))
+        (org-link-open-as-file (concat filename "::*Timeblock") nil)
         (org-capture-goto-target "t")))
     ((>= prefix 4)
       (org-capture-goto-target "t"))
