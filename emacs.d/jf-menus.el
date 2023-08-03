@@ -27,6 +27,14 @@
   (interactive)
   (find-file "~/git/org/agenda.org"))
 
+(transient-define-suffix jf/shr/toggle-images ()
+  "Toggle showing or hiding images"
+  :description (lambda ()
+			           (format "Show SHR Images (%s)"
+                   (if shr-inhibit-images "*" " ")))
+  (interactive)
+  (setq shr-inhibit-images (not shr-inhibit-images)))
+
 (transient-define-suffix jf/jump-to/code-backlog ()
   "Jump to coding backlog"
   :description "Capture Backlog"
@@ -98,6 +106,7 @@
      ("m t" "Typopunct (*)" typopunct-mode :if-non-nil typopunct-mode)
      ("m o" "MacOS Native Option ( )" jf/toggle-osx-alternate-modifier :if-non-nil ns-alternate-modifier)
      ("m o" "MacOS Native Option (*)" jf/toggle-osx-alternate-modifier :if-nil ns-alternate-modifier)
+     ("m i" jf/shr/toggle-images)
      ]
     ["Grab Refs"
       ("g e" "Elfeed" jf/menu--org-capture-elfeed-show :if-derived elfeed-show-mode)
