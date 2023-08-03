@@ -602,14 +602,14 @@ Useful if you want a more robust view into the recommend candidates."
   (setq vertico-cycle t)
   :init
   ;; Type "C-3 return" and select the 3rd candidate in the list.
-  (load "~/.emacs.d/straight/build/vertico/extensions/vertico-indexed.elc"
+  (load "~/.emacs.d/straight/build/vertico/extensions/vertico-indexed.el"
     nil
     jf/silence-loading-log)
   (vertico-indexed-mode)
-  (load "~/.emacs.d/straight/build/vertico/extensions/vertico-directory.elc"
+  (load "~/.emacs.d/straight/build/vertico/extensions/vertico-directory.el"
     nil
     jf/silence-loading-log)
-  (load "~/.emacs.d/straight/build/vertico/extensions/vertico-repeat.elc"
+  (load "~/.emacs.d/straight/build/vertico/extensions/vertico-repeat.el"
     nil
     jf/silence-loading-log)
   (global-set-key (kbd "M-r") #'vertico-repeat)
