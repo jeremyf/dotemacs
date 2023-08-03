@@ -84,8 +84,10 @@
       ("u" "Copy stand-up to kill ring" jf/org-mode-agenda-to-stand-up-summary)
       ("w" "Weekly hours report" jf/org-mode-weekly-report)]
     ["Denote"
+      ("d a" jf/project/add-project-path :if jf/denote?)
       ("d c" jf/denote-org-capture/filename-set)
-      ("d p" jf/project/convert-document-to-project :if jf/denote?)]
+      ("d p" jf/project/convert-document-to-project :if jf/denote?)
+      ]
     ["Blogging"
       ("b a" jf/org-mode/add-abstract :if jf/org-mode/blog-entry?)
       ("b x" "Export to TakeOnRules…" jf/export-org-to-tor :if jf/org-mode/blog-entry?)]]

@@ -320,5 +320,21 @@ This encodes the logic for creating a project."
           (call-interactively #'denote-rename-file-using-front-matter))
         (user-error "Unable to convert buffer to project")))))
 
+(transient-define-suffix jf/project/add-project-path (label path)
+  "Add a PROJECT_PATH `org-mode' keyword to buffer.
+
+This encodes the logic for creating a project."
+  :description "Add project path…"
+  (interactive (list
+                 (read-string "Label: ")
+                 (read-string "Path: ")))
+    (goto-char (point-min))
+    (let ((case-fold-search t))
+      (and (or
+             (re-search-forward "^#\\+PROJECT_PATHS:")
+             (re-search-forward "^#\\+PROJECT_NAME:"))
+        (forward-line)
+        (insert "#+PROJECT_PATHS: (\"" label "\" . \"" path "\")\n"))))
+
 (provide 'jf-project)
 ;;; jf-project.el ends here
