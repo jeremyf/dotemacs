@@ -23,7 +23,6 @@
 (require 'jf-completing)
 (require 'jf-coding)
 (require 'jf-organizing)
-(require 'jf-project-theme-colors)
 (require 'jf-framing)
 (require 'jf-utility)
 (require 'jf-writing)
@@ -40,6 +39,7 @@
 (require 'jf-capf-hacking)
 (require 'jf-experiments)
 (require 'git-related)
+;; (require 'jf-project-theme-colors)
 
 (setq jf/artist-mode-spraycan "🞄⁛◌🞆⊖⊗⁛●◯⦿⬤")
 (load (concat user-emacs-directory "hide-comnt.el") :noerror)
