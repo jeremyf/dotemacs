@@ -62,7 +62,7 @@ CONTENTS is nil.  INFO is a plist holding contextual information."
   '((name . "wrapper")))
 
 (defun jf/org-md-quote-block (quote-block contents info)
-  "Render a QUOTE-BLOCK with CONTENT and INFO.
+  "Render a QUOTE-BLOCK with CONTENTS and INFO.
 
 Either render via the standard markdown way or when exporting to
 Take on Rules using the \"blockquote\" special block."

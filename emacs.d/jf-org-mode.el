@@ -935,20 +935,20 @@ Without PREFIX and not clocking capture clock otherwise capture to Backlog."
 
 I envision this function called from the command-line."
   (if (and (fboundp 'org-clocking-p) (org-clocking-p))
-    (org-capture-string text "I")
+    (org-capture-string text "i")
     (with-current-buffer (window-buffer)
       (goto-char (point-max))
       (insert "\n" text))))
 
-(defun jf/org-mode/open-all-unresolved-pull-requests ()
-  "Opens all unresolved pull requests identified in agenda."
-  (interactive)
-  (dolist (url (-distinct
-                 (org-map-entries
-                   (lambda ()
-                     (org-element-property :raw-value (org-element-at-point)))
-                   "+LEVEL=5+mergerequests+TODO=\"STARTED\"" 'agenda)))
-    (eww-browse-with-external-browser url)))
+;; (defun jf/org-mode/open-all-unresolved-pull-requests ()
+;;   "Opens all unresolved pull requests identified in agenda."
+;;   (interactive)
+;;   (dolist (url (-distinct
+;;                  (org-map-entries
+;;                    (lambda ()
+;;                      (org-element-property :raw-value (org-element-at-point)))
+;;                    "+LEVEL=5+mergerequests+TODO=\"STARTED\"" 'agenda)))
+;;     (eww-browse-with-external-browser url)))
 
 
 (setq org-capture-templates
@@ -963,7 +963,7 @@ I envision this function called from the command-line."
          plain (clock)
          "%(jf/denote/capture-wrap :link \"%L\" :content \"%i\")"
          :empty-lines 1)
-       ("I" "Immediate to Clock"
+       ("i" "Immediate to Clock"
          plain (clock)
          "%i%?"
          :immediate-finish t)

@@ -38,7 +38,6 @@
      ("Details and Summary" . "#+begin_details\n#+begin_summary\n\n#+end_summary\n#+end_details")
      ("Emacs Lisp" . "#+begin_src emacs-lisp\n#+end_src")
      ("Gherkin" . "#+begin_src gherkin\n#+end_src")
-     ("Margin Note" . tempel-insert-marginnote_block)
      ("Org Structure" . org-insert-structure-template)
      ("Plant UML (puml)" . "#+begin_src plantuml\n@startuml\n!theme amiga\n\n@enduml\n#+end_src")
      ("Ruby" . "#+begin_src ruby\n#+end_src")
