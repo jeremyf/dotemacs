@@ -34,7 +34,7 @@
 
 (defvar dig-my-grave/templates-alist/org-mode
   '(("Bash" . "#+begin_src bash :results scalar replace :exports both :tangle yes\n#+end_src")
-     ("Blockquote" . tempel-insert-blockquote_block)
+     ("Blockquote" . jf/org-mode/insert-block/quote_block)
      ("Details and Summary" . "#+begin_details\n#+begin_summary\n\n#+end_summary\n#+end_details")
      ("Emacs Lisp" . "#+begin_src emacs-lisp\n#+end_src")
      ("Gherkin" . "#+begin_src gherkin\n#+end_src")
@@ -46,6 +46,17 @@
 
   "A list of `cons' cells used for `dig-my-grave' `completing-read'.
 The `car' as the label and `cdr' as the value that we'll insert.")
+
+(defun jf/org-mode/insert-block/quote_block (author cite cite_url)
+  (interactive (list (read-string "Author: ")
+                 (read-string "Cite: ")
+                 (read-string "Cite URL: ")))
+  ;; TODO Extract the attr_shortcode functionality to be able to insert this.
+  (insert "#+attr_shortcode:"
+    (unless (s-blank? pre) (concat " :pre " pre))
+    (unless (s-blank? cite) (concat " :cite " cite))
+    (unless (s-blank? cite_url) (concat " :cite_url " cite_url))
+    "\n#+begin_quote\n\n#+end_blockquote"))
 
 (define-key org-mode-map (kbd "`") #'dig-my-grave)
 (defun dig-my-grave ()

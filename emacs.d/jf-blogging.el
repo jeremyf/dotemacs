@@ -61,6 +61,21 @@ CONTENTS is nil.  INFO is a plist holding contextual information."
   :override (lambda (&rest rest) ())
   '((name . "wrapper")))
 
+(defun jf/org-md-quote-block (quote-block contents info)
+  "Render a QUOTE-BLOCK with CONTENT and INFO.
+
+Either render via the standard markdown way or when exporting to
+Take on Rules using the \"blockquote\" special block."
+  (if jf/exporting-org-to-tor
+    (progn
+      (org-element-put-property quote-block :type "blockquote")
+      (org-hugo-special-block quote-block contents info))
+    ;; The original md quote block method; probably a better way to do this.
+    (replace-regexp-in-string
+      "^" "> "
+      (replace-regexp-in-string "\n\\'" "" contents))))
+(advice-add #'org-md-quote-block :override #'jf/org-md-quote-block)
+
 (setq org-hugo-base-dir "~/git/takeonrules.source")
 
 (defvar jf/org-macros-setup-filename
@@ -148,24 +163,6 @@ CONTENTS is nil.  INFO is a plist holding contextual information."
 (defvar jf/tor-session-report-location
   '("around the table" "via Zoom" "via Discord and Roll20" "via Discord" "in my living room")
   "TakeOnRules session report locations.")
-
-(cl-defun jf/org-tag-as-session-report (&key (buffer (current-buffer)))
-  "Set the current BUFFER as a \"session-report\"."
-  (interactive)
-  (with-current-buffer buffer
-    (save-excursion
-      (denote-keywords-add '("sessions"))
-      (goto-char (point-min))
-      (forward-line 4)
-      (let* ((date (org-read-date nil nil nil "Session Date"))
-              (game (completing-read "Game: " (jf/tor-game-list)))
-              (location (completing-read "Location: "
-                          jf/tor-session-report-location)))
-        (insert (format
-                  (concat "\n#+SESSION_REPORT_DATE: %s"
-                    "\n#+SESSION_REPORT_GAME: %s"
-                    "\n#+SESSION_REPORT_LOCATION: %s")
-                  date game location))))))
 
 (cl-defun jf/org-keywords-as-plist (&key (keywords-regexp "\\(IDENTIFIER\\|FILETAGS\\|HUGO_FRONT_MATTER_FORMAT\\|HUGO_SECTION\\|HUGO_BASE_DIR\\|TITLE\\|SUBTITLE\\)"))
   (-flatten (mapcar (lambda (prop)

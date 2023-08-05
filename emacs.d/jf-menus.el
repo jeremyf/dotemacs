@@ -31,7 +31,7 @@
   "Toggle showing or hiding images"
   :description (lambda ()
 			           (format "Show SHR Images (%s)"
-                   (if shr-inhibit-images "*" " ")))
+                   (if shr-inhibit-images " " "*")))
   (interactive)
   (setq shr-inhibit-images (not shr-inhibit-images)))
 
@@ -48,14 +48,39 @@
 ;;   (jf/org-mode/capture/insert-content-dwim b e p))
 
 (transient-define-suffix jf/org-mode/add-abstract (abstract)
-  "Add abstract to `org-mode'"
-  :description "Add Abstract"
+  "Add ABSTRACT to `org-mode'"
+  :description "Add Abstract…"
   (interactive (list (read-string "Abstract: ")))
   (when (jf/org-mode/blog-entry?)
     (save-excursion
       (goto-char (point-min))
       (re-search-forward "^$")
       (insert "\n#+HUGO_CUSTOM_FRONT_MATTER: :abstract " abstract))))
+
+(transient-define-suffix jf/org-mode/add-series (series)
+  "Add SERIES to `org-mode'"
+  :description "Add Series…"
+  (interactive (list (completing-read "Series: " (jf/tor-series-list))))
+  (when (jf/org-mode/blog-entry?)
+    (save-excursion
+      (goto-char (point-min))
+      (re-search-forward "^$")
+      (insert "\n#+HUGO_CUSTOM_FRONT_MATTER: :series " series))))
+
+(transient-define-suffix jf/org-mode/add-session-report (date game location)
+  "Add session report metadata (DATE, GAME, and LOCATION) to current buffer."
+  :description "Add Session…"
+  (interactive (list
+                 (org-read-date nil nil nil "Session Date")
+                 (completing-read "Game: " (jf/tor-game-list))
+                 (completing-read "Location: " jf/tor-session-report-location)))
+  (when (jf/org-mode/blog-entry?)
+    (save-excursion
+      (goto-char (point-min))
+      (re-search-forward "^$")
+      (insert "\n#+HUGO_CUSTOM_FRONT_MATTER: :sessionReport "
+              "'((date . \"" date "\") (game . \"" game "\") "
+              "(location . \"" location "\"))"))))
 
 (defun jf/org-mode/blog-entry? (&optional buffer)
   (when-let* ((buffer (or buffer (current-buffer)))
@@ -98,6 +123,8 @@
       ]
     ["Blogging"
       ("b a" jf/org-mode/add-abstract :if jf/org-mode/blog-entry?)
+      ("b r" jf/org-mode/add-session-report :if jf/org-mode/blog-entry?)
+      ("b s" jf/org-mode/add-series :if jf/org-mode/blog-entry?)
       ("b x" "Export to TakeOnRules…" jf/export-org-to-tor :if jf/org-mode/blog-entry?)]]
   [["Modes"
      ;; I could write functions for these, but this is concise enough

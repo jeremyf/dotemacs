@@ -501,7 +501,7 @@ Assumes that I'm on a :projects: headline.
 ;; smartquote handling.
 (require 'jf-formatting)
 
-(require 'dig-my-grave)
+
 ;; In
 ;; https://takeonrules.com/2022/02/26/note-taking-with-org-roam-and-transclusion/,
 ;; I wrote about ~org-transclusion~.  The quick version, ~org-transclusion~
@@ -875,8 +875,16 @@ The return value is a list of `cons' with the `car' values of:
           (parts (s-split ":" (car elements)))
           (type (car parts))
           (path (s-join ":" (cdr parts))))
-    (message "Opening %s with %s" path type)
+    (message "Opening %s with %s for %s" path type major-mode)
     (cond
+      ((string= "eww-mode" (format "%s" major-mode))
+        (save-excursion
+          (let* ((url (plist-get eww-data :url))
+                  (title (plist-get eww-data :title)))
+            (concat "#+attr_shortcode:"
+              (when title (concat " :cite " title))
+              (when url (concat " :cite_url " url))
+              "\n#+begin_blockquote\n" content "\n#+end_blockquote\n%?"))))
       ((string= "elfeed" type)
         (save-excursion
           (funcall (org-link-get-parameter type :follow) path)
@@ -944,14 +952,14 @@ I envision this function called from the command-line."
 
 
 (setq org-capture-templates
-    '(("c" "Content to Denote"
+    '(("d" "To Denote"
         plain (file denote-last-path)
         #'jf/denote-org-capture
         :no-save t
         :immediate-finish nil
         :kill-buffer t
         :jump-to-captured t)
-       ("C" "Content to Clock"
+       ("c" "Content to Clock"
          plain (clock)
          "%(jf/denote/capture-wrap :link \"%L\" :content \"%i\")"
          :empty-lines 1)

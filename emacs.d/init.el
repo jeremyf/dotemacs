@@ -39,6 +39,7 @@
 (require 'jf-capf-hacking)
 (require 'jf-experiments)
 (require 'git-related)
+(require 'dig-my-grave)
 ;; (require 'jf-project-theme-colors)
 
 (setq jf/artist-mode-spraycan "🞄⁛◌🞆⊖⊗⁛●◯⦿⬤")

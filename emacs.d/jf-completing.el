@@ -550,8 +550,7 @@ Useful if you want a more robust view into the recommend candidates."
   (add-hook 'prog-mode-hook 'tempel-setup-capf)
   (add-hook 'text-mode-hook 'tempel-setup-capf)
   ;; Hyper Macro!
-  (tempel-key "H-r b" blockquote_block org-mode-map)
-  (tempel-key "H-r u" update_block org-mode-map)
+  (tempel-key "H-m u" update_block org-mode-map)
   (tempel-key "H-m c" cite org-mode-map)
   (tempel-key "H-m i" idiomatic org-mode-map)
   (tempel-key "H-m k" keyboard org-mode-map))
