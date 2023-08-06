@@ -551,9 +551,10 @@ Useful if you want a more robust view into the recommend candidates."
   (add-hook 'text-mode-hook 'tempel-setup-capf)
   ;; Hyper Macro!
   (tempel-key "H-m u" update_block org-mode-map)
-  (tempel-key "H-m c" cite org-mode-map)
-  (tempel-key "H-m i" idiomatic org-mode-map)
-  (tempel-key "H-m k" keyboard org-mode-map))
+  (tempel-key "H-m c" macro-cite org-mode-map)
+  (tempel-key "H-m i" macro-idiomatic org-mode-map)
+  (tempel-key "H-m m" macro-mechanic org-mode-map)
+  (tempel-key "H-m k" macro-keyboard org-mode-map))
 
 (use-package vertico
   ;; Another one of minad's packages which improves my day to day experience.  I

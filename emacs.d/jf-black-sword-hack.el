@@ -64,7 +64,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
   "See page 76 of /The Black Sword Hack: Ultimate Chaos Edition/")
 
 
-(defconst jf/gaming/black-sword-hack/table/travel-theme
+(defconst jf/gaming/black-sword-hack/table/travel-subject
   '("Antagonist" "Animal" "Hermit" "Spirit" "Potentate"
      "Demon" "Explorer" "Merchant" "Caves" "Messenger"
      "Ruins" "Cult" "Community" "Ghost" "Outlaws"
