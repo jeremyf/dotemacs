@@ -1,54 +1,55 @@
 ;; This file is about registering different tables.
 
 (defun jf/tables/roll (table-name)
+  "Roll the given TABLE-NAME (or dice expression)."
   (interactive (list (completing-read "Table name: " jf/tables)))
   (let ((table (gethash (intern table-name) jf/tables)))
-    (message "%s :: %s" table-name (jf/tables/roll-on table))))
+    (message "%s" (jf/tables/roll-on (or table table-name)))))
 
 (defun jf/tables/roll-on (table &optional container)
-  (unless container (setq container table))
+  "Pick a random result from the given TABLE.
+
+The CONTAINER determines the scope."
+  (unless container (setq-local container table))
   (cond
-   ((-cons-pair? table)
-    (cdr table))
-   ((listp table)
-    (jf/roll-on-table (seq-random-elt table) container))
-   ((symbolp table)
-    (jf/roll-on-table (symbol-value table) container))
-   ((functionp table)
-    (funcall table container))
-   ((ad-lambda-p table)
-    (funcall table container))
-   ((numberp table)
-    table)
-   ;; Once I have a string; explode on tokens.  What do the tokens look like?
-   ;; Inclined to go with the following: "On the horizon you see ${table-name}."
-   ((stringp table)
-    (s-format table #'jf/tables/roll-on-via-interpolation))
+    ((-cons-pair? table)
+      (jf/tables/roll-on (cdr table) container))
+    ((listp table)
+      ;; Need a way to discern how to roll on the table.
+      (jf/tables/roll-on (seq-random-elt table) container))
+    ((symbolp table)
+      (jf/tables/roll-on (symbol-value table) container))
+    ((functionp table)
+      (funcall table container))
+    ((ad-lambda-p table)
+      (funcall table container))
+    ((numberp table)
+      table)
+    ;; Once I have a string; explode on tokens.  What do the tokens look like?
+    ;; Inclined to go with the following: "On the horizon you see ${table-name}."
+    ((stringp table)
+      (s-format table #'jf/tables/roll-on/via-interpolation))
     (t (user-error (format "Unable to handle %s." table)))))
 
-(defun jf/tables/roll-on-via-interpolation (table-name)
-  (let ((table (gethash (intern table-name) jf/tables)))
-    (jf/tables/roll-on table)))
+(defun jf/tables/roll-on/via-interpolation (text)
+  "Roll the TEXT; either from a table or as a dice-expression."
+  (if-let ((table (gethash (intern text) jf/tables)))
+    (jf/tables/roll-on table)
+    (format "%s [%s]" (cdr (org-d20--roll text)) text)))
 
-(setq jf/tables (make-hash-table))
-;;   "A hash-table of random tables.
+(defvar jf/tables (make-hash-table)
+  "A hash-table of random tables.
 
-;; The hash key is the \"human readable\" name of the table.
-;; The hash value is the symbolic name of the table.")
+The hash key is the \"human readable\" name of the table (as a symbol).
+The hash value is the contents of the table.")
 
-(cl-defun jf/table (&key source name table)
-  (puthash (intern (format "%s (%s)" name source)) table jf/tables))
-
-(jf/table
-  :name "Character"
-  :source "Black Sword Hack"
-  :table "Hello ${Unexpected Event (Black Sword Hack)}, I like ${Keepsakes (Errant)}")
+(cl-defun jf/table (&key name table)
+  "A helper function to store the given TABLE at the NAME in `jf/tables'."
+  (puthash (intern name) table jf/tables))
 
 (jf/table
-  :name "Unexpected Event"
-  :source "Black Sword Hack"
-  :table
-  '((1 . "Very negative")
+  :name "Unexpected Event (Black Sword Hack)"
+  :table '((1 . "Very negative")
      (2 . "Negative")
      (3 . "Negative but…")
      (4 . "Positive but…")
@@ -56,10 +57,8 @@
      (6 . "Very Positive")))
 
 (jf/table
-  :name "Keepsakes"
-  :source "Errant"
-  :table
-  '("The sword of the hero Black Mask. Useless, but looks really cool."
+  :name "Keepsakes (Errant)"
+  :table '("The sword of the hero Black Mask. Useless, but looks really cool."
      "Big, floppy cork hat. Waterproof."
      "Strange pair of boots, with four wheels attached to each sole."
      "Jar of pungent pickled eggs, given to you by a stranger on a carriage."
@@ -161,8 +160,7 @@
      "Set of loaded dice."))
 
 (jf/table
-  :name "Failed Professions"
-  :source "Errant"
+  :name "Failed Professions (Errant)"
   :table
   '("Acrobat" "Alewife" "Antiquarian" "Apothecary" "Armpit-hair plucker"
      "Baker" "Ball-fetcher" "Barber" "Barrel maker" "Beadle"
