@@ -624,7 +624,7 @@ When the SOURCE is a string, use `s-format' to expand the
   (unless container (setq container source))
   (cond
    ((-cons-pair? source)
-    source)
+    (cdr source))
    ((listp source)
     (jf/roll-on-table (seq-random-elt source) container))
    ((symbolp source)

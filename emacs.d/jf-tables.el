@@ -2,27 +2,62 @@
 
 (defun jf/tables/roll (table-name)
   (interactive (list (completing-read "Table name: " jf/tables)))
-  (let ((table (alist-get table-name jf/tables nil nil #'string=)))
-    (message "%s :: %s" table-name (jf/roll-on-table table))))
+  (let ((table (gethash (intern table-name) jf/tables)))
+    (message "%s :: %s" table-name (jf/tables/roll-on table))))
 
-(defvar jf/tables (list)
-  "A hash-table of random tables.
+(defun jf/tables/roll-on (table &optional container)
+  (unless container (setq container table))
+  (cond
+   ((-cons-pair? table)
+    (cdr table))
+   ((listp table)
+    (jf/roll-on-table (seq-random-elt table) container))
+   ((symbolp table)
+    (jf/roll-on-table (symbol-value table) container))
+   ((functionp table)
+    (funcall table container))
+   ((ad-lambda-p table)
+    (funcall table container))
+   ((numberp table)
+    table)
+   ;; Once I have a string; explode on tokens.  What do the tokens look like?
+   ;; Inclined to go with the following: "On the horizon you see ${table-name}."
+   ((stringp table)
+    (s-format table #'jf/tables/roll-on-via-interpolation))
+    (t (user-error (format "Unable to handle %s." table)))))
 
-The hash key is the \"human readable\" name of the table.
-The hash value is the symbolic name of the table.")
+(defun jf/tables/roll-on-via-interpolation (table-name)
+  (let ((table (gethash (intern table-name) jf/tables)))
+    (jf/tables/roll-on table)))
 
-(cl-defmacro jf/table (&key name key description table)
-  (let* ((var-sym (intern (concat "jf/tables/" key))))
-    `(progn
-       (defvar ,var-sym
-         ,table
-         ,description)
-       (add-to-list 'jf/tables '(,name . ,var-sym)))))
+(setq jf/tables (make-hash-table))
+;;   "A hash-table of random tables.
+
+;; The hash key is the \"human readable\" name of the table.
+;; The hash value is the symbolic name of the table.")
+
+(cl-defun jf/table (&key source name table)
+  (puthash (intern (format "%s (%s)" name source)) table jf/tables))
 
 (jf/table
-  :name "Keepsakes (Errant)"
-  :key "errant/keepsakes"
-  :description "Errant RPG's Keepsakes, pages 58 to 61"
+  :name "Character"
+  :source "Black Sword Hack"
+  :table "Hello ${Unexpected Event (Black Sword Hack)}, I like ${Keepsakes (Errant)}")
+
+(jf/table
+  :name "Unexpected Event"
+  :source "Black Sword Hack"
+  :table
+  '((1 . "Very negative")
+     (2 . "Negative")
+     (3 . "Negative but…")
+     (4 . "Positive but…")
+     (5 . "Positive")
+     (6 . "Very Positive")))
+
+(jf/table
+  :name "Keepsakes"
+  :source "Errant"
   :table
   '("The sword of the hero Black Mask. Useless, but looks really cool."
      "Big, floppy cork hat. Waterproof."
@@ -126,9 +161,8 @@ The hash value is the symbolic name of the table.")
      "Set of loaded dice."))
 
 (jf/table
-  :name "Failed Professions (Errant)"
-  :key "errant/failed_professions"
-  :description "Errant RPG's Failed Professions, page 62."
+  :name "Failed Professions"
+  :source "Errant"
   :table
   '("Acrobat" "Alewife" "Antiquarian" "Apothecary" "Armpit-hair plucker"
      "Baker" "Ball-fetcher" "Barber" "Barrel maker" "Beadle"
