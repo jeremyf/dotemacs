@@ -1,10 +1,23 @@
 ;; This file is about registering different tables.
 
-(defun jf/tables/roll (table-name)
-  "Roll the given TABLE-NAME (or dice expression)."
-  (interactive (list (completing-read "Table name: " jf/tables)))
-  (let ((table (gethash (intern table-name) jf/tables)))
-    (message "%s" (jf/tables/roll-on (or table table-name)))))
+(defvar jf/tables (make-hash-table)
+  "A hash-table of random tables.
+
+The hash key is the \"human readable\" name of the table (as a symbol).
+The hash value is the contents of the table.")
+
+(cl-defun jf/table (&key name table)
+  "A helper function to store the given TABLE at the NAME in `jf/tables'."
+  (puthash (intern name) table jf/tables))
+
+(defun jf/tables/roll (expression)
+  "Roll the given EXPRESSION (prompt for a table-name)."
+  (interactive (list (completing-read "Expression: " jf/tables)))
+  (let* ((table (gethash (intern expression) jf/tables))
+          (exp (if (and (not table) (not (string-match-p "\\${" expression)))
+                 (concat "${" expression "}")
+                 expression)))
+    (message "%s :: %s" expression (jf/tables/roll-on (or table exp)))))
 
 (defun jf/tables/roll-on (table &optional container)
   "Pick a random result from the given TABLE.
@@ -37,24 +50,67 @@ The CONTAINER determines the scope."
     (jf/tables/roll-on table)
     (format "%s [%s]" (cdr (org-d20--roll text)) text)))
 
-(defvar jf/tables (make-hash-table)
-  "A hash-table of random tables.
-
-The hash key is the \"human readable\" name of the table (as a symbol).
-The hash value is the contents of the table.")
-
-(cl-defun jf/table (&key name table)
-  "A helper function to store the given TABLE at the NAME in `jf/tables'."
-  (puthash (intern name) table jf/tables))
+(jf/table
+  :name "Oracle Unexpected Event (Black Sword Hack)"
+  :table '((1 . "Very negative")
+            (2 . "Negative")
+            (3 . "Negative but…")
+            (4 . "Positive but…")
+            (5 . "Positive")
+            (6 . "Very Positive")))
 
 (jf/table
-  :name "Unexpected Event (Black Sword Hack)"
-  :table '((1 . "Very negative")
+  :name "Oracle Question Result (Black Sword Hack)"
+  :table '((1 . "No and…")
+            (2 . "No")
+            (3 . "No but…")
+            (4 . "Yes but…")
+            (5 . "Yes")
+            (6 . "Yes and…")))
+
+(jf/table
+  :name "Oracle Unexpected Event (Black Sword Hack)"
+  :table
+  '((1 . "Very negative")
      (2 . "Negative")
      (3 . "Negative but…")
      (4 . "Positive but…")
      (5 . "Positive")
      (6 . "Very Positive")))
+
+(jf/table
+  :name "Event Theme (Black Sword Hack)"
+  :table
+  '("Death" "Treachery" "Infiltration" "Desperation" "Instability" "Suspicion"
+     "Escape" "Fear" "Hunt" "Division" "Falsehood" "Celebration"
+     "Conquest" "Friendship" "Love" "Sacrifice" "Decay" "Exile"
+     "Revenge" "Greed" "Isolation" "Preservation" "Loss" "Rebirth"
+     "Oppression" "Destruction" "Ignorance" "Purification" "Scarcity" "Quest"
+     "Stagnation" "Redemption" "Failure" "Help" "Corruption" "Rebellion"))
+
+(jf/table
+  :name "Event Subject (Black Sword Hack)"
+  :table
+  '("Army" "Church" "Ghost" "Nobility" "Otherworldly" "Plague"
+     "Omen" "Ally" "Family" "Wizard" "Guild" "Architect"
+     "Crusaders" "Vagrant" "Rival" "Artefact" "Messenger" "Inquisitors"
+     "Ruins" "Knowledge" "Cave" "Dream" "Hamlet" "Outlaws"
+     "Healers" "Cult" "Guardian" "Settlers" "Monument" "Food"
+     "Judges" "Storm" "Demon" "Court" "Theatre" "Assassins"))
+
+(jf/table
+  :name "Travel Theme (Black Sword Hack)"
+  :table
+  '("Aggression" "Exchange" "Discovery" "Revelation" "Pursuit"
+     "Lost" "Isolation" "Death" "Escape" "Change"))
+
+(jf/table
+  :name "Travel Subject (Black Sword Hack)"
+  :table
+  '("Antagonist" "Animal" "Hermit" "Spirit" "Potentate"
+     "Demon" "Explorer" "Merchant" "Caves" "Messenger"
+     "Ruins" "Cult" "Community" "Ghost" "Outlaws"
+     "Artists" "Soldiers" "Sorcerer" "Vagrant" "Natural disaster"))
 
 (jf/table
   :name "Keepsakes (Errant)"
@@ -182,3 +238,33 @@ The hash value is the contents of the table.")
      "Sycophant" "Tanner" "Taster" "Taxidermist" "Tinker"
      "Toad doctor" "Tosher" "Town crier" "Urinatores" "Usurer"
      "Water carrier" "Wheelwright" "Whipping boy" "Whiffler" "Worm rancher"))
+
+
+(defconst jf/gaming/black-sword-hack/table/oracle-question-likelihood
+  '(("Don't think so" . (lambda () (cl-sort (list (+ 1 (random 6)) (+ 1 (random 6)) (+ 1 (random 6))) #'<)))
+     ("Unlikely" . (lambda () (cl-sort (list (+ 1 (random 6)) (+ 1 (random 6))) #'<)))
+     ("Who knows?" . (lambda () (list (+ 1 (random 6)))))
+     ("Probably" . (lambda () (cl-sort (list (+ 1 (random 6)) (+ 1 (random 6))) #'>)))
+     ("Definitely". (lambda () (cl-sort (list (+ 1 (random 6)) (+ 1 (random 6)) (+ 1 (random 6))) #'>))))
+  "The table of options and encoded dice rolls for question likelihoods.
+
+From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
+(transient-define-suffix jf/gaming/black-sword-hack/table/oracle-response (question likelihood)
+  "The Dark God's Oracle answers the QUESTION for the LIKELIHOOD."
+  :description "Dark God’s Oracle Answer…"
+  (interactive (list
+                 (read-string "Yes/No Question: ")
+                 (completing-read "Likelihood: " jf/gaming/black-sword-hack/table/oracle-question-likelihood nil t)))
+  (let* ((dice (funcall (alist-get likelihood jf/gaming/black-sword-hack/table/oracle-question-likelihood nil nil #'string=)))
+         (answer (alist-get (car dice) jf/gaming/black-sword-hack/table/oracle-question-result))
+          (unexpected (alist-get (car (list-utils-dupes dice)) jf/gaming/black-sword-hack/table/oracle-unexpected-event))
+          (response (concat "- Question :: " question "\n"
+                            "- Answer :: "  answer "\n"
+                      (when unexpected (concat "- Unexpected Event :: " unexpected "\n"))
+                      "- Dice :: " (format "%s" dice))))
+    (kill-new response)
+    (message response)))
+
+(jf/table
+  :name "Event (Black Sword Hack)"
+  :table "\n  - Theme :: ${Event Theme (Black Sword Hack)}\n  - Subject :: ${Event Subject (Black Sword Hack)}")
