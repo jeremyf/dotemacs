@@ -9,12 +9,15 @@ I roll the dice, filter the results, and fetch from the table.
 
 - :name :: the human readable and reference-able name (used for
   completing read and the key for the table storage).
-- :fetcher :: function that takes two positional arguments (see
-  `random-table/fetcher/default'.)
 - :data :: the tabular data, often as a list of strings.  By
   design, those list of strings can have interpolation
  (e.g. \"${2d6}\" both of dice structures but also of other
   tables.
+- :roller :: function to roll dice and return list of dice results.
+- :filter :: function to filter the list of dice.
+- :fetcher :: function that takes two positional arguments (see
+  `random-table/fetcher/default'.)
+- :public :: when true show
 - :store :: do we store this value for later lookup during an
   evaluation of this table?
 - :reuse :: the :name of a table's stored dice results.
@@ -27,10 +30,10 @@ and use those dice results to determine both the answer as well
 as whether there are unexpected events.  All from the same roll."
   name
   data
-  (public t)
   (roller #'random-table/roller/default)
   (filter #'random-table/filter/default)
   (fetcher #'random-table/fetcher/default)
+  (public t)
   (store nil)
   (reuse nil))
 
@@ -69,10 +72,10 @@ The hash key is the \"human readable\" name of the table (as a symbol).
 The hash value is the contents of the table.")
 
 (cl-defun random-table/register (&rest kws &key name data &allow-other-keys)
-  "A helper function to store the given TABLE at the NAME in `random-table/storage/tables'."
+  "Store the DATA, NAME, and KWS in a `random-table'."
   (let* ((key (intern name))
           (struct (apply #'make-random-table :name key :data (-list data) kws)))
-  (puthash key struct random-table/storage/tables)))
+    (puthash key struct random-table/storage/tables)))
 
 (defun random-table/storage/tables/roll (expression)
   "Roll the given EXPRESSION (prompt for a table-name)."
@@ -161,105 +164,105 @@ The CONTAINER determines the scope."
 (random-table/register
   :name "Keepsakes (Errant)"
   :data '("The sword of the hero Black Mask. Useless, but looks really cool."
-     "Big, floppy cork hat. Waterproof."
-     "Strange pair of boots, with four wheels attached to each sole."
-     "Jar of pungent pickled eggs, given to you by a stranger on a carriage."
-     "Pair of cosy, woollen socks."
-     "Bucket filled with crabs."
-     "Goblin child: it is convinced you are its mother."
-     "Case of costume jewellery. Worthless, but convincing from a distance."
-     "Deck of cards with an extra ace."
-     "Banned edition of the major holy text of the land, filled with heretical dogma and apocryphal stories."
-     "Large hoop skirt, big enough to hide a small child in."
-     "Bagpipes."
-     "Black leather boots, knee-high. Black leather gloves, elbow- length. A riding crop. A gag."
-     "Just two guys, ready to help you out. They’re burly, they’re brawny, they’re best friends."
-     "Coat you stole from a disgraced magician. Full of kerchiefs, dead doves, and other miscellanea."
-     "The signet ring of an unknown king."
-     "Dwarven treasure dog, loyal but cowardly."
-     "Pouch of firecrackers."
-     "A dolorous cow."
-     "String of 12 hard sausage links."
-     "Bottle of incredibly fine whiskey, which you clearly stole."
-     "10’ spool of thin, copper wire."
-     "Pincushion, filled with pins."
-     "The finest ham in all the land, smoked by the man, Pitmaster Sam!"
-     "Long, strong elastic cord."
-     "Bowling ball."
-     "Small vial of acid. Very corrosive."
-     "Bag of chilli powder."
-     "Needle and thread."
-     "Wig of beautiful golden hair. Reaches down to your ankles."
-     "Bag of beloved marbles that you won from a child."
-     "Several small jars of bright acrylic paints."
-     "Unnerving and upsettingly lifelike puppet."
-     "Incredibly avant-garde and impractical clothes that no sane person would be willing to purchase."
-     "Small bag of incredibly pungent and heady herbs. When burned, even smelling the smoke is enough to intoxicate someone."
-     "Package, addressed to someone you don’t know, in some place you’ve never heard."
-     "Rake."
-     "Bottle of lubricant, suitable for internal, external, and industrial use."
-     "Extremely springy spring."
-     "Mechanically articulated hand attached to a stick. All of the fingers can be controlled independently, though it is quite confusing to operate."
-     "Lump of clay."
-     "Wind-up music box."
-     "Tube of fast-drying, industrial-strength glue."
-     "Pair of stilts."
-     "Book of fiery, righteous, political polemic."
-     "Pair of tinted spectacles."
-     "Very fine squash."
-     "Vial of medicine, syrupy and sweet. Makes one quite drowsy."
-     "Bag of flour."
-     "Plague doctor’s mask, stuffed with fragrant herbs."
-     "Wheel of aged Grey Matter, the mouldiest cheese in the world. Causes intense hallucinations."
-     "Pouch of laxative powder."
-     "Snorkel."
-     "Worn, dog-eared copy of the novel Lust & Larceny: The Trysts of the Amorous Elven Thief, Vol 1. While lowbrow, the book is incredibly engrossing; it’s hard to pull yourself away from it."
-     "Glitter."
-     "Jug of genuine wolf piss."
-     "Fire-squirt."
-     "Bottle of rat poison."
-     "Pouch of beans."
-     "Snake."
-     "A few pamphlets of surprisingly convincing conspiracy theories."
-     "Pot labelled ‘rice pudding’ that is actually filled with liquid cement."
-     "Glass case of pinned butterflies."
-     "Two magnetic spoons."
-     "Collapsible walking cane."
-     "Priest’s vestments."
-     "Game with stone pieces and a cloth board. The accompanying instruction booklet is full of poorly worded, incomprehensible, and contradictory rules."
-     "A trio of newborn puppies."
-     "Small glass cylinder, rounded at the tips. Quite phallic."
-     "Sachet of dried cooking herbs."
-     "Packets of various coloured dye powders."
-     "Thick, heavy blanket you’ve carried with you since childhood."
-     "Hand-bound notebook, containing six quite touching love poems. The names of the beloved in each poem have been crossed out and rewritten multiple times."
-     "Set of clothes lined with fleece. Very warm."
-     "Dismembered pinky finger with a long painted red fingernail."
-     "The flu."
-     "Small sundial attached to a wrist strap."
-     "Booklet of various fashionable hair, beard, and moustache styles."
-     "Crystal monocle, also useful as a lens."
-     "Polished metal hand mirror."
-     "Delicious cake, baked for you by your sweetheart."
-     "An incredibly belligerent goose."
-     "A four-leaf clover."
-     "Packet of saccharinely sweet lollipops."
-     "Large bar of hard soap, floral scented."
-     "Bag of small ceramic balls, which explode in a blinding flash of light when thrown."
-     "Small tube of pale pink face paint."
-     "Umbrella."
-     "Tub of styling gel."
-     "Rapidly decomposing fish."
-     "Bottle of incredibly pungent perfume."
-     "Trained messenger pigeon."
-     "Fine-mesh net."
-     "Pouch of itching powder."
-     "Hand drum."
-     "A dozen angry hornets in a jar."
-     "Wind-up clockwork toy."
-     "Your dad. Capable of criticizing anyone till they feel incompetent and worthless."
-     "Jar of sweet, sticky honey."
-     "Set of loaded dice."))
+           "Big, floppy cork hat. Waterproof."
+           "Strange pair of boots, with four wheels attached to each sole."
+           "Jar of pungent pickled eggs, given to you by a stranger on a carriage."
+           "Pair of cosy, woollen socks."
+           "Bucket filled with crabs."
+           "Goblin child: it is convinced you are its mother."
+           "Case of costume jewellery. Worthless, but convincing from a distance."
+           "Deck of cards with an extra ace."
+           "Banned edition of the major holy text of the land, filled with heretical dogma and apocryphal stories."
+           "Large hoop skirt, big enough to hide a small child in."
+           "Bagpipes."
+           "Black leather boots, knee-high. Black leather gloves, elbow- length. A riding crop. A gag."
+           "Just two guys, ready to help you out. They’re burly, they’re brawny, they’re best friends."
+           "Coat you stole from a disgraced magician. Full of kerchiefs, dead doves, and other miscellanea."
+           "The signet ring of an unknown king."
+           "Dwarven treasure dog, loyal but cowardly."
+           "Pouch of firecrackers."
+           "A dolorous cow."
+           "String of 12 hard sausage links."
+           "Bottle of incredibly fine whiskey, which you clearly stole."
+           "10’ spool of thin, copper wire."
+           "Pincushion, filled with pins."
+           "The finest ham in all the land, smoked by the man, Pitmaster Sam!"
+           "Long, strong elastic cord."
+           "Bowling ball."
+           "Small vial of acid. Very corrosive."
+           "Bag of chilli powder."
+           "Needle and thread."
+           "Wig of beautiful golden hair. Reaches down to your ankles."
+           "Bag of beloved marbles that you won from a child."
+           "Several small jars of bright acrylic paints."
+           "Unnerving and upsettingly lifelike puppet."
+           "Incredibly avant-garde and impractical clothes that no sane person would be willing to purchase."
+           "Small bag of incredibly pungent and heady herbs. When burned, even smelling the smoke is enough to intoxicate someone."
+           "Package, addressed to someone you don’t know, in some place you’ve never heard."
+           "Rake."
+           "Bottle of lubricant, suitable for internal, external, and industrial use."
+           "Extremely springy spring."
+           "Mechanically articulated hand attached to a stick. All of the fingers can be controlled independently, though it is quite confusing to operate."
+           "Lump of clay."
+           "Wind-up music box."
+           "Tube of fast-drying, industrial-strength glue."
+           "Pair of stilts."
+           "Book of fiery, righteous, political polemic."
+           "Pair of tinted spectacles."
+           "Very fine squash."
+           "Vial of medicine, syrupy and sweet. Makes one quite drowsy."
+           "Bag of flour."
+           "Plague doctor’s mask, stuffed with fragrant herbs."
+           "Wheel of aged Grey Matter, the mouldiest cheese in the world. Causes intense hallucinations."
+           "Pouch of laxative powder."
+           "Snorkel."
+           "Worn, dog-eared copy of the novel Lust & Larceny: The Trysts of the Amorous Elven Thief, Vol 1. While lowbrow, the book is incredibly engrossing; it’s hard to pull yourself away from it."
+           "Glitter."
+           "Jug of genuine wolf piss."
+           "Fire-squirt."
+           "Bottle of rat poison."
+           "Pouch of beans."
+           "Snake."
+           "A few pamphlets of surprisingly convincing conspiracy theories."
+           "Pot labelled ‘rice pudding’ that is actually filled with liquid cement."
+           "Glass case of pinned butterflies."
+           "Two magnetic spoons."
+           "Collapsible walking cane."
+           "Priest’s vestments."
+           "Game with stone pieces and a cloth board. The accompanying instruction booklet is full of poorly worded, incomprehensible, and contradictory rules."
+           "A trio of newborn puppies."
+           "Small glass cylinder, rounded at the tips. Quite phallic."
+           "Sachet of dried cooking herbs."
+           "Packets of various coloured dye powders."
+           "Thick, heavy blanket you’ve carried with you since childhood."
+           "Hand-bound notebook, containing six quite touching love poems. The names of the beloved in each poem have been crossed out and rewritten multiple times."
+           "Set of clothes lined with fleece. Very warm."
+           "Dismembered pinky finger with a long painted red fingernail."
+           "The flu."
+           "Small sundial attached to a wrist strap."
+           "Booklet of various fashionable hair, beard, and moustache styles."
+           "Crystal monocle, also useful as a lens."
+           "Polished metal hand mirror."
+           "Delicious cake, baked for you by your sweetheart."
+           "An incredibly belligerent goose."
+           "A four-leaf clover."
+           "Packet of saccharinely sweet lollipops."
+           "Large bar of hard soap, floral scented."
+           "Bag of small ceramic balls, which explode in a blinding flash of light when thrown."
+           "Small tube of pale pink face paint."
+           "Umbrella."
+           "Tub of styling gel."
+           "Rapidly decomposing fish."
+           "Bottle of incredibly pungent perfume."
+           "Trained messenger pigeon."
+           "Fine-mesh net."
+           "Pouch of itching powder."
+           "Hand drum."
+           "A dozen angry hornets in a jar."
+           "Wind-up clockwork toy."
+           "Your dad. Capable of criticizing anyone till they feel incompetent and worthless."
+           "Jar of sweet, sticky honey."
+           "Set of loaded dice."))
 
 (random-table/register
   :name "Failed Professions (Errant)"
@@ -302,10 +305,10 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
                  (read-string "Yes/No Question: ")
                  (completing-read "Likelihood: " jf/gaming/black-sword-hack/table/oracle-question-likelihood nil t)))
   (let* ((dice (funcall (alist-get likelihood jf/gaming/black-sword-hack/table/oracle-question-likelihood nil nil #'string=)))
-         (answer (alist-get (car dice) jf/gaming/black-sword-hack/table/oracle-question-result))
+          (answer (alist-get (car dice) jf/gaming/black-sword-hack/table/oracle-question-result))
           (unexpected (alist-get (car (list-utils-dupes dice)) jf/gaming/black-sword-hack/table/oracle-unexpected-event))
           (response (concat "- Question :: " question "\n"
-                            "- Answer :: "  answer "\n"
+                      "- Answer :: "  answer "\n"
                       (when unexpected (concat "- Unexpected Event :: " unexpected "\n"))
                       "- Dice :: " (format "%s" dice))))
     (kill-new response)
@@ -349,14 +352,15 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
   :name "Oracle Question > Answer (Black Sword Hack)"
   :public nil
   :reuse "Oracle Question (Black Sword Hack)"
-  :filter (lambda (dice) (car dice))
+  :filter (lambda (dice) "We have a pool of dice to pick one." (car dice))
   :data '("No and…" "No" "No but…" "Yes but…" "Yes" "Yes and…"))
 
 (random-table/register
   :name "Oracle Question > Unexpected Event (Black Sword Hack)"
   :reuse "Oracle Question (Black Sword Hack)"
   :public nil
-  :filter (lambda (dice) (car (list-utils-dupes (-list dice))))
+  :filter (lambda (dice) "We have a pool of dice to determine if there are dupes."
+            (car (list-utils-dupes (-list dice))))
   :fetcher (lambda (table index)
              (when index (concat " with unexpected event of " (nth (- index 1) table))))
   :data '("Very negative" "Negative" "Negative but…" "Positive but…" "Positive" "Very Positive"))
@@ -408,9 +412,13 @@ This can either be a named table or a general expression (e.g. 2d6).
 Or a combination of multiple tables.
 
 We report that function via `#'random-table/roll/reporter'."
-  (interactive (list (completing-read "Expression: " random-table/storage/tables #'random-table/public?)))
+  (interactive (list (completing-read "Expression: "
+                       random-table/storage/tables
+                       ;; Predicate, keep only the public tables.
+                       (lambda (name table &rest args) (random-table-public table)))))
   ;; TODO: convert the message to a function
-  (apply random-table/roll/reporter (list expression (random-table/roll-expression expression))))
+  (apply random-table/roll/reporter
+    (list expression (random-table/roll-expression expression))))
 
 (defun random-table/roll-expression (expression)
   (if-let* ((table (gethash (intern expression) random-table/storage/tables)))
@@ -418,6 +426,3 @@ We report that function via `#'random-table/roll/reporter'."
     ;; We have specified a non-table; roll the expression.  We'll treat a non-escaped on as a dice expression.
     (s-format (if (string-match-p "\\${" expression) expression (concat "${" expression "}"))
       #'random-table/storage/tables/roll-on/via-interpolation)))
-
-(defun random-table/public? (name table &rest args)
-  (random-table-public table))
