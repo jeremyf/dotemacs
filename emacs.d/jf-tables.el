@@ -1,5 +1,33 @@
-;; This file is about registering different tables.
+;;; jf-tables --- Roll on some tables. -*- lexical-binding: t -*-
+
+;; Copyright (C) 2023 Jeremy Friesen
+;; Author: Jeremy Friesen <jeremy@jeremyfriesen.com>
+
+;; This file is NOT part of GNU Emacs.
+
+;;; Commentary:
+
+;; This package provides a means of registering random tables (see
+;; `random-table' and `random-table/register') and then rolling on those tables
+;; (see `random-table/roll').
+;;
+;; The `random-table/roll' is an `interactive' function that will prompt you to
+;; select an expression.  You can choose from a list of registered public tables
+;; or provide your own text.  This package uses the `s-format' to parse the
+;; given expression.
+;;
+;; Examples:
+;; - (random-table/roll "2d6") will roll 2 six-sided dice.
+;; - (random-table/roll "There are ${2d6} orcs.") will roll 2 six-sided dice and
+;;   output the sentence "There are 7 orcs."
+
+;;; Code:
+
+;;;; Requirements:
 (require 'org-d20)
+(require 'cl)
+
+;;;; Data Structures and Storage
 (cl-defstruct random-table
   "The definition of a structured random table.
 
@@ -17,7 +45,7 @@ I roll the dice, filter the results, and fetch from the table.
 - :filter :: function to filter the list of dice.
 - :fetcher :: function that takes two positional arguments (see
   `random-table/fetcher/default'.)
-- :public :: when true show
+- :private :: when true, do not show in list of rollable tables.
 - :store :: do we store this value for later lookup during an
   evaluation of this table?
 - :reuse :: the :name of a table's stored dice results.
@@ -33,28 +61,9 @@ as whether there are unexpected events.  All from the same roll."
   (roller #'random-table/roller/default)
   (filter #'random-table/filter/default)
   (fetcher #'random-table/fetcher/default)
-  (public t)
+  (private nil)
   (store nil)
   (reuse nil))
-
-(defun random-table/fetcher/default (data &optional position)
-  "Find POSITION on the given DATA.
-
-When POSITION is not given, choose a random element from the TABLE."
-  (if (integerp position)
-    ;; Off by one errors are so very real.
-    (nth (- position 1) data)
-    (seq-random-elt data)))
-
-(defun random-table/roller/default (&rest data)
-  "Roll for the given DATA."
-  (+ 1 (random (length (-list data)))))
-
-(defun random-table/filter/default (&rest rolls)
-  "Filter the given ROLLS.
-
-See `random-table/roller/default'."
-  (apply #'+ (-list rolls)))
 
 (defvar random-table/storage/results
   (make-hash-table)
@@ -71,98 +80,157 @@ See `random-table' for discussion about storage and reuse.")
 The hash key is the \"human readable\" name of the table (as a symbol).
 The hash value is the contents of the table.")
 
-(cl-defun random-table/register (&rest kws &key name data &allow-other-keys)
-  "Store the DATA, NAME, and KWS in a `random-table'."
-  (let* ((key (intern name))
-          (struct (apply #'make-random-table :name key :data (-list data) kws)))
-    (puthash key struct random-table/storage/tables)))
+(defun random-table/roller/default (&rest data)
+  "Roll for the given DATA."
+  ;; Constant off by one errors are likely
+  (+ 1 (random (length (-list data)))))
 
-(defun random-table/storage/tables/roll (expression)
-  "Roll the given EXPRESSION (prompt for a table-name)."
-  (interactive (list (completing-read "Expression: " random-table/storage/tables)))
-  (let* ((struct (gethash (intern expression) random-table/storage/tables))
-          (table (when struct (random-table-data struct)))
-          (exp (if (and (not table) (not (string-match-p "\\${" expression)))
-                 (concat "${" expression "}")
-                 expression)))
-    (message "%s :: %s" expression (random-table/storage/tables/roll-on (or table exp)))))
+(defun random-table/filter/default (&rest rolls)
+  "Filter the given ROLLS.
 
-(defun random-table/storage/tables/roll-on (table &optional container)
-  "Pick a random result from the given TABLE.
+See `random-table/roller/default'."
+  (apply #'+ (-list rolls)))
 
-The CONTAINER determines the scope."
-  (unless container (setq-local container table))
-  (cond
-    ((-cons-pair? table)
-      (random-table/storage/tables/roll-on (cdr table) container))
-    ((listp table)
-      ;; Need a way to discern how to roll on the table.
-      (random-table/storage/tables/roll-on (seq-random-elt table) container))
-    ((symbolp table)
-      (random-table/storage/tables/roll-on (symbol-value table) container))
-    ((functionp table)
-      (funcall table container))
-    ((ad-lambda-p table)
-      (funcall table container))
-    ((numberp table)
-      table)
-    ;; Once I have a string; explode on tokens.  What do the tokens look like?
-    ;; Inclined to go with the following: "On the horizon you see ${table-name}."
-    ((stringp table)
-      (s-format table #'random-table/storage/tables/roll-on/via-interpolation))
-    (t (user-error (format "Unable to handle %s." table)))))
+(defun random-table/fetcher/default (data &optional position)
+  "Find POSITION on the given DATA.
 
-(defun random-table/storage/tables/roll-on/via-interpolation (text)
-  "Roll the TEXT; either from a table or as a dice-expression."
-  (if-let ((struct (gethash (intern text) random-table/storage/tables)))
-    (random-table/storage/tables/roll-on (random-table-data struct))
+When POSITION is not given, choose a random element from the TABLE."
+  (if (integerp position)
+    ;; Off by one errors are so very real.
+    (nth (- position 1) data)
+    (seq-random-elt data)))
+
+;;;; Interactive
+(defun random-table/roll (expression)
+  "Evaluate the given EXPRESSION by \"rolling\" it.
+
+This can either be a named table or a general expression (e.g. 2d6).
+
+Or a combination of multiple tables.
+
+We report that function via `#'random-table/reporter'."
+  (interactive (list (completing-read "Expression: "
+                       random-table/storage/tables
+                       ;; Predicate that filters out non-private tables.
+                       (lambda (name table &rest args) (not (random-table-private table))))))
+  ;; TODO: Consider allowing custom reporter as a function.  We already register
+  ;; it in the general case.
+  (apply random-table/reporter
+    (list expression (random-table/roll/expression expression))))
+
+(defvar random-table/reporter
+  #'random-table/reporter/as-kill-and-message
+  "The function takes two positional parameters:
+
+- EXPRESSION :: The text to evaluate for \"rolling\"
+- RESULT :: The results of those rolls.
+
+See `random-table/reporter/as-kill-and-message'.")
+
+(defun random-table/reporter/as-kill-and-message (expression result)
+  "Responsible for reporting the EXPRESSION and RESULT.
+
+See `random-table/reporter'."
+  (let ((text (format "%s :: %s" expression result)))
+    (kill-new text)
+    (message text)))
+
+(defun random-table/evaluate/table (table)
+  "Evaluate the random TABLE.
+
+See `random-table'."
+  (let* ((rolled (random-table/evaluate/table/roll table))
+          (name (random-table-name table))
+          (data (random-table-data table))
+          (filtered (apply (random-table-filter table) (-list rolled)))
+          (entry (if filtered (apply (random-table-fetcher table) (list data (-list filtered)))
+                   nil))
+          (results (or (when entry (random-table/roll/expression entry)) "")))
+    (remhash (random-table-name table) random-table/storage/results)
+    results))
+
+(defun random-table/evaluate/table/roll (table)
+  "Roll on the TABLE, favoring re-using and caching values.
+
+Why cache values?  Some tables you roll one set of dice and then
+use those dice to lookup on other tables."
+  (let ((results
+          (or (when-let ((reuse-table-name (random-table-reuse table)))
+                (or
+                  (gethash (intern reuse-table-name) random-table/storage/results)
+                  (random-table/evaluate/table/roll
+                    (random-table/storage/get-table reuse-table-name))))
+            (apply (random-table-roller table) (-list (random-table-data table))))))
+    (when-let ((stored-table-name (random-table-store table)))
+      (puthash (random-table-name table) results random-table/storage/results))
+    results))
+
+(defun random-table/roll/expression (expression)
+  (if-let* ((table (random-table/storage/get-table expression :allow_nil t)))
+    (random-table/evaluate/table table)
+    ;; We have specified a non-table; roll the expression.  We'll treat a non-escaped on as a dice expression.
+    (progn
+      (s-format (if (string-match-p "\\${" expression) expression (concat "${" expression "}"))
+        #'random-table/roll/expression/replacer))))
+
+(defun random-table/roll/expression/replacer (text)
+  "Roll the TEXT; either from a table or as a dice-expression.
+
+This is constructed as the replacer function of `s-format'."
+  (if-let ((table (random-table/storage/get-table text :allow_nil t)))
+    (random-table/evaluate/table table)
     (let ((result (org-d20--roll text)))
+      ;; Need to sniff out if org-d20--roll knew what to do.
       (if (or (not (s-present? (car result))) (string= (car result) "0"))
         text
         (format "%s" (cdr result))))))
 
+(cl-defun random-table/storage/get-table (value &key allow_nil)
+  "Coerce the given VALUE to a registered `random-table'.
 
-;; (random-table/register
-;;   :name "Oracle Question Result (Black Sword Hack)"
-;;   :data '((1 . "No and…")
-;;             (2 . "No")
-;;             (3 . "No but…")
-;;             (4 . "Yes but…")
-;;             (5 . "Yes")
-;;             (6 . "Yes and…")))
+When the given VALUE cannot be found in the
+`random-table/stroage/tables' registry we look to ALLOW_NIL.
 
-;; (random-table/register
-;;   :name "Oracle Unexpected Event (Black Sword Hack)"
-;;   :data
-;;   '((1 . "Very negative")
-;;      (2 . "Negative")
-;;      (3 . "Negative but…")
-;;      (4 . "Positive but…")
-;;      (5 . "Positive")
-;;      (6 . "Very Positive")))
+When ALLOW_NIL is non-nil, we return `nil' when no table is found
+in `random-table/stroage/tables' registry.
 
-(random-table/register
-  :name "Travel (Black Sword Hack)"
-  :data "\n  - Subject :: ${Travel > Subject (Black Sword Hack)}\n  - Theme :: ${Travel > Theme (Black Sword Hack)}")
+When ALLOW_NIL is `nil' we raise an `error' when no table was
+found in the `random-table/stroage/tables' registry."
+  (if-let ((table (cond
+    ((random-table-p value)
+      value)
+    ((symbolp value)
+      (gethash value random-table/storage/tables))
+    ((stringp value)
+      (gethash (intern value) random-table/storage/tables))
+    (t
+      (error "Expected %s to be a `random-table', `symbol', or `string' got %s."
+        value
+        (type-of value))))))
+    table
+    (unless allow_nil
+    (error "Could not find table %s; use `random-table/register'." value))))
 
-(random-table/register
-  :name "Travel > Theme (Black Sword Hack)"
-  :public nil
-  :data
-  '("Aggression" "Exchange" "Discovery" "Revelation" "Pursuit"
-     "Lost" "Isolation" "Death" "Escape" "Change"))
+;;; Register Tables
+(defun random-table/roll (expression)
+  "Evaluate the given EXPRESSION by \"rolling\" it.
 
-(random-table/register
-  :name "Travel > Subject (Black Sword Hack)"
-  :public nil
-  :data
-  '("Antagonist" "Animal" "Hermit" "Spirit" "Potentate"
-     "Demon" "Explorer" "Merchant" "Caves" "Messenger"
-     "Ruins" "Cult" "Community" "Ghost" "Outlaws"
-     "Artists" "Soldiers" "Sorcerer" "Vagrant" "Natural disaster"))
+This can either be a named table or a general expression (e.g. 2d6).
 
-(random-table/register
-  :name "Keepsakes (Errant)"
+Or a combination of multiple tables.
+
+We report that function via `#'random-table/reporter'."
+  (interactive (list (completing-read "Expression: "
+                       random-table/storage/tables
+                       ;; Predicate that filters out non-private tables.
+                       (lambda (name table &rest args) (not (random-table-private table))))))
+  ;; TODO: Consider allowing custom reporter as a function.  We already register
+  ;; it in the general case.
+  (apply random-table/reporter
+    (list expression (random-table/roll/expression expression))))
+
+;;;; Errant
+(random-table/register :name "Keepsakes (Errant)"
   :data '("The sword of the hero Black Mask. Useless, but looks really cool."
            "Big, floppy cork hat. Waterproof."
            "Strange pair of boots, with four wheels attached to each sole."
@@ -264,8 +332,7 @@ The CONTAINER determines the scope."
            "Jar of sweet, sticky honey."
            "Set of loaded dice."))
 
-(random-table/register
-  :name "Failed Professions (Errant)"
+(random-table/register :name "Failed Professions (Errant)"
   :data
   '("Acrobat" "Alewife" "Antiquarian" "Apothecary" "Armpit-hair plucker"
      "Baker" "Ball-fetcher" "Barber" "Barrel maker" "Beadle"
@@ -288,6 +355,46 @@ The CONTAINER determines the scope."
      "Toad doctor" "Tosher" "Town crier" "Urinatores" "Usurer"
      "Water carrier" "Wheelwright" "Whipping boy" "Whiffler" "Worm rancher"))
 
+;;;; Black Sword Hack
+(random-table/register :name "Travel Event (Black Sword Hack)"
+  :data "\n  - Subject :: ${Travel Event > Subject (Black Sword Hack)}\n  - Theme :: ${Travel Event > Theme (Black Sword Hack)}")
+
+(random-table/register :name "Travel Event > Theme (Black Sword Hack)"
+  :private t
+  :data
+  '("Aggression" "Exchange" "Discovery" "Revelation" "Pursuit"
+     "Lost" "Isolation" "Death" "Escape" "Change"))
+
+(random-table/register :name "Travel Event > Subject (Black Sword Hack)"
+  :private t
+  :data
+  '("Antagonist" "Animal" "Hermit" "Spirit" "Potentate"
+     "Demon" "Explorer" "Merchant" "Caves" "Messenger"
+     "Ruins" "Cult" "Community" "Ghost" "Outlaws"
+     "Artists" "Soldiers" "Sorcerer" "Vagrant" "Natural disaster"))
+
+(random-table/register :name "Oracle Event (Black Sword Hack)"
+  :data '("\n  - Theme :: ${Oracle Event > Theme (Black Sword Hack)}\n  - Subject :: ${Oracle Event > Subject (Black Sword Hack)}"))
+
+(random-table/register :name "Oracle Event > Theme (Black Sword Hack)"
+  :private t
+  :data
+  '("Death" "Treachery" "Infiltration" "Desperation" "Instability" "Suspicion"
+     "Escape" "Fear" "Hunt" "Division" "Falsehood" "Celebration"
+     "Conquest" "Friendship" "Love" "Sacrifice" "Decay" "Exile"
+     "Revenge" "Greed" "Isolation" "Preservation" "Loss" "Rebirth"
+     "Oppression" "Destruction" "Ignorance" "Purification" "Scarcity" "Quest"
+     "Stagnation" "Redemption" "Failure" "Help" "Corruption" "Rebellion"))
+
+(random-table/register :name "Oracle Event > Subject (Black Sword Hack)"
+  :private t
+  :data
+  '("Army" "Church" "Ghost" "Nobility" "Otherworldly" "Plague"
+     "Omen" "Ally" "Family" "Wizard" "Guild" "Architect"
+     "Crusaders" "Vagrant" "Rival" "Artefact" "Messenger" "Inquisitors"
+     "Ruins" "Knowledge" "Cave" "Dream" "Hamlet" "Outlaws"
+     "Healers" "Cult" "Guardian" "Settlers" "Monument" "Food"
+     "Judges" "Storm" "Demon" "Court" "Theatre" "Assassins"))
 
 (defconst jf/gaming/black-sword-hack/table/oracle-question-likelihood
   '(("Don't think so" . (lambda () (cl-sort (list (+ 1 (random 6)) (+ 1 (random 6)) (+ 1 (random 6))) #'<)))
@@ -297,132 +404,36 @@ The CONTAINER determines the scope."
      ("Definitely". (lambda () (cl-sort (list (+ 1 (random 6)) (+ 1 (random 6)) (+ 1 (random 6))) #'>))))
   "The table of options and encoded dice rolls for question likelihoods.
 
+Note, that the first dice in the returned list is either the
+greatest or least; the dice are correctly sorted for picking the
+first most dice for results.  Othertimes, we inspect the dice
+rolls.
+
 From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
-(transient-define-suffix jf/gaming/black-sword-hack/table/oracle-response (question likelihood)
-  "The Dark God's Oracle answers the QUESTION for the LIKELIHOOD."
-  :description "Dark God’s Oracle Answer…"
-  (interactive (list
-                 (read-string "Yes/No Question: ")
-                 (completing-read "Likelihood: " jf/gaming/black-sword-hack/table/oracle-question-likelihood nil t)))
-  (let* ((dice (funcall (alist-get likelihood jf/gaming/black-sword-hack/table/oracle-question-likelihood nil nil #'string=)))
-          (answer (alist-get (car dice) jf/gaming/black-sword-hack/table/oracle-question-result))
-          (unexpected (alist-get (car (list-utils-dupes dice)) jf/gaming/black-sword-hack/table/oracle-unexpected-event))
-          (response (concat "- Question :: " question "\n"
-                      "- Answer :: "  answer "\n"
-                      (when unexpected (concat "- Unexpected Event :: " unexpected "\n"))
-                      "- Dice :: " (format "%s" dice))))
-    (kill-new response)
-    (message response)))
 
-;;; Black Sword Hack
-(random-table/register
-  :name "Oracle Event (Black Sword Hack)"
-  :data '("\n  - Theme :: ${Oracle Event > Theme (Black Sword Hack)}\n  - Subject :: ${Oracle Event > Subject (Black Sword Hack)}"))
+(defun random-table/roller/oracle-question (table)
+  (let ((likelihood (completing-read "Likelihood: " jf/gaming/black-sword-hack/table/oracle-question-likelihood nil t)))
+    (funcall (alist-get likelihood jf/gaming/black-sword-hack/table/oracle-question-likelihood nil nil #'string=))))
 
-(random-table/register
-  :name "Oracle Event > Theme (Black Sword Hack)"
-  :public nil
-  :data
-  '("Death" "Treachery" "Infiltration" "Desperation" "Instability" "Suspicion"
-     "Escape" "Fear" "Hunt" "Division" "Falsehood" "Celebration"
-     "Conquest" "Friendship" "Love" "Sacrifice" "Decay" "Exile"
-     "Revenge" "Greed" "Isolation" "Preservation" "Loss" "Rebirth"
-     "Oppression" "Destruction" "Ignorance" "Purification" "Scarcity" "Quest"
-     "Stagnation" "Redemption" "Failure" "Help" "Corruption" "Rebellion"))
-
-(random-table/register
-  :name "Oracle Event > Subject (Black Sword Hack)"
-  :public nil
-  :data
-  '("Army" "Church" "Ghost" "Nobility" "Otherworldly" "Plague"
-     "Omen" "Ally" "Family" "Wizard" "Guild" "Architect"
-     "Crusaders" "Vagrant" "Rival" "Artefact" "Messenger" "Inquisitors"
-     "Ruins" "Knowledge" "Cave" "Dream" "Hamlet" "Outlaws"
-     "Healers" "Cult" "Guardian" "Settlers" "Monument" "Food"
-     "Judges" "Storm" "Demon" "Court" "Theatre" "Assassins"))
-
-(random-table/register
-  :name "Oracle Question (Black Sword Hack)"
+(random-table/register :name "Oracle Question (Black Sword Hack)"
+  :roller #'random-table/roller/oracle-question
   :data '("${Oracle Question > Answer (Black Sword Hack)}${Oracle Question > Unexpected Event (Black Sword Hack)}")
-  :store t
-  ;; :fetcher #'random-table/fetcher/black-sword-hack-oracle
   :store t)
 
-(random-table/register
-  :name "Oracle Question > Answer (Black Sword Hack)"
-  :public nil
+(random-table/register :name "Oracle Question > Answer (Black Sword Hack)"
   :reuse "Oracle Question (Black Sword Hack)"
-  :filter (lambda (dice) "We have a pool of dice to pick one." (car dice))
+  :private t
+  :filter (lambda (&rest dice) "We have a pool of dice to pick one." (car (-list dice)))
   :data '("No and…" "No" "No but…" "Yes but…" "Yes" "Yes and…"))
 
-(random-table/register
-  :name "Oracle Question > Unexpected Event (Black Sword Hack)"
+(random-table/register :name "Oracle Question > Unexpected Event (Black Sword Hack)"
   :reuse "Oracle Question (Black Sword Hack)"
-  :public nil
-  :filter (lambda (dice) "We have a pool of dice to determine if there are dupes."
+  :private t
+  :filter (lambda (&rest dice) "We have a pool of dice to determine if there are dupes."
             (car (list-utils-dupes (-list dice))))
   :fetcher (lambda (table index)
-             (when index (concat " with unexpected event of " (nth (- index 1) table))))
+             (when index (concat " with unexpected \"" (nth (- (car (-list index)) 1) table) "\" event")))
   :data '("Very negative" "Negative" "Negative but…" "Positive but…" "Positive" "Very Positive"))
 
-(defvar random-table/roll/reporter
-  #'random-table/roll/reporter/as-kill-and-message
-  "The function takes two positional parameters:
-
-- EXPRESSION :: The text to evaluate for \"rolling\"
-- RESULT :: The results of those rolls.
-
-See `random-table/roll/reporter/as-kill-and-message'.")
-
-(defun random-table/roll/reporter/as-kill-and-message (expression result)
-  "Responsible for reporting the EXPRESSION and RESULT.
-
-See `random-table/roll/reporter'."
-  (let ((text (format "%s :: %s" expression result)))
-    (kill-new text)
-    (message text)))
-
-(defun random-table/evaluate/table (table)
-  "Evaluate the random TABLE.
-
-See `random-table'."
-  (let* ((rolled (random-table/evaluate/table/roll table))
-          (data (random-table-data table))
-          (filtered (apply (random-table-filter table) (-list rolled)))
-          (entry (apply (random-table-fetcher table) (list data (-list filtered))))
-          (results (when entry (random-table/roll-expression entry))))
-    (remhash (random-table-name table) random-table/storage/results)
-    results))
-
-(defun random-table/evaluate/table/roll (table)
-  (let ((results
-          (or (when-let ((reuse-name (random-table-reuse table)))
-                (or (gethash (intern reuse-name) random-table/storage/tables)
-                  (random-table/evaluate/table/roll (intern reuse-name))))
-            (apply (random-table-roller table) (-list (random-table-data table))))))
-    (when (random-table-store table)
-      (puthash (random-table-name table) results random-table/storage/results))
-    results))
-
-(defun random-table/roll (expression)
-  "Evaluate the given EXPRESSION by \"rolling\" it.
-
-This can either be a named table or a general expression (e.g. 2d6).
-
-Or a combination of multiple tables.
-
-We report that function via `#'random-table/roll/reporter'."
-  (interactive (list (completing-read "Expression: "
-                       random-table/storage/tables
-                       ;; Predicate, keep only the public tables.
-                       (lambda (name table &rest args) (random-table-public table)))))
-  ;; TODO: convert the message to a function
-  (apply random-table/roll/reporter
-    (list expression (random-table/roll-expression expression))))
-
-(defun random-table/roll-expression (expression)
-  (if-let* ((table (gethash (intern expression) random-table/storage/tables)))
-    (random-table/evaluate/table table)
-    ;; We have specified a non-table; roll the expression.  We'll treat a non-escaped on as a dice expression.
-    (s-format (if (string-match-p "\\${" expression) expression (concat "${" expression "}"))
-      #'random-table/storage/tables/roll-on/via-interpolation)))
+(provide 'jf-tables)
+;;; jf-tables.el ends here
