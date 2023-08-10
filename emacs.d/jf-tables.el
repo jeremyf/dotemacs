@@ -115,6 +115,23 @@ When POSITION is not given, choose a random element from the TABLE."
     (nth (- position 1) data)
     (seq-random-elt data)))
 
+(defvar random-table/reporter
+  #'random-table/reporter/as-kill-and-message
+  "The function takes two positional parameters:
+
+- EXPRESSION :: The text to evaluate for \"rolling\"
+- RESULT :: The results of those rolls.
+
+See `random-table/reporter/as-kill-and-message'.")
+
+(defun random-table/reporter/as-kill-and-message (expression result)
+  "Responsible for reporting the EXPRESSION and RESULT.
+
+See `random-table/reporter'."
+  (let ((text (format "%s :: %s" expression result)))
+    (kill-new text)
+    (message text)))
+
 ;;;; Interactive
 (defun random-table/roll (text)
   "Evaluate the given TEXT by \"rolling\" it.
@@ -133,22 +150,27 @@ We report that function via `#'random-table/reporter'."
   (apply random-table/reporter
     (list text (random-table/roll/text text))))
 
-(defvar random-table/reporter
-  #'random-table/reporter/as-kill-and-message
-  "The function takes two positional parameters:
+;; TODO Rename this; I'm not satisfied and want to refactor.
+(defun random-table/roll/text (text)
+  "Roll the given TEXT; either by evaluating as a `random-table' or via `s-format'."
+  (if-let* ((table (random-table/get-table text :allow_nil t)))
+    (random-table/evaluate/table table)
+    ;; We have specified a non-table; roll the text.  We'll treat a non-escaped on as a dice text.
+    (progn
+      (s-format (if (string-match-p "\\${" text) text (concat "${" text "}"))
+        #'random-table/roll/text/replacer))))
 
-- EXPRESSION :: The text to evaluate for \"rolling\"
-- RESULT :: The results of those rolls.
+(defun random-table/roll/text/replacer (text)
+  "Roll the TEXT; either from a table or as a dice-expression.
 
-See `random-table/reporter/as-kill-and-message'.")
-
-(defun random-table/reporter/as-kill-and-message (expression result)
-  "Responsible for reporting the EXPRESSION and RESULT.
-
-See `random-table/reporter'."
-  (let ((text (format "%s :: %s" expression result)))
-    (kill-new text)
-    (message text)))
+This is constructed as the replacer function of `s-format'."
+  (if-let ((table (random-table/get-table text :allow_nil t)))
+    (random-table/evaluate/table table)
+    (let ((result (org-d20--roll text)))
+      ;; Need to sniff out if org-d20--roll knew what to do.
+      (if (or (not (s-present? (car result))) (string= (car result) "0"))
+        text
+        (format "%s" (cdr result))))))
 
 (defun random-table/evaluate/table (table)
   "Evaluate the random TABLE.
@@ -174,35 +196,13 @@ use those dice to lookup on other tables."
                 (or
                   (gethash (intern reuse-table-name) random-table/storage/results)
                   (random-table/evaluate/table/roll
-                    (random-table/storage/get-table reuse-table-name))))
+                    (random-table/get-table reuse-table-name))))
             (apply (random-table-roller table) (-list (random-table-data table))))))
     (when-let ((stored-table-name (random-table-store table)))
       (puthash (random-table-name table) results random-table/storage/results))
     results))
 
-;; TODO Rename this; I'm not satisfied and want to refactor.
-(defun random-table/roll/text (text)
-  "Roll the given TEXT; either by evaluating as a `random-table' or via `s-format'."
-  (if-let* ((table (random-table/storage/get-table text :allow_nil t)))
-    (random-table/evaluate/table table)
-    ;; We have specified a non-table; roll the text.  We'll treat a non-escaped on as a dice text.
-    (progn
-      (s-format (if (string-match-p "\\${" text) text (concat "${" text "}"))
-        #'random-table/roll/text/replacer))))
-
-(defun random-table/roll/text/replacer (text)
-  "Roll the TEXT; either from a table or as a dice-expression.
-
-This is constructed as the replacer function of `s-format'."
-  (if-let ((table (random-table/storage/get-table text :allow_nil t)))
-    (random-table/evaluate/table table)
-    (let ((result (org-d20--roll text)))
-      ;; Need to sniff out if org-d20--roll knew what to do.
-      (if (or (not (s-present? (car result))) (string= (car result) "0"))
-        text
-        (format "%s" (cdr result))))))
-
-(cl-defun random-table/storage/get-table (value &key allow_nil)
+(cl-defun random-table/get-table (value &key allow_nil)
   "Coerce the given VALUE to a registered `random-table'.
 
 When the given VALUE cannot be found in the
@@ -440,6 +440,149 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
   :fetcher (lambda (table index)
              (when index (concat " with unexpected \"" (nth (- (car (-list index)) 1) table) "\" event")))
   :data '("Very negative" "Negative" "Negative but…" "Positive but…" "Positive" "Very Positive"))
+
+(random-table/register :name "Arabic Name"
+  :data '("${Arabic Name > Male Given Name} ${Arabic Name > Surname}"
+           "${Arabic Name > Female Given Name} ${Arabic Name > Surname}"))
+
+(random-table/register :name "Arabic Name > Male Given Name"
+  :private t
+  :data '("Aamir" "Ayub" "Binyamin" "Efraim" "Ibrahim"
+           "Ilyas" "Ismail" "Jibril" "Jumanah" "Kazi"
+           "Lut" "Matta" "Mohammed" "Mubarak" "Mustafa"
+           "Nazir" "Rahim" "Reza" "Sharif" "Taimur"
+           "Usman" "Yakub" "Yusuf" "Zakariya" "Zubair"))
+
+(random-table/register :name "Arabic Name > Female Given Name"
+  :private t
+  :data '("Aisha" "Alimah" "Badia" "Bisharah" "Chanda"
+           "Daliya" "Fatimah" "Ghania" "Halah" "Kaylah"
+           "Khayrah" "Layla" "Mina" "Munisa" "Mysha"
+           "Naimah" "Nissa" "Nura" "Parveen" "Rana"
+           "Shalha" "Suhira" "Tahirah" "Yasmin" "Zulehka"))
+
+(random-table/register :name "Arabic Name > Surname"
+  :private t
+  :data '("Abdel" "Awad" "Dahhak" "Essa" "Hanna"
+           "Harbi" "Hassan" "Isa" "Kasim" "Katib"
+           "Khalil" "Malik" "Mansoor" "Mazin" "Musa"
+           "Najeeb" "Namari" "Naser" "Rahman" "Rasheed"
+           "Saleh" "Salim" "Shadi" "Sulaiman" "Tabari"))
+
+(random-table/register :name "Item, Fantasy"
+  :private t
+  :data '("Weapon" "Potion" "Scroll" "Armor" "Book"
+           "Map" "Jewel" "Device" "Note" "Container"
+           "Letter" "Amulet" "Ring" "Promissory" "Glasses"
+           "Key" "Ingredient" "Poison" "Drug" "Pet"))
+
+(random-table/register :name "Corporation, Sci-Fi"
+  :data '("- Name :: ${Corporation, Sci-Fi > Prefix} ${Corporation, Sci-Fi > Suffix}\n- Rumor :: ${Corporation, Sci-Fi > Rumor}"))
+
+(random-table/register :name "Corporation, Sci-Fi > Prefix"
+  :private t
+  :data '("Ad Astra" "Colonial" "Compass" "Daybreak" "Frontier"
+           "Guo Yin" "Highbeam" "Imani" "Magnus" "Meteor"
+           "Neogen" "New Dawn" "Omnitech" "Outertech" "Overwatch"
+           "Panstellar" "Shogun" "Silverlight" "Spiker" "Stella"
+           "Striker" "Sunbeam" "Terra Prime" "Wayfarer" "West Wind"))
+
+(random-table/register :name "Corporation, Sci-Fi > Suffix"
+  :private t
+  :data '("Alliance" "Association" "Band" "Circle" "Clan"
+           "Combine" "Company" "Cooperative" "Corporation" "Enterprises"
+           "Faction" "Group" "Megacorp" "Multistellar" "Organization"
+           "Outfit" "Pact" "Partnership" "Ring" "Society"
+           "Sodality" "Syndicate" "Union" "Unity" "Zaibatsu"))
+
+(random-table/register :name "Corporation, Sci-Fi > Rumor"
+  :private t
+  :data
+  '("Reckless with the lives of their employees"
+     "Have a dark secret about their board of directors"
+     "Notoriously xenophobic towards aliens"
+     "Lost much money to an embezzler who evaded arrest"
+     "Reliable and trustworthy goods"
+     "Stole a lot of R&D from a rival corporation"
+     "They have high-level political connections"
+     "Rumored cover-up of a massive industrial accident"
+     "Stodgy and very conservative in their business plans"
+     "Stodgy and very conservative in their business plans"
+     "The company’s owner is dangerously insane"
+     "Rumored ties to a eugenics cult"
+     "Said to have a cache of pretech equipment"
+     "Possibly teetering on the edge of bankruptcy"
+     "Front for a planetary government’s espionage arm"
+     "Secretly run by a psychic cabal"
+     "Secretly run by hostile aliens"
+     "Secretly run by an unbraked AI"
+     "They’ve turned over a new leaf with the new CEO"
+     "Deeply entangled with the planetary underworl"))
+
+(random-table/register :name "Heresy"
+  :data '("\n- Founder :: ${Heresy > Founder}\n- Major Heresy :: ${Heresy > Major Heresy}\n- Attitude :: ${Heresy > Attitude}\n- Quirk :: ${Heresy > Quirk}"))
+
+(random-table/register :name "Heresy > Founder"
+  :private t
+  :data '("Defrocked clergy: founded by a cleric outcast from the faith."
+           "Frustrated layman: founded by a layman frustrated with the faith’s decadence rigidity or lack of authenticity."
+           "Renegade prophet: founded by a revered holy figure who broke with the faith."
+           "High prelate: founded by an important and powerful cleric to convey his or her beliefs."
+           "Dissatisfied minor clergy: founded by a minor cleric frustrated with the faith’s current condition."
+           "Outsider: founded by a member of another faith deeply influenced by the parent religion."
+           "Academic: founded by a professor or theologian on intellectual grounds."
+           "Accidental: the founder never meant their works to be taken that way."))
+
+(random-table/register :name "Heresy > Major Heresy"
+  :private t
+  :data '("Manichaeanism: the sect believes in harsh austerities and rejection of matter as something profane and evil."
+           "Donatism: the sect believes that clergy must be personally pure and holy in order to be legitimate."
+           "Supercessionism: the sect believes the founder or some other source supercedes former scripture or tradition."
+           "Antinomianism: the sect believes that their holy persons are above any earthly law and may do as they will."
+           "Universal priesthood: the sect believes that there is no distinction between clergy and layman and that all functions of the faith may be performed by all members."
+           "Conciliarism: the sect believes that the consensus of believers may correct or command even the clerical leadership of the faith."
+           "Ethnocentrism: the sect believes that only a particular ethnicity or nationality can truly belong to the faith."
+           "Separatism: the sect believes members should shun involvement with the secular world."
+           "Stringency: the sect believes that even minor sins should be punished and major sins should be capital crimes."
+           "Syncretism: the sect has added elements of another native faith to their beliefs."
+           "Primitivism: the sect tries to recreate what they imagine was the original community of faith."
+           "Conversion by the sword: unbelievers must be brought to obedience to the sect or be granted death."))
+
+(random-table/register :name "Heresy > Attitude"
+  :private t
+  :data '("Filial: the sect honors and respects the orthodox faith, but feels it is substantially in error."
+           "Anathematic: the orthodox are spiritually worse than infidels, and their ways must be avoided at all costs."
+           "Evangelical: the sect feels compelled to teach the orthodox the better truth of their ways."
+           "Contemptuous: the orthodox are spiritually lost and ignoble."
+           "Aversion: the sect wishes to shun and avoid the orthodox."
+           "Hatred: the sect wishes the death or conversion of the orthodox."
+           "Indifference: the sect has no particular animus or love for the orthodox."
+           "Obedience: the sect feels obligated to obey the orthodox hierarchy in all matters not related to their specific faith."
+           "Legitimist: the sect views itself as the \true\" orthodox faith and the present orthodox hierarchy as pretenders to their office."
+           "Purificationist: the sect’s austerities, sufferings, and asceticisms are necessary to purify the orthodox."))
+
+(random-table/register :name "Heresy > Quirk"
+  :private t
+  :data '("Clergy of only one gender"
+           "Dietary prohibitions"
+           "Characteristic item of clothing or jewelry"
+           "Public prayer at set times or places"
+           "Forbidden to do something commonly done"
+           "Anti-intellectual deploring secular learning"
+           "Mystical seeking union with God through meditation"
+           "Lives in visibly distinct houses or districts"
+           "Has a language specific to the sect"
+           "Greatly respects learning and education"
+           "Favors specific colors or symbols"
+           "Has unique purification rituals"
+           "Always armed"
+           "Forbids marriage or romance outside the sect"
+           "Will not eat with people outside the sect"
+           "Must donate labor or tithe money to the sect"
+           "Special friendliness toward another faith or ethnicity"
+           "Favors certain professions for their membership"
+           "Vigorous charity work among unbelievers"
+           "Forbidden the use of certain technology"))
 
 (provide 'jf-tables)
 ;;; jf-tables.el ends here
