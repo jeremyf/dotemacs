@@ -20,6 +20,17 @@
 ;; - (random-table/roll "2d6") will roll 2 six-sided dice.
 ;; - (random-table/roll "There are ${2d6} orcs.") will roll 2 six-sided dice and
 ;;   output the sentence "There are 7 orcs."
+;;
+;; Tables can reference other tables, using the above string interpolation
+;; (e.g. "Roll on ${Your Table}" where "Your Table" is the name of a registered
+;; table.).  No considerations have been made to check for cyclical references,
+;; you my dear human reader, must account for that.  An example is the
+;; "Oracle Question (Black Sword Hack)" table.  It has one entry:
+;;
+;; "${Oracle Question > Answer (Black Sword Hack)}${Oracle Question > Unexpected Event (Black Sword Hack)}".
+;;
+;; When we roll "Oracle Question (Black Sword Hack)", we then roll on the two
+;; sub-tables.
 
 ;;; Code:
 
@@ -31,9 +42,11 @@
 (cl-defstruct random-table
   "The definition of a structured random table.
 
-The slots are:
-
 I roll the dice, filter the results, and fetch from the table.
+The `random-table/evaluate/table' defines the steps we take to
+\"roll on the table.\"
+
+The slots are:
 
 - :name :: the human readable and reference-able name (used for
   completing read and the key for the table storage).
@@ -44,10 +57,12 @@ I roll the dice, filter the results, and fetch from the table.
 - :roller :: function to roll dice and return list of dice results.
 - :filter :: function to filter the list of dice.
 - :fetcher :: function that takes two positional arguments (see
-  `random-table/fetcher/default'.)
+  `random-table/fetcher/default'.); it is used to fetch the correct entry
+  from the table.
 - :private :: when true, do not show in list of rollable tables.
-- :store :: do we store this value for later lookup during an
-  evaluation of this table?
+- :store :: When non-nil, we store the roller's value for the
+  duration of the table evaluation.  Useful for when you have one
+  roll that you use for multiple tables.
 - :reuse :: the :name of a table's stored dice results.
 
 About :reuse and :store
@@ -101,10 +116,10 @@ When POSITION is not given, choose a random element from the TABLE."
     (seq-random-elt data)))
 
 ;;;; Interactive
-(defun random-table/roll (expression)
-  "Evaluate the given EXPRESSION by \"rolling\" it.
+(defun random-table/roll (text)
+  "Evaluate the given TEXT by \"rolling\" it.
 
-This can either be a named table or a general expression (e.g. 2d6).
+This can either be a named table or a general text (e.g. 2d6).
 
 Or a combination of multiple tables.
 
@@ -116,7 +131,7 @@ We report that function via `#'random-table/reporter'."
   ;; TODO: Consider allowing custom reporter as a function.  We already register
   ;; it in the general case.
   (apply random-table/reporter
-    (list expression (random-table/roll/expression expression))))
+    (list text (random-table/roll/text text))))
 
 (defvar random-table/reporter
   #'random-table/reporter/as-kill-and-message
@@ -138,14 +153,14 @@ See `random-table/reporter'."
 (defun random-table/evaluate/table (table)
   "Evaluate the random TABLE.
 
-See `random-table'."
+See `random-table'.  "
   (let* ((rolled (random-table/evaluate/table/roll table))
           (name (random-table-name table))
           (data (random-table-data table))
           (filtered (apply (random-table-filter table) (-list rolled)))
           (entry (if filtered (apply (random-table-fetcher table) (list data (-list filtered)))
                    nil))
-          (results (or (when entry (random-table/roll/expression entry)) "")))
+          (results (or (when entry (random-table/roll/text entry)) "")))
     (remhash (random-table-name table) random-table/storage/results)
     results))
 
@@ -165,15 +180,17 @@ use those dice to lookup on other tables."
       (puthash (random-table-name table) results random-table/storage/results))
     results))
 
-(defun random-table/roll/expression (expression)
-  (if-let* ((table (random-table/storage/get-table expression :allow_nil t)))
+;; TODO Rename this; I'm not satisfied and want to refactor.
+(defun random-table/roll/text (text)
+  "Roll the given TEXT; either by evaluating as a `random-table' or via `s-format'."
+  (if-let* ((table (random-table/storage/get-table text :allow_nil t)))
     (random-table/evaluate/table table)
-    ;; We have specified a non-table; roll the expression.  We'll treat a non-escaped on as a dice expression.
+    ;; We have specified a non-table; roll the text.  We'll treat a non-escaped on as a dice text.
     (progn
-      (s-format (if (string-match-p "\\${" expression) expression (concat "${" expression "}"))
-        #'random-table/roll/expression/replacer))))
+      (s-format (if (string-match-p "\\${" text) text (concat "${" text "}"))
+        #'random-table/roll/text/replacer))))
 
-(defun random-table/roll/expression/replacer (text)
+(defun random-table/roll/text/replacer (text)
   "Roll the TEXT; either from a table or as a dice-expression.
 
 This is constructed as the replacer function of `s-format'."
@@ -212,22 +229,11 @@ found in the `random-table/stroage/tables' registry."
     (error "Could not find table %s; use `random-table/register'." value))))
 
 ;;; Register Tables
-(defun random-table/roll (expression)
-  "Evaluate the given EXPRESSION by \"rolling\" it.
-
-This can either be a named table or a general expression (e.g. 2d6).
-
-Or a combination of multiple tables.
-
-We report that function via `#'random-table/reporter'."
-  (interactive (list (completing-read "Expression: "
-                       random-table/storage/tables
-                       ;; Predicate that filters out non-private tables.
-                       (lambda (name table &rest args) (not (random-table-private table))))))
-  ;; TODO: Consider allowing custom reporter as a function.  We already register
-  ;; it in the general case.
-  (apply random-table/reporter
-    (list expression (random-table/roll/expression expression))))
+(cl-defun random-table/register (&rest kws &key name data &allow-other-keys)
+  "Store the DATA, NAME, and KWS in a `random-table'."
+  (let* ((key (intern name))
+          (struct (apply #'make-random-table :name key :data (-list data) kws)))
+    (puthash key struct random-table/storage/tables)))
 
 ;;;; Errant
 (random-table/register :name "Keepsakes (Errant)"
