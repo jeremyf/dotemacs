@@ -101,7 +101,7 @@
      ("j g" "Global Mark" consult-global-mark)
      ("j h" "Hugo File" jf/jump_to_corresponding_hugo_file :if-derived org-mode)
      ("j m" "Mark" consult-mark)
-     ("j p" "Jump in Pull requests" jf/org-mode/open-all-unresolved-pull-requests)
+     ;; ("j p" "Jump in Pull requests" jf/org-mode/open-all-unresolved-pull-requests)
      ("j r" "Jump to Git Related" consult-git-related-find-file)
      ("j l" "Jump to Magit Project Lists" magit-list-repositories)
      ;; ("j s" "Jump to Shortdoc" shortdoc-display-group)

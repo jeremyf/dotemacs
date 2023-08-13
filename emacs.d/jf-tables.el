@@ -30,7 +30,7 @@
 ;; "${Oracle Question > Answer (Black Sword Hack)}${Oracle Question > Unexpected Event (Black Sword Hack)}".
 ;;
 ;; When we roll "Oracle Question (Black Sword Hack)", we then roll on the two
-;; sub-tables.
+;; sub-tables.  Which can also leverage the template interpolation.
 
 ;;; Code:
 
@@ -420,6 +420,12 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
 (defun random-table/roller/oracle-question (table)
   (let ((likelihood (completing-read "Likelihood: " jf/gaming/black-sword-hack/table/oracle-question-likelihood nil t)))
     (funcall (alist-get likelihood jf/gaming/black-sword-hack/table/oracle-question-likelihood nil nil #'string=))))
+
+(random-table/register :name "Attributes (OSR)"
+  :data '("\n- Strength :: ${3d6}\n- Dexterity :: ${3d6}\n- Constitution :: ${3d6}\n- Intelligence :: ${3d6}\n- Wisdom :: ${3d6}\n- Charisma :: ${3d6}"))
+
+(random-table/register :name "Attributes (Black Sword Hack)"
+  :data '("\n- Strength :: ${4d4}\n- Dexterity :: ${4d4}\n- Constitution :: ${4d4}\n- Intelligence :: ${4d4}\n- Wisdom :: ${4d4}\n- Charisma :: ${4d4}"))
 
 (random-table/register :name "Oracle Question (Black Sword Hack)"
   :roller #'random-table/roller/oracle-question
