@@ -652,7 +652,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
 ;;;; Herbalist's Primer
 
 (random-table/register :name "Plant (Herbalist's Primer)"
-  :data '("${Plant > Name Prefix (Herbalist's Primer)}${Plant > Name Suffix (Herbalist's Primer)} is ${Plant > Rarity (Herbalist's Primer)} ${Plant > Habit (Herbalist's Primer)}, mostly prized for its ${Plant > Properties (Herbalist's Primer)} value.  It is a native to the ${Plant > Climate (Herbalist's Primer)} ${Plant > Biome (Herbalist's Primer)}.  Interestingly, it ${Plant > Quirk (Herbalist's Primer)}."))
+  :data '("${Plant > Name Prefix (Herbalist's Primer)}${Plant > Name Suffix (Herbalist's Primer)} is ${Plant > Rarity (Herbalist's Primer)} ${Plant > Habit (Herbalist's Primer)}, mostly prized for its ${Plant > Properties (Herbalist's Primer)} value.  It is a native to the ${Plant > Climate (Herbalist's Primer)} ${Plant > Biome (Herbalist's Primer)}.  Interestingly, it ${Plant > Quirk (Herbalist's Primer)}.${Plant > Property Description (Herbalist's Primer)}"))
 
 (random-table/register :name "Plant > Name Prefix (Herbalist's Primer)"
   :private t
@@ -676,6 +676,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
 
 (random-table/register :name "Plant > Properties (Herbalist's Primer)"
   :private t
+  :store t
   :data '("culinary" "industrial" "magical" "medicinal" "ornamental" "poisonous"))
 
 (random-table/register :name "Plant > Climate (Herbalist's Primer)"
@@ -690,7 +691,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
   :data '("caves" "deserts" "forests" "gardens" "hills"
            "lakes" "meadows" "mountains" "plains" "plantations"
            "riverbanks" "roadsides" "seas" "shores" "shrublands"
-           "streams" "swamps" "urban areas" "volanoes" "wastes"))
+           "streams" "swamps" "urban areas" "volcanoes" "wastes"))
 
 (random-table/register :name "Plant > Quirk (Herbalist's Primer)"
   :private t
@@ -699,6 +700,78 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "grows almost entirely underground" "only blooms at night" "is poisonous to other plants" "causes a strong allergic reaction" "produces a lot of pollen"
            "attracts all kinds of insects" "is a favorite snack of many animals" "often hosts bird nests" "has a lovely, sweet flavor" "grows incredibly fast"))
 
+(random-table/register :name "Plant > Property Description (Herbalist's Primer)"
+  :reuse "Plant > Properties (Herbalist's Primer)"
+  :private t
+  :data '("C" ;; culinary
+           nil ;; industrial
+           "M" ;; magical
+           "M" ;; medicinal
+           nil ;; ornamental
+           "P" ;; poisonous
+           ))
 
+(random-table/register :name "Plant > Material (Herbalist's Primer)"
+  :private t
+  :data '("balsam" "bark" "bulbs" "buds" "cones"
+           "flowers" "fruits" "galls" "gum" "juice"
+           "leaves" "petals" "pollen" "resin" "rhizomes"
+           "root" "seeds" "stems" "timber" "tubers"))
+
+(random-table/register :name "Plant > Method (Herbalist's Primer)"
+  :private t
+  :data '("applied to an inanimate object" "burned as incenses" "carried" "chewed" "distilled"
+           "drank as tea" "grown" "held under the tongue" "ingested" "juiced and injected"
+           "mixed with alchohol" "place under a pillow" "powdered and inhaled" "rubbed on skin" "scattered on the wind"
+           "sewn inside clothing" "swallowed whole" "thrown at a target" "torn or shredded" "worn"))
+
+(random-table/register :name "Plant > Effect > Medicinal (Herbalist's Primer)"
+  :private t
+  :data '("aid digestion" "alleviate allergy" "cure wounds" "destroy viruses" "fight the flu"
+           "improve focus" "kill bacteria" "lower blood pressure" "mend bones" "neutralize poison"
+           "reduce inflammation" "remove itching" "remove nausea" "remove pain" "sanitize the wound"
+           "soothe the skin" "stop bleeding" "stop cough" "strengthen the heart" "strenthen the immune system"))
+
+(random-table/register :name "Plant > Effect > Poisonous (Herbalist's Primer)"
+  :private t
+  :data '("cause acute pain" "cause bleeding" "cause coma" "cause contact allergy" "cause death"
+           "cause diarrhea" "cause dizziness" "cause hallucinations" "cause itching"
+           "cause nausea" "cause neurological damage" "cause paralysis" "cause swelling" "cause violent spasms"
+           "raise blood pressure" "remove a sense" "stop breathing" "stop the heart" "turn blood to ichor"))
+
+(random-table/register :name "Plant > Effect > Magical (Herbalist's Primer)"
+  :private t
+  :data '("alert about danger" "allow seeing in the dark" "allow speaking with animals" "animate objects" "attract feyfolk"
+           "attract love" "attract wealth" "bestow courage" "bestow luck" "bless the user"
+           "break curses" "bring luck in games of chance" "bring prophetic visions" "calm animals" "cause fear"
+           "conjure spirits" "create a circle of protection" "cure all diseases" "cure all wounds" "detect enemies"
+           "detect lies" "divert lightning" "douse flames" "enforce telling the truth" "exorcise spirits"
+           "explode" "find hidden treasures" "find water" "grant a sense of direction" "grant flight"
+           "grant immortality" "grant invisibility" "grant safe travel" "grant second sight" "grant wishes"
+           "keep wild animals at bay" "make the user beautiful" "open a portal to another realm" "open locks" "prolong life"
+           "protect from compulsion" "protect from evil" "protect from harm" "purify the area" "put undead to rest"
+           "raise the dead" "reflect malicious magic" "remove negative energy" "remove toxins" "stop shapeshifting"))
+
+(random-table/register :name "Plant > Complication (Herbalist's Primer)"
+  :data '("dangerous animals often protect it"
+           "it grows in a desolate far-away place"
+           "it is a deadly poison"
+           "it is highly addictive"
+           "it spontaneously combusts"
+           "it is under the protection of the local law"
+           "it is easy to mistake with a toxic plant"
+           "it attracts mosquitoes"
+           "it needs to be used within minutes of gathering"
+           "it tastes like three-week-old garbage"
+           "its juice stains everything it touches"
+           "nobody has seen it in the last century"
+           "possession is illegal"
+           "special set of tools is needed for harvesting"
+           "the stench sticks around for weeks"
+           "the demand is higher than the supply"
+           "the harvest time is just a single day"
+           "the rumors say it brings bad luck"
+           "touching it causes intense pain"
+           "using it requires an obscure, elaborate ritual"))
 (provide 'jf-tables)
 ;;; jf-tables.el ends here
