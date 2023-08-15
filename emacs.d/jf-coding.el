@@ -400,7 +400,7 @@ method, get the containing class."
       (and (f-exists? gemfile-lock)
         (s-present?
           (shell-command-to-string
-            (concat "rg \"^ +spring \" " gemfile-lock))))))
+            (concat "rg \"^ +spring-commands-rspec \" " gemfile-lock))))))
   ;; Out of the box, for my typical docker ecosystem, the `rspec-spring-p'
   ;; function does not work.  So I'm overriding the default behavior to match my
   ;; ecosystem.
@@ -1403,7 +1403,7 @@ positioning the cursor.")
      "Style/YodaExpression"
      "Style/ZeroLengthPredicate"))
 
-(require 'jf-copilot)
+;; (require 'jf-copilot)
 
 (provide 'jf-coding)
 ;;; jf-coding.el ends here
