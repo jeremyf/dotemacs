@@ -493,7 +493,7 @@ method, get the containing class."
   :hook ((ruby-mode ruby-ts-mode) . yard-mode))
 
 (defvar jf/ruby-mode/comment-header-regexp
-  "^##\\(#\\)*$"
+  "^[[:space:]]*##\\(#\\)*$"
   "The regular expression for a Ruby comment header.
 
 I noticed that a fellow Rubyist would start her method comment
@@ -518,6 +518,7 @@ positioning the cursor.")
     (progn
       (search-forward-regexp jf/ruby-mode/comment-header-regexp)
       (beginning-of-line)
+      (recenter scroll-margin t)
       (pulsar-pulse-line))
     (error (goto-char (point-max)))))
 
@@ -533,6 +534,7 @@ positioning the cursor.")
     (progn
       (search-backward-regexp jf/ruby-mode/comment-header-regexp)
       (beginning-of-line)
+      (recenter scroll-margin t)
       (pulsar-pulse-line))
     (error (goto-char (point-min)))))
 
