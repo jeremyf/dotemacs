@@ -110,9 +110,13 @@ See `random-table/roller/default'."
   "Find POSITION on the given DATA.
 
 When POSITION is not given, choose a random element from the TABLE."
-  (if (integerp position)
-    ;; Off by one errors are so very real.
-    (nth (- position 1) data)
+   (message "Data: %S\nPosition: %S" data position)
+
+  (if-let ((index (if (integerp position) position (car position))))
+    (if (-cons-pair? (car data))
+      (cdr (seq-find (lambda (row) (member index (car row))) data))
+      ;; Off by one errors are so very real.
+      (nth (- index 1) data))
     (seq-random-elt data)))
 
 (defvar random-table/reporter
@@ -166,11 +170,10 @@ We report that function via `#'random-table/reporter'."
 This is constructed as the replacer function of `s-format'."
   (if-let ((table (random-table/get-table text :allow_nil t)))
     (random-table/evaluate/table table)
-    (let ((result (org-d20--roll text)))
-      ;; Need to sniff out if org-d20--roll knew what to do.
-      (if (or (not (s-present? (car result))) (string= (car result) "0"))
-        text
-        (format "%s" (cdr result))))))
+    ;; Ensure that we have a dice expression
+    (if (string-match-p "[0-9]?d[0-9]" text)
+      (format "%s" (cdr (org-d20--roll text)))
+      text)))
 
 (defun random-table/evaluate/table (table)
   "Evaluate the random TABLE.
@@ -214,19 +217,21 @@ in `random-table/stroage/tables' registry.
 When ALLOW_NIL is `nil' we raise an `error' when no table was
 found in the `random-table/stroage/tables' registry."
   (if-let ((table (cond
-    ((random-table-p value)
-      value)
-    ((symbolp value)
-      (gethash value random-table/storage/tables))
-    ((stringp value)
-      (gethash (intern value) random-table/storage/tables))
-    (t
-      (error "Expected %s to be a `random-table', `symbol', or `string' got %s."
-        value
-        (type-of value))))))
+                    ((random-table-p value)
+                      value)
+                    ((symbolp value)
+                      (gethash value random-table/storage/tables))
+                    ((stringp value)
+                      (gethash (intern value) random-table/storage/tables))
+                    ((integerp value)
+                      value)
+                    (t
+                      (error "Expected %s to be a `random-table', `symbol', `integer', or `string' got %s."
+                        value
+                        (type-of value))))))
     table
     (unless allow_nil
-    (error "Could not find table %s; use `random-table/register'." value))))
+      (error "Could not find table %s; use `random-table/register'." value))))
 
 ;;; Register Tables
 (cl-defun random-table/register (&rest kws &key name data &allow-other-keys)
@@ -236,6 +241,49 @@ found in the `random-table/stroage/tables' registry."
     (puthash key struct random-table/storage/tables)))
 
 ;;;; Errant
+
+
+(random-table/register :name "Reaction Roll (Errant)"
+  :roller (lambda (&rest data) (+ 2 (random 6) (random 6)))
+  :data '(((2) . "Hostile [DV +8]")
+           ((3 4 5) . "Unfriendly [DV +4]")
+           ((6 7 8) . "Unsure")
+           ((9 10 11) . "Amicable [DV -2]")
+           ((12) . "Friendly [DV -4]")))
+
+(random-table/register :name "Character (Errant)"
+  :data (list (concat "\n- Physique :: ${4d4}\n- Skill :: ${4d4}\n- Mind :: ${4d4}"
+                "\n- Presence :: ${4d4}"
+                "\n- Failed Profession :: ${Failed Professions (Errant)}"
+                "\n- Keepsakes :: ${Keepsakes (Errant)}"
+                "\n- Ancestry :: ${Ancestry (Errant)}")))
+
+(random-table/register :name "Grimoire (Errant)"
+  :data '("\n- Essence :: ${Grimoire > Essence (Errant)}\n- Sphere :: ${Grimoire > Sphere (Errant)}"))
+
+(random-table/register :name "Grimoire > Essence (Errant)"
+  :private t
+  :data '("Protect" "Summon" "Control" "Quicken" "Slow"
+           "Comprehend" "Move" "Animate" "Link" "Command"
+           "Curse" "Destroy" "Create" "Bless" "Take"
+           "Transfer" "Switch" "Reveal" "Hide" "Restrict"
+           "Liberate" "Reflect" "Seal" "Request" "Grow"
+           "Shrink" "Open" "Close" "Transform" "Communicate"
+           "Improve" "Diminish" "Incapacitate" "Return" "Send"
+           "Enter" "Become" "Replace" "Convert" "Complete"
+           "Attract" "Repulse" "Absorb" "Increase" "Reduce"
+           "Receive" "Aid" "Hinder" "Interrupt" "Harm"))
+
+(random-table/register :name "Grimoire > Sphere (Errant)"
+  :private t
+  :data '("Magic" "Space" "Time" "Mind" "Spirit" "Body"
+           "Elements" "Dimensions" "Life" "Death" "Objects" "BIota"))
+
+
+
+(random-table/register :name "Ancestry (Errant)"
+  :data '("Tough" "Arcane" "Cunning" "Adaptable"))
+
 (random-table/register :name "Keepsakes (Errant)"
   :data '("The sword of the hero Black Mask. Useless, but looks really cool."
            "Big, floppy cork hat. Waterproof."
@@ -422,13 +470,24 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
     (funcall (alist-get likelihood jf/gaming/black-sword-hack/table/oracle-question-likelihood nil nil #'string=))))
 
 (random-table/register :name "Attributes (OSR)"
-  :data '("\n- Strength :: ${3d6}\n- Dexterity :: ${3d6}\n- Constitution :: ${3d6}\n- Intelligence :: ${3d6}\n- Wisdom :: ${3d6}\n- Charisma :: ${3d6}"))
+  :data '("\n- Strength :: ${3d6}\n- Intelligence :: ${3d6}\n- Wisdom :: ${3d6}\n- Dexterity :: ${3d6}\n- Constitution :: ${3d6}\n- Charisma :: ${3d6}"))
 
 (random-table/register :name "Attributes (Black Sword Hack)"
-  :data '("\n- Strength :: ${4d4}\n- Dexterity :: ${4d4}\n- Constitution :: ${4d4}\n- Intelligence :: ${4d4}\n- Wisdom :: ${4d4}\n- Charisma :: ${4d4}"))
+  :data '("\n- Strength :: ${Attribute Score (Black Sword Hack)}\n- Dexterity :: ${Attribute Score (Black Sword Hack)}\n- Constitution :: ${Attribute Score (Black Sword Hack)}\n- Intelligence :: ${Attribute Score (Black Sword Hack)}\n- Wisdom :: ${Attribute Score (Black Sword Hack)}\n- Charisma :: ${Attribute Score (Black Sword Hack)}"))
+
+(random-table/register :name "Attribute Score (Black Sword Hack)"
+  :private t
+  :roller (lambda (&rest data) (+ 2 (random 6) (random 6)))
+  :data '(((2 3) . "8")
+           ((4 5) . "9")
+           ((6 7) . "10")
+           ((8 9) . "11")
+           ((10 11) . "12")
+           ((12) . "13")))
 
 (random-table/register :name "Oracle Question (Black Sword Hack)"
   :roller #'random-table/roller/oracle-question
+  :fetcher (lambda (data index) (car data))
   :data '("${Oracle Question > Answer (Black Sword Hack)}${Oracle Question > Unexpected Event (Black Sword Hack)}")
   :store t)
 
@@ -443,8 +502,8 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
   :private t
   :filter (lambda (&rest dice) "We have a pool of dice to determine if there are dupes."
             (car (list-utils-dupes (-list dice))))
-  :fetcher (lambda (table index)
-             (when index (concat " with unexpected \"" (nth (- (car (-list index)) 1) table) "\" event")))
+  :fetcher (lambda (data index)
+             (when index (concat " with unexpected \"" (nth (- (car (-list index)) 1) data) "\" event")))
   :data '("Very negative" "Negative" "Negative but…" "Positive but…" "Positive" "Very Positive"))
 
 (random-table/register :name "Arabic Name"
