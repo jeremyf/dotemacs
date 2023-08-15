@@ -590,5 +590,56 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "Vigorous charity work among unbelievers"
            "Forbidden the use of certain technology"))
 
+;;;; Herbalist's Primer
+
+(random-table/register :name "Plant (Herbalist's Primer)"
+  :data '("${Plant > Name Prefix (Herbalist's Primer)}${Plant > Name Suffix (Herbalist's Primer)} is ${Plant > Rarity (Herbalist's Primer)} ${Plant > Habit (Herbalist's Primer)}, mostly prized for its ${Plant > Properties (Herbalist's Primer)} value.  It is a native to the ${Plant > Climate (Herbalist's Primer)} ${Plant > Biome (Herbalist's Primer)}.  Interestingly, it ${Plant > Quirk (Herbalist's Primer)}."))
+
+(random-table/register :name "Plant > Name Prefix (Herbalist's Primer)"
+  :private t
+  :data '("Arrow" "Blood" "Crimson" "Death" "Dragon" "Fire" "Gold" "Good" "Ice" "Life"
+           "Raven" "Snake" "Spear" "Spirit" "Star" "Sword" "Truth" "Witch" "Wolf" "Worm"))
+
+(random-table/register :name "Plant > Name Suffix (Herbalist's Primer)"
+  :private t
+  :data '("bane" "bark" "bean" "berry" "bush" "fern" "flower" "fruit" "grass" "leaf"
+           "nut" "plant" "root" "seed" "spice" "thorn" "tree" "weed" "wort" "wood"))
+
+;; Todo consider altering the rarity
+(random-table/register :name "Plant > Rarity (Herbalist's Primer)"
+  :private t
+  :data '("a widespread" "an abundant" "a common" "a popular" "an uncommon"
+           "a rare" "an endangered" "a near-extinct" "a legendary" "a mythical"))
+
+(random-table/register :name "Plant > Habit (Herbalist's Primer)"
+  :private t
+  :data '("herb" "shrub" "tree"))
+
+(random-table/register :name "Plant > Properties (Herbalist's Primer)"
+  :private t
+  :data '("culinary" "industrial" "magical" "medicinal" "ornamental" "poisonous"))
+
+(random-table/register :name "Plant > Climate (Herbalist's Primer)"
+  :private t
+  :data '("artic" "arid" "boreal" "cold" "continental"
+           "dry" "high-altitude" "hot" "humid" "ice-bound"
+           "island" "marine" "monsoon" "oceanic" "polar"
+           "subartic" "subtropical" "temperate" "tropical" "wet"))
+
+(random-table/register :name "Plant > Biome (Herbalist's Primer)"
+  :private t
+  :data '("caves" "deserts" "forests" "gardens" "hills"
+           "lakes" "meadows" "mountains" "plains" "plantations"
+           "riverbanks" "roadsides" "seas" "shores" "shrublands"
+           "streams" "swamps" "urban areas" "volanoes" "wastes"))
+
+(random-table/register :name "Plant > Quirk (Herbalist's Primer)"
+  :private t
+  :data '("is carnivorous" "is parasitic" "is symbiotic with another plant" "stores water in the stems" "has a strong, pleasant aroma"
+           "is always warm to the touch" "is covered in sharp spikes" "is covered in a sticky sap" "smells of rotting meat" "grows in the tree crowns"
+           "grows almost entirely underground" "only blooms at night" "is poisonous to other plants" "causes a strong allergic reaction" "produces a lot of pollen"
+           "attracts all kinds of insects" "is a favorite snack of many animals" "often hosts bird nests" "has a lovely, sweet flavor" "grows incredibly fast"))
+
+
 (provide 'jf-tables)
 ;;; jf-tables.el ends here
