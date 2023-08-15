@@ -146,7 +146,7 @@ first matching link."
     org-element-use-cache nil
     org-export-with-sub-superscripts '{}
     org-pretty-entities t
-    org-pretty-entities-include-sub-superscripts t
+    org-pretty-entities-include-sub-superscripts nil
     org-agenda-log-mode-items '(clock)
     org-directory (file-truename "~/git/org")
     ;; org-agenda-files (jf/org-mode/agenda-files)
@@ -982,5 +982,53 @@ I envision this function called from the command-line."
          "- %T :: %?"
          :empty-lines-before 1
          :empty-lines-after 1)))
+
+(use-package org-noter
+             :straight
+             (:repo "org-noter/org-noter"
+                    :host github
+                    :type git
+               :files ("*.el" "modules/*.el"))
+  :config
+  (setq org-noter-doc-split-fraction '(0.67 . 0.33)))
+
+;; (use-package org-pdftools
+;;   :straight t
+;;   :hook (org-mode . org-pdftools-setup-link))
+
+;; (use-package org-noter-pdftools
+;;   :straight t
+;;   :after org-noter
+;;   :config
+;;   ;; Add a function to ensure precise note is inserted
+;;   (defun org-noter-pdftools-insert-precise-note (&optional toggle-no-questions)
+;;     (interactive "P")
+;;     (org-noter--with-valid-session
+;;      (let ((org-noter-insert-note-no-questions (if toggle-no-questions
+;;                                                    (not org-noter-insert-note-no-questions)
+;;                                                  org-noter-insert-note-no-questions))
+;;            (org-pdftools-use-isearch-link t)
+;;            (org-pdftools-use-freepointer-annot t))
+;;        (org-noter-insert-note (org-noter--get-precise-info)))))
+
+;;   ;; fix https://github.com/weirdNox/org-noter/pull/93/commits/f8349ae7575e599f375de1be6be2d0d5de4e6cbf
+;;   (defun org-noter-set-start-location (&optional arg)
+;;     "When opening a session with this document, go to the current location.
+;; With a prefix ARG, remove start location."
+;;     (interactive "P")
+;;     (org-noter--with-valid-session
+;;       (let ((inhibit-read-only t)
+;;              (ast (org-noter--parse-root))
+;;              (location (org-noter--doc-approx-location (when (called-interactively-p 'any) 'interactive))))
+;;         (with-current-buffer (org-noter--session-notes-buffer session)
+;;           (org-with-wide-buffer
+;;             (goto-char (org-element-property :begin ast))
+;;             (if arg
+;;               (org-entry-delete nil org-noter-property-note-location)
+;;               (org-entry-put nil org-noter-property-note-location
+;;                 (org-noter-pdftools--pretty-print-location location))))))))
+;;   (with-eval-after-load 'pdf-annot
+;;     (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note)))
+
 (provide 'jf-org-mode)
 ;;; jf-org-mode.el ends here

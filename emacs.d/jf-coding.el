@@ -236,6 +236,7 @@ method, get the containing class."
   (editorconfig-mode 1))
 
 (use-package eglot
+  :straight (:type built-in)
   ;; The Language Server Protocol (LSP) is a game changer; having access to that
   ;; tooling is very much a nice to have.
   :hook ((css-mode css-ts-mode
@@ -492,68 +493,6 @@ method, get the containing class."
                                ("C-c C-y" . jf/ruby-mode/yardoc-ify)))
   :hook ((ruby-mode ruby-ts-mode) . yard-mode))
 
-(defvar jf/ruby-mode/comment-header-regexp
-  "^[[:space:]]*##\\(#\\)*$"
-  "The regular expression for a Ruby comment header.
-
-I noticed that a fellow Rubyist would start her method comment
-blocks with \"##\".  I liked how that looked, creating a clear
-marker of a comment block.
-
-Then when pairing with a team member she asked about those
-comment two \"##\".  I said my assumption was that they were used
-for navigation.  It would make sense as an anchoring point for
-positioning the cursor.")
-
-(defun jf/ruby-mode/commend-header-forward ()
-  "Move to next line matching `jf/ruby-mode/comment-header-regexp'."
-  (interactive)
-  (when (string-match-p
-          jf/ruby-mode/comment-header-regexp
-          (buffer-substring-no-properties
-            (line-beginning-position)
-            (line-end-position)))
-    (forward-line))
-  (condition-case err
-    (progn
-      (search-forward-regexp jf/ruby-mode/comment-header-regexp)
-      (beginning-of-line)
-      (recenter scroll-margin t)
-      (pulsar-pulse-line))
-    (error (goto-char (point-max)))))
-
-(defun jf/ruby-mode/comment-header-backward ()
-  (interactive)
-  (when (string-match-p
-          jf/ruby-mode/comment-header-regexp
-          (buffer-substring-no-properties
-            (line-beginning-position)
-            (line-end-position)))
-    (previous-line))
-  (condition-case err
-    (progn
-      (search-backward-regexp jf/ruby-mode/comment-header-regexp)
-      (beginning-of-line)
-      (recenter scroll-margin t)
-      (pulsar-pulse-line))
-    (error (goto-char (point-min)))))
-
-(define-key ruby-mode-map (kbd "s-ESC") #'jf/ruby-mode/comment-header-backward)
-(define-key ruby-mode-map (kbd "C-s-]") #'jf/ruby-mode/commend-header-forward)
-
-(defun jf/ruby-ts-mode-configurator ()
-  "Configure the `treesit' provided `ruby-ts-mode'."
-  ;; I encountered some loading issues where ruby-ts-mode was not available
-  ;; during my understanding of the use-package life-cycle.
-  (setq-local add-log-current-defun-function #'jf/treesit/qualified_method_name)
-  (define-key ruby-ts-mode-map (kbd "C-M-h") #'jf/treesit/function-select)
-  (define-key ruby-ts-mode-map (kbd "C-c C-f") #'jf/current-scoped-function-name)
-  (define-key ruby-ts-mode-map (kbd "C-c C-y") #'jf/ruby-mode/yardoc-ify)
-  (define-key ruby-ts-mode-map (kbd "C-c C-r") #'jf/treesit/wrap-rubocop)
-  (define-key ruby-ts-mode-map (kbd "s-ESC") #'jf/ruby-mode/comment-header-backward)
-  (define-key ruby-ts-mode-map (kbd "C-s-]") #'jf/ruby-mode/commend-header-forward))
-(add-hook 'ruby-ts-mode-hook #'jf/ruby-ts-mode-configurator)
-
 ;; I didn't know about `add-log-current-defun-function' until a blog reader
 ;; reached out.  Now, I'm making a general function for different modes.
 (defun jf/current-scoped-function-name ()
@@ -590,6 +529,68 @@ See `add-log-current-defun-function'."
     ;; (electric-pair-mode)
     (flymake-mode 1)
     (which-function-mode)))
+
+(defvar jf/ruby-mode/comment-header-regexp
+  "^[[:space:]]*##\\(#\\)*$"
+  "The regular expression for a Ruby comment header.
+
+I noticed that a fellow Rubyist would start her method comment
+blocks with \"##\".  I liked how that looked, creating a clear
+marker of a comment block.
+
+Then when pairing with a team member she asked about those
+comment two \"##\".  I said my assumption was that they were used
+for navigation.  It would make sense as an anchoring point for
+positioning the cursor.")
+
+(defun jf/ruby-mode/commend-header-forward ()
+  "Move to next line matching `jf/ruby-mode/comment-header-regexp'."
+  (interactive)
+  (when (string-match-p
+          jf/ruby-mode/comment-header-regexp
+          (buffer-substring-no-properties
+            (line-beginning-position)
+            (line-end-position)))
+    (forward-line))
+  (condition-case err
+    (progn
+      (search-forward-regexp jf/ruby-mode/comment-header-regexp)
+      (beginning-of-line)
+      (recenter scroll-margin t)
+      (pulsar-pulse-line))
+    (error (goto-char (point-max)))))
+
+(defun jf/ruby-mode/comment-header-backward ()
+  (interactive)
+  (when (string-match-p
+          jf/ruby-mode/comment-header-regexp
+          (buffer-substring-no-properties
+            (line-beginning-position)
+            (recenter scroll-margin t)
+            (line-end-position)))
+    (previous-line))
+  (condition-case err
+    (progn
+      (search-backward-regexp jf/ruby-mode/comment-header-regexp)
+      (beginning-of-line)
+      (pulsar-pulse-line))
+    (error (goto-char (point-min)))))
+
+(define-key ruby-mode-map (kbd "s-ESC") #'jf/ruby-mode/comment-header-backward)
+(define-key ruby-mode-map (kbd "C-s-]") #'jf/ruby-mode/commend-header-forward)
+
+(defun jf/ruby-ts-mode-configurator ()
+  "Configure the `treesit' provided `ruby-ts-mode'."
+  ;; I encountered some loading issues where ruby-ts-mode was not available
+  ;; during my understanding of the use-package life-cycle.
+  (setq-local add-log-current-defun-function #'jf/treesit/qualified_method_name)
+  (define-key ruby-ts-mode-map (kbd "C-M-h") #'jf/treesit/function-select)
+  (define-key ruby-ts-mode-map (kbd "C-c C-f") #'jf/current-scoped-function-name)
+  (define-key ruby-ts-mode-map (kbd "C-c C-y") #'jf/ruby-mode/yardoc-ify)
+  (define-key ruby-ts-mode-map (kbd "s-ESC") #'jf/ruby-mode/comment-header-backward)
+  (define-key ruby-ts-mode-map (kbd "C-s-]") #'jf/ruby-mode/commend-header-forward)
+  (define-key ruby-ts-mode-map (kbd "C-c C-r") #'jf/treesit/wrap-rubocop))
+(add-hook 'ruby-ts-mode-hook #'jf/ruby-ts-mode-configurator)
 
 ;; From https://emacs.dyerdwelling.family/emacs/20230414111409-emacs--indexing-emacs-init/
 ;;
