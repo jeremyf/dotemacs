@@ -492,54 +492,6 @@ method, get the containing class."
                                ("C-c C-y" . jf/ruby-mode/yardoc-ify)))
   :hook ((ruby-mode ruby-ts-mode) . yard-mode))
 
-(defun jf/ruby-ts-mode-configurator ()
-  "Configure the `treesit' provided `ruby-ts-mode'."
-  ;; I encountered some loading issues where ruby-ts-mode was not available
-  ;; during my understanding of the use-package life-cycle.
-  (setq-local add-log-current-defun-function #'jf/treesit/qualified_method_name)
-  (define-key ruby-ts-mode-map (kbd "C-M-h") #'jf/treesit/function-select)
-  (define-key ruby-ts-mode-map (kbd "C-c C-f") #'jf/current-scoped-function-name)
-  (define-key ruby-ts-mode-map (kbd "C-c C-y") #'jf/ruby-mode/yardoc-ify)
-  (define-key ruby-ts-mode-map (kbd "C-c C-r") #'jf/treesit/wrap-rubocop))
-(add-hook 'ruby-ts-mode-hook #'jf/ruby-ts-mode-configurator)
-
-;; I didn't know about `add-log-current-defun-function' until a blog reader
-;; reached out.  Now, I'm making a general function for different modes.
-(defun jf/current-scoped-function-name ()
-  "Echo and kill the current scoped function name.
-
-See `add-log-current-defun-function'."
-  (interactive)
-  (if-let ((text (funcall add-log-current-defun-function)))
-    (progn
-      (message "%s" text)
-      (kill-new (substring-no-properties text)))
-    (user-error "Warning: Point not on function")))
-(bind-key "C-c C-f" #'jf/current-scoped-function-name prog-mode-map)
-(bind-key "C-c C-f" #'jf/current-scoped-function-name emacs-lisp-mode-map)
-
-(use-package devdocs
-  ;; Download and install documents from https://devdocs.io/
-  ;; Useful for having local inline docs.  Perhaps not always in the format that
-  ;; I want, but can't have everything.
-  :straight t
-  :commands (devdocs-install))
-
-(use-package flymake
-  :straight t
-  ;; Don't be so hasty in syntax checking.
-  :custom (flymake-no-changes-timeout 3))
-
-(use-package prog-mode
-  :straight (:type built-in)
-  :hook (prog-mode . jf/prog-mode-configurator)
-  :preface
-  (defun jf/prog-mode-configurator ()
-    "Do the configuration of all the things."
-    ;; (electric-pair-mode)
-    (flymake-mode 1)
-    (which-function-mode)))
-
 (defvar jf/ruby-mode/comment-header-regexp
   "^##\\(#\\)*$"
   "The regular expression for a Ruby comment header.
@@ -584,14 +536,58 @@ positioning the cursor.")
       (pulsar-pulse-line))
     (error (goto-char (point-min)))))
 
-(define-key ruby-ts-mode-map (kbd "s-ESC")
-  #'jf/ruby-mode/comment-header-backward)
-(define-key ruby-mode-map (kbd "s-ESC")
-  #'jf/ruby-mode/comment-header-backward)
-(define-key ruby-ts-mode-map (kbd "C-s-]")
-  #'jf/ruby-mode/commend-header-forward)
-(define-key ruby-mode-map (kbd "C-s-]")
-  #'jf/ruby-mode/commend-header-forward)
+(define-key ruby-mode-map (kbd "s-ESC") #'jf/ruby-mode/comment-header-backward)
+(define-key ruby-mode-map (kbd "C-s-]") #'jf/ruby-mode/commend-header-forward)
+
+(defun jf/ruby-ts-mode-configurator ()
+  "Configure the `treesit' provided `ruby-ts-mode'."
+  ;; I encountered some loading issues where ruby-ts-mode was not available
+  ;; during my understanding of the use-package life-cycle.
+  (setq-local add-log-current-defun-function #'jf/treesit/qualified_method_name)
+  (define-key ruby-ts-mode-map (kbd "C-M-h") #'jf/treesit/function-select)
+  (define-key ruby-ts-mode-map (kbd "C-c C-f") #'jf/current-scoped-function-name)
+  (define-key ruby-ts-mode-map (kbd "C-c C-y") #'jf/ruby-mode/yardoc-ify)
+  (define-key ruby-ts-mode-map (kbd "C-c C-r") #'jf/treesit/wrap-rubocop)
+  (define-key ruby-ts-mode-map (kbd "s-ESC") #'jf/ruby-mode/comment-header-backward)
+  (define-key ruby-ts-mode-map (kbd "C-s-]") #'jf/ruby-mode/commend-header-forward))
+(add-hook 'ruby-ts-mode-hook #'jf/ruby-ts-mode-configurator)
+
+;; I didn't know about `add-log-current-defun-function' until a blog reader
+;; reached out.  Now, I'm making a general function for different modes.
+(defun jf/current-scoped-function-name ()
+  "Echo and kill the current scoped function name.
+
+See `add-log-current-defun-function'."
+  (interactive)
+  (if-let ((text (funcall add-log-current-defun-function)))
+    (progn
+      (message "%s" text)
+      (kill-new (substring-no-properties text)))
+    (user-error "Warning: Point not on function")))
+(bind-key "C-c C-f" #'jf/current-scoped-function-name prog-mode-map)
+(bind-key "C-c C-f" #'jf/current-scoped-function-name emacs-lisp-mode-map)
+
+(use-package devdocs
+  ;; Download and install documents from https://devdocs.io/
+  ;; Useful for having local inline docs.  Perhaps not always in the format that
+  ;; I want, but can't have everything.
+  :straight t
+  :commands (devdocs-install))
+
+(use-package flymake
+  :straight t
+  ;; Don't be so hasty in syntax checking.
+  :custom (flymake-no-changes-timeout 3))
+
+(use-package prog-mode
+  :straight (:type built-in)
+  :hook (prog-mode . jf/prog-mode-configurator)
+  :preface
+  (defun jf/prog-mode-configurator ()
+    "Do the configuration of all the things."
+    ;; (electric-pair-mode)
+    (flymake-mode 1)
+    (which-function-mode)))
 
 ;; From https://emacs.dyerdwelling.family/emacs/20230414111409-emacs--indexing-emacs-init/
 ;;
