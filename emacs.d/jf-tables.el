@@ -506,33 +506,159 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
              (when index (concat " with unexpected \"" (nth (- (car (-list index)) 1) data) "\" event")))
   :data '("Very negative" "Negative" "Negative but…" "Positive but…" "Positive" "Very Positive"))
 
-(random-table/register :name "Arabic Name"
-  :data '("${Arabic Name > Male Given Name} ${Arabic Name > Surname}"
-           "${Arabic Name > Female Given Name} ${Arabic Name > Surname}"))
+;;;; Random Names (from Stars without Number)
+(random-table/register :name "Name"
+  :data '( "${Arabic Name > Male Given Name} ${Arabic Name > Surname}"
+           "${Arabic Name > Female Given Name} ${Arabic Name > Surname}"
+           "${Chinese Name > Male Given Name} ${Chinese Name > Surname}"
+           "${Chinese Name > Female Given Name} ${Chinese Name > Surname}"
+           "${English Name > Male Given Name} ${English Name > Surname}"
+           "${English Name > Female Given Name} ${English Name > Surname}"
+           "${Greek Name > Male Given Name} ${Greek Name > Surname}"
+           "${Greek Name > Female Given Name} ${Greek Name > Surname}"
+           "${Indian Name > Male Given Name} ${Indian Name > Surname}"
+           "${Indian Name > Female Given Name} ${Indian Name > Surname}"
+           "${Japanese Name > Male Given Name} ${Japanese Name > Surname}"
+           "${Japanese Name > Female Given Name} ${Japanese Name > Surname}"
+           "${Latin Name > Male Given Name} ${Latin Name > Surname}"
+           "${Latin Name > Female Given Name} ${Latin Name > Surname}"
+           "${Nigerian Name > Male Given Name} ${Nigerian Name > Surname}"
+           "${Nigerian Name > Female Given Name} ${Nigerian Name > Surname}"
+           "${Russian Name > Male Given Name} ${Russian Name > Surname}"
+           "${Russian Name > Female Given Name} ${Russian Name > Surname}"
+           "${Spanish Name > Male Given Name} ${Spanish Name > Surname}"
+           "${Spanish Name > Female Given Name} ${Spanish Name > Surname}"))
 
 (random-table/register :name "Arabic Name > Male Given Name"
   :private t
-  :data '("Aamir" "Ayub" "Binyamin" "Efraim" "Ibrahim"
-           "Ilyas" "Ismail" "Jibril" "Jumanah" "Kazi"
-           "Lut" "Matta" "Mohammed" "Mubarak" "Mustafa"
-           "Nazir" "Rahim" "Reza" "Sharif" "Taimur"
-           "Usman" "Yakub" "Yusuf" "Zakariya" "Zubair"))
-
+  :data '("Aamir" "Ayub" "Binyamin" "Efraim" "Ibrahim" "Ilyas" "Ismail" "Jibril" "Jumanah" "Kazi" "Lut" "Matta" "Mohammed" "Mubarak" "Mustafa" "Nazir" "Rahim" "Reza" "Sharif" "Taimur" "Usman" "Yakub" "Yusuf" "Zakariya" "Zubair"))
 (random-table/register :name "Arabic Name > Female Given Name"
   :private t
-  :data '("Aisha" "Alimah" "Badia" "Bisharah" "Chanda"
-           "Daliya" "Fatimah" "Ghania" "Halah" "Kaylah"
-           "Khayrah" "Layla" "Mina" "Munisa" "Mysha"
-           "Naimah" "Nissa" "Nura" "Parveen" "Rana"
-           "Shalha" "Suhira" "Tahirah" "Yasmin" "Zulehka"))
-
+  :data '("Aisha" "Alimah" "Badia" "Bisharah" "Chanda" "Daliya" "Fatimah" "Ghania" "Halah" "Kaylah" "Khayrah" "Layla" "Mina" "Munisa" "Mysha" "Naimah" "Nissa" "Nura" "Parveen" "Rana" "Shalha" "Suhira" "Tahirah" "Yasmin" "Zulehka"))
 (random-table/register :name "Arabic Name > Surname"
   :private t
-  :data '("Abdel" "Awad" "Dahhak" "Essa" "Hanna"
-           "Harbi" "Hassan" "Isa" "Kasim" "Katib"
-           "Khalil" "Malik" "Mansoor" "Mazin" "Musa"
-           "Najeeb" "Namari" "Naser" "Rahman" "Rasheed"
-           "Saleh" "Salim" "Shadi" "Sulaiman" "Tabari"))
+  :data '("Abdel" "Awad" "Dahhak" "Essa" "Hanna" "Harbi" "Hassan" "Isa" "Kasim" "Katib" "Khalil" "Malik" "Mansoor" "Mazin" "Musa" "Najeeb" "Namari" "Naser" "Rahman" "Rasheed" "Saleh" "Salim" "Shadi" "Sulaiman" "Tabari"))
+(random-table/register :name "Arabic Location Name"
+  :private t
+  :data '("Adan" "Magrit" "Ahsa" "Masqat" "Andalus" "Misr" "Asmara" "Muruni" "Asqlan" "Qabis" "Baqubah" "Qina" "Basit" "Rabat" "Baysan" "Ramlah" "Baytlahm" "Riyadh" "Bursaid" "Sabtah" "Dahilah" "Salalah" "Darasalam" "Sana" "Dawhah" "Sinqit" "Ganin" "Suqutrah" "Gebal" "Sur" "Gibuti" "Tabuk" "Giddah" "Tangah" "Harmah" "Tarifah" "Hartum" "Tarrakunah" "Hibah" "Tisit" "Hims" "Uman" "Hubar" "Urdunn" "Karbala" "Wasqah" "Kut" "Yaburah" "Lacant" "Yaman"))
+
+(random-table/register :name "Chinese Name > Male Given Name"
+  :private t
+  :data '("Aiguo" "Bohai" "Chao" "Dai" "Dawei" "Duyi" "Fa" "Fu" "Gui" "Hong" "Jianyu" "Kang" "Li" "Niu" "Peng" "Quan" "Ru" "Shen" "Shi" "Song" "Tao" "Xue" "Yi" "Yuan" "Zian"))
+(random-table/register :name "Chinese Name > Female Given Name"
+  :private t
+  :data '("Biyu" "Changying" "Daiyu" "Huidai" "Huiliang" "Jia" "Jingfei" "Lan" "Liling" "Liu" "Meili" "Niu" "Peizhi" "Qiao" "Qing" "Ruolan" "Shu" "Suyin" "Ting" "Xia" "Xiaowen" "Xiulan" "Ya" "Ying" "Zhilan"))
+(random-table/register :name "Chinese Name > Surname"
+  :private t
+  :data '("Bai" "Cao" "Chen" "Cui" "Ding" "Du" "Fang" "Fu" "Guo" "Han" "Hao" "Huang" "Lei" "Li" "Liang" "Liu" "Long" "Song" "Tan" "Tang" "Wang" "Wu" "Xing" "Yang" "Zhang"))
+(random-table/register :name "Chinese Location Name"
+  :private t
+  :data '("Andong" "Luzhou" "Anqing" "Ningxia" "Anshan" "Pingxiang" "Chaoyang" "Pizhou" "Chaozhou" "Qidong" "Chifeng" "Qingdao" "Dalian" "Qinghai" "Dunhuang" "Rehe" "Fengjia" "Shanxi" "Fengtian" "Taiyuan" "Fuliang" "Tengzhou" "Fushun" "Urumqi" "Gansu" "Weifang" "Ganzhou" "Wugang" "Guizhou" "Wuxi" "Hotan" "Xiamen" "Hunan" "Xian" "Jinan" "Xikang" "Jingdezhen" "Xining" "Jinxi" "Xinjiang" "Jinzhou" "Yidu" "Kunming" "Yingkou" "Liaoning" "Yuxi" "Linyi" "Zigong" "Lushun" "Zoige"))
+
+(random-table/register :name "English Name > Male Given Name"
+  :private t
+  :data '("Adam" "Albert" "Alfred" "Allan" "Archibald" "Arthur" "Basil" "Charles" "Colin" "Donald" "Douglas" "Edgar" "Edmund" "Edward" "George" "Harold" "Henry" "Ian" "James" "John" "Lewis" "Oliver" "Philip" "Richard" "William"))
+(random-table/register :name "English Name > Female Given Name"
+	:private t
+  :data '("Abigail" "Anne" "Beatrice" "Blanche" "Catherine" "Charlotte" "Claire" "Eleanor" "Elizabeth" "Emily" "Emma" "Georgia" "Harriet" "Joan" "Judy" "Julia" "Lucy" "Lydia" "Margaret" "Mary" "Molly" "Nora" "Rosie" "Sarah" "Victoria"))
+(random-table/register :name "English Name > Surname"
+  :private t
+  :data '("Barker" "Brown" "Butler" "Carter" "Chapman" "Collins" "Cook" "Davies" "Gray" "Green" "Harris" "Jackson" "Jones" "Lloyd" "Miller" "Roberts" "Smith" "Taylor" "Thomas" "Turner" "Watson" "White" "Williams" "Wood" "Young"))
+(random-table/register :name "English Location Name"
+  :private t
+  :data '("Aldington" "Kedington" "Appleton" "Latchford" "Ashdon" "Leigh" "Berwick" "Leighton" "Bramford" "Maresfield" "Brimstage" "Markshall" "Carden" "Netherpool" "Churchill" "Newton" "Clifton" "Oxton" "Colby" "Preston" "Copford" "Ridley" "Cromer" "Rochford" "Davenham" "Seaford" "Dersingham" "Selsey" "Doverdale" "Stanton" "Elsted" "Stockham" "Ferring" "Stoke" "Gissing" "Sutton" "Heydon" "Thakeham" "Holt" "Thetford" "Hunston" "Thorndon" "Hutton" "Ulting" "Inkberrow" "Upton" "Inworth" "Westhorpe" "Isfield" "Worcester"))
+
+(random-table/register :name "Greek Name > Male Given Name"
+		:private t
+  :data '("Alexander" "Alexius" "Anastasius" "Christodoulos" "Christos" "Damian" "Dimitris" "Dysmas" "Elias" "Giorgos" "Ioannis" "Konstantinos" "Lambros" "Leonidas" "Marcos" "Miltiades" "Nestor" "Nikos" "Orestes" "Petros" "Simon" "Stavros" "Theodore" "Vassilios" "Yannis"))
+(random-table/register :name "Greek Name > Female Given Name"
+  :private t
+  :data '("Alexandra" "Amalia" "Callisto" "Charis" "Chloe" "Dorothea" "Elena" "Eudoxia" "Giada" "Helena" "Ioanna" "Lydia" "Melania" "Melissa" "Nika" "Nikolina" "Olympias" "Philippa" "Phoebe" "Sophia" "Theodora" "Valentina" "Valeria" "Yianna" "Zoe"))
+(random-table/register :name "Greek Name > Surname"
+	:private t
+  :data '("Andreas" "Argyros" "Dimitriou" "Floros" "Gavras" "Ioannidis" "Katsaros" "Kyrkos" "Leventis" "Makris" "Metaxas" "Nikolaidis" "Pallis" "Pappas" "Petrou" "Raptis" "Simonides" "Spiros" "Stavros" "Stephanidis" "Stratigos" "Terzis" "Theodorou" "Vasiliadis" "Yannakakis"))
+(random-table/register :name "Greek Location Name"
+  :private t
+  :data '("Adramyttion" "Kallisto" "Ainos" "Katerini" "Alikarnassos" "Kithairon" "Avydos" "Kydonia" "Dakia" "Lakonia" "Dardanos" "Leros" "Dekapoli" "Lesvos" "Dodoni" "Limnos" "Efesos" "Lykia" "Efstratios" "Megara" "Elefsina" "Messene" "Ellada" "Milos" "Epidavros" "Nikaia" "Erymanthos" "Orontis" "Evripos" "Parnasos" "Gavdos" "Petro" "Gytheio" "Samos" "Ikaria" "Syros" "Ilios" "Thapsos" "Illyria" "Thessalia" "Iraia" "Thira" "Irakleio" "Thiva" "Isminos" "Varvara" "Ithaki" "Voiotia" "Kadmeia" "Vyvlos"))
+
+                              ;; Indian Name > Male Given Name
+(random-table/register :name "Indian Name > Male Given Name"
+  :private t
+  :data '("Amrit" "Ashok" "Chand" "Dinesh" "Gobind" "Harinder" "Jagdish" "Johar" "Kurien" "Lakshman" "Madhav" "Mahinder" "Mohal" "Narinder" "Nikhil" "Omrao" "Prasad" "Pratap" "Ranjit" "Sanjay" "Shankar" "Thakur" "Vijay" "Vipul" "Yash"))
+(random-table/register :name "Indian Name > Female Given Name"
+  :private t
+  :data '("Amala" "Asha" "Chandra" "Devika" "Esha" "Gita" "Indira" "Indrani" "Jaya" "Jayanti" "Kiri" "Lalita" "Malati" "Mira" "Mohana" "Neela" "Nita" "Rajani" "Sarala" "Sarika" "Sheela" "Sunita" "Trishna" "Usha" "Vasanta"))
+(random-table/register :name "Indian Name > Surname"
+  :private t
+  :data '("Achari" "Banerjee" "Bhatnagar" "Bose" "Chauhan" "Chopra" "Das" "Dutta" "Gupta" "Johar" "Kapoor" "Mahajan" "Malhotra" "Mehra" "Nehru" "Patil" "Rao" "Saxena" "Shah" "Sharma" "Singh" "Trivedi" "Venkatesan" "Verma" "Yadav"))
+(random-table/register :name "Indian Location Name"
+  :private t
+  :data '("Ahmedabad" "Jaisalmer" "Alipurduar" "Jharonda" "Alubari" "Kadambur" "Anjanadri" "Kalasipalyam" "Ankleshwar" "Karnataka" "Balarika" "Kutchuhery" "Bhanuja" "Lalgola" "Bhilwada" "Mainaguri" "Brahmaghosa" "Nainital" "Bulandshahar" "Nandidurg" "Candrama" "Narayanadri" "Chalisgaon" "Panipat" "Chandragiri" "Panjagutta" "Charbagh" "Pathankot" "Chayanka" "Pathardih" "Chittorgarh" "Porbandar" "Dayabasti" "Rajasthan" "Dikpala" "Renigunta" "Ekanga" "Sewagram" "Gandhidham" "Shakurbasti" "Gollaprolu" "Siliguri" "Grahisa" "Sonepat" "Guwahati" "Teliwara" "Haridasva" "Tinpahar" "Indraprastha" "Villivakkam"))
+
+(random-table/register :name "Japanese Name > Male Given Name"
+  :private t
+  :data '("Akira" "Daisuke" "Fukashi" "Goro" "Hiro" "Hiroya" "Hotaka" "Katsu" "Katsuto" "Keishuu" "Kyuuto" "Mikiya" "Mitsunobu" "Mitsuru" "Naruhiko" "Nobu" "Shigeo" "Shigeto" "Shou" "Shuji" "Takaharu" "Teruaki" "Tetsushi" "Tsukasa" "Yasuharu"))
+(random-table/register :name "Japanese Name > Female Given Name"
+  :private t
+  :data '("Aemi" "Airi" "Ako" "Ayu" "Chikaze" "Eriko" "Hina" "Kaori" "Keiko" "Kyouka" "Mayumi" "Miho" "Namiko" "Natsu" "Nobuko" "Rei" "Ririsa" "Sakimi" "Shihoko" "Shika" "Tsukiko" "Tsuzune" "Yoriko" "Yorimi" "Yoshiko"))
+(random-table/register :name "Japanese Name > Surname"
+  :private t
+  :data '("Abe" "Arakaki" "Endo" "Fujiwara" "Goto" "Ito" "Kikuchi" "Kinjo" "Kobayashi" "Koga" "Komatsu" "Maeda" "Nakamura" "Narita" "Ochi" "Oshiro" "Saito" "Sakamoto" "Sato" "Suzuki" "Takahashi" "Tanaka" "Watanabe" "Yamamoto" "Yamasaki"))
+(random-table/register :name "Japanese Location Name"
+  :private t
+  :data '("Bando" "Mitsukaido" "Chikuma" "Moriya" "Chikusei" "Nagano" "Chino" "Naka" "Hitachi" "Nakano" "Hitachinaka" "Ogi" "Hitachiomiya" "Okaya" "Hitachiota" "Omachi" "Iida" "Ryugasaki" "Iiyama" "Saku" "Ina" "Settsu" "Inashiki" "Shimotsuma" "Ishioka" "Shiojiri" "Itako" "Suwa" "Kamisu" "Suzaka" "Kasama" "Takahagi" "Kashima" "Takeo" "Kasumigaura" "Tomi" "Kitaibaraki" "Toride" "Kiyose" "Tsuchiura" "Koga" "Tsukuba" "Komagane" "Ueda" "Komoro" "Ushiku" "Matsumoto" "Yoshikawa" "Mito" "Yuki"))
+
+(random-table/register :name "Latin Name > Male Given Name"
+  :private t
+  :data '("Agrippa" "Appius" "Aulus" "Caeso" "Decimus" "Faustus" "Gaius" "Gnaeus" "Hostus" "Lucius" "Mamercus" "Manius" "Marcus" "Mettius" "Nonus" "Numerius" "Opiter" "Paulus" "Proculus" "Publius" "Quintus" "Servius" "Tiberius" "Titus" "Volescus"))
+(random-table/register :name "Latin Name > Female Given Name"
+  :private t
+  :data '("Appia" "Aula" "Caesula" "Decima" "Fausta" "Gaia" "Gnaea" "Hosta" "Lucia" "Maio" "Marcia" "Maxima" "Mettia" "Nona" "Numeria" "Octavia" "Postuma" "Prima" "Procula" "Septima" "Servia" "Tertia" "Tiberia" "Titia" "Vibia"))
+(random-table/register :name "Latin Name > Surname"
+  :private t
+  :data '("Antius" "Aurius" "Barbatius" "Calidius" "Cornelius" "Decius" "Fabius" "Flavius" "Galerius" "Horatius" "Julius" "Juventius" "Licinius" "Marius" "Minicius" "Nerius" "Octavius" "Pompeius" "Quinctius" "Rutilius" "Sextius" "Titius" "Ulpius" "Valerius" "Vitellius"))
+(random-table/register :name "Latin Location Name"
+  :private t
+  :data '("Abilia" "Lucus" "Alsium" "Lugdunum" "Aquileia" "Mediolanum" "Argentoratum" "Novaesium" "Ascrivium" "Patavium" "Asculum" "Pistoria" "Attalia" "Pompeii" "Barium" "Raurica" "Batavorum" "Rigomagus" "Belum" "Roma" "Bobbium" "Salernum" "Brigantium" "Salona" "Burgodunum" "Segovia" "Camulodunum" "Sirmium" "Clausentum" "Spalatum" "Corduba" "Tarraco" "Coriovallum" "Treverorum" "Durucobrivis" "Verulamium" "Eboracum" "Vesontio" "Emona" "Vetera" "Florentia" "Vindelicorum" "Lactodurum" "Vindobona" "Lentia" "Vinovia" "Lindum" "Viroconium" "Londinium" "Volubilis"))
+
+(random-table/register :name "Nigerian Name > Male Given Name"
+  :private t
+  :data '("Adesegun" "Akintola" "Amabere" "Arikawe" "Asagwara" "Chidubem" "Chinedu" "Chiwetei" "Damilola" "Esangbedo" "Ezenwoye" "Folarin" "Genechi" "Idowu" "Kelechi" "Ketanndu" "Melubari" "Nkanta" "Obafemi" "Olatunde" "Olumide" "Tombari" "Udofia" "Uyoata" "Uzochi"))
+(random-table/register :name "Nigerian Name > Female Given Name"
+  :private t
+  :data '("Abike" "Adesuwa" "Adunola" "Anguli" "Arewa" "Asari" "Bisola" "Chioma" "Eduwa" "Emilohi" "Fehintola" "Folasade" "Mahparah" "Minika" "Nkolika" "Nkoyo" "Nuanae" "Obioma" "Olafemi" "Shanumi" "Sominabo" "Suliat" "Tariere" "Temedire" "Yemisi"))
+(random-table/register :name "Nigerian Name > Surname"
+  :private t
+  :data '("Adegboye" "Adeniyi" "Adeyeku" "Adunola" "Agbaje" "Akpan" "Akpehi" "Aliki" "Asuni" "Babangida" "Ekim" "Ezeiruaku" "Fabiola" "Fasola" "Nwokolo" "Nzeocha" "Ojo" "Okonkwo" "Okoye" "Olaniyan" "Olawale" "Olumese" "Onajobi" "Soyinka" "Yamusa"))
+(random-table/register :name "Nigerian Location Name"
+  :private t
+  :data '("Abadan" "Jere" "Ador" "Kalabalge" "Agatu" "Katsina" "Akamkpa" "Knoduga" "Akpabuyo" "Konshishatse" "Ala" "Kukawa" "Askira" "Kwande" "Bakassi" "Kwayakusar" "Bama" "Logo" "Bayo" "Mafa" "Bekwara" "Makurdi" "Biase" "Nganzai" "Boki" "Obanliku" "Buruku" "Obi" "Calabar" "Obubra" "Chibok" "Obudu" "Damboa" "Odukpani" "Dikwa" "Ogbadibo" "Etung" "Ohimini" "Gboko" "Okpokwu" "Gubio" "Otukpo" "Guzamala" "Shani" "Gwoza" "Ugep" "Hawul" "Vandeikya" "Ikom" "Yala"))
+
+(random-table/register :name "Russian Name > Male Given Name"
+  :private t
+  :data '("Aleksandr" "Andrei" "Arkady" "Boris" "Dmitri" "Dominik" "Grigory" "Igor" "Ilya" "Ivan" "Kiril" "Konstantin" "Leonid" "Nikolai" "Oleg" "Pavel" "Petr" "Sergei" "Stepan" "Valentin" "Vasily" "Viktor" "Yakov" "Yegor" "Yuri"))
+(random-table/register :name "Russian Name > Female Given Name"
+  :private t
+  :data '("Aleksandra" "Anastasia" "Anja" "Catarina" "Devora" "Dima" "Ekaterina" "Eva" "Irina" "Karolina" "Katlina" "Kira" "Ludmilla" "Mara" "Nadezdha" "Nastassia" "Natalya" "Oksana" "Olena" "Olga" "Sofia" "Svetlana" "Tatyana" "Vilma" "Yelena"))
+(random-table/register :name "Russian Name > Surname"
+  :private t
+  :data '("Abelev" "Bobrikov" "Chemerkin" "Gogunov" "Gurov" "Iltchenko" "Kavelin" "Komarov" "Korovin" "Kurnikov" "Lebedev" "Litvak" "Mekhdiev" "Muraviov" "Nikitin" "Ortov" "Peshkov" "Romasko" "Shvedov" "Sikorski" "Stolypin" "Turov" "Volokh" "Zaitsev" "Zhukov"))
+(random-table/register :name "Russian Location Name"
+  :private t
+  :data '("Amur" "Omsk" "Arkhangelsk" "Orenburg" "Astrakhan" "Oryol" "Belgorod" "Penza" "Bryansk" "Perm" "Chelyabinsk" "Pskov" "Chita" "Rostov" "Gorki" "Ryazan" "Irkutsk" "Sakhalin" "Ivanovo" "Samara" "Kaliningrad" "Saratov" "Kaluga" "Smolensk" "Kamchatka" "Sverdlovsk" "Kemerovo" "Tambov" "Kirov" "Tomsk" "Kostroma" "Tula" "Kurgan" "Tver" "Kursk" "Tyumen" "Leningrad" "Ulyanovsk" "Lipetsk" "Vladimir" "Magadan" "Volgograd" "Moscow" "Vologda" "Murmansk" "Voronezh" "Novgorod" "Vyborg" "Novosibirsk" "Yaroslavl"))
+
+(random-table/register :name "Spanish Name > Male Given Name"
+  :private t
+  :data '("Alejandro" "Alonso" "Amelio" "Armando" "Bernardo" "Carlos" "Cesar" "Diego" "Emilio" "Estevan" "Felipe" "Francisco" "Guillermo" "Javier" "Jose" "Juan" "Julio" "Luis" "Pedro" "Raul" "Ricardo" "Salvador" "Santiago" "Valeriano" "Vicente"))
+(random-table/register :name "Spanish Name > Female Given Name"
+  :private t
+  :data '("Adalina" "Aleta" "Ana" "Ascencion" "Beatriz" "Carmela" "Celia" "Dolores" "Elena" "Emelina" "Felipa" "Inez" "Isabel" "Jacinta" "Lucia" "Lupe" "Maria" "Marta" "Nina" "Paloma" "Rafaela" "Soledad" "Teresa" "Valencia" "Zenaida"))
+(random-table/register :name "Spanish Name > Surname"
+  :private t
+  :data '("Arellano" "Arispana" "Borrego" "Carderas" "Carranzo" "Cordova" "Enciso" "Espejo" "Gavilan" "Guerra" "Guillen" "Huertas" "Illan" "Jurado" "Moretta" "Motolinia" "Pancorbo" "Paredes" "Quesada" "Roma" "Rubiera" "Santoro" "Torrillas" "Vera" "Vivero"))
+(random-table/register :name "Spanish Location Name"
+  :private t
+  :data '("Aguascebas" "Loreto" "Alcazar" "Lujar" "Barranquete" "Marbela" "Bravatas" "Matagorda" "Cabezudos" "Nacimiento" "Calderon" "Niguelas" "Cantera" "Ogijares" "Castillo" "Ortegicar" "Delgadas" "Pampanico" "Donablanca" "Pelado" "Encinetas" "Quesada" "Estrella" "Quintera" "Faustino" "Riguelo" "Fuentebravia" "Ruescas" "Gafarillos" "Salteras" "Gironda" "Santopitar" "Higueros" "Taberno" "Huelago" "Torres" "Humilladero" "Umbrete" "Illora" "Valdecazorla" "Isabela" "Velez" "Izbor" "Vistahermosa" "Jandilla" "Yeguas" "Jinetes" "Zahora" "Limones" "Zumeta"))
 
 (random-table/register :name "Item, Fantasy"
   :private t
@@ -650,7 +776,6 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "Forbidden the use of certain technology"))
 
 ;;;; Herbalist's Primer
-
 (random-table/register :name "Plant (Herbalist's Primer)"
   :data '("${Plant > Name Prefix (Herbalist's Primer)}${Plant > Name Suffix (Herbalist's Primer)} is ${Plant > Rarity (Herbalist's Primer)} ${Plant > Habit (Herbalist's Primer)}, mostly prized for its ${Plant > Properties (Herbalist's Primer)} value.  It is a native to the ${Plant > Climate (Herbalist's Primer)} ${Plant > Biome (Herbalist's Primer)}.  Interestingly, it ${Plant > Quirk (Herbalist's Primer)}.${Plant > Property Description (Herbalist's Primer)}"))
 
@@ -701,15 +826,15 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "attracts all kinds of insects" "is a favorite snack of many animals" "often hosts bird nests" "has a lovely, sweet flavor" "grows incredibly fast"))
 
 (random-table/register :name "Plant > Property Description (Herbalist's Primer)"
-  :reuse "Plant > Properties (Herbalist's Primer)"
   :private t
-  :data '("C" ;; culinary
-           nil ;; industrial
-           "M" ;; magical
-           "M" ;; medicinal
-           nil ;; ornamental
-           "P" ;; poisonous
-           ))
+  :data
+  '(nil ;; culinary
+    nil ;; industrial
+    "  Magical Property: the plant’s ${Plant > Material (Herbalist's Primer)} ${Plant > Method (Herbalist's Primer)} will ${Plant > Effect > Magical (Herbalist's Primer)}.  One complication is that ${Plant > Complication (Herbalist's Primer)}." ;; magical
+    "  Medicinal Property: the plant’s ${Plant > Material (Herbalist's Primer)} ${Plant > Method (Herbalist's Primer)} will ${Plant > Effect > Medicinal (Herbalist's Primer)}.  One complication is that ${Plant > Complication (Herbalist's Primer)}." ;; magical
+    nil ;; ornamental
+     "  Poisonous Property: the plant’s ${Plant > Material (Herbalist's Primer)} ${Plant > Method (Herbalist's Primer)} will ${Plant > Effect > Poisonous (Herbalist's Primer)}.  One complication is that ${Plant > Complication (Herbalist's Primer)}." ;; magical
+     ))
 
 (random-table/register :name "Plant > Material (Herbalist's Primer)"
   :private t
@@ -730,7 +855,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
   :data '("aid digestion" "alleviate allergy" "cure wounds" "destroy viruses" "fight the flu"
            "improve focus" "kill bacteria" "lower blood pressure" "mend bones" "neutralize poison"
            "reduce inflammation" "remove itching" "remove nausea" "remove pain" "sanitize the wound"
-           "soothe the skin" "stop bleeding" "stop cough" "strengthen the heart" "strenthen the immune system"))
+           "soothe the skin" "stop bleeding" "stop coughing" "strengthen the heart" "strenthen the immune system"))
 
 (random-table/register :name "Plant > Effect > Poisonous (Herbalist's Primer)"
   :private t
@@ -753,6 +878,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "raise the dead" "reflect malicious magic" "remove negative energy" "remove toxins" "stop shapeshifting"))
 
 (random-table/register :name "Plant > Complication (Herbalist's Primer)"
+  :private t
   :data '("dangerous animals often protect it"
            "it grows in a desolate far-away place"
            "it is a deadly poison"
