@@ -41,6 +41,8 @@
 (require 'git-related)
 (require 'dig-my-grave)
 ;; (require 'jf-project-theme-colors)
+(require 'jf-tables)
+(load "~/git/dotemacs/emacs.d/random-tables-data.el")
 
 (setq jf/artist-mode-spraycan "🞄⁛◌🞆⊖⊗⁛●◯⦿⬤")
 (load (concat user-emacs-directory "hide-comnt.el") :noerror)
