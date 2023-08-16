@@ -110,8 +110,6 @@ See `random-table/roller/default'."
   "Find POSITION on the given DATA.
 
 When POSITION is not given, choose a random element from the TABLE."
-   (message "Data: %S\nPosition: %S" data position)
-
   (if-let ((index (if (integerp position) position (car position))))
     (if (-cons-pair? (car data))
       (cdr (seq-find (lambda (row) (member index (car row))) data))
@@ -569,7 +567,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
   :data '("Aldington" "Kedington" "Appleton" "Latchford" "Ashdon" "Leigh" "Berwick" "Leighton" "Bramford" "Maresfield" "Brimstage" "Markshall" "Carden" "Netherpool" "Churchill" "Newton" "Clifton" "Oxton" "Colby" "Preston" "Copford" "Ridley" "Cromer" "Rochford" "Davenham" "Seaford" "Dersingham" "Selsey" "Doverdale" "Stanton" "Elsted" "Stockham" "Ferring" "Stoke" "Gissing" "Sutton" "Heydon" "Thakeham" "Holt" "Thetford" "Hunston" "Thorndon" "Hutton" "Ulting" "Inkberrow" "Upton" "Inworth" "Westhorpe" "Isfield" "Worcester"))
 
 (random-table/register :name "Greek Name > Male Given Name"
-		:private t
+	:private t
   :data '("Alexander" "Alexius" "Anastasius" "Christodoulos" "Christos" "Damian" "Dimitris" "Dysmas" "Elias" "Giorgos" "Ioannis" "Konstantinos" "Lambros" "Leonidas" "Marcos" "Miltiades" "Nestor" "Nikos" "Orestes" "Petros" "Simon" "Stavros" "Theodore" "Vassilios" "Yannis"))
 (random-table/register :name "Greek Name > Female Given Name"
   :private t
@@ -581,7 +579,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
   :private t
   :data '("Adramyttion" "Kallisto" "Ainos" "Katerini" "Alikarnassos" "Kithairon" "Avydos" "Kydonia" "Dakia" "Lakonia" "Dardanos" "Leros" "Dekapoli" "Lesvos" "Dodoni" "Limnos" "Efesos" "Lykia" "Efstratios" "Megara" "Elefsina" "Messene" "Ellada" "Milos" "Epidavros" "Nikaia" "Erymanthos" "Orontis" "Evripos" "Parnasos" "Gavdos" "Petro" "Gytheio" "Samos" "Ikaria" "Syros" "Ilios" "Thapsos" "Illyria" "Thessalia" "Iraia" "Thira" "Irakleio" "Thiva" "Isminos" "Varvara" "Ithaki" "Voiotia" "Kadmeia" "Vyvlos"))
 
-                              ;; Indian Name > Male Given Name
+;; Indian Name > Male Given Name
 (random-table/register :name "Indian Name > Male Given Name"
   :private t
   :data '("Amrit" "Ashok" "Chand" "Dinesh" "Gobind" "Harinder" "Jagdish" "Johar" "Kurien" "Lakshman" "Madhav" "Mahinder" "Mohal" "Narinder" "Nikhil" "Omrao" "Prasad" "Pratap" "Ranjit" "Sanjay" "Shankar" "Thakur" "Vijay" "Vipul" "Yash"))
@@ -668,7 +666,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "Key" "Ingredient" "Poison" "Drug" "Pet"))
 
 (random-table/register :name "Corporation, Sci-Fi"
-  :data '("- Name :: ${Corporation, Sci-Fi > Prefix} ${Corporation, Sci-Fi > Suffix}\n- Rumor :: ${Corporation, Sci-Fi > Rumor}"))
+  :data '("- Name :: ${Corporation, Sci-Fi > Prefix} ${Corporation, Sci-Fi > Suffix}\n- Business :: ${Corporation, Sci-Fi > Business}\n- Rumor :: ${Corporation, Sci-Fi > Rumor}"))
 
 (random-table/register :name "Corporation, Sci-Fi > Prefix"
   :private t
@@ -686,218 +684,230 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "Outfit" "Pact" "Partnership" "Ring" "Society"
            "Sodality" "Syndicate" "Union" "Unity" "Zaibatsu"))
 
-(random-table/register :name "Corporation, Sci-Fi > Rumor"
-  :private t
-  :data
-  '("Reckless with the lives of their employees"
-     "Have a dark secret about their board of directors"
-     "Notoriously xenophobic towards aliens"
-     "Lost much money to an embezzler who evaded arrest"
-     "Reliable and trustworthy goods"
-     "Stole a lot of R&D from a rival corporation"
-     "They have high-level political connections"
-     "Rumored cover-up of a massive industrial accident"
-     "Stodgy and very conservative in their business plans"
-     "Stodgy and very conservative in their business plans"
-     "The company’s owner is dangerously insane"
-     "Rumored ties to a eugenics cult"
-     "Said to have a cache of pretech equipment"
-     "Possibly teetering on the edge of bankruptcy"
-     "Front for a planetary government’s espionage arm"
-     "Secretly run by a psychic cabal"
-     "Secretly run by hostile aliens"
-     "Secretly run by an unbraked AI"
-     "They’ve turned over a new leaf with the new CEO"
-     "Deeply entangled with the planetary underworl"))
+(random-table/register :name "Corporation, Sci-Fi > Business"
+  :data '("Aeronautics" "Agriculture" "Art" "Assassination" "Asteroid Mining"
+           "Astrotech" "Biotech" "Bootlegging" "Computer Hardware" "Construction"
+           "Cybernetics" "Electronics" "Energy Weapons" "Entertainment" "Espionage"
+           "Exploration" "Fishing" "Fuel Refining" "Gambling" "Gemstones"
+           "Gengineering" "Grav Vehicles" "Heavy Weapons" "Ideology" "Illicit Drugs"
+           "Journalism" "Law Enforcement" "Liquor" "Livestock" "Maltech"
+           "Mercenary Work" "Metallurgy" "Pharmaceuticals" "Piracy" "Planetary Mining"
+           "Plastics" "Pretech" "Prisons" "Programming" "Projectile Guns"
+           "Prostitution" "Psionics" "Psitech" "Robotics" "Security"
+           "Shipyards" "Snacks" "Telcoms" "Transport" "Xenotech"))
 
-(random-table/register :name "Heresy"
-  :data '("\n- Founder :: ${Heresy > Founder}\n- Major Heresy :: ${Heresy > Major Heresy}\n- Attitude :: ${Heresy > Attitude}\n- Quirk :: ${Heresy > Quirk}"))
+  (random-table/register :name "Corporation, Sci-Fi > Rumor"
+    :private t
+    :data
+    '("Reckless with the lives of their employees"
+       "Have a dark secret about their board of directors"
+       "Notoriously xenophobic towards aliens"
+       "Lost much money to an embezzler who evaded arrest"
+       "Reliable and trustworthy goods"
+       "Stole a lot of R&D from a rival corporation"
+       "They have high-level political connections"
+       "Rumored cover-up of a massive industrial accident"
+       "Stodgy and very conservative in their business plans"
+       "Stodgy and very conservative in their business plans"
+       "The company’s owner is dangerously insane"
+       "Rumored ties to a eugenics cult"
+       "Said to have a cache of pretech equipment"
+       "Possibly teetering on the edge of bankruptcy"
+       "Front for a planetary government’s espionage arm"
+       "Secretly run by a psychic cabal"
+       "Secretly run by hostile aliens"
+       "Secretly run by an unbraked AI"
+       "They’ve turned over a new leaf with the new CEO"
+       "Deeply entangled with the planetary underworl"))
 
-(random-table/register :name "Heresy > Founder"
-  :private t
-  :data '("Defrocked clergy: founded by a cleric outcast from the faith."
-           "Frustrated layman: founded by a layman frustrated with the faith’s decadence rigidity or lack of authenticity."
-           "Renegade prophet: founded by a revered holy figure who broke with the faith."
-           "High prelate: founded by an important and powerful cleric to convey his or her beliefs."
-           "Dissatisfied minor clergy: founded by a minor cleric frustrated with the faith’s current condition."
-           "Outsider: founded by a member of another faith deeply influenced by the parent religion."
-           "Academic: founded by a professor or theologian on intellectual grounds."
-           "Accidental: the founder never meant their works to be taken that way."))
+  (random-table/register :name "Heresy"
+    :data '("\n- Founder :: ${Heresy > Founder}\n- Major Heresy :: ${Heresy > Major Heresy}\n- Attitude :: ${Heresy > Attitude}\n- Quirk :: ${Heresy > Quirk}"))
 
-(random-table/register :name "Heresy > Major Heresy"
-  :private t
-  :data '("Manichaeanism: the sect believes in harsh austerities and rejection of matter as something profane and evil."
-           "Donatism: the sect believes that clergy must be personally pure and holy in order to be legitimate."
-           "Supercessionism: the sect believes the founder or some other source supercedes former scripture or tradition."
-           "Antinomianism: the sect believes that their holy persons are above any earthly law and may do as they will."
-           "Universal priesthood: the sect believes that there is no distinction between clergy and layman and that all functions of the faith may be performed by all members."
-           "Conciliarism: the sect believes that the consensus of believers may correct or command even the clerical leadership of the faith."
-           "Ethnocentrism: the sect believes that only a particular ethnicity or nationality can truly belong to the faith."
-           "Separatism: the sect believes members should shun involvement with the secular world."
-           "Stringency: the sect believes that even minor sins should be punished and major sins should be capital crimes."
-           "Syncretism: the sect has added elements of another native faith to their beliefs."
-           "Primitivism: the sect tries to recreate what they imagine was the original community of faith."
-           "Conversion by the sword: unbelievers must be brought to obedience to the sect or be granted death."))
+  (random-table/register :name "Heresy > Founder"
+    :private t
+    :data '("Defrocked clergy: founded by a cleric outcast from the faith."
+             "Frustrated layman: founded by a layman frustrated with the faith’s decadence rigidity or lack of authenticity."
+             "Renegade prophet: founded by a revered holy figure who broke with the faith."
+             "High prelate: founded by an important and powerful cleric to convey his or her beliefs."
+             "Dissatisfied minor clergy: founded by a minor cleric frustrated with the faith’s current condition."
+             "Outsider: founded by a member of another faith deeply influenced by the parent religion."
+             "Academic: founded by a professor or theologian on intellectual grounds."
+             "Accidental: the founder never meant their works to be taken that way."))
 
-(random-table/register :name "Heresy > Attitude"
-  :private t
-  :data '("Filial: the sect honors and respects the orthodox faith, but feels it is substantially in error."
-           "Anathematic: the orthodox are spiritually worse than infidels, and their ways must be avoided at all costs."
-           "Evangelical: the sect feels compelled to teach the orthodox the better truth of their ways."
-           "Contemptuous: the orthodox are spiritually lost and ignoble."
-           "Aversion: the sect wishes to shun and avoid the orthodox."
-           "Hatred: the sect wishes the death or conversion of the orthodox."
-           "Indifference: the sect has no particular animus or love for the orthodox."
-           "Obedience: the sect feels obligated to obey the orthodox hierarchy in all matters not related to their specific faith."
-           "Legitimist: the sect views itself as the \true\" orthodox faith and the present orthodox hierarchy as pretenders to their office."
-           "Purificationist: the sect’s austerities, sufferings, and asceticisms are necessary to purify the orthodox."))
+  (random-table/register :name "Heresy > Major Heresy"
+    :private t
+    :data '("Manichaeanism: the sect believes in harsh austerities and rejection of matter as something profane and evil."
+             "Donatism: the sect believes that clergy must be personally pure and holy in order to be legitimate."
+             "Supercessionism: the sect believes the founder or some other source supercedes former scripture or tradition."
+             "Antinomianism: the sect believes that their holy persons are above any earthly law and may do as they will."
+             "Universal priesthood: the sect believes that there is no distinction between clergy and layman and that all functions of the faith may be performed by all members."
+             "Conciliarism: the sect believes that the consensus of believers may correct or command even the clerical leadership of the faith."
+             "Ethnocentrism: the sect believes that only a particular ethnicity or nationality can truly belong to the faith."
+             "Separatism: the sect believes members should shun involvement with the secular world."
+             "Stringency: the sect believes that even minor sins should be punished and major sins should be capital crimes."
+             "Syncretism: the sect has added elements of another native faith to their beliefs."
+             "Primitivism: the sect tries to recreate what they imagine was the original community of faith."
+             "Conversion by the sword: unbelievers must be brought to obedience to the sect or be granted death."))
 
-(random-table/register :name "Heresy > Quirk"
-  :private t
-  :data '("Clergy of only one gender"
-           "Dietary prohibitions"
-           "Characteristic item of clothing or jewelry"
-           "Public prayer at set times or places"
-           "Forbidden to do something commonly done"
-           "Anti-intellectual deploring secular learning"
-           "Mystical seeking union with God through meditation"
-           "Lives in visibly distinct houses or districts"
-           "Has a language specific to the sect"
-           "Greatly respects learning and education"
-           "Favors specific colors or symbols"
-           "Has unique purification rituals"
-           "Always armed"
-           "Forbids marriage or romance outside the sect"
-           "Will not eat with people outside the sect"
-           "Must donate labor or tithe money to the sect"
-           "Special friendliness toward another faith or ethnicity"
-           "Favors certain professions for their membership"
-           "Vigorous charity work among unbelievers"
-           "Forbidden the use of certain technology"))
+  (random-table/register :name "Heresy > Attitude"
+    :private t
+    :data '("Filial: the sect honors and respects the orthodox faith, but feels it is substantially in error."
+             "Anathematic: the orthodox are spiritually worse than infidels, and their ways must be avoided at all costs."
+             "Evangelical: the sect feels compelled to teach the orthodox the better truth of their ways."
+             "Contemptuous: the orthodox are spiritually lost and ignoble."
+             "Aversion: the sect wishes to shun and avoid the orthodox."
+             "Hatred: the sect wishes the death or conversion of the orthodox."
+             "Indifference: the sect has no particular animus or love for the orthodox."
+             "Obedience: the sect feels obligated to obey the orthodox hierarchy in all matters not related to their specific faith."
+             "Legitimist: the sect views itself as the \true\" orthodox faith and the present orthodox hierarchy as pretenders to their office."
+             "Purificationist: the sect’s austerities, sufferings, and asceticisms are necessary to purify the orthodox."))
+
+  (random-table/register :name "Heresy > Quirk"
+    :private t
+    :data '("Clergy of only one gender"
+             "Dietary prohibitions"
+             "Characteristic item of clothing or jewelry"
+             "Public prayer at set times or places"
+             "Forbidden to do something commonly done"
+             "Anti-intellectual deploring secular learning"
+             "Mystical seeking union with God through meditation"
+             "Lives in visibly distinct houses or districts"
+             "Has a language specific to the sect"
+             "Greatly respects learning and education"
+             "Favors specific colors or symbols"
+             "Has unique purification rituals"
+             "Always armed"
+             "Forbids marriage or romance outside the sect"
+             "Will not eat with people outside the sect"
+             "Must donate labor or tithe money to the sect"
+             "Special friendliness toward another faith or ethnicity"
+             "Favors certain professions for their membership"
+             "Vigorous charity work among unbelievers"
+             "Forbidden the use of certain technology"))
 
 ;;;; Herbalist's Primer
-(random-table/register :name "Plant (Herbalist's Primer)"
-  :data '("${Plant > Name Prefix (Herbalist's Primer)}${Plant > Name Suffix (Herbalist's Primer)} is ${Plant > Rarity (Herbalist's Primer)} ${Plant > Habit (Herbalist's Primer)}, mostly prized for its ${Plant > Properties (Herbalist's Primer)} value.  It is a native to the ${Plant > Climate (Herbalist's Primer)} ${Plant > Biome (Herbalist's Primer)}.  Interestingly, it ${Plant > Quirk (Herbalist's Primer)}.${Plant > Property Description (Herbalist's Primer)}"))
+  (random-table/register :name "Plant (Herbalist's Primer)"
+    :data '("${Plant > Name Prefix (Herbalist's Primer)}${Plant > Name Suffix (Herbalist's Primer)} is ${Plant > Rarity (Herbalist's Primer)} ${Plant > Habit (Herbalist's Primer)}, mostly prized for its ${Plant > Properties (Herbalist's Primer)} value.  It is a native to the ${Plant > Climate (Herbalist's Primer)} ${Plant > Biome (Herbalist's Primer)}.  Interestingly, it ${Plant > Quirk (Herbalist's Primer)}.${Plant > Property Description (Herbalist's Primer)}"))
 
-(random-table/register :name "Plant > Name Prefix (Herbalist's Primer)"
-  :private t
-  :data '("Arrow" "Blood" "Crimson" "Death" "Dragon" "Fire" "Gold" "Good" "Ice" "Life"
-           "Raven" "Snake" "Spear" "Spirit" "Star" "Sword" "Truth" "Witch" "Wolf" "Worm"))
+  (random-table/register :name "Plant > Name Prefix (Herbalist's Primer)"
+    :private t
+    :data '("Arrow" "Blood" "Crimson" "Death" "Dragon" "Fire" "Gold" "Good" "Ice" "Life"
+             "Raven" "Snake" "Spear" "Spirit" "Star" "Sword" "Truth" "Witch" "Wolf" "Worm"))
 
-(random-table/register :name "Plant > Name Suffix (Herbalist's Primer)"
-  :private t
-  :data '("bane" "bark" "bean" "berry" "bush" "fern" "flower" "fruit" "grass" "leaf"
-           "nut" "plant" "root" "seed" "spice" "thorn" "tree" "weed" "wort" "wood"))
+  (random-table/register :name "Plant > Name Suffix (Herbalist's Primer)"
+    :private t
+    :data '("bane" "bark" "bean" "berry" "bush" "fern" "flower" "fruit" "grass" "leaf"
+             "nut" "plant" "root" "seed" "spice" "thorn" "tree" "weed" "wort" "wood"))
 
-;; Todo consider altering the rarity
-(random-table/register :name "Plant > Rarity (Herbalist's Primer)"
-  :private t
-  :data '("a widespread" "an abundant" "a common" "a popular" "an uncommon"
-           "a rare" "an endangered" "a near-extinct" "a legendary" "a mythical"))
+  ;; Todo consider altering the rarity
+  (random-table/register :name "Plant > Rarity (Herbalist's Primer)"
+    :private t
+    :data '("a widespread" "an abundant" "a common" "a popular" "an uncommon"
+             "a rare" "an endangered" "a near-extinct" "a legendary" "a mythical"))
 
-(random-table/register :name "Plant > Habit (Herbalist's Primer)"
-  :private t
-  :data '("herb" "shrub" "tree"))
+  (random-table/register :name "Plant > Habit (Herbalist's Primer)"
+    :private t
+    :data '("herb" "shrub" "tree"))
 
-(random-table/register :name "Plant > Properties (Herbalist's Primer)"
-  :private t
-  :store t
-  :data '("culinary" "industrial" "magical" "medicinal" "ornamental" "poisonous"))
+  (random-table/register :name "Plant > Properties (Herbalist's Primer)"
+    :private t
+    :store t
+    :data '("culinary" "industrial" "magical" "medicinal" "ornamental" "poisonous"))
 
-(random-table/register :name "Plant > Climate (Herbalist's Primer)"
-  :private t
-  :data '("artic" "arid" "boreal" "cold" "continental"
-           "dry" "high-altitude" "hot" "humid" "ice-bound"
-           "island" "marine" "monsoon" "oceanic" "polar"
-           "subartic" "subtropical" "temperate" "tropical" "wet"))
+  (random-table/register :name "Plant > Climate (Herbalist's Primer)"
+    :private t
+    :data '("artic" "arid" "boreal" "cold" "continental"
+             "dry" "high-altitude" "hot" "humid" "ice-bound"
+             "island" "marine" "monsoon" "oceanic" "polar"
+             "subartic" "subtropical" "temperate" "tropical" "wet"))
 
-(random-table/register :name "Plant > Biome (Herbalist's Primer)"
-  :private t
-  :data '("caves" "deserts" "forests" "gardens" "hills"
-           "lakes" "meadows" "mountains" "plains" "plantations"
-           "riverbanks" "roadsides" "seas" "shores" "shrublands"
-           "streams" "swamps" "urban areas" "volcanoes" "wastes"))
+  (random-table/register :name "Plant > Biome (Herbalist's Primer)"
+    :private t
+    :data '("caves" "deserts" "forests" "gardens" "hills"
+             "lakes" "meadows" "mountains" "plains" "plantations"
+             "riverbanks" "roadsides" "seas" "shores" "shrublands"
+             "streams" "swamps" "urban areas" "volcanoes" "wastes"))
 
-(random-table/register :name "Plant > Quirk (Herbalist's Primer)"
-  :private t
-  :data '("is carnivorous" "is parasitic" "is symbiotic with another plant" "stores water in the stems" "has a strong, pleasant aroma"
-           "is always warm to the touch" "is covered in sharp spikes" "is covered in a sticky sap" "smells of rotting meat" "grows in the tree crowns"
-           "grows almost entirely underground" "only blooms at night" "is poisonous to other plants" "causes a strong allergic reaction" "produces a lot of pollen"
-           "attracts all kinds of insects" "is a favorite snack of many animals" "often hosts bird nests" "has a lovely, sweet flavor" "grows incredibly fast"))
+  (random-table/register :name "Plant > Quirk (Herbalist's Primer)"
+    :private t
+    :data '("is carnivorous" "is parasitic" "is symbiotic with another plant" "stores water in the stems" "has a strong, pleasant aroma"
+             "is always warm to the touch" "is covered in sharp spikes" "is covered in a sticky sap" "smells of rotting meat" "grows in the tree crowns"
+             "grows almost entirely underground" "only blooms at night" "is poisonous to other plants" "causes a strong allergic reaction" "produces a lot of pollen"
+             "attracts all kinds of insects" "is a favorite snack of many animals" "often hosts bird nests" "has a lovely, sweet flavor" "grows incredibly fast"))
 
-(random-table/register :name "Plant > Property Description (Herbalist's Primer)"
-  :private t
-  :data
-  '(nil ;; culinary
-    nil ;; industrial
-    "  Magical Property: the plant’s ${Plant > Material (Herbalist's Primer)} ${Plant > Method (Herbalist's Primer)} will ${Plant > Effect > Magical (Herbalist's Primer)}.  One complication is that ${Plant > Complication (Herbalist's Primer)}." ;; magical
-    "  Medicinal Property: the plant’s ${Plant > Material (Herbalist's Primer)} ${Plant > Method (Herbalist's Primer)} will ${Plant > Effect > Medicinal (Herbalist's Primer)}.  One complication is that ${Plant > Complication (Herbalist's Primer)}." ;; magical
-    nil ;; ornamental
-     "  Poisonous Property: the plant’s ${Plant > Material (Herbalist's Primer)} ${Plant > Method (Herbalist's Primer)} will ${Plant > Effect > Poisonous (Herbalist's Primer)}.  One complication is that ${Plant > Complication (Herbalist's Primer)}." ;; magical
-     ))
+  (random-table/register :name "Plant > Property Description (Herbalist's Primer)"
+    :private t
+    :data
+    '(nil ;; culinary
+       nil ;; industrial
+       "  Magical Property: the plant’s ${Plant > Material (Herbalist's Primer)} ${Plant > Method (Herbalist's Primer)} will ${Plant > Effect > Magical (Herbalist's Primer)}.  One complication is that ${Plant > Complication (Herbalist's Primer)}." ;; magical
+       "  Medicinal Property: the plant’s ${Plant > Material (Herbalist's Primer)} ${Plant > Method (Herbalist's Primer)} will ${Plant > Effect > Medicinal (Herbalist's Primer)}.  One complication is that ${Plant > Complication (Herbalist's Primer)}." ;; magical
+       nil ;; ornamental
+       "  Poisonous Property: the plant’s ${Plant > Material (Herbalist's Primer)} ${Plant > Method (Herbalist's Primer)} will ${Plant > Effect > Poisonous (Herbalist's Primer)}.  One complication is that ${Plant > Complication (Herbalist's Primer)}." ;; magical
+       ))
 
-(random-table/register :name "Plant > Material (Herbalist's Primer)"
-  :private t
-  :data '("balsam" "bark" "bulbs" "buds" "cones"
-           "flowers" "fruits" "galls" "gum" "juice"
-           "leaves" "petals" "pollen" "resin" "rhizomes"
-           "root" "seeds" "stems" "timber" "tubers"))
+  (random-table/register :name "Plant > Material (Herbalist's Primer)"
+    :private t
+    :data '("balsam" "bark" "bulbs" "buds" "cones"
+             "flowers" "fruits" "galls" "gum" "juice"
+             "leaves" "petals" "pollen" "resin" "rhizomes"
+             "root" "seeds" "stems" "timber" "tubers"))
 
-(random-table/register :name "Plant > Method (Herbalist's Primer)"
-  :private t
-  :data '("applied to an inanimate object" "burned as incenses" "carried" "chewed" "distilled"
-           "drank as tea" "grown" "held under the tongue" "ingested" "juiced and injected"
-           "mixed with alchohol" "place under a pillow" "powdered and inhaled" "rubbed on skin" "scattered on the wind"
-           "sewn inside clothing" "swallowed whole" "thrown at a target" "torn or shredded" "worn"))
+  (random-table/register :name "Plant > Method (Herbalist's Primer)"
+    :private t
+    :data '("applied to an inanimate object" "burned as incenses" "carried" "chewed" "distilled"
+             "drank as tea" "grown" "held under the tongue" "ingested" "juiced and injected"
+             "mixed with alchohol" "place under a pillow" "powdered and inhaled" "rubbed on skin" "scattered on the wind"
+             "sewn inside clothing" "swallowed whole" "thrown at a target" "torn or shredded" "worn"))
 
-(random-table/register :name "Plant > Effect > Medicinal (Herbalist's Primer)"
-  :private t
-  :data '("aid digestion" "alleviate allergy" "cure wounds" "destroy viruses" "fight the flu"
-           "improve focus" "kill bacteria" "lower blood pressure" "mend bones" "neutralize poison"
-           "reduce inflammation" "remove itching" "remove nausea" "remove pain" "sanitize the wound"
-           "soothe the skin" "stop bleeding" "stop coughing" "strengthen the heart" "strenthen the immune system"))
+  (random-table/register :name "Plant > Effect > Medicinal (Herbalist's Primer)"
+    :private t
+    :data '("aid digestion" "alleviate allergy" "cure wounds" "destroy viruses" "fight the flu"
+             "improve focus" "kill bacteria" "lower blood pressure" "mend bones" "neutralize poison"
+             "reduce inflammation" "remove itching" "remove nausea" "remove pain" "sanitize the wound"
+             "soothe the skin" "stop bleeding" "stop coughing" "strengthen the heart" "strenthen the immune system"))
 
-(random-table/register :name "Plant > Effect > Poisonous (Herbalist's Primer)"
-  :private t
-  :data '("cause acute pain" "cause bleeding" "cause coma" "cause contact allergy" "cause death"
-           "cause diarrhea" "cause dizziness" "cause hallucinations" "cause itching"
-           "cause nausea" "cause neurological damage" "cause paralysis" "cause swelling" "cause violent spasms"
-           "raise blood pressure" "remove a sense" "stop breathing" "stop the heart" "turn blood to ichor"))
+  (random-table/register :name "Plant > Effect > Poisonous (Herbalist's Primer)"
+    :private t
+    :data '("cause acute pain" "cause bleeding" "cause coma" "cause contact allergy" "cause death"
+             "cause diarrhea" "cause dizziness" "cause hallucinations" "cause itching"
+             "cause nausea" "cause neurological damage" "cause paralysis" "cause swelling" "cause violent spasms"
+             "raise blood pressure" "remove a sense" "stop breathing" "stop the heart" "turn blood to ichor"))
 
-(random-table/register :name "Plant > Effect > Magical (Herbalist's Primer)"
-  :private t
-  :data '("alert about danger" "allow seeing in the dark" "allow speaking with animals" "animate objects" "attract feyfolk"
-           "attract love" "attract wealth" "bestow courage" "bestow luck" "bless the user"
-           "break curses" "bring luck in games of chance" "bring prophetic visions" "calm animals" "cause fear"
-           "conjure spirits" "create a circle of protection" "cure all diseases" "cure all wounds" "detect enemies"
-           "detect lies" "divert lightning" "douse flames" "enforce telling the truth" "exorcise spirits"
-           "explode" "find hidden treasures" "find water" "grant a sense of direction" "grant flight"
-           "grant immortality" "grant invisibility" "grant safe travel" "grant second sight" "grant wishes"
-           "keep wild animals at bay" "make the user beautiful" "open a portal to another realm" "open locks" "prolong life"
-           "protect from compulsion" "protect from evil" "protect from harm" "purify the area" "put undead to rest"
-           "raise the dead" "reflect malicious magic" "remove negative energy" "remove toxins" "stop shapeshifting"))
+  (random-table/register :name "Plant > Effect > Magical (Herbalist's Primer)"
+    :private t
+    :data '("alert about danger" "allow seeing in the dark" "allow speaking with animals" "animate objects" "attract feyfolk"
+             "attract love" "attract wealth" "bestow courage" "bestow luck" "bless the user"
+             "break curses" "bring luck in games of chance" "bring prophetic visions" "calm animals" "cause fear"
+             "conjure spirits" "create a circle of protection" "cure all diseases" "cure all wounds" "detect enemies"
+             "detect lies" "divert lightning" "douse flames" "enforce telling the truth" "exorcise spirits"
+             "explode" "find hidden treasures" "find water" "grant a sense of direction" "grant flight"
+             "grant immortality" "grant invisibility" "grant safe travel" "grant second sight" "grant wishes"
+             "keep wild animals at bay" "make the user beautiful" "open a portal to another realm" "open locks" "prolong life"
+             "protect from compulsion" "protect from evil" "protect from harm" "purify the area" "put undead to rest"
+             "raise the dead" "reflect malicious magic" "remove negative energy" "remove toxins" "stop shapeshifting"))
 
-(random-table/register :name "Plant > Complication (Herbalist's Primer)"
-  :private t
-  :data '("dangerous animals often protect it"
-           "it grows in a desolate far-away place"
-           "it is a deadly poison"
-           "it is highly addictive"
-           "it spontaneously combusts"
-           "it is under the protection of the local law"
-           "it is easy to mistake with a toxic plant"
-           "it attracts mosquitoes"
-           "it needs to be used within minutes of gathering"
-           "it tastes like three-week-old garbage"
-           "its juice stains everything it touches"
-           "nobody has seen it in the last century"
-           "possession is illegal"
-           "special set of tools is needed for harvesting"
-           "the stench sticks around for weeks"
-           "the demand is higher than the supply"
-           "the harvest time is just a single day"
-           "the rumors say it brings bad luck"
-           "touching it causes intense pain"
-           "using it requires an obscure, elaborate ritual"))
-(provide 'jf-tables)
+  (random-table/register :name "Plant > Complication (Herbalist's Primer)"
+    :private t
+    :data '("dangerous animals often protect it"
+             "it grows in a desolate far-away place"
+             "it is a deadly poison"
+             "it is highly addictive"
+             "it spontaneously combusts"
+             "it is under the protection of the local law"
+             "it is easy to mistake with a toxic plant"
+             "it attracts mosquitoes"
+             "it needs to be used within minutes of gathering"
+             "it tastes like three-week-old garbage"
+             "its juice stains everything it touches"
+             "nobody has seen it in the last century"
+             "possession is illegal"
+             "special set of tools is needed for harvesting"
+             "the stench sticks around for weeks"
+             "the demand is higher than the supply"
+             "the harvest time is just a single day"
+             "the rumors say it brings bad luck"
+             "touching it causes intense pain"
+             "using it requires an obscure, elaborate ritual"))
+  (provide 'jf-tables)
 ;;; jf-tables.el ends here
