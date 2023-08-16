@@ -506,7 +506,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
 
 ;;;; Random Names (from Stars without Number)
 (random-table/register :name "Name"
-  :data '( "${Arabic Name > Male Given Name} ${Arabic Name > Surname}"
+  :data '("${Arabic Name > Male Given Name} ${Arabic Name > Surname}"
            "${Arabic Name > Female Given Name} ${Arabic Name > Surname}"
            "${Chinese Name > Male Given Name} ${Chinese Name > Surname}"
            "${Chinese Name > Female Given Name} ${Chinese Name > Surname}"
@@ -525,7 +525,9 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "${Russian Name > Male Given Name} ${Russian Name > Surname}"
            "${Russian Name > Female Given Name} ${Russian Name > Surname}"
            "${Spanish Name > Male Given Name} ${Spanish Name > Surname}"
-           "${Spanish Name > Female Given Name} ${Spanish Name > Surname}"))
+           "${Spanish Name > Female Given Name} ${Spanish Name > Surname}"
+           "${Norse Given Name} ${Norse Surname}"
+           "${Norse Given Name} ${Norse Surname}"))
 
 (random-table/register :name "Arabic Name > Male Given Name"
   :private t
@@ -657,6 +659,45 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
 (random-table/register :name "Spanish Location Name"
   :private t
   :data '("Aguascebas" "Loreto" "Alcazar" "Lujar" "Barranquete" "Marbela" "Bravatas" "Matagorda" "Cabezudos" "Nacimiento" "Calderon" "Niguelas" "Cantera" "Ogijares" "Castillo" "Ortegicar" "Delgadas" "Pampanico" "Donablanca" "Pelado" "Encinetas" "Quesada" "Estrella" "Quintera" "Faustino" "Riguelo" "Fuentebravia" "Ruescas" "Gafarillos" "Salteras" "Gironda" "Santopitar" "Higueros" "Taberno" "Huelago" "Torres" "Humilladero" "Umbrete" "Illora" "Valdecazorla" "Isabela" "Velez" "Izbor" "Vistahermosa" "Jandilla" "Yeguas" "Jinetes" "Zahora" "Limones" "Zumeta"))
+
+(random-table/register :name "Norse Given Name"
+  :private t
+  :data '("Åge" "Alvar" "Anna" "Anri" "Ari" "Arne" "Arnkatla" "Åse" "Astrid" "Auður" "Birger" "Bjørn" "Bo" "Bodil" "Darri" "Edda" "Einar" "Emil" "Erik" "Estrik" "Flóki" "Flosi" "Freyja" "Frida" "Frode" "Funi" "Gertrud" "Gorm" "Gro" "Guðmundr" "Guðrún" "Gunhild" "Gunnar" "Halfdan" "Halbera" "Harald" "Harpa" "Hekla" "Helgi" "Hilda" "Hilmir" "Hrefna" "Inga" "Ingibjörg" "Ingólfur" "Jóhanna" "Kaðlín" "Kåre" "Karitas" "Katla" "Ketill" "Knud" "Kristín" "Kristján" "Leif" "Lind" "Liv" "Logi" "Lukka" "Magnús" "Margrét" "María" "Njal" "Nói" "Ødger" "Ólafur" "Orri" "Randi" "Revna" "Roar" "Rune" "Saga" "Salvar" "Sif" "Sigmar" "Signe" "Sigred" "Sigriður" "Sigrún" "Skarde" "Stefán" "Sten" "Sune" "Sunna" "Svend" "Thurid" "Þuríður" "Thyra" "Toke" "Tora" "Torsten" "Tove" "Troels" "Trygve" "Ulfhild" "Valgerður" "Vilmar" "Von" "Yrsa"))
+
+(random-table/register :name "Norse Surname"
+  :private t
+  :data '("${Norse Given Name}son" "${Norse Given Name}dóttir"))
+
+(random-table/register :name "Person"
+  :data '("\n- Name :: ${Name}\n- Physique :: ${Person > Physique}\n- Skin :: ${Person > Skin}\n- Hair :: ${Person > Hair}\n- Face :: ${Person > Face}\n- Speech :: ${Person > Speech}\n- Virtue :: ${Person > Virtue}\n- Vice :: ${Person > Vice}"))
+
+(random-table/register :name "Person > Physique"
+  :private t
+  :data '("Athletic" "Brawny" "Diminutive" "Lanky" "Rugged" "Slim" "Short" "Statuesque" "Stout" "Towering"))
+
+(random-table/register :name "Person > Skin"
+  :private t
+  :data '("Birthmark" "Drawn" "Elogated" "Pockmarked" "Rosy" "Rough" "Smooth" "Freckled" "Scarred" "Weathered"))
+
+(random-table/register :name "Person > Hair"
+  :private t
+  :data '("Shaved" "Braided" "Curly" "Matted" "Frizzy" "Flowing" "Luxurious" "Oily" "Wavy" "Wispy"))
+
+(random-table/register :name "Person > Face"
+  :private t
+  :data '("Bony" "Damaged" "Chiselled" "Elongated" "Pale" "Symmetrical" "Fierce" "Sharp" "Square" "Sunken"))
+
+(random-table/register :name "Person > Speech"
+  :private t
+  :data '("Blunt" "Booming" "Cryptic" "Droning" "Formal" "Gravelly" "Precise" "Squeaky" "Eloquent" "Whispery"))
+
+(random-table/register :name "Person > Virtue"
+  :private t
+  :data '("Ambitious" "Cautious" "Courageous" "Discipline" "Gergarious" "Honourable" "Humble" "Merciful" "Serene" "Tolerant"))
+
+(random-table/register :name "Person > Vice"
+  :private t
+  :data '("Aggressive" "Bitter" "Craven" "Deceitful" "Greedy" "Lazy" "Nervous" "Rude" "Vain" "Vengeful"))
 
 (random-table/register :name "Item, Fantasy"
   :private t
