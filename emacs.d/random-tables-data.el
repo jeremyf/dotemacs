@@ -1,3 +1,4 @@
+(require 'random-table)
 ;;;; Errant
 (random-table/register :name "Reaction Roll (Errant)"
   :roller (lambda (&rest data) (+ 2 (random 6) (random 6)))

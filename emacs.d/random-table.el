@@ -1,4 +1,4 @@
-;;; jf-tables --- Roll on some tables. -*- lexical-binding: t -*-
+;;; random-table --- Roll on some tables. -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2023 Jeremy Friesen
 ;; Author: Jeremy Friesen <jeremy@jeremyfriesen.com>
@@ -9,12 +9,20 @@
 
 ;; This package provides a means of registering random tables (see
 ;; `random-table' and `random-table/register') and then rolling on those tables
-;; (see `random-table/roll').
+;; (see the `random-table/roll').
 ;;
 ;; The `random-table/roll' is an `interactive' function that will prompt you to
 ;; select an expression.  You can choose from a list of registered public tables
 ;; or provide your own text.  This package uses the `s-format' to parse the
 ;; given expression.
+;;
+;; The guts of the logic is `random-table/evaluate/table' namely how we:
+;;
+;; - Gather the dice (represented by the :roller)
+;; - Filter the dice to a value (represented by the :filter), we might pick a
+;;          single dice rolled or sum them or whatever.
+;; - Fetch the filtered result from the table.
+;; - Evaluate the row.
 ;;
 ;; Examples:
 ;; - (random-table/roll "2d6") will roll 2 six-sided dice.
@@ -24,13 +32,7 @@
 ;; Tables can reference other tables, using the above string interpolation
 ;; (e.g. "Roll on ${Your Table}" where "Your Table" is the name of a registered
 ;; table.).  No considerations have been made to check for cyclical references,
-;; you my dear human reader, must account for that.  An example is the
-;; "Oracle Question (Black Sword Hack)" table.  It has one entry:
-;;
-;; "${Oracle Question > Answer (Black Sword Hack)}${Oracle Question > Unexpected Event (Black Sword Hack)}".
-;;
-;; When we roll "Oracle Question (Black Sword Hack)", we then roll on the two
-;; sub-tables.  Which can also leverage the template interpolation.
+;; you my dear human reader, must account for that.
 
 ;;; Code:
 
@@ -38,7 +40,7 @@
 (require 'org-d20)
 (require 'cl)
 
-;;;; Data Structures and Storage
+;;;; Data Structures and Storage and Defaults
 (cl-defstruct random-table
   "The definition of a structured random table.
 
@@ -80,6 +82,12 @@ as whether there are unexpected events.  All from the same roll."
   (store nil)
   (reuse nil))
 
+(cl-defun random-table/register (&rest kws &key name data &allow-other-keys)
+  "Store the DATA, NAME, and all given KWS in a `random-table'."
+  (let* ((key (intern name))
+          (struct (apply #'make-random-table :name key :data (-list data) kws)))
+    (puthash key struct random-table/storage/tables)))
+
 (defvar random-table/storage/results
   (make-hash-table)
   "An ephemeral storage for dice results of rolling for a table.
@@ -96,23 +104,35 @@ The hash key is the \"human readable\" name of the table (as a symbol).
 The hash value is the contents of the table.")
 
 (defun random-table/roller/default (&rest data)
-  "Roll for the given DATA."
+  "Return list with one element that is between 1 the `length' of the given DATA.
+
+Rollers should return a `list' of values; perhaps the results of
+ individual dice rolled.
+
+See `random-table/filter/default'."
   ;; Constant off by one errors are likely
-  (+ 1 (random (length (-list data)))))
+  (list (+ 1 (random (length (-list data))))))
 
 (defun random-table/filter/default (&rest rolls)
-  "Filter the given ROLLS.
+  "Filter the given ROLLS and return an integer.
 
 See `random-table/roller/default'."
   (apply #'+ (-list rolls)))
 
-(defun random-table/fetcher/default (data &optional position)
-  "Find POSITION on the given DATA.
+(defun random-table/fetcher/default (data &optional roll)
+  "Find ROLL on the given table's DATA.
 
-When POSITION is not given, choose a random element from the TABLE."
-  (if-let ((index (if (integerp position) position (car position))))
+When ROLL is not given, choose a random element from the TABLE."
+  (if-let ((index (if (integerp roll) roll (car roll))))
     (if (-cons-pair? (car data))
-      (cdr (seq-find (lambda (row) (member index (car row))) data))
+      ;; We have a cons-pair, meaning we have multiple rolls mapping to the same
+      ;; result.
+      (cdr (seq-find
+             (lambda (row)
+               (if (-cons-pair? row)
+                 (and (>= index (car row)) (<= index (cdr row)))
+                 (member index (car row))))
+             data))
       ;; Off by one errors are so very real.
       (nth (- index 1) data))
     (seq-random-elt data)))
@@ -150,19 +170,20 @@ We report that function via `#'random-table/reporter'."
   ;; TODO: Consider allowing custom reporter as a function.  We already register
   ;; it in the general case.
   (apply random-table/reporter
-    (list text (random-table/roll/text text))))
+    (list text (random-table/roll/parse-text text))))
 
-;; TODO Rename this; I'm not satisfied and want to refactor.
-(defun random-table/roll/text (text)
-  "Roll the given TEXT; either by evaluating as a `random-table' or via `s-format'."
+(defun random-table/roll/parse-text (text)
+  "Roll the given TEXT.
+
+Either by evaluating as a `random-table' or via `s-format'."
   (if-let* ((table (random-table/get-table text :allow_nil t)))
     (random-table/evaluate/table table)
     ;; We have specified a non-table; roll the text.  We'll treat a non-escaped on as a dice text.
     (progn
       (s-format (if (string-match-p "\\${" text) text (concat "${" text "}"))
-        #'random-table/roll/text/replacer))))
+        #'random-table/roll/parse-text/replacer))))
 
-(defun random-table/roll/text/replacer (text)
+(defun random-table/roll/parse-text/replacer (text)
   "Roll the TEXT; either from a table or as a dice-expression.
 
 This is constructed as the replacer function of `s-format'."
@@ -176,14 +197,14 @@ This is constructed as the replacer function of `s-format'."
 (defun random-table/evaluate/table (table)
   "Evaluate the random TABLE.
 
-See `random-table'.  "
-  (let* ((rolled (random-table/evaluate/table/roll table))
+See `random-table'."
+  (let* ((data (random-table-data table))
           (name (random-table-name table))
-          (data (random-table-data table))
+          (rolled (random-table/evaluate/table/roll table))
           (filtered (apply (random-table-filter table) (-list rolled)))
-          (entry (if filtered (apply (random-table-fetcher table) (list data (-list filtered)))
+          (row (if filtered (apply (random-table-fetcher table) (list data (-list filtered)))
                    nil))
-          (results (or (when entry (random-table/roll/text entry)) "")))
+          (results (or (when row (random-table/roll/parse-text row)) "")))
     (remhash (random-table-name table) random-table/storage/results)
     results))
 
@@ -231,12 +252,5 @@ found in the `random-table/stroage/tables' registry."
     (unless allow_nil
       (error "Could not find table %s; use `random-table/register'." value))))
 
-;;; Register Tables
-(cl-defun random-table/register (&rest kws &key name data &allow-other-keys)
-  "Store the DATA, NAME, and KWS in a `random-table'."
-  (let* ((key (intern name))
-          (struct (apply #'make-random-table :name key :data (-list data) kws)))
-    (puthash key struct random-table/storage/tables)))
-
-(provide 'jf-tables)
-;;; jf-tables.el ends here
+(provide 'random-table)
+;;; random-table.el ends here
