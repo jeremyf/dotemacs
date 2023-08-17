@@ -206,8 +206,21 @@
      "Healers" "Cult" "Guardian" "Settlers" "Monument" "Food"
      "Judges" "Storm" "Demon" "Court" "Theatre" "Assassins"))
 
-(defun roll (sides)
-  (+ 1 (random sides)))
+(random-table/register :name "Attributes (OSR)"
+  :data '("\n- Strength :: ${3d6}\n- Intelligence :: ${3d6}\n- Wisdom :: ${3d6}\n- Dexterity :: ${3d6}\n- Constitution :: ${3d6}\n- Charisma :: ${3d6}"))
+
+(random-table/register :name "Attributes (Black Sword Hack)"
+  :data '("\n- Strength :: ${Attribute Score (Black Sword Hack)}\n- Dexterity :: ${Attribute Score (Black Sword Hack)}\n- Constitution :: ${Attribute Score (Black Sword Hack)}\n- Intelligence :: ${Attribute Score (Black Sword Hack)}\n- Wisdom :: ${Attribute Score (Black Sword Hack)}\n- Charisma :: ${Attribute Score (Black Sword Hack)}"))
+
+(random-table/register :name "Attribute Score (Black Sword Hack)"
+  :private t
+  :roller (lambda (&rest data) (+ 2 (random 6) (random 6)))
+  :data '(((2 3) . "8")
+           ((4 5) . "9")
+           ((6 7) . "10")
+           ((8 9) . "11")
+           ((10 11) . "12")
+           ((12) . "13")))
 
 (defconst jf/gaming/black-sword-hack/table/oracle-question-likelihood
   '(("Don't think so" . (lambda () (cl-sort (list (+ 1 (random 6)) (+ 1 (random 6)) (+ 1 (random 6))) #'<)))
@@ -228,19 +241,6 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
   "Prompt for likelihood and return corresponding roller."
   (let ((likelihood (completing-read "Likelihood: " jf/gaming/black-sword-hack/table/oracle-question-likelihood nil t)))
     (funcall (alist-get likelihood jf/gaming/black-sword-hack/table/oracle-question-likelihood nil nil #'string=))))
-
-(random-table/register :name "Attributes (Black Sword Hack)"
-  :data '("\n- Strength :: ${Attribute Score (Black Sword Hack)}\n- Dexterity :: ${Attribute Score (Black Sword Hack)}\n- Constitution :: ${Attribute Score (Black Sword Hack)}\n- Intelligence :: ${Attribute Score (Black Sword Hack)}\n- Wisdom :: ${Attribute Score (Black Sword Hack)}\n- Charisma :: ${Attribute Score (Black Sword Hack)}"))
-
-(random-table/register :name "Attribute Score (Black Sword Hack)"
-  :private t
-  :roller (lambda (&rest data) (+ 2 (random 6) (random 6)))
-  :data '(((2 3) . "8")
-           ((4 5) . "9")
-           ((6 7) . "10")
-           ((8 9) . "11")
-           ((10 11) . "12")
-           (12 . "13")))
 
 (random-table/register :name "Oracle Question (Black Sword Hack)"
   :roller #'random-table/roller/oracle-question
