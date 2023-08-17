@@ -155,6 +155,7 @@ See `random-table/reporter'."
     (message text)))
 
 ;;;; Interactive
+(global-set-key (kbd "H-r") #'random-table/roll)
 (defun random-table/roll (text)
   "Evaluate the given TEXT by \"rolling\" it.
 
