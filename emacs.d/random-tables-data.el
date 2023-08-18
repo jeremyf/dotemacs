@@ -1,5 +1,6 @@
 (require 'random-table)
-;;;; Errant
+
+;;; Errant
 (random-table/register :name "Reaction Roll (Errant)"
   :roller (lambda (&rest data) (+ 2 (random 6) (random 6)))
   :data '(((2) . "Hostile [DV +8]")
@@ -35,8 +36,6 @@
   :private t
   :data '("Magic" "Space" "Time" "Mind" "Spirit" "Body"
            "Elements" "Dimensions" "Life" "Death" "Objects" "BIota"))
-
-
 
 (random-table/register :name "Ancestry (Errant)"
   :data '("Tough" "Arcane" "Cunning" "Adaptable"))
@@ -166,7 +165,7 @@
      "Toad doctor" "Tosher" "Town crier" "Urinatores" "Usurer"
      "Water carrier" "Wheelwright" "Whipping boy" "Whiffler" "Worm rancher"))
 
-;;;; Black Sword Hack
+;;; Black Sword Hack
 (random-table/register :name "Travel Event (Black Sword Hack)"
   :data "\n  - Subject :: ${Travel Event > Subject (Black Sword Hack)}\n  - Theme :: ${Travel Event > Theme (Black Sword Hack)}")
 
@@ -207,6 +206,9 @@
      "Healers" "Cult" "Guardian" "Settlers" "Monument" "Food"
      "Judges" "Storm" "Demon" "Court" "Theatre" "Assassins"))
 
+(defun roll (sides)
+  (+ 1 (random sides)))
+
 (defconst jf/gaming/black-sword-hack/table/oracle-question-likelihood
   '(("Don't think so" . (lambda () (cl-sort (list (+ 1 (random 6)) (+ 1 (random 6)) (+ 1 (random 6))) #'<)))
      ("Unlikely" . (lambda () (cl-sort (list (+ 1 (random 6)) (+ 1 (random 6))) #'<)))
@@ -222,12 +224,10 @@ rolls.
 
 From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
 
-(defun random-table/roller/oracle-question (table)
+(defun random-table/roller/oracle-question (_table)
+  "Prompt for likelihood and return corresponding roller."
   (let ((likelihood (completing-read "Likelihood: " jf/gaming/black-sword-hack/table/oracle-question-likelihood nil t)))
     (funcall (alist-get likelihood jf/gaming/black-sword-hack/table/oracle-question-likelihood nil nil #'string=))))
-
-(random-table/register :name "Attributes (OSR)"
-  :data '("\n- Strength :: ${3d6}\n- Intelligence :: ${3d6}\n- Wisdom :: ${3d6}\n- Dexterity :: ${3d6}\n- Constitution :: ${3d6}\n- Charisma :: ${3d6}"))
 
 (random-table/register :name "Attributes (Black Sword Hack)"
   :data '("\n- Strength :: ${Attribute Score (Black Sword Hack)}\n- Dexterity :: ${Attribute Score (Black Sword Hack)}\n- Constitution :: ${Attribute Score (Black Sword Hack)}\n- Intelligence :: ${Attribute Score (Black Sword Hack)}\n- Wisdom :: ${Attribute Score (Black Sword Hack)}\n- Charisma :: ${Attribute Score (Black Sword Hack)}"))
@@ -240,7 +240,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            ((6 7) . "10")
            ((8 9) . "11")
            ((10 11) . "12")
-           ((12) . "13")))
+           (12 . "13")))
 
 (random-table/register :name "Oracle Question (Black Sword Hack)"
   :roller #'random-table/roller/oracle-question
@@ -263,7 +263,11 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
              (when index (concat " with unexpected \"" (nth (- (car (-list index)) 1) data) "\" event")))
   :data '("Very negative" "Negative" "Negative but…" "Positive but…" "Positive" "Very Positive"))
 
-;;;; Random Names (from Stars without Number)
+;;; OSR
+(random-table/register :name "Attributes (OSR) (3d6 Down the Line)"
+  :data '("\n- Strength :: ${3d6}\n- Intelligence :: ${3d6}\n- Wisdom :: ${3d6}\n- Dexterity :: ${3d6}\n- Constitution :: ${3d6}\n- Charisma :: ${3d6}"))
+
+;;; Random Names (from Stars without Number)
 (random-table/register :name "Name"
   :data '("${Arabic Name > Male Given Name} ${Arabic Name > Surname}"
            "${Arabic Name > Female Given Name} ${Arabic Name > Surname}"
@@ -318,7 +322,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
   :private t
   :data '("Adam" "Albert" "Alfred" "Allan" "Archibald" "Arthur" "Basil" "Charles" "Colin" "Donald" "Douglas" "Edgar" "Edmund" "Edward" "George" "Harold" "Henry" "Ian" "James" "John" "Lewis" "Oliver" "Philip" "Richard" "William"))
 (random-table/register :name "English Name > Female Given Name"
-	:private t
+  :private t
   :data '("Abigail" "Anne" "Beatrice" "Blanche" "Catherine" "Charlotte" "Claire" "Eleanor" "Elizabeth" "Emily" "Emma" "Georgia" "Harriet" "Joan" "Judy" "Julia" "Lucy" "Lydia" "Margaret" "Mary" "Molly" "Nora" "Rosie" "Sarah" "Victoria"))
 (random-table/register :name "English Name > Surname"
   :private t
@@ -328,13 +332,13 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
   :data '("Aldington" "Kedington" "Appleton" "Latchford" "Ashdon" "Leigh" "Berwick" "Leighton" "Bramford" "Maresfield" "Brimstage" "Markshall" "Carden" "Netherpool" "Churchill" "Newton" "Clifton" "Oxton" "Colby" "Preston" "Copford" "Ridley" "Cromer" "Rochford" "Davenham" "Seaford" "Dersingham" "Selsey" "Doverdale" "Stanton" "Elsted" "Stockham" "Ferring" "Stoke" "Gissing" "Sutton" "Heydon" "Thakeham" "Holt" "Thetford" "Hunston" "Thorndon" "Hutton" "Ulting" "Inkberrow" "Upton" "Inworth" "Westhorpe" "Isfield" "Worcester"))
 
 (random-table/register :name "Greek Name > Male Given Name"
-	:private t
+  :private t
   :data '("Alexander" "Alexius" "Anastasius" "Christodoulos" "Christos" "Damian" "Dimitris" "Dysmas" "Elias" "Giorgos" "Ioannis" "Konstantinos" "Lambros" "Leonidas" "Marcos" "Miltiades" "Nestor" "Nikos" "Orestes" "Petros" "Simon" "Stavros" "Theodore" "Vassilios" "Yannis"))
 (random-table/register :name "Greek Name > Female Given Name"
   :private t
   :data '("Alexandra" "Amalia" "Callisto" "Charis" "Chloe" "Dorothea" "Elena" "Eudoxia" "Giada" "Helena" "Ioanna" "Lydia" "Melania" "Melissa" "Nika" "Nikolina" "Olympias" "Philippa" "Phoebe" "Sophia" "Theodora" "Valentina" "Valeria" "Yianna" "Zoe"))
 (random-table/register :name "Greek Name > Surname"
-	:private t
+  	:private t
   :data '("Andreas" "Argyros" "Dimitriou" "Floros" "Gavras" "Ioannidis" "Katsaros" "Kyrkos" "Leventis" "Makris" "Metaxas" "Nikolaidis" "Pallis" "Pappas" "Petrou" "Raptis" "Simonides" "Spiros" "Stavros" "Stephanidis" "Stratigos" "Terzis" "Theodorou" "Vasiliadis" "Yannakakis"))
 (random-table/register :name "Greek Location Name"
   :private t
@@ -465,8 +469,9 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "Letter" "Amulet" "Ring" "Promissory" "Glasses"
            "Key" "Ingredient" "Poison" "Drug" "Pet"))
 
+;;; Stars without Number
 (random-table/register :name "Corporation, Sci-Fi"
-  :data '("- Name :: ${Corporation, Sci-Fi > Prefix} ${Corporation, Sci-Fi > Suffix}\n- Business :: ${Corporation, Sci-Fi > Business}\n- Rumor :: ${Corporation, Sci-Fi > Rumor}"))
+  :data '("\n- Name :: ${Corporation, Sci-Fi > Prefix} ${Corporation, Sci-Fi > Suffix}\n- Business :: ${Corporation, Sci-Fi > Business}\n- Rumor :: ${Corporation, Sci-Fi > Rumor}"))
 
 (random-table/register :name "Corporation, Sci-Fi > Prefix"
   :private t
@@ -485,6 +490,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "Sodality" "Syndicate" "Union" "Unity" "Zaibatsu"))
 
 (random-table/register :name "Corporation, Sci-Fi > Business"
+  :private t
   :data '("Aeronautics" "Agriculture" "Art" "Assassination" "Asteroid Mining"
            "Astrotech" "Biotech" "Bootlegging" "Computer Hardware" "Construction"
            "Cybernetics" "Electronics" "Energy Weapons" "Entertainment" "Espionage"
@@ -585,7 +591,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
              "Vigorous charity work among unbelievers"
              "Forbidden the use of certain technology"))
 
-;;;; Herbalist's Primer
+;;; Herbalist's Primer
   (random-table/register :name "Plant (Herbalist's Primer)"
     :data '("${Plant > Name Prefix (Herbalist's Primer)}${Plant > Name Suffix (Herbalist's Primer)} is ${Plant > Rarity (Herbalist's Primer)} ${Plant > Habit (Herbalist's Primer)}, mostly prized for its ${Plant > Properties (Herbalist's Primer)} value.  It is a native to the ${Plant > Climate (Herbalist's Primer)} ${Plant > Biome (Herbalist's Primer)}.  Interestingly, it ${Plant > Quirk (Herbalist's Primer)}.${Plant > Property Description (Herbalist's Primer)}"))
 

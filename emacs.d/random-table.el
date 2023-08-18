@@ -124,13 +124,22 @@ See `random-table/roller/default'."
 
 When ROLL is not given, choose a random element from the TABLE."
   (if-let ((index (if (integerp roll) roll (car roll))))
+    ;; Sniff out if the first element to see if we're dealing with a table that has ranges.
     (if (-cons-pair? (car data))
       ;; We have a cons-pair, meaning we have multiple rolls mapping to the same
       ;; result.
       (cdr (seq-find
              (lambda (row)
                (if (-cons-pair? row)
-                 (and (>= index (car row)) (<= index (cdr row)))
+                 (let ((range (car row)))
+                   (cond
+                     ((-cons-pair? range)
+                       (and (>= index (car range)) (<= index (cdr range))))
+                     ((listp range)
+                       (member index range))
+                     ((integerp range) (= index range))
+                     (t
+                       (error "Expected `cons', `list', or `integer' got %s for row %S." (type-of range) row))))
                  (member index (car row))))
              data))
       ;; Off by one errors are so very real.
@@ -252,6 +261,35 @@ found in the `random-table/stroage/tables' registry."
     table
     (unless allow_nil
       (error "Could not find table %s; use `random-table/register'." value))))
+
+(defun random-table/dice/parse-spec (spec)
+  "Convert SPEC to list:
+
+   - Number of dice
+   - Face
+   - Adder
+
+  e.g. \"1d6\" -> (1 6 0) or \"2d10+2\" -> (2 10 2) or \"4dF\" -> (4 \"f\" 0)"
+  (when (string-match
+         "^\\([1-9][0-9]*\\)d\\([0-9a-zA-Z]*\\)\\([+-][0-9]*\\)?"
+         spec)
+    (list (random-table/dice/string-to-number (match-string 1 spec) 1)
+          (random-table/dice/string-to-number (match-string 2 spec)
+                                   decide-default-dice-facespec)
+          (random-table/dice/string-to-number (match-string 3 spec) 0))))
+
+(defun random-table/dice/string-to-number (spec default)
+  (let ((n (if (stringp spec)
+               (string-to-number spec)
+             0)))
+    (cond ((null spec) default)
+          ((> n 0) n)
+          ((string= "+" spec) 0)
+          ((string= "-" spec) 0)
+      (t spec))))
+
+;; (let ((spec (random-table/dice/parse-spec spec-string)))
+;;   (apply 'decide-roll-dice-spec (if spec spec '(1 6 0))))
 
 (provide 'random-table)
 ;;; random-table.el ends here
