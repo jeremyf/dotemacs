@@ -766,29 +766,29 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
   :roller #'random-table/roller/death-and-dismemberment/damage
   :private t
   :data '(((1 . 10) . "Arm Injury; Rolled ${current_roll}\n- +1 Injury\n- Arm disabled for +${current_roll} day(s).")
-           ((11 . 15) . "Arm Injury; Rolled ${current_roll}\n- +1 Injury\n- Arm disabled for +${current_roll} day(s).\n- One Fatal Wound.\n- ${Save vs Mangled Arm}.")
-           ((16 . 1000) . "Arm Injury; Rolled ${current_roll}\n- +1 Injury\n- Arm disabled for +${current_roll} day(s).\n- ${current_roll} - 14 Fatal Wounds.\n- ${Save vs Mangled Arm}")))
+           ((11 . 15) . "Arm Injury; Rolled ${current_roll}\n- +1 Injury\n- Arm disabled for +${current_roll} day(s).\n- One Fatal Wound.\n- ${Save vs. Mangled Arm}.")
+           ((16 . 1000) . "Arm Injury; Rolled ${current_roll}\n- +1 Injury\n- Arm disabled for +${current_roll} day(s).\n- ${current_roll} - 14 Fatal Wounds.\n- ${Save vs. Mangled Arm}")))
 
 (random-table/register :name "Death and Dismemberment > Physical > Leg"
   :roller #'random-table/roller/death-and-dismemberment/damage
   :private t
   :data '(((1 . 10) . "Leg Injury; Rolled ${current_roll}\n- +1 Injury\n- Leg disabled for +${current_roll} day(s).")
-           ((11 . 15) . "Leg Injury; Rolled ${current_roll}\n- +1 Injury\n- Leg disabled for +${current_roll} day(s).\n- One Fatal Wound.\n- ${Save vs. Mangled Leg}.")
-           ((16 . 1000) . "Leg Injury; Rolled ${current_roll}\n- +1 Injury\n- Leg disabled for +${current_roll} day(s).\n- ${current_roll} - 14 Fatal Wounds.\n- Save vs. Mangled Leg.")))
+           ((11 . 15) . "Leg Injury; Rolled ${current_roll}\n- +1 Injury\n- Leg disabled for +${current_roll} day(s).\n- One Fatal Wound.\n- ${Save vs. Mangled Leg}")
+           ((16 . 1000) . "Leg Injury; Rolled ${current_roll}\n- +1 Injury\n- Leg disabled for +${current_roll} day(s).\n- ${current_roll} - 14 Fatal Wounds.\n- ${Save vs. Mangled Leg}")))
 
 (random-table/register :name "Death and Dismemberment > Physical > Torso"
   :roller #'random-table/roller/death-and-dismemberment/damage
   :private t
   :data '(((1 . 10) . "Torso Injury; Rolled ${current_roll}\n- +1 Injury\n- Blood loss for +${current_roll} day(s).")
-           ((11 . 15) . "Torso Injury; Rolled ${current_roll}\n- +1 Injury\n- Blood loss for +${current_roll} day(s).\n- One Fatal Wound.\n- ${Save vs. Crushed Torso}.")
-           ((16 . 1000) . "Torso Injury; Rolled ${current_roll}\n- +1 Injury\n- Blood loss for +${current_roll} day(s).\n- ${current_roll} - 14 Fatal Wounds.\n- Save vs. Crushed Torso.")))
+           ((11 . 15) . "Torso Injury; Rolled ${current_roll}\n- +1 Injury\n- Blood loss for +${current_roll} day(s).\n- One Fatal Wound.\n- ${Save vs. Crushed Torso}")
+           ((16 . 1000) . "Torso Injury; Rolled ${current_roll}\n- +1 Injury\n- Blood loss for +${current_roll} day(s).\n- ${current_roll} - 14 Fatal Wounds.\n- ${Save vs. Crushed Torso}")))
 
 (random-table/register :name "Death and Dismemberment > Physical > Head"
   :roller #'random-table/roller/death-and-dismemberment/damage
   :private t
   :data '(((1 . 10) . "Head Injury; Rolled ${current_roll}\n- +1 Injury\n- Concussed for +${current_roll} day(s).")
-           ((11 . 15) . "Head Injury; Rolled ${current_roll}\n- +1 Injury\n- Concussed for +${current_roll} day(s).\n- One Fatal Wound.\n- Save vs. Skullcracked.")
-           ((16 . 1000) . "Head Injury; Rolled ${current_roll}\n- +1 Injury\n- Concussed for +${current_roll} day(s).\n- ${current_roll} - 14 Fatal Wounds.\n- Save vs. Skullcracked.")))
+           ((11 . 15) . "Head Injury; Rolled ${current_roll}\n- +1 Injury\n- Concussed for +${current_roll} day(s).\n- One Fatal Wound.\n- ${Save vs. Skullcracked}")
+           ((16 . 1000) . "Head Injury; Rolled ${current_roll}\n- +1 Injury\n- Concussed for +${current_roll} day(s).\n- ${current_roll} - 14 Fatal Wounds.\n- ${Save vs. Skullcracked}")))
 
 (random-table/register :name "Death and Dismemberment > Non-Lethal"
   :roller #'random-table/roller/death-and-dismemberment/damage
@@ -799,10 +799,46 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
   (let ((score (read-number (format "%s\n> Enter Saving Throw Score: " (random-table-name table)) 15))
          (modifier (read-number (format "%s\n> Modifier: " (random-table-name table)) 0))
          (roll (+ 1 (random 20))))
-    (+ (- roll score) modifier)))
+    (cond
+      ((= roll 1) "Fail")
+      ((= roll 20) "Save")
+      ((>= (+ roll modifier) score) "Save")
+      (t "Fail"))))
 
-(random-table/register :name "Save vs Mangled Arm"
+(random-table/register :name "Save vss Mangled Arm"
   :roller #'random-table/roller/saving-throw
   :private t
-  :data '(((-30 . 0) . "Saved against losing arm…lose a finger instead.")
-          ((1 . 100) . "Failed to save against losing or permanently disabling an arm.")))
+  :data '(("Save" . "Saved against losing an arm…lose a finger instead.")
+          ("Fail" . "Failed to save against losing or permanently disabling an arm.")))
+
+(random-table/register :name "Save vs. Mangled Leg"
+  :roller #'random-table/roller/saving-throw
+  :private t
+  :data '(("Save" . "Saved against losing a leg…lose a toe instead.")
+          ("Fail" . "Failed to save against losing or permanently disabling a leg.")))
+
+(random-table/register :name "Save vs. Crushed Torso"
+  :roller #'random-table/roller/saving-throw
+  :private t
+  :data '(("Save" . "Saved against crushed torso…gain a new scar.")
+           ("Fail" . "Failed to save against crushed torso.  ${Save vs. Crushed Torso > Failure}")))
+
+(random-table/register :name "Save vs. Crushed Torso > Failure"
+  :private t
+  :data '("Permanently lose 1 Strength." "Permanently lose 1 Dexterity." "Permanently lose 1 Constitution."
+           "Crushed throat. You cannot speak louder than a whisper."
+           "Crushed ribs. Treat Con as 4 when holding your breath."
+           "Your spine is broken and you are paralyzed from the neck down. You can recover from this by making a Con check after 1d6 days, and again after 1d6 weeks if you fail the first check. If you fail both, it is permanent."))
+
+(random-table/register :name "Save vs. Skullcracked"
+  :roller #'random-table/roller/saving-throw
+  :private t
+  :data '(("Save" . "Saved against cracked skull…gain a new scar.")
+           ("Fail" . "Failed to save against cracked skull.  ${Save vs. Skullcracked > Failure}")))
+
+(random-table/register :name "Save vs. Skullcracked > Failure"
+  :private t
+  :data '("Permanently lose 1 Intelligence." "Permanently lose 1 Wisdom." "Permanently lose 1 Charisma."
+           "Lose your left eye. -1 to Ranged Attack."
+           "Lose your right eye. -1 to Ranged Attack."
+           "Go into a coma. You can recover from a coma by making a Con check after 1d6 days, and again after 1d6 weeks if you fail the first check. If you fail both, it is permanent."))
