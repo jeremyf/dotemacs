@@ -7,6 +7,8 @@
 
 ;;; Commentary:
 
+;; A blog post on this package: https://takeonrules.com/2023/08/17/emacs-proto-package-for-random-tables/
+
 ;; This package provides a means of registering random tables (see
 ;; `random-table' and `random-table/register') and then rolling on those tables
 ;; (see the `random-table/roll').
@@ -117,7 +119,10 @@ See `random-table/filter/default'."
   "Filter the given ROLLS and return an integer.
 
 See `random-table/roller/default'."
-  (apply #'+ (-list rolls)))
+  (cond
+    ;; Allows us to have table entries that are named.
+    ((stringp (car rolls)) (car rolls))
+    (t (apply #'+ (-list rolls)))))
 
 (defun random-table/fetcher/default (data &optional roll)
   "Find ROLL on the given table's DATA.
@@ -137,9 +142,12 @@ When ROLL is not given, choose a random element from the TABLE."
                        (and (>= index (car range)) (<= index (cdr range))))
                      ((listp range)
                        (member index range))
-                     ((integerp range) (= index range))
+                     ((integerp range)
+                       (= index range))
+                     ((stringp range)
+                       (string= index range))
                      (t
-                       (error "Expected `cons', `list', or `integer' got %s for row %S." (type-of range) row))))
+                       (error "Expected `cons', `list', `string' or `integer' got %s for row %S." (type-of range) row))))
                  (member index (car row))))
              data))
       ;; Off by one errors are so very real.
@@ -199,10 +207,14 @@ Either by evaluating as a `random-table' or via `s-format'."
 This is constructed as the replacer function of `s-format'."
   (if-let ((table (random-table/get-table text :allow_nil t)))
     (random-table/evaluate/table table)
-    ;; Ensure that we have a dice expression
-    (if (string-match-p "[0-9]?d[0-9]" text)
-      (format "%s" (cdr (org-d20--roll text)))
-      text)))
+    (cond
+      ((and random-table/current-roll (string-match "current_roll" text))
+        random-table/current-roll)
+      (t
+        ;; Ensure that we have a dice expression
+        (if (string-match-p "[0-9]?d[0-9]" text)
+          (format "%s" (cdr (org-d20--roll text)))
+          text)))))
 
 (defun random-table/evaluate/table (table)
   "Evaluate the random TABLE.
@@ -210,13 +222,15 @@ This is constructed as the replacer function of `s-format'."
 See `random-table'."
   (let* ((data (random-table-data table))
           (name (random-table-name table))
-          (rolled (random-table/evaluate/table/roll table))
-          (filtered (apply (random-table-filter table) (-list rolled)))
-          (row (if filtered (apply (random-table-fetcher table) (list data (-list filtered)))
+          (rolled (random-table/evaluate/table/roll table)))
+    (setq random-table/current-roll rolled)
+    (let* ((filtered (apply (random-table-filter table) (-list rolled)))
+            (row (if filtered (apply (random-table-fetcher table) (list data (-list filtered)))
                    nil))
-          (results (or (when row (random-table/roll/parse-text row)) "")))
-    (remhash (random-table-name table) random-table/storage/results)
-    results))
+            (results (or (when row (random-table/roll/parse-text row)) "")))
+      (remhash (random-table-name table) random-table/storage/results)
+      (setq random-table/current-roll nil)
+      results)))
 
 (defun random-table/evaluate/table/roll (table)
   "Roll on the TABLE, favoring re-using and caching values.
@@ -262,6 +276,8 @@ found in the `random-table/stroage/tables' registry."
     (unless allow_nil
       (error "Could not find table %s; use `random-table/register'." value))))
 
+;;; Probationary methods
+;; TODO Work on removing the org-d20 dependency
 (defun random-table/dice/parse-spec (spec)
   "Convert SPEC to list:
 
