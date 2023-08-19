@@ -716,17 +716,20 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
              "touching it causes intense pain"
              "using it requires an obscure, elaborate ritual"))
 
+
 ;;; House Rules
 ;;;; Goblin Punch Death and Dismemberment
 ;; See https://drive.google.com/file/d/0BxVHEMMjLlZ4cFVJTEFEcW9WV0U/view?resourcekey=0-matru4XOnZc-kjaQtiEX3Q
-(defun random-table/roller/death-and-dismemberment (table)
-  (completing-read "Damage Type: " (mapcar (lambda (row) (car row)) (random-table-data table))))
+(defun random-table/roller/prompt-from-table-data (table)
+	(completing-read
+	 (format "%s via:" (random-table-name table))
+	 (random-table-data table) nil t))
 
 (defun random-table/roller/death-and-dismemberment/damage (&rest table)
   (+ 1 (random 12) (read-number "Number of Existing Injuries: " 0) (read-number "Lethal Damage: " 0)))
 
 (random-table/register :name "Death and Dismemberment"
-  :roller #'random-table/roller/death-and-dismemberment
+  :roller #'random-table/roller/prompt-from-table-data
   :data '(("Physical" . "${Death and Dismemberment > Physical}")
            ("Acid/Fire" . "${Death and Dismemberment > Acid/Fire}")
            ("Eldritch" . "${Death and Dismemberment > Eldritch}")
