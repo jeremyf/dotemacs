@@ -2,7 +2,7 @@
 
 ;;; Errant
 (random-table/register :name "Reaction Roll (Errant)"
-  :roller (lambda (&rest data) (+ 2 (random 6) (random 6)))
+  :roller (lambda (table) (+ 2 (random 6) (random 6)))
   :data '(((2) . "Hostile [DV +8]")
            ((3 4 5) . "Unfriendly [DV +4]")
            ((6 7 8) . "Unsure")
@@ -214,7 +214,7 @@
 
 (random-table/register :name "Attribute Score (Black Sword Hack)"
   :private t
-  :roller (lambda (&rest data) (+ 2 (random 6) (random 6)))
+  :roller (lambda (table) (+ 2 (random 6) (random 6)))
   :data '(((2 3) . "8")
            ((4 5) . "9")
            ((6 7) . "10")
@@ -237,7 +237,7 @@ rolls.
 
 From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
 
-(defun random-table/roller/oracle-question (_table)
+(defun random-table/roller/oracle-question (table)
   "Prompt for likelihood and return corresponding roller."
   (let ((likelihood (completing-read "Likelihood: " jf/gaming/black-sword-hack/table/oracle-question-likelihood nil t)))
     (funcall (alist-get likelihood jf/gaming/black-sword-hack/table/oracle-question-likelihood nil nil #'string=))))
@@ -715,3 +715,94 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
              "the rumors say it brings bad luck"
              "touching it causes intense pain"
              "using it requires an obscure, elaborate ritual"))
+
+;;; House Rules
+;;;; Goblin Punch Death and Dismemberment
+;; See https://drive.google.com/file/d/0BxVHEMMjLlZ4cFVJTEFEcW9WV0U/view?resourcekey=0-matru4XOnZc-kjaQtiEX3Q
+(defun random-table/roller/death-and-dismemberment (table)
+  (completing-read "Damage Type: " (mapcar (lambda (row) (car row)) (random-table-data table))))
+
+(defun random-table/roller/death-and-dismemberment/damage (&rest table)
+  (+ 1 (random 12) (read-number "Number of Existing Injuries: " 0) (read-number "Lethal Damage: " 0)))
+
+(random-table/register :name "Death and Dismemberment"
+  :roller #'random-table/roller/death-and-dismemberment
+  :data '(("Physical" . "${Death and Dismemberment > Physical}")
+           ("Acid/Fire" . "${Death and Dismemberment > Acid/Fire}")
+           ("Eldritch" . "${Death and Dismemberment > Eldritch}")
+           ("Lightning" . "${Death and Dismemberment > Lightning}")
+           ("Non-Lethal" . "${Death and Dismemberment > Non-Lethal}")))
+
+(random-table/register :name "Death and Dismemberment > Eldritch"
+  :roller #'random-table/roller/death-and-dismemberment/damage
+  :private t
+  :data '(((1 . 10) . "Rolled ${current_roll}\n- +1 Injury\n- Anathema for +${current_roll} day(s).")
+           ((11 . 15) . "Rolled ${current_roll}\n- +1 Injury\n- Anathema for +${current_roll} day(s).\n- One Fatal Wound.\n- Save vs. Curse.")
+           ((16 . 1000) . "Rolled ${current_roll}\n- +1 Injury\n- Anathema for +${current_roll} day(s).\n- ${current_roll} - 14 Fatal Wounds.\n- Save vs. Curse.")))
+
+(random-table/register :name "Death and Dismemberment > Acid/Fire"
+  :roller #'random-table/roller/death-and-dismemberment/damage
+  :private t
+  :data '(((1 . 10) . "Rolled ${current_roll}\n- +1 Injury\n- Burned for +${current_roll} day(s).")
+           ((11 . 15) . "Rolled ${current_roll}\n- +1 Injury\n- Burned for +${current_roll} day(s).\n- One Fatal Wound.\n- Save vs. Blind.")
+           ((16 . 1000) . "Rolled ${current_roll}\n- +1 Injury\n- Burned for +${current_roll} day(s)\n- ${current_roll} - 14 Fatal Wounds.\n- Save vs. Blind.")))
+
+(random-table/register :name "Death and Dismemberment > Lightning"
+  :roller #'random-table/roller/death-and-dismemberment/damage
+  :private t
+  :data '(((1 . 10) . "Rolled ${current_roll}\n- +1 Injury\n- Burned for +${current_roll} day(s).")
+           ((11 . 15) . "Rolled ${current_roll}\n- +1 Injury\n- Burned for +${current_roll} day(s).\n- One Fatal Wound.\n- Save vs. Deaf.")
+           ((16 . 1000) . "Rolled ${current_roll}\n- +1 Injury\n- Burned for +${current_roll} day(s)\n- ${current_roll} - 14 Fatal Wounds.\n- Save vs. Deaf.")))
+
+(random-table/register :name "Death and Dismemberment > Physical"
+  :roller (lambda (table) (+ 1 (random 6)))
+  :private t
+  :data '(((1) . "Death and Dismemberment > Physical > Arm")
+           ((2) . "Death and Dismemberment > Physical > Leg")
+           ((3 . 4) . "Death and Dismemberment > Physical > Torso")
+           ((5 . 6) . "Death and Dismemberment > Physical > Head")))
+
+(random-table/register :name "Death and Dismemberment > Physical > Arm"
+  :roller #'random-table/roller/death-and-dismemberment/damage
+  :private t
+  :data '(((1 . 10) . "Arm Injury; Rolled ${current_roll}\n- +1 Injury\n- Arm disabled for +${current_roll} day(s).")
+           ((11 . 15) . "Arm Injury; Rolled ${current_roll}\n- +1 Injury\n- Arm disabled for +${current_roll} day(s).\n- One Fatal Wound.\n- ${Save vs Mangled Arm}.")
+           ((16 . 1000) . "Arm Injury; Rolled ${current_roll}\n- +1 Injury\n- Arm disabled for +${current_roll} day(s).\n- ${current_roll} - 14 Fatal Wounds.\n- ${Save vs Mangled Arm}")))
+
+(random-table/register :name "Death and Dismemberment > Physical > Leg"
+  :roller #'random-table/roller/death-and-dismemberment/damage
+  :private t
+  :data '(((1 . 10) . "Leg Injury; Rolled ${current_roll}\n- +1 Injury\n- Leg disabled for +${current_roll} day(s).")
+           ((11 . 15) . "Leg Injury; Rolled ${current_roll}\n- +1 Injury\n- Leg disabled for +${current_roll} day(s).\n- One Fatal Wound.\n- ${Save vs. Mangled Leg}.")
+           ((16 . 1000) . "Leg Injury; Rolled ${current_roll}\n- +1 Injury\n- Leg disabled for +${current_roll} day(s).\n- ${current_roll} - 14 Fatal Wounds.\n- Save vs. Mangled Leg.")))
+
+(random-table/register :name "Death and Dismemberment > Physical > Torso"
+  :roller #'random-table/roller/death-and-dismemberment/damage
+  :private t
+  :data '(((1 . 10) . "Torso Injury; Rolled ${current_roll}\n- +1 Injury\n- Blood loss for +${current_roll} day(s).")
+           ((11 . 15) . "Torso Injury; Rolled ${current_roll}\n- +1 Injury\n- Blood loss for +${current_roll} day(s).\n- One Fatal Wound.\n- ${Save vs. Crushed Torso}.")
+           ((16 . 1000) . "Torso Injury; Rolled ${current_roll}\n- +1 Injury\n- Blood loss for +${current_roll} day(s).\n- ${current_roll} - 14 Fatal Wounds.\n- Save vs. Crushed Torso.")))
+
+(random-table/register :name "Death and Dismemberment > Physical > Head"
+  :roller #'random-table/roller/death-and-dismemberment/damage
+  :private t
+  :data '(((1 . 10) . "Head Injury; Rolled ${current_roll}\n- +1 Injury\n- Concussed for +${current_roll} day(s).")
+           ((11 . 15) . "Head Injury; Rolled ${current_roll}\n- +1 Injury\n- Concussed for +${current_roll} day(s).\n- One Fatal Wound.\n- Save vs. Skullcracked.")
+           ((16 . 1000) . "Head Injury; Rolled ${current_roll}\n- +1 Injury\n- Concussed for +${current_roll} day(s).\n- ${current_roll} - 14 Fatal Wounds.\n- Save vs. Skullcracked.")))
+
+(random-table/register :name "Death and Dismemberment > Non-Lethal"
+  :roller #'random-table/roller/death-and-dismemberment/damage
+  :private t
+  :data '(((1 . 1000) . "Non-Lethal Injury; Rolled ${current_roll}\n- +1 Injury\n- Knocked out for +${current_roll} round(s).")))
+
+(defun random-table/roller/saving-throw (table)
+  (let ((score (read-number (format "%s\n> Enter Saving Throw Score: " (random-table-name table)) 15))
+         (modifier (read-number (format "%s\n> Modifier: " (random-table-name table)) 0))
+         (roll (+ 1 (random 20))))
+    (+ (- roll score) modifier)))
+
+(random-table/register :name "Save vs Mangled Arm"
+  :roller #'random-table/roller/saving-throw
+  :private t
+  :data '(((-30 . 0) . "Saved against losing arm…lose a finger instead.")
+          ((1 . 100) . "Failed to save against losing or permanently disabling an arm.")))

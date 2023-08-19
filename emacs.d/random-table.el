@@ -105,15 +105,13 @@ See `random-table' for discussion about storage and reuse.")
 The hash key is the \"human readable\" name of the table (as a symbol).
 The hash value is the contents of the table.")
 
-(defun random-table/roller/default (&rest data)
-  "Return list with one element that is between 1 the `length' of the given DATA.
-
-Rollers should return a `list' of values; perhaps the results of
- individual dice rolled.
+(defun random-table/roller/default (table)
+  "Given the TABLE roll randomly on it.
 
 See `random-table/filter/default'."
   ;; Constant off by one errors are likely
-  (list (+ 1 (random (length (-list data))))))
+
+  (list (+ 1 (random (length (-list (random-table-data table)))))))
 
 (defun random-table/filter/default (&rest rolls)
   "Filter the given ROLLS and return an integer.
@@ -243,7 +241,7 @@ use those dice to lookup on other tables."
                   (gethash (intern reuse-table-name) random-table/storage/results)
                   (random-table/evaluate/table/roll
                     (random-table/get-table reuse-table-name))))
-            (apply (random-table-roller table) (-list (random-table-data table))))))
+            (apply (random-table-roller table) (-list table)))))
     (when-let ((stored-table-name (random-table-store table)))
       (puthash (random-table-name table) results random-table/storage/results))
     results))
