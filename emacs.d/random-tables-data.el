@@ -1,8 +1,23 @@
 (require 'random-table)
 
+;;; Random Table Roller
+(cl-defmacro random-table/roller (&rest body &key label &allow-other-keys)
+  (let ((roller (intern (concat "random-table/roller/" label)))
+         (docstring (format "Roll %s on given TABLE" label)))
+    `(defun ,roller (table)
+       ,docstring
+       (if current-prefix-arg
+         (read-number (format "Roll %s for %s: " (random-table-name table) ,label))
+         ,@body))))
+
+(random-table/roller :label "1d6" (+ 1 (random 6)))
+(random-table/roller :label "2d6" (+ 2 (random 6) (random 6)))
+(random-table/roller :label "1d12" (+ 1 (random 12)))
+(random-table/roller :label "1d20" (+ 1 (random 20)))
+
 ;;; Errant
 (random-table/register :name "Reaction Roll (Errant)"
-  :roller (lambda (table) (+ 2 (random 6) (random 6)))
+  :roller #'random-table/roller/2d6
   :data '(((2) . "Hostile [DV +8]")
            ((3 4 5) . "Unfriendly [DV +4]")
            ((6 7 8) . "Unsure")
@@ -214,7 +229,7 @@
 
 (random-table/register :name "Attribute Score (Black Sword Hack)"
   :private t
-  :roller (lambda (table) (+ 2 (random 6) (random 6)))
+  :roller #'random-table/roller/2d6
   :data '(((2 3) . "8")
            ((4 5) . "9")
            ((6 7) . "10")
@@ -725,8 +740,10 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
 	 (format "%s via:" (random-table-name table))
 	 (random-table-data table) nil t))
 
-(defun random-table/roller/death-and-dismemberment/damage (&rest table)
-  (+ 1 (random 12) (read-number "Number of Existing Injuries: " 0) (read-number "Lethal Damage: " 0)))
+(defun random-table/roller/death-and-dismemberment/damage (table)
+  (+ (read-number "Number of Existing Injuries: " 0)
+    (read-number "Lethal Damage: " 0)
+    (random-table/roller/1d12 table)))
 
 (random-table/register :name "Death and Dismemberment"
   :roller #'random-table/roller/prompt-from-table-data
@@ -758,7 +775,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            ((16 . 1000) . "Rolled ${current_roll}\n- +1 Injury\n- Burned for +${current_roll} day(s)\n- ${current_roll} - 14 Fatal Wounds.\n- Save vs. Deaf.")))
 
 (random-table/register :name "Death and Dismemberment > Physical"
-  :roller (lambda (table) (+ 1 (random 6)))
+  :roller #'random-table/roller/1d6
   :private t
   :data '(((1) . "Death and Dismemberment > Physical > Arm")
            ((2) . "Death and Dismemberment > Physical > Leg")
@@ -801,7 +818,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
 (defun random-table/roller/saving-throw (table)
   (let ((score (read-number (format "%s\n> Enter Saving Throw Score: " (random-table-name table)) 15))
          (modifier (read-number (format "%s\n> Modifier: " (random-table-name table)) 0))
-         (roll (+ 1 (random 20))))
+         (roll (random-table/roller/1d20 table)))
     (cond
       ((= roll 1) "Fail")
       ((= roll 20) "Save")
