@@ -63,6 +63,8 @@ The slots are:
 - :fetcher :: function that takes two positional arguments (see
   `random-table/fetcher/default'.); it is used to fetch the correct entry
   from the table.
+- :exclude-from-prompt :: when true, ignore the prefix arg for
+  prompting for dice roll.
 - :private :: when true, do not show in list of rollable tables.
 - :store :: When non-nil, we store the roller's value for the
   duration of the table evaluation.  Useful for when you have one
@@ -80,15 +82,23 @@ as whether there are unexpected events.  All from the same roll."
   (roller #'random-table/roller/default)
   (filter #'random-table/filter/default)
   (fetcher #'random-table/fetcher/default)
+  (exclude-from-prompt nil)
   (private nil)
   (store nil)
   (reuse nil))
 
-(cl-defun random-table/register (&rest kws &key name data &allow-other-keys)
+(cl-defun random-table/register (&rest kws &key name data exclude-from-prompt &allow-other-keys)
   "Store the DATA, NAME, and all given KWS in a `random-table'."
-  (let* ((key (intern name))
-          (struct (apply #'make-random-table :name key :data (-list data) kws)))
-    (puthash key struct random-table/storage/tables)))
+  ;; We need to guard for a reserved character; which we use for operations.
+  (if (string-match-p "\\(\\[\\|\\]\\)" name)
+    (user-error "Attempt to register \"%s\" table failed.  You cannot include the following characters: \"[\", \"]\"." name)
+    (let* ((key (intern name))
+            (struct (apply #'make-random-table
+                      :name key
+                      :exclude-from-prompt (or exclude-from-prompt
+                                             (= 1 (length (-list data))))
+                      :data (-list data) kws)))
+      (puthash key struct random-table/storage/tables))))
 
 (defvar random-table/storage/results
   (make-hash-table)
@@ -111,18 +121,17 @@ The hash value is the contents of the table.")
          (docstring (format "Roll %s on given TABLE" label)))
     `(defun ,roller (table)
        ,docstring
-       (if current-prefix-arg
+       (if (and current-prefix-arg (not (random-table-exclude-from-prompt table)))
          (read-number (format "Roll %s for %s: " ,label (random-table-name table)))
          ,@body))))
 
 (defun random-table/roller/default (table)
   "Given the TABLE roll randomly on it.
-
 See `random-table/filter/default'.
 See `random-table/roller' macro."
   ;; Constant off by one errors are likely
   (let ((faces (length (-list (random-table-data table)))))
-    (if current-prefix-arg
+    (if (and current-prefix-arg (not (random-table-exclude-from-prompt table)))
       (read-number (format "Roll 1d%s for %s: " faces (random-table-name table)))
       (+ 1 (random faces)))))
 
@@ -130,6 +139,8 @@ See `random-table/roller' macro."
 ;; consistent interface.
 (random-table/roller :label "1d6" (+ 1 (random 6)))
 (random-table/roller :label "2d6" (+ 2 (random 6) (random 6)))
+(random-table/roller :label "1d8" (+ 1 (random 8)))
+(random-table/roller :label "1d10" (+ 1 (random 10)))
 (random-table/roller :label "1d12" (+ 1 (random 12)))
 (random-table/roller :label "1d20" (+ 1 (random 20)))
 
@@ -216,8 +227,9 @@ Either by evaluating as a `random-table' or via `s-format'."
     (random-table/evaluate/table table)
     ;; We have specified a non-table; roll the text.  We'll treat a non-escaped on as a dice text.
     (progn
-      (s-format (if (string-match-p "\\${" text) text (concat "${" text "}"))
-        #'random-table/roll/parse-text/replacer))))
+      (let ((text (format "%s" text)))
+        (s-format (if (string-match-p "\\${" text) (format "%s" text) (format "${%s}" text))
+          #'random-table/roll/parse-text/replacer)))))
 
 (defun random-table/roll/parse-text/replacer (text)
   "Roll the TEXT; either from a table or as a dice-expression.
@@ -226,6 +238,14 @@ This is constructed as the replacer function of `s-format'."
   (if-let ((table (random-table/get-table text :allow_nil t)))
     (random-table/evaluate/table table)
     (cond
+      ((string-match "\\[\\(.*\\)\\][[:space:]]*\\(-\\|\\+\\|\\*\\)[[:space:]]*\\[\\(.*\\)\\]" text)
+        (let* ((table-one (match-string-no-properties 1 text))
+               (operator (match-string-no-properties 2 text))
+                (table-two (match-string-no-properties 3 text)))
+          (apply (intern operator)
+            (list
+              (string-to-number (random-table/roll/parse-text/replacer table-one))
+              (string-to-number (random-table/roll/parse-text/replacer table-two))))))
       ((and random-table/current-roll (string-match "current_roll" text))
         random-table/current-roll)
       (t
@@ -285,7 +305,7 @@ found in the `random-table/stroage/tables' registry."
                     ((stringp value)
                       (gethash (intern value) random-table/storage/tables))
                     ((integerp value)
-                      value)
+                      nil)
                     (t
                       (error "Expected %s to be a `random-table', `symbol', `integer', or `string' got %s."
                         value
