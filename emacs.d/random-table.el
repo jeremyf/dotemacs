@@ -105,13 +105,32 @@ See `random-table' for discussion about storage and reuse.")
 The hash key is the \"human readable\" name of the table (as a symbol).
 The hash value is the contents of the table.")
 
+;;; Random Table Roller
+(cl-defmacro random-table/roller (&rest body &key label &allow-other-keys)
+  (let ((roller (intern (concat "random-table/roller/" label)))
+         (docstring (format "Roll %s on given TABLE" label)))
+    `(defun ,roller (table)
+       ,docstring
+       (if current-prefix-arg
+         (read-number (format "Roll %s for %s: " ,label (random-table-name table)))
+         ,@body))))
+
 (defun random-table/roller/default (table)
   "Given the TABLE roll randomly on it.
 
-See `random-table/filter/default'."
+See `random-table/filter/default'.
+See `random-table/roller' macro."
   ;; Constant off by one errors are likely
+  (let ((faces (length (-list (random-table-data table)))))
+    (if current-prefix-arg
+      (read-number (format "Roll 1d%s for %s: " faces (random-table-name table)))
+      (+ 1 (random faces)))))
 
-  (list (+ 1 (random (length (-list (random-table-data table)))))))
+;;;; Perhaps not ideal to have one function per roll type.  But...having
+(random-table/roller :label "1d6" (+ 1 (random 6)))
+(random-table/roller :label "2d6" (+ 2 (random 6) (random 6)))
+(random-table/roller :label "1d12" (+ 1 (random 12)))
+(random-table/roller :label "1d20" (+ 1 (random 20)))
 
 (defun random-table/filter/default (&rest rolls)
   "Filter the given ROLLS and return an integer.

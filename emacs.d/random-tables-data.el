@@ -1,20 +1,5 @@
 (require 'random-table)
 
-;;; Random Table Roller
-(cl-defmacro random-table/roller (&rest body &key label &allow-other-keys)
-  (let ((roller (intern (concat "random-table/roller/" label)))
-         (docstring (format "Roll %s on given TABLE" label)))
-    `(defun ,roller (table)
-       ,docstring
-       (if current-prefix-arg
-         (read-number (format "Roll %s for %s: " (random-table-name table) ,label))
-         ,@body))))
-
-(random-table/roller :label "1d6" (+ 1 (random 6)))
-(random-table/roller :label "2d6" (+ 2 (random 6) (random 6)))
-(random-table/roller :label "1d12" (+ 1 (random 12)))
-(random-table/roller :label "1d20" (+ 1 (random 20)))
-
 ;;; Errant
 (random-table/register :name "Reaction Roll (Errant)"
   :roller #'random-table/roller/2d6
