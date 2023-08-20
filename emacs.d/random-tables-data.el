@@ -1,4 +1,28 @@
 (require 'random-table)
+;;; Support Functions
+
+(defun random-table/roller/saving-throw (table)
+  "Prompt for rolling a saving throw for the given TABLE."
+  (let ((score (read-number
+                 (format "%s\n> Enter Saving Throw Score: "
+                   (random-table-name table))
+                 15))
+         (modifier (read-number
+                     (format "%s\n> Modifier: "
+                       (random-table-name table))
+                     0))
+         (roll (random-table/roller/1d20 table)))
+    (cond
+      ((= roll 1) "Fail")
+      ((= roll 20) "Save")
+      ((>= (+ roll modifier) score) "Save")
+      (t "Fail"))))
+
+(defun random-table/roller/prompt-from-table-data (table)
+  "Prompt for picking a range from a TABLE."
+	(completing-read
+	  (format "%s via:" (random-table-name table))
+	  (random-table-data table) nil t))
 
 ;;; Errant
 (random-table/register :name "Reaction Roll (Errant)"
@@ -720,11 +744,6 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
 ;;; House Rules
 ;;;; Goblin Punch Death and Dismemberment
 ;; See https://drive.google.com/file/d/0BxVHEMMjLlZ4cFVJTEFEcW9WV0U/view?resourcekey=0-matru4XOnZc-kjaQtiEX3Q
-(defun random-table/roller/prompt-from-table-data (table)
-	(completing-read
-	 (format "%s via:" (random-table-name table))
-	 (random-table-data table) nil t))
-
 (defun random-table/roller/death-and-dismemberment/damage (table)
   (+ (read-number "Number of Existing Injuries: " 0)
     (read-number "Lethal Damage: " 0)
@@ -799,16 +818,6 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
   :roller #'random-table/roller/death-and-dismemberment/damage
   :private t
   :data '(((1 . 1000) . "Non-Lethal Injury; Rolled ${current_roll}\n- +1 Injury\n- Knocked out for +${current_roll} round(s).")))
-
-(defun random-table/roller/saving-throw (table)
-  (let ((score (read-number (format "%s\n> Enter Saving Throw Score: " (random-table-name table)) 15))
-         (modifier (read-number (format "%s\n> Modifier: " (random-table-name table)) 0))
-         (roll (random-table/roller/1d20 table)))
-    (cond
-      ((= roll 1) "Fail")
-      ((= roll 20) "Save")
-      ((>= (+ roll modifier) score) "Save")
-      (t "Fail"))))
 
 (random-table/register :name "Save vss Mangled Arm"
   :roller #'random-table/roller/saving-throw

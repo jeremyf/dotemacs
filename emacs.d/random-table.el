@@ -126,7 +126,8 @@ See `random-table/roller' macro."
       (read-number (format "Roll 1d%s for %s: " faces (random-table-name table)))
       (+ 1 (random faces)))))
 
-;;;; Perhaps not ideal to have one function per roll type.  But...having
+;; Perhaps not ideal to have one function per roll type.  But...having a
+;; consistent interface.
 (random-table/roller :label "1d6" (+ 1 (random 6)))
 (random-table/roller :label "2d6" (+ 2 (random 6) (random 6)))
 (random-table/roller :label "1d12" (+ 1 (random 12)))
