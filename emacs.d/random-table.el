@@ -137,6 +137,10 @@ See `random-table/roller' macro."
 
 ;; Perhaps not ideal to have one function per roll type.  But...having a
 ;; consistent interface.
+(random-table/roller :label "1d2" (+ 1 (random 2)))
+(random-table/roller :label "1d3" (+ 1 (random 3)))
+(random-table/roller :label "1d4" (+ 1 (random 4)))
+(random-table/roller :label "1d5" (+ 1 (random 5)))
 (random-table/roller :label "1d6" (+ 1 (random 6)))
 (random-table/roller :label "2d6" (+ 2 (random 6) (random 6)))
 (random-table/roller :label "1d8" (+ 1 (random 8)))
@@ -242,10 +246,9 @@ This is constructed as the replacer function of `s-format'."
         (let* ((table-one (match-string-no-properties 1 text))
                (operator (match-string-no-properties 2 text))
                 (table-two (match-string-no-properties 3 text)))
-          (apply (intern operator)
-            (list
+          (funcall (intern operator)
               (string-to-number (random-table/roll/parse-text/replacer table-one))
-              (string-to-number (random-table/roll/parse-text/replacer table-two))))))
+              (string-to-number (random-table/roll/parse-text/replacer table-two)))))
       ((and random-table/current-roll (string-match "current_roll" text))
         random-table/current-roll)
       (t
@@ -281,7 +284,7 @@ use those dice to lookup on other tables."
                   (gethash (intern reuse-table-name) random-table/storage/results)
                   (random-table/evaluate/table/roll
                     (random-table/get-table reuse-table-name))))
-            (apply (random-table-roller table) (-list table)))))
+            (funcall (random-table-roller table) table))))
     (when-let ((stored-table-name (random-table-store table)))
       (puthash (random-table-name table) results random-table/storage/results))
     results))
