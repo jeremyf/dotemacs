@@ -26,7 +26,11 @@
 
 ;;; Errant
 (random-table/register :name "Henchman (Errant)"
-  :data '("\n- Archetype :: ${Henchman > Archetype (Errant)}\n- Morale :: ${[Henchman > Morale Base] + [Henchman > Morale Variable]}"))
+  :data (list
+          (concat "\n- Archetype :: ${Henchman > Archetype (Errant)}"
+            "\n- Renown :: ${Henchman > Renown}"
+            "\n- Morale :: ${[Henchman > Morale Base] + [Henchman > Morale Variable]}"
+            "\n${Character (Errant)}")))
 
 (random-table/register :name "Henchman > Archetype (Errant)"
   :private t
@@ -48,8 +52,12 @@
 (random-table/register :name "Henchman > Morale Variable"
   :private t
   :roller (lambda (table)
-            (let* ((options '(("Nothing" . 0) ("+25%" . 1) ("+50%" . 2) ("+75% or more" . 3)))
-                    (key (completing-read "Additional Generosity of Offer: " options))
+            (let* ((options '(("Nothing" . 0)
+                               ("+25%" . 1)
+                               ("+50%" . 2)
+                               ("+75% or more" . 3)))
+                    (key (completing-read "Additional Generosity of Offer: "
+                           options nil t))
                     (modifier (alist-get key options nil nil #'string=)))
               (+ modifier (random-table/roller/2d6 table))))
   :data '(((2) . -2)
@@ -57,6 +65,19 @@
            ((6 . 8) . 0)
            ((9 . 11) . 1)
            ((12 . 15) . 2)))
+
+(random-table/register :name "Henchman > Renown"
+  :roller (lambda (table)
+            (let* ((options '(("Hamlet" . (lambda (table) 1))
+                               ("Village" . random-table/roller/1d2)
+                               ("Town" . random-table/roller/1d3)
+                               ("City" . random-table/roller/1d4)
+                               ("Metropolis" . random-table/roller/1d5)))
+                    (location (completing-read "Hiring location for Henchman: "
+                                options nil t)))
+              (funcall (alist-get location options nil nil #'string=) table)))
+  :private t
+  :data '(1 2 3 4 5))
 
 (random-table/register :name "Reaction Roll (Errant)"
   :roller #'random-table/roller/2d6
@@ -67,8 +88,8 @@
            ((12) . "Friendly [DV -4]")))
 
 (random-table/register :name "Character (Errant)"
-  :data (list (concat "\n- Physique :: ${4d4}\n- Skill :: ${4d4}\n- Mind :: ${4d4}"
-                "\n- Presence :: ${4d4}"
+  :data (list (concat "\n- Physique :: ${4d4}\n- Skill :: ${4d4}"
+                "\n- Mind :: ${4d4}\n- Presence :: ${4d4}"
                 "\n- Failed Profession :: ${Failed Professions (Errant)}"
                 "\n- Keepsakes :: ${Keepsakes (Errant)}"
                 "\n- Ancestry :: ${Ancestry (Errant)}")))
