@@ -25,6 +25,39 @@
 	  (random-table-data table) nil t))
 
 ;;; Errant
+(random-table/register :name "Henchman (Errant)"
+  :data '("\n- Archetype :: ${Henchman > Archetype (Errant)}\n- Morale :: ${[Henchman > Morale Base] + [Henchman > Morale Variable]}"))
+
+(random-table/register :name "Henchman > Archetype (Errant)"
+  :private t
+  :roller #'random-table/roller/1d10
+  :data '(((1 . 5) . "Warrior")
+           ((6 . 8) . "Professional")
+           ((9 . 10) . "Magic User")))
+
+(random-table/register :name "Henchman > Morale Base"
+  :private t
+  :roller (lambda (table) (read-number "Hiring PC's Presence Score: "))
+  :data '(((3 . 4) . 5)
+           ((5 . 8) . 6)
+           ((9 . 13) . 7)
+           ((14 . 16) . 8)
+           ((17 . 18) . 9)
+           ((19 . 20) . 10)))
+
+(random-table/register :name "Henchman > Morale Variable"
+  :private t
+  :roller (lambda (table)
+            (let* ((options '(("Nothing" . 0) ("+25%" . 1) ("+50%" . 2) ("+75% or more" . 3)))
+                    (key (completing-read "Additional Generosity of Offer: " options))
+                    (modifier (alist-get key options nil nil #'string=)))
+              (+ modifier (random-table/roller/2d6 table))))
+  :data '(((2) . -2)
+           ((3 . 5) . -1)
+           ((6 . 8) . 0)
+           ((9 . 11) . 1)
+           ((12 . 15) . 2)))
+
 (random-table/register :name "Reaction Roll (Errant)"
   :roller #'random-table/roller/2d6
   :data '(((2) . "Hostile [DV +8]")
@@ -293,6 +326,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
 
 ;;; Random Names (from Stars without Number)
 (random-table/register :name "Name"
+  :exclude-from-prompt t
   :data '("${Arabic Name > Male Given Name} ${Arabic Name > Surname}"
            "${Arabic Name > Female Given Name} ${Arabic Name > Surname}"
            "${Chinese Name > Male Given Name} ${Chinese Name > Surname}"
