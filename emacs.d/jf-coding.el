@@ -601,8 +601,10 @@ See `add-log-current-defun-function'."
     (setq imenu-sort-function 'imenu--sort-by-name)
     (setq imenu-generic-expression
       '((nil "^;;[[:space:]]+-> \\(.*\\)$" 1)
-         ("defun" "^.*([[:space:]]*\\(cl-\\)?defun[[:space:]]+\\([^(]+\\)" 2)
-         ("macro" "^.*([[:space:]]*\\(cl-\\)?defmacro[[:space:]]+\\([^(]+\\)" 2)
+         ("defvar" "^([[:space:]]*\\(cl-\\)?defvar[[:space:]]+\\(.*\\)$" 2)
+         ("defconst" "^([[:space:]]*\\(cl-\\)?defconst[[:space:]]+\\(.*\\)$" 2)
+         ("defun" "^([[:space:]]*\\(cl-\\)?defun[[:space:]]+\\([^(]+\\)" 2)
+         ("macro" "^([[:space:]]*\\(cl-\\)?defmacro[[:space:]]+\\([^(]+\\)" 2)
          ("use-package" "^.*([[:space:]]*use-package[[:space:]]+\\([[:word:]-]+\\)" 1)))
     (imenu-add-menubar-index)))
 
