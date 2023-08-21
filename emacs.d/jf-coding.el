@@ -530,54 +530,54 @@ See `add-log-current-defun-function'."
     (flymake-mode 1)
     (which-function-mode)))
 
-(defvar jf/ruby-mode/comment-header-regexp
-  "^[[:space:]]*##\\(#\\)*$"
-  "The regular expression for a Ruby comment header.
+(defvar jf/comment-header-regexp/major-modes-alist
+  '((emacs-lisp-mode . "^;;;;*")
+     (ruby-mode . "^[[:space:]]*###*$")
+     (ruby-ts-mode . "^[[:space:]]*###*$"))
+  "AList of major modes and their comment headers.")
 
-I noticed that a fellow Rubyist would start her method comment
-blocks with \"##\".  I liked how that looked, creating a clear
-marker of a comment block.
-
-Then when pairing with a team member she asked about those
-comment two \"##\".  I said my assumption was that they were used
-for navigation.  It would make sense as an anchoring point for
-positioning the cursor.")
-
-(defun jf/ruby-mode/commend-header-forward ()
-  "Move to next line matching `jf/ruby-mode/comment-header-regexp'."
+(defun jf/commend-header-forward ()
+  "Move to next line matching `jf/comment-header-regexp/ruby-mode'."
   (interactive)
+  (let ((regexp (alist-get major-mode jf/comment-header-regexp/major-modes-alist)))
+    (when (string-match-p
+            regexp
+            (buffer-substring-no-properties
+              (line-beginning-position)
+              (line-end-position)))
+      (forward-line))
+    (condition-case err
+      (progn
+        (search-forward-regexp regexp)
+        (beginning-of-line)
+        (recenter scroll-margin t)
+        (pulsar-pulse-line))
+      (error (goto-char (point-max))))))
+
+(defun jf/comment-header-backward ()
+  (interactive)
+    (let ((regexp (alist-get major-mode jf/comment-header-regexp/major-modes-alist)))
   (when (string-match-p
-          jf/ruby-mode/comment-header-regexp
+          regexp
           (buffer-substring-no-properties
             (line-beginning-position)
             (line-end-position)))
-    (forward-line))
+    (previous-line)
+    (recenter scroll-margin t)
+    (pulsar-pulse-line))
   (condition-case err
     (progn
-      (search-forward-regexp jf/ruby-mode/comment-header-regexp)
+      (search-backward-regexp regexp)
       (beginning-of-line)
       (recenter scroll-margin t)
       (pulsar-pulse-line))
-    (error (goto-char (point-max)))))
+    (error (goto-char (point-min))))))
 
-(defun jf/ruby-mode/comment-header-backward ()
-  (interactive)
-  (when (string-match-p
-          jf/ruby-mode/comment-header-regexp
-          (buffer-substring-no-properties
-            (line-beginning-position)
-            (recenter scroll-margin t)
-            (line-end-position)))
-    (previous-line))
-  (condition-case err
-    (progn
-      (search-backward-regexp jf/ruby-mode/comment-header-regexp)
-      (beginning-of-line)
-      (pulsar-pulse-line))
-    (error (goto-char (point-min)))))
+(define-key ruby-mode-map (kbd "s-ESC") #'jf/comment-header-backward)
+(define-key ruby-mode-map (kbd "C-s-]") #'jf/commend-header-forward)
 
-(define-key ruby-mode-map (kbd "s-ESC") #'jf/ruby-mode/comment-header-backward)
-(define-key ruby-mode-map (kbd "C-s-]") #'jf/ruby-mode/commend-header-forward)
+(define-key emacs-lisp-mode-map (kbd "s-ESC") #'jf/comment-header-backward)
+(define-key emacs-lisp-mode-map (kbd "C-s-]") #'jf/commend-header-forward)
 
 (defun jf/ruby-ts-mode-configurator ()
   "Configure the `treesit' provided `ruby-ts-mode'."
@@ -587,8 +587,8 @@ positioning the cursor.")
   (define-key ruby-ts-mode-map (kbd "C-M-h") #'jf/treesit/function-select)
   (define-key ruby-ts-mode-map (kbd "C-c C-f") #'jf/current-scoped-function-name)
   (define-key ruby-ts-mode-map (kbd "C-c C-y") #'jf/ruby-mode/yardoc-ify)
-  (define-key ruby-ts-mode-map (kbd "s-ESC") #'jf/ruby-mode/comment-header-backward)
-  (define-key ruby-ts-mode-map (kbd "C-s-]") #'jf/ruby-mode/commend-header-forward)
+  (define-key ruby-ts-mode-map (kbd "s-ESC") #'jf/comment-header-backward)
+  (define-key ruby-ts-mode-map (kbd "C-s-]") #'jf/commend-header-forward)
   (define-key ruby-ts-mode-map (kbd "C-c C-r") #'jf/treesit/wrap-rubocop))
 (add-hook 'ruby-ts-mode-hook #'jf/ruby-ts-mode-configurator)
 
