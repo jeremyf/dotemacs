@@ -95,6 +95,9 @@ as whether there are unexpected events.  All from the same roll."
     (let* ((key (intern name))
             (struct (apply #'make-random-table
                       :name key
+                      ;; When there's only one possible result, don't prompt the
+                      ;; user when they chose the "I'll roll my own dice"
+                      ;; option.
                       :exclude-from-prompt (or exclude-from-prompt
                                              (= 1 (length (-list data))))
                       :data (-list data) kws)))
