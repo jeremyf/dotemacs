@@ -1,4 +1,7 @@
 (require 'random-table)
+
+(global-set-key (kbd "H-r") #'random-table/roll)
+(global-set-key (kbd "C-c C-r") #'random-table/roll)
 ;;; Support Functions
 
 (defun random-table/roller/saving-throw (table)
@@ -335,7 +338,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
   :filter (lambda (&rest dice) "We have a pool of dice to determine if there are dupes."
             (car (list-utils-dupes (-list dice))))
   :fetcher (lambda (data index)
-             (when index (concat " with unexpected \"" (nth (- (car (-list index)) 1) data) "\" event")))
+             (when index (concat " with unexpected “" (nth (- (car (-list index)) 1) data) "” event")))
   :data '("Very negative" "Negative" "Negative but…" "Positive but…" "Positive" "Very Positive"))
 
 ;;; OSE
@@ -908,3 +911,5 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "Lose your left eye. -1 to Ranged Attack."
            "Lose your right eye. -1 to Ranged Attack."
            "Go into a coma. You can recover from a coma by making a Con check after 1d6 days, and again after 1d6 weeks if you fail the first check. If you fail both, it is permanent."))
+
+;;; D30 Sandbox Companion
