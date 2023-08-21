@@ -284,9 +284,6 @@
      "Healers" "Cult" "Guardian" "Settlers" "Monument" "Food"
      "Judges" "Storm" "Demon" "Court" "Theatre" "Assassins"))
 
-(random-table/register :name "Attributes (OSR)"
-  :data '("\n- Strength :: ${3d6}\n- Intelligence :: ${3d6}\n- Wisdom :: ${3d6}\n- Dexterity :: ${3d6}\n- Constitution :: ${3d6}\n- Charisma :: ${3d6}"))
-
 (random-table/register :name "Attributes (Black Sword Hack)"
   :data '("\n- Strength :: ${Attribute Score (Black Sword Hack)}\n- Dexterity :: ${Attribute Score (Black Sword Hack)}\n- Constitution :: ${Attribute Score (Black Sword Hack)}\n- Intelligence :: ${Attribute Score (Black Sword Hack)}\n- Wisdom :: ${Attribute Score (Black Sword Hack)}\n- Charisma :: ${Attribute Score (Black Sword Hack)}"))
 
@@ -341,7 +338,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
              (when index (concat " with unexpected \"" (nth (- (car (-list index)) 1) data) "\" event")))
   :data '("Very negative" "Negative" "Negative but…" "Positive but…" "Positive" "Very Positive"))
 
-;;; OSR
+;;; OSE
 (random-table/register :name "Attributes (OSR) (3d6 Down the Line)"
   :data '("\n- Strength :: ${3d6}\n- Intelligence :: ${3d6}\n- Wisdom :: ${3d6}\n- Dexterity :: ${3d6}\n- Constitution :: ${3d6}\n- Charisma :: ${3d6}"))
 
