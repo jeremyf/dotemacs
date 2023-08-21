@@ -81,6 +81,7 @@ It will display entries without switching to them."
   :straight t
   :config
   (setq shr-cookie-policy nil)
+  (setq eww-auto-rename-buffer 'title)
   (defun shr-tag-dfn (dom)
     (shr-fontize-dom dom 'italic))
 
