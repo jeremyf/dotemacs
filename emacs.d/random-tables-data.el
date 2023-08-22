@@ -1,4 +1,5 @@
-(require 'random-table)
+(use-package random-table
+  :straight (:host github :repo "jeremyf/random-table.el"))
 
 (global-set-key (kbd "H-r") #'random-table/roll)
 (global-set-key (kbd "C-c C-r") #'random-table/roll)
