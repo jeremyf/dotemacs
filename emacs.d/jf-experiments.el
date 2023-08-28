@@ -109,5 +109,14 @@ I'm uncertain if this is useful/practical.  However there is
 (setq gnus-select-method '(nntp "campaignwiki.org"))
 ;; (add-to-list 'gnus-secondary-select-methods '(nnml ""))
 
+
+(defun jf/rancher/rm-then-vim-project-file (&optional filename)
+  "Kill some text to edit a FILENAME in Rancher."
+  (interactive)
+  (let* ((f (or filename (buffer-file-name)))
+          (relative-name (concat "./" (file-relative-name f (projectile-project-root)))))
+    (kill-new (f-read f))
+    (kill-new (format "rm %s ; vim %s" relative-name relative-name))))
+
 (provide 'jf-experiments)
 ;;; jf-experiments.el ends here
