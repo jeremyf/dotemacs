@@ -117,7 +117,7 @@
 (random-table/register :name "Grimoire > Sphere (Errant)"
   :private t
   :data '("Magic" "Space" "Time" "Mind" "Spirit" "Body"
-           "Elements" "Dimensions" "Life" "Death" "Objects" "BIota"))
+           "Elements" "Dimensions" "Life" "Death" "Objects" "Biota"))
 
 (random-table/register :name "Ancestry (Errant)"
   :data '("Tough" "Arcane" "Cunning" "Adaptable"))
@@ -317,7 +317,7 @@ rolls.
 From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
 
 (defun random-table/roller/oracle-question (table)
-  "Prompt for likelihood and return corresponding roller."
+  "Prompt for likelihood and return corresponding roller for TABLE."
   (let ((likelihood (completing-read "Likelihood: " jf/gaming/black-sword-hack/table/oracle-question-likelihood nil t)))
     (funcall (alist-get likelihood jf/gaming/black-sword-hack/table/oracle-question-likelihood nil nil #'string=))))
 
