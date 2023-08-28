@@ -948,4 +948,164 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "Lose your right eye. -1 to Ranged Attack."
            "Go into a coma. You can recover from a coma by making a Con check after 1d6 days, and again after 1d6 weeks if you fail the first check. If you fail both, it is permanent."))
 
-;;; D30 Sandbox Companion
+;;; Solo GM-ing
+
+(random-table/register :name "The “But” is related to"
+  :private t
+  :data '("A twist to the relationship between people in the situation"
+           "An adjustment to the physical environment."
+           "An error in an assumption some NPC is making."
+           "A fact the hero thinks they know is actually wrong."
+           "The failure of a piece of gear, either for the hero or an NPC."
+           "Sublimely bad or good timing by a sudden event."))
+
+(random-table/register :name "Action Oracle"
+  :data '("Scheme" "Clash" "Weaken" "Initiate" "Create"
+           "Swear" "Avenge" "Guard" "Defeat" "Control"
+           "Break" "Risk" "Surrender" "Inspect" "Raid"
+           "Evade" "Assault" "Deflect" "Threaten" "Attack"
+           "Leave" "Preserve" "Manipulate" "Remove" "Eliminate"
+           "Withdraw" "Abandon" "Investigate" "Hold" "Focus"
+           "Uncover" "Breach" "Aid" "Uphold" "Falter"
+           "Suppress" "Hunt" "Share" "Destroy" "Avoid"
+           "Reject" "Demand" "Explore" "Bolster" "Seize"
+           "Mourn" "Reveal" "Gather" "Defy" "Transform"
+           "Persevere" "Serve" "Begin" "Move" "Coordinate"
+           "Resist" "Await" "Impress" "Take" "Oppose"
+           "Capture" "Overwhelm" "Challenge" "Acquire" "Protect"
+           "Finish" "Strengthen" "Restore" "Advance" "Command"
+           "Refuse" "Find" "Deliver" "Hide" "Fortify"
+           "Betray" "Secure" "Arrive" "Affect" "Change"
+           "Defend" "Debate" "Support" "Follow" "Construct"
+           "Locate" "Endure" "Release" "Lose" "Reduce"
+           "Escalate" "Distract" "Journey" "Escort" "Learn"
+           "Communicate" "Depart" "Search" "Charge" "Summon"))
+
+(random-table/register :name "Theme Oracle"
+  :data '("Risk" "Ability" "Price" "Ally" "Battle"
+           "Safety" "Survival" "Weapon" "Wound" "Shelter"
+           "Leader" "Fear" "Time" "Duty" "Secret"
+           "Innocence" "Renown" "Direction" "Death" "Honor"
+           "Labor" "Solution" "Tool" "Balance" "Love"
+           "Barrier" "Creation" "Decay" "Trade" "Bond"
+           "Hope" "Superstition" "Peace" "Deception" "History"
+           "World" "Vow" "Protection" "Nature" "Opinion"
+           "Burden" "Vengeance" "Opportunity" "Faction" "Danger"
+           "Corruption" "Freedom" "Debt" "Hate" "Possession"
+           "Stranger" "Passage" "Land" "Creature" "Disease"
+           "Advantage" "Blood" "Language" "Rumor" "Weakness"
+           "Greed" "Family" "Resource" "Structure" "Dream"
+           "Community" "War" "Portent" "Prize" "Destiny"
+           "Momentum" "Power" "Memory" "Ruin" "Mysticism"
+           "Rival" "Problem" "Idea" "Revenge" "Health"
+           "Fellowship" "Enemy" "Religion" "Spirit" "Fame"
+           "Desolation" "Strength" "Knowledge" "Truth" "Quest"
+           "Pride" "Loss" "Law" "Path" "Warning"
+           "Relationship" "Wealth" "Home" "Strategy" "Supply"))
+
+(random-table/register :name "Character Attitudes"
+  :data '("willing" "excited" "reluctant" "resentful" "pleased" "outraged"
+           "uncomfortable" "cautious" "powerless" "defiant" "frustrated" "obligated"
+           "focused" "confident" "scared" "ambivalent" "wary" "amused"
+           "reluctant" "suspicious" "worried" "fatigued" "obsessed" "curious"
+           "focused" "optimistic" "determined" "worn down" "elated" "troubled"
+           "uneasy" "thankful" "skeptical" "rebellious" "misunderstood" "daring"));;; D30 Sandbox Companion
+
+(random-table/register :name "Location Adjectives of Disconnection"
+  :table '("Deserted" "Claustrophobic" "Dismal" "Isolated" "Secluded" "Shadowy"
+            "Neglected" "Shrouded" "Pallid" "Eerie" "Gloomy" "Towering"))
+
+(random-table/register :name "Location Adjectives of Connection"
+  :table '("Glorious" "Harmonious" "Dazzling" "Wonderful" "Delightful" "Inviting"
+            "Mystical" "Magnificent" "Tranquil" "Silent" "Magical" "Charming"))
+
+(random-table/register :name "Descriptive Words to Pair with Concrete Element"
+  :table '("peaceful" "scary" "treacherous" "rejuvenating" "ancient" "broken"
+            "idyllic"  "crumbling" "bucolic" "rocky" "gentle" "broken"
+            "secret" "withering" "bleak" "fallen" "incandescent" "cataclysmic"
+            "uncharted" "barren" "pastoral" "bleak" "misty" "delightful"
+            "enchanted" "demolished" "rusted" "shimmering" "effervescent" "mysterious"
+            "perilous" "sacred" "solitary" "eerie" "otherworldly" "wondrous"))
+
+;; OSR Solo Rules written by Peter Rudin-Burgess Creative Common License Attribution 4.0 International (CC BY 4.0) https://creativecommons.org/licenses/by/4.0/
+(random-table/register :name "Plot Twist"
+  :data '("${Plot Twist > Subject} ${Plot Twist > Event}"))
+
+(random-table/register :name "Plot Twist > Subject"
+  :private t
+  :data '("An NPC" "Your PC" "An organization"
+           "A physical event" "An emotional event" "An item"))
+
+(random-table/register :name "Plot Twist > Event"
+  :private t
+  :data '("appears." "alters the location." "helps the hero."
+           "hinders the hero." "changes the goal." "ends the scene."))
+
+(random-table/roller :label "2d4"
+  (+ 2 (random 4) (random 4)))
+
+(random-table/register :name "How Far Away is a Thing > Same Place"
+  :roller #'random-table/roller/2d4
+  :data '((2 . "Almost touching you")
+           (3 . "Within arm's reach")
+           (4 . "Just steps away")
+           (5 . "just around the corner")
+           (6 . "in the next room")
+           (7 . "a few levels up (or down…)")
+           (8 . "Somehwere in the dungeon")))
+
+(random-table/register :name "How Far Away is a Thing > Distant Thing"
+  :roller #'random-table/roller/2d4
+  :data '((2 . "The same patch of grass (or mountainside…)")
+           (3 . "The same village (or lair or dungeon…)")
+           (4 . "The same clan (or duchy or faction…)")
+           (5 . "A mile or so away")
+           (6 . "About 10-25 miles away")
+           (7 . "About 100-200 miles away")
+           (8 . "Very far away")))
+
+(random-table/register :name "Intervention Type"
+  :data '("New entity" "Entity positive" "Entity negative"
+           "Advance plot" "Regress plot" "Wild"))
+
+(random-table/register :name "Everything Is Not as Expected"
+  :data '("Increase simple element"
+           "Decrease simple element"
+           "Add simple element"
+           "Remove simple element"
+           "Increase major element"
+           "Decrease major element"
+           "Add major element"
+           "Remove major element"
+           "Wild positive"
+           "Wild negative"))
+
+;; Ask the Stars” by Chris McDowall, available at www.bastionland.com.
+(random-table/register :name "Ask the Stars"
+  :data '("- Answer :: ${Ask the Stars > Answer}\n- Symbol :: ${Ask the Stars > Symbol}\n- Position :: ${Ask the Stars > Position}"))
+
+(random-table/register :name "Ask the Stars > Answer"
+  :roller #'random-table/roller/1d12
+  :private t
+  :data '(((1 . 3) . "Hard no")
+           ((4 . 6) . "No")
+           ((7 . 9) . "Yes")
+           ((10 . 12) . "Hard yes")))
+
+(random-table/register :name "Ask the Stars > Symbol"
+  :private t
+  :data '("The Fang (hostility/fear)" "The Wings (freedom/nature)"
+           "The Cage (protection/obligation)" "The Hand (creation/misdirection)"
+           "The Mask (persuasion/shame)" "The Eye (judgement/secrets)"
+           "The Child (learning/greed)" "The Traveller (wandering/chance)"
+           "The Elder (authority/tradition)" "The Fleet (direction/struggle)"
+           "The Council (opposition/cycles)" "The Legion (unification/identity)"))
+
+(random-table/register :name "Ask the Stars > Position"
+  :private t
+  :data '("Rising (growth/possibility)" "Entombed (memory/death)"
+           "Twinned (intimacy/dependency)" "Waning (hunger/decay)"
+           "Rooted (stability/plenty)" "Bowed (submission/mercy)"
+           "Colliding (change/violence)" "Burning (honesty/pride)"
+           "Veiled (faith/deceit)" "Exiled (guilt/autonomy)"
+           "Crowned (ambition/ruin)" "Reflected (reversal/vanity)"))
