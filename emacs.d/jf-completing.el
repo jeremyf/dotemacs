@@ -110,7 +110,6 @@
           ("M-g e" . consult-compile-error)
           ("M-g g" . consult-goto-line)
           ("H-o" . consult-org-agenda)
-          ("C-c o" . consult-org-agenda)
           ("M-g M-o" . consult-org-agenda)
           ("M-g M-g" . consult-goto-line)
           ("s-l" . consult-goto-line)
@@ -119,18 +118,18 @@
           ("M-g m" . consult-mark)
           ("M-g M" . consult-global-mark)
           ("C-x C-SPC" . consult-global-mark)
-          ("M-i" . consult-imenu)
+          ("M-i" . jf/consult-imenu)
           ("M-g i" . consult-imenu)
           ("M-g I" . consult-imenu-multi)
           ;; M-s bindings (search-map)
           ("M-s f" . consult-find)
-          ("M-s L" . consult-locate)
-          ;; ("M-s g" . consult-grep)
-          ("M-s G" . consult-git-grep)
+          ;; ("M-s L" . consult-locate)
+          ;; ("M-s g" . consult-git-grep)
+          ;; ("M-s G" . consult-git-grep)
           ("M-s r" . consult-ripgrep)
           ("C-c f" . consult-ripgrep)
-          ("M-s l" . consult-line)
-          ("M-s L" . consult-line-multi)
+          ;; ("M-s l" . consult-line)
+          ("M-s M-s" . consult-line-multi)
           ;; Customizations that map to ivy
           ("C-c r" . consult-recent-file)
           ;; ("C-c o" . consult-file-externally)
@@ -176,6 +175,12 @@
   ;; Configure other variables and modes in the :config section,
   ;; after lazily loading the package.
   :preface
+  (defun jf/consult-imenu (prefix)
+    "Call `consult-imenu' or when PREFIX is given call `consult-imenu-multi'."
+    (interactive "P")
+    (if (car prefix)
+      (consult-imenu-multi)
+      (consult-imenu)))
   (defun consult-clock-in (prefix &optional match)
     "Clock into an Org agenda heading picking from MATCH.
 
