@@ -481,13 +481,16 @@ PARG is part of the method signature for `org-link-parameters'."
   (let* ((denote-directory (if subdirectory
              (f-join (denote-directory)
                (concat subdirectory "/"))
-                             (denote-directory))))
+                             (denote-directory)))
+          (all-files (denote-all-files))
+          (file (funcall project-read-file-name-function
+                  "Select note: "
+                  all-files
+                  (lambda (fname) (s-contains? filter fname t))
+                  'denote--file-history)))
     ;; This leverages a post v1.0.0 parameter of Denote
     ;; See https://git.sr.ht/~protesilaos/denote/commit/c6c3fc95c66ba093a266c775f411c0c8615c14c7
-    (concat scheme
-            ":"
-            (denote-retrieve-filename-identifier
-       (denote-file-prompt filter)))))
+    (concat scheme ":" (denote-retrieve-filename-identifier file))))
 
 (cl-defun jf/denote/link-ol-abbr-with-property (link
             description
@@ -525,9 +528,8 @@ PARG is part of the method signature for `org-link-parameters'."
        :complete (lambda (&optional parg)
              (jf/org-link-complete-link-for
               parg
-              :scheme "abbr"
-              :filter " _abbr*"
-              :subdirectory "glossary"))
+               :scheme "abbr"
+               :filter "_abbr"))
        :export (lambda (link description format protocol)
            (jf/denote/link-ol-abbr-with-property
             link description format protocol
@@ -541,9 +543,8 @@ PARG is part of the method signature for `org-link-parameters'."
        :complete (lambda (&optional parg)
              (jf/org-link-complete-link-for
               parg
-              :scheme "abbr-plural"
-              :filter " _abbr*"
-              :subdirectory "glossary"))
+               :scheme "abbr-plural"
+               :filter "_abbr"))
        :export (lambda (link description format protocol)
            (jf/denote/link-ol-abbr-with-property
             link description format protocol
@@ -553,7 +554,7 @@ PARG is part of the method signature for `org-link-parameters'."
        :follow #'denote-link-ol-follow
     ;;;; I'm unclear if/how I want to proceed with this
        ;; :store (lambda (jf/org-link-store-link-for :scheme "abbr-plural"))
-       )
+  )
 
 (org-link-set-parameters "date"
                          :complete #'jf/denote/link-complete-date
@@ -624,7 +625,6 @@ PARG is for a conformant method signature."
              (jf/org-link-complete-link-for
                                       parg
                                       :scheme "epigraph"
-                                      :filter ""
                                       :subdirectory "epigraphs"))
                          :export (lambda (link description format protocol)
                                    (jf/denote/link-ol-epigraph-link
