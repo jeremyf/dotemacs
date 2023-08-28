@@ -22,6 +22,17 @@
   :bind (("C-=" . er/expand-region)
           ("C-+" . er/contract-region)))
 
+;; Learning about this, may be curious about https://tony-zorman.com/posts/change-inner.html
+(use-package change-inner
+  :straight t
+  :bind (;; Note the symmetry between 'change-inner binding and er/expand-region
+          ("C-c C-=" . 'change-inner)
+          ;; Below is an alternate consideration; namely if I want inner/outer
+          ;; behavior
+          ;; ("C-c TAB" . 'change-inner)
+          ;; ("C-c C-o" . 'change-outer)
+          ))
+
 (use-package fill-column-indicator
   ;; It's nice to have a gentle reminder showing me the recommended column width
   ;; for the current buffer.
