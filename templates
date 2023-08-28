@@ -60,6 +60,9 @@ markdown-mode markdown-ts-mode
 ;;;; org-mode
 org-mode
 
+(eg "([[abbr:20230824T082549][e.g.]] " q ")")
+(ie "([[abbr:20230825T130802][i.e.]] " q ")")
+
 (local-var "# -*- " (p "Variable name: ")": " (p "Value: ") "; -*-")
 (macro-cite "{{{cite(" (p (completing-read "Cite: " (jf/org-macro-value-list "cite"))) ")}}}")
 (macro-keyboard "{{{kbd(" (p (completing-read "Keyboard: " (jf/org-macro-value-list "kbd"))) ")}}}")
