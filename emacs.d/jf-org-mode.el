@@ -127,6 +127,8 @@ first matching link."
                            (wl . wl-other-frame)))
   :config
   (setq org-clock-persist 'history)
+  ;; When I would load the agenda, I'd invariably type "l" to list the entries.
+  (setq org-agenda-start-with-log-mode t)
   (setq org-confirm-babel-evaluate #'jf/org-confirm-babel-evaluate
     org-fontify-quote-and-verse-blocks t
     ;; I'd prefer to use the executable, but that doe not appear to be the
@@ -971,7 +973,7 @@ I envision this function called from the command-line."
          :immediate-finish t)
        ("t" "Task (for Project)"
          plain (function jf/org-mode/capture/project-task/find)
-         "- %T :: %?"
+         "%T\n\n%?"
          :empty-lines-before 1
          :empty-lines-after 1
          :clock-in t
@@ -979,7 +981,7 @@ I envision this function called from the command-line."
          :jump-to-capture t)
        ("n" "Note for project task"
          plain (function jf/org-mode/capture/project-task/find)
-         "- %T :: %?"
+         "%T\n\n%?"
          :empty-lines-before 1
          :empty-lines-after 1)))
 
