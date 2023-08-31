@@ -372,7 +372,7 @@ With ARG, do this that many times."
         (when (f-exists? (f-join (projectile-project-root) "Gemfile.lock"))
           (list :command-name "run-command-samvera-versions"
             ;; TODO: Extract some of this as a command.
-            :command-line (format "cd %s; rg \"^ +((bulk|hy)rax|\\(*.\\)iiif\\(*.\\)|rails|qa|blacklight(-.*)?) \\(\\d+\\.\\d+\\.\\d+\" Gemfile.lock" dir)
+            :command-line (format "cd %s; rg \"^ +((bulk|hy)rax([-_].*)?|\\(*.\\)iiif\\(*.\\)|rails|qa|blacklight([-_].*)?) \\(\\d+\\.\\d+\\.\\d+\" Gemfile.lock | sort" dir)
             :display (format "Samvera gem versions for %s" dir))))
       (list :command-name "install-dotzshrc-files"
         :command-line "cd ~/git/dotzshrc; ruby install.rb"
