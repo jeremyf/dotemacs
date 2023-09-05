@@ -50,8 +50,6 @@ emacs-lisp-mode
 ;;;; fundamental-mode
 fundamental-mode
 
-(dir-r "Derivative::Rodeo::")
-
 ;;;; markdown-mode
 markdown-mode markdown-ts-mode
 
@@ -68,6 +66,10 @@ org-mode
 (macro-keyboard "{{{kbd(" (p (completing-read "Keyboard: " (jf/org-macro-value-list "kbd"))) ")}}}")
 (macro-idiomatic "{{{i(" (p (completing-read "Idiom: " (jf/org-macro-value-list "i"))) ")}}}")
 (macro-mechanic "{{{mechanic(" (p (completing-read "Mechanic: " (jf/org-macro-value-list "mechanic"))) ")}}}")
+
+(eg "([[abbr:20230824T082549][e.g.]] ")
+(ie "([[abbr:20230825T130802][i.e.]] ")
+(rpg "[[abbr:20221009T115226][RPG]] ")
 
 (update_block "#+attr_shortcode: :date " (format-time-string "%Y-%m-%d")
   " :mode " (p (completing-read "Mode: " '(inline paragraph marginnote sidenote section fallback) nil t) mode)

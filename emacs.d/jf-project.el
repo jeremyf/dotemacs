@@ -328,13 +328,14 @@ This encodes the logic for creating a project."
   (interactive (list
                  (read-string "Label: ")
                  (read-string "Path: ")))
+  (save-excursion
     (goto-char (point-min))
     (let ((case-fold-search t))
       (and (or
-             (re-search-forward "^#\\+PROJECT_PATHS:")
-             (re-search-forward "^#\\+PROJECT_NAME:"))
-        (forward-line)
-        (insert "#+PROJECT_PATHS: (\"" label "\" . \"" path "\")\n"))))
+             (re-search-forward "^#\\+PROJECT_PATHS:" nil t)
+             (re-search-forward "^#\\+PROJECT_NAME:" nil t)
+             (progn (goto-line 6) (re-search-forward "^$" nil t)))
+        (insert "#+PROJECT_PATHS: (\"" label "\" . \"" path "\")\n")))))
 
 (provide 'jf-project)
 ;;; jf-project.el ends here

@@ -243,6 +243,7 @@ first matching link."
   :custom (org-src-tab-acts-natively t)
   (org-clock-clocktable-default-properties '(:maxlevel 5 :link t :tags t))
   :bind (:map org-mode-map
+          ("C-c l u" . jf/org-mode/convert-link-type)
           ("C-c l i" . org-insert-link)
           ("M-g o" . consult-org-heading))
   :bind (("C-c l s" . org-store-link)
@@ -879,9 +880,9 @@ The return value is a list of `cons' with the `car' values of:
           (parts (s-split ":" (car elements)))
           (type (car parts))
           (path (s-join ":" (cdr parts))))
-    (message "Opening %s with %s for %s" path type major-mode)
     (cond
-      ((string= "eww-mode" (format "%s" major-mode))
+      ;; The 'eww-mode never fires :(
+      ((eq 'eww-mode major-mode)
         (save-excursion
           (let* ((url (plist-get eww-data :url))
                   (title (plist-get eww-data :title)))
@@ -895,7 +896,7 @@ The return value is a list of `cons' with the `car' values of:
           (let ((url (elfeed-entry-link elfeed-show-entry))
                  (title (elfeed-entry-title elfeed-show-entry))
                  (author (plist-get (car (plist-get (elfeed-entry-meta elfeed-show-entry) :authors)) :name)))
-            (concat "#+attr_shortcode:"
+            (concat (when (or author title url) "#+attr_shortcode:")
               (when author (concat " :pre " author))
               (when title (concat " :cite " title))
               (when url (concat " :cite_url " url))
@@ -906,8 +907,11 @@ The return value is a list of `cons' with the `car' values of:
           (s-format jf/org-mode/capture/template/while-clocking
             'aget
             (jf/org-mode/capture/get-field-values content))))
+      ((or (string= "http" type) (string= "https" type))
+        (save-excursion
+          (concat "#+attr_shortcode: :cite_url " link
+              "\n#+begin_blockquote\n" content "\n#+end_blockquote\n%?")))
       (t (concat "\n#+begin_example\n" content "\n#+end_example")))))
-
 (defun jf/org-mode/capture/parameters (prefix)
   "A logic lookup table by PREFIX."
   (cond

@@ -689,34 +689,7 @@ When USE_HUGO_SHORTCODE is given use glossary based exporting."
 
 (advice-add #'denote-link-ol-export
       :override #'jf/denote/link-ol-export
-      '((name . "wrapper")))
-
-;; When I link to glossary entries, I want to use their URLs.  I have several
-;; different fields that could have the “export url”:
-;;
-;; - OFFER :: The URL which you can “get” the item (e.g. purchase the game,
-;;   find where to check it out at a library)
-;;
-;; - ROAM_REFS :: In past incarnations, I would add a ROAM_REFS to the Org-Roam
-;;   node that was my “local” blog post.
-;;
-;; - SAME_AS :: This could be the primary URL; however due to past
-;;   implementations, I was extracting the SAME_AS URL from the ITEMID; which
-;;   was typically the Wikidata URL.
-(defun jf/denote/export-url-from-id (id)
-  "Return the appropriate url for the given `denote' ID."
-  ;; TODO: Remove function?
-  (when-let ((the-plist (jf/denote/plist-for-export-of-id id)))
-    (plist-get the-plist :url)))
-
-;;  ;; Should be: https://www.worldcat.org link
-;; (message "%s" (jf/denote/export-url-from-id "20221009T115949"))
-;;  ;; Should be https://samvera.org
-;; (message "%s" (jf/denote/export-url-from-id "20221009T120341"))
-;;  ;; Should be https://en.wikipedia.org/wiki/Jira_(software)
-;; (message "%s" (jf/denote/export-url-from-id "20221009T120152"))
-;;  ;; Should be nil
-;;(message "%s" (jf/denote/export-url-from-id "20221009T120712"))
+  '((name . "wrapper")))
 
 (defun jf/associate-blog-post-url-with-identifier (url identifier)
   "Associate given URL with the `denote' IDENTIFIER."
@@ -730,13 +703,20 @@ When USE_HUGO_SHORTCODE is given use glossary based exporting."
        :default url)
       (save-buffer))))
 
-(cl-defun jf/convert-org-link-type-at-point (&key (types '("abbr" "abbr-plural" "denote" "epigraph")))
-  "Convert link at POINT from one of the `org-link' TYPES."
-  (interactive)
-  (if-let ((element (org-element-lineage (org-element-context) '(link) t)))
-      ;; Change type
-      (message "%s" element)
-    (user-error "Point is not an org-link")))
+(defun jf/org-mode/convert-link-type (&optional element)
+  "Replace the given `org-mode' ELEMENT's link type."
+  (interactive (list (org-element-context)))
+  (let ((types '("abbr" "abbr-plural" "denote")))
+    (if (eq 'link (car element))
+      (let ((type (org-element-property :type (org-element-context))))
+        (if (member type types)
+          (replace-string (format "[[%s:" type)
+            (format "[[%s:" (completing-read "New link type: " types nil t))
+            nil
+            (org-element-property :begin element)
+            (org-element-property :end element))
+          (user-error "Current element is of type %s; it must be one of the following: %s" type types)))
+      (user-error "Current element must be of type 'link; it is %S" (car element)))))
 
 ;;;;; Capturing functions for applications
 (defun jf/menu--org-capture-firefox ()

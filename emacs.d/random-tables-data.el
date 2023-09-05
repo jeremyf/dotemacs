@@ -1,5 +1,4 @@
-(use-package random-table
-  :straight (:host github :repo "jeremyf/random-table.el"))
+(require 'random-table "~/git/random-table.el/random-table.el")
 
 (global-set-key (kbd "H-r") #'random-table/roll)
 (global-set-key (kbd "C-c C-r") #'random-table/roll)
@@ -248,6 +247,52 @@
      "Water carrier" "Wheelwright" "Whipping boy" "Whiffler" "Worm rancher"))
 
 ;;; Black Sword Hack
+(random-table/register :name "Demon Name (Black Sword Hack)"
+  :data '("Beleth" "Abaddon" "Ulshedra" "Marduk" "Raum"
+           "Halphas" "Ashurban" "Ordog" "Charun" "Surgat"
+           "Ahriman" "Wissigo" "Furcas" "Keldim" "Gorgo"
+           "Rahab" "Gaki" "Samnu" "Namtar" "Baalberith"))
+
+(random-table/register :name "Nickname (Black Sword Hack)"
+  :data '("The Graceless" "Two beards" "the Killing Machine" "Blue Belly"
+           "the Moon Child" "the Giggling Killer" "the Unwise" "Starwatcher"
+           "Cruddy" "the Inflexible" "Many Tongues" "the Duteous"
+           "the Questionable" "Bad Fortune" "the Half Great" "He Who Listens"
+           "the Barbarous" "No Horse" "the Silent" "Devourer"
+           "Smallpox" "the Night Beast" "the Skullmonger" "Godslayer"
+           "the Chewer" "She Who Dances For No One" "the Shadow Maker" "the Painful"
+           "the Pale Sinner" "the Greenish" "One Tooth" "the Absurdist"
+           "the Chronicler" "the Unscrupulous" "Demonbane" "the Indomitable"
+           "the Pain Dealer" "Wülf Hair" "the Silver Squirrel" "the Purple Usurper"
+           "the Slavemaker" "the Sceptic" "the Uncrowned" "the Dark Rambler"
+           "the Soulless" "the Golden" "the Unafraid" "the Creaky Marauder"
+           "the Eternal Loser" "the Subjugator" "Non-Dead" "the Star King"
+           "the Inscrutable" "the Glatisant" "Three Eyes" "the Walking Dread"
+           "Kingmaker" "the Holy Mumbler" "He Who Loves The Dead" "Dogface"
+           "the Rationalist" "the Ethereal Cannibal" "The Wind Wanderer" "She Who Comes From Below…"))
+
+(random-table/register :name "How to find the demon you seek (Black Sword Hack)"
+  :data '("By killing its master, a prominent figure in this town"
+           "In a well, posing as a divining spirit,spreading awful rumours"
+           "In the queen’s secret jewel cabinet"
+           "Hidden inside a map, on the shelves of a forgotten library"
+           "Inside a small gem owned by a clueless noble"
+           "In a cup used by a cult to drug their acolytes"
+           "In the memories of an amnesiac Chaos priest"
+           "In the broken sword of a banished Templar"
+           "Trapped in the wedding ring of an undying king"
+           "In a cryptic tome, sealed by another demon"
+           "In the breastplate of a dead knight left on a battlefield"
+           "Inside a stone circle, ready to serve whoever can best it in a duel."
+           "Haunting the castle where its last master was murdered"
+           "Enslaved by a powerful oracle"
+           "Inside the heathen reliquary that releases it once per month"
+           "Carved on the gravestone of an emperor"
+           "Inside the only toy owned by an orphan"
+           "In the liver of the Inquisitor it is possessing"
+           "Hidden in its castle, on a nightmarish demonic plane"
+           "In the mouth of a dead dragon, guarded by superstitious locals"))
+
 (random-table/register :name "Travel Event (Black Sword Hack)"
   :data "\n  - Subject :: ${Travel Event > Subject (Black Sword Hack)}\n  - Theme :: ${Travel Event > Theme (Black Sword Hack)}")
 
@@ -959,7 +1004,11 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "The failure of a piece of gear, either for the hero or an NPC."
            "Sublimely bad or good timing by a sudden event."))
 
-(random-table/register :name "Action Oracle"
+(random-table/register :name "Oracle"
+  :data '("- Action :: ${Oracle > Action}\n- Theme :: ${Oracle > Theme}"))
+
+(random-table/register :name "Oracle > Action"
+  :private t
   :data '("Scheme" "Clash" "Weaken" "Initiate" "Create"
            "Swear" "Avenge" "Guard" "Defeat" "Control"
            "Break" "Risk" "Surrender" "Inspect" "Raid"
@@ -981,7 +1030,8 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "Escalate" "Distract" "Journey" "Escort" "Learn"
            "Communicate" "Depart" "Search" "Charge" "Summon"))
 
-(random-table/register :name "Theme Oracle"
+(random-table/register :name "Oracle > Theme"
+  :private t
   :data '("Risk" "Ability" "Price" "Ally" "Battle"
            "Safety" "Survival" "Weapon" "Wound" "Shelter"
            "Leader" "Fear" "Time" "Duty" "Secret"
@@ -1012,15 +1062,15 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "uneasy" "thankful" "skeptical" "rebellious" "misunderstood" "daring"));;; D30 Sandbox Companion
 
 (random-table/register :name "Location Adjectives of Disconnection"
-  :table '("Deserted" "Claustrophobic" "Dismal" "Isolated" "Secluded" "Shadowy"
+  :data '("Deserted" "Claustrophobic" "Dismal" "Isolated" "Secluded" "Shadowy"
             "Neglected" "Shrouded" "Pallid" "Eerie" "Gloomy" "Towering"))
 
 (random-table/register :name "Location Adjectives of Connection"
-  :table '("Glorious" "Harmonious" "Dazzling" "Wonderful" "Delightful" "Inviting"
+  :data '("Glorious" "Harmonious" "Dazzling" "Wonderful" "Delightful" "Inviting"
             "Mystical" "Magnificent" "Tranquil" "Silent" "Magical" "Charming"))
 
 (random-table/register :name "Descriptive Words to Pair with Concrete Element"
-  :table '("peaceful" "scary" "treacherous" "rejuvenating" "ancient" "broken"
+  :data '("peaceful" "scary" "treacherous" "rejuvenating" "ancient" "broken"
             "idyllic"  "crumbling" "bucolic" "rocky" "gentle" "broken"
             "secret" "withering" "bleak" "fallen" "incandescent" "cataclysmic"
             "uncharted" "barren" "pastoral" "bleak" "misty" "delightful"
@@ -1082,7 +1132,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
 
 ;; Ask the Stars” by Chris McDowall, available at www.bastionland.com.
 (random-table/register :name "Ask the Stars"
-  :data '("- Answer :: ${Ask the Stars > Answer}\n- Symbol :: ${Ask the Stars > Symbol}\n- Position :: ${Ask the Stars > Position}"))
+  :data '("\n- Answer :: ${Ask the Stars > Answer}\n- Symbol :: ${Ask the Stars > Symbol}\n- Position :: ${Ask the Stars > Position}"))
 
 (random-table/register :name "Ask the Stars > Answer"
   :roller #'random-table/roller/1d12
@@ -1109,3 +1159,74 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "Colliding (change/violence)" "Burning (honesty/pride)"
            "Veiled (faith/deceit)" "Exiled (guilt/autonomy)"
            "Crowned (ambition/ruin)" "Reflected (reversal/vanity)"))
+
+;; https://yumdm.com/wp-content/uploads/2021/04/D12-Monthly-Issue-1.pdf
+(random-table/register :name "What is the monster doing?"
+  :roller #'random-table/roller/2d6
+  :data '((2 . "Caring for…")
+           (3 . "Trapmaking/Marking territory")
+           (4 . "Crafting/Sharpening weapons")
+           (5 . "Resting/Sleeping/Recreation")
+           (6 . "Moving through area")
+           (7 . "Patrolling territory")
+           (8 . "Eating/Cooking")
+           (9 . "Searching for…")
+           (10 . "Escaping from…")
+           (11 . "Trading with…")
+           (12 . "Fighting with…")))
+
+(random-table/register :name "Reaction Roll (OSE)"
+  :roller (lambda (table)
+            (+ (random-table/roller/2d6 table)
+              (string-to-number (completing-read "Charisma Modifier: "
+                                  '("-2" "-1" "0" "1" "2") nil t))
+              (string-to-number (completing-read "Additional Modifier: "
+                                  '("-2" "-1" "0" "1" "2") nil t "0"))
+              ))
+  :data '(((-2 . 2) . "Attacks")
+           ((3 . 5) . "Hostile, may attack")
+           ((6 . 8) . "Uncertain, confused")
+           ((9 . 11) . "Indifferent, may negotiate")
+           ((12 . 16) . "Eager, friendly")))
+
+(random-table/register :name "The Anarchical Grimoire of Propylonic Discharges"
+  :data '("The Immediate Removal of ${AGoPD (d10)}."
+           "The Violent Eradicator of ${AGoPD (d10)}."
+           "The Animation of ${AGoPD (d10)}."
+           "Reverse ${AGoPD (d8)}."
+           "Symmetrical yet Unstable ${AGoPD (d8)}."
+           "Blatant and Ignited ${AGoPD (d8)}."
+           "An Unexpected Summoning ${AGoPD (d6)}."
+           "The Effulgent Translocation ${AGoPD (d6)}."
+           "Pandemonic Ramming ${AGoPD (d6)}."
+           "The Haunting of a Door by ${AGoPD (d4)}."
+           "The Possessing of the Caster by ${AGoPD (d4)}."
+           "The Efficacious Repelling of ${AGoPD (d4)}."))
+
+(random-table/register :name "AGoPD (d10)"
+  :private t
+  :data '("Locks & Bolts" "Hinges & Rails" "Handles & Knobs"
+     "Glyphs & Runes" "Door-steps" "Door-panels" "Door-mats"
+     "Door-frames" "Knockers" "Peep-holes"))
+
+(random-table/register :name "AGoPD (d8)"
+  :private t
+  :data '("By-passing of ${AGoPD (d10)}"
+           "Disappearance of ${AGoPD (d10)}"
+           "Transmutation of ${AGoPD (d10)}"
+           "Impotence"
+           "Exhibition"
+           "Walling"
+           "Dead-bolting"
+           "Entrance"))
+
+(random-table/register :name "AGoPD (d6)"
+  :private t
+  :data
+  '("of Helpful ${AGoPD (d4)}" "of Silver ${AGoPD (d10)}" "of the Magic-User"
+     "Applied to One’s Enemies" "as Protection" "In a Delayed Fashion"))
+
+(random-table/register :name "AGoPD (d4)"
+  :private t
+  :data '("Cat-headed Things" "Heralds of the Termite People"
+           "A Fae Porter-Knight" "The Ghost of Katastroph"))
