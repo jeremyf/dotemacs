@@ -118,5 +118,17 @@ I'm uncertain if this is useful/practical.  However there is
     (kill-new (f-read f))
     (kill-new (format "rm %s ; vim %s" relative-name relative-name))))
 
+;; (use-package eyebrowse
+;;   :straight t)
+
+;; (use-package org-timeblock
+;;   :straight (org-timeblock :type git
+;;               :host github
+;;               :repo "ichernyshovvv/org-timeblock"))
+
+(use-package stem-reading-mode
+  :straight t
+  :config (setq stem-reading-overlay t))
+
 (provide 'jf-experiments)
 ;;; jf-experiments.el ends here
