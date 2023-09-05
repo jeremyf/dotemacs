@@ -50,8 +50,17 @@
   :straight t
   :bind
   ;; Note this is in the same prefix space as `browse-at-remote'
-  ("C-c l o" . link-hint-open-link)
-  ("C-c l c" . link-hint-copy-link))
+  ("C-c l o" . jf/link-hint-open-link)
+  ("C-c l c" . link-hint-copy-link)
+  :preface
+  (defun jf/link-hint-open-link (prefix)
+    "Hint at then browse a URL.
+
+When given PREFIX use `eww-browse-url'."
+    (interactive "P")
+    (let ((browse-url-browser-function
+            (if prefix #'eww-browse-url browse-url-browser-function)))
+        (link-hint-open-link))))
 
 ;;;; Custom Functions
 ;; (defun jf/scroll-down-half-page ()
