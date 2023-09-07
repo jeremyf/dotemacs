@@ -2,8 +2,8 @@
 
 (global-set-key (kbd "H-r") #'random-table/roll)
 (global-set-key (kbd "C-c C-r") #'random-table/roll)
-;;; Support Functions
 
+;;; Support Functions
 (defun random-table/roller/saving-throw (table)
   "Prompt for rolling a saving throw for the given TABLE."
   (let ((score (read-number
@@ -955,7 +955,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
   :private t
   :data '(((1 . 1000) . "Non-Lethal Injury; Rolled ${current_roll}\n- +1 Injury\n- Knocked out for +${current_roll} round(s).")))
 
-(random-table/register :name "Save vss Mangled Arm"
+(random-table/register :name "Save vs Mangled Arm"
   :roller #'random-table/roller/saving-throw
   :private t
   :data '(("Save" . "Saved against losing an arm…lose a finger instead.")
@@ -1094,6 +1094,9 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
 (random-table/roller :label "2d4"
   (+ 2 (random 4) (random 4)))
 
+(random-table/roller :label "d66"
+  (+ (* 10 (+ 1 (random 6))) (+ 1 (random 6))))
+
 (random-table/register :name "How Far Away is a Thing > Same Place"
   :roller #'random-table/roller/2d4
   :data '((2 . "Almost touching you")
@@ -1189,6 +1192,20 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            ((9 . 11) . "Indifferent, may negotiate")
            ((12 . 16) . "Eager, friendly")))
 
+(random-table/register :name "Random Dungeon Content (OSE)"
+  :roller #'random-table/roller/d66
+  :data '((11 . "Contents Empty with Treasure")
+           ((12 . 16) . "Contents Empty")
+           (21 . "Contents Empty with Treasure")
+           ((22 . 26) . "Contents Empty")
+           ((31 . 33) . "Monster with Treasure")
+           ((34 . 36) . "Monster")
+           ((41 . 43) . "Monster with Treasure")
+           ((44 . 46) . "Monster")
+           ((51 . 56) . "Special")
+           ((61 . 62) . "Trap with Treasure")
+           ((63 . 66) . "Trap with Treasure")))
+
 (random-table/register :name "The Anarchical Grimoire of Propylonic Discharges"
   :data '("The Immediate Removal of ${AGoPD (d10)}."
            "The Violent Eradicator of ${AGoPD (d10)}."
@@ -1230,3 +1247,158 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
   :private t
   :data '("Cat-headed Things" "Heralds of the Termite People"
            "A Fae Porter-Knight" "The Ghost of Katastroph"))
+
+(random-table/register :name "NPC > Immediate Desire (Scarlet Heroes)"
+  :data '("Aiding a friend" "Avenging a slight" "Bribing an official"
+           "Buying an object" "Collecting a bribe" "Collecting a debt"
+           "Commit a crime" "Curing a sickness" "Destroying evidence"
+           "Earning money" "Funding a funeral" "Getting a document"
+           "Getting drunk" "Going home to rest" "Having a man/woman"
+           "Helping a relative" "Impressing a lover" "Impressing the boss"
+           "Paying a debt" "Recovering a lost item" "Revealing a secret"
+           "Selling an object" "Spreading a faith" "Spying on a person"
+           "Stealing from the boss"))
+
+(random-table/register :name "NPC > Ruling Temperament (Scarlet Heroes)"
+  :data '("Ambitious" "Bigoted" "Capricious"
+           "Cautious" "Compassionate" "Deceitful"
+           "Exhibitionistic" "Fearful" "Garrulous"
+           "Greedy" "Indecisive" "Inquisitive"
+           "Lazy" "Loyal" "Lustful"
+           "Merciful" "Observant" "Patient"
+           "Proud" "Scornful" "Shy"
+           "Stubborn" "Valorous" "Vicious"
+           "Wrathful"))
+
+(random-table/register :name "NPC > Memorable Traits (Scarlet Heroes)"
+  :data '("Always carries things" "Always hurried" "Asthmatic"
+           "Blind in an eye" "Careless dresser" "Constantly watchful"
+           "Dark, sober clothes" "Deaf or hard of hearing" "Elaborate tattoos"
+           "Emphatic speech" "Facial scarring" "Gaudy jewelry"
+           "Immaculate clothes" "Laconic speaker" "Magnificent hair"
+           "Missing an appendage" "Numerous piercings" "Often drunk"
+           "Out of shape" "Precise hands" "Shaven or balding"
+           "Stutters" "Subtle fragrance" "Tends work constantly"
+           "Twitches regularly"))
+
+(random-table/register :name "Actor > Commoner (Scarlet Heroes)"
+  :data '("Ambitious scholar" "Battered ex-adventurer" "Beautiful young mistress"
+           "Bold ship captain" "Commercial moneylender" "Cunning shipwright"
+           "Cynical investigator" "Doddering sage" "Drunken sailor"
+           "Dubious spice merchant" "Earthy construction boss" "Elderly crafter"
+           "Erudite bookseller" "Exquisite dancer" "Grasping merchant"
+           "Grizzled border hunter" "Gross slave or labor trader" "Honest gravetender"
+           "Humble day laborer" "Intrepid explorer" "Marriage-minded deb"
+           "Minor government official" "Mistreated servant or slave" "Pitiless tax collector"
+           "Polished tea house owner" "Promising artist" "Puzzled foreigner"
+           "Rakehell family heir" "Relentless bounty hunter" "Reputable tong brother"
+           "Retired mercenary officer" "Rough caravan master" "Sagacious alchemist"
+           "Sincere priest" "Skillful artisan" "Stern market magistrate"
+           "Suspicious farm owner" "Veteran soldier" "Wealthy bachelor"
+           "Weary physician"))
+
+(random-table/register :name "Actor > Underworld (Scarlet Heroes)"
+  :data '("Ambitious guttersnipe" "Amoral assassin" "Bitter pretender to rank"
+           "Black marketeer" "Callous blackmailer" "Careworn priest"
+           "Cheap legbreaker" "Cheating merchant" "Cretinous street thug"
+           "Crippled beggar child" "Cynical young whore" "Deceitful footpad"
+           "Degraded former noble" "Depraved slumming noble" "Desperate young mother"
+           "Diseased beggar" "Disguised con artist" "Dissipated physician"
+           "Drug den proprietor" "Earnest charity worker" "Exiled foreigner"
+           "Expert forger" "Grasping fence" "Hard-drinking labor boss"
+           "Hardened burglar" "Haughty ninja" "Impartial info broker"
+           "Impoverished ex-noble" "Knife-slinging gambler" "Menacing tong enforcer"
+           "Migrant farmer" "Naive country girl" "Press gang boss"
+           "Priest of a forbidden faith" "Ruthless moneylender" "Scrawny pickpocket"
+           "Street-worn prostitute" "Suspicious urchin" "World-weary madame"
+           "Wretched miser"))
+
+(random-table/register :name "Actor > Elite and Noble (Scarlet Heroes)"
+  :data '("Aged plutocrat"  "City magistrate" "Cynical watch leader" "Discreet banker"
+           "Exiled pretender" "Famed courtesan" "Famous artist" "Favored concubine"
+           "Feared court blackmailer" "Foreign diplomat" "Foreign nobleman" "Heartless noble matron"
+           "High military officer" "High-ranking priest" "Instructor to nobles" "Master assassin"
+           "Mighty war hero" "Minister of taxes" "Minister of trade" "Newlywed noble bride"
+           "Ninja clan leader" "Official investigator" "Powerful sorcerer" "Provincial governor"
+           "Purveyor of rare sins" "Rich moneylender" "Riotous young heir" "Scheming daifu"
+           "Scion of a noble lineage" "Scion of past rulers" "Shipping fleet owner" "Social club leader"
+           "Sorcerous “fixer”" "Steward of family lands" "Tong grandfather" "Veteran adventurer"
+           "Wealthy heir" "Wealthy landowner" "Wealthy merchant prince" "Widely-sought maiden"))
+
+(random-table/register :name "Actor > Relationship (Scarlet Heroes)"
+  :data '("Business partner" "Child" "Childhood friend" "Co-workers" "Cousin"
+           "Crime culprit" "Crime partner" "Crime victim" "Ex-lover" "Ex-spouse"
+           "Grandparent" "Has blackmail" "Heir to something" "Inlaws" "Lover"
+           "Old favor" "Parent" "Rival" "Schoolmates" "Sibling"
+           "Society fellows" "Spouse" "Subordinate" "Superior" "Uncle/Aunt"))
+
+(defvar random-table/prompts/reactions-scarlet-heroes
+  '(("-3 for grave insults or risks to the life of self or loved ones" . -3)
+     ("-2 for insults or risks to the NPC’s wealth or standing" . -2)
+     ("-1 for the risk of significant cost to their actions" . -1)
+     ("+1 for a modest bribe or when a favor is owed to a PC" . 1)
+     ("+2 for a large bribe or significant service owed" . 2)
+     ("+3 for a PC who saved their life or did similar service" . 3)))
+
+(defun random-table/roller/reactions-scarlet-heroes (table)
+  "Roller for the Scarlet Hereos TABLE."
+  (let* ((charisma-modifier (or (gethash 'charisma-modifier random-table/roll/cache)
+                     (read-number
+                       (format "%s\n> Charisma Modifier: "
+                         (random-table-name table))
+                       0)))
+          (reaction-modifier (or (gethash 'reaction-modifier random-table/roll/cache)
+                               (alist-get (completing-read
+                                            (format "%s\n> Additional Modifiers: "
+                                              (random-table-name table))
+                                            random-table/prompts/reactions-scarlet-heroes nil t)
+                                 random-table/prompts/reactions-scarlet-heroes
+                                 nil nil #'string=))))
+    (puthash 'charisma-modifier charisma-modifier random-table/roll/cache)
+    (puthash 'reaction-modifier reaction-modifier random-table/roll/cache)
+    (+ reaction-modifier charisma-modifier (random-table/roller/2d6 table))))
+
+(random-table/register :name "Reactions > Friendly (Scarlet Heroes)"
+  :roller #'random-table/roller/reactions-scarlet-heroes
+  :data '(((-9 . 1) . "${Reactions > Stranger (Scarlet Heroes)}")
+           (2 . "Sneering contempt")
+           (3 . "Flat dismissal")
+           (4 . "Reasoned refusal")
+           (5 . "Bribeable")
+           (6 . "Persuadable")
+           (7 . "Hesitant Agreement")
+           (8 . "Quick consent")
+           (9 . "Pleased consent")
+           (10 . "Vigorous consent")
+           (11 . "Firm commitment")
+           ((12 . 23) . "Bold enthusiasm")))
+
+(random-table/register :name "Reactions > Stranger (Scarlet Heroes)"
+  :roller #'random-table/roller/reactions-scarlet-heroes
+  :data '(((-9 . 1) . "${Reactions > Unfriendly (Scarlet Heroes)}")
+           (2 . "Anger")
+           (3 . "Annoyance")
+           (4 . "Dismissal")
+           (5 . "Flat refusal")
+           (6 . "Qualified refusal")
+           (7 . "Bribeable")
+           (8 . "Qualified consent")
+           (9 . "Tentative agreement")
+           (10 . "Full agreement")
+           (11 . "Helpful consent")
+           ((12 . 23) . "Admiring consent")))
+
+(random-table/register :name "Reactions > Unfriendly (Scarlet Heroes)"
+  :roller #'random-table/roller/reactions-scarlet-heroes
+  :data '(((-9 . 1) . "Violence or direct harm")
+           (2 . "Anger/Violence")
+           (3 . "Anger/Scorn")
+           (4 . "Scorn")
+           (5 . "Dismissal")
+           (6 . "Flat rejection")
+           (7 . "Considered refusal")
+           (8 . "Bribeable")
+           (9 . "Persuadable")
+           (10 . "Qualified consent")
+           (11 . "Grudging agreement")
+           ((12 .23) . "Tolerant consent")))
