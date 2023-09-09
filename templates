@@ -114,8 +114,7 @@ enh-ruby-mode ruby-mode rspec-mode ruby-ts-mode
   "# @!endgroup Class Attributes" n>
   "##")
 
-(debug "require \"debug\"; binding.break" n)
-(db "require 'byebug'; byebug" n)
+(db (jf/require-debugger) n)
 (frozen "# frozen_string_literal: true")
 (shell "#!/usr/bin/env ruby -w")
 (dc "described_class")
