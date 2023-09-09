@@ -51,17 +51,22 @@
       (user-error "No function to select")))
 
   (defun jf/treesit/wrap-rubocop (&optional given-cops)
-    "Wrap the current ruby function by disabling/enabling the GIVEN-COPS."
+    "Wrap the current ruby active region or function by disabling/enabling the GIVEN-COPS."
     (interactive)
     (if (derived-mode-p 'ruby-ts-mode 'ruby-mode)
-      (if-let ((func (treesit-defun-at-point)))
+      (if-let ((beg (if (use-region-p)
+                               (region-beginning)
+                               (treesit-node-start (treesit-defun-at-point))))
+                (end (if (use-region-p)
+                              (region-end)
+                               (treesit-node-end (treesit-defun-at-point)))))
         (let ((cops (or given-cops
                       (completing-read-multiple "Cops to Disable: "
                         (jf/rubocop/list-all-cops) nil t))))
           (save-excursion
-            (goto-char (treesit-node-start func))
+            (goto-char beg)
             (let ((indentation (s-repeat (current-column) " ")))
-              (kill-region (treesit-node-start func) (treesit-node-end func))
+              (kill-region beg end)
               (beginning-of-line)
               (insert
                 (s-join "\n"
@@ -75,76 +80,8 @@
                   (mapcar (lambda (cop)
                             (concat indentation "# rubocop:enable " cop))
                     cops))))))
-        (user-error "Not in a function"))
+        (user-error "Not a region nor a function"))
       (user-error "%s is not derived from a ruby mode" major-mode)))
-
-  ;; I love M-q and also have some opinions about how my yard docs should look.
-  ;; This allows both of those to peacefully coexist.
-  (defun jf/ruby-mode/unfill-toggle ()
-    "Either `unfill-toggle' or `tidy-ruby-docs'."
-    (interactive)
-    (if (string= (treesit-node-type (treesit-node-at (point))) "comment")
-      (save-excursion
-        ;; Grab the first non-comment line
-        (jf/treesit/tidy-ruby-docs (point)))
-      (unfill-toggle)))
-
-  ;; A function to tidy up the yardocs in the comment section the method.  This
-  ;; is a mostly idempotent script that will format a yardoc comment section to
-  ;; my preferred structure/indentation.
-  ;;
-  ;; TODO: At present this does not handle comment lines of the form:
-  ;; "^ *# \w"
-  (defun jf/treesit/tidy-ruby-docs (cursor)
-    "Tidy the ruby yardoc at CURSOR."
-    (interactive "d")
-    ;; Ensure that we position at the beginning of the keyword declaration.
-    (end-of-line)
-    (search-backward-regexp "^ *# +@")
-    (if (s-match "^ *# +@example" (jf/get-line-text))
-      ;; Move past the example line.
-      (progn (next-line) (search-forward-regexp "^ *# +@\\w+"))
-      ;; Otherwise
-      (progn
-        ;; Because the `unfill-toggle' treats comments as the same area, we need
-        ;; to add blank lines around the keyword section.
-        (newline)
-        (set-mark (point))
-        (let* ((oldmark (mark))
-                ;; Determine the size of the keyword.
-                (line (jf/get-line-text nil))
-                (keyword_length (length (car (s-match "@\\w+" line)))))
-          (search-forward-regexp "^ *# +@\\w+")
-          (while (s-match "^ *# [^@]" (jf/get-line-text 1))
-            (next-line))
-          (end-of-line)
-          (newline)
-          (backward-char)
-          (end-of-line)
-          (fill-region oldmark (point))
-          (search-backward-regexp "^ *# +@")
-          (when (s-match "^ *# [^@]" (jf/get-line-text 1))
-            (progn
-              (next-line)
-              (beginning-of-line)
-              (search-forward-regexp "^ *#")
-              ;; Now pad that next line
-              (let ((padding (s-repeat (+ 1 keyword_length) " ")))
-                (unless (s-match (concat "^ *#" padding) (jf/get-line-text))
-                  (insert padding)))
-              (deactivate-mark)
-              (unfill-toggle))))
-        (forward-paragraph)
-        (delete-char -1)
-        (set-mark (point))
-        (backward-paragraph)
-        (delete-char 1)
-        (goto-char (mark))))
-    ;; While we're still in the same comment section; move to the next
-    ;; interesting element (e.g. non-empty lines)
-    (when (string= "comment" (treesit-node-type (treesit-node-at (point))))
-      (progn (search-forward-regexp "^ *# ?[^ ]+")
-        (jf/treesit/tidy-ruby-docs (point)))))
 
   ;; This function, tested against Ruby, will return the module space qualified
   ;; method name (e.g. Hello::World#method_name).
