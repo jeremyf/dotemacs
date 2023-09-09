@@ -256,6 +256,13 @@ With a PREFIX jump to the agenda without starting the clock."
               :host gitlab
               :repo "OlMon/consult-projectile"
               :branch "master")
+  :config
+  (setq consult-projectile-sources
+    '(consult-projectile--source-projectile-buffer
+       consult-projectile--source-projectile-file
+       consult-projectile--source-projectile-project
+       consult-projectile--source-projectile-dir
+       consult-projectile--source-projectile-recentf))
   :bind
   ;;; This overwrite `ns-open-file-using-panel'; the operating system's "Finder"
   ;; ("C-c o" . consult-projectile)
