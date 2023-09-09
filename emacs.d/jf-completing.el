@@ -258,11 +258,31 @@ With a PREFIX jump to the agenda without starting the clock."
               :branch "master")
   :config
   (setq consult-projectile-sources
-    '(consult-projectile--source-projectile-buffer
+    '( ;; key b
+       consult-projectile--source-projectile-buffer
+       ;; key f
        consult-projectile--source-projectile-file
+       ;; key p
        consult-projectile--source-projectile-project
+       ;; key d
        consult-projectile--source-projectile-dir
-       consult-projectile--source-projectile-recentf))
+       ;; key m
+       consult--source-bookmark
+       ;; key r
+       consult-projectile--source-projectile-recentf
+       ;; key *
+       consult--source-modified-buffer))
+  (setq read-file-name-function #'consult-find-file-with-preview)
+
+  (defun consult-find-file-with-preview (prompt &optional dir default mustmatch initial pred)
+    (interactive)
+    (let ((default-directory (or dir default-directory)))
+      (consult--read #'read-file-name-internal :state (consult--file-preview)
+        :prompt prompt
+        :initial initial
+        :require-match mustmatch
+        :predicate pred)))
+
   :bind
   ;;; This overwrite `ns-open-file-using-panel'; the operating system's "Finder"
   ;; ("C-c o" . consult-projectile)
