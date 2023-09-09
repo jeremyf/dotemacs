@@ -377,15 +377,18 @@ method, get the containing class."
   "Determine the correct debugger based on the Gemfile."
   (let ((gemfile-lock (f-join (projectile-project-root) "Gemfile.lock")))
     (if-let* ((f-exists? gemfile-lock)
-               (debuggers (s-split "\n"
-                            (shell-command-to-string
-                              (concat "rg \"^ +(byebug|debugger|pry-byebug|debug) \" "
-                                gemfile-lock " -r '$1' --only-matching | uniq")))))
+               (debuggers
+                 (s-split "\n"
+                   (shell-command-to-string
+                     (concat
+                       "rg \"^ +(byebug|debugger|pry-byebug|debug) \" "
+                       gemfile-lock
+                       " -r '$1' --only-matching | uniq")))))
       (cond
-        ((member "byebug") "require 'byebug'; byebug")
-        ((member "debug") "require 'debug'; binding.break")
-        ((member "debugger") "require 'debugger'; debugger")
-        ((member "pry-byebug") "require 'pry-byebug'; binding.pry")
+        ((member "byebug" debuggers) "require 'byebug'; byebug")
+        ((member "debug" debuggers) "require 'debug'; binding.break")
+        ((member "debugger" debuggers) "require 'debugger'; debugger")
+        ((member "pry-byebug" debuggers) "require 'pry-byebug'; binding.pry")
         (t "require 'debug'; binding.break"))
       "require 'debug'; binding.break")))
 
