@@ -3,13 +3,28 @@
 (global-set-key (kbd "H-r") #'random-table/roll)
 (global-set-key (kbd "C-c C-r") #'random-table/roll)
 
+(random-table/prompt "Charisma Modifier"
+  :type #'read-number
+  :default 0)
+
+(random-table/prompt "Reaction Modifier"
+  :type #'completing-read
+  :range '(("0 Nothing" . 0)
+            ("-3 for grave insults or risks to the life of self or loved ones" . -3)
+            ("-2 for insults or risks to the NPC’s wealth or standing" . -2)
+            ("-1 for the risk of significant cost to their actions" . -1)
+            ("+1 for a modest bribe or when a favor is owed to a PC" . 1)
+            ("+2 for a large bribe or significant service owed" . 2)
+            ("+3 for a PC who saved their life or did similar service" . 3)))
+
+(random-table/prompt "Saving Throw Score"
+  :type #'read-number
+  :default 15)
+
 ;;; Support Functions
 (defun random-table/roller/saving-throw (table)
   "Prompt for rolling a saving throw for the given TABLE."
-  (let ((score (read-number
-                 (format "%s\n> Enter Saving Throw Score: "
-                   (random-table-name table))
-                 15))
+  (let ((score (random-table/prompt "Saving Throw Score"))
          (modifier (read-number
                      (format "%s\n> Modifier: "
                        (random-table-name table))
@@ -1342,20 +1357,8 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
 
 (defun random-table/roller/reactions-scarlet-heroes (table)
   "Roller for the Scarlet Hereos TABLE."
-  (let* ((charisma-modifier (or (gethash 'charisma-modifier random-table/roll/cache)
-                     (read-number
-                       (format "%s\n> Charisma Modifier: "
-                         (random-table-name table))
-                       0)))
-          (reaction-modifier (or (gethash 'reaction-modifier random-table/roll/cache)
-                               (alist-get (completing-read
-                                            (format "%s\n> Additional Modifiers: "
-                                              (random-table-name table))
-                                            random-table/prompts/reactions-scarlet-heroes nil t)
-                                 random-table/prompts/reactions-scarlet-heroes
-                                 nil nil #'string=))))
-    (puthash 'charisma-modifier charisma-modifier random-table/roll/cache)
-    (puthash 'reaction-modifier reaction-modifier random-table/roll/cache)
+  (let* ((charisma-modifier (random-table/prompt "Charisma Modifier"))
+          (reaction-modifier (random-table/prompt "Reaction Modifier")))
     (+ reaction-modifier charisma-modifier (random-table/roller/2d6 table))))
 
 (random-table/register :name "Reactions > Friendly (Scarlet Heroes)"

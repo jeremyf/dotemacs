@@ -130,41 +130,6 @@ I'm uncertain if this is useful/practical.  However there is
   :straight t
   :config (setq stem-reading-overlay t))
 
-(defvar random-table/prompt/registry
-  (make-hash-table)
-  "Stores the registry of prompts")
-
-(cl-defun random-table/prompt/register (&key name cache type range default)
-  (let* ((prompt (format "%s: " name)))
-    (let ((func (cond
-                  ((eq type #'read-number)
-                    '(message "%s %s" ,@prompt ,default))
-                  ((eq type #'completing-read)
-                    (lambda () (alist-get (completing-read ,@prompt ,@range nil t)
-                                 ,@range nil nil #'string=)))
-                  (_ (user-error "Unknown type %s function for %s registry" type name)))))
-      (puthash (intern name) func random-table/prompt/registry))))
-
-(defun random-table/prompt (name)
-  (apply (gethash (intern name) random-table/prompt/registry)))
-
-(random-table/prompt/register :name "Charisma Modifier"
-  :type #'read-number
-  :default 0)
-
-(random-table/prompt/register :name "Reaction Modifier"
-  :type #'completing-read
-  :range '(("0 Nothing" . 0)
-            ("-3 for grave insults or risks to the life of self or loved ones" . -3)
-            ("-2 for insults or risks to the NPC’s wealth or standing" . -2)
-            ("-1 for the risk of significant cost to their actions" . -1)
-            ("+1 for a modest bribe or when a favor is owed to a PC" . 1)
-            ("+2 for a large bribe or significant service owed" . 2)
-            ("+3 for a PC who saved their life or did similar service" . 3)))
-
-(random-table/prompt/register :name "Saving Throw"
-  :type #'read-number
-  :default 15)
 
 (provide 'jf-experiments)
 ;;; jf-experiments.el ends here
