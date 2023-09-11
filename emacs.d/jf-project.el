@@ -331,11 +331,12 @@ This encodes the logic for creating a project."
   (save-excursion
     (goto-char (point-min))
     (let ((case-fold-search t))
-      (and (or
-             (re-search-forward "^#\\+PROJECT_PATHS:" nil t)
-             (re-search-forward "^#\\+PROJECT_NAME:" nil t)
-             (progn (goto-line 6) (re-search-forward "^$" nil t)))
-        (insert "#+PROJECT_PATHS: (\"" label "\" . \"" path "\")\n")))))
+      (if (or
+            (re-search-forward "^#\\+PROJECT_PATHS:" nil t)
+            (re-search-forward "^#\\+PROJECT_NAME:" nil t))
+        (end-of-line)
+        (progn (goto-line 6) (re-search-forward "^$" nil t)))
+      (insert "\n#+PROJECT_PATHS: (\"" label "\" . \"" path "\")"))))
 
 (provide 'jf-project)
 ;;; jf-project.el ends here
