@@ -120,6 +120,7 @@ enh-ruby-mode ruby-mode rspec-mode ruby-ts-mode
 (dc "described_class")
 (rspec "# frozen_string_literal: true" n n "require 'spec_helper'" n n "RSpec.describe " q " do" n n "end")
 (subject "subject(:" p ") { " p " }")
+(struct p " = Struct.new(" p ", keyword_init: true)")
 ;; A little experiment in mixing tempel behavior and multiple values.
 (init (p "Parameters (comma separated): " given-params t)
   (let* ((params (mapcar #'s-trim (s-split "," given-params)))
