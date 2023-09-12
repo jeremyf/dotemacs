@@ -287,18 +287,14 @@ Else, evaluate the whole buffer."
 ;; to `org-mode'.
 (global-set-key (kbd "<f12>") 'jf/create-scratch-buffer)
 (cl-defun jf/create-scratch-buffer (&optional arg)
-  "Quickly open a scratch buffer based on ARG.
-
-Defaults to `org-mode': `org-mode'"
+  "Create a scratch `denote' note.  If ARG given, create `scratch' instead."
   (interactive "P")
-  (crux-create-scratch-buffer)
-  (rename-buffer (concat "*scratch* at " (format-time-string "%Y-%m-%d %H:%M")))
-  (let ((prefix (or (car arg) 1)))
-    (cond
-      ((>= prefix 32) (ruby-mode))
-      ((>= prefix 16) (emacs-lisp-mode))
-      ((>= prefix 4) (markdown-mode))
-      (t (org-mode)))))
+  (if (car arg)
+    (progn
+      (crux-create-scratch-buffer)
+      (rename-buffer (concat "*scratch* at " (format-time-string "%Y-%m-%d %H:%M")))
+      (org-mode))
+    (jf/denote/create-scratch (format-time-string "%Y-%m-%d Scratch"))))
 
 ;; Sometimes I want to move, without renaming, a file.  This function helps
 ;; make that easy.
