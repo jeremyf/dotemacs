@@ -48,7 +48,9 @@
 
 (server-start)
 
-(global-set-key (kbd "TAB") #'indent-for-tab-command)
+(add-hook 'after-init-hook
+  (lambda ()
+    (global-set-key (kbd "TAB") #'indent-for-tab-command)))
 
 (setq gc-cons-threshold (expt 2 24) ;; 16777216
       gc-cons-percentage 0.1)
