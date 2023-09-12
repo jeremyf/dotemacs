@@ -51,7 +51,7 @@ The `car' as the label and `cdr' as the value that we'll insert.")
                  (read-string "Cite: ")
                  (read-string "Cite URL: ")))
   ;; TODO Extract the attr_shortcode functionality to be able to insert this.
-  (insert "#+attr_shortcode:"
+  (insert (when (or (s-present? author) (s-present? cite) (s-present? cite_url)) "#+attr_shortcode:")
     (if (s-present? author) (concat " :pre " author) "")
     (if (s-present? cite) (concat " :cite " cite) "")
     (if (s-present? cite_url) (concat " :cite_url " cite_url) "")
