@@ -213,7 +213,8 @@ Else, evaluate the whole buffer."
 (defun jf/nab-file-name-to-clipboard (arg)
   "Nab, I mean copy, the current buffer file name to the clipboard.
 
-  When you pass the universal ARG prompt for different aspects of a file."
+  When you pass one universal prefix ARG, nab the project relative filename.
+  When you pass two or more prompt for different aspects of a file."
   ;; https://blog.sumtypeofway.com/posts/emacs-config.html
   (interactive "P")
   (let* ((prefix (car arg))
@@ -221,7 +222,12 @@ Else, evaluate the whole buffer."
             (if (equal major-mode 'dired-mode)
               default-directory
               (buffer-file-name)))
-          (options '(("Filename, Basename" .
+          (filename
+            (cond
+              ((not prefix) raw-filename)
+              ((= prefix 4) (concat "./" (file-relative-name raw-filename (projectile-project-root))))
+              ((>= prefix 16)
+                (let ((options '(("Filename, Basename" .
                        (lambda (f) (file-name-nondirectory f)))
                       ("Filename, Project Relative" .
                         (lambda (f) (concat "./" (file-relative-name f (projectile-project-root)))))
@@ -230,13 +236,10 @@ Else, evaluate the whole buffer."
                       ("Dirname" .
                         (lambda (f) (file-name-directory f)))
                       ("Dirname, Project Relative" .
-                        (lambda (f) (concat "./" (file-relative-name (file-name-directory f) (projectile-project-root)))))))
-          (filename
-            (if prefix
-              (funcall (alist-get (completing-read "Option: " options nil t)
-                         options nil nil #'string=)
-                raw-filename)
-              raw-filename)))
+                        (lambda (f) (concat "./" (file-relative-name (file-name-directory f) (projectile-project-root))))))))
+                  (funcall (alist-get (completing-read "Option: " options nil t)
+                                       options nil nil #'string=)
+                    raw-filename))))))
     (when filename
       (kill-new filename)
       (message "Copied buffer file name '%s' to the clipboard." filename))))
