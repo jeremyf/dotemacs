@@ -253,7 +253,7 @@ ID-ONLY link without title."
     (consult-projectile--file (denote-directory))))
 
 ;;;;; Note taking Domains
-(cl-defmacro jf/denote/create-functions-for (&key domain key (create-fn nil) (prompts '(title keywords)))
+(cl-defmacro jf/denote/create-functions-for (&key domain key (create-fn nil))
   "A macro to CREATE-FN for the given DOMAIN.
 
           The KEY is the ASCII value of the binding key.
@@ -286,12 +286,11 @@ ID-ONLY link without title."
        (add-to-list 'jf/denote/subdirectories ,domain)
        (when (boundp 'consult-notes-sources)
          (add-to-list 'consult-notes-sources '(,domain ,key ,subdirectory)))
-       (defun ,default-create-fn (&optional title prompt)
+       (defun ,default-create-fn ()
          ,default-create-docstring
          (interactive)
-         (let ((denote-directory (f-join (denote-directory) ,domain))
-                (denote-prompts ,prompts))
-           (call-interactively #'denote title prompt)))
+         (let ((denote-directory (f-join (denote-directory) ,domain)))
+           (call-interactively #'denote)))
        (bind-key (format "H-d c %c" ,key) (or ,create-fn ',default-create-fn))
        (bind-key (format "H-d f %c" ,key) ',finder-fn)
        (defun ,finder-fn ()
@@ -333,7 +332,7 @@ ID-ONLY link without title."
   (denote title
     nil
     'org
-    (f-join (denote-directory) "epigraphs")))
+    (f-join (denote-directory) "scratch")))
 
 ;; The scratch domain is a place to capture random notes.  These can be promoted
 ;; to another directory or eventually discarded.
