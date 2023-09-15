@@ -84,7 +84,9 @@ With one PREFIX go to place where we would jump on capture."
     (t (progn
          (call-interactively #'set-mark-command)
          (if (when (and (fboundp 'org-clocking-p) (org-clocking-p)) t)
-           (org-clock-goto)
+           (progn
+             (org-clock-goto)
+             (goto-char (org-element-property :contents-end (org-element-at-point))))
            ;; Jump to where we would put a project were we to capture it.
            (org-capture-goto-target "t")))))
   (pulsar-pulse-line))
