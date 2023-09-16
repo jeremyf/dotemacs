@@ -70,33 +70,35 @@
            ((17 . 18) . 9)
            ((19 . 20) . 10)))
 
+(random-table/prompt "Additional Generosity of Offer"
+  :type #'completing-read
+  :range '(("Nothing" . 0)
+             ("+25%" . 1)
+             ("+50%" . 2)
+             ("+75% or more" . 3)))
+
 (random-table/register :name "Henchman > Morale Variable"
   :private t
   :roller (lambda (table)
-            (let* ((options '(("Nothing" . 0)
-                               ("+25%" . 1)
-                               ("+50%" . 2)
-                               ("+75% or more" . 3)))
-                    (key (completing-read "Additional Generosity of Offer: "
-                           options nil t))
-                    (modifier (alist-get key options nil nil #'string=)))
-              (+ modifier (random-table/roller/2d6 table))))
+            (+ (random-table/prompt "Additional Generosity of Offer") (random-table/roller/2d6 table)))
   :data '(((2) . -2)
            ((3 . 5) . -1)
            ((6 . 8) . 0)
            ((9 . 11) . 1)
            ((12 . 15) . 2)))
 
+(random-table/prompt "Hiring location for Henchman"
+  :type #'completing-read
+  :range '(("Hamlet" . (lambda (table) 1))
+            ("Village" . random-table/roller/1d2)
+            ("Town" . random-table/roller/1d3)
+            ("City" . random-table/roller/1d4)
+            ("Metropolis" . random-table/roller/1d5)))
+
+
 (random-table/register :name "Henchman > Renown"
   :roller (lambda (table)
-            (let* ((options '(("Hamlet" . (lambda (table) 1))
-                               ("Village" . random-table/roller/1d2)
-                               ("Town" . random-table/roller/1d3)
-                               ("City" . random-table/roller/1d4)
-                               ("Metropolis" . random-table/roller/1d5)))
-                    (location (completing-read "Hiring location for Henchman: "
-                                options nil t)))
-              (funcall (alist-get location options nil nil #'string=) table)))
+            (funcall (random-table/prompt "Hiring location for Henchman") table))
   :private t
   :data '(1 2 3 4 5))
 
@@ -1204,11 +1206,23 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
               (string-to-number (completing-read "Additional Modifier: "
                                   '("-2" "-1" "0" "1" "2") nil t "0"))
               ))
-  :data '(((-2 . 2) . "Attacks")
-           ((3 . 5) . "Hostile, may attack")
-           ((6 . 8) . "Uncertain, confused")
-           ((9 . 11) . "Indifferent, may negotiate")
-           ((12 . 16) . "Eager, friendly")))
+  :data '(((-2 . 2) . "\n- Reaction :: Attacks")
+           ((3 . 5) . "\n- Reaction :: Hostile, may attack\n- Motivation :: ${Monster Motivation (OSE)}")
+           ((6 . 8) . "\n- Reaction :: Uncertain, confused\n- Motivation :: ${Monster Motivation (OSE)}")
+           ((9 . 11) . "\n- Reaction :: Indifferent, may negotiate\n- Motivation :: ${Monster Motivation (OSE)}")
+           ((12 . 16) . "\n- Reaction :: Eager, friendly")))
+
+(random-table/register :name "Monster Motivation (OSE)"
+  :data '("Food: They’re hungry. You can distract them with rations, point them towards corpses, cast a food illusion. They could be hurt and in need of healing."
+           "Gold: They want d100 GP x their HD. This could be a tax, a toll, tribute, tithe, or they could just be greedy bastards."
+           "Treasure/Magic Items: They want a number of items equal to their HD. Scrolls and potions count as well."
+           "Random Item: Roll a random item from a random character’s sheet, they want that for some reason."
+           "Territory: This is their territory, they will defend it, but mostly they just want you to leave or prove why you should be allowed to pass through."
+           "Information: They want to know about a rival faction, nearby NPC or monster, or dungeon landmark or location."
+           "Help: They need something from further in the dungeon, or from a nearby wilderness hex. They may want you to kill other monsters in the dungeon or clear out a hex. They may be haunting the area and can only leave when their quest is fulfilled."
+           "Trade: They have a random item from each category on the equipment list (one piece of armor, one weapon, one piece of equipment, etc.) and they’re willing to trade those items or sell them. All trades made inside the dungeon are at a higher markup than you’ll find in town."
+           "To Complete a Mission: They’re in service to the closest NPC in the dungeon and whatever that NPC wants, this monster is on a mission to help achieve that aim."
+           "Directions: They’re lost and are looking for directions out, or for someone to escort them to a safe area."))
 
 (random-table/register :name "Random Dungeon Content (OSE)"
   :roller #'random-table/roller/d66
