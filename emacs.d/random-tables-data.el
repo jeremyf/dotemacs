@@ -115,7 +115,8 @@
 (dolist (ability '("Ability > Physique (Errant)" "Ability > Skill (Errant)" "Ability > Mind (Errant)" "Ability > Presence (Errant)"))
   (random-table/register :name ability
     :store t
-    :reuse ability
+    :reuse ability ;; Because we might roll the Archetype first, which is
+                   ;; informed by the ability scores rolled.
     :roller #'random-table/roller/4d4
     :data '(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16)))
 
@@ -131,7 +132,8 @@
                 "\n"
                 "\n- Failed Profession :: ${Failed Professions (Errant)}"
                 "\n- Keepsakes :: ${Keepsakes (Errant)}"
-                "\n\nEquipment"
+                "\n"
+                "\nEquipment"
                 "\n- A backpack."
                 "\n- A medium weapon of their choice (1 item slot)."
                 "\n- A quiver of ammunition, if needed (1 item slot, depletion 2)."
@@ -144,29 +146,60 @@
                 "\n- A waterskin (1⁄4 item slot)."
                 "\n- 4 supply (1⁄4 item slot each).")))
 
+(cl-defun random-table/roller/archetype (table &key (attribute-template "Ability > %s (Errant)"))
+  "Using the TABLE data determine Errant Archetype.
+
+This function rolls (or uses the rolls) of the corresponding
+tables derived from the given ATTRIBUTE-TEMPLATE.
+
+This will return the CDR of a CONS pair of the given TABLE's data.  That way the
+value we cache is the Archetype.
+
+See “Archetype (Errant)” table."
+  (let* ((attribute_archetypes (random-table-data table))
+          ;; (("Physique" . 10) ("Skill" . 9) ("Mind" . 8) ("Presence" . 7)
+          (attr_rolls
+            (mapcar (lambda (attr_arch)
+                      (cons (car attr_arch)
+                        (string-to-number
+                          (random-table/roll/parse-text
+                            (format attribute-template (car attr_arch))))))
+              attribute_archetypes))
+          ;; (10 9)
+          (top_ability_scores
+            (take 2 (-distinct (sort (mapcar #'cdr attr_rolls) #'>))))
+          (candidates '())
+          ;; We always want to add candidates to the list, hence the
+          ;; compare is via no-comp
+          (no-comp (lambda (a b) nil )))
+    (dolist (attr_roll attr_rolls)
+      ;; When the roll is part of the top two attributes, add the
+      ;; Attribute's associated Archetype to the candidate list.
+      (when (member (cdr attr_roll) top_ability_scores)
+        (add-to-list 'candidates (car attr_roll) nil no-comp))
+      ;; When the roll is the highest roll, skew the odds towards the
+      ;; Attribute's associated Archetype.
+      (when (= (cdr attr_roll) (nth 0 top_ability_scores))
+        ;; Adding at least 1 more when we're working with the high
+        ;; attribute score.
+        (dotimes (i (/ (- (+ 1 (cdr attr_roll))
+                         (nth 1 top_ability_scores))
+                      2))
+          (add-to-list 'candidates (car attr_roll) nil no-comp))))
+    ;; candidates = ("Physique" "Physique" "Skill")
+    (alist-get (seq-random-elt candidates) attribute_archetypes)))
+
 (random-table/register :name "Archetype (Errant)"
   :private t
-  :roller (lambda (table)
-            (let* ((physique (string-to-number (random-table/roll/parse-text "Ability > Physique (Errant)")))
-                    (skill (string-to-number (random-table/roll/parse-text "Ability > Skill (Errant)")))
-                    (mind (string-to-number (random-table/roll/parse-text "Ability > Mind (Errant)")))
-                    (presence (string-to-number (random-table/roll/parse-text "Ability > Presence (Errant)")))
-                    (top-abilities (take 2 (sort (list physique skill mind presence) #'>)))
-                    (candidates (list)))
-              (when (member physique top-abilities) (add-to-list 'candidates "Violent" nil #'eq))
-              (when (= physique (first top-abilities)) (add-to-list 'candidates "Violent" nil #'eq))
-              (when (member skill top-abilities) (add-to-list 'candidates "Deviant" nil #'eq))
-              (when (= skill (first top-abilities)) (add-to-list 'candidates "Deviant" nil #'eq))
-              (when (member mind top-abilities) (add-to-list 'candidates "Occult" nil #'eq))
-              (when (= mind (first top-abilities)) (add-to-list 'candidates "Occult" nil #'eq))
-              (when (member presence top-abilities) (add-to-list 'candidates "Zealot" nil #'eq))
-              (when (= presence (first top-abilities)) (add-to-list 'candidates "Zealot" nil #'eq))
-              (insert (format "\nPhysique: %S\tSkill: %S\tMind: %S\tPresence: %S" physique skill mind presence))
-              (insert (format "\nCandidates: %S" candidates))
-              (seq-random-elt candidates)))
-  :fetcher (lambda (data archetype)
-             (car archetype))
-  :data '("Violent" "Deviant" "Occult" "Zealot"))
+  :store t
+  :roller #'random-table/roller/archetype
+  ;; We need to overload the fetcher to simply use the result derived from the
+  ;; roller.  The data is provided as a map of classes.
+  :fetcher (lambda (data result) (car result))
+  :data '(("Physique" . "Violent")
+           ("Skill" . "Deviant")
+           ("Mind" . "Occult")
+           ("Presence" . "Zealot")))
 
 (random-table/register :name "Grimoire (Errant)"
   :data '("\n- Essence :: ${Grimoire > Essence (Errant)}\n- Sphere :: ${Grimoire > Sphere (Errant)}"))
