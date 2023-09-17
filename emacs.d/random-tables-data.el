@@ -115,18 +115,19 @@
 (dolist (ability '("Ability > Physique (Errant)" "Ability > Skill (Errant)" "Ability > Mind (Errant)" "Ability > Presence (Errant)"))
   (random-table/register :name ability
     :store t
+    :reuse ability
     :roller #'random-table/roller/4d4
     :data '(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16)))
 
 (random-table/register :name "Character (Errant)"
   :data (list (concat
+                "\n- Archetype :: ${Archetype (Errant)}"
+                "\n- Ancestry :: ${Ancestry (Errant)}"
+                "\n"
                 "\n- Physique :: ${Ability > Physique (Errant)}"
                 "\n- Skill :: ${Ability > Skill (Errant)}"
                 "\n- Mind :: ${Ability > Mind (Errant)}"
                 "\n- Presence :: ${Ability > Presence (Errant)}"
-                "\n"
-                "\n- Archetype :: ${Archetype (Errant)}"
-                "\n- Ancestry :: ${Ancestry (Errant)}"
                 "\n"
                 "\n- Failed Profession :: ${Failed Professions (Errant)}"
                 "\n- Keepsakes :: ${Keepsakes (Errant)}"
@@ -146,10 +147,10 @@
 (random-table/register :name "Archetype (Errant)"
   :private t
   :roller (lambda (table)
-            (let* ((physique (random-table/storage/results/get "Ability > Physique (Errant)"))
-                    (skill (random-table/storage/results/get "Ability > Skill (Errant)"))
-                    (mind (random-table/storage/results/get "Ability > Mind (Errant)"))
-                    (presence (random-table/storage/results/get "Ability > Presence (Errant)"))
+            (let* ((physique (string-to-number (random-table/roll/parse-text "Ability > Physique (Errant)")))
+                    (skill (string-to-number (random-table/roll/parse-text "Ability > Skill (Errant)")))
+                    (mind (string-to-number (random-table/roll/parse-text "Ability > Mind (Errant)")))
+                    (presence (string-to-number (random-table/roll/parse-text "Ability > Presence (Errant)")))
                     (top-abilities (take 2 (sort (list physique skill mind presence) #'>)))
                     (candidates (list)))
               (when (member physique top-abilities) (add-to-list 'candidates "Violent" nil #'eq))
@@ -160,6 +161,8 @@
               (when (= mind (first top-abilities)) (add-to-list 'candidates "Occult" nil #'eq))
               (when (member presence top-abilities) (add-to-list 'candidates "Zealot" nil #'eq))
               (when (= presence (first top-abilities)) (add-to-list 'candidates "Zealot" nil #'eq))
+              (insert (format "\nPhysique: %S\tSkill: %S\tMind: %S\tPresence: %S" physique skill mind presence))
+              (insert (format "\nCandidates: %S" candidates))
               (seq-random-elt candidates)))
   :fetcher (lambda (data archetype)
              (car archetype))
