@@ -110,12 +110,60 @@
            ((9 10 11) . "Amicable [DV -2]")
            ((12) . "Friendly [DV -4]")))
 
+(random-table/roller :label "4d4" (+ 4 (random 4) (random 4) (random 4) (random 4)))
+
+(dolist (ability '("Ability > Physique (Errant)" "Ability > Skill (Errant)" "Ability > Mind (Errant)" "Ability > Presence (Errant)"))
+  (random-table/register :name ability
+    :store t
+    :roller #'random-table/roller/4d4
+    :data '(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16)))
+
 (random-table/register :name "Character (Errant)"
-  :data (list (concat "\n- Physique :: ${4d4}\n- Skill :: ${4d4}"
-                "\n- Mind :: ${4d4}\n- Presence :: ${4d4}"
+  :data (list (concat
+                "\n- Physique :: ${Ability > Physique (Errant)}"
+                "\n- Skill :: ${Ability > Skill (Errant)}"
+                "\n- Mind :: ${Ability > Mind (Errant)}"
+                "\n- Presence :: ${Ability > Presence (Errant)}"
+                "\n"
+                "\n- Archetype :: ${Archetype (Errant)}"
+                "\n- Ancestry :: ${Ancestry (Errant)}"
+                "\n"
                 "\n- Failed Profession :: ${Failed Professions (Errant)}"
                 "\n- Keepsakes :: ${Keepsakes (Errant)}"
-                "\n- Ancestry :: ${Ancestry (Errant)}")))
+                "\n\nEquipment"
+                "\n- A backpack."
+                "\n- A medium weapon of their choice (1 item slot)."
+                "\n- A quiver of ammunition, if needed (1 item slot, depletion 2)."
+                "\n- A bedroll (1 item slot)."
+                "\n- A torch (1⁄2 item slot, burn 2)."
+                "\n- 50’ of rope (1⁄2 item slot)."
+                "\n- A mess kit (1⁄4 item slot)."
+                "\n- A tinderbox (1⁄4 item slot)."
+                "\n- Rations (1⁄4 item slot, depletion 1)"
+                "\n- A waterskin (1⁄4 item slot)."
+                "\n- 4 supply (1⁄4 item slot each).")))
+
+(random-table/register :name "Archetype (Errant)"
+  :private t
+  :roller (lambda (table)
+            (let* ((physique (random-table/storage/results/get "Ability > Physique (Errant)"))
+                    (skill (random-table/storage/results/get "Ability > Skill (Errant)"))
+                    (mind (random-table/storage/results/get "Ability > Mind (Errant)"))
+                    (presence (random-table/storage/results/get "Ability > Presence (Errant)"))
+                    (top-abilities (take 2 (sort (list physique skill mind presence) #'>)))
+                    (candidates (list)))
+              (when (member physique top-abilities) (add-to-list 'candidates "Violent" nil #'eq))
+              (when (= physique (first top-abilities)) (add-to-list 'candidates "Violent" nil #'eq))
+              (when (member skill top-abilities) (add-to-list 'candidates "Deviant" nil #'eq))
+              (when (= skill (first top-abilities)) (add-to-list 'candidates "Deviant" nil #'eq))
+              (when (member mind top-abilities) (add-to-list 'candidates "Occult" nil #'eq))
+              (when (= mind (first top-abilities)) (add-to-list 'candidates "Occult" nil #'eq))
+              (when (member presence top-abilities) (add-to-list 'candidates "Zealot" nil #'eq))
+              (when (= presence (first top-abilities)) (add-to-list 'candidates "Zealot" nil #'eq))
+              (seq-random-elt candidates)))
+  :fetcher (lambda (data archetype)
+             (car archetype))
+  :data '("Violent" "Deviant" "Occult" "Zealot"))
 
 (random-table/register :name "Grimoire (Errant)"
   :data '("\n- Essence :: ${Grimoire > Essence (Errant)}\n- Sphere :: ${Grimoire > Sphere (Errant)}"))
@@ -375,6 +423,28 @@
 
 (random-table/register :name "Debt Holder (Errant)"
   :data '("${Debt Holder > Adjective (Errant)} ${Debt Holder > Person (Errant)}"))
+
+(random-table/register :name "Conspicuous Consumption Failed Save (Errant)"
+  :data '((1 . "Something gets burned down or destroyed; roll a d6 to see how bad it was: on a 1, confined to a single building; on a 6, a big part of town has gone up. Future CONSPICUOUS CONSUMPTION rolls receive a penalty equal to the d6 roll till it’s repaired.  Roll another d6 to see who knows: on a 4 or lower, just the COMPANY knows; on a 5, a blackmailer knows; on a 6, EVERYBODY knows.")
+           (2 . "Beaten and robbed: lose half HP and all items in inventory.")
+           (3 . "Magical affliction: someone or something has put a curse on you, or transformed you into an animal.")
+           (4 . "You’ve gotten into legal trouble. You’re due to appear in court. Roll a d6 to see how bad the charges are; the lower the roll the worse it is.")
+           (5 . "You’ve contracted a disease or infection.")
+           (6 . "You’ve made an enemy; a random npc now hates you. Roll a d6 to see how bad it is: on a 1, they can’t stand your presence, on a 6, they’re after your head.")
+           (7 . "You’ve insulted a local person or organisation of import. Lose ${1d4} [d4] FACTION reputation.")
+           (8 . "You wake up in a random adjacent hex, stark naked, in someone or something’s house/lair. Your friends have all your stuff. Roll a REACTION ROLL for your host.")
+           (9 . "You get into a brawl. Lose d6 HP.")
+           (10 . "You’ve got a hangover. All checks for the next two TRAVEL TURNS have DV +2.")
+           (11 . "You’ve made a pact with a god, devil, or some other supernatural power, and have to do some quest or task for them.")
+           (12 . "You’re betrothed. Calling off the marriage will incur the wrath of the family or your scorned lover. If you’re already married, this could get messy.")
+           (13 . "You’ve earned notoriety as a gadabout. Your next CONSPICUOUS CONSUMPTION roll will be doubled.")
+           (14 . "You’ve gotten a new tattoo or some other bodily alteration. Roll a d6 to see how bad it is: on a 1, it’s offensive to EVERYONE (-2 to all REACTION ROLLS while it’s visible); on a 6, it's actually pretty cool.")
+           (15 . "You’ve made an ass of yourself in town. No one will take you seriously for the next ${1d4} [d4] DOWNTIME TURNS.")
+           (16 . "You’ve been initiated into a cult, secret society, or some other organisation.")
+           (17 . "You’ve impressed someone, made an ally, or attracted a new retainer.")
+           (18 . "You get a windfall. Receive half money spent on CONSPICUOUS CONSUMPTION back.")
+           (19 . "You make a discovery or hear a rumour of some sort.")
+           (20 . "You make an advancement. Increase rolled ATTRIBUTE by 1.")))
 
 (random-table/register :name "Debt Holder > Adjective (Errant)"
   :private t
