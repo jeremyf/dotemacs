@@ -403,7 +403,8 @@ Useful if you want a more robust view into the recommend candidates."
       ""
       ("b" "Bindings" embark-bindings)
       ("c" "Command" helpful-command)
-      ("d" "Docs" devdocs-lookup)
+      ("d" "Definition" sdcv-search)
+      ("D" "Docs" devdocs-lookup)
       ("f" "Function (interactive)" helpful-callable)
       ("F" "Function (all)" helpful-function)
       ("k" "Key" helpful-key)

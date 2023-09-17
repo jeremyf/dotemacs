@@ -96,7 +96,8 @@
 
  backup-directory-alist '((".*" . "~/.emacs.d/backups/"))
 
- bookmark-default-file "~/git/emacs-bookmarks/bookmarks"
+  bookmark-default-file "~/git/org/my-bookmarks.el"
+  bookmark-save-flag 1
 
  custom-safe-themes t        ;; I may as well trust themes.
 

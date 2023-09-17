@@ -139,6 +139,7 @@
            "Elements" "Dimensions" "Life" "Death" "Objects" "Biota"))
 
 (random-table/register :name "Ancestry (Errant)"
+  :private t
   :data '("Tough" "Arcane" "Cunning" "Adaptable"))
 
 (random-table/register :name "Keepsakes (Errant)"
@@ -265,6 +266,123 @@
      "Sycophant" "Tanner" "Taster" "Taxidermist" "Tinker"
      "Toad doctor" "Tosher" "Town crier" "Urinatores" "Usurer"
      "Water carrier" "Wheelwright" "Whipping boy" "Whiffler" "Worm rancher"))
+
+(random-table/register :name "General Event (Errant)"
+  :data '((1 . "Encounter")
+           (2 . "Delay")
+           (3 . "Resource use")
+           (4 . "Local effect")
+           (5 . "Clue")
+           (6 . "Free from effect")))
+
+(random-table/prompt "Downtime Turn Action Modifier (Errant)"
+  :type 'bound-integer-range
+  :range '(-3 -2 -1 0 1 2 3))
+
+(random-table/register :name "General Downtime Turn Action (Errant)"
+  :roller (lambda (table)
+            (+ (random-table/roller/2d6 table) (random-table/prompt "Downtime Turn Action Modifier (Errant)")))
+  :data '(((-10 . 6) . "Failure, no progress.")
+           ((7 . 9) . "/Setback/, partial success, or progress.")
+           ((10 . 22) . "Success, mark progress on /tracker/.")))
+
+(random-table/register :name "Downtime Event (Errant)"
+  :data '((1 . "Encounter: the COMPANY encounters an NPC(s). The guide may wish to have a list of random encounters prepared.")
+           (2 . "Complication: a negative issue affects the region;\n- ${Downtime Event > Complications (Errant)}")
+           (3 . "Expiration: any ongoing complications end. Any other temporary situations, arrangements, or benefits end.")
+           (4 . "Trend: a positive or novel issue affects the region;\n- ${Downtime Event > Trends (Errant)}")
+           (5 . "Intimation: the COMPANY receives some clue, perhaps relating to their next adventure, or to what the next encounter, complication, or trend may be.")
+           (6 . "Free: nothing happens! The COMPANY gains a much needed reprieve and are allowed to complete their actions in peace.")))
+
+(random-table/register :name "Downtime Event > Complications (Errant)"
+  :private t
+  :roller #'random-table/roller/2d6
+  :data '((2 . "Natural disaster (e.g. a fire, a tornado, a meteor)." )
+           (3 . "Ongoing disaster (e.g. a famine, a plague, a drought)." )
+           (4 . "Major figure assassinated." )
+           (5 . "Series of murders begins." )
+           (6 . "A SCOURGE arises in the region." )
+           (7 . "An ERRANT’s ESTATE, INSTITUTION, infrastructure project, DOMAIN, or other goal suffers a setback." )
+           (8 . "Legal claims are brought against the COMPANY or they are publicly slandered." )
+           (9 . "An ally of the COMPANY loses trust in or cuts ties with them." )
+           (10 . "An insurrection or a siege occurs. If not dealt with in ${1d4} [1d4] DOWNTIME TURNS it will be successful." )
+           (11 . "Two or more fACTIONS begin to oppose each other or actively go to war." )
+           (12 . "An ally of the COMPANY dies." )))
+
+(random-table/register :name "Downtime Event > Trends (Errant)"
+  :private t
+  :roller #'random-table/roller/2d4
+  :data '((2 . "Two or more FACTIONS announce an alliance.")
+           (3 . "A religious event occurs (e.g. an omen or apparition).")
+           (4 . "A scandal is revealed.")
+           (5 . "New NPC arrives in the area.")
+           (6 . "A rival COMPANY arrives in the area")
+           (7 . "A discovery is made (e.g. new technology, new lands).")
+           (8 . "A new FACTION emerges.")))
+
+(random-table/register :name "Weather (Errant)"
+  :roller #'random-table/roller/prompt-from-table-data
+  :data '(("Winter" . "Winter :: ${Weather > Winter (Errant)}")
+           ("Spring" . "Springer :: ${Weather > Spring (Errant)}")
+           ("Summer" . "Summer :: ${Weather > Summer (Errant)}")
+           ("Autumn" . "Autumn :: ${Weather > Autumn (Errant)}")))
+
+(random-table/prompt "Weather > Previous Day (Errant)"
+  :type #'completing-read
+  :range '(("Overcast" . -2)
+            ("Clear Skies" . 2)
+            ("Other" . 0)))
+
+(defun random-table/roller/errant-weather (table)
+  (+ (random-table/prompt "Weather > Previous Day (Errant)")
+    (random-table/roller/2d6 table)))
+
+(random-table/register :name "Weather > Winter (Errant)"
+  :private t
+  :roller #'random-table/roller/errant-weather
+  :data '(((0 . 2) . "/Severe weather/ (e.g. blizzard)")
+           ((3 . 5) . "/Severe weather/ (e.g. hail storm)")
+           ((6 . 8) . "/Inclement weather/ (e.g. sleet)")
+           ((9 . 11) . "Overcast (-2 to next weather roll)")
+           ((12 . 14) . "Clear skies (+2 to next weather roll)")))
+
+(random-table/register :name "Weather > Autumn (Errant)"
+  :private t
+  :roller #'random-table/roller/errant-weather
+  :data '(((0 . 2) . "/Severe weather/ (e.g. hurricane)")
+           ((3 . 5) . "/Inclement weather/ (e.g. fog)")
+           ((6 . 8) . "Overcast (-2 to next weather roll)")
+           ((9 . 11) .  "Cloudy")
+           ((12 . 14) . "Clear skies (+2 to next weather roll)")))
+
+(random-table/register :name "Weather > Summer (Errant)"
+  :private t
+  :roller #'random-table/roller/errant-weather
+  :data '(((0 . 2) . "/Severe weather/ (e.g. thunderstorm)")
+           ((3 . 5) . "/Inclement weather/ (e.g. heat wave)")
+           ((6 . 8) . "Sunny")
+           ((9 . 11) .  "Clear skies (+2 to next weather roll)")
+           ((12 . 14) . "Beautiful day (only need to spend one TRAVEL TURN /sleeping/.")))
+
+(random-table/register :name "Weather > Spring (Errant)"
+  :private t
+  :roller #'random-table/roller/errant-weather
+  :data '(((0 . 2) . "/Inclement weather/ (e.g. down pour)")
+           ((3 . 5) . "Cosmetic change (e.g. drizzle)")
+           ((6 . 8) . "Cloudy")
+           ((9 . 11) .  "Clear skies (+2 to next weather roll)")
+           ((12 . 14) . "Beautiful day (only need to spend one TRAVEL TURN /sleeping/.")))
+
+(random-table/register :name "Debt Holder (Errant)"
+  :data '("${Debt Holder > Adjective (Errant)} ${Debt Holder > Person (Errant)}"))
+
+(random-table/register :name "Debt Holder > Adjective (Errant)"
+  :private t
+  :data '("unctuous" "sententious" "truculent" "supercilious" "fulsome" "vainglorious"))
+
+(random-table/register :name "Debt Holder > Person (Errant)"
+  :private t
+  :data '("eunuch" "merchant" "clergyman" "madam" "officer" "intellectual"))
 
 ;;; Black Sword Hack
 (random-table/register :name "Demon Name (Black Sword Hack)"

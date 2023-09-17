@@ -998,6 +998,30 @@ I envision this function called from the command-line."
   :config
   (setq org-noter-doc-split-fraction '(0.67 . 0.33)))
 
+(use-package org-bookmark-heading
+  ;; Capture more robust org-mode bookmarks
+  :straight t
+  :preface
+  (defun jf/org-bookmark-heading--display-path (path)
+    "Return display string for PATH.
+
+Returns the title at the PATH when file is a `denote' file."
+    (if (denote-file-is-note-p path)
+      (denote-retrieve-filename-title path)
+      (org-bookmark-heading--display-path path))))
+
+(defun jf/org-bookmark-heading-make-record (&rest app)
+  "Coerce the absolute file path to home relative.
+
+APP is the parameters for saving the bookmark."
+  (let ((bookmark-alist (apply app)))
+    (when-let ((home-relative-filename (jf/filename/tilde-based (alist-get 'filename bookmark-alist))))
+      (setf (alist-get 'filename bookmark-alist) home-relative-filename))
+    ;; Return the modified bookmark-alist
+    bookmark-alist))
+(advice-add #'org-bookmark-heading-make-record :around #'jf/org-bookmark-heading-make-record)
+
+
 ;; (use-package org-pdftools
 ;;   :straight t
 ;;   :hook (org-mode . org-pdftools-setup-link))
