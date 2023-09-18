@@ -79,8 +79,7 @@
 
 (random-table/register :name "Henchman > Morale Variable"
   :private t
-  :roller (lambda (table)
-            (+ (random-table/prompt "Additional Generosity of Offer") (random-table/roller/2d6 table)))
+  :roller '(+ "2d6" "Additional Generosity of Offer")
   :data '(((2) . -2)
            ((3 . 5) . -1)
            ((6 . 8) . 0)
@@ -364,8 +363,7 @@ See “Archetype (Errant)” table."
   :range '(-3 -2 -1 0 1 2 3))
 
 (random-table/register :name "General Downtime Turn Action (Errant)"
-  :roller (lambda (table)
-            (+ (random-table/roller/2d6 table) (random-table/prompt "Downtime Turn Action Modifier (Errant)")))
+  :roller '(+ "2d6" "Downtime Turn Action Modifier (Errant)")
   :data '(((-10 . 6) . "Failure, no progress.")
            ((7 . 9) . "/Setback/, partial success, or progress.")
            ((10 . 22) . "Success, mark progress on /tracker/.")))
