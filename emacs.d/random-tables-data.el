@@ -55,7 +55,7 @@
 
 (random-table/register :name "Henchman > Archetype (Errant)"
   :private t
-  :roller #'random-table/roller/1d10
+  :roller "1d10"
   :data '(((1 . 5) . "Warrior")
            ((6 . 8) . "Professional")
            ((9 . 10) . "Magic User")))
@@ -102,21 +102,21 @@
   :data '(1 2 3 4 5))
 
 (random-table/register :name "Reaction Roll (Errant)"
-  :roller #'random-table/roller/2d6
+  :roller "2d6"
   :data '(((2) . "Hostile [DV +8]")
            ((3 4 5) . "Unfriendly [DV +4]")
            ((6 7 8) . "Unsure")
            ((9 10 11) . "Amicable [DV -2]")
            ((12) . "Friendly [DV -4]")))
 
-(random-table/roller :label "4d4" (+ 4 (random 4) (random 4) (random 4) (random 4)))
+
 
 (dolist (ability '("Ability > Physique (Errant)" "Ability > Skill (Errant)" "Ability > Mind (Errant)" "Ability > Presence (Errant)"))
   (random-table/register :name ability
     :store t
     :reuse ability ;; Because we might roll the Archetype first, which is
                    ;; informed by the ability scores rolled.
-    :roller #'random-table/roller/4d4
+    :roller "4d4"
     :data '(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16)))
 
 (random-table/register :name "Character (Errant)"
@@ -378,7 +378,7 @@ See “Archetype (Errant)” table."
 
 (random-table/register :name "Downtime Event > Complications (Errant)"
   :private t
-  :roller #'random-table/roller/2d6
+  :roller "2d6"
   :data '((2 . "Natural disaster (e.g. a fire, a tornado, a meteor)." )
            (3 . "Ongoing disaster (e.g. a famine, a plague, a drought)." )
            (4 . "Major figure assassinated." )
@@ -393,7 +393,7 @@ See “Archetype (Errant)” table."
 
 (random-table/register :name "Downtime Event > Trends (Errant)"
   :private t
-  :roller #'random-table/roller/2d4
+  :roller "2d4"
   :data '((2 . "Two or more FACTIONS announce an alliance.")
            (3 . "A religious event occurs (e.g. an omen or apparition).")
            (4 . "A scandal is revealed.")
@@ -415,13 +415,9 @@ See “Archetype (Errant)” table."
             ("Clear Skies" . 2)
             ("Other" . 0)))
 
-(defun random-table/roller/errant-weather (table)
-  (+ (random-table/prompt "Weather > Previous Day (Errant)")
-    (random-table/roller/2d6 table)))
-
 (random-table/register :name "Weather > Winter (Errant)"
   :private t
-  :roller #'random-table/roller/errant-weather
+  :roller '(+ "2d6" "Weather > Previous Day (Errant)")
   :data '(((0 . 2) . "/Severe weather/ (e.g. blizzard)")
            ((3 . 5) . "/Severe weather/ (e.g. hail storm)")
            ((6 . 8) . "/Inclement weather/ (e.g. sleet)")
@@ -430,7 +426,7 @@ See “Archetype (Errant)” table."
 
 (random-table/register :name "Weather > Autumn (Errant)"
   :private t
-  :roller #'random-table/roller/errant-weather
+  :roller '(+ "2d6" "Weather > Previous Day (Errant)")
   :data '(((0 . 2) . "/Severe weather/ (e.g. hurricane)")
            ((3 . 5) . "/Inclement weather/ (e.g. fog)")
            ((6 . 8) . "Overcast (-2 to next weather roll)")
@@ -439,7 +435,7 @@ See “Archetype (Errant)” table."
 
 (random-table/register :name "Weather > Summer (Errant)"
   :private t
-  :roller #'random-table/roller/errant-weather
+  :roller '(+ "2d6" "Weather > Previous Day (Errant)")
   :data '(((0 . 2) . "/Severe weather/ (e.g. thunderstorm)")
            ((3 . 5) . "/Inclement weather/ (e.g. heat wave)")
            ((6 . 8) . "Sunny")
@@ -448,7 +444,7 @@ See “Archetype (Errant)” table."
 
 (random-table/register :name "Weather > Spring (Errant)"
   :private t
-  :roller #'random-table/roller/errant-weather
+  :roller '(+ "2d6" "Weather > Previous Day (Errant)")
   :data '(((0 . 2) . "/Inclement weather/ (e.g. down pour)")
            ((3 . 5) . "Cosmetic change (e.g. drizzle)")
            ((6 . 8) . "Cloudy")
@@ -580,7 +576,7 @@ See “Archetype (Errant)” table."
 
 (random-table/register :name "Attribute Score (Black Sword Hack)"
   :private t
-  :roller #'random-table/roller/2d6
+  :roller "2d6"
   :data '(((2 3) . "8")
            ((4 5) . "9")
            ((6 7) . "10")
@@ -634,7 +630,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
   :data '("\n- Strength :: ${3d6}\n- Intelligence :: ${3d6}\n- Wisdom :: ${3d6}\n- Dexterity :: ${3d6}\n- Constitution :: ${3d6}\n- Charisma :: ${3d6}"))
 
 (random-table/register :name "Secondary Skill (OSE)"
-  :roller #'random-table/roller/1d100
+  :roller "1d100"
   :data '(((1 . 3) . "Animal trainer")
            ((4 . 5) . "Armourer")
            ((6 . 9) . "Baker")
@@ -692,7 +688,9 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "${Spanish Name > Male Given Name} ${Spanish Name > Surname}"
            "${Spanish Name > Female Given Name} ${Spanish Name > Surname}"
            "${Norse Given Name} ${Norse Surname}"
-           "${Norse Given Name} ${Norse Surname}"))
+           "${Norse Given Name} ${Norse Surname}"
+           "${Breggle Name > Male Given Name} ${Breggle Name > Surname}"
+           "${Breggle Name > Female Given Name} ${Breggle Name > Surname}"))
 
 (random-table/register :name "Arabic Name > Male Given Name"
   :private t
@@ -1157,7 +1155,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            ((16 . 1000) . "Rolled ${current_roll}\n- +1 Injury\n- Burned for +${current_roll} day(s)\n- ${current_roll} - 14 Fatal Wounds.\n- Save vs. Deaf.")))
 
 (random-table/register :name "Death and Dismemberment > Physical"
-  :roller #'random-table/roller/1d6
+  :roller "1d6"
   :private t
   :data '(((1) . "Death and Dismemberment > Physical > Arm")
            ((2) . "Death and Dismemberment > Physical > Leg")
@@ -1333,14 +1331,8 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
   :data '("appears." "alters the location." "helps the hero."
            "hinders the hero." "changes the goal." "ends the scene."))
 
-(random-table/roller :label "2d4"
-  (+ 2 (random 4) (random 4)))
-
-(random-table/roller :label "d66"
-  (+ (* 10 (+ 1 (random 6))) (+ 1 (random 6))))
-
 (random-table/register :name "How Far Away is a Thing > Same Place"
-  :roller #'random-table/roller/2d4
+  :roller "2d4"
   :data '((2 . "Almost touching you")
            (3 . "Within arm's reach")
            (4 . "Just steps away")
@@ -1350,7 +1342,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            (8 . "Somehwere in the dungeon")))
 
 (random-table/register :name "How Far Away is a Thing > Distant Thing"
-  :roller #'random-table/roller/2d4
+  :roller "2d4"
   :data '((2 . "The same patch of grass (or mountainside…)")
            (3 . "The same village (or lair or dungeon…)")
            (4 . "The same clan (or duchy or faction…)")
@@ -1380,7 +1372,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
   :data '("\n- Answer :: ${Ask the Stars > Answer}\n- Symbol :: ${Ask the Stars > Symbol}\n- Position :: ${Ask the Stars > Position}"))
 
 (random-table/register :name "Ask the Stars > Answer"
-  :roller #'random-table/roller/1d12
+  :roller "1d12"
   :private t
   :data '(((1 . 3) . "Hard no")
            ((4 . 6) . "No")
@@ -1407,7 +1399,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
 
 ;; https://yumdm.com/wp-content/uploads/2021/04/D12-Monthly-Issue-1.pdf
 (random-table/register :name "What is the monster doing?"
-  :roller #'random-table/roller/2d6
+  :roller "2d6"
   :data '((2 . "Caring for…")
            (3 . "Trapmaking/Marking territory")
            (4 . "Crafting/Sharpening weapons")
@@ -1447,7 +1439,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "Directions: They’re lost and are looking for directions out, or for someone to escort them to a safe area."))
 
 (random-table/register :name "Random Dungeon Content (OSE)"
-  :roller #'random-table/roller/d66
+  :roller "d66"
   :data '((11 . "Contents Empty with Treasure")
            ((12 . 16) . "Contents Empty")
            (21 . "Contents Empty with Treasure")
@@ -1644,3 +1636,59 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            (10 . "Qualified consent")
            (11 . "Grudging agreement")
            ((12 .23) . "Tolerant consent")))
+
+;;; Dolmenwood
+
+;; Common names
+(random-table/register :name "Breggle Name > Male Given Name"
+  :private t
+  :data '("Addle" "Aele" "Blocke" "Braembel" "Broob"
+           "Crump" "Curlip" "Eleye" "Grennigore" "Gripe"
+           "Hrannick" "Lope" "Mashker" "Shadgore" "Shadwell"
+           "Shadwicke" "Shank" "Snerd" "Snerg" "Windor"))
+
+(random-table/register :name "Breggle Name > Surname"
+  :private t
+  :data '("Blathergripe" "Bluegouge" "Bockburrough" "Bockstump" "Elbowgen"
+           "Forlocke" "Hwodlow" "Lankshorn" "Lockeshorn" "Longbeard"
+           "Longshanks" "Shankwold" "Smallbuck" "Snicklebock" "Snidebleat"
+           "Snoode" "Underbleat" "Underbuck" "Wolder" "Woldleap"))
+
+(random-table/register :name "Breggle Name > Female Given Name"
+  :private t
+  :data '("Berrild" "Clover" "Crewwin" "Draed" "Ellip"
+           "Fannigrew" "Frandorup" "Grendilore" "Grewigg" "Gwendl"
+           "Hildrup" "Hraigl" "Hwendl" "Hwoldrup" "Lindor"
+           "Maybel" "Merrild" "Myrkle" "Nannigrew" "Pettigrew"))
+
+(random-table/register :name "Lock (Errant)"
+  :data '("- Type :: ${Lock > Type (Errant)}\n- Actions :: ${Lock > Actions (Errant)}\n- Modifier :: ${Lock > Modifier (Errant)}"))
+
+(random-table/register :name "Lock > Type (Errant)"
+  :private t
+  :store t
+  :data '("Strange" "Adamantine" "Mythril" "Diamond" "Dwarven" "Elvish" "Steel" "Iron" "Brass" "Copper" "Tin" "Crude"))
+
+(random-table/register :name "Lock > Actions (Errant)"
+  :roller (lambda (table)
+            (let ((data (random-table-data table)))
+              (if (yes-or-no-p (format "Lock action already established for %s type? "
+                                 (random-table/storage/results/fetch-rolled "Lock > Type (Errant)")))
+                      (completing-read "Lock’s Action: " data nil t)
+              (random-table/roller/string (format "1d%s" (length data))))))
+  :private t
+  :fetcher (lambda (data choice)
+             "We may have picked the string...Or rolled."
+             (if (numberp (car choice))
+               (nth (- (car choice) 1) data)
+               (car choice)))
+  :data '("/Twist/, /Tap/, /Twist/" "/Twist/, /Tap/, /Turn/" "/Twist/, /Turn/, /Twist/"
+           "/Twist/, /Turn/, /Tap/" "/Tap/, /Twist/, /Tap/" "/Tap/, /Twist/, /Turn/"
+           "/Tap/, /Turn/, /Twist/" "/Tap/, /Turn/, /Tap/" "/Turn/, /Twist/, /Tap/"
+           "/Turn/, /Twist/, /Turn/" "/Turn/, /Tap/, /Twist/" "/Turn/, /Tap/, /Turn/"))
+
+(random-table/register :name "Lock > Modifier (Errant)"
+  :private t
+  :data '("Spiked" "Spiked" "Secured" "Secured"
+           "Weathered" "Weathered" "Cracked" "Cracked"
+           "Normal" "Normal" "Normal" "Normal"))
