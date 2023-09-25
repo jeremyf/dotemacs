@@ -140,7 +140,7 @@
      "☄️: epic (Enumeration of lots of other issues/tasks)"
      "⚙️: config changes"
      "🎬: initial commit or setup of project/component"
-     "🚧: work in progress"
+     "🚧: work in progress (WIP)"
      "🤖: continuous integration (CI) changes")
   ;; The following list was pulled from http://udacity.github.io/git-styleguide/
   ;;

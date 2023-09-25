@@ -276,6 +276,7 @@ method, get the containing class."
 (use-package magit-todos
   :config (magit-todos-mode)
   :commands (magit-todos-list)
+  :custom (magit-todos-exclude-globs '(".git/" "public/"))
   :straight (:host github :repo "alphapapa/magit-todos"))
 
 (use-package lua-mode
