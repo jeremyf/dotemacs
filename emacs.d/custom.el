@@ -18,6 +18,7 @@
  '(org-agenda-files
     '("~/git/org/agenda.org" "~/git/takeonrules.source/agenda.org" "~/git/org/denote/scientist/20221021T221357--scientist-agenda__scientist.org"))
  '(org-export-backends '(ascii html latex md odt))
+ '(random-table/reporter 'random-table/reporter/as-insert)
  '(safe-local-variable-values
     '((jf/tor-minor-mode . 1)
        (projectile-require-project-root)
