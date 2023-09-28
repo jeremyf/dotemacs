@@ -149,7 +149,7 @@ setting up an IDE-like layout)."
       `(hl-todo
          ((,c :foreground ,red-faint)))
       `(fill-column-indicator
-         ((,c :width ultra-condensed :background ,bg-dim :foreground ,bg-dim)))
+         ((,c :width ultra-condensed :background ,fringe :foreground ,fringe)))
       `(font-lock-regexp-face
          ((,c :foreground ,red))))))
 
