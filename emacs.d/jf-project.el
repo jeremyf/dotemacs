@@ -338,7 +338,7 @@ This encodes the logic for creating a project."
             (re-search-forward "^#\\+PROJECT_NAME:" nil t))
         (end-of-line)
         (progn (goto-line 6) (re-search-forward "^$" nil t)))
-      (insert "\n#+PROJECT_PATHS: (\"" label "\" . \"" path "\")"))))
+      (insert "\n#+PROJECT_PATHS: (\"" (s-trim label) "\" . \"" (s-trim path) "\")"))))
 
 (provide 'jf-project)
 ;;; jf-project.el ends here

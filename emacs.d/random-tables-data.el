@@ -24,6 +24,65 @@
   :type #'read-number
   :default 15)
 
+(defun jf/gaming/errant/movement-dice (prefix)
+  "Calculate an Errant's movement dice.  When given a PREFIX open the HTML page."
+  (interactive "P")
+  (if prefix
+    (shell-command (concat
+                     "open ~/git/takeonrules.source/static/errant/index.html"))
+    (let* ((range '("4" "5" "6" "7" "8" "9" "10" "11" "12" "13" "14" "15" "16"
+                     "17" "18" "19" "20"))
+            ;; Yeah yeah yeah, I could probably automate this creation; well I
+            ;; did it in Ruby because that's my primary language.
+            (slot-range '("0" "0.25" "0.5" "0.75" "1" "1.25" "1.5" "1.75" "2"
+                           "2.25" "2.5" "2.75" "3" "3.25" "3.5" "3.75" "4"
+                           "4.25" "4.5" "4.75" "5" "5.25" "5.5" "5.75" "6"
+                           "6.25" "6.5" "6.75" "7" "7.25" "7.5" "7.75" "8"
+                           "8.25" "8.5" "8.75" "9" "9.25" "9.5" "9.75" "10"
+                           "10.25" "10.5" "10.75" "11" "11.25" "11.5" "11.75"
+                           "12" "12.25" "12.5" "12.75" "13" "13.25" "13.5"
+                           "13.75" "14" "14.25" "14.5" "14.75" "15" "15.25"
+                           "15.5" "15.75" "16" "16.25" "16.5" "16.75" "17"
+                           "17.25" "17.5" "17.75" "18" "18.25" "18.5" "18.75"
+                           "19" "19.25" "19.5" "19.75" "20" "20.25" "20.5"
+                           "20.75" "21" "21.25" "21.5" "21.75" "22" "22.25"
+                           "22.5" "22.75" "23" "23.25" "23.5" "23.75" "24"))
+	          (phys (string-to-number (completing-read "Physique: " range nil t)))
+	          (skil (string-to-number (completing-read "Skill: " range nil t)))
+	          (slots-hand (string-to-number (completing-read "Slots in hand: "
+                                            (subseq slot-range 0 9) nil t)))
+	          (slots-handy (string-to-number (completing-read "Slots in handy: "
+                                             (subseq slot-range 0 17) nil t)))
+	          (slots-worn (string-to-number (completing-read "Slots in worn: "
+                                            slot-range nil t)))
+	          (slots-pack (string-to-number (completing-read "Slots in pack: "
+                                            slot-range nil t)))
+            (text (format (concat "Errant Movement\n- Physique: %s · Skill: %s"
+                            "\n- Slots Hand: %s · Handy: %s · Worn: %s · "
+                            "Pack: %s")
+			              phys skil slots-hand slots-handy slots-worn slots-pack)))
+      (dolist (label-slots (list (cons "in hand, handy, worn, pack"
+				                           (+ slots-hand slots-handy slots-worn
+                                     slots-pack))
+				                     (cons "in hand, handy, worn"
+				                       (+ slots-hand slots-handy slots-worn))
+				                     (cons "handy, worn"
+				                       (+ slots-handy slots-worn))
+				                     (cons "worn" slots-worn)
+				                     (cons "naked and free" 0)))
+        (let* ((slots (cdr label-slots))
+                (label (car label-slots))
+                (enc (if (>= phys slots)
+		                   (floor (* 4 slots) phys)
+		                   (+ 4 (- (floor slots) phys))))
+                (spd (if (>= skil enc) (- skil enc) 0))
+                (md (floor spd 4))
+                (md-text (if (= 0 md) "0" (format "%sd4" md))))
+          (setq-local text (format "%s\n- %s\n  ENC: %s · SPD: %s· MD: %s"
+				                     text label enc spd md-text))))
+      (kill-new text)
+      (message text))))
+
 ;;; Support Functions
 (defun random-table/roller/saving-throw (table)
   "Prompt for rolling a saving throw for the given TABLE."
@@ -94,7 +153,6 @@
             ("City" . random-table/roller/1d4)
             ("Metropolis" . random-table/roller/1d5)))
 
-
 (random-table/register :name "Henchman > Renown"
   :roller (lambda (table)
             (funcall (random-table/prompt "Hiring location for Henchman") table))
@@ -102,16 +160,17 @@
   :data '(1 2 3 4 5))
 
 (random-table/register :name "Reaction Roll (Errant)"
-  :roller "2d6"
-  :data '(((2) . "Hostile [DV +8]")
-           ((3 4 5) . "Unfriendly [DV +4]")
-           ((6 7 8) . "Unsure")
-           ((9 10 11) . "Amicable [DV -2]")
-           ((12) . "Friendly [DV -4]")))
+  :roller '(+ "2d6" "-3/+3 Modifier" "Alignment Modifier")
+  :data '(((-10 . 2) . "Hostile [DV +8] (Disposition ${current_roll})")
+           ((3 4 5) . "Unfriendly [DV +4] (Disposition ${current_roll})")
+           ((6 7 8) . "Unsure (Disposition ${current_roll})")
+           ((9 10 11) . "Amicable [DV -2] (Disposition ${current_roll})")
+           ((12 . 24) . "Friendly [DV -4] (Disposition ${current_roll})")))
 
-
-
-(dolist (ability '("Ability > Physique (Errant)" "Ability > Skill (Errant)" "Ability > Mind (Errant)" "Ability > Presence (Errant)"))
+(dolist (ability '("Ability > Physique (Errant)"
+                    "Ability > Skill (Errant)"
+                    "Ability > Mind (Errant)"
+                    "Ability > Presence (Errant)"))
   (random-table/register :name ability
     :store t
     :reuse ability ;; Because we might roll the Archetype first, which is
@@ -358,15 +417,31 @@ See “Archetype (Errant)” table."
            (5 . "Clue")
            (6 . "Free from effect")))
 
-(random-table/prompt "Downtime Turn Action Modifier (Errant)"
+(random-table/prompt "-3/+3 Modifier"
+  :type 'bound-integer-range
+  :range '(-3 -2 -1 0 1 2 3))
+
+(random-table/prompt "Alignment Modifier"
   :type 'bound-integer-range
   :range '(-3 -2 -1 0 1 2 3))
 
 (random-table/register :name "General Downtime Turn Action (Errant)"
-  :roller '(+ "2d6" "Downtime Turn Action Modifier (Errant)")
+  :roller '(+ "2d6" "-3/+3 Modifier")
   :data '(((-10 . 6) . "Failure, no progress.")
            ((7 . 9) . "/Setback/, partial success, or progress.")
            ((10 . 22) . "Success, mark progress on /tracker/.")))
+
+(random-table/register :name "Chase Developments (Errant)"
+  :data '((1 . "Hiding Spot - neither side has line of sight on the other. The character with the lowest spd makes a check to hide. If they succeed, they can’t be found and the chase ends; if they fail, the pursuers immediately make a movement roll.")
+           (2 . "Throng - a crowd of people, a flock of animals, or some other group impedes progress. The characters on that side may attempt to convince the throng to assist them if possible, or else someone must make a check to clear a path. On a failed check, the opposing side immediately makes a movement roll.")
+           (3 . "Dilemma - the characters face a decision between two unfavourable options, such as having to choose to divert to a more difficult path or plough through a crowd.")
+           (4 . "Hazard – something threatens the side that rolled this result; they must make a check to avoid damage, or some other unfavourable situation such as being knocked prone.")
+           (5 . "Obstacle - something impedes progress on the path; the character with the highest spd must make a check to bypass the obstacle, else the opposing side immediately makes a movement roll.")
+           (6 . "Opportunity - a character on the side who rolled this result can immediately take an extra action, though they must decide what to do quickly.")
+           (7 . "Paths Converge - a character on the side that rolled this result and a character on the opposing side cross paths momentarily, coming within a hair’s breadth of each other; they may each make an action before the trail separates them once more.")
+           (8 . "Risky Shortcut - a risky shortcut presents itself. Characters on this side may take this shortcut, but must make a check to do so. If they succeed, they immediately sprint. If they fail, they are separated from the others on their side and taken out of the chase.")
+           (9 . "Separated - a character on the side which rolled this result is separated from the rest of their side, and is tracked separately till they can reunite with their group. If the character was on the pursuing side, they must make a check or be taken out of the chase.")
+           (10 . "Twist - the situation changes in some way; perhaps a new group joins the chase, or the side that is pursuing and the side that is being pursued switch; the environment might change, as might the conditions that end the chase.")))
 
 (random-table/register :name "Downtime Event (Errant)"
   :data '((1 . "Encounter: the COMPANY encounters an NPC(s). The guide may wish to have a list of random encounters prepared.")
@@ -1494,7 +1569,11 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
   :data '("Cat-headed Things" "Heralds of the Termite People"
            "A Fae Porter-Knight" "The Ghost of Katastroph"))
 
+(random-table/register :name "NPC (Scarlet Heroes)"
+  :data '("\n- Actor :: ${Actor Type (Scarlet Heroes)}\n- Relation :: ${Actor > Relationship (Scarlet Heroes)}\n- Desire :: ${NPC > Immediate Desire (Scarlet Heroes)}\n- Temperment :: ${NPC > Ruling Temperament (Scarlet Heroes)}\n- Memorable Trait :: ${NPC > Memorable Traits (Scarlet Heroes)}"))
+
 (random-table/register :name "NPC > Immediate Desire (Scarlet Heroes)"
+  :private t
   :data '("Aiding a friend" "Avenging a slight" "Bribing an official"
            "Buying an object" "Collecting a bribe" "Collecting a debt"
            "Commit a crime" "Curing a sickness" "Destroying evidence"
@@ -1506,6 +1585,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "Stealing from the boss"))
 
 (random-table/register :name "NPC > Ruling Temperament (Scarlet Heroes)"
+  :private t
   :data '("Ambitious" "Bigoted" "Capricious"
            "Cautious" "Compassionate" "Deceitful"
            "Exhibitionistic" "Fearful" "Garrulous"
@@ -1517,6 +1597,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "Wrathful"))
 
 (random-table/register :name "NPC > Memorable Traits (Scarlet Heroes)"
+  :private t
   :data '("Always carries things" "Always hurried" "Asthmatic"
            "Blind in an eye" "Careless dresser" "Constantly watchful"
            "Dark, sober clothes" "Deaf or hard of hearing" "Elaborate tattoos"
@@ -1527,7 +1608,15 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "Stutters" "Subtle fragrance" "Tends work constantly"
            "Twitches regularly"))
 
+(random-table/register :name "Actor Type (Scarlet Heroes)"
+  :private t
+  :roller #'random-table/roller/prompt-from-table-data
+  :data '(("Commoner" . "${Actor > Commoner (Scarlet Heroes)}")
+           ("Underworld" . "${Actor > Underworld (Scarlet Heroes)}")
+           ("Elite or Noble" . "${Actor > Elite and Noble (Scarlet Heroes)}")))
+
 (random-table/register :name "Actor > Commoner (Scarlet Heroes)"
+  :private t
   :data '("Ambitious scholar" "Battered ex-adventurer" "Beautiful young mistress"
            "Bold ship captain" "Commercial moneylender" "Cunning shipwright"
            "Cynical investigator" "Doddering sage" "Drunken sailor"
@@ -1544,6 +1633,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "Weary physician"))
 
 (random-table/register :name "Actor > Underworld (Scarlet Heroes)"
+  :private t
   :data '("Ambitious guttersnipe" "Amoral assassin" "Bitter pretender to rank"
            "Black marketeer" "Callous blackmailer" "Careworn priest"
            "Cheap legbreaker" "Cheating merchant" "Cretinous street thug"
@@ -1560,6 +1650,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "Wretched miser"))
 
 (random-table/register :name "Actor > Elite and Noble (Scarlet Heroes)"
+  :private t
   :data '("Aged plutocrat"  "City magistrate" "Cynical watch leader" "Discreet banker"
            "Exiled pretender" "Famed courtesan" "Famous artist" "Favored concubine"
            "Feared court blackmailer" "Foreign diplomat" "Foreign nobleman" "Heartless noble matron"
@@ -1572,29 +1663,23 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "Wealthy heir" "Wealthy landowner" "Wealthy merchant prince" "Widely-sought maiden"))
 
 (random-table/register :name "Actor > Relationship (Scarlet Heroes)"
+  :private t
   :data '("Business partner" "Child" "Childhood friend" "Co-workers" "Cousin"
            "Crime culprit" "Crime partner" "Crime victim" "Ex-lover" "Ex-spouse"
            "Grandparent" "Has blackmail" "Heir to something" "Inlaws" "Lover"
            "Old favor" "Parent" "Rival" "Schoolmates" "Sibling"
            "Society fellows" "Spouse" "Subordinate" "Superior" "Uncle/Aunt"))
 
-(defvar random-table/prompts/reactions-scarlet-heroes
-  '(("-3 for grave insults or risks to the life of self or loved ones" . -3)
-     ("-2 for insults or risks to the NPC’s wealth or standing" . -2)
-     ("-1 for the risk of significant cost to their actions" . -1)
-     ("+1 for a modest bribe or when a favor is owed to a PC" . 1)
-     ("+2 for a large bribe or significant service owed" . 2)
-     ("+3 for a PC who saved their life or did similar service" . 3)))
+(random-table/register :name "Reaction Roll (Scarlet Heroes)"
+  :roller #'random-table/roller/prompt-from-table-data
+  :data '(("Friendly" . "${Reaction Roll > Friendly (Scarlet Heroes)}")
+           ("Stranger" . "${Reaction Roll > Stranger (Scarlet Heroes)}")
+           ("Unfriendly" . "${Reaction Roll > Unfriendly (Scarlet Heroes)}")))
 
-(defun random-table/roller/reactions-scarlet-heroes (table)
-  "Roller for the Scarlet Hereos TABLE."
-  (let* ((charisma-modifier (random-table/prompt "Charisma Modifier"))
-          (reaction-modifier (random-table/prompt "Reaction Modifier")))
-    (+ reaction-modifier charisma-modifier (random-table/roller/2d6 table))))
-
-(random-table/register :name "Reactions > Friendly (Scarlet Heroes)"
-  :roller #'random-table/roller/reactions-scarlet-heroes
-  :data '(((-9 . 1) . "${Reactions > Stranger (Scarlet Heroes)}")
+(random-table/register :name "Reaction Roll > Friendly (Scarlet Heroes)"
+  :private t
+  :roller '(+ "2d6" "Charisma Modifier" "Reaction Modifier")
+  :data '(((-9 . 1) . "${Reaction Roll > Stranger (Scarlet Heroes)}")
            (2 . "Sneering contempt")
            (3 . "Flat dismissal")
            (4 . "Reasoned refusal")
@@ -1607,9 +1692,10 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            (11 . "Firm commitment")
            ((12 . 23) . "Bold enthusiasm")))
 
-(random-table/register :name "Reactions > Stranger (Scarlet Heroes)"
-  :roller #'random-table/roller/reactions-scarlet-heroes
-  :data '(((-9 . 1) . "${Reactions > Unfriendly (Scarlet Heroes)}")
+(random-table/register :name "Reaction Roll > Stranger (Scarlet Heroes)"
+  :private t
+  :roller '(+ "2d6" "Charisma Modifier" "Reaction Modifier")
+  :data '(((-9 . 1) . "${Reaction Roll > Unfriendly (Scarlet Heroes)}")
            (2 . "Anger")
            (3 . "Annoyance")
            (4 . "Dismissal")
@@ -1622,8 +1708,9 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            (11 . "Helpful consent")
            ((12 . 23) . "Admiring consent")))
 
-(random-table/register :name "Reactions > Unfriendly (Scarlet Heroes)"
-  :roller #'random-table/roller/reactions-scarlet-heroes
+(random-table/register :name "Reaction Roll > Unfriendly (Scarlet Heroes)"
+  :private t
+  :roller '(+ "2d6" "Charisma Modifier" "Reaction Modifier")
   :data '(((-9 . 1) . "Violence or direct harm")
            (2 . "Anger/Violence")
            (3 . "Anger/Scorn")
@@ -1671,9 +1758,13 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
 
 (random-table/register :name "Lock > Actions (Errant)"
   :roller (lambda (table)
+            "Roll on TABLE, considering that types have same action in a campaign."
+            ;; In Errant, once you encounter a given Lock Type (e.g. Elvish) it
+            ;; should always have the same opening action sequence.  Hence the
+            ;; prompt.
             (let ((data (random-table-data table)))
               (if (yes-or-no-p (format "Lock action already established for %s type? "
-                                 (random-table/storage/results/fetch-rolled "Lock > Type (Errant)")))
+                                 (random-table/storage/results/get-data-value "Lock > Type (Errant)")))
                       (completing-read "Lock’s Action: " data nil t)
               (random-table/roller/string (format "1d%s" (length data))))))
   :private t
@@ -1687,8 +1778,278 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "/Tap/, /Turn/, /Twist/" "/Tap/, /Turn/, /Tap/" "/Turn/, /Twist/, /Tap/"
            "/Turn/, /Twist/, /Turn/" "/Turn/, /Tap/, /Twist/" "/Turn/, /Tap/, /Turn/"))
 
+(random-table/register :name "Death & Dying (Errant)"
+  :roller #'random-table/roller/prompt-from-table-data
+  :data '(("Physical (Stabbing, Ripping, Crushing, etc.)" . "${Death & Dying > Physical (Errant)}")
+           ("Shocking (Electricity, Cold, Pyschic, etc.)" . "${Death & Dying > Shocking (Errant)}")
+           ("Burning (Fire, Acid, Lava, Digestive Enzymes, etc.)" . "${Death & Dying > Burning (Errant)}")
+           ("Toxic" . "")))
+
+(random-table/register :name "Death & Dying > Physical (Errant)"
+  :data '((1 . "Slow internal bleeding. /On death’s door/, but in EXPLORATION TURNS.")
+           (2 . "Leg mangled. Can’t run. If both legs go, you can’t walk.")
+           (3 . "Arm wrecked. If both arms go, you can’t hold anything.")
+           (4 . "/On death's door/")
+           (5 . "Leg destroyed (severed or hanging by sinews). Can’t run. If both legs go, you can’t walk. Also /on death’s door/.")
+           (6 . "Arm destroyed (severed or hanging by sinews). If both arms go, you can’t hold any- thing. Also /on death’s door/.")
+           (7 . "Head shot. /on death’s door/ and major brain trauma.")
+           (8 . "Throat or lung torn open. /Consigned to the reaper/.")
+           (9 . "Guts hanging out. /Consigned to the reaper/ and /out of action/.")
+           ((10 . 15) . "Dead.")
+           ((16 . 100) . "Deader than Dead (unable to be revived or properly buried.)")))
+
+(random-table/register :name "Death & Dying > Shocking (Errant)"
+  :data '((1 . "Zapped. Stunned for an INITIATIVE TURN.")
+           (2 . "Knocked out. Unconscious (DEPLETION 1).")
+           (3 . "Concussed. Knocked out for d12 INITIATIVE TURNS and 1 point of EXHAUSTION.")
+           (4 . "Cardiac arrest. /On death’s door/ and 1 point of EXHAUSTION.")
+           (5 . "Scrambled. Major brain trauma and /on death’s door/.")
+           (6 . "Deep fried. Unconscious (DEPLETION 1), major brain trauma, and /on death’s door/.")
+           (7 . "Internal damage. Coughing up blood or bleeding from eyes and mouth. /Consigned to the reaper./")
+           (8 . "Respiratory system failure. /Consigned to the reaper./")
+           (9 . "Brain dead. /Consigned to the reaper/ and /out of action/.")
+           ((10 . 15) . "Dead")
+           ((16 . 100) . "Deader than Dead (unable to be revived or properly buried.)")))
+
+(random-table/register :name "Death & Dying > Burning (Errant)"
+  :data '((1 . "Eye destroyed. If both eyes go, you’re blind.")
+           (2 . "Mouth melted. Can’t speak, only grunt and moan (unable to cast SORCERIES or MIRACLES.)")
+           (3 . "Face melted.")
+           (4 . "Fingers burnt off.")
+           (5 . "Suffocating. /On death’s door/ and 1 point of EXHAUSTION.")
+           (6 . "Nose is burnt off, inner ears ruined. Deaf and can no longer smell or taste. Also /on death’s door/.")
+           (7 . "Your lungs and face are burnt off. Also /on death’s door/ and 1 point of EXHAUSTION.")
+           (8 . "Skin burned off. /Consigned to the reaper/.")
+           (9 . "Burnt to a crisp. /Consigned to the reaper/ and /out of action/.")
+           ((10 . 15) . "Dead")
+           ((16 . 100) . "Deader than Dead (unable to be revived or properly buried.)")))
+
+(random-table/register :name "Death & Dying > Toxic (Errant)"
+  :data '((1 . "Nauseous. 1 point of EXHAUSTION.")
+           (2 . "Immune system compro- mised. HP halved.")
+           (3 . "Blood tainted. Can’t recover HP.")
+           (4 . "Bleeding from nose and eyes. /On death’s door/, but in exploration turns.")
+           (5 . "Excreting blood from pores. /On death’s door/, but in EXPLORATION TURNS, and 1 point of EXHAUSTION.")
+           (6 . "Rupture. You’re throwing up black acrid blood. /On death’s door/.")
+           (7 . "Nervous system shutdown. Can’t move and /on death’s door/.")
+           (8 . "Immune system shutdown. /Consigned to the reaper/.")
+           (9 . "Total organ failure. /Consigned to the reaper/ and /out of action/.")
+           ((10 . 15) . "Dead")
+           ((16 . 100) . "Deader than Dead (unable to be revived or properly buried.)")))
+
 (random-table/register :name "Lock > Modifier (Errant)"
   :private t
   :data '("Spiked" "Spiked" "Secured" "Secured"
            "Weathered" "Weathered" "Cracked" "Cracked"
            "Normal" "Normal" "Normal" "Normal"))
+
+;;; Frog God Games
+(random-table/register :name "Inn (Borderlands)"
+  :data '("\n- Name :: The ${Inn > Creature Adjective} ${Inn > Creature}\n- Description :: ${Inn > Description}"
+           "\n- Name :: The ${Inn > Creature} and ${Inn > Creature}\n- Description :: ${Inn > Description}"
+           "\n- Name :: The ${Inn > Creature}’s ${Inn > Item}\n- Description :: ${Inn > Description}"
+           "\n- Name :: The ${Inn > Creature}\n- Description :: ${Inn > Description}"
+           "\n- Name :: The ${Inn > Item Adjective} ${Inn > Item}\n- Description :: ${Inn > Description}"
+           "\n- Name :: The ${Inn > Item} and ${Inn > Item}\n- Description :: ${Inn > Description}"))
+
+(random-table/register :name "Inn > Creature Adjective"
+  :private t
+  :data '("${1d6 + 1}" "Blind" "Bloody" "Blue" "Bouncing"
+           "Bronze" "Cheerful" "Copper" "Dancing" "Drunken"
+           "Fat" "Flying" "Golden" "Good" "Green"
+           "Grey" "Growling" "Happy" "Hunting" "Jaunty"
+           "Jolly" "Leaping" "Lost" "Lucky" "Mad"
+           "Merry" "Musical" "Odd" "Pale" "Pious"
+           "Prancing" "Prowling" "Ragged" "Red" "Royal"
+           "Shining" "Silver" "Singing" "Sleeping" "Smiling"
+           "Spotted" "Stone" "Striped" "Timid" "Traveling"
+           "Wandering" "Wanton" "Weary" "Woebegone" "Wooden"))
+
+(random-table/register :name "Inn > Creature"
+  :private t
+  :data '("Abbot (or Man)" "Baron (or Serf or Inkeeper)" "Beggar" "Bird (or Parrot)"
+           "Boar (or Pagan)" "Crab (or Acorn or Forester)" "Dragon (or Drake)" "Druid (or Bishop)"
+           "Farmer" "Fish (or Heron)" "Fool (or Harper)" "Fox (or Husband)" "Frog (or Plover)"
+           "Goose (or Gander)" "Griffon (or Hippogriff)" "Hangman (or Knight)"
+           "Harper (or Duke or Harlequin)" "Harpy (or Trout)" "Jester" "Judge (or Princess)"
+           "Knight (or Peacock)" "Lady (or Lord or Baroness)" "Lion (or Tiger)" "Magpie (or Knave)"
+           "Manticore (or Mouse or Mandrake)" "Merchant" "Miller (or Smith)" "Minstrel"
+           "Monk (or Friar)" "Peasant" "Pheasant (or Hog)" "Piper (or Swan)" "Pony (or Donkey)"
+           "Ram (or Mermaid)" "Raven (or Crow)" "Reeve (or Bailiff)" "Robin (or Dog)"
+           "Rooster (or Hen)" "Sage (or Scholar)" "Satyr (or Hawk)" "Shepherd (or Sheep)"
+           "Sheriff (or Tree)" "Squire (or Pikeman)" "Tinker" "Toad (or Otter)" "Troll (or Hedgehog)"
+           "Warhorse (or Destrier or Horse)" "Widow (or Wife)" "Wizard (or Mage)" "Wyvern (or Whale)"))
+
+(random-table/register :name "Inn > Item"
+  :private t
+  :data '("Banner (or Flag)" "Bed (or Blanket)" "Bucket" "Candle (or Brand)" "Cauldron" "Chair"
+           "Chest" "Circle (or Circlet or Crown)" "Cloak (or Doublet)" "Cup (or Chalice)"
+           "Dagger" "Den (or Friend)" "Drum" "Fiddle (or Pipe)" "Foot (or Footprint or Hoof)"
+           "Goblet" "Halberd" "Hand (or Claw)" "Harp (or Tambour)" "Hat" "Head"
+           "Hearth" "Home" "Hood" "Kettle (or Pot)" "Key" "Lance (or Broadsword)"
+           "Landing (or Forge)" "Lantern (or Lamp)" "Mace" "Mallet (or Pike)"
+           "Mask (or Hammer)" "Moon" "Pillar (or Door)" "Purse" "Rope (or Harness)"
+           "Scythe" "Shield (or Gauntlet)" "Shoe" "Staff (or Quarterstaff)" "Stone"
+           "Sword (or Banquet)" "Table" "Tankard (or Hall)" "Tear (or Teardrop or Toes)"
+           "Torch (or Castle)" "Tower" "Wagon" "Wand (or Talisman)" "Wheatsheaf (or Tail)"))
+
+(random-table/register :name "Inn > Item Adjective"
+  :private t
+  :data '("Barking" "Black (or Copper)" "Blue" "Broken (or Bent or Fallen or Torn)"
+           "Brown" "Bumpy (or Rugged)" "Cloven" "Covered" "Crooked (or Leaning or Diagonal)"
+           "Dancing" "Double (or Triple)" "Dreaming" "Fancy" "Flying" "Giant's" "Glowing"
+           "Golden" "Good" "Green" "Grey" "Hanging (or Checkered or Checked or Pied)"
+           "Hidden" "High" "Large" "Lost" "Magic (or Enchanted)" "Mended" "Mounted (or Welcoming)"
+           "Mystical (or Painted)" "New" "Old" "Perfect" "Proud" "Purple" "Red"
+           "Royal" "Shining" "Sideways" "Silver (or Silvery)" "Simple" "Singing (or Fat or Changeable)"
+           "Sleeping" "Small" "Talking" "Two-Handed (or Ample)" "Unusual (or Odd)"
+           "Well-made" "Whistling" "White" "Yellow"))
+
+(random-table/register :name "Inn > Description"
+  :private t
+  :roller "1d100"
+  :data '(((1 . 20) . "Main inn building, stable, outhouse, barn for chickens and ${1d4} [d4] cows. These are the least secure of roadside inns, and usually (but definitely not always) have the lowest quality food and lodgings. They do not have additional horses.")
+           ((21 . 25) . "Religious hostel with chapel, stone curtain-wall, main inn building, stable, smithy, barn, outhouse, ${1d3} [1d3] outbuildings (shed, dovecote, etc.), chicken coops and/or pigsties.")
+           ((26 . 30) . "Small tower, stone curtain-wall, main inn building, stable, smithy, barn, outhouse, ${1d3} [d3] outbuildings (shed, dovecote, etc.), chicken coops and/or pigsties, and ${1d3} [d3] small houses within the curtilage. These are usually built on the ruins of, or using remaining structures from, ancient Hyperborean road-forts. These highly-secure inns tend to be the most prosperous and the highest quality. A few horses are almost always for sale at these large stopping-places, along with a tailor, leatherworker, and one or two other craftsmen who live here.")
+           ((31 . 50) . "Stone curtain-wall, main inn building, stable, smithy, barn, outhouse, ${1d3} [d3] outbuildings (shed, dovecote, etc.), chicken coops and/or pigsties. Fresh mounts will be available here.")
+           ((51 . 75) . "Wooden palisade-wall, main inn building, stable, outhouse, ${1d3} [d3] outbuildings (shed, dovecote, etc.), chicken coops and/or pigsties. With no smithy, an inn this size generally does not have any additional horses.")
+           ((76 . 100) . "Wooden palisade-wall, main inn building, stable, smithy, barn, outhouse, ${1d3} outbuildings (shed, dovecote, etc.), chicken coops and/or pigsties. The presence of a smithy indicates that this size inn probably has one or more horses available for travelers in need of fresh mounts.")))
+
+(random-table/register :name "Place Names > Geographical > Suilley Rampart (Borderlands)"
+  :private t
+  :data '("Ej" "Bassin" "Bas" "Hilsej" "Pont"
+           "Ribiere" "Broc" "Cair" "Caer" "Castel"
+           "Gleisa" "Chiria"  "Faletz" "Val" "Faletz"
+           "Patiaj" "Travessar" "Val" "Boule" "Ronde"
+           "Ej" "Ej" "Fair" "Fel" "Valt"
+           "Guet" "Forett" "Bifurc" "Fort" "Petival"
+           "Bocage" "Redenza" "Villa" "Stoc" "Lande"
+           "Haut" "Colline" "Boule" "Holt" "Ostal"
+           "Nel" "Stoc" "Nel" "Lac" "Barcasej"
+           "Lane" "Pasture" "Bord" "Marc" "Mercat"
+           "Maraiz" "Champ" "Molie" "Mine" "Fan"
+           "Mire" "Tourbietz" "Mont" "Montagne" "Boc"
+           "Mud" "Noc" "Champ" "Pec" "Pit"
+           "Ponj" "Etaang" "Ridj" "Marc" "Riu"
+           "Ruad" "Escarp" "Side" "Ej" "Val"
+           "Slope" "Font" "Stoc" "Caer" "Stoc"
+           "Rajol" "Valt" "Villa" "Ton" "Top"
+           "Tor" "Vil" "Sentir" "Bifurc" "Val"
+           "Voir" "Eau" "Puit" "Ferme" "Ferme"
+           "Foret" "Granja" "Patiaj" ))
+
+(random-table/register :name "Place Names > Geographical > Eastreach-Exeter (Borderlands)"
+  :private t
+  :data '("Bank" "Basin" "Botham" "Bray" "Bridge"
+           "Brook" "Brook" "Cairn" "Caster" "Castle"
+           "Church" "Clearing" "Cliff" "Combe" "Crag"
+           "Croft" "Cross" "Dean" "Dell" "Down"
+           "Edge" "Fair" "Fell" "Firth" "Ford"
+           "Forest" "Fork" "Fort" "Glen" "Grove"
+           "Hall" "Ham" "Harrow" "Heath" "Heights"
+           "Hill" "Hollow" "Holt" "House" "How"
+           "Kirk" "Knoll" "Lake" "Landing" "Lane"
+           "Lynch" "March" "Mark" "Market" "Marsh"
+           "Meadow" "Mill" "Mine" "Minster" "Mire"
+           "Moor" "Mound" "Mountain" "Mouth" "Mud"
+           "Nook" "Pasture" "Peak" "Pit" "Pond"
+           "Pool" "Ridge" "River" "Road" "Scarp"
+           "Side" "Slade" "Slade" "Slope" "Spring"
+           "Stoke" "Stone" "Stow" "Stream" "Thicket"
+           "Thorpe" "Ton" "Top" "Tower" "Town"
+           "Trail" "Twitchel" "Valley" "View" "Water"
+           "Well" "Wich" "Wick" "Wold" "Worth"
+           "Yard"))
+
+;;; Knave
+
+(random-table/register :name "Wilderness Region (Knave)"
+  :data '("Ashland" "Badland" "Bamboo Forest" "Basalt Columns" "Bay" "Beach" "Bluff" "Bog" "Boulder Field" "Brook"
+           "Butte" "Caldera" "Canyon" "Cave" "Cliff" "Cloud Forest" "Coniferous Forest" "Copse" "Crag" "Crater"
+           "Creek" "Crossing" "Crystals" "Deciduous Forest" "Delta" "Den" "Dunes" "Dust Bowl" "Fen" "Fjord"
+           "Floodplain" "Gas Vent" "Geyser" "Glacier" "Gorge" "Grotto" "Grove" "Gulch" "Heath" "Highland"
+           "Hollow" "Hoodoo" "Hot Spring" "Ice Sheet" "Jungle" "Knoll" "Lagoon" "Lair" "Lake" "Lakebed"
+           "Lava Field" "Lava Tube" "Loch" "Mangrove Swamp" "Marsh" "Meadow" "Mesa" "Mire" "Moor" "Mountain"
+           "Mud Plain" "Oasis" "Oil Seep" "Pass" "Pasture" "Petrified Forest" "Pit" "Plateau" "Pond" "Prairie"
+           "Quicksand" "Rainforest" "Rapids" "Ravine" "Ridge" "River" "Riverland" "Rockslide" "Salt Flat" "Salt Marsh"
+           "Savanna" "Scree Slope" "Scrubland" "Sinkhole" "Spring" "Steppe" "Stream" "Sulfur Spring" "Swamp" "Taiga"
+           "Tar Pit" "Thicket" "Tundra" "Valley" "Volcanic Plain" "Volcano" "Wasteland" "Waterfall" "Wetlands" "Whirlpool"))
+
+(random-table/register :name "Wilderness Structure (Knave)"
+  :data '("Abbey" "Altar" "Amphitheater" "Aqueduct" "Archive" "Asylum" "Bandit Camp" "Barn" "Battlefield" "Bell Tower"
+           "Bonfire" "Bower" "Brazier" "Cairn" "Cart Track" "Castle" "Catacomb" "Chapel" "City" "Cistern"
+           "Convent" "Crossroads" "Dam" "Dirt Road" "Dolmen" "Dungeon" "Farm" "Ferry" "Festival" "Fishing Hut"
+           "Ford" "Forester Lodge" "Fort" "Gallows" "Garden" "Garrison" "Gate" "Gibbet" "Graveyard" "Hamlet"
+           "Hedge" "Henge" "Hermitage" "Hideout" "Highway" "Hunter’s Camp" "Hunting Lodge" "Inn" "Keep" "Library"
+           "Lighthouse" "Logging Camp" "Manor" "Market" "Memorial" "Mill" "Mine" "Monastery" "Monolith" "Monument"
+           "Mosaic" "Mule Track" "Obelisk" "Orchard" "Outpost" "Paved Road" "Pen" "Pilgrim Camp" "Pillar" "Port"
+           "Prison" "Pyramid" "Refugee Camp" "Road" "Ruin" "Shepherd Hut" "Shrine" "Signal Tower" "Stable" "Statue"
+           "Stone Bridge" "Stone Circle" "Surveyor Camp" "Tavern" "Temple" "Toll House" "Tomb" "Tower" "Town" "Trader Camp"
+           "Trail" "Trap" "Village" "Wall" "Watchtower" "Watermill" "Well" "Windmill" "Wizard Tower" "Wooden Bridge"))
+
+
+(random-table/register :name "Wilderness Trait (Knave)"
+  :data '("Amber" "Ashen" "Bewitching" "Black" "Blasted" "Blessed" "Blighted" "Bloody" "Boiling" "Bright"
+           "Broken" "Burning" "Cerulean" "Clouded" "Cracked" "Creeping" "Crimson" "Cursed" "Dark" "Dead"
+           "Desolate" "Divine" "Doomed" "Echoing" "Eerie" "Elder" "Eldritch" "Emerald" "Endless" "Eternal"
+           "Fallen" "Fearsome" "Fell" "Forbidden" "Forgotten" "Forsaken" "Frozen" "Ghostly" "Glittering" "Gloomy"
+           "Golden" "Grim" "Haunted" "Hidden" "Holy" "Infested" "Iron" "Jade" "Jagged" "Loathsome"
+           "Lonely" "Misty" "Murmuring" "Mysterious" "Oozing" "Overgrown" "Perilous" "Petrified" "Phantasmal" "Puzzling"
+           "Ravaged" "Ravenous" "Restless" "Savage" "Scorching" "Screaming" "Shadowy" "Shattered" "Shifting" "Shining"
+           "Shivering" "Shrouded" "Silent" "Silver" "Singing" "Sinister" "Sinking" "Sleeping" "Sliding" "Stoney"
+           "Stormy" "Sunken" "Swarming" "Sweltering" "Thorny" "Thundering" "Torrential" "Twisting" "Unquiet" "Vanishing"
+           "Vast" "Violet" "Wandering" "Watching" "Whispering" "White" "Withered" "Wondrous" "Writhing" "Yellow"))
+
+(random-table/register :name "Wilderness Theme (Knave)"
+  :data '("Blessings" "Blindness" "Blood" "Bones" "Books" "Brains" "Chaos" "Children" "Collapse" "Combat"
+           "Confusion" "Corpses" "Corruption" "Creation" "Criminal Activity" "Crows" "Cults" "Curses" "Death" "Decay"
+           "Disease" "Divination" "Dragons" "Drowning" "Echoes" "Eyes" "Faces" "Feasting" "Fog" "Gateways"
+           "Ghosts" "Gods" "Hands" "Holy War" "Hunger" "Hunting" "Imprisonment" "Invasion" "Invention" "Inversion"
+           "Judgement" "Lies" "Light" "Locks" "Madness" "Memory" "Mirrors" "Mob Rule" "Mouths" "Music"
+           "Mutation" "Outsiders" "Pageantry" "Paranoia" "Poison" "Priests" "Prophecy" "Rats" "Refugees" "Restless Dead"
+           "Revenge" "Riches" "Rituals" "Rival Factions" "Sacrifice" "Savage Fury" "Secret Knowledge" "Serpents" "Shadows" "Skulls"
+           "Slavery" "Slime" "Smoke" "Songs" "Souls" "Spiders" "Stasis" "Statues" "Summoning" "Survival"
+           "Teeth" "Tentacles" "Tests and Trials" "The Moon" "The Night" "The Stars" "The Sun" "Thorns" "Trickery" "Tyranny"
+           "Vampires" "Voids" "Water" "Whispers" "Wild Growth" "Wine" "Winter" "Wolves" "Worms" "Zealotry"))
+
+(random-table/register :name "Divine Domain (Knave)"
+  :data '("Acid" "Alchemy" "Bees" "Beggars" "Betrayal" "Birds" "Blades" "Blood" "Blossoms" "Children"
+           "Clay" "Clouds" "Commerce" "Courage" "Cowards" "Craftsmanship" "Crows" "Darkness" "Deserts" "Destruction"
+           "Disease" "Doors" "Dreams" "Duels" "Eagles" "Earthquakes" "Fire" "Fish" "Forge" "Fungi"
+           "Gluttony" "Gossip" "Greed" "Healing" "Horses" "Hunger" "Illusions" "Jealousy" "Language" "Lava"
+           "Libraries" "Light" "Lightning" "Love" "Luck" "Machines" "Madness" "Mazes" "Miners" "Mirrors"
+           "Mountains" "Murderers" "Music" "Oratory" "Performance" "Poison" "Priests" "Prisoners" "Rage" "Rain"
+           "Revenge" "Revolution" "Roads" "Royalty" "Rust" "Salt" "Sand" "Secrets" "Serpents" "Silence"
+           "Slaves" "Sleep" "Smoke" "Soldiers" "Spiders" "Swamps" "Tailors" "The Blind" "The Elderly" "The Future"
+           "The Grave" "The Harvest" "The Hearth" "The Hunt" "The Law" "The Sea" "Thieves" "Thorns" "Travelers" "Trees"
+           "Trickery" "Truth" "Tundra" "Tunnels" "Vermin" "Walls" "Wind" "Wine" "Winter" "Wolves"))
+
+(random-table/register :name "Divine Symbol (Knave)"
+  :data '("Antlers" "Arrow" "Axe" "Bear" "Bell" "Bird" "Blood drop" "Book" "Boots" "Bow"
+           "Bowl" "Branch" "Brazier" "Cauldron" "Chain" "Chariot" "Circle" "Cloud" "Coin" "Comb"
+           "Constellation" "Crab" "Cross" "Crown" "Crystal" "Dagger" "Deer" "Diamond" "Dice" "Doll"
+           "Eye" "Fangs" "Feather" "Fish" "Fist" "Flower" "Fountain" "Fox" "Frog" "Fruit"
+           "Gate" "Goat" "Hammer" "Hand" "Heart" "Helmet" "Hook" "Horn" "Horse" "Hourglass"
+           "Key" "Knot" "Lamp" "Leaf" "Lightning bolt" "Lock" "Mask" "Moon" "Nut" "Octopus"
+           "Ox" "Pen" "Pincer" "Pine cone" "Planet" "Rabbit" "Rat" "Ring" "Roots" "Scorpion"
+           "Scales" "Scroll" "Serpent" "Shield" "Sickle" "Skull" "Snail" "Snowflake" "Spear" "Spinning wheel"
+           "Spiral" "Square" "Staff" "Star" "Sun" "Sword" "Talons" "Tentacle" "Throne" "Tooth"
+           "Torch" "Tree" "Triangle" "Turtle" "Wave" "Web" "Whale" "Whip" "Wings" "Wolf"))
+
+(random-table/register :name "Potion Effect (Knave)"
+  :data '("Telepathy"  "Telekinesis"  "Clairvoyance"  "True Poison"  "True Glue"  "True Acid"  "True Grease"  "Grow"  "Shrink"  "Healing"
+           "Rot"  "Love"  "Hate"  "Rage"  "Fear"  "Joy"  "Paranoia"  "Prophecy"  "Courage"  "Invisibility"
+           "Strength"  "Speed"  "Jumping"  "Climbing"  "Swimming"  "Intangibility"  "Forgetfulness"  "Petrification"  "Polymorph"  "Gills"
+           "Webs"  "Claws"  "Long Tongue"  "Four Arms"  "Stinger"  "Zombie Blood"  "Vampirism"  "Burrowing"  "Cloudkill"  "Understanding"
+           "Dark Vision"  "X-Ray Vision"  "Infravision"  "Ultravision"  "Sleep"  "False Life"  "Career"  "Grandeur"  "Gold Sense"  "Hearing"
+           "Smelling"  "Taste"  "Eagle Vision"  "Micro Vision"  "Lycanthropy"  "Levitation"  "Flight"  "Gravity"  "Anti-Gravity"  "Repulsion"
+           "Clone"  "Mutation"  "Raise Dead"  "Heartlessness"  "Silence"  "Loudness"  "Beast Speech"  "Bird Speech"  "Grub Speech"  "Dead Speech"
+           "Fish Speech"  "Metal Speech"  "Plant Speech"  "Stone Speech"  "Hypnotism"  "Tongues"  "True Sight"  "Water Walk"  "Ventriloquism"  "Youth"
+           "Age"  "Mold Stone"  "Mold Metal"  "Mold Flesh"  "Beast-form"  "Bird-Form"  "Fish-Form"  "Vermin-Form"  "Fire-form"  "Ice-form"
+           "Gas-form"  "Ooze-form"  "Heat-Proof"  "Cold-Proof"  "Lightning Proof"  "Spell Proof"  "Fire-Breath"  "Ice-Breath"  "Acid-Breath"  "Lightning Breath"))
+
+(random-table/register :name "Deity"
+  :roller "1d6"
+  :data '((1 . "\n- Domains :: ${Divine Domain (Knave)}\n- Symbol :: ${Divine Symbol (Knave)}")
+           ((2 . 4) . "\n- Domains :: ${Divine Domain (Knave)} and ${Divine Domain (Knave)}\n- Symbol :: ${Divine Symbol (Knave)}")
+           ((5 . 6) . "\n- Domains :: ${Divine Domain (Knave)}, ${Divine Domain (Knave)}, and ${Divine Domain (Knave)}\n- Symbol :: ${Divine Symbol (Knave)}")))

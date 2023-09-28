@@ -13,25 +13,6 @@
 (require 'jf-quick-help)
 (require 'jf-org-mode)
 
-(use-package decide
-  :straight (decide :host github :type git :repo "jeremyf/decide-mode"))
-
-(use-package org-d20
-  ;; I’m really only using this for the ~org-d20--roll~ function.
-  :after org
-  :bind  (("C-s-r" . jf/roll-expression-dwim))
-  :config
-  (defun jf/roll-expression-dwim (expression &optional)
-    "Roll the EXPRESSION, check `thing-at-point' then prompt."
-    (interactive (list (if (string-match
-          "[dD][0-9]"
-          (format "%s" (thing-at-point 'sexp t)))
-         (thing-at-point 'sexp t)
-       (read-string "Dice Expression: "))))
-    (-let* (((rolls . result) (org-d20--roll expression)))
-      (message "%s => %s" expression result)))
-  :straight (org-d20 :host github :repo "spwhitton/org-d20"))
-
 ;;;; General
 
 (defconst jf/gaming/runes

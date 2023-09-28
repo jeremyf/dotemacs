@@ -290,14 +290,14 @@ Else, evaluate the whole buffer."
 ;; to `org-mode'.
 (global-set-key (kbd "<f12>") 'jf/create-scratch-buffer)
 (cl-defun jf/create-scratch-buffer (&optional arg)
-  "Create a scratch `denote' note.  If ARG given, create `scratch' instead."
+  "Create a `scratch' buffer; if ARG given create a `denote' scratch note."
   (interactive "P")
   (if (car arg)
+    (jf/denote/create-scratch (format-time-string "%Y-%m-%d Scratch"))
     (progn
       (crux-create-scratch-buffer)
       (rename-buffer (concat "*scratch* at " (format-time-string "%Y-%m-%d %H:%M")))
-      (org-mode))
-    (jf/denote/create-scratch (format-time-string "%Y-%m-%d Scratch"))))
+      (org-mode))))
 
 ;; Sometimes I want to move, without renaming, a file.  This function helps
 ;; make that easy.
