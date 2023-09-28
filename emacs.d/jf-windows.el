@@ -148,6 +148,8 @@ setting up an IDE-like layout)."
          ((,c :background ,bg-lavender)))
       `(hl-todo
          ((,c :foreground ,red-faint)))
+      `(fill-column-indicator
+         ((,c :width ultra-condensed :background ,bg-dim :foreground ,bg-dim)))
       `(font-lock-regexp-face
          ((,c :foreground ,red))))))
 

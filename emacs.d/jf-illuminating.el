@@ -33,14 +33,12 @@
           ;; ("C-c C-o" . 'change-outer)
           ))
 
-(use-package fill-column-indicator
+
+(use-package display-fill-column-indicator
   ;; It's nice to have a gentle reminder showing me the recommended column width
   ;; for the current buffer.
-  :straight t
-  :hook (prog-mode . fci-mode)
-  :config
-  (setq fci-rule-width 1))
-
+  :straight (:type built-in)
+  :hook (prog-mode . display-fill-column-indicator-mode))
 
 (use-package kind-icon
   ;; This packages helps provide additional icons for functions and variables in
