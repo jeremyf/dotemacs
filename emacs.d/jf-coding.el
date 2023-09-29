@@ -290,6 +290,29 @@ method, get the containing class."
   :mode (("README\\.md\\'" . gfm-mode)
           ("\\.md\\'" . markdown-mode)
           ("\\.markdown\\'" . markdown-mode))
+  :preface
+  (defun jf/markdown-toc (&optional depth)
+    "Extract DEPTH (default 3) of headings from the current Markdown buffer.
+   The generated and indented TOC will be inserted at point."
+    (interactive "P")
+    (let ((max-depth (or depth 3)) toc-list)
+      (save-excursion
+        (goto-char (point-min))
+        (while (re-search-forward "^\\(##+\\)\\s-+\\(.*\\)" nil t)
+          (let* ((level (length (match-string 1)))
+                  (heading-text (match-string 2))
+                  (heading-id (downcase (replace-regexp-in-string "[[:space:]]+" "-" heading-text))))
+            (when (<= level max-depth)
+              (push (cons level (cons heading-text heading-id)) toc-list)))))
+      (setq toc-list (reverse toc-list))
+      (dolist (item toc-list)
+        (let* ((level (car item))
+                (heading-text (cadr item))
+                (heading-id (cddr item))
+                (indentation (make-string (- (* 2 (1- level)) 2) ?\ ))
+                (line (format "- [%s](#%s)\n" heading-text heading-id)))
+          (setq markdown-toc (concat markdown-toc (concat indentation line)))))
+      (insert markdown-toc)))
   :init
   (setq markdown-command "/opt/homebrew/bin/pandoc")
   (font-lock-add-keywords 'markdown-mode
