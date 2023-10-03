@@ -173,7 +173,7 @@ method, get the containing class."
   (editorconfig-mode 1))
 
 (use-package eglot
-  :straight (:type built-in)
+  :straight (:host github :repo "joaotavora/eglot")
   ;; The Language Server Protocol (LSP) is a game changer; having access to that
   ;; tooling is very much a nice to have.
   :hook ((css-mode css-ts-mode
@@ -212,8 +212,7 @@ method, get the containing class."
               #'jf/version-control/issue-capf
               #'eglot-completion-at-point
               #'tempel-expand
-              #'cape-keyword))))
-  :straight t)
+              #'cape-keyword)))))
 
 
 
