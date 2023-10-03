@@ -593,7 +593,7 @@ PARG is for conformant method signature."
   "Export a date for the given LINK, DESCRIPTION, FORMAT, and PROTOCOL."
   (cond
     ((or (eq format 'html) (eq format 'md))
-      (format "<time datetime=\"%s\">%s</time>" link description))
+      (format "<time datetime=\"%s\" title=\"%s\">%s</time>" link link description))
     (t (format "%s (%s)" description link))))
 
 (cl-defun jf/denote/link-follow-date (date &optional parg)

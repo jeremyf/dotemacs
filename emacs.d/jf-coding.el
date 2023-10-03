@@ -192,6 +192,7 @@ method, get the containing class."
     (setq eldoc-documentation-strategy
       'eldoc-documentation-compose-eagerly))
   :config
+  (setq eglot-events-buffer-size 0)
   ;; (use-package eglot-tempel
   ;; ;; I use `tempel' and I use `eglot'; having some glue between those helps.
   ;; :straight (eglot-tempel :host github :repo "fejfighter/eglot-tempel"))

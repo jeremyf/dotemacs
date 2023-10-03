@@ -67,6 +67,17 @@ org-mode
 (macro-keyboard "{{{kbd(" (p (completing-read "Keyboard: " (jf/org-macro-value-list "kbd"))) ")}}}")
 (macro-idiomatic "{{{i(" (p (completing-read "Idiom: " (jf/org-macro-value-list "i"))) ")}}}")
 (macro-mechanic "{{{mechanic(" (p (completing-read "Mechanic: " (jf/org-macro-value-list "mechanic"))) ")}}}")
+(monster "** " (p "Monster Name") n
+  ":PROPERTIES:" n
+  ":ID: " (org-id-new) n
+  ":SOURCE:" p n
+  ":THREAT: " p n
+  ":HP: " p n
+  ":ATTACKS: " p n
+  ":MD: " p n
+  ":MORALE: " p n
+  ":ALIGNMENT: " p n
+  ":END:" n q)
 
 (eg "([[abbr:20230824T082549][e.g.]] ")
 (ie "([[abbr:20230825T130802][i.e.]] ")

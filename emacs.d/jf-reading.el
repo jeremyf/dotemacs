@@ -27,7 +27,7 @@
   :config
   (setq-default elfeed-search-filter "@2-days-ago +unread ")
   :bind ((:map elfeed-search-mode-map
-         ("q" . jf/elfeed-save-db-and-bury))))
+           ("q" . jf/elfeed-save-db-and-bury))))
 
 (defun jf/elfeed-save-db-and-bury ()
   "Wrapper to save the elfeed db to disk before burying buffer."
@@ -74,6 +74,16 @@ It will display entries without switching to them."
   :after elfeed
   :config (elfeed-org)
   (setq rmh-elfeed-org-files (list "~/git/org/elfeed.org")))
+
+(use-package elfeed-curate
+  :straight (:host github :repo "rnadler/elfeed-curate")
+  :bind (:map elfeed-search-mode-map
+              ("a" . elfeed-curate-edit-entry-annoation)
+              ("x" . elfeed-curate-export-entries))
+        (:map elfeed-show-mode-map
+              ("a" . elfeed-curate-edit-entry-annoation)
+              ("m" . elfeed-curate-toggle-star)
+              ("q" . kill-buffer-and-window)))
 
 (use-package eww
   ;; A plain text browser.  Use this to see just how bad much of the web has

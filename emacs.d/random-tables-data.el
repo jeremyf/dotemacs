@@ -192,6 +192,7 @@
                 "\n- Keepsakes :: ${Keepsakes (Errant)}"
                 "\n"
                 "\nEquipment"
+                "${Archetype Equipment (Errant)}"
                 "\n- A backpack."
                 "\n- A medium weapon of their choice (1 item slot)."
                 "\n- A quiver of ammunition, if needed (1 item slot, depletion 2)."
@@ -203,6 +204,15 @@
                 "\n- Rations (1⁄4 item slot, depletion 1)"
                 "\n- A waterskin (1⁄4 item slot)."
                 "\n- 4 supply (1⁄4 item slot each).")))
+
+(random-table/register :name "Archetype Equipment (Errant)"
+  :reuse "Archetype (Errant)"
+  :fetcher (lambda (data roll) (alist-get (car roll) data nil nil #'string=))
+  :data '(("Violent" . "\n- Heavy weapon (2 item slots) or a Small shield (1 item slot, 4 blocks) or Large shield (2 item slots,
+6 blocks)")
+           ("Deviant" . "\n- Burglar’s tools (1 item slot) or an Alchemist’s kit (1 item slot)")
+           ("Occult" . "${Grimoire (Errant)}${Grimoire (Errant)}${Grimoire (Errant)}${Grimoire (Errant)}")
+           ("Zealot" . "\n- One relic (Blade, Wand, Talisman, Calice see p. 75)")))
 
 (cl-defun random-table/roller/archetype (table &key (attribute-template "Ability > %s (Errant)"))
   "Using the TABLE data determine Errant Archetype.
@@ -260,7 +270,7 @@ See “Archetype (Errant)” table."
            ("Presence" . "Zealot")))
 
 (random-table/register :name "Grimoire (Errant)"
-  :data '("\n- Essence :: ${Grimoire > Essence (Errant)}\n- Sphere :: ${Grimoire > Sphere (Errant)}"))
+  :data '("\n- Grimoire (1⁄4 item slot)\n  - Essence :: ${Grimoire > Essence (Errant)}\n  - Sphere :: ${Grimoire > Sphere (Errant)}\n  - Theme :: ${Grimoire > Theme (Errant)}"))
 
 (random-table/register :name "Grimoire > Essence (Errant)"
   :private t
@@ -280,9 +290,65 @@ See “Archetype (Errant)” table."
   :data '("Magic" "Space" "Time" "Mind" "Spirit" "Body"
            "Elements" "Dimensions" "Life" "Death" "Objects" "Biota"))
 
+(random-table/register :name "Grimoire > Theme (Errant)"
+  :private t
+  :data '("reflection, mirror, prediction" "sound, music, resonance"
+           "metal, restraint, imprisonment" "possession, betrayal, parasitism"
+           "flesh, secrets, extortion" "oath, trust, witness"
+           "assassination, retribution, target" "illumination, shadow, flicker"
+           "miasma, contagion, breath" "clairvoyance, truth, fortune"
+           "refraction, vision, geometry" "microcosm, voyage, homecoming"
+           "sacrifice, wisdom, prophecy" "return, arc, gravity"
+           "perception, foresight, awareness" "perspective, containment, curvature"
+           "tone, air, catalyst" "ice, cessation, continuation"
+           "fire, extinguish, forbiddance" "water, treachery, pressure"
+           "earth, openings, weight" "storms, navigation, flight"
+           "lightning, conductivity, thunder" "undeath, oppression, hierarchy"
+           "nostalgia, haunting, denial" "identity, disguise, personality"
+           "puzzle, solution, contradiction" "egocentrism, trinket, expression"
+           "revival, rejuvenation, animation" "persuasion, manipulation, contempt"
+           "silence, melody, listening" "replication, subversion, belief"
+           "fluidity, doubt, cowardice" "slumber, consciousness, meditation"
+           "ambiguity, confusion, hypnosis" "intent, purpose, narrative"
+           "memory, archive, history" "threshold, passivity, motion"
+           "emptiness, disparity, difference" "void, origin, periphery"
+           "culture, tradition, artefact" "entrance, forbiddance, security"
+           "rotation, perpetuation, cycle" "clarification, association, relativism"
+           "heist, hold, prize" "potential, domestication, savagery"
+           "odour, intoxication, unconsciousness" "torture, resilience, limit"
+           "survival, adaptation, predation" "representation, fortitude, vitality"
+           "authority, judgement, corruption" "escape, fate, crime"
+           "celerity, delivery, contact" "benevolence, medicine, dosage"
+           "record, temptation, repugnance" "armour, protection, integrity"
+           "fortification, repair, construction" "reduction, multiplication, calculation"
+           "signature, disappointment, division" "banishment, position, expulsion"
+           "pact, willpower, malice" "pestilence, desperation, frailty"
+           "completion, separation, origin" "fertility, reincarnation, gestation"
+           "lust, chastity, obscenity" "gluttony, temperance, inebriation"
+           "war, provocation, injury" "youth, redemption, forgiveness"
+           "luck, probability, gamble" "causality, consequence, inevitability"
+           "birth, shame, guilt" "famine, cruelty, deprivation"
+           "death, overthrow, mortality" "hostility, recklessness, dedication"
+           "sloth, diligence, rest" "chance, play, serendipity"
+           "greed, charity, property" "creation, texture, destruction"
+           "passion, diplomacy, power" "architecture, support, decay"
+           "learning, loss, irony" "home, empathy, hunger"
+           "toxin, psyche, affection" "shatter, sight, distortion"
+           "leverage, rebellion, resistance" "exploration, discovery, Alignment"
+           "ritual, compassion, community" "correction, purification, mystery"
+           "recognition, honour, resourcefulness" "foolishness, reprisal, gender"
+           "secrets, growth, heat" "dirt, focus, rebirth"
+           "denial, filth, depression" "wrath, patience, violence"
+           "envy, gratitude, theft" "pride, humility, hubris"
+           "prudence, reason, discernment" "temperance, appetites, production"
+           "fortitude, courage, defence" "justice, proportionality, impartiality"))
+
 (random-table/register :name "Ancestry (Errant)"
   :private t
-  :data '("Tough" "Arcane" "Cunning" "Adaptable"))
+  :data '("Tough (Once per session, when you would be reduced to 0 hp, you may choose to be reduced to 1 hp instead)."
+           "Arcane (Once per session, you can attempt to perform a minor magic related to your ancestry: roll 2d6 and add your renown, on a 10+ you succeed, on a 7-9 a complication occurs, on a 6 or lower, failure)."
+           "Cunning (Once per session, you may reroll any d20 roll)."
+           "Adaptable (Once per session, you may choose to use one attribute for a check in lieu of another)."))
 
 (random-table/register :name "Keepsakes (Errant)"
   :data '("The sword of the hero Black Mask. Useless, but looks really cool."
