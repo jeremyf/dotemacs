@@ -272,7 +272,6 @@ With a PREFIX jump to the agenda without starting the clock."
        consult-projectile--source-projectile-recentf
        ;; key *
        consult--source-modified-buffer))
-  (setq read-file-name-function #'consult-find-file-with-preview)
 
   (defun consult-find-file-with-preview (prompt &optional dir default mustmatch initial pred)
     (interactive)
