@@ -20,6 +20,8 @@
   :straight t
   :config (projectile-mode 1)
   :custom (projectile-project-search-path '("~/git/"))
+  ;; (projectile-git-fd-args "-H -0 -E hyrax-webapp -E .git -tf --strip-cwd-prefix -c never")
+  ;; (projectile-git-submodule-command "")
   :bind ("s-." . projectile-toggle-between-implementation-and-test))
 
 (provide 'jf-organizing)

@@ -20,7 +20,9 @@
  '(org-export-backends '(ascii html latex md odt))
  '(random-table/reporter 'random-table/reporter/as-insert)
  '(safe-local-variable-values
-    '((jf/tor-minor-mode . 1)
+    '((projectile-git-fd-args . "-H -0 -E hyrax-webapp -E .git -tf --strip-cwd-prefix -c never")
+       (projectile-git-submodule-command . "")
+       (jf/tor-minor-mode . 1)
        (projectile-require-project-root)
        (projectile-git-command . "git ls-files -zco --exclude-from=.projectile.gitignore")
        (org-insert-tilde-language . ruby)
@@ -40,6 +42,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(denote-faces-link ((((class color) (min-colors 256)) (:inherit link :box (:line-width (1 . 1) :color "#a59a94" :style released-button)))))
+ '(fill-column-indicator ((((class color) (min-colors 256)) :width ultra-condensed :background "#efe9dd" :foreground "#efe9dd")))
  '(font-lock-misc-punctuation-face ((((class color) (min-colors 256)) :foreground "#316500")))
  '(font-lock-regexp-face ((((class color) (min-colors 256)) :foreground "#8f0075")))
  '(hl-todo ((((class color) (min-colors 256)) :foreground "#7f0000")))
