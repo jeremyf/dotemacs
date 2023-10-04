@@ -88,6 +88,11 @@
     (and (denote-file-is-note-p file)
       (string-match-p "\\/blog-posts\\/" file))))
 
+(transient-define-suffix jf/enable-indent-for-tab-command ()
+  :description "Enable `indent-for-tab-command'"
+  (interactive)
+  (global-set-key (kbd "TAB") #'indent-for-tab-command))
+
 ;; this suffix provides a dynamic description of the current host I want to use
 ;; for my blog.  And the prefix’s function toggles the host.
 (global-set-key (kbd "s-1") 'jf/menu)
@@ -134,6 +139,7 @@
      ("m o" "MacOS Native Option ( )" jf/toggle-osx-alternate-modifier :if-non-nil ns-alternate-modifier)
      ("m o" "MacOS Native Option (*)" jf/toggle-osx-alternate-modifier :if-nil ns-alternate-modifier)
      ("m i" jf/shr/toggle-images)
+     ("TAB" jf/enable-indent-for-tab-command)
      ]
     ["Grab Refs"
       ("g e" "Elfeed" jf/menu--org-capture-elfeed-show :if-derived elfeed-show-mode)
