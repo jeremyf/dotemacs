@@ -15,26 +15,6 @@
 ;;;; Pre-requisites
 (require 'jf-writing)
 
-;; On <2023-03-08 Thu> I was noticing that `treesit' as implemented appeared to
-;; have notable latency.  I did some profiling and found that for a Ruby file
-;; Emacs spent quite a bit of time in the `treesit' functions.  I toggled back to
-;; `tree-sitter' and did not notice any slowness.
-;;
-;; On <2023-03-25 Sat> I read the `tree-sitter' README and they encouraged Emacs
-;; 29.x to use the built-in `treesit' package.
-;; (use-package tree-sitter
-;;   ;; See https://github.com/emacs-tree-sitter/elisp-tree-sitter
-;;   :straight (tree-sitter :host github
-;;       :repo "emacs-tree-sitter/elisp-tree-sitter")
-;;   :config
-;;   (add-to-list 'tree-sitter-major-mode-language-alist '(ruby-mode . ruby))
-;;   :init (global-tree-sitter-mode)
-;;   (add-hook 'tree-sitter-after-on-hook #'tree-sitter-hl-mode))
-
-;; (use-package tree-sitter-langs
-;;   ;; Provides the languages "dictionaries" for tree-sitter highlighting.
-;;   :straight t)
-
 (use-package treesit
   :straight (:type built-in)
   :init
@@ -62,7 +42,7 @@
                                (treesit-node-end (treesit-defun-at-point)))))
         (let ((cops (or given-cops
                       (completing-read-multiple "Cops to Disable: "
-                        (jf/rubocop/list-all-cops) nil t))))
+                        jf/rubocop/list-all-cops nil t))))
           (save-excursion
             (goto-char beg)
             (let ((indentation (s-repeat (current-column) " ")))
@@ -589,14 +569,9 @@ See `add-log-current-defun-function'."
          ("use-package" "^.*([[:space:]]*use-package[[:space:]]+\\([[:word:]-]+\\)" 1)))
     (imenu-add-menubar-index)))
 
-(defun jf/rubocop/list-all-cops ()
+(defvar jf/rubocop/list-all-cops
   "List of all cops."
-
-  ;; (split-string-and-unquote
-  ;;   (shell-command-to-string
-  ;;     (concat
-  ;;       "rubocop --show-cops 2>/dev/null | rg \"^\([A-Z][\w/]+\):$\" -r '$1' | sort | tr '\n' '@'"))
-  ;;   "@")
+  ;; rubocop --show-cops | rg "^([A-Z][\w/]+):" -r '$1' | pbcopy
   '("Bundler/DuplicatedGem"
      "Bundler/GemComment"
      "Bundler/GemFilename"
