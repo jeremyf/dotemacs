@@ -42,6 +42,7 @@
   :straight t)
 
 (use-package ts
+  ;; Timestamp library (not typescript)
   :straight t)
 
 ;;; Support packages

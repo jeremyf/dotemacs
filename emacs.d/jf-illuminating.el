@@ -22,16 +22,17 @@
   :bind (("C-=" . er/expand-region)
           ("C-+" . er/contract-region)))
 
+;; I thought I might use this but I never practiced.  Holding it as a reminder.
 ;; Learning about this, may be curious about https://tony-zorman.com/posts/change-inner.html
-(use-package change-inner
-  :straight t
-  :bind (;; Note the symmetry between 'change-inner binding and er/expand-region
-          ("C-c C-=" . 'change-inner)
-          ;; Below is an alternate consideration; namely if I want inner/outer
-          ;; behavior
-          ;; ("C-c TAB" . 'change-inner)
-          ;; ("C-c C-o" . 'change-outer)
-          ))
+;; (use-package change-inner
+;;   :straight t
+;;   :bind (;; Note the symmetry between 'change-inner binding and er/expand-region
+;;           ("C-c C-=" . 'change-inner)
+;;           ;; Below is an alternate consideration; namely if I want inner/outer
+;;           ;; behavior
+;;           ;; ("C-c TAB" . 'change-inner)
+;;           ;; ("C-c C-o" . 'change-outer)
+;;           ))
 
 
 (use-package display-fill-column-indicator
@@ -139,10 +140,11 @@
   :straight t
   :config (whole-line-or-region-global-mode))
 
-(use-package yafolding
-  ;; It can be helpful to fold regions; I don't do it much but it can be
-  ;; helpful.
-  :straight t)
+;; Since writing the comment about folding, I haven't used it.
+;; (use-package yafolding
+;;   ;; It can be helpful to fold regions; I don't do it much but it can be
+;;   ;; helpful.
+;;   :straight t)
 
 (use-package keycast
   ;; When I turn on `keycast-mode-line' each key press will echo in the

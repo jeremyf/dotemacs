@@ -12,7 +12,7 @@
 ;; assumptions with `fboundp'.
 ;;
 ;; To enter focus mode: "M-x logos-focus-mode"
-;; To enter presentation mode: "M-x jf/presenter-minor-mode"
+;; To enter presentation mode: "M-x jf/minor-mode/presenter"
 
 ;;; Code:
 (use-package edit-indirect
@@ -82,23 +82,26 @@
   (olivetti-minimum-body-width 80)
   (olivetti-recall-visual-line-mode-entry-state t))
 
-;;; Presentation mode leveraging logos
-(require 'jf-minor-mode-maker)
+;;; qPresentation mode leveraging logos
 
-(defvar jf/presenter-minor-mode-map (let ((map (make-sparse-keymap)))
-          (define-key map (kbd "C-n") #'next-line)
-          (define-key map (kbd "C-p") #'previous-line)
-          (dolist (key `("M-]" "s-]"))
-            (define-key map (kbd key) #'logos-forward-page-dwim))
-          (dolist (key `("M-[" "s-["))
-            (define-key map (kbd key) #'logos-backward-page-dwim))
-          map))
+(defvar jf/minor-mode/presenter-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-n") #'next-line)
+    (define-key map (kbd "C-p") #'previous-line)
+    (dolist (key `("M-]" "s-]"))
+      (define-key map (kbd key) 'logos-forward-page-dwim))
+    (dolist (key `("M-[" "s-["))
+      (define-key map (kbd key) 'logos-backward-page-dwim))
+    map))
 
-(jf/minor-mode-maker :title "Logos Presenter"
-         :abbr "presenter"
-         :keymap jf/presenter-minor-mode-map)
+(define-minor-mode jf/minor-mode/presenter
+  "Enter a `logos' and `olivetti' mode for showing things."
+  :init-value nil
+  :global nil
+  :keymap jf/minor-mode/presenter-map
+  :lighter " presenter")
 
-(defcustom jf/presenter-minor-mode-on-hook
+(defcustom jf/minor-mode/presenter-on-hook
   (lambda ()
     (let ((logos-hide-cursor nil)
     (logos-buffer-read-only nil)
@@ -111,10 +114,10 @@
       (when (fboundp 'vi-tilde-fringe-mode) (vi-tilde-fringe-mode -1))
       (when (fboundp 'git-gutter-mode) (git-gutter-mode -1))
       (when (fboundp 'centaur-tabs-local-mode) (centaur-tabs-local-mode -1))))
-  "Hook when `jf/presenter-minor-mode' activated."
+  "Hook when `jf/minor-mode/presenter' activated."
   :type 'hook)
 
-(defcustom jf/presenter-minor-mode-off-hook
+(defcustom jf/minor-mode/presenter-off-hook
   (lambda ()
     (call-interactively 'widen)
     (olivetti-mode -1)
@@ -125,7 +128,7 @@
     (when (fboundp 'vi-tilde-fringe-mode) (vi-tilde-fringe-mode t))
     (when (fboundp 'git-gutter-mode) (git-gutter-mode t))
     (when (fboundp 'centaur-tabs-local-mode) (centaur-tabs-local-mode t)))
-  "Hook when `jf/presenter-minor-mode' deactivated."
+  "Hook when `jf/minor-mode/presenter' deactivated."
   :type 'hook)
 (provide 'jf-framing)
 ;;; jf-framing.el ends here

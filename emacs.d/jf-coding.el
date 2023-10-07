@@ -117,8 +117,9 @@ method, get the containing class."
   :config (setq treesit-auto-install 'prompt)
   (global-treesit-auto-mode))
 
-;; Show the scope info of methods, blocks, if/case statements
 (use-package scopeline
+  ;; Show the scope info of methods, blocks, if/case statements.  This is done
+  ;; via an overlay for "blocks" that are more than 5 (default) lines
   :straight (:host github :repo "jeremyf/scopeline.el")
   :hook ((ruby-mode ruby-ts-mode) . scopeline-mode))
 
@@ -194,8 +195,6 @@ method, get the containing class."
               #'eglot-completion-at-point
               #'tempel-expand
               #'cape-keyword)))))
-
-
 
 (use-package eldoc
   ;; Helps with rendering documentation
@@ -478,7 +477,7 @@ See `add-log-current-defun-function'."
 (use-package flymake
   :straight t
   ;; Don't be so hasty in syntax checking.
-  :custom (flymake-no-changes-timeout 3))
+  :custom (flymake-no-changes-timeout 2))
 
 (use-package prog-mode
   :straight (:type built-in)
@@ -534,9 +533,8 @@ See `add-log-current-defun-function'."
     (error (goto-char (point-min))))))
 
 (define-key ruby-mode-map (kbd "s-ESC") #'jf/comment-header-backward)
-(define-key ruby-mode-map (kbd "C-s-]") #'jf/commend-header-forward)
-
 (define-key emacs-lisp-mode-map (kbd "s-ESC") #'jf/comment-header-backward)
+(define-key ruby-mode-map (kbd "C-s-]") #'jf/commend-header-forward)
 (define-key emacs-lisp-mode-map (kbd "C-s-]") #'jf/commend-header-forward)
 
 (defun jf/ruby-ts-mode-configurator ()

@@ -27,7 +27,8 @@
 ;;
 ;; Create a buffer specific `abbrev'
 (use-package lam
-  :straight (:host github :repo "ChanderG/lam"))
+  :straight (:host github :repo "ChanderG/lam")
+  :bind ("C-x l" . #'lam/control))
 
 (use-package emacs
   :bind ("C-M-i" . completion-at-point)
@@ -93,8 +94,6 @@
           ("C-x b" . consult-bookmark)
           ("s-b" . consult-buffer)
           ("C-x 4 b" . consult-buffer-other-window)
-          ("C-s-b" . consult-buffer-other-window)
-          ("C-x 5 b" . consult-buffer-other-frame)
           ;; Custom M-# bindings for fast register access
           ("M-#" . consult-register-load)
           ("M-'" . consult-register-store)
@@ -103,7 +102,6 @@
           ("C-y" . yank)
           ("C-c C-/" . #'consult-clock-in)
           ("M-y" . consult-yank-from-kill-ring)
-          ("<help> a" . consult-apropos)
           ("M-s k" . consult-keep-lines)
           ("M-s u" . consult-focus-lines)
           ;; M-g bindings (goto-map)
@@ -281,7 +279,6 @@ With a PREFIX jump to the agenda without starting the clock."
         :initial initial
         :require-match mustmatch
         :predicate pred)))
-
   :bind
   ;;; This overwrite `ns-open-file-using-panel'; the operating system's "Finder"
   ;; ("C-c o" . consult-projectile)
@@ -325,13 +322,24 @@ With a PREFIX jump to the agenda without starting the clock."
   (corfu-quit-no-match 'separator)
   (corfu-preview-current 'insert)       ; Preview current candidate?
   (corfu-preselect-first t)             ; Preselect first candidate?
-  :config
+  :prefac
   (defun corfu-move-to-minibuffer ()
     "Move \"popup\" completion candidates to minibuffer.
 Useful if you want a more robust view into the recommend candidates."
     (interactive)
     (let (completion-cycle-threshold completion-cycling)
       (apply #'consult-completion-in-region completion-in-region--data)))
+  (defun corfu-enable-always-in-minibuffer ()
+  "Enable Corfu in the minibuffer if Vertico/Mct are not active."
+  (unless (or (bound-and-true-p mct--active)
+              (bound-and-true-p vertico--input)
+              (eq (current-local-map) read-passwd-map))
+    ;; (setq-local corfu-auto nil) ;; Enable/disable auto completion
+    (setq-local corfu-echo-delay nil ;; Disable automatic echo and popup
+                corfu-popupinfo-delay nil)
+    (corfu-mode 1)))
+  :config
+  (add-hook 'minibuffer-setup-hook #'corfu-enable-always-in-minibuffer 1)
   :init
   ;; (corfu-indexed-mode)
   ;; Recommended: Enable Corfu globally.
@@ -595,6 +603,7 @@ Useful if you want a more robust view into the recommend candidates."
   ;; selection with `marginalia' and then having the `vertico-indexed-mode'
   ;; option for quick numerical selection.
   :straight (:type git :host github :repo "minad/vertico")
+  :command
   :bind (:map vertico-map
           (("<tab>" . #'vertico-insert)
             ("<escape>" . #'minibuffer-keyboard-quit)
@@ -647,7 +656,6 @@ Useful if you want a more robust view into the recommend candidates."
     jf/silence-loading-log)
   (global-set-key (kbd "M-r") #'vertico-repeat)
   (add-hook 'minibuffer-setup-hook #'vertico-repeat-save))
-
 
 (use-package which-key
   ;; This package helps me begin typing a key sequence and seeing what options
