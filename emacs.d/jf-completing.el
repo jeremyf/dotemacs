@@ -322,7 +322,7 @@ With a PREFIX jump to the agenda without starting the clock."
   (corfu-quit-no-match 'separator)
   (corfu-preview-current 'insert)       ; Preview current candidate?
   (corfu-preselect-first t)             ; Preselect first candidate?
-  :prefac
+  :preface
   (defun corfu-move-to-minibuffer ()
     "Move \"popup\" completion candidates to minibuffer.
 Useful if you want a more robust view into the recommend candidates."
@@ -603,7 +603,6 @@ Useful if you want a more robust view into the recommend candidates."
   ;; selection with `marginalia' and then having the `vertico-indexed-mode'
   ;; option for quick numerical selection.
   :straight (:type git :host github :repo "minad/vertico")
-  :command
   :bind (:map vertico-map
           (("<tab>" . #'vertico-insert)
             ("<escape>" . #'minibuffer-keyboard-quit)
