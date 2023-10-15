@@ -568,7 +568,6 @@ See `add-log-current-defun-function'."
     (imenu-add-menubar-index)))
 
 (defvar jf/rubocop/list-all-cops
-  "List of all cops."
   ;; rubocop --show-cops | rg "^([A-Z][\w/]+):" -r '$1' | pbcopy
   '("Bundler/DuplicatedGem"
      "Bundler/GemComment"
@@ -1356,7 +1355,8 @@ See `add-log-current-defun-function'."
      "Style/WordArray"
      "Style/YodaCondition"
      "Style/YodaExpression"
-     "Style/ZeroLengthPredicate"))
+     "Style/ZeroLengthPredicate")
+  "List of all cops.")
 
 ;; (require 'jf-copilot)
 
