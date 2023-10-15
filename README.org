@@ -64,7 +64,7 @@ Organizing concepts is an interesting challenge, as packages interact in a multi
 - [[file:emacs.d/jf-menus.el][jf-menus.el]] ::
 - [[file:emacs.d/jf-minor-mode-maker.el][jf-minor-mode-maker.el]] ::
 - [[file:emacs.d/jf-navigating.el][jf-navigating.el]] ::
-- [[file:emacs.d/jf-org-mode.el][jf-org-mode.el]] ::
+- [[file:emacs.d/jf-org-mode.el][jf-org-mode.el]] :: Beloved OrgMode \ Along my path we meet and \ Now walk together
 - [[file:emacs.d/jf-organizing.el][jf-organizing.el]] ::
 - [[file:emacs.d/jf-project.el][jf-project.el]] :: Connective tissue for projects
 - [[file:emacs.d/jf-quick-help.el][jf-quick-help.el]] ::
