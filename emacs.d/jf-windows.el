@@ -19,6 +19,11 @@
   :custom
   (display-buffer-alist
     '(;; no windows
+       ("\\*elfeed-curate-annotation\\*"
+         (display-buffer-in-side-window)
+         (window-height . 0.33)
+         (side . bottom)
+         (window-parameters . ((mode-line-format . (" %b")))))
        ("\\`\\*Async Shell Command\\*\\'"
          (display-buffer-no-window))
        ;; I like the slide out window for this "context-type menus"

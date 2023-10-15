@@ -555,6 +555,8 @@ Assumes that I'm on a :projects: headline.
 (add-to-list 'org-export-global-macros
   '("mechanic" . "@@html:<i class=\"mechanic\">@@$1@@html:</i>@@"))
 (add-to-list 'org-export-global-macros
+  '("m" . "@@html:<i class=\"mechanic\">@@$1@@html:</i>@@"))
+(add-to-list 'org-export-global-macros
   '("linkToSeries" . "@@hugo:{{< linkToSeries \"@@$1@@hugo:\" >}}@@"))'
 
 (defun jf/org-link-delete-link ()

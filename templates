@@ -66,7 +66,7 @@ org-mode
 (macro-cite "{{{cite(" (p (completing-read "Cite: " (jf/org-macro-value-list "cite"))) ")}}}")
 (macro-keyboard "{{{kbd(" (p (completing-read "Keyboard: " (jf/org-macro-value-list "kbd"))) ")}}}")
 (macro-idiomatic "{{{i(" (p (completing-read "Idiom: " (jf/org-macro-value-list "i"))) ")}}}")
-(macro-mechanic "{{{mechanic(" (p (completing-read "Mechanic: " (jf/org-macro-value-list "mechanic"))) ")}}}")
+(macro-mechanic "{{{m(" (p (completing-read "Mechanic: " (jf/org-macro-value-list "m(?:echanic)?"))) ")}}}")
 (monster "** " (p "Monster Name") n
   ":PROPERTIES:" n
   ":ID: " (org-id-new) n
