@@ -25,13 +25,13 @@
 (defvar bootstrap-version)
 (defvar bootstrap-version)
 (let ((bootstrap-file
-       (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
-      (bootstrap-version 6))
+        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+       (bootstrap-version 6))
   (unless (file-exists-p bootstrap-file)
     (with-current-buffer
-        (url-retrieve-synchronously
-         "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
-         'silent 'inhibit-cookies)
+      (url-retrieve-synchronously
+        "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
+        'silent 'inhibit-cookies)
       (goto-char (point-max))
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
@@ -45,20 +45,20 @@
   :config
   (exec-path-from-shell-initialize)
   (if (and (fboundp 'native-comp-available-p)
-           (native-comp-available-p))
-      (progn
-        (message "Native comp is available")
-        ;; Using Emacs.app/Contents/MacOS/bin since it was compiled with
-        ;; ./configure --prefix="$PWD/nextstep/Emacs.app/Contents/MacOS"
-        (add-to-list 'exec-path (concat invocation-directory "bin") t)
-        (setenv "LIBRARY_PATH" (concat (getenv "LIBRARY_PATH")
-                                       (when (getenv "LIBRARY_PATH")
-                                         ":")
-                                       ;; This is where Homebrew puts gcc libraries.
-                                       (car (file-expand-wildcards
-                                             "/opt/homebrew/lib/gcc/*"))))
-        ;; Only set after LIBRARY_PATH can find gcc libraries.
-        (setq comp-deferred-compilation t))
+        (native-comp-available-p))
+    (progn
+      (message "Native comp is available")
+      ;; Using Emacs.app/Contents/MacOS/bin since it was compiled with
+      ;; ./configure --prefix="$PWD/nextstep/Emacs.app/Contents/MacOS"
+      (add-to-list 'exec-path (concat invocation-directory "bin") t)
+      (setenv "LIBRARY_PATH" (concat (getenv "LIBRARY_PATH")
+                               (when (getenv "LIBRARY_PATH")
+                                 ":")
+                               ;; This is where Homebrew puts gcc libraries.
+                               (car (file-expand-wildcards
+                                      "/opt/homebrew/lib/gcc/*"))))
+      ;; Only set after LIBRARY_PATH can find gcc libraries.
+      (setq comp-deferred-compilation t))
     (message "Native comp is *not* available")))
 
 ;; These are some general configurations that I’ve slowly accumulated.  There’s
@@ -67,7 +67,7 @@
 ;; later.
 
 (setq user-full-name "Jeremy Friesen"
-      user-mail-address "jeremy@jeremyfriesen.com")
+  user-mail-address "jeremy@jeremyfriesen.com")
 (defconst jf/github-username "jeremyf"
   "My username on github.")
 
@@ -92,63 +92,68 @@
   (setq grep-program "rg"))
 
 (setq
- backup-by-copying t         ;; Don't delink hardlinks
+  backup-by-copying t         ;; Don't delink hardlinks
 
- backup-directory-alist '((".*" . "~/.emacs.d/backups/"))
+  backup-directory-alist '((".*" . "~/.emacs.d/backups/"))
 
   bookmark-default-file "~/git/org/my-bookmarks.el"
   bookmark-save-flag 1
 
- custom-safe-themes t        ;; I may as well trust themes.
+  custom-safe-themes t        ;; I may as well trust themes.
 
- create-lockfiles nil        ;; Don't create lock files.
+  create-lockfiles nil        ;; Don't create lock files.
 
- delete-old-versions t       ;; Automatically delete excess backups
- dired-dwim-target t ;; https://www.reddit.com/r/emacs/comments/102y0n4/weekly_tips_tricks_c_thread/
- echo-key-strokes 0.2
+  delete-old-versions t       ;; Automatically delete excess backups
+  dired-dwim-target t ;; https://www.reddit.com/r/emacs/comments/102y0n4/weekly_tips_tricks_c_thread/
 
- global-mark-ring-max 32
+  echo-key-strokes 0.2
 
- help-window-select t
+  global-mark-ring-max 32
 
- idle-update-delay 1.1       ;; Slow down the UI being updated to improve
- ;; performance
+  help-window-select t
 
- indent-tabs-mode nil        ;; Ensure tabs are expanded, not inserted
+  idle-update-delay 1.1       ;; Slow down the UI being updated to improve
+  ;; performance
 
- inhibit-startup-screen t    ;; Don't include the  emacs "start" window
+  indent-tabs-mode nil        ;; Ensure tabs are expanded, not inserted
 
- kept-new-versions 20        ;; how many of the newest versions to keep
+  inhibit-startup-screen t    ;; Don't include the  emacs "start" window
 
- kept-old-versions 5         ;; and how many of the old
+  kept-new-versions 20        ;; how many of the newest versions to keep
 
- kill-ring-max 120           ;; Set a generous kill ring size.
+  kept-old-versions 5         ;; and how many of the old
+
+  kill-ring-max 120           ;; Set a generous kill ring size.
 
   load-prefer-newer t ;; Favor new bit code
 
- read-process-output-max (* 6 512 1024)  ;; Increase read size per process
+  read-process-output-max (* 6 512 1024)  ;; Increase read size per process
 
- recentf-max-menu-items 50
+  recentf-max-menu-items 50
 
- recentf-max-saved-items 50
+  recentf-max-saved-items 50
 
- switch-to-buffer-obey-display-actions t ;; https://www.masteringemacs.org/article/demystifying-emacs-window-manager
+  require-final-newline t
 
- ;; split-width-threshold nil ;; 160 * 8
+  show-trailing-whitespace t
 
- ;; https://github.com/maryrosecook/emacs/blob/6ef574e27f33f08a81b26970b5fb9b4c9c1f9eff/init.el#L745
- split-height-threshold 99999999999999999 ;; make emacs only add vertical split panes
+  switch-to-buffer-obey-display-actions t ;; https://www.masteringemacs.org/article/demystifying-emacs-window-manager
 
- vc-follow-symlinks t        ;; Follow symlinks instead of prompting.
+  ;; split-width-threshold nil ;; 160 * 8
 
- version-control t           ;; Use version numbers on backups
+  ;; https://github.com/maryrosecook/emacs/blob/6ef574e27f33f08a81b26970b5fb9b4c9c1f9eff/init.el#L745
+  split-height-threshold 99999999999999999 ;; make emacs only add vertical split panes
 
- x-underline-at-descent-line t ;; Recommendation from
- ;; https://protesilaos.com/emacs/modus-themes
+  vc-follow-symlinks t        ;; Follow symlinks instead of prompting.
 
- ns-right-command-modifier 'hyper ;; Exposing one additional modifier key.
+  version-control t           ;; Use version numbers on backups
 
- line-move-visual t)
+  x-underline-at-descent-line t ;; Recommendation from
+  ;; https://protesilaos.com/emacs/modus-themes
+
+  ns-right-command-modifier 'hyper ;; Exposing one additional modifier key.
+
+  line-move-visual t)
 
 (bind-key "H-s" 'save-buffer)
 ;; With subword-mode, HelloWorld is two words for navigation.
@@ -168,9 +173,9 @@
 (set-keyboard-coding-system 'utf-8)
 
 (add-function :after after-focus-change-function
-              (defun jf/garbage-collect-maybe ()
-                (unless (frame-focus-state)
-                  (garbage-collect))))
+  (defun jf/garbage-collect-maybe ()
+    (unless (frame-focus-state)
+      (garbage-collect))))
 
 ;; And I’m going to disable a few key bindings.  These were always messing me
 ;; up a bit.  Also enable a few that I find helpful.  (I’ll enable a lot more
@@ -197,7 +202,7 @@
   :straight t
   :init
   (setq gcmh-idle-delay 5
-        gcmh-high-cons-threshold (* 16 1024 1024))  ; 16mb
+    gcmh-high-cons-threshold (* 16 1024 1024))  ; 16mb
   :config (gcmh-mode))
 
 ;;; Connective Tissue and oddity functions:
@@ -206,23 +211,23 @@
     client call.")
 
 (defadvice server-visit-files
-    (around server-visit-files-custom-find
-      activate compile)
+  (around server-visit-files-custom-find
+    activate compile)
   "Maintain a counter of visited files from a single client call."
   (let ((server-visit-files-custom-find:buffer-count 0))
     ad-do-it))
 (defun server-visit-hook-custom-find ()
   "Arrange to visit the files from a client call in separate windows."
   (if (zerop server-visit-files-custom-find:buffer-count)
-      (progn
-  (delete-other-windows)
-  (switch-to-buffer (current-buffer)))
+    (progn
+      (delete-other-windows)
+      (switch-to-buffer (current-buffer)))
     (let ((buffer (current-buffer))
-    (window (split-window-sensibly)))
+           (window (split-window-sensibly)))
       (switch-to-buffer buffer)
       (balance-windows)))
   (setq server-visit-files-custom-find:buffer-count
-  (1+ server-visit-files-custom-find:buffer-count)))
+    (1+ server-visit-files-custom-find:buffer-count)))
 (add-hook 'server-visit-hook 'server-visit-hook-custom-find)
 
 
