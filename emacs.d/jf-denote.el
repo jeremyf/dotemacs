@@ -216,27 +216,35 @@ ID-ONLY link without title."
   (interactive (list (jf/denote/file-prompt)
                  current-prefix-arg))
   (if (and target (file-exists-p target))
-    (denote-link-or-create target id-only)
-    (denote--push-extracted-title-to-history)
-    (call-interactively #'denote-link-after-creating)))
+    (let ((type (denote-filetype-heuristics target)))
+      (denote-link target type
+		    (denote--link-get-description target type)
+		    id-only)
+      )
+    (denote--command-with-title-history #'denote-link-after-creating)))
 
-(defun jf/denote/file-prompt ()
-  "Prompt for a file based on subdirectories."
+(defun jf/denote/file-prompt (&optional files-matching-regexp)
+  "Prompt for a file based on subdirectories.
+
+See `denote-file-prompt'"
   ;; I’m not looking at active silo-ing and want to be able to search
   ;; specifically from the top-level and all subdirectories.
-  (let* ((vc-dirs-ignores (mapcar
-                            (lambda (dir)
-                              (concat dir "/"))
-                            vc-directory-exclusion-list))
-          (all-files (mapcan
-                       (lambda (sub-dir)
-                         (project--files-in-directory (f-join
-                                                        (denote-directory)
-                                                        sub-dir)
-                           vc-dirs-ignores))
-                       jf/denote/subdirectories)))
-    (funcall project-read-file-name-function
-      "Find file" all-files nil 'file-name-history)))
+  (when-let* ((vc-dirs-ignores (mapcar
+                                 (lambda (dir)
+                                   (concat dir "/"))
+                                 vc-directory-exclusion-list))
+               (files (mapcan
+                        (lambda (sub-dir)
+                          (project--files-in-directory (f-join
+                                                         (denote-directory)
+                                                         sub-dir)
+                            vc-dirs-ignores))
+                        jf/denote/subdirectories))
+               (file (funcall project-read-file-name-function
+                       "Select note" files nil 'file-name-history)))
+    (let ((completion-ignore-case read-file-name-completion-ignore-case))
+      (add-to-history 'denote--file-history file)
+      file)))
 
 (setq consult-notes-sources (list))
 (setq jf/denote/subdirectories (list))
