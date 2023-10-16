@@ -197,7 +197,7 @@ setting up an IDE-like layout)."
                                 (selection . (semibold accented))
                                 (popup . (accented intense)))
     modus-themes-headings
-    '((1 . (variable-pitch light 1.6))
+    '((1 . (variable-pitch bold 1.7))
        (2 . (overline semibold 1.5))
        (3 . (monochrome overline 1.4 background))
        (4 . (overline 1.3))
