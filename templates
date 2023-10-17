@@ -59,6 +59,7 @@ markdown-mode markdown-ts-mode
 org-mode
 
 (eg "([[abbr:20230824T082549][e.g.]] " q ")")
+(aka "([[abbr:20221009T115519][a.k.a.]] " q ")")
 (ie "[[abbr:20230825T130802][i.e.]] " q "")
 (clocktable "#+BEGIN: clocktable :scope file :tcolumns 1 :block untilnow :narrow 80! :step year :stepskip0 t :fileskip0 t :filetitle t\n#+END:")
 
