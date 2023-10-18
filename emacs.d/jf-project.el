@@ -86,7 +86,7 @@ With one PREFIX go to place where we would jump on capture."
          (if (when (and (fboundp 'org-clocking-p) (org-clocking-p)) t)
            (progn
              (org-clock-goto)
-             (goto-char (org-element-property :contents-end (org-element-at-point))))
+             (goto-char (org-element-property :contents-begin (org-element-at-point))))
            ;; Jump to where we would put a project were we to capture it.
            (org-capture-goto-target "t")))))
   (pulsar-pulse-line))
@@ -261,7 +261,12 @@ We want files to have the 'projects' `denote' keyword."
     ;; Defer finding this file as long as possible.
     (find-file filename)
     (if-let (task (alist-get task-name tasks nil nil #'string=))
-      (goto-char (org-element-property :contents-end task))
+      ;; I like having the most recent writing close to the headline; showing a
+      ;; reverse order.  This also allows me to have sub-headings within a task
+      ;; and not insert content and clocks there.
+      (if-let ((drawer (car (org-element-map task 'drawer #'identity))))
+        (goto-char (org-element-property :contents-end drawer))
+        (goto-char (org-element-property :contents-begin task)))
       (progn
         (goto-char (point-max))
         ;; Yes make this a top-level element.  It is easy to demote and move
