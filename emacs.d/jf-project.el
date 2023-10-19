@@ -260,13 +260,15 @@ We want files to have the 'projects' `denote' keyword."
           (task-name (completing-read (format "Task for %s: " project) tasks)))
     ;; Defer finding this file as long as possible.
     (find-file filename)
+
     (if-let (task (alist-get task-name tasks nil nil #'string=))
       ;; I like having the most recent writing close to the headline; showing a
       ;; reverse order.  This also allows me to have sub-headings within a task
       ;; and not insert content and clocks there.
-      (if-let ((drawer (car (org-element-map task 'drawer #'identity))))
-        (goto-char (org-element-property :contents-end drawer))
-        (goto-char (org-element-property :contents-begin task)))
+      ;; (if-let ((drawer (car (org-element-map task 'drawer #'identity))))
+      ;; (goto-char (org-element-property :contents-end drawer))
+      ;; (goto-char (org-element-property :contents-begin task)))
+      (goto-char (org-element-property :contents-end task))
       (progn
         (goto-char (point-max))
         ;; Yes make this a top-level element.  It is easy to demote and move
