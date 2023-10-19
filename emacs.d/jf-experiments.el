@@ -130,6 +130,77 @@ I'm uncertain if this is useful/practical.  However there is
   :straight t
   :config (setq stem-reading-overlay t))
 
+(defun calculate-distance-to (to fun pred)
+  "Calculate distance from BEG to END in units of FUN.
+Assume BEG <= END.  FUN is a function moving forward by one unit
+of measurement (e.g., a word or sentence)."
+  (when to
+    (save-excursion
+      (let ((count 0))
+        (while (funcall pred (point) to)
+          (funcall fun)
+          (cl-incf count))
+        count))))
+
+(defun find-nearest-word-repetitions ()
+  "Find and report the nearest repetitions of word at point."
+  (interactive)
+  (let* ((word (word-at-point))
+         (re (format "\\b%s\\b" (regexp-quote word)))
+         (case-fold-search t)
+         (prev (save-excursion
+                 (beginning-of-thing 'word)
+                 (when (re-search-backward re nil t)
+                   (point))))
+         (prev-overlay (when prev
+                         (make-overlay prev
+                                       (save-excursion
+                                         (goto-char prev)
+                                         (forward-word)
+                                         (point)))))
+         (next (save-excursion
+                 (end-of-thing 'word)
+                 (when (re-search-forward re nil t)
+                   (point))))
+         (next-overlay (when next
+                         (make-overlay next
+                                       (save-excursion
+                                         (goto-char next)
+                                         (backward-word)
+                                         (point)))))
+         (prev-words (save-excursion
+                       (beginning-of-thing 'word)
+                       (calculate-distance-to prev #'backward-word #'>)))
+         (next-words (save-excursion
+                       (end-of-thing 'word)
+                       (calculate-distance-to next #'forward-word #'<)))
+         (prev-sentences (save-excursion
+                           (beginning-of-thing 'sentence)
+                           (calculate-distance-to prev #'backward-sentence #'>)))
+         (next-sentences (save-excursion
+                           (end-of-thing 'sentence)
+                           (calculate-distance-to next #'forward-sentence #'<))))
+    (message "%s\n%s\n%s"
+             (format "Word on point is `%s'." word)
+             (if prev
+                 (format "The previous occurrence was %s word(s)/%s sentence(s) ago."
+                         prev-words prev-sentences)
+               "This is the first occurrence.")
+             (if next
+                 (format "The next occurrence will be in %s word(s)/%s sentence(s)."
+                         next-words next-sentences)
+               "This is the last occurrence."))
+    (when prev
+      (overlay-put prev-overlay 'face 'show-paren-match)
+      (run-at-time "4 sec" nil (lambda ()
+                                 (delete-overlay prev-overlay))))
+    (when next
+      (overlay-put next-overlay 'face 'show-paren-match)
+      (run-at-time "4 sec" nil (lambda ()
+                                 (delete-overlay next-overlay))))))
+
+(global-set-key (kbd "C-x C-r") #'find-nearest-word-repetitions)
+
 
 (provide 'jf-experiments)
 ;;; jf-experiments.el ends here

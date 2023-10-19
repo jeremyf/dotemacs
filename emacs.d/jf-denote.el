@@ -352,6 +352,9 @@ See `denote-file-prompt'"
 (jf/denote/create-functions-for :domain "work"
   :key ?w)
 
+(jf/denote/create-functions-for :domain "private"
+  :key ?v)
+
 ;;;;;; Epigraphs
 (cl-defun jf/denote/create-epigraph (&key
                                       (body (read-from-minibuffer
