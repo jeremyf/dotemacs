@@ -152,14 +152,18 @@ Two PREFIX given: prompt for DIRECTORY and filename GLOBs."
            (globs (or globs (when (>= (or prefix 0) 16)
                       (color-rg-read-file-type "Filter file by type (default: [ %s ]): ")))))
       (color-rg-search-input keyword directory globs)))
-  :bind ("C-c f" . jf/color-rg-search-project))
+  :bind
+  ("C-c f f" . jf/color-rg-search-project)
+  ("C-c f r" . consult-ripgrep)
+  (:map color-rg-mode-map (("p" . color-rg-jump-prev-keyword)
+                           ("n" . color-rg-jump-next-keyword))))
 
 (use-package visual-regexp
   ;; I haven't used much search and replace but the visual queues are useful.
   ;; And I learned about ,\ in this play.  ,\(upcase \1) will upcase the first
   ;; capture region.
   :straight t
-  :bind ("C-x C-r r" . vr/replace)
+  :bind ("C-c C-r r" . vr/replace)
   ("C-c C-r m" . vr/mc-mark)
   ("C-c C-r q" . vr/query-replace)
   ("C-c C-r p" . project-query-replace-regexp))

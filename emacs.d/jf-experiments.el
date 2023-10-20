@@ -41,12 +41,6 @@
   (require 'org-tufte)
   (setq org-tufte-htmlize-code t))
 
-;; https://github.com/thierryvolpiatto/isearch-light
-(use-package isl
-  :straight (:host github :repo "thierryvolpiatto/isearch-light")
-  :bind (("C-c C-s" . isl-search)))
-
-
 ;; ;; A package to browse/read reddit in emacs and `org-mode' format.
 ;; (use-package reddigg
 ;;   :straight (:host github :repo "jeremyf/emacs-reddigg")
