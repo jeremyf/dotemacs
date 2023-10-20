@@ -154,6 +154,7 @@ Two PREFIX given: prompt for DIRECTORY and filename GLOBs."
       (color-rg-search-input keyword directory globs)))
   :bind
   ("C-c f f" . jf/color-rg-search-project)
+  ("C-c f l" . color-rg-search-input-in-current-file)
   ("C-c f r" . consult-ripgrep)
   (:map color-rg-mode-map (("p" . color-rg-jump-prev-keyword)
                            ("n" . color-rg-jump-next-keyword))))
@@ -252,8 +253,9 @@ Else, evaluate the whole buffer."
     (kill-region (region-beginning) (region-end))
     (kill-line arg)))
 
-(global-set-key (kbd "C-c n") 'jf/nab-file-name-to-clipboard)
-(defun jf/nab-file-name-to-clipboard (arg)
+(global-set-key (kbd "C-c n") 'jf/yank-file-name-to-clipboard) ;; Deprecated
+(global-set-key (kbd "C-c y n") 'jf/yank-file-name-to-clipboard)
+(defun jf/yank-file-name-to-clipboard (arg)
   "Nab, I mean copy, the current buffer file name to the clipboard.
 
   When you pass one universal prefix ARG, nab the project relative filename.

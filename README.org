@@ -73,3 +73,22 @@ Organizing concepts is an interesting challenge, as packages interact in a multi
 - [[file:emacs.d/jf-versioning.el][jf-versioning.el]] ::
 - [[file:emacs.d/jf-windows.el][jf-windows.el]] ::
 - [[file:emacs.d/jf-writing.el][jf-writing.el]] :: General writing functions
+
+** Keybinding Prefixes
+
+On <2023-10-20 Fri> I began refactoring some keybindings.  There were functions that got “prime” key chords but were not things I’d frequently use.  As such, I’m taking a two-fold approach:
+
+1. Create and document keybinding prefixes
+2. Rely on the =which-key= package to provide bits of guidance.
+
+Those keybinding prefixes are as follows:
+
+1. =C-c y= :: *Yank* something; as insert some text.
+2. =C-c w= :: *Wrap* something; as in wrap the /current region/ by inserting text before and after the region.
+3. =C-c f= :: *Find* something; search the file or project for something.
+4. =C-c j= :: *Jump* to something; I have =C-j= bound =avy-goto-char-timer= as a quick in buffer jumper.  And =C-c C-j= as =jf/project/jump-to-task=; which provides another context
+
+There are foundational keys that are deeply bound to muscle memory:
+
+- =C-s= :: For =consult-line=; a mini-buffer search and go to line within file.  Akin to a feature I used in TextMate, Sublime, and Atom.
+- =s-t= :: For =consult-projectile=; a very potent navigation through buffers, files, and projects.

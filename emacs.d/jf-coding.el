@@ -65,7 +65,7 @@
 
   ;; This function, tested against Ruby, will return the module space qualified
   ;; method name (e.g. Hello::World#method_name).
-  (cl-defun jf/treesit/qualified_method_name ()
+  (cl-defun jf/treesit/yank-qualified-method-fname ()
     "Return the fully qualified name of method at point.  If not on a
 method, get the containing class."
     (if-let ((func (treesit-defun-at-point)))
@@ -222,8 +222,8 @@ method, get the containing class."
   :custom (ruby-flymake-use-rubocop-if-available nil)
   :bind
   (:map ruby-mode-map (("C-M-h" . jf/treesit/function-select)
-                        ("C-c C-f" . jf/treesit/qualified_method_name)
-                        ("C-c C-w r" . jf/treesit/wrap-rubocop)))
+                        ("C-c y f" . jf/treesit/yank-qualified-method-fname)
+                        ("C-c w r" . jf/treesit/wrap-rubocop)))
   :hook ((ruby-mode ruby-ts-mode) .
           (lambda ()
             (eldoc-mode)
@@ -417,7 +417,7 @@ method, get the containing class."
   :preface
   ;; This is not working as I had tested; it's very dependent on the little
   ;; details.  I think I may want to revisit to just work on the current line.
-  (defun jf/ruby-mode/yardoc-ify ()
+  (defun jf/ruby-mode/yank-yardoc ()
     "Add parameter yarddoc stubs for the current method."
     (interactive)
     (save-excursion
@@ -448,13 +448,13 @@ method, get the containing class."
                                param
                                " [Object]"))
                            identifiers)))))))
-  :bind* (:map ruby-mode-map (("C-c C-f" . jf/current-scoped-function-name)
-                               ("C-c C-y" . jf/ruby-mode/yardoc-ify)))
+  :bind* (:map ruby-mode-map (("C-c y f" . jf/yank-current-scoped-function-name)
+                               ("C-c y y" . jf/ruby-mode/yank-yardoc)))
   :hook ((ruby-mode ruby-ts-mode) . yard-mode))
 
 ;; I didn't know about `add-log-current-defun-function' until a blog reader
 ;; reached out.  Now, I'm making a general function for different modes.
-(defun jf/current-scoped-function-name ()
+(defun jf/yank-current-scoped-function-name ()
   "Echo and kill the current scoped function name.
 
 See `add-log-current-defun-function'."
@@ -464,8 +464,8 @@ See `add-log-current-defun-function'."
       (message "%s" text)
       (kill-new (substring-no-properties text)))
     (user-error "Warning: Point not on function")))
-(bind-key "C-c C-f" #'jf/current-scoped-function-name prog-mode-map)
-(bind-key "C-c C-f" #'jf/current-scoped-function-name emacs-lisp-mode-map)
+(bind-key "C-c y f" #'jf/yank-current-scoped-function-name prog-mode-map)
+(bind-key "C-c y f" #'jf/yank-current-scoped-function-name emacs-lisp-mode-map)
 
 (use-package devdocs
   ;; Download and install documents from https://devdocs.io/
@@ -541,13 +541,13 @@ See `add-log-current-defun-function'."
   "Configure the `treesit' provided `ruby-ts-mode'."
   ;; I encountered some loading issues where ruby-ts-mode was not available
   ;; during my understanding of the use-package life-cycle.
-  (setq-local add-log-current-defun-function #'jf/treesit/qualified_method_name)
+  (setq-local add-log-current-defun-function #'jf/treesit/yank-qualified-method-fname)
   (define-key ruby-ts-mode-map (kbd "C-M-h") #'jf/treesit/function-select)
-  (define-key ruby-ts-mode-map (kbd "C-c C-f") #'jf/current-scoped-function-name)
-  (define-key ruby-ts-mode-map (kbd "C-c C-y") #'jf/ruby-mode/yardoc-ify)
+  (define-key ruby-ts-mode-map (kbd "C-c y f") #'jf/yank-current-scoped-function-name)
+  (define-key ruby-ts-mode-map (kbd "C-c y y") #'jf/ruby-mode/yank-yardoc)
   (define-key ruby-ts-mode-map (kbd "s-ESC") #'jf/comment-header-backward)
   (define-key ruby-ts-mode-map (kbd "C-s-]") #'jf/commend-header-forward)
-  (define-key ruby-ts-mode-map (kbd "C-c C-w r") #'jf/treesit/wrap-rubocop))
+  (define-key ruby-ts-mode-map (kbd "C-c w r") #'jf/treesit/wrap-rubocop))
 (add-hook 'ruby-ts-mode-hook #'jf/ruby-ts-mode-configurator)
 
 ;; From https://emacs.dyerdwelling.family/emacs/20230414111409-emacs--indexing-emacs-init/
