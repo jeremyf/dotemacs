@@ -127,6 +127,10 @@
   :straight t)
 
 (use-package color-rg
+  ;; This command provides an interface to ripgrep with results buffer that
+  ;; provides a modeline with available commands.  Were it not for
+  ;; `consult-ripgrep' interaction with `orderless', it would be a complete
+  ;; replacement.  But I'll keep both of them around.
   :straight t
   :commands (color-rg-read-file-type color-rg-search-input color-rg-read-input)
   :preface
@@ -149,8 +153,14 @@ Two PREFIX given: prompt for directory and dir glob."
   :bind ("C-c f" . jf/color-rg-search-project))
 
 (use-package visual-regexp
+  ;; I haven't used much search and replace but the visual queues are useful.
+  ;; And I learned about ,\ in this play.  ,\(upcase \1) will upcase the first
+  ;; capture region.
   :straight t
-  :bind ("C-x C-r" . vr/replace))
+  :bind ("C-x C-r r" . vr/replace)
+  ("C-c C-r m" . vr/mc-mark)
+  ("C-c C-r q" . vr/query-replace)
+  ("C-c C-r p" . project-query-replace-regexp))
 
 (use-package crux
   ;; A mix of a few odd and useful functions.
@@ -169,7 +179,7 @@ Two PREFIX given: prompt for directory and dir glob."
 
 ;;;; Hammerspoon --------------------------------------------------------------
 
-;; Hammerspoon is Lua application that provides a consistent API for
+;; Hammerspoon is a Lua application that provides a consistent API for
 ;; interacting with MacOS.  The editWithEmacs.spoon allows me to copy text from
 ;; one region, edit it in Emacs, and paste it back into the Application.
 (when (file-directory-p
