@@ -137,9 +137,11 @@
   (defun jf/color-rg-search-project (prefix &optional keyword directory globs)
     "Dispatch to `color-rg-search-input' based on given PREFIX.
 
-No PREFIX given: search in current directory.
-One PREFIX given: prompt for a directory.
-Two PREFIX given: prompt for directory and dir glob."
+Prompt, via `color-rg-search-input', for KEYWORD when none is given.
+
+No PREFIX given: search in current DIRECTORY.
+One PREFIX given: prompt for a DIRECTORY.
+Two PREFIX given: prompt for DIRECTORY and filename GLOBs."
     (interactive "p")
     (let ((keyword (or keyword (color-rg-read-input)))
            (directory (or directory
