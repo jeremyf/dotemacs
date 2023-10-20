@@ -153,6 +153,32 @@ setting up an IDE-like layout)."
          ((,c :background ,bg-lavender)))
       `(hl-todo
          ((,c :foreground ,red-faint)))
+      `(color-rg-font-lock-header-line-text
+         ((,c :foreground ,name)))
+      `(color-rg-font-lock-header-line-keyword
+         ((,c :foreground ,keybind)))
+      `(color-rg-font-lock-function-location
+         ((,c :foreground ,keybind)))
+      `(color-rg-font-lock-header-line-edit-mode
+      ((,c :foreground ,keybind)))
+      `(color-rg-font-lock-header-line-directory
+         ((,c :foreground ,fg-link :background ,bg-link)))
+      `(color-rg-font-lock-command
+         ((,c :foreground ,fg-alt :background ,bg-inactive)))
+      `(color-rg-font-lock-file
+         ((,c :foreground ,fg-link :background ,bg-link)))
+       `(color-rg-font-lock-line-number
+          ((,c :background ,bg-line-number-inactive :foreground ,fg-line-number-inactive)))
+       `(color-rg-font-lock-column-number
+          ((,c :background ,bg-line-number-inactive :foreground ,fg-line-number-inactive)))
+      `(color-rg-font-lock-position-splitter
+      ((,c :background ,bg-line-number-inactive :foreground ,fg-line-number-inactive)))
+       `(color-rg-font-lock-match
+          ((,c :background ,bg-completion-match-1 :foreground ,fg-completion-match-1)))
+       `(color-rg-font-lock-mark-changed
+          ((,c :background ,bg-changed :foreground ,fg-changed)))
+       `(color-rg-font-lock-mark-deleted
+          ((,c :background ,bg-removed :foreground ,fg-removed)))
       `(fill-column-indicator
          ((,c :width ultra-condensed :background ,fringe :foreground ,fringe)))
       `(font-lock-regexp-face
