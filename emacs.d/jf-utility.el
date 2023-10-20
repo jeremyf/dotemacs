@@ -126,6 +126,32 @@
   ;; :init (setq ripgrep-arguments "--ignore-case")
   :straight t)
 
+(use-package color-rg
+  :straight t
+  :commands (color-rg-read-file-type color-rg-search-input color-rg-read-input)
+  :preface
+  (defun jf/color-rg-search-project (&optional keyword directory globs)
+    "Dispatch to `color-rg-search-input' based on given PREFIX.
+
+No PREFIX given: search in current directory.
+One PREFIX given: prompt for a directory.
+Two PREFIX given: prompt for directory and dir glob."
+    (interactive)
+    (let ((keyword (or keyword (color-rg-read-input)))
+           (directory (or directory
+                        (if (>= (or 0 (car current-prefix-arg)) 4)
+                        ;; A kludge to prompt for a directory
+                        (call-interactively (lambda (dir) (interactive "D") dir))
+                        (color-rg-project-root-dir))))
+           (globs (or globs (when (>= (or 0 (car current-prefix-arg)) 16)
+                      (color-rg-read-file-type "Filter file by type (default: [ %s ]): ")))))
+      (color-rg-search-input keyword directory globs)))
+  :bind ("C-c f" . jf/color-rg-search-project))
+
+(use-package visual-regexp
+  :straight t
+  :bind ("C-x C-r" . vr/replace))
+
 (use-package crux
   ;; A mix of a few odd and useful functions.
   :straight t

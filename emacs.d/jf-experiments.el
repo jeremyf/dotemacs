@@ -199,8 +199,5 @@ of measurement (e.g., a word or sentence)."
       (run-at-time "4 sec" nil (lambda ()
                                  (delete-overlay next-overlay))))))
 
-(global-set-key (kbd "C-x C-r") #'find-nearest-word-repetitions)
-
-
 (provide 'jf-experiments)
 ;;; jf-experiments.el ends here

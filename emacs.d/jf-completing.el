@@ -124,8 +124,10 @@
           ;; ("M-s L" . consult-locate)
           ;; ("M-s g" . consult-git-grep)
           ;; ("M-s G" . consult-git-grep)
+          ;;
+          ;; I keep this around because orderless search is great
           ("M-s r" . consult-ripgrep)
-          ("C-c f" . consult-ripgrep)
+          ;; ("C-c f" . consult-ripgrep)
           ;; ("M-s l" . consult-line)
           ("M-s M-s" . consult-line-multi)
           ;; Customizations that map to ivy
