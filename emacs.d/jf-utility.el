@@ -143,11 +143,11 @@ Two PREFIX given: prompt for directory and dir glob."
     (interactive)
     (let ((keyword (or keyword (color-rg-read-input)))
            (directory (or directory
-                        (if (>= (or 0 (car current-prefix-arg)) 4)
+                        (if (>= (or (car current-prefix-arg) 0) 4)
                         ;; A kludge to prompt for a directory
                         (call-interactively (lambda (dir) (interactive "D") dir))
                         (color-rg-project-root-dir))))
-           (globs (or globs (when (>= (or 0 (car current-prefix-arg)) 16)
+           (globs (or globs (when (>= (or (car current-prefix-arg) 0) 16)
                       (color-rg-read-file-type "Filter file by type (default: [ %s ]): ")))))
       (color-rg-search-input keyword directory globs)))
   :bind ("C-c f" . jf/color-rg-search-project))
