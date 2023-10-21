@@ -131,8 +131,8 @@ setting up an IDE-like layout)."
                        :style released-button)))))
       `(jf/bom-face
          ((,c (:width ultra-expanded :box (:line-width (2 . 2)
-                       :color ,underline-err
-                       :style released-button)))))
+                                            :color ,underline-err
+                                            :style released-button)))))
       `(jf/tabs-face
          ((,c :underline (:style wave :color ,bg-blue-intense))))
       `(jf/org-faces-date
@@ -154,31 +154,32 @@ setting up an IDE-like layout)."
       `(hl-todo
          ((,c :foreground ,red-faint)))
       `(color-rg-font-lock-header-line-text
-         ((,c :foreground ,name)))
+         ((,c :foreground ,green)))
       `(color-rg-font-lock-header-line-keyword
          ((,c :foreground ,keybind)))
       `(color-rg-font-lock-function-location
          ((,c :foreground ,keybind)))
       `(color-rg-font-lock-header-line-edit-mode
-      ((,c :foreground ,keybind)))
+         ((,c :foreground ,keybind)))
       `(color-rg-font-lock-header-line-directory
          ((,c :foreground ,fg-link :background ,bg-link)))
       `(color-rg-font-lock-command
          ((,c :foreground ,fg-alt :background ,bg-inactive)))
       `(color-rg-font-lock-file
          ((,c :foreground ,fg-link :background ,bg-link)))
-       `(color-rg-font-lock-line-number
-          ((,c :background ,bg-line-number-inactive :foreground ,fg-line-number-inactive)))
-       `(color-rg-font-lock-column-number
-          ((,c :background ,bg-line-number-inactive :foreground ,fg-line-number-inactive)))
+      `(color-rg-font-lock-line-number
+         ((,c :background ,bg-line-number-inactive :foreground ,fg-line-number-inactive)))
+      `(color-rg-font-lock-column-number
+         ((,c :background ,bg-line-number-inactive :foreground ,fg-line-number-inactive)))
       `(color-rg-font-lock-position-splitter
-      ((,c :background ,bg-line-number-inactive :foreground ,fg-line-number-inactive)))
-       `(color-rg-font-lock-match
-          ((,c :background ,bg-completion-match-1 :foreground ,fg-completion-match-1)))
-       `(color-rg-font-lock-mark-changed
-          ((,c :background ,bg-changed :foreground ,fg-changed)))
-       `(color-rg-font-lock-mark-deleted
-          ((,c :background ,bg-removed :foreground ,fg-removed)))
+         ((,c :background ,bg-line-number-inactive :foreground ,fg-line-number-inactive)))
+      `(color-rg-font-lock-match
+         ((,c :background ,bg-completion-match-3 :foreground ,fg-completion-match-3)))
+      `(color-rg-font-lock-mark-changed
+         ((,c :backgr
+            ound ,bg-changed :foreground ,fg-changed)))
+      `(color-rg-font-lock-mark-deleted
+         ((,c :background ,bg-removed :foreground ,fg-removed)))
       `(fill-column-indicator
          ((,c :width ultra-condensed :background ,fringe :foreground ,fringe)))
       `(font-lock-regexp-face
