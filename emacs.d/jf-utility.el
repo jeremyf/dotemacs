@@ -154,7 +154,7 @@ Two PREFIX given: prompt for DIRECTORY and filename GLOBs."
       (color-rg-search-input keyword directory globs)))
   :bind
   ("C-c f f" . jf/color-rg-search-project)
-  ("C-c f RET" . jf/color-rg-search-project)
+  ("C-c f <RET>" . jf/color-rg-search-project)
   ("C-c f l" . color-rg-search-input-in-current-file)
   ("C-c f r" . consult-ripgrep)
   (:map color-rg-mode-map (("p" . color-rg-jump-prev-keyword)
