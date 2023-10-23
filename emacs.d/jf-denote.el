@@ -547,6 +547,8 @@ PARG is part of the method signature for `org-link-parameters'."
           (format "<abbr title=\"%s\">%s</abbr>"
             title
             keyword-value)))
+      ((eq format 'latex)
+        (format "\\ac{%s}" keyword-value))
       (t (format "%s (%s)"
            title
            keyword-value)))))

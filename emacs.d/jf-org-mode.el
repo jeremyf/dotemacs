@@ -224,6 +224,7 @@ first matching link."
       \\usepackage{mathpazo}
       \\usepackage{xcolor}
       \\usepackage{enumerate}
+      \\usepackage[printonlyused,nohyperlinks]{acronym}
       \\definecolor{bg}{rgb}{0.95,0.95,0.95}
       \\tolerance=1000
       [NO-DEFAULT-PACKAGES]
