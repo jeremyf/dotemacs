@@ -485,9 +485,27 @@ See `add-log-current-defun-function'."
   :preface
   (defun jf/prog-mode-configurator ()
     "Do the configuration of all the things."
+    ;; I'll type my own parenthesis thank you very much.
     ;; (electric-pair-mode)
     (flymake-mode 1)
     (which-function-mode)))
+
+(use-package copilot
+  ;; I want to explore this a bit, but by default want it "off" and to be
+  ;; as unobtrusive.
+  :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
+  :bind (:map copilot-mode-map (("C-c 0 <return>" . copilot-accept-completion)
+                                 ("C-c 0 <down>" .  copilot-next-completion)
+                                 ("C-c 0 <up>" . copilot-previous-completion)
+                                 ("C-c 0 DEL" . copilot-clear-overlay)
+                                 ("C-c 0 TAB" . copilot-panel-complete)
+                                 ("C-c 0 ESC" . copilot-mode)))
+  :bind ("C-c 0 ESC" . copilot-mode)
+  :custom
+  ;; Copilot...never give me code comment recommendations.
+  (copilot-disable-predicates '(er--point-is-in-comment-p))
+  (copilot-idle-delay 1.5)
+  :ensure t)
 
 (defvar jf/comment-header-regexp/major-modes-alist
   '((emacs-lisp-mode . "^;;;;*")
