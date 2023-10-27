@@ -82,7 +82,7 @@ Take on Rules using the \"blockquote\" special block."
   "~/git/dotemacs/lib/org-macros.setup"
   "The path to the file that has inline org macros.")
 
-(defcustom jf/exporting-org-to-tor nil
+(defvar jf/exporting-org-to-tor nil
   "Not nil while performing the export of org file to Take on Rules.")
 
 (cl-defun jf/export-org-to-tor (&key (buffer (current-buffer)))
