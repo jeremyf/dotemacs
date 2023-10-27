@@ -733,17 +733,26 @@ When USE_HUGO_SHORTCODE is given use glossary based exporting."
       (save-buffer))))
 
 (defun jf/org-mode/convert-link-type (&optional element)
-  "Replace the given `org-mode' ELEMENT's link type."
+  "Replace the given `org-mode' ELEMENT's link type and text."
   (interactive (list (org-element-context)))
   (let ((types '("abbr" "abbr-plural" "denote")))
     (if (eq 'link (car element))
-      (let ((type (org-element-property :type (org-element-context))))
+      (let ((type (org-element-property :type (org-element-context)))
+             (denote-id (plist-get (cadr element) :path)))
         (if (member type types)
-          (replace-string (format "[[%s:" type)
-            (format "[[%s:" (completing-read "New link type: " types nil t))
-            nil
-            (org-element-property :begin element)
-            (org-element-property :end element))
+          (when-let ((new-type (completing-read "New link type: " types nil t)))
+            (let ((new-text (cond
+                              ((string= "abbr" new-type)
+                                (jf/denote/org-property-from-id :identifier denote-id :property "ABBR"))
+                              ((string= "abbr-plural" new-type)
+                                (jf/denote/org-property-from-id :identifier denote-id :property "ABBR_PLURAL"))
+                              ((string= "denote" new-type)
+                                (jf/denote/org-property-from-id :identifier denote-id :property "TITLE")))))
+              (replace-regexp "\\[\\[\\([[:alpha:]]+\\):\\([0-9A-Z]+\\)\\]\\[\\([^]]+\\)\\]\\]"
+                (format "[[%s:%s][%s]]" new-type denote-id  new-text)
+                nil
+                (org-element-property :begin element)
+                (org-element-property :end element))))
           (user-error "Current element is of type %s; it must be one of the following: %s" type types)))
       (user-error "Current element must be of type 'link; it is %S" (car element)))))
 
