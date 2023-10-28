@@ -734,8 +734,9 @@ When USE_HUGO_SHORTCODE is given use glossary based exporting."
 
 (defun jf/org-mode/convert-link-type (&optional element)
   "Replace the given `org-mode' ELEMENT's link type and text."
-  (interactive (list (org-element-context)))
-  (let ((types '("abbr" "abbr-plural" "denote")))
+  (interactive)
+  (let* ((types '("abbr" "abbr-plural" "denote"))
+          (element (or element (org-element-context))))
     (if (eq 'link (car element))
       (let ((type (org-element-property :type (org-element-context)))
              (denote-id (plist-get (cadr element) :path)))
@@ -747,11 +748,12 @@ When USE_HUGO_SHORTCODE is given use glossary based exporting."
                                              ((string= "abbr" new-type) "ABBR")
                                              ((string= "abbr-plural" new-type) "PLURAL_ABBR")
                                              ((string= "denote" new-type) "TITLE")))))
-              (replace-regexp "\\[\\[\\([^:]+\\):\\([0-9A-Z]+\\)\\]\\[\\([^]]+\\)\\]\\]"
-                (format "[[%s:%s][%s]]" new-type denote-id  new-text)
-                nil
-                (org-element-property :begin element)
-                (org-element-property :end element))
+              (progn
+                (replace-regexp-in-region "\\[\\[\\([^:]+\\):\\([0-9A-Z]+\\)\\]\\[\\([^]]+\\)\\]\\]"
+                  (format "[[%s:%s][%s]]" new-type denote-id  new-text)
+                  (org-element-property :begin element)
+                  (org-element-property :end element))
+                (org-link-descriptive-ensure))
               (user-error "Expected denote-id %s to have a %s acceptable property" denote-id new-type)))
           (user-error "Current element is of type %s; it must be one of the following: %s" type types)))
       (user-error "Current element must be of type 'link; it is %S" (car element)))))
