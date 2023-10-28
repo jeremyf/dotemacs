@@ -752,7 +752,7 @@ When USE_HUGO_SHORTCODE is given use glossary based exporting."
                 nil
                 (org-element-property :begin element)
                 (org-element-property :end element))
-              (user-error "Expected denote-id %s to have a %s acceptable property." denote-id new-type)))
+              (user-error "Expected denote-id %s to have a %s acceptable property" denote-id new-type)))
           (user-error "Current element is of type %s; it must be one of the following: %s" type types)))
       (user-error "Current element must be of type 'link; it is %S" (car element)))))
 
