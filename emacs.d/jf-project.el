@@ -245,9 +245,13 @@ We want files to have the 'projects' `denote' keyword."
     (when (file-exists-p jf/agenda-filename/personal) (setq projects (cons jf/agenda-filename/personal projects)))
     projects))
 
-(defun jf/org-mode/agenda-files-update (&rest _)
+(transient-define-suffix jf/org-mode/agenda-files-update (&rest _)
   "Update the value of `org-agenda-files'."
+  :description "Update agenda files…"
+  (interactive)
+  (message "Updating `org-agenda-files'")
   (setq org-agenda-files (jf/org-mode/agenda-files)))
+
 ;; (advice-add 'org-agenda :before #'jf/org-mode/agenda-files-update)
 ;; (advice-add 'org-todo-list :before #'jf/org-mode/agenda-files-update)
 (add-hook 'after-init-hook #'jf/org-mode/agenda-files-update)
