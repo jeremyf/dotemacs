@@ -509,11 +509,11 @@ PARG is part of the method signature for `org-link-parameters'."
                              (f-join (denote-directory)
                                (concat subdirectory "/"))
                              (denote-directory)))
-          (all-files (denote-all-files))
           (file (funcall project-read-file-name-function
                   "Select note: "
-                  all-files
-                  (lambda (fname) (s-contains? filter fname t))
+                  (denote-all-files)
+                  ;; Filter might be nil; if so pass nil.  Otherwise the string.
+                  (when filter (lambda (fname) (s-contains? filter fname t)))
                   'denote--file-history)))
     ;; This leverages a post v1.0.0 parameter of Denote
     ;; See https://git.sr.ht/~protesilaos/denote/commit/c6c3fc95c66ba093a266c775f411c0c8615c14c7
