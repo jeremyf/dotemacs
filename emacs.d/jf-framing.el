@@ -25,6 +25,11 @@
   ;; A `narrow-region' extension that moves towards providing a
   ;; presentation-type experience.
   :straight t
+  :bind (:map logos-focus-mode-map
+          ("M-]" . #'logos-forward-page-dwim)
+          ("s-]" . #'logos-forward-page-dwim)
+          ("M-[" . #'logos-backward-page-dwim)
+          ("s-[" . #'logos-backward-page-dwim))
   :config
   (let ((map global-map))
     (define-key map [remap narrow-to-region] #'logos-narrow-dwim)
