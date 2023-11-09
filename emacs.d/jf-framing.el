@@ -126,7 +126,7 @@
   (lambda ()
     (call-interactively 'widen)
     (olivetti-mode -1)
-    (keycast-mode-line-mode t)
+    (keycast-mode-line-mode -1)
     ;; (setq-local  org-hide-emphasis-markers nil)
     (display-line-numbers-mode t)
     (when (fboundp 'fontaine-set-preset) (fontaine-set-preset 'default))
