@@ -142,7 +142,7 @@
      ("TAB" jf/enable-indent-for-tab-command)
      ]
     ["Grab Refs"
-      ("g e" "Elfeed" jf/menu--org-capture-elfeed-show :if-derived elfeed-show-mode)
+      ("g e" "Elfeed" jf/capture/denote/from/elfeed-show-entry :if-derived elfeed-show-mode)
       ("g f" "Firefox" jf/menu--org-capture-firefox)
       ("g s" "Safari" jf/menu--org-capture-safari)
       ("g w" "Eww" jf/menu--org-capture-eww :if-derived eww-mode)

@@ -493,6 +493,9 @@ Consider different logic if IS-A-SERIES."
       nil
       template)))
 
+(jf/denote/create-functions-for :domain "references"
+  :key ?r)
+
 (jf/denote/create-functions-for :domain "indices"
   :key ?i
   :create-fn 'jf/denote/create-indices-entry)
@@ -786,12 +789,29 @@ When USE_HUGO_SHORTCODE is given use glossary based exporting."
           (title (plist-get eww-data :title)))
     (jf/denote/capture-reference :url url :title title)))
 
-(cl-defun jf/menu--org-capture-elfeed-show (&key (entry elfeed-show-entry))
-  "Create a `denote' from `elfeed' ENTRY."
-  (interactive)
-  (let* ((url (elfeed-entry-link entry))
-          (title (elfeed-entry-title entry)))
-    (jf/denote/capture-reference :url url :title title)))
+(defun jf/capture/denote/from/elfeed-show-entry (entry domain keywords)
+  "Write `elfeed' ENTRY as `org-mode' content to `denote' DOMAIN."
+  (interactive (list elfeed-show-entry "references" (denote-keywords-prompt)))
+  (let* ((denote-directory (f-join (denote-directory) domain))
+	 (title (elfeed-entry-title entry))
+	 (url (elfeed-entry-link entry))
+	 (html (elfeed-deref (elfeed-entry-content entry)))
+	 (org-content (with-temp-buffer
+			(insert html)
+			(shell-command-on-region
+			 (point-min) (point-max)
+			 ;; Remove trailing \\ from each line.
+			 (concat (executable-find "pandoc") " -f html -t org "
+				 "--wrap=none | rg \"(\\\\\\\\)\" -r ''")
+			 t t)
+			(buffer-substring-no-properties (point-min)
+							(point-max)))))
+    (denote title
+	    keywords
+	    'org
+	    denote-directory
+	    nil
+	    (concat "#+ROAM_REFS: " url "\n\n" org-content))))
 
 (cl-defun jf/denote/capture-reference (&key
                                         title

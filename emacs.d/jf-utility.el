@@ -446,7 +446,8 @@ I'm okay with that behavior, but I'm putting it here to mention it â€œout loudâ€
 
 (defun jf/filename/tilde-based (filename)
   "Return ~/ relative FILENAME."
-  (string-replace (getenv "HOME") "~" filename))
+  (string-replace (getenv "HOME") "~"
+    (if (consp filename) (cadr filename) filename)))
 
 (provide 'jf-utility)
 ;;; jf-utility.el ends here
