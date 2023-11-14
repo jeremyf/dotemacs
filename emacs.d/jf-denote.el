@@ -782,51 +782,51 @@ When USE_HUGO_SHORTCODE is given use glossary based exporting."
           (title (cadr link-title-pair)))
     (jf/denote/capture-reference :url url :title title)))
 
-(defun jf/menu--org-capture-eww ()
+(defun jf/capture/denote/from/eww-data ()
   "Create an `denote' entry from `eww' data."
   (interactive)
   (let* ((url (plist-get eww-data :url))
-          (title (plist-get eww-data :title)))
-    (jf/denote/capture-reference :url url :title title)))
+          (title (plist-get eww-data :title))
+          (html (plist-get eww-data :source))
+          (content (jf/convert-via-pandoc html :from "html" :to "org")))
+    (jf/denote/capture-reference :url url :title title :content content)))
 
-(defun jf/capture/denote/from/elfeed-show-entry (entry domain keywords)
-  "Write `elfeed' ENTRY as `org-mode' content to `denote' DOMAIN."
-  (interactive (list elfeed-show-entry "references" (denote-keywords-prompt)))
-  (let* ((denote-directory (f-join (denote-directory) domain))
-	 (title (elfeed-entry-title entry))
-	 (url (elfeed-entry-link entry))
-	 (html (elfeed-deref (elfeed-entry-content entry)))
-	 (org-content (with-temp-buffer
-			(insert html)
-			(shell-command-on-region
-			 (point-min) (point-max)
-			 ;; Remove trailing \\ from each line.
-			 (concat (executable-find "pandoc") " -f html -t org "
-				 "--wrap=none | rg \"(\\\\\\\\)\" -r ''")
-			 t t)
-			(buffer-substring-no-properties (point-min)
-							(point-max)))))
-    (denote title
-	    keywords
-	    'org
-	    denote-directory
-	    nil
-	    (concat "#+ROAM_REFS: " url "\n\n" org-content))))
+(defun jf/capture/denote/from/elfeed-show-entry ()
+  "Create `denote' entry from `elfeed-show-entry'."
+  (interactive)
+  (let* ((url (elfeed-entry-link elfeed-show-entry))
+          (title (elfeed-entry-title elfeed-show-entry))
+	        (html (elfeed-deref (elfeed-entry-content elfeed-show-entry)))
+	        (content (jf/convert-via-pandoc html :from "html" :to "org")))
+    (jf/denote/capture-reference :url url :title title :content content)))
+
+(cl-defun jf/convert-via-pandoc (text &key (from "html") (to "org"))
+  "Convert TEXT, via pandoc, FROM one content-type TO another."
+  (with-temp-buffer
+		(insert text)
+		(shell-command-on-region
+			(point-min) (point-max)
+			(concat (executable-find "pandoc") " -f " from " -t " to
+			  ;; Remove trailing \\ from each line.
+				" --wrap=none | rg \"(\\\\\\\\)\" -r ''")
+			t t)
+		(buffer-substring-no-properties (point-min) (point-max))))
 
 (cl-defun jf/denote/capture-reference (&key
                                         title
                                         url
+                                        (content "")
                                         (keywords (denote-keywords-prompt))
-                                        (domain "melange"))
+                                        (domain "references"))
   "Create a `denote' entry for the TITLE and URL.
 
-Capturing for the given DOMAIN and KEYWORDS prompt."
+Capturing for the given CONTENT, DOMAIN, and KEYWORDS prompt."
   (denote title
     keywords
     'org
     (f-join (denote-directory) domain)
     nil
-    (concat "#+ROAM_REFS: " url "\n")))
+    (concat "#+ROAM_REFS: " url "\n\n" (or content ""))))
 
 (defun jf/denote/archive-timesheet-month ()
   "Cut the month agenda and create a `denote' note."

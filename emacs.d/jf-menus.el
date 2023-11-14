@@ -145,7 +145,7 @@
       ("g e" "Elfeed" jf/capture/denote/from/elfeed-show-entry :if-derived elfeed-show-mode)
       ("g f" "Firefox" jf/menu--org-capture-firefox)
       ("g s" "Safari" jf/menu--org-capture-safari)
-      ("g w" "Eww" jf/menu--org-capture-eww :if-derived eww-mode)
+      ("g w" "Eww" jf/capture/denote/from/eww-data :if-derived eww-mode)
       ]])
 
 ;; (use-package file-info

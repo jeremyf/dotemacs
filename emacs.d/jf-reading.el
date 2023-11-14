@@ -24,6 +24,7 @@
   :hook ((elfeed-show-mode . jf/reader-visual))
   :custom
   (elfeed-curl-timeout 90)
+  (elfeed-db-directory "~/Documents/.elfeed")
   :config
   (setq-default elfeed-search-filter "@2-days-ago +unread ")
   :bind ((:map elfeed-search-mode-map
