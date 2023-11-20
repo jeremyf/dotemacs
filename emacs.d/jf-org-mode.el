@@ -1063,5 +1063,6 @@ APP is the parameters for saving the bookmark."
 ;;   (with-eval-after-load 'pdf-annot
 ;;     (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note)))
 
+
 (provide 'jf-org-mode)
 ;;; jf-org-mode.el ends here

@@ -547,7 +547,7 @@ PARG is part of the method signature for `org-link-parameters'."
           (format "<abbr title=\"%s\">%s</abbr>"
             title
             keyword-value)))
-      ((eq format 'latex)
+      ((or (eq format 'latex) (eq format 'beamer))
         (format "\\ac{%s}" keyword-value))
       (t (format "%s (%s)"
            title
@@ -607,6 +607,8 @@ PARG is for conformant method signature."
   (cond
     ((or (eq format 'html) (eq format 'md))
       (format "<time datetime=\"%s\" title=\"%s\">%s</time>" link link description))
+    ((eq format 'beamer)
+      (format "%s" description))
     (t (format "%s (%s)" description link))))
 
 (cl-defun jf/denote/link-follow-date (date &optional parg)
