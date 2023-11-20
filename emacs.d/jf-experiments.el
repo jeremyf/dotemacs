@@ -193,5 +193,32 @@ of measurement (e.g., a word or sentence)."
       (run-at-time "4 sec" nil (lambda ()
                                  (delete-overlay next-overlay))))))
 
+;; https://macowners.club/posts/org-capture-from-everywhere-macos/
+(defun jf/func-make-capture-frame ()
+  "Create a new frame and run `org-capture'."
+  (interactive)
+  (make-frame '((name . "capture")
+                (top . 300)
+                (left . 700)
+                (width . 80)
+                (height . 25)))
+  (select-frame-by-name "capture")
+  (delete-other-windows)
+  (cl-flet ((switch-to-buffer-other-window (buf) (switch-to-buffer buf)))
+          (org-capture)))
+
+(defadvice org-capture-finalize
+    (after delete-capture-frame activate)
+  "Advise capture-finalize to close the frame."
+  (if (equal "capture" (frame-parameter nil 'name))
+      (delete-frame)))
+
+(defadvice org-capture-destroy
+    (after delete-capture-frame activate)
+  "Advise capture-destroy to close the frame."
+  (if (equal "capture" (frame-parameter nil 'name))
+      (delete-frame)))
+
+
 (provide 'jf-experiments)
 ;;; jf-experiments.el ends here

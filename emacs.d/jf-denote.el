@@ -806,9 +806,8 @@ When USE_HUGO_SHORTCODE is given use glossary based exporting."
 		(insert text)
 		(shell-command-on-region
 			(point-min) (point-max)
-			(concat (executable-find "pandoc") " -f " from " -t " to
-			  ;; Remove trailing \\ from each line.
-				" --wrap=none | rg \"(\\\\\\\\)\" -r ''")
+			(concat (executable-find "pandoc") " -f " from " -t " to " --wrap=none")
+      ;;| rg \"(\\\\\\\\)\" -r ''")
 			t t)
 		(buffer-substring-no-properties (point-min) (point-max))))
 
