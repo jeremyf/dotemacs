@@ -2240,7 +2240,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "Never leaves a companion in peril, ML +2."
            "1d6*400 gp from past jobs."
            "Grumbler."
-ji           "At the end of his wits, (1 in 6 chance) of berserk rage in critical situation, +2 to hit, but 1:3 attacks indiscriminately."
+           "At the end of his wits, (1 in 6 chance) of berserk rage in critical situation, +2 to hit, but 1:3 attacks indiscriminately."
            "Escaped from the gallows."
            "Fencing instructor, 1d3*100 XP to one character on downtime after each expedition."
            "Wants to retire in style after pulling “that one big job”."
@@ -2252,3 +2252,113 @@ ji           "At the end of his wits, (1 in 6 chance) of berserk rage in critica
            "Accursed."
            "Fanatical, +2 ML and +1 damage."
            "Princeling travelling incognito, LVL +2, departs after 1d3 expeditions with parting gift of 1d6*200 gp per companion."))
+
+;; https://welshpiper.com/random-noble-houses/
+(random-table/register :name "Noble House"
+  :data (list (concat
+                "\n- Atriarch Pronouns :: ${Noble House > Atriarch Pronouns}"
+                "\n- Atriarch Age :: ${Noble House > Atriarch Age}"
+                "\n- Alignment :: ${Noble House > Alignment}"
+                "\n- Influence :: ${Noble House > Influence}"
+                "\n- Holdings :: ${Noble House > Holdings}"
+                "\n- Relatives :: ${Noble House > Relatives}"
+                "\n- Recent Activity :: ${Noble House > Recent Activity}"
+                "\n- Current Ambition :: ${Noble House > Current Ambition}"
+                "\n- Closet Skeleton :: ${Noble House > Closet Skeleton}")))
+
+(random-table/register :name "Noble House > Atriarch Pronouns"
+  :private t
+  :data '("He/Him" "She/Her" "They/Them"))
+
+(random-table/register :name "Noble House > Atriarch Age"
+  :store t
+  :data '((1 . "Young (${Noble House > Atriarch > Young Personality})")
+           ((2 . 4) . "Middle-aged (${Noble House > Atriarch > Middle-aged Personality}})")
+           ((5 . 6) . "Old (${Noble House > Atriarch > Old Personality}})")))
+(random-table/register :name "Noble House > Atriarch > Young Personality"
+  :private t
+  :data '("naive" "bold" "confident" "fearful" "rash" "arrogant"))
+
+(random-table/register :name "Noble House > Atriarch > Middle-aged Personality"
+  :private t
+  :data '("calculating" "assertive" "savvy" "cautious" "aggressive" "bullying"))
+
+(random-table/register :name "Noble House > Atriarch > Old Personality"
+  :private t
+  :data '("cunning" "demanding" "prudent" "subtle" "detached" "domineering"))
+
+(random-table/register :name "Noble House > Alignment"
+  :private t
+  :data '(((1 . 2) . "Law")
+           ((3 . 5) . "Neutral")
+           (6 . "Chaos")))
+
+(random-table/register :name "Noble House > Influence"
+  :private t
+  :data '("None" "Scant" "Marginal" "Average" "Significant" "Considerable"))
+
+(random-table/register :name "Noble House > Holdings"
+  :private t
+  :data '(((1 . 2) . "Modest (${1d10} 5-mile hexes)")
+           ((3 . 5) . "Appreciable (${1d10 + 10} 5-mile hexes)")
+           (6 . "Extensive (${1d10 + 10} 5-mile hexes)")))
+
+(random-table/register :name "Noble House > Relatives"
+  :private t
+  :data '(((1 . 2) . "Small (${2d6} with claims to family resources)")
+           ((3 . 5) . "Medium (${2d6} with claims to family resources)")
+           (6 . "Large (${2d6 + 12} with claims to family resources)")))
+
+(random-table/register :name "Noble House > Recent Activity"
+  :private t
+  :data '("Favoured by the king (d6: 1-2 staunch loyalty; 3-4 the Midas touch; 5-6 shrewd politicking)"
+           "Achieved overwhelming military victory"
+           "Achieved Pyrrhic military victory"
+           "Supported a new vassal"
+           "Driven out/slain marauding monster"
+           "Returned after adventuring expedition to (d6: 1-3 local wilderness; 4-5 king’s wilderness; 6 foreign country)"
+           "Captured (d6: 1-3 outlaws; 4 spies; 5 marauding monster; 6 humanoid rabble)"
+           "Brokered diplomatic agreement on king’s behalf (d6: 1-3 trade agreement; 4-5 mutual defence pact; 6 truce)"
+           "Discovered valuable commodity (d6: 1-2 precious metal; 3-5 industrial material; 6 gemstones)"
+           "Birth in the family"
+           "Death in the family (d6: 1-2 natural causes; 3-4 battle; 5 accident 6 questionable circumstances)"
+           "Wilderness within fief is plagued by (d6: 1-2 outlaws; 3-4 wandering monster; 5 refugees; 6 humanoid band)"
+           "Family member ransomed by (d6: 1-2 foreign enemy; 3-4 outlaws; 5 humanoids; 6 unknown kidnapper)"
+           "Participated in a duel (d6: 1-2 won; 3-4 lost; 5-6 draw)"
+           "Afflicted by plague"
+           "Adventuring family member(s) presumed lost or dead"
+           "Losing money as a result of (d6: 1 stolen heirloom; 2-3 bad business; 4 raiders; 5 rival noble; 6 freak accident)"
+           "Vassal settlement endangered by (d6: 1 attack; 2-3 plague; 4-5 low food supply; 6 bandits)"
+           "Suffered military defeat"
+           "Snubbed by king for (d6: 1-2 poor military performance; 3-4 late rents; 5-6 causing trouble at court)"))
+
+(random-table/register :name "Noble House > Current Ambition"
+  :private t
+  :data '("Support the king’s top priority plan (d6: 1-2 expansion; 3 warfare; 4-5 diplomacy; 6 rooting out dissidents)"
+           "Advance the (d6: 1 church; 2-3 pet construction project; 4 local commodities; 5 military; 6 population size)"
+           "Acquire more land (d6: 1-2 strategic location; 3-5 valuable resource; 6 special feature)"
+           "Dispose of (d6: 1-2 another noble; 3 non-secular official; 4 military officer; 5 high-level bureaucrat; 6 powerful adventurer)"
+           "Marry into a particular family for (d6: 1 wealth; 2 love; 3-4 political advantage; 5 lust; 6 nefarious purposes)"
+           "Bring about (d6: 1-2 political; 3-4 economic; 5 religious; 6 judicial) reform"
+           "Take a bite out of crime"
+           "Build fortification (d6: 1-2 defensive wall; 3-4 tower; 5 keep; 6 castle)"
+           "Establish a new settlement"
+           "Build infrastructure (d6: 1-2 road; 3 bridge; 4 watch tower; 5 signal beacon; 6 folly)"
+           "Clear stain on family name"
+           "Make a name for the family via (d6: 1-2 adventuring/exploring; 3-4 amassing wealth; 5 military conquest; 6 political influence)"))
+
+(random-table/register :name "Noble House > Closet Skeleton"
+  :private t
+  :data '("None (outwardly, things seem a little too perfect…)"
+           "Engaged in treasonous activity with (d6: 1 independent actor; 2-3 official body; 4-5 foreign power; 6 dissident element)"
+           "Perpetrated and covered up a capital crime (e.g., murder, rape, arson)"
+           "Under the enchantment of a (d6: 1-3 cursed item; 4 spell caster; 5 demon; 6 demanding immortal)"
+           "Fey creature; 6 geas (or similar spell))"
+           "Manipulates the system to avoid military service"
+           "Supports a band of (d6: 1-3 outlaws; 4 humanoids; 5 organised thieves; 6 dangerous mercenaries)"
+           "Withholds the king’s fees to (d6: 1-2 amass personal hoard; 3-4 divert funds; 5 cover gambling debts; 6 pay an extortionist)"
+           "Sideline poacher (d6: 1-2 fish & game; 3-5 natural resource; 6 valuable commodity)"
+           "Afflicted with lycanthropy (or similar disease)"
+           "Family history of mental illness"
+           "Member of (d6: 1-2 death cult; 3-4 outlawed profession (e.g. sorcerer); 5-6 seditious faction)"
+           "Addicted to (d6: 1-3 legal or widely available intoxicant; 4 committing crimes; 5 material possessions; 6 exotic drug)"))
