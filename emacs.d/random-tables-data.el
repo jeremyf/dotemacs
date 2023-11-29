@@ -807,35 +807,35 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
 ;;; Random Names (from Stars without Number)
 (random-table/register :name "Name"
   :exclude-from-prompt t
-  :data '("${Arabic Name > Male Given Name} ${Arabic Name > Surname}"
-           "${Arabic Name > Female Given Name} ${Arabic Name > Surname}"
-           "${Chinese Name > Male Given Name} ${Chinese Name > Surname}"
-           "${Chinese Name > Female Given Name} ${Chinese Name > Surname}"
-           "${English Name > Male Given Name} ${English Name > Surname}"
-           "${English Name > Female Given Name} ${English Name > Surname}"
-           "${Greek Name > Male Given Name} ${Greek Name > Surname}"
-           "${Greek Name > Female Given Name} ${Greek Name > Surname}"
-           "${Indian Name > Male Given Name} ${Indian Name > Surname}"
-           "${Indian Name > Female Given Name} ${Indian Name > Surname}"
-           "${Japanese Name > Male Given Name} ${Japanese Name > Surname}"
-           "${Japanese Name > Female Given Name} ${Japanese Name > Surname}"
-           "${Latin Name > Male Given Name} ${Latin Name > Surname}"
-           "${Latin Name > Female Given Name} ${Latin Name > Surname}"
-           "${Nigerian Name > Male Given Name} ${Nigerian Name > Surname}"
-           "${Nigerian Name > Female Given Name} ${Nigerian Name > Surname}"
-           "${Russian Name > Male Given Name} ${Russian Name > Surname}"
-           "${Russian Name > Female Given Name} ${Russian Name > Surname}"
-           "${Spanish Name > Male Given Name} ${Spanish Name > Surname}"
-           "${Spanish Name > Female Given Name} ${Spanish Name > Surname}"
+  :data '("${Arabic Name > Masculine Given Name} ${Arabic Name > Surname}"
+           "${Arabic Name > Feminine Given Name} ${Arabic Name > Surname}"
+           "${Chinese Name > Masculine Given Name} ${Chinese Name > Surname}"
+           "${Chinese Name > Feminine Given Name} ${Chinese Name > Surname}"
+           "${English Name > Masculine Given Name} ${English Name > Surname}"
+           "${English Name > Feminine Given Name} ${English Name > Surname}"
+           "${Greek Name > Masculine Given Name} ${Greek Name > Surname}"
+           "${Greek Name > Feminine Given Name} ${Greek Name > Surname}"
+           "${Indian Name > Masculine Given Name} ${Indian Name > Surname}"
+           "${Indian Name > Feminine Given Name} ${Indian Name > Surname}"
+           "${Japanese Name > Masculine Given Name} ${Japanese Name > Surname}"
+           "${Japanese Name > Feminine Given Name} ${Japanese Name > Surname}"
+           "${Latin Name > Masculine Given Name} ${Latin Name > Surname}"
+           "${Latin Name > Feminine Given Name} ${Latin Name > Surname}"
+           "${Nigerian Name > Masculine Given Name} ${Nigerian Name > Surname}"
+           "${Nigerian Name > Feminine Given Name} ${Nigerian Name > Surname}"
+           "${Russian Name > Masculine Given Name} ${Russian Name > Surname}"
+           "${Russian Name > Feminine Given Name} ${Russian Name > Surname}"
+           "${Spanish Name > Masculine Given Name} ${Spanish Name > Surname}"
+           "${Spanish Name > Feminine Given Name} ${Spanish Name > Surname}"
            "${Norse Given Name} ${Norse Surname}"
            "${Norse Given Name} ${Norse Surname}"
-           "${Breggle Name > Male Given Name} ${Breggle Name > Surname}"
-           "${Breggle Name > Female Given Name} ${Breggle Name > Surname}"))
+           "${Breggle Name > Masculine Given Name} ${Breggle Name > Surname}"
+           "${Breggle Name > Feminine Given Name} ${Breggle Name > Surname}"))
 
-(random-table/register :name "Arabic Name > Male Given Name"
+(random-table/register :name "Arabic Name > Masculine Given Name"
   :private t
   :data '("Aamir" "Ayub" "Binyamin" "Efraim" "Ibrahim" "Ilyas" "Ismail" "Jibril" "Jumanah" "Kazi" "Lut" "Matta" "Mohammed" "Mubarak" "Mustafa" "Nazir" "Rahim" "Reza" "Sharif" "Taimur" "Usman" "Yakub" "Yusuf" "Zakariya" "Zubair"))
-(random-table/register :name "Arabic Name > Female Given Name"
+(random-table/register :name "Arabic Name > Feminine Given Name"
   :private t
   :data '("Aisha" "Alimah" "Badia" "Bisharah" "Chanda" "Daliya" "Fatimah" "Ghania" "Halah" "Kaylah" "Khayrah" "Layla" "Mina" "Munisa" "Mysha" "Naimah" "Nissa" "Nura" "Parveen" "Rana" "Shalha" "Suhira" "Tahirah" "Yasmin" "Zulehka"))
 (random-table/register :name "Arabic Name > Surname"
@@ -845,10 +845,10 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
   :private t
   :data '("Adan" "Magrit" "Ahsa" "Masqat" "Andalus" "Misr" "Asmara" "Muruni" "Asqlan" "Qabis" "Baqubah" "Qina" "Basit" "Rabat" "Baysan" "Ramlah" "Baytlahm" "Riyadh" "Bursaid" "Sabtah" "Dahilah" "Salalah" "Darasalam" "Sana" "Dawhah" "Sinqit" "Ganin" "Suqutrah" "Gebal" "Sur" "Gibuti" "Tabuk" "Giddah" "Tangah" "Harmah" "Tarifah" "Hartum" "Tarrakunah" "Hibah" "Tisit" "Hims" "Uman" "Hubar" "Urdunn" "Karbala" "Wasqah" "Kut" "Yaburah" "Lacant" "Yaman"))
 
-(random-table/register :name "Chinese Name > Male Given Name"
+(random-table/register :name "Chinese Name > Masculine Given Name"
   :private t
   :data '("Aiguo" "Bohai" "Chao" "Dai" "Dawei" "Duyi" "Fa" "Fu" "Gui" "Hong" "Jianyu" "Kang" "Li" "Niu" "Peng" "Quan" "Ru" "Shen" "Shi" "Song" "Tao" "Xue" "Yi" "Yuan" "Zian"))
-(random-table/register :name "Chinese Name > Female Given Name"
+(random-table/register :name "Chinese Name > Feminine Given Name"
   :private t
   :data '("Biyu" "Changying" "Daiyu" "Huidai" "Huiliang" "Jia" "Jingfei" "Lan" "Liling" "Liu" "Meili" "Niu" "Peizhi" "Qiao" "Qing" "Ruolan" "Shu" "Suyin" "Ting" "Xia" "Xiaowen" "Xiulan" "Ya" "Ying" "Zhilan"))
 (random-table/register :name "Chinese Name > Surname"
@@ -858,10 +858,10 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
   :private t
   :data '("Andong" "Luzhou" "Anqing" "Ningxia" "Anshan" "Pingxiang" "Chaoyang" "Pizhou" "Chaozhou" "Qidong" "Chifeng" "Qingdao" "Dalian" "Qinghai" "Dunhuang" "Rehe" "Fengjia" "Shanxi" "Fengtian" "Taiyuan" "Fuliang" "Tengzhou" "Fushun" "Urumqi" "Gansu" "Weifang" "Ganzhou" "Wugang" "Guizhou" "Wuxi" "Hotan" "Xiamen" "Hunan" "Xian" "Jinan" "Xikang" "Jingdezhen" "Xining" "Jinxi" "Xinjiang" "Jinzhou" "Yidu" "Kunming" "Yingkou" "Liaoning" "Yuxi" "Linyi" "Zigong" "Lushun" "Zoige"))
 
-(random-table/register :name "English Name > Male Given Name"
+(random-table/register :name "English Name > Masculine Given Name"
   :private t
   :data '("Adam" "Albert" "Alfred" "Allan" "Archibald" "Arthur" "Basil" "Charles" "Colin" "Donald" "Douglas" "Edgar" "Edmund" "Edward" "George" "Harold" "Henry" "Ian" "James" "John" "Lewis" "Oliver" "Philip" "Richard" "William"))
-(random-table/register :name "English Name > Female Given Name"
+(random-table/register :name "English Name > Feminine Given Name"
   :private t
   :data '("Abigail" "Anne" "Beatrice" "Blanche" "Catherine" "Charlotte" "Claire" "Eleanor" "Elizabeth" "Emily" "Emma" "Georgia" "Harriet" "Joan" "Judy" "Julia" "Lucy" "Lydia" "Margaret" "Mary" "Molly" "Nora" "Rosie" "Sarah" "Victoria"))
 (random-table/register :name "English Name > Surname"
@@ -871,10 +871,10 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
   :private t
   :data '("Aldington" "Kedington" "Appleton" "Latchford" "Ashdon" "Leigh" "Berwick" "Leighton" "Bramford" "Maresfield" "Brimstage" "Markshall" "Carden" "Netherpool" "Churchill" "Newton" "Clifton" "Oxton" "Colby" "Preston" "Copford" "Ridley" "Cromer" "Rochford" "Davenham" "Seaford" "Dersingham" "Selsey" "Doverdale" "Stanton" "Elsted" "Stockham" "Ferring" "Stoke" "Gissing" "Sutton" "Heydon" "Thakeham" "Holt" "Thetford" "Hunston" "Thorndon" "Hutton" "Ulting" "Inkberrow" "Upton" "Inworth" "Westhorpe" "Isfield" "Worcester"))
 
-(random-table/register :name "Greek Name > Male Given Name"
+(random-table/register :name "Greek Name > Masculine Given Name"
   :private t
   :data '("Alexander" "Alexius" "Anastasius" "Christodoulos" "Christos" "Damian" "Dimitris" "Dysmas" "Elias" "Giorgos" "Ioannis" "Konstantinos" "Lambros" "Leonidas" "Marcos" "Miltiades" "Nestor" "Nikos" "Orestes" "Petros" "Simon" "Stavros" "Theodore" "Vassilios" "Yannis"))
-(random-table/register :name "Greek Name > Female Given Name"
+(random-table/register :name "Greek Name > Feminine Given Name"
   :private t
   :data '("Alexandra" "Amalia" "Callisto" "Charis" "Chloe" "Dorothea" "Elena" "Eudoxia" "Giada" "Helena" "Ioanna" "Lydia" "Melania" "Melissa" "Nika" "Nikolina" "Olympias" "Philippa" "Phoebe" "Sophia" "Theodora" "Valentina" "Valeria" "Yianna" "Zoe"))
 (random-table/register :name "Greek Name > Surname"
@@ -884,11 +884,11 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
   :private t
   :data '("Adramyttion" "Kallisto" "Ainos" "Katerini" "Alikarnassos" "Kithairon" "Avydos" "Kydonia" "Dakia" "Lakonia" "Dardanos" "Leros" "Dekapoli" "Lesvos" "Dodoni" "Limnos" "Efesos" "Lykia" "Efstratios" "Megara" "Elefsina" "Messene" "Ellada" "Milos" "Epidavros" "Nikaia" "Erymanthos" "Orontis" "Evripos" "Parnasos" "Gavdos" "Petro" "Gytheio" "Samos" "Ikaria" "Syros" "Ilios" "Thapsos" "Illyria" "Thessalia" "Iraia" "Thira" "Irakleio" "Thiva" "Isminos" "Varvara" "Ithaki" "Voiotia" "Kadmeia" "Vyvlos"))
 
-;; Indian Name > Male Given Name
-(random-table/register :name "Indian Name > Male Given Name"
+;; Indian Name > Masculine Given Name
+(random-table/register :name "Indian Name > Masculine Given Name"
   :private t
   :data '("Amrit" "Ashok" "Chand" "Dinesh" "Gobind" "Harinder" "Jagdish" "Johar" "Kurien" "Lakshman" "Madhav" "Mahinder" "Mohal" "Narinder" "Nikhil" "Omrao" "Prasad" "Pratap" "Ranjit" "Sanjay" "Shankar" "Thakur" "Vijay" "Vipul" "Yash"))
-(random-table/register :name "Indian Name > Female Given Name"
+(random-table/register :name "Indian Name > Feminine Given Name"
   :private t
   :data '("Amala" "Asha" "Chandra" "Devika" "Esha" "Gita" "Indira" "Indrani" "Jaya" "Jayanti" "Kiri" "Lalita" "Malati" "Mira" "Mohana" "Neela" "Nita" "Rajani" "Sarala" "Sarika" "Sheela" "Sunita" "Trishna" "Usha" "Vasanta"))
 (random-table/register :name "Indian Name > Surname"
@@ -898,10 +898,10 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
   :private t
   :data '("Ahmedabad" "Jaisalmer" "Alipurduar" "Jharonda" "Alubari" "Kadambur" "Anjanadri" "Kalasipalyam" "Ankleshwar" "Karnataka" "Balarika" "Kutchuhery" "Bhanuja" "Lalgola" "Bhilwada" "Mainaguri" "Brahmaghosa" "Nainital" "Bulandshahar" "Nandidurg" "Candrama" "Narayanadri" "Chalisgaon" "Panipat" "Chandragiri" "Panjagutta" "Charbagh" "Pathankot" "Chayanka" "Pathardih" "Chittorgarh" "Porbandar" "Dayabasti" "Rajasthan" "Dikpala" "Renigunta" "Ekanga" "Sewagram" "Gandhidham" "Shakurbasti" "Gollaprolu" "Siliguri" "Grahisa" "Sonepat" "Guwahati" "Teliwara" "Haridasva" "Tinpahar" "Indraprastha" "Villivakkam"))
 
-(random-table/register :name "Japanese Name > Male Given Name"
+(random-table/register :name "Japanese Name > Masculine Given Name"
   :private t
   :data '("Akira" "Daisuke" "Fukashi" "Goro" "Hiro" "Hiroya" "Hotaka" "Katsu" "Katsuto" "Keishuu" "Kyuuto" "Mikiya" "Mitsunobu" "Mitsuru" "Naruhiko" "Nobu" "Shigeo" "Shigeto" "Shou" "Shuji" "Takaharu" "Teruaki" "Tetsushi" "Tsukasa" "Yasuharu"))
-(random-table/register :name "Japanese Name > Female Given Name"
+(random-table/register :name "Japanese Name > Feminine Given Name"
   :private t
   :data '("Aemi" "Airi" "Ako" "Ayu" "Chikaze" "Eriko" "Hina" "Kaori" "Keiko" "Kyouka" "Mayumi" "Miho" "Namiko" "Natsu" "Nobuko" "Rei" "Ririsa" "Sakimi" "Shihoko" "Shika" "Tsukiko" "Tsuzune" "Yoriko" "Yorimi" "Yoshiko"))
 (random-table/register :name "Japanese Name > Surname"
@@ -911,10 +911,10 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
   :private t
   :data '("Bando" "Mitsukaido" "Chikuma" "Moriya" "Chikusei" "Nagano" "Chino" "Naka" "Hitachi" "Nakano" "Hitachinaka" "Ogi" "Hitachiomiya" "Okaya" "Hitachiota" "Omachi" "Iida" "Ryugasaki" "Iiyama" "Saku" "Ina" "Settsu" "Inashiki" "Shimotsuma" "Ishioka" "Shiojiri" "Itako" "Suwa" "Kamisu" "Suzaka" "Kasama" "Takahagi" "Kashima" "Takeo" "Kasumigaura" "Tomi" "Kitaibaraki" "Toride" "Kiyose" "Tsuchiura" "Koga" "Tsukuba" "Komagane" "Ueda" "Komoro" "Ushiku" "Matsumoto" "Yoshikawa" "Mito" "Yuki"))
 
-(random-table/register :name "Latin Name > Male Given Name"
+(random-table/register :name "Latin Name > Masculine Given Name"
   :private t
   :data '("Agrippa" "Appius" "Aulus" "Caeso" "Decimus" "Faustus" "Gaius" "Gnaeus" "Hostus" "Lucius" "Mamercus" "Manius" "Marcus" "Mettius" "Nonus" "Numerius" "Opiter" "Paulus" "Proculus" "Publius" "Quintus" "Servius" "Tiberius" "Titus" "Volescus"))
-(random-table/register :name "Latin Name > Female Given Name"
+(random-table/register :name "Latin Name > Feminine Given Name"
   :private t
   :data '("Appia" "Aula" "Caesula" "Decima" "Fausta" "Gaia" "Gnaea" "Hosta" "Lucia" "Maio" "Marcia" "Maxima" "Mettia" "Nona" "Numeria" "Octavia" "Postuma" "Prima" "Procula" "Septima" "Servia" "Tertia" "Tiberia" "Titia" "Vibia"))
 (random-table/register :name "Latin Name > Surname"
@@ -924,10 +924,10 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
   :private t
   :data '("Abilia" "Lucus" "Alsium" "Lugdunum" "Aquileia" "Mediolanum" "Argentoratum" "Novaesium" "Ascrivium" "Patavium" "Asculum" "Pistoria" "Attalia" "Pompeii" "Barium" "Raurica" "Batavorum" "Rigomagus" "Belum" "Roma" "Bobbium" "Salernum" "Brigantium" "Salona" "Burgodunum" "Segovia" "Camulodunum" "Sirmium" "Clausentum" "Spalatum" "Corduba" "Tarraco" "Coriovallum" "Treverorum" "Durucobrivis" "Verulamium" "Eboracum" "Vesontio" "Emona" "Vetera" "Florentia" "Vindelicorum" "Lactodurum" "Vindobona" "Lentia" "Vinovia" "Lindum" "Viroconium" "Londinium" "Volubilis"))
 
-(random-table/register :name "Nigerian Name > Male Given Name"
+(random-table/register :name "Nigerian Name > Masculine Given Name"
   :private t
   :data '("Adesegun" "Akintola" "Amabere" "Arikawe" "Asagwara" "Chidubem" "Chinedu" "Chiwetei" "Damilola" "Esangbedo" "Ezenwoye" "Folarin" "Genechi" "Idowu" "Kelechi" "Ketanndu" "Melubari" "Nkanta" "Obafemi" "Olatunde" "Olumide" "Tombari" "Udofia" "Uyoata" "Uzochi"))
-(random-table/register :name "Nigerian Name > Female Given Name"
+(random-table/register :name "Nigerian Name > Feminine Given Name"
   :private t
   :data '("Abike" "Adesuwa" "Adunola" "Anguli" "Arewa" "Asari" "Bisola" "Chioma" "Eduwa" "Emilohi" "Fehintola" "Folasade" "Mahparah" "Minika" "Nkolika" "Nkoyo" "Nuanae" "Obioma" "Olafemi" "Shanumi" "Sominabo" "Suliat" "Tariere" "Temedire" "Yemisi"))
 (random-table/register :name "Nigerian Name > Surname"
@@ -937,10 +937,10 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
   :private t
   :data '("Abadan" "Jere" "Ador" "Kalabalge" "Agatu" "Katsina" "Akamkpa" "Knoduga" "Akpabuyo" "Konshishatse" "Ala" "Kukawa" "Askira" "Kwande" "Bakassi" "Kwayakusar" "Bama" "Logo" "Bayo" "Mafa" "Bekwara" "Makurdi" "Biase" "Nganzai" "Boki" "Obanliku" "Buruku" "Obi" "Calabar" "Obubra" "Chibok" "Obudu" "Damboa" "Odukpani" "Dikwa" "Ogbadibo" "Etung" "Ohimini" "Gboko" "Okpokwu" "Gubio" "Otukpo" "Guzamala" "Shani" "Gwoza" "Ugep" "Hawul" "Vandeikya" "Ikom" "Yala"))
 
-(random-table/register :name "Russian Name > Male Given Name"
+(random-table/register :name "Russian Name > Masculine Given Name"
   :private t
   :data '("Aleksandr" "Andrei" "Arkady" "Boris" "Dmitri" "Dominik" "Grigory" "Igor" "Ilya" "Ivan" "Kiril" "Konstantin" "Leonid" "Nikolai" "Oleg" "Pavel" "Petr" "Sergei" "Stepan" "Valentin" "Vasily" "Viktor" "Yakov" "Yegor" "Yuri"))
-(random-table/register :name "Russian Name > Female Given Name"
+(random-table/register :name "Russian Name > Feminine Given Name"
   :private t
   :data '("Aleksandra" "Anastasia" "Anja" "Catarina" "Devora" "Dima" "Ekaterina" "Eva" "Irina" "Karolina" "Katlina" "Kira" "Ludmilla" "Mara" "Nadezdha" "Nastassia" "Natalya" "Oksana" "Olena" "Olga" "Sofia" "Svetlana" "Tatyana" "Vilma" "Yelena"))
 (random-table/register :name "Russian Name > Surname"
@@ -950,10 +950,10 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
   :private t
   :data '("Amur" "Omsk" "Arkhangelsk" "Orenburg" "Astrakhan" "Oryol" "Belgorod" "Penza" "Bryansk" "Perm" "Chelyabinsk" "Pskov" "Chita" "Rostov" "Gorki" "Ryazan" "Irkutsk" "Sakhalin" "Ivanovo" "Samara" "Kaliningrad" "Saratov" "Kaluga" "Smolensk" "Kamchatka" "Sverdlovsk" "Kemerovo" "Tambov" "Kirov" "Tomsk" "Kostroma" "Tula" "Kurgan" "Tver" "Kursk" "Tyumen" "Leningrad" "Ulyanovsk" "Lipetsk" "Vladimir" "Magadan" "Volgograd" "Moscow" "Vologda" "Murmansk" "Voronezh" "Novgorod" "Vyborg" "Novosibirsk" "Yaroslavl"))
 
-(random-table/register :name "Spanish Name > Male Given Name"
+(random-table/register :name "Spanish Name > Masculine Given Name"
   :private t
   :data '("Alejandro" "Alonso" "Amelio" "Armando" "Bernardo" "Carlos" "Cesar" "Diego" "Emilio" "Estevan" "Felipe" "Francisco" "Guillermo" "Javier" "Jose" "Juan" "Julio" "Luis" "Pedro" "Raul" "Ricardo" "Salvador" "Santiago" "Valeriano" "Vicente"))
-(random-table/register :name "Spanish Name > Female Given Name"
+(random-table/register :name "Spanish Name > Feminine Given Name"
   :private t
   :data '("Adalina" "Aleta" "Ana" "Ascencion" "Beatriz" "Carmela" "Celia" "Dolores" "Elena" "Emelina" "Felipa" "Inez" "Isabel" "Jacinta" "Lucia" "Lupe" "Maria" "Marta" "Nina" "Paloma" "Rafaela" "Soledad" "Teresa" "Valencia" "Zenaida"))
 (random-table/register :name "Spanish Name > Surname"
@@ -1792,7 +1792,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
 ;;; Dolmenwood
 
 ;; Common names
-(random-table/register :name "Breggle Name > Male Given Name"
+(random-table/register :name "Breggle Name > Masculine Given Name"
   :private t
   :data '("Addle" "Aele" "Blocke" "Braembel" "Broob"
            "Crump" "Curlip" "Eleye" "Grennigore" "Gripe"
@@ -1806,7 +1806,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "Longshanks" "Shankwold" "Smallbuck" "Snicklebock" "Snidebleat"
            "Snoode" "Underbleat" "Underbuck" "Wolder" "Woldleap"))
 
-(random-table/register :name "Breggle Name > Female Given Name"
+(random-table/register :name "Breggle Name > Feminine Given Name"
   :private t
   :data '("Berrild" "Clover" "Crewwin" "Draed" "Ellip"
            "Fannigrew" "Frandorup" "Grendilore" "Grewigg" "Gwendl"
@@ -2275,6 +2275,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
   :data '((1 . "Young (${Noble House > Atriarch > Young Personality})")
            ((2 . 4) . "Middle-aged (${Noble House > Atriarch > Middle-aged Personality}})")
            ((5 . 6) . "Old (${Noble House > Atriarch > Old Personality}})")))
+
 (random-table/register :name "Noble House > Atriarch > Young Personality"
   :private t
   :data '("naive" "bold" "confident" "fearful" "rash" "arrogant"))
@@ -2362,3 +2363,266 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "Family history of mental illness"
            "Member of (d6: 1-2 death cult; 3-4 outlawed profession (e.g. sorcerer); 5-6 seditious faction)"
            "Addicted to (d6: 1-3 legal or widely available intoxicant; 4 committing crimes; 5 material possessions; 6 exotic drug)"))
+
+(random-table/register :name "Mortal Site > What is it"
+  :private t
+  :data '("Campsite" "Hunting lodge" "Hermitage" "Church, monastery, or nunnery"
+           "Workshop" "Farm" "Small fair" "Inn"
+           "Forge" "Mill" "Woodcutter’s lodge" "Orphanage"
+           "Pavilion" "Altar, statue, or shrine" "Road, path, or bridge" "Hamlet, village or towne"
+           "Manse" "Tower or small keep" "Castle" "Disguised as ${Mortal Site > What is it} but actually ${Mortal Site > What is it}"))
+
+(random-table/register :name "Mortal Site > Who is here"
+  :private t
+  :data '("Abandoned. No one is here; or roll on fey Who Is Here table (page 146)"
+           "${1d6} explorers, surveyors, or cartographers"
+           "${1d10} escaped slaves"
+           "${1d4} knights and their retinues"
+           "${1d6} poachers or outlaw loggers"
+           "${4d4} bandits, footpads, or ne’er-do-wells"
+           "A hermit"
+           "${2d6} monks, nuns, or (gasp) both"
+           "${1d4} runaways or lost children"
+           "${1d20} poets, musicians, and/or artists"
+           "${3d4} adventurers or fortune seekers"
+           "${1d20} wizards, alchemists, and/or herbalists"
+           "${1d20} settlers"
+           "${1d6} prospectors or miners"
+           "${1d20} revelers or lovers"
+           "${1d4} witches, cabalists, or oracles"
+           "${1d6} ghosts, wraiths, or revenants"
+           "${2d6} nobles or aristocrats"
+           "${1d4} monarchs and their retinues"
+           "Disguised as ${Mortal Site > Who is here} but actually ${Mortal Site > Who is here}"))
+
+(random-table/register :name "Fey Site > What is it"
+  :private t
+  :data '("Maypole" "Bonfire" "Unicorn blind" "Tournament field"
+           "Military outpost" "Market" "Fair" "Garden"
+           "Mortal observation post" "Amphitheater" "Band shell" "Observatory"
+           "Standing stones" "Circus" "Wildlife museum" "Mushroom library"
+           "Holiday home (timeshare)" "Manse" "Castle" "Disguised as ${Fey Site > What is it} but actually ${Fey Site > What is it}"))
+
+(random-table/register :name "Fey Site > Who is here"
+  :private t
+  :data '("Abandoned. No one is here; or roll on mortal Who Is Here table (page 144)"
+           "1d10 Seelies on a vision quest"
+           "1d10 Seelies banished from Faerie"
+           "1d6 Seelie aristocrats and their creature servants"
+           "1d6 Unseelie collectors of eyeballs"
+           "1d4 Unseelie trollriders"
+           "A Seelie and an Unseelie trysting"
+           "Unseelies spying on 1d10 Seelies having an important debate about something silly or a silly debate about something important"
+           "1d6 Seelie will-o’-the-wisp hunters"
+           "A troupe of 1d10 Seelie actors that only perform Shakespearian death scenes"
+           "A crowd of 1d20 bored Seelies waiting for something interesting to happen"
+           "1d10 Unseelie unicorn hunters"
+           "1d4 reformed Unseelies hoping to defect"
+           "1d4 Unseelie double agents meeting with their Seelie counterparts"
+           "2d6 mortal holy folk waiting to ambush fey folk, whom they consider unholy"
+           "1d4 mortal poets, musicians, and/or artists seeking out fey enchantments/inspiration"
+           "A Seelie tournament (1d100 in attendance)"
+           "An Unseelie riot (1d100 rioters)"
+           "A royal procession of 1d100 Seelies"
+           "Disguised as ${Fey Site > Who is here} but actually ${Fey Site > Who is here}"))
+
+(random-table/register :name "Helveczia > In the stagecoach"
+  :data '("${Helveczia > In the stagecoach > Adjective} ${Helveczia > In the stagecoach > Person} ${Helveczia > In the stagecoach > Activity}"))
+
+(random-table/register :name "Helveczia > In the stagecoach > Adjective"
+  :private t
+  :data '("belligerent" "cold" "curious" "deceitful"
+           "dying" "flirty" "hypochondriac" "indiscreet"
+           "inquisitive" "jovial" "lustful" "naive"
+           "obsessed" "pious" "quarrelsome" "ribald"
+           "rueful" "scheming" "sickly" "taciturn"
+           "talkative" "trusting" "worrisome" "wounded"))
+
+(random-table/register :name "Helveczia > In the stagecoach > Person"
+  :private t
+  :data '("aristocrat" "charlatan" "child" "clergyman"
+           "convict" "courtesan" "craftsman" "diplomat"
+           "doctor" "friar" "gentleman" "lady"
+           "maiden" "matron" "nun" "officer"
+           "official" "rake" "secretary" "soldier"
+           "student" "teacher" "underling" "vicar"))
+
+(random-table/register :name "Helveczia > In the stagecoach > Activity"
+  :private t
+  :data '("running out of options" "in exile" "carrying important item" "fleeing from persecution"
+           "fleeing from superiors" "fleeing heartbreak" "in adulterous affair" "on secret mission"
+           "moving to relatives" "on hunting trip" "on pilgrimage" "on pleasure cruise"
+           "on regular errand" "on state commission" "on wild goose chase" "pursued by enemies"
+           "pursuing inheritance" "resolving family affairs" "seeking opportunities" "seeking trouble"
+           "spying on company" "trying to forget" "untangling a mystery" "visiting relatives"))
+
+(random-table/register :name "In the Shadows of Mont Brun > Names"
+  :data '("${German Name > Given Name > Masculine} ${German Name > Family Name > General}"
+           "${German Name > Given Name > Masculine} ${German Name > Family Name > Swiss}"
+           "${German Name > Given Name > Feminine} ${German Name > Family Name > General}"
+           "${German Name > Given Name > Feminine} ${German Name > Family Name > Swiss}"
+           "${Italian Name > Given Name > Masculine} ${Italian Name > Family Name > General}"
+           "${Italian Name > Given Name > Masculine} ${Italian Name > Family Name > Swiss}"
+           "${Italian Name > Given Name > Feminine} ${Italian Name > Family Name > General}"
+           "${Italian Name > Given Name > Feminine} ${Italian Name > Family Name > Swiss}"
+           "${French Name > Given Name > Masculine} ${French Name > Family Name > General}"
+           "${French Name > Given Name > Masculine} ${French Name > Family Name > Swiss}"
+           "${French Name > Given Name > Feminine} ${French Name > Family Name > General}"
+           "${French Name > Given Name > Feminine} ${French Name > Family Name > Swiss}"))
+
+(random-table/register :name "German Name > Given Name > Masculine"
+  :private t
+  :data '("Aaron" "Adolf" "Albert" "Albin" "Ambrosius" "Andreas" "Anselm" "Anton" "Augustus" "Balthazar"
+           "Barnabas" "Benedict" "Bernd" "Bernhard" "Berthold" "Blasius" "Burkhard" "Casimir" "Christian" "Christoph"
+           "Dietrich" "Eberhard" "Eilert" "Elias" "Engelbert" "Erasmus" "Erhard" "Ernest" "Eugene" "Ferdinand"
+           "Franz" "Friedrich" "Gabriel" "Gaspar" "Gebhard" "Gedeon." "Gerhard" "Gernot" "Giinther" "Gottfried"
+           "Gotthard" "Gotthelf" "Gottlieb" "Gotz" "Gregor" "Gregorius" "Gustav" "Heimpold" "Heinrich" "Helmut"
+           "Hermann" "Hubert" "Ignatz" "Jakob" "Jan" "Jiirgen" "Joachim" "Jobst" "Johan" "Johannes" "Joist"
+           "Jonathan" "Joseph" "Karl" "Klaus" "Konrad" "Lazarus" "Leopold" "Lorenz"
+           "Ludwig" "Markus" "Matthias" "Maximillian" "Melchior" "Michael" "Moritz" "Nathaniel" "Nicodemus" "Otto"
+           "Paul" "Richard" "Riidiger" "Rudolf" "Rupert" "Samuel" "Sebald" "Servatius" "Siegfried" "Sigismund"
+           "Stephan" "Theobald" "Theodor" "Tobias" "Ulrich" "Volker" "Wendelin" "Werner" "Wilhelm" "Wilibald" "Zacharias"))
+
+(random-table/register :name "German Name > Given Name > Feminine"
+  :private t
+  :data '("Abigail" "Adelheid" "Agatha" "Agnes" "Albrade" "Amalia" "Andrea" "Angela" "Angelica" "Anna"
+           "Anneken" "Annelise" "Annemarie" "Astrid" "Aurelia" "Beatha" "Beatrix" "Bertha" "Bettina" "Birgit"
+           "Brunnhilde" "Carolina" "Catharina" "Catrina" "Cecilia" "Charlotte" "Clara" "Edeltraud" "Eleonora" "Elisabeth"
+           "Elsa" "Emilie" "Engell" "Erika" "Esther" "Eva" "Frida" "Friederica" "Helga" "Gerda"
+           "Gertrude" "Greta" "Gretel" "Gude" "Gudrun" "Hedwig" "Heide" "Herta" "Hildegonde" "Hille"
+           "Tlona" "Ilseke" "Ingrid" "Irma" "Irmel" "Kriemhilde" "Irmgard" "Isolde" "Johanna" "Julia"
+           "Juliana" "Jutta" "Karoline" "Kristine" "Kunigunda" "Laura" "Lena" "Lisalotte" "Lisbeth" "Louisa"
+           "Lucretia" "Lydia" "Lyse" "Margaretha" "Maria" "Magdalena" "Marianne" "Martha" "Mathilde" "Metten"
+           "Metze" "Regina" "Ortrud" "Philippina" "Rike" "Rosa" "Rosamund" "Rosina" "Sabina" "Sara"
+           "Sieglinde" "Sigrid" "Silke" "Susanna" "Theodora" "Theresia" "Ulrica" "Ursula" "Veronica" "Wilhelmina"))
+
+(random-table/register :name "German Name > Family Name > General"
+  :private t
+  :data '("Albrecht" "Ammann" "App" "Bachmann" "Bader" "Bauer" "Baumann" "Beck" "Berger" "Braun."
+           "Brunner" "Burkhard" "Dietrich" "Engelfrid" "Esslinger" "Felder" "Forster" "Frei" "Fuchs" "Furrer"
+           "Ganz" "Geiger" "Gerach" "Gerber" "Giering" "Graf" "Grob" "Gross" "Gut" "Haas"
+           "Hafliger" "Hafner" "Hartmann" "Hauser" "Hecht" "Herzog" "Hirt" "Hodel" "Kohler" "Hofer"
+           "Holliger" "Hotz" "Huber" "Kammermann" "Kappeller" "Kessler" "Knecht" "Kunz" "Kiing" "Lang"
+           "Laub" "Lehmann" "Maier" "Maurer" "Meister" "Richenbach" "Mettler" "Miiler" "Neuhaus" "Nusplinger"
+           "Ortenberg" "Pfister" "Probst" "Ritter" "Roos" "Roth" "Schifer" "Schaub" "Schenk" "Scherer"
+           "Schmid" "Schmidt" "Schneider" "Schuler" "Schumacher" "Schwarz" "Spielmann" "Spiefmacher" "Spreng" "Stalder"
+           "Steiger" "Stocker" "Steiner" "Stilhartz" "Strub" "Studer" "Stiirzinger" "Tischmesser" "Vogel" "von Vilingen"
+           "Walder" "Walter" "Wegmann" "Weiss" "Wicht" "Winkler" "Wirth" "Wolf" "Ziegler" "Zimmermann"))
+
+(random-table/register :name "German Name > Family Name > Swiss"
+  :private t
+  :data '("Altherr" "Altenburger" "Attiger" "Baumgartner" "Binder" "Bircher" "Bissig" "Blatter" "Bléchlinger" "Bolliger"
+           "Bosshard" "Bihler" "Dannacher" "Degen" "Dengler" "Dieth" "Dirler" "Eggler" "Eggwiller" "Ehrenzeller"
+           "Eicher" "Engemann" "Epp" "Fehr" "Fritschi" "Frohlich" "Gebert" "Gerung" "Gfeller" "Gisler"
+           "Glaus" "Glinz" "Gottlinger" "Greminger" "Gresch" "Grobli" "Gsell" "Gugelmann" "Hildbrand" "Gygax"
+           "Hagenburger" "Halder" "Haltmeyer" "Hauselmann" "Hausknecht" "Heitz" "Herger" "Hofstetter" "Hirlimann" "Imhof"
+           "Leu" "Locher" "Lutz" "Liischer" "Lithi" "Ort" "Maag" "Mattli" "Mehr" "Messerli"
+           "Mettler" "Mittelholzer" "Miiller" "Rebmann" "Regli" "Reimann" "Riedweg" "Rietmann" "Rothmund" "Riigg"
+           "Schaffner" "Scharer" "Schlatter" "Schlegel" "Schopfer" "Spéorri" "Stadelmann" "Stauffer" "Stéckli" "Stéssel"
+           "Studer" "Truttmann" "Stutz" "Thommen" "Vogt" "Vollmar" "Vogeli" "Walder" "Wartmann" "Webrli"
+           "Weniger" "Wettstein" "Weyermann" "Widmer" "Wipfli" "Wirth" "Wyrsch" "Wyss" "Zollinger" "Zweifel"))
+
+(random-table/register :name "Italian Name > Given Name > Masculine"
+  :private t
+  :data '("Adamo" "Agnolo" "Agostino" "Alberico" "Aldo" "Alessandro" "Alessio" "Ambrogio" "Andrea" "Angelo"
+           "Antonio" "Armando" "Arnaldo" "Arrigo" "Arturo" "Averardo" "Bartolomeo" "Bastiano" "Benedetto" "Benozzo"
+           "Bertino" "Bindo" "Bruno" "Camillo" "Carlo" "Cesare" "Chimento" "Claudio" "Cristoforo" "Domenico"
+           "Donato" "Ennio" "Enrico" "Ercole" "Ernesto" "Fabrizio" "Fausto" "Ferdinando" "Fiorentino" "Francesco"
+           "Fulvio" "Gaetano" "Gasparo" "Giacinto" "Giacomo" "Giancarlo" "Gianfrancesco" "Gianluigi" "Gilberto" "Gioffre"
+           "Giorgio" "Giovanni" "Girolamo" "Giuseppe" "Guglielmo" "Guido" "Jacopo" "Lazzaro" "Lodovico" "Lorenzo"
+           "Luca" "Luciano" "Luigi" "Marcello" "Marco" "Mariano" "Mario" "Massimo" "Matteo" "Maurizio"
+           "Mocenigo" "Moreno" "Niccolo" "Nunzio" "Orlando" "Ottavio" "Pandolfo" "Pasqua" "Pasquale" "Patrizio"
+           "Pierluigi" "Pietro" "Silvestro" "Silvio" "Spinello" "Stefano" "Stoldo" "Taddeo" "Tommaso" "Ubaldo"
+           "Uberto" "Ugo" "Umberto" "Virgilio"))
+
+(random-table/register :name "Italian Name > Given Name > Feminine"
+  :private t
+  :data '("Adriana" "Agnella" "Agnese" "Albina" "Alessandra" "Alessia" "Annamaria" "Antonella" "Antonia" "Aurelia"
+           "Barbara" "Beatrice" "Bella" "Bianca" "Camilla" "Carlotta" "Cassandra" "Cecilia" "Chiara" "Cristina"
+           "Donatella" "Eleanora" "Elisabetta" "Euphemia" "Fabrizia" "Federica" "Fiametta" "Filippa" "Flavia" "Francesca"
+           "Franceschina" "Francheta" "Gianna" "Ginevra" "Giovanna" "Giulia" "Giulietta" "Gloria" "Griselda" "Helena"
+           "Ilaria" "Imelda" "Tolanda" "Ippolita" "Isabella" "Isotta" "Julia" "Laura" "Lauretta" "Letizia"
+           "Lidia" "Livia" "Lorena" "Lorenza" "Loretta" "Lucia" "Lucrezia" "Luisa" "Madelena" "Marcella"
+           "Maria" "Marietta" "Marissa" "Marta" "Martinella" "Melissa" "Monica" "Morena" "Morella" "Nezetta"
+           "Monteleone" "Nina" "Olimpia" "Olivia" "Ornelia" "Paola" "Patrizia" "Pellitteri" "Paula" "Raffaella"
+           "Regina" "Renata" "Sibilla" "Silvia" "Simona" "Simonetta" "Sophia" "Stella" "Valentina" "Valeria"
+           "Verona" "Veronica" "Vincenza" "Vittoria"))
+
+(random-table/register :name "Italian Name > Family Name > General"
+  :private t
+  :data '("Abagio" "Acerbi" "Acordolo" "Albarenno" "Albergati" "Albiso" "Augeri" "Avonal" "Babilonio" "Baldovinetti"
+           "Barba" "Barbachollo" "Barbamachollo" "Barbazini" "Barberan" "Barbigia" "Barozzi" "Bellego" "Bellini" "Bernasconi"
+           "Bianchi" "Bieri" "Bondimier" "Buglione" "Calandrini" "Calbi" "Calbo" "Calderara" "Caldogne" "Callocci"
+           "Calvane" "Calvenzano" "Calza" "Canepa" "Contarini" "Corner" "Crivelli" "da Leze" "da Vigo" "de Abondiolis"
+           "de Accora" "de Alberinis" "de Albiate" "de Calis" "de Calvino" "de Fidelis" "de Filago" "de Fino" "de Priuli" "de Rossi"
+           "Donado" "Falier" "Farnese" "Filiarchi" "Fiolario" "Fioravanti" "Fiorino" "Fonte" "Foscarini" "Gioffre"
+           "Giustiniani" "Gradenigo" "Grimaldi" "Grimani" "Gritti" "la Tella" "Lanzone" "Larocca" "Lonero" "Longo"
+           "Morini" "Loredan" "Luppi" "Marcello" "Marchesani" "Marin" "Mariotti" "Porzio" "Mauroceno" "Mazzara"
+           "Memo" "Menditto" "Riccoboni" "Roncone" "Rosso" "Scalera" "Spizega" "Tessitore" "Trevisan" "Vellucci"
+           "Vetrone" "Vicelli" "Zambrano" "Zorzi"))
+
+(random-table/register :name "Italian Name > Family Name > Swiss"
+  :private t
+  :data '("Alfieri" "Ambrosini" "Ballinari" "Balzari" "Barenco" "Beltrami" "Berla" "Bernardi" "Bernasocchi" "Bertina"
+           "Besler" "Biasca" "Bodinoli" "Bonoli" "Bonzanigo" "Borghi" "Borgo-Caratti" "Brentini" "Bruga" "Bulloni"
+           "Calanchini" "Capezzoli" "Carmine" "Cattaneo" "Cauzza" "Christofanini" "Cippa" "Cusa" "Delgrande" "Dolcini"
+           "Farinelli" "Flori" "Gabani" "Galli" "Ghisla" "Gianini" "Giovanetti" "Grossi" "Guglielmini" "Guidi"
+           "Guidinetti" "Laffranchi" "Laffranchini" "Lavizzari" "Lentini" "Leona" "Luis" "Lussi" "Malaguerra" "Maletti"
+           "Mantelli" "Mariotti" "Martignoli" "Mazzucchelli" "Micheletti" "Minetta" "Minotti" "Molinari" "Morelli" "Moretti"
+           "Muggiasca" "Nadi" "Negrini" "Odone" "Ostini" "Pacciorini" "Palla" "Paolini" "Pedotti" "Pedrazzoli"
+           "Morosini" "Pellanda" "Pellini" "Peretti" "Pessi" "Pini" "Ponzio" "Querini" "Raspini" "Ravizza"
+           "Re" "Respini" "Solari" "Taddei" "Taragnoli" "Tatti" "Tognacca" "Tonini" "Traversi" "Valentini"
+           "Vanazzi" "Varrone" "Zanetti" "Zanini"))
+
+(random-table/register :name "French Name > Given Name > Masculine"
+  :private t
+  :data '("Adenet" "Agénor" "Allain" "Ambrose" "Anselme" "Arnalt" "Aubin" "Bernard" "Bertin" "Blaise"
+           "Bossu" "Bénoist" "Charles" "Claude" "Clément" "Cédric" "Denis" "Drouet" "Edmond" "Edouard"
+           "Ernault" "Etienne" "Fabrice" "Felix" "Fernand" "Floquart" "Francois" "Frédéric" "Gaspard" "Gaston"
+           "Gaultier" "Gerome" "Gilbert" "Gilet" "Gilles" "Guibert" "Guieffroy" "Guillaume" "Guiot" "Guy"
+           "Gérard" "Heliot" "Hilaire" "Hiérome" "Honoré" "Huget" "Hugh" "Hughes" "Hugo" "Huguet"
+           "Imbert" "Jacob" "Jacques" "Jacquet" "Jaquemin" "Jean" "Jean-XX" "Jean-XX" "Jean-XX" "Jean-XX"
+           "Jehan" "Julien" "Justin" "Lazare" "Lothaire" "Louis" "Loys" "Luc" "Marc" "Marcel"
+           "Mathelot" "Mathieu" "Maximilien" "Michel" "Médard" "Nicolaus" "Octave" "Odo" "Olivier" "Pascal"
+           "Patrick" "Paul" "Perrin" "Philippe" "Pierre" "Raoul" "René" "Reynard" "Richart" "Robert"
+           "Rogier" "Roland" "Rémy" "Simon" "Stéphane" "Theophile" "Victor" "Vincent" "Yves" "Yvonnet"))
+
+(random-table/register :name "French Name > Given Name > Feminine"
+  :private t
+  :data '("Adele" "Agathe" "Agnes" "Alice" "Amélie" "Angélique" "Anne" "Annes" "Annette" "Arlette"
+           "Aurélie" "Anne-Marie" "Belle" "Belsant" "Benedicta" "Béatrice" "Bénédicte" "Bertha" "Blanche" "Blanchefleur"
+           "Brigitte" "Camille" "Cecilia" "Céline" "Charlotte" "Christine" "Claire" "Clara" "Claricia" "Clémence"
+           "Colette" "Delphine" "Dominique" "Dorothée" "Edith" "Eleanor" "Eliane" "Elisabeth" "Elodie" "Emma"
+           "Danielle" "Eugénie" "Eve" "Eva" "Fleurette" "Florine" "Francoise" "Geneviéve" "Géraldine" "Gillota"
+           "Giselle" "Gisla" "Godelina" "Helena" "Heloise" "Hermine" "Isabel" "Jaqueline" "Jeanne" "Jeannette"
+           "Joélle" "Jolene" "Julie" "Juliette" "Justine" "Leonore" "Lucie" "Madelaine" "Manon" "Marceline"
+           "Margot" "Marianne" "Marie" "Marine" "Marie-Claude" "Maryse" "Matildis" "Michelle" "Monique" "Noémie"
+           "Odette" "Odile" "Paulette" "Pauline" "Renée" "Sabine" "Simone" "Stéphanie" "Suzanne" "Sylvie"
+           "Thérése" "Valérie" "Sévérine" "Véronique" "Violette" "Vivienne" "Ysoude" "Yvette" "Yvonne" "Zoé"))
+
+(random-table/register :name "French Name > Family Name > General"
+  :private t
+  :data '("Favre" "Affré" "Allard" "Allemand" "Arceneaux" "Astier" "Bacque" "Barbet" "Baudet" "Beaumont"
+           "Beauregard" "Badeux" "Besnard" "Bittencourt" "Blouet" "Berger" "Boissieu" "Bonhomme" "Bossuet" "Boulet"
+           "Bourcier" "Bourgeois" "Brazier" "Bruneau" "Carpentier" "Carré" "Chapelle" "Choffard" "Clérisseau" "Cochin"
+           "Cormier" "Coupain" "Courbet" "Crépin" "Cuvier" "D’Amboise" "de Périgon" "de Venteillon" "de Verley" "de Villepin"
+           "Cortot" "Delannoy" "des Lys" "Delaplace" "Dimont" "Droz" "du Marais" "Duchemin" "Fouché" "Gachet"
+           "Gérin" "Girardot" "Gounelle" "Granet" "Granier" "Grenier" "Jacquier" "Jeannin" "Kléber" "Lafaille"
+           "Laffitte" "Lalande" "Lavaud" "Lazard" "le Chaudronnier" "le Morve" "Lecocq" "Leroux" "Levasseur" "Lévesque"
+           "Levett" "Loup" "Maspier" "Mauvaissoir" "Masson." "Mazzal" "Ménétries" "Messier" "Moitessier" "Morand"
+           "Piaget" "Picard" "Poussin" "Quint" "Renier" "Renou" "Rossignol" "Rouanet" "Rouzet" "Saint-Méran"
+           "Saint-Yves" "Seyrés" "Rochette" "Thévenet" "Thibault" "Toussaint" "Trintignant" "Vaugrenard" "Vérany" "Villefort"))
+
+
+(random-table/register :name "French Name > Family Name > Swiss"
+  :private t
+  :data '("Ausset" "Béchet" "Béranger" "Bérard" "Berdez" "Blanchenay" "Blanchet" "Borel" "Borgeaud" "Bossy"
+           "Bressenel" "Boisot" "Burnat" "Carrard" "Chastellain" "Bridel" "Chauvet" "Chevallier" "Conod" "Correvon"
+           "Creux" "Cuénoud" "Daccord" "de Blonay" "de Bons" "de Cerjat" "de Coppet" "de Crousaz" "de Dompierre" "de Joffrey"
+           "de la Harpe" "de Morsier" "de Roguin" "Delajoux" "Delavigne" "Delisle" "Despland" "Destraz" "Doxat" "Duplessis"
+           "de Loys" "Dupuget" "Duvoisin" "Duthon" "Fatio" "Favrat" "Fevot" "Fraisse" "Gantin" "Gaudard"
+           "Gendroz" "Gilliard" "Grivel" "Groux" "Guex" "Henrioud" "Hugonnet" "Husson" "la Salle" "Lambert"
+           "Leresche" "Maillard" "Mandrot" "Marcuard" "Maret" "Masset" "Mercier" "Michod" "Monnerat" "Monneron"
+           "Monnier" "Morel" "Muret" "Nicollier" "Ney" "Panchaud" "Papon" "Paschoud" "Penel" "Péneveyre"
+           "Perret" "Peytrignet" "Pilloud" "Reboul" "Régis" "Rosset" "Roulet" "Savary" "Sordet" "Specht"
+           "Taillens" "Tapernoux" "Rossier" "Tarin" "Tornier" "Trincard" "Villard" "Villommet" "Vulliemin" "Willommet"))
