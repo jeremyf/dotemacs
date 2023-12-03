@@ -171,6 +171,12 @@ Two PREFIX given: prompt for DIRECTORY and filename GLOBs."
   ("C-c C-r q" . vr/query-replace)
   ("C-c C-r p" . project-query-replace-regexp))
 
+;; https://github.com/hokomo/query-replace-parallel
+;; Presented at https://pad.emacsconf.org/2023-parallel
+(use-package query-replace-parallel
+  :straight (:host github :repo "hokomo/query-replace-parallel")
+  :commands (query-replace-parallel query-replace-parallel-regexp))
+
 (use-package crux
   ;; A mix of a few odd and useful functions.
   :straight t

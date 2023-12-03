@@ -13,6 +13,18 @@
 (require 'jf-quick-help)
 (require 'jf-org-mode)
 
+;; (require 'rpgdm "~/git/emacs-rpgdm/rpgdm.el")
+;; (require 'rpgdm-dice "~/git/emacs-rpgdm/rpgdm-dice.el")
+;; (require 'rpgdm-tables "~/git/emacs-rpgdm/rpgdm-trables.el")
+;; (require 'rpgdm-tables-dice "~/git/emacs-rpgdm/rpgdm-trables-dice.el")
+;; (require 'rpgdm-tables-freq "~/git/emacs-rpgdm/rpgdm-trables-freq.el")
+
+;; (use-package rpgdm
+;;   :init (use-package hydra :straight t)
+;;   :straight (:host gitlab
+;;               :repo "howardabrams/emacs-rpgdm"))
+;; (require 'rpgdm-tables-dice.el)
+
 ;;;; General
 
 (defconst jf/gaming/runes

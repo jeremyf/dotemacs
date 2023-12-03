@@ -219,6 +219,21 @@ of measurement (e.g., a word or sentence)."
   (if (equal "capture" (frame-parameter nil 'name))
       (delete-frame)))
 
+(use-package centered-cursor-mode
+  :straight t
+  :config
+  ;; Optional, enables centered-cursor-mode in all buffers.
+  :hook (org-mode . centered-cursor-mode))
+
+ (use-package eat
+  :straight (:type git
+       :host codeberg
+       :repo "akib/emacs-eat"
+       :files ("*.el" ("term" "term/*.el") "*.texi"
+               "*.ti" ("terminfo/e" "terminfo/e/*")
+               ("terminfo/65" "terminfo/65/*")
+               ("integration" "integration/*")
+                (:exclude ".dir-locals.el" "*-tests.el"))))
 
 (provide 'jf-experiments)
 ;;; jf-experiments.el ends here
