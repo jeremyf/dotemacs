@@ -127,6 +127,7 @@ first matching link."
                            (wl . wl-other-frame)))
   :config
   (setq org-clock-persist 'history)
+  (setq org-export-headline-levels 4)
   ;; When I would load the agenda, I'd invariably type "l" to list the entries.
   (setq org-agenda-start-with-log-mode t)
   (setq org-confirm-babel-evaluate #'jf/org-confirm-babel-evaluate
