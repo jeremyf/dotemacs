@@ -920,7 +920,7 @@ The return value is a list of `cons' with the `car' values of:
   (cond
     ;; When we're clocking and no prefix is given...
     ((and (= 1 prefix) (fboundp 'org-clocking-p) (org-clocking-p))
-      (list :key "C" :template jf/org-mode/capture/template/while-clocking))
+      (list :key "i" :template jf/org-mode/capture/template/while-clocking))
     ;; We're not clocking or we provided a prefix.
     (t (list :key "c" :template jf/org-mode/capture/template/default))))
 
@@ -980,7 +980,7 @@ I envision this function called from the command-line."
          :immediate-finish t)
        ("t" "Task (for Project)"
          plain (function jf/org-mode/capture/project-task/find)
-         "%T\n\n%?"
+         "%?"
          :empty-lines-before 1
          :empty-lines-after 1
          :clock-in t
