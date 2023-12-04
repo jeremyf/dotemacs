@@ -219,13 +219,7 @@ of measurement (e.g., a word or sentence)."
   (if (equal "capture" (frame-parameter nil 'name))
       (delete-frame)))
 
-(use-package centered-cursor-mode
-  :straight t
-  :config
-  ;; Optional, enables centered-cursor-mode in all buffers.
-  :hook (org-mode . centered-cursor-mode))
-
- (use-package eat
+(use-package eat
   :straight (:type git
        :host codeberg
        :repo "akib/emacs-eat"

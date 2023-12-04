@@ -1065,5 +1065,25 @@ APP is the parameters for saving the bookmark."
 ;;     (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note)))
 
 
+(setq org-export-filter-node-property-functions
+  (list
+    (lambda (data back-end channel)
+      (cond
+        ((eq back-end 'latex)
+          (let ((field-value (s-split ":" data)))
+            (format "\\item \\textbf{%s:} %s\n"
+              (s-titleize (s-replace "_" " " (car field-value)))
+              (s-trim (cadr field-value)))))
+        (t data)))))
+
+(defun jf/org-latex-property-drawer (_property-drawer contents _info)
+  "Transcode a PROPERTY-DRAWER element from Org to LaTeX.
+CONTENTS holds the contents of the drawer.  INFO is a plist
+holding contextual information."
+  (and (org-string-nw-p contents)
+    (format "\\begin{itemize}\n%s\\end{itemize}" contents)))
+
+(advice-add #'org-latex-property-drawer :override #'jf/org-latex-property-drawer)
+
 (provide 'jf-org-mode)
 ;;; jf-org-mode.el ends here

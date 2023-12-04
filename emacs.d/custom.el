@@ -20,7 +20,9 @@
  '(org-export-backends '(ascii html latex md odt))
  '(random-table/reporter 'random-table/reporter/as-insert)
  '(safe-local-variable-values
-    '((projectile-git-fd-args . "-H -0 -E hyrax-webapp -E .git -tf --strip-cwd-prefix -c never")
+    '((eval setq-local org-export-with-properties
+        '("PRONOUNS" "BACKGROUND" "ANCESTRY" "KEEPSAKE" "ARCHETYPE" "SESSION_DATE" "START_LOCATION" "CAMPAIGN_START_DATE" "CAMPAIGN_END_DATE" "END_LOCATION"))
+       (projectile-git-fd-args . "-H -0 -E hyrax-webapp -E .git -tf --strip-cwd-prefix -c never")
        (projectile-git-submodule-command . "")
        (jf/tor-minor-mode . 1)
        (projectile-require-project-root)
