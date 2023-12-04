@@ -235,5 +235,17 @@ of measurement (e.g., a word or sentence)."
                ("integration" "integration/*")
                 (:exclude ".dir-locals.el" "*-tests.el"))))
 
+(use-package treemacs
+  :straight t
+  :bind ("s-o" . #'treemacs-select-window))
+
+(use-package treemacs-projectile
+  :straight t
+  :after (treemacs projectile))
+
+(use-package treemacs-magit
+  :straight t
+  :after (treemacs magit))
+
 (provide 'jf-experiments)
 ;;; jf-experiments.el ends here

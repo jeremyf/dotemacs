@@ -33,8 +33,8 @@
          (side . right)
          (slot . 0)
          (window-parameters . ((mode-line-format . (" %b")))))
-       ("*Register Preview*" (display-buffer-reuse-window))
-       (t (display-buffer-reuse-window display-buffer-same-window))))
+       ("*Register Preview*" (display-buffer-reuse-window))))
+       ;; (t (display-buffer-reuse-window display-buffer-same-window))))
   :bind (("s-q" . #'jf/bury-or-unbury-buffer))
   :config (setq confirm-kill-emacs #'yes-or-no-p)
   :preface
