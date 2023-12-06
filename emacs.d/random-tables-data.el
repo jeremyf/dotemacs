@@ -2613,7 +2613,6 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "Piaget" "Picard" "Poussin" "Quint" "Renier" "Renou" "Rossignol" "Rouanet" "Rouzet" "Saint-Méran"
            "Saint-Yves" "Seyrés" "Rochette" "Thévenet" "Thibault" "Toussaint" "Trintignant" "Vaugrenard" "Vérany" "Villefort"))
 
-
 (random-table/register :name "French Name > Family Name > Swiss"
   :private t
   :data '("Ausset" "Béchet" "Béranger" "Bérard" "Berdez" "Blanchenay" "Blanchet" "Borel" "Borgeaud" "Bossy"

@@ -559,6 +559,10 @@ Assumes that I'm on a :projects: headline.
 (add-to-list 'org-export-global-macros
   '("m" . "@@html:<i class=\"mechanic\">@@$1@@html:</i>@@"))
 (add-to-list 'org-export-global-macros
+  '("newline" . "@@latex:\\@@ @@html:<br />@@"))
+(add-to-list 'org-export-global-macros
+  '("newpage" . "@@latex:\newpage@@"))
+(add-to-list 'org-export-global-macros
   '("linkToSeries" . "@@hugo:{{< linkToSeries \"@@$1@@hugo:\" >}}@@"))'
 
 (defun jf/org-link-delete-link ()
@@ -1071,7 +1075,8 @@ APP is the parameters for saving the bookmark."
       (cond
         ((eq back-end 'latex)
           (let ((field-value (s-split ":" data)))
-            (format "\\item \\textbf{%s:} %s\n"
+            ;; (format "\\item\\textbf{%s:} %s\n"
+            (format "\\item[{%s:}] %s\n"
               (s-titleize (s-replace "_" " " (car field-value)))
               (s-trim (cadr field-value)))))
         (t data)))))
@@ -1081,9 +1086,22 @@ APP is the parameters for saving the bookmark."
 CONTENTS holds the contents of the drawer.  INFO is a plist
 holding contextual information."
   (and (org-string-nw-p contents)
-    (format "\\begin{itemize}\n%s\\end{itemize}" contents)))
+    (format "\\begin{description}\n%s\\end{description}" contents)))
 
 (advice-add #'org-latex-property-drawer :override #'jf/org-latex-property-drawer)
+
+;; Without these, I've lost table of contents in PDF exports.
+(defun jf/org-export-change-options (plist backend)
+  (cond
+    ((equal backend 'html)
+     (plist-put plist :with-toc nil)
+     (plist-put plist :section-numbers nil))
+    ((equal backend 'latex)
+     (plist-put plist :with-toc t)
+     (plist-put plist :section-numbers nil)))
+  plist)
+(add-to-list 'org-export-filter-options-functions #'jf/org-export-change-options)
+
 
 (provide 'jf-org-mode)
 ;;; jf-org-mode.el ends here
