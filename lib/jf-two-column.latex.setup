@@ -16,13 +16,13 @@
 #+LATEX_HEADER: \usepackage{relsize,etoolbox}
 #+LATEX_HEADER: \AtBeginEnvironment{quote}{\smaller}
 #+LATEX_HEADER: \usepackage[printonlyused,nohyperlinks]{acronym}
-#+LATEX_HEADER: \usepackage[norule,marginal,hang]{footmisc}
+#+LATEX_HEADER: \usepackage[marginal,hang]{footmisc}
 #+LATEX_HEADER: \usepackage{multicol}
 #+LATEX_HEADER: \setlength\columnsep{20pt}
 #+LATEX_HEADER: \usepackage{hyperref}
 #+LATEX_HEADER: \hypersetup{pdfborder=0 0 0}
 
-#+OPTIONS: toc:2
+#+OPTIONS: toc:3
 
 # If this is a header; it will affect the table of contents.  But as a LATEX
 # command, it happens in the processing order ofthe org file.
