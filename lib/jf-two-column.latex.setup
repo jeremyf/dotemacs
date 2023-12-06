@@ -1,0 +1,30 @@
+# -*- mode: org; -*-
+
+#+LATEX_COMPILER: lualatex
+#+LATEX_CLASS: article
+#+LATEX_CLASS_OPTIONS: [11pt]
+#+LATEX_HEADER: \usepackage[french,english]{babel}
+#+LATEX_HEADER: \usepackage[a4paper,top=3cm,bottom=3cm]{geometry}
+#+LATEX_HEADER: \usepackage{minimalist}
+#+LATEX_HEADER: \usepackage{fontspec}
+#+LATEX_HEADER: \usepackage{caption} \captionsetup{labelfont=bf,font={sf,small}}
+#+LATEX_HEADER: \setmainfont{TeX Gyre Pagella}
+#+LATEX_HEADER: \usepackage{enumitem} \setlist{nosep}
+#+LATEX_HEADER: \usepackage{longtable}
+#+LATEX_HEADER: \usepackage{microtype}
+#+LATEX_HEADER: \AtBeginEnvironment{longtable}{\footnotesize}
+#+LATEX_HEADER: \usepackage{relsize,etoolbox}
+#+LATEX_HEADER: \AtBeginEnvironment{quote}{\smaller}
+#+LATEX_HEADER: \usepackage[printonlyused,nohyperlinks]{acronym}
+#+LATEX_HEADER: \usepackage[norule,marginal,hang]{footmisc}
+#+LATEX_HEADER: \usepackage{multicol}
+#+LATEX_HEADER: \setlength\columnsep{20pt}
+#+LATEX_HEADER: \usepackage{hyperref}
+#+LATEX_HEADER: \hypersetup{pdfborder=0 0 0}
+
+#+OPTIONS: toc:2
+
+# If this is a header; it will affect the table of contents.  But as a LATEX
+# command, it happens in the processing order ofthe org file.
+#+LATEX: \let\oldsection\section
+#+LATEX: \renewcommand{\section}[1]{\newpage\endmulticols\oldsection{#1}\multicols{2}}
