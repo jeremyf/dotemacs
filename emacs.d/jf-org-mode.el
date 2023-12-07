@@ -206,34 +206,7 @@ first matching link."
   ;; I’m trash with LaTeX, but like the layout thusfar.
   (add-to-list 'org-latex-classes
     '("jf/article"
-       "\\documentclass[11pt,a4paper]{article}
-      \\usepackage[utf8]{inputenc}
-      \\usepackage[T1]{fontenc}
-      \\usepackage{fixltx2e}
-      \\usepackage{graphicx}
-      \\usepackage{longtable}
-      \\usepackage{float}
-      \\usepackage{wrapfig}
-      \\usepackage{rotating}
-      \\usepackage[normalem]{ulem}
-      \\usepackage{amsmath}
-      \\usepackage{textcomp}
-      \\usepackage{marvosym}
-      \\usepackage{wasysym}
-      \\usepackage{amssymb}
-      \\usepackage{hyperref}
-      \\usepackage{mathpazo}
-      \\usepackage{xcolor}
-      \\usepackage{enumerate}
-      \\usepackage[printonlyused,nohyperlinks]{acronym}
-      \\definecolor{bg}{rgb}{0.95,0.95,0.95}
-      \\tolerance=1000
-      [NO-DEFAULT-PACKAGES]
-      [PACKAGES]
-      [EXTRA]
-
-      \\linespread{1.1}
-      \\hypersetup{pdfborder=0 0 0}"
+       "\\documentclass[11pt,a4paper]{article}"
        ("\\section{%s}" . "\\section{%s}")
        ("\\subsection{%s}" . "\\subsection{%s}")
        ("\\subsubsection{%s}" . "\\subsubsection{%s}")
@@ -1098,7 +1071,7 @@ holding contextual information."
      (plist-put plist :with-toc nil)
      (plist-put plist :section-numbers nil))
     ((equal backend 'latex)
-     (plist-put plist :with-toc t)
+     (plist-put plist :with-toc 3)
      (plist-put plist :section-numbers nil)))
   plist)
 (add-to-list 'org-export-filter-options-functions #'jf/org-export-change-options)
