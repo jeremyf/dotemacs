@@ -234,10 +234,11 @@ first matching link."
 
       \\linespread{1.1}
       \\hypersetup{pdfborder=0 0 0}"
-       ("\\section{%s}" . "\\section*{%s}")
-       ("\\subsection{%s}" . "\\subsection*{%s}")
-       ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-       ("\\paragraph{%s}" . "\\paragraph*{%s}")))
+       ("\\section{%s}" . "\\section{%s}")
+       ("\\subsection{%s}" . "\\subsection{%s}")
+       ("\\subsubsection{%s}" . "\\subsubsection{%s}")
+       ("\\paragraph{%s}" . "\\paragraph{%s}")
+       ("\\subparagraph{%s}" . "\\subparagraph{%s}")))
 
   ;; \\hypersetup{colorlinks=false,pdfborderstyle={/S/U/W 1},pdfborder=0 0 1}"
   ;; Make TAB act as if it were issued from the buffer of the languages's major
