@@ -204,6 +204,8 @@ first matching link."
   ;; I grabbed from the following LaTeX class from
   ;; https://www.reddit.com/r/emacs/comments/3zcr43/nooborgmode_custom_latexpdf_export_custom_style/.
   ;; I’m trash with LaTeX, but like the layout thusfar.
+  (progn
+  (setq org-latex-classes '())
   (add-to-list 'org-latex-classes
     '("jf/article"
        "\\documentclass[11pt,a4paper]{article}"
@@ -211,7 +213,7 @@ first matching link."
        ("\\subsection{%s}" . "\\subsection{%s}")
        ("\\subsubsection{%s}" . "\\subsubsection{%s}")
        ("\\paragraph{%s}" . "\\paragraph{%s}")
-       ("\\subparagraph{%s}" . "\\subparagraph{%s}")))
+       ("\\subparagraph{%s}" . "\\subparagraph{%s}"))))
 
   ;; \\hypersetup{colorlinks=false,pdfborderstyle={/S/U/W 1},pdfborder=0 0 1}"
   ;; Make TAB act as if it were issued from the buffer of the languages's major
