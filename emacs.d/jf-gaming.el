@@ -13,17 +13,37 @@
 (require 'jf-quick-help)
 (require 'jf-org-mode)
 
-;; (require 'rpgdm "~/git/emacs-rpgdm/rpgdm.el")
-;; (require 'rpgdm-dice "~/git/emacs-rpgdm/rpgdm-dice.el")
-;; (require 'rpgdm-tables "~/git/emacs-rpgdm/rpgdm-trables.el")
-;; (require 'rpgdm-tables-dice "~/git/emacs-rpgdm/rpgdm-trables-dice.el")
-;; (require 'rpgdm-tables-freq "~/git/emacs-rpgdm/rpgdm-trables-freq.el")
-
-;; (use-package rpgdm
-;;   :init (use-package hydra :straight t)
-;;   :straight (:host gitlab
-;;               :repo "howardabrams/emacs-rpgdm"))
-;; (require 'rpgdm-tables-dice.el)
+(if (f-file?  "~/git/emacs-rpgtk/rpgtk-messages.el")
+  (progn
+    ;; Favor my clone of the code.
+    (require 'rpgtk-messages "~/git/emacs-rpgtk/rpgtk-messages.el")
+    (require 'rpgtk-dice "~/git/emacs-rpgtk/rpgtk-dice.el")
+    (require 'rpgtk-tables "~/git/emacs-rpgtk/rpgtk-tables.el")
+    (require 'rpgtk-org "~/git/emacs-rpgtk/rpgtk-org.el"))
+  (progn
+    (use-package rpgtk-messages
+      :straight (:host codeberg
+                  :repo "takeonrules/emacs-rpgtk"
+                  :type git
+                  :files ("rpgtk-messages.el")))
+    (use-package rpgtk-dice
+      :init (use-package rpgtk-messages :straight t)
+      :straight (:host codeberg
+                  :repo "takeonrules/emacs-rpgtk"
+                  :type git
+                  :files ("rpgtk-dice.el")))
+    (use-package rpgtk-tables
+      :init (use-package rpgtk-messages :straight t)
+      :straight (:host codeberg
+                  :repo "takeonrules/emacs-rpgtk"
+                  :type git
+                  :files ("rpgtk-tables.el")))
+    (use-package rpgtk-org
+      :init (use-package rpgtk-messages :straight t)
+      :straight (:host codeberg
+                  :repo "takeonrules/emacs-rpgtk"
+                  :type git
+                  :files ("rpgtk-org.el")))))
 
 ;;;; General
 

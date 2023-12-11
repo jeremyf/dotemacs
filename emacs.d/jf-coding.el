@@ -332,13 +332,13 @@ method, get the containing class."
         (t "require 'debug'; binding.break"))
       "require 'debug'; binding.break")))
 
-(unbind-key "C-x C-r")
-(use-package repl-driven-development
-  ;; Type C-u and the command to print to the buffer.
-  :straight t
-  :config
-  (repl-driven-development [C-x C-r b] "bash")
-  (repl-driven-development [C-x C-r r] "irb --inf-ruby-mode" :prompt "irb(main):.*>"))
+;; (unbind-key "C-x C-r")
+;; (use-package repl-driven-development
+;;   ;; Type C-u and the command to print to the buffer.
+;;   :straight t
+;;   :config
+;;   (repl-driven-development [C-x C-r b] "bash")
+;;   (repl-driven-development [C-x C-r r] "irb --inf-ruby-mode" :prompt "irb(main):.*>"))
 
 (use-package rspec-mode
   ;; I write most of my Ruby tests using rspec.  This tool helps manage that
