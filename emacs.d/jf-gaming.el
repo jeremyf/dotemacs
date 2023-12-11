@@ -16,10 +16,20 @@
 (if (f-file?  "~/git/emacs-rpgtk/rpgtk-messages.el")
   (progn
     ;; Favor my clone of the code.
-    (require 'rpgtk-messages "~/git/emacs-rpgtk/rpgtk-messages.el")
-    (require 'rpgtk-dice "~/git/emacs-rpgtk/rpgtk-dice.el")
-    (require 'rpgtk-tables "~/git/emacs-rpgtk/rpgtk-tables.el")
-    (require 'rpgtk-org "~/git/emacs-rpgtk/rpgtk-org.el"))
+    (use-package rpgtk-messages
+      :straight (:type git :local-repo "~/git/emacs-rpgtk/" :files ("rpgtk-messages.el")))
+    (use-package rpgtk-dice
+      :straight (:type git :local-repo "~/git/emacs-rpgtk/" :files ("rpgtk-dice.el")))
+    (use-package rpgtk-tables
+      :straight (:type git :local-repo "~/git/emacs-rpgtk/" :files ("rpgtk-tables.el"))
+      :custom (rpgtk-tables-choose-predicate #'jf/rpgtk-tables-choose-predicate)
+      :config
+      (defun jf/rpgtk-tables-choose-predicate ()
+        "Skip any tables that have a parent directory of \"/_private/\"."
+        (-reject (lambda (el) (s-contains? "/_private/" el))
+          (funcall #'rpgtk-tables-choose-default-predicate))))
+    (use-package rpgtk-org
+      :straight (:type git :local-repo "~/git/emacs-rpgtk/" :files ("rpgtk-org.el"))))
   (progn
     (use-package rpgtk-messages
       :straight (:host codeberg
