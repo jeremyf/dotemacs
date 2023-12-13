@@ -12,7 +12,6 @@
 #+LATEX_HEADER: \usepackage{longtable}
 #+LATEX_HEADER: \usepackage{microtype}
 #+LATEX_HEADER: \AtBeginEnvironment{longtable}{\footnotesize}
-#+LATEX_HEADER: \usepackage{minted}
 #+LATEX_HEADER: \usepackage[marginal,hang]{footmisc}
 #+LATEX_HEADER: \usepackage{relsize,etoolbox}
 #+LATEX_HEADER: \AtBeginEnvironment{quote}{\smaller}
@@ -22,18 +21,11 @@
 #+LATEX_HEADER: \setlength\columnsep{20pt}
 #+LATEX_HEADER: \hypersetup{pdfborder=0 0 0}
 #+LATEX_HEADER: \tolerance=1000
-#+LATEX_HEADER: \usepackage{fixltx2e}
-#+LATEX_HEADER: \usepackage{graphicx}
-#+LATEX_HEADER: \usepackage{longtable}
 #+LATEX_HEADER: \usepackage{float}
-#+LATEX_HEADER: \usepackage{wrapfig}
 #+LATEX_HEADER: \usepackage{rotating}
 #+LATEX_HEADER: \setcounter{secnumdepth}{1}
-#+LATEX_HEADER: \setcounter{tocdepth}{3}
-
 # If this is a header; it will affect the table of contents.  But as a LATEX
 # command, it happens in the processing order ofthe org file.
 #+LATEX: \let\oldsection\section
 #+LATEX: \renewcommand{\section}[1]{\newpage\end{multicols}\oldsection{#1}\begin{multicols}{2}}
-
 # lualatex  -interaction=nonstopmode -recorder --output-format=pdf path/to/file.tex
