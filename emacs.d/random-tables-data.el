@@ -1105,7 +1105,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "Hatred: the sect wishes the death or conversion of the orthodox."
            "Indifference: the sect has no particular animus or love for the orthodox."
            "Obedience: the sect feels obligated to obey the orthodox hierarchy in all matters not related to their specific faith."
-           "Legitimist: the sect views itself as the \true\" orthodox faith and the present orthodox hierarchy as pretenders to their office."
+           "Legitimist: the sect views itself as the “true” orthodox faith and the present orthodox hierarchy as pretenders to their office."
            "Purificationist: the sect’s austerities, sufferings, and asceticisms are necessary to purify the orthodox."))
 
 (random-table/register :name "Heresy > Quirk"
