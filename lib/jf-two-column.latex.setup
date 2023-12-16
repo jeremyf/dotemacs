@@ -23,6 +23,9 @@
 #+LATEX_HEADER: \tolerance=1000
 #+LATEX_HEADER: \usepackage{float}
 #+LATEX_HEADER: \usepackage{rotating}
+#+LATEX_HEADER: \usepackage{sectsty}
+#+LATEX_HEADER: \usepackage{titlesec}
+#+LATEX_HEADER: \titleformat{\section}{\normalfont\fontsize{12}{18}\bfseries}{\thesection}{1em}{}
 #+LATEX_HEADER: \setcounter{secnumdepth}{1}
 # If this is a header; it will affect the table of contents.  But as a LATEX
 # command, it happens in the processing order ofthe org file.
