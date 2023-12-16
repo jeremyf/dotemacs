@@ -90,7 +90,7 @@
                      (format "%s\n> Modifier: "
                        (random-table-name table))
                      0))
-         (roll (random-table/roller/1d20 table)))
+         (roll (random-table/roller/string "1d20")))
     (cond
       ((= roll 1) "Fail")
       ((= roll 20) "Save")
@@ -110,6 +110,7 @@
             "\n- Renown :: ${Henchman > Renown}"
             "\n- Morale :: ${[Henchman > Morale Base] + [Henchman > Morale Variable]}"
             "\n${Character (Errant)}")))
+
 
 (random-table/register :name "Henchman > Archetype (Errant)"
   :private t
@@ -146,11 +147,12 @@
 
 (random-table/prompt "Hiring location for Henchman"
   :type #'completing-read
+  ;; TODO: Can I use "1d2" in this situation?
   :range '(("Hamlet" . (lambda (table) 1))
-            ("Village" . random-table/roller/1d2)
-            ("Town" . random-table/roller/1d3)
-            ("City" . random-table/roller/1d4)
-            ("Metropolis" . random-table/roller/1d5)))
+            ("Village" . (lambda (table) (random-table/roller/string "1d2")))
+            ("Town" . (lambda (table) (random-table/roller/string "1d3")))
+            ("City" . (lambda (table) (random-table/roller/string "1d4")))
+            ("Metropolis" . (lambda (table) (random-table/roller/string "1d5")))))
 
 (random-table/register :name "Henchman > Renown"
   :roller (lambda (table)
@@ -1256,123 +1258,6 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "touching it causes intense pain"
            "using it requires an obscure, elaborate ritual"))
 
-
-;;; House Rules
-;;;; Goblin Punch Death and Dismemberment
-;; See https://drive.google.com/file/d/0BxVHEMMjLlZ4cFVJTEFEcW9WV0U/view?resourcekey=0-matru4XOnZc-kjaQtiEX3Q
-(defun random-table/roller/death-and-dismemberment/damage (table)
-  (+ (read-number "Number of Existing Injuries: " 0)
-    (read-number "Lethal Damage: " 0)
-    (random-table/roller/1d12 table)))
-
-(random-table/register :name "Death and Dismemberment"
-  :roller #'random-table/roller/prompt-from-table-data
-  :data '(("Physical" . "${Death and Dismemberment > Physical}")
-           ("Acid/Fire" . "${Death and Dismemberment > Acid/Fire}")
-           ("Eldritch" . "${Death and Dismemberment > Eldritch}")
-           ("Lightning" . "${Death and Dismemberment > Lightning}")
-           ("Non-Lethal" . "${Death and Dismemberment > Non-Lethal}")))
-
-(random-table/register :name "Death and Dismemberment > Eldritch"
-  :roller #'random-table/roller/death-and-dismemberment/damage
-  :private t
-  :data '(((1 . 10) . "Rolled ${current_roll}\n- +1 Injury\n- Anathema for +${current_roll} day(s).")
-           ((11 . 15) . "Rolled ${current_roll}\n- +1 Injury\n- Anathema for +${current_roll} day(s).\n- One Fatal Wound.\n- Save vs. Curse.")
-           ((16 . 1000) . "Rolled ${current_roll}\n- +1 Injury\n- Anathema for +${current_roll} day(s).\n- ${current_roll} - 14 Fatal Wounds.\n- Save vs. Curse.")))
-
-(random-table/register :name "Death and Dismemberment > Acid/Fire"
-  :roller #'random-table/roller/death-and-dismemberment/damage
-  :private t
-  :data '(((1 . 10) . "Rolled ${current_roll}\n- +1 Injury\n- Burned for +${current_roll} day(s).")
-           ((11 . 15) . "Rolled ${current_roll}\n- +1 Injury\n- Burned for +${current_roll} day(s).\n- One Fatal Wound.\n- Save vs. Blind.")
-           ((16 . 1000) . "Rolled ${current_roll}\n- +1 Injury\n- Burned for +${current_roll} day(s)\n- ${current_roll} - 14 Fatal Wounds.\n- Save vs. Blind.")))
-
-(random-table/register :name "Death and Dismemberment > Lightning"
-  :roller #'random-table/roller/death-and-dismemberment/damage
-  :private t
-  :data '(((1 . 10) . "Rolled ${current_roll}\n- +1 Injury\n- Burned for +${current_roll} day(s).")
-           ((11 . 15) . "Rolled ${current_roll}\n- +1 Injury\n- Burned for +${current_roll} day(s).\n- One Fatal Wound.\n- Save vs. Deaf.")
-           ((16 . 1000) . "Rolled ${current_roll}\n- +1 Injury\n- Burned for +${current_roll} day(s)\n- ${current_roll} - 14 Fatal Wounds.\n- Save vs. Deaf.")))
-
-(random-table/register :name "Death and Dismemberment > Physical"
-  :roller "1d6"
-  :private t
-  :data '(((1) . "Death and Dismemberment > Physical > Arm")
-           ((2) . "Death and Dismemberment > Physical > Leg")
-           ((3 . 4) . "Death and Dismemberment > Physical > Torso")
-           ((5 . 6) . "Death and Dismemberment > Physical > Head")))
-
-(random-table/register :name "Death and Dismemberment > Physical > Arm"
-  :roller #'random-table/roller/death-and-dismemberment/damage
-  :private t
-  :data '(((1 . 10) . "Arm Injury; Rolled ${current_roll}\n- +1 Injury\n- Arm disabled for +${current_roll} day(s).")
-           ((11 . 15) . "Arm Injury; Rolled ${current_roll}\n- +1 Injury\n- Arm disabled for +${current_roll} day(s).\n- One Fatal Wound.\n- ${Save vs. Mangled Arm}.")
-           ((16 . 1000) . "Arm Injury; Rolled ${current_roll}\n- +1 Injury\n- Arm disabled for +${current_roll} day(s).\n- ${current_roll} - 14 Fatal Wounds.\n- ${Save vs. Mangled Arm}")))
-
-(random-table/register :name "Death and Dismemberment > Physical > Leg"
-  :roller #'random-table/roller/death-and-dismemberment/damage
-  :private t
-  :data '(((1 . 10) . "Leg Injury; Rolled ${current_roll}\n- +1 Injury\n- Leg disabled for +${current_roll} day(s).")
-           ((11 . 15) . "Leg Injury; Rolled ${current_roll}\n- +1 Injury\n- Leg disabled for +${current_roll} day(s).\n- One Fatal Wound.\n- ${Save vs. Mangled Leg}")
-           ((16 . 1000) . "Leg Injury; Rolled ${current_roll}\n- +1 Injury\n- Leg disabled for +${current_roll} day(s).\n- ${current_roll} - 14 Fatal Wounds.\n- ${Save vs. Mangled Leg}")))
-
-(random-table/register :name "Death and Dismemberment > Physical > Torso"
-  :roller #'random-table/roller/death-and-dismemberment/damage
-  :private t
-  :data '(((1 . 10) . "Torso Injury; Rolled ${current_roll}\n- +1 Injury\n- Blood loss for +${current_roll} day(s).")
-           ((11 . 15) . "Torso Injury; Rolled ${current_roll}\n- +1 Injury\n- Blood loss for +${current_roll} day(s).\n- One Fatal Wound.\n- ${Save vs. Crushed Torso}")
-           ((16 . 1000) . "Torso Injury; Rolled ${current_roll}\n- +1 Injury\n- Blood loss for +${current_roll} day(s).\n- ${current_roll} - 14 Fatal Wounds.\n- ${Save vs. Crushed Torso}")))
-
-(random-table/register :name "Death and Dismemberment > Physical > Head"
-  :roller #'random-table/roller/death-and-dismemberment/damage
-  :private t
-  :data '(((1 . 10) . "Head Injury; Rolled ${current_roll}\n- +1 Injury\n- Concussed for +${current_roll} day(s).")
-           ((11 . 15) . "Head Injury; Rolled ${current_roll}\n- +1 Injury\n- Concussed for +${current_roll} day(s).\n- One Fatal Wound.\n- ${Save vs. Skullcracked}")
-           ((16 . 1000) . "Head Injury; Rolled ${current_roll}\n- +1 Injury\n- Concussed for +${current_roll} day(s).\n- ${current_roll} - 14 Fatal Wounds.\n- ${Save vs. Skullcracked}")))
-
-(random-table/register :name "Death and Dismemberment > Non-Lethal"
-  :roller #'random-table/roller/death-and-dismemberment/damage
-  :private t
-  :data '(((1 . 1000) . "Non-Lethal Injury; Rolled ${current_roll}\n- +1 Injury\n- Knocked out for +${current_roll} round(s).")))
-
-(random-table/register :name "Save vs Mangled Arm"
-  :roller #'random-table/roller/saving-throw
-  :private t
-  :data '(("Save" . "Saved against losing an arm…lose a finger instead.")
-           ("Fail" . "Failed to save against losing or permanently disabling an arm.")))
-
-(random-table/register :name "Save vs. Mangled Leg"
-  :roller #'random-table/roller/saving-throw
-  :private t
-  :data '(("Save" . "Saved against losing a leg…lose a toe instead.")
-           ("Fail" . "Failed to save against losing or permanently disabling a leg.")))
-
-(random-table/register :name "Save vs. Crushed Torso"
-  :roller #'random-table/roller/saving-throw
-  :private t
-  :data '(("Save" . "Saved against crushed torso…gain a new scar.")
-           ("Fail" . "Failed to save against crushed torso.  ${Save vs. Crushed Torso > Failure}")))
-
-(random-table/register :name "Save vs. Crushed Torso > Failure"
-  :private t
-  :data '("Permanently lose 1 Strength." "Permanently lose 1 Dexterity." "Permanently lose 1 Constitution."
-           "Crushed throat. You cannot speak louder than a whisper."
-           "Crushed ribs. Treat Con as 4 when holding your breath."
-           "Your spine is broken and you are paralyzed from the neck down. You can recover from this by making a Con check after 1d6 days, and again after 1d6 weeks if you fail the first check. If you fail both, it is permanent."))
-
-(random-table/register :name "Save vs. Skullcracked"
-  :roller #'random-table/roller/saving-throw
-  :private t
-  :data '(("Save" . "Saved against cracked skull…gain a new scar.")
-           ("Fail" . "Failed to save against cracked skull.  ${Save vs. Skullcracked > Failure}")))
-
-(random-table/register :name "Save vs. Skullcracked > Failure"
-  :private t
-  :data '("Permanently lose 1 Intelligence." "Permanently lose 1 Wisdom." "Permanently lose 1 Charisma."
-           "Lose your left eye. -1 to Ranged Attack."
-           "Lose your right eye. -1 to Ranged Attack."
-           "Go into a coma. You can recover from a coma by making a Con check after 1d6 days, and again after 1d6 weeks if you fail the first check. If you fail both, it is permanent."))
-
 ;;; Solo GM-ing
 
 (random-table/register :name "The “But” is related to"
@@ -1554,7 +1439,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
 
 (random-table/register :name "Reaction Roll (OSE)"
   :roller (lambda (table)
-            (+ (random-table/roller/2d6 table)
+            (+ (random-table/roller/string "2d6")
               (string-to-number (completing-read "Charisma Modifier: "
                                   '("-2" "-1" "0" "1" "2") nil t))
               (string-to-number (completing-read "Additional Modifier: "
@@ -2625,3 +2510,33 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "Monnier" "Morel" "Muret" "Nicollier" "Ney" "Panchaud" "Papon" "Paschoud" "Penel" "Péneveyre"
            "Perret" "Peytrignet" "Pilloud" "Reboul" "Régis" "Rosset" "Roulet" "Savary" "Sordet" "Specht"
            "Taillens" "Tapernoux" "Rossier" "Tarin" "Tornier" "Trincard" "Villard" "Villommet" "Vulliemin" "Willommet"))
+
+(random-table/register :name "Savoy Region > Random Encounter"
+  :roller "1d6"
+  :data '(((1 . 3) . "${Savoy Region > Random Creature}")
+           ((4 . 5) . "${Savoy Region > Random Creature} and ${Savoy Region > Random Creature} ${[coming to blows/sharing a meal/conversing/shouting]}")
+           (6 . "${Savoy Region > Random Creature} pretending to be ${Savoy Region > Random Creature}")))
+
+(random-table/register :name "Savoy Region > Random Creature"
+  :private t
+  :data '((1 . "${1d6+3} ${[soldiers/brigands]}")
+           (2 . "${1d3} ${[Santémagîte/Catholic/Huegonot]} ${[pilgrims/itenerant priests/monks]}")
+           ((3 . 4) . "1 ${[peddler/merchant/leper]}")
+           (5 . "1 ${[stage coach/merchant]} and ${1d3} guards")
+           (6 . "${1d3+1} Chaos cultists pretending to be ${[pilgrims/lepers/merchants]}")))
+
+(random-table/register :name "Mythical Castle Region Encounter"
+  :data '("A mountain hermit out ${[basking naked/whispering prayers/singing a hedonistic song/crouched and munching on mushrooms]}."
+           "A now startled animal ${[foraging/hunting]}."
+           "Adventuring company ${[skulking towards/boisterously marching to/tattered and fleeing from/cautiously and wearly departing]} the castle."
+           "A ${[Papal/French/Holy Roman Empirian/regional]} ${[company/individual/pair]} ${[surveying/chasing/hunting/fleeing/seeking]} something."
+           "${1d6} of The Fox’s Brigand ${[found dead and mangled/lying in wait/lost/whispering around a cook fire]}."
+           "Something fantastical…${Mythical Castle Region Fantastical Encounter}"))
+
+(random-table/register :name "Mythical Castle Region Fantastical Encounter"
+  :data '("A manifestation of ${[Arioch/Mother Mary/Saint Boniface/Tambor/Alsidora]} demanding ${[patronage/information/a sacrifice/help]}."
+           "A ${[treant/troll/ghost/troupe of goblins/Tatzelwurm/troupe of dwarfs]}."
+           "A goblin market ${[just opening/in full swing/closing down]}."
+           "A ${[coven of witches/trio of witches/lone witch]} ${[performing a ritual/in flight/reciting epic poetry]}."
+           "A large boulder stirring and slowly shifting…as though waking from a long slumber."
+           "${[4d6/3d20]} ${[skeletons/restless dead/apparations]} marching to ${[bolster/exact revenge on]} the castle."))
