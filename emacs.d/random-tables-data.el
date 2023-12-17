@@ -4,6 +4,7 @@
     :straight (:host github :repo "jeremyf/random-table.el")))
 
 (global-set-key (kbd "H-r") #'random-table/roll)
+(global-set-key (kbd "C-H-r") #'random-table/roll-region)
 
 (random-table/prompt "Charisma Modifier"
   :type #'read-number
@@ -104,22 +105,21 @@
 	  (random-table-data table) nil t))
 
 ;;; Errant
-(random-table/register :name "Henchman (Errant)"
+(random-table/register :name "Errant > Henchman"
   :data (list
-          (concat "\n- Archetype :: ${Henchman > Archetype (Errant)}"
-            "\n- Renown :: ${Henchman > Renown}"
-            "\n- Morale :: ${[Henchman > Morale Base] + [Henchman > Morale Variable]}"
-            "\n${Character (Errant)}")))
+          (concat "\n- Archetype :: {Errant > Henchman > Archetype}"
+            "\n- Renown :: {Errant > Henchman > Renown}"
+            "\n- Morale :: [Errant :: Henchman :: Morale Base] + [Errant :: Henchman :: Morale Variable]"
+            "\n{Errant > Character}")))
 
-
-(random-table/register :name "Henchman > Archetype (Errant)"
+(random-table/register :name "Errant > Henchman > Archetype"
   :private t
   :roller "1d10"
   :data '(((1 . 5) . "Warrior")
            ((6 . 8) . "Professional")
            ((9 . 10) . "Magic User")))
 
-(random-table/register :name "Henchman > Morale Base"
+(random-table/register :name "Errant > Henchman > Morale Base"
   :private t
   :roller (lambda (table) (read-number "Hiring PC's Presence Score: "))
   :data '(((3 . 4) . 5)
@@ -136,7 +136,7 @@
             ("+50%" . 2)
             ("+75% or more" . 3)))
 
-(random-table/register :name "Henchman > Morale Variable"
+(random-table/register :name "Errant > Henchman > Morale Variable"
   :private t
   :roller '(+ "2d6" "Additional Generosity of Offer")
   :data '(((2) . -2)
@@ -154,46 +154,49 @@
             ("City" . (lambda (table) (random-table/roller/string "1d4")))
             ("Metropolis" . (lambda (table) (random-table/roller/string "1d5")))))
 
-(random-table/register :name "Henchman > Renown"
+(random-table/register :name "Errant > Henchman > Renown"
   :roller (lambda (table)
             (funcall (random-table/prompt "Hiring location for Henchman") table))
   :private t
   :data '(1 2 3 4 5))
 
-(random-table/register :name "Reaction Roll (Errant)"
+(random-table/register :name "Errant > Reaction Roll"
   :roller '(+ "2d6" "-3/+3 Modifier" "Alignment Modifier")
-  :data '(((-10 . 2) . "Hostile [DV +8] (Disposition ${current_roll})")
-           ((3 4 5) . "Unfriendly [DV +4] (Disposition ${current_roll})")
-           ((6 7 8) . "Unsure (Disposition ${current_roll})")
-           ((9 10 11) . "Amicable [DV -2] (Disposition ${current_roll})")
-           ((12 . 24) . "Friendly [DV -4] (Disposition ${current_roll})")))
+  :data '(((-10 . 2) . "Hostile [DV +8] (Disposition {CURRENT_ROLL})")
+           ((3 4 5) . "Unfriendly [DV +4] (Disposition {CURRENT_ROLL})")
+           ((6 7 8) . "Unsure (Disposition {CURRENT_ROLL})")
+           ((9 10 11) . "Amicable [DV -2] (Disposition {CURRENT_ROLL})")
+           ((12 . 24) . "Friendly [DV -4] (Disposition {CURRENT_ROLL})")))
 
-(dolist (ability '("Ability > Physique (Errant)"
-                    "Ability > Skill (Errant)"
-                    "Ability > Mind (Errant)"
-                    "Ability > Presence (Errant)"))
+;; We're registering this to generate the correct Archetype based on the rolled
+;; ability scores.  Hence the :reuse declaration and it's :private nature.
+(dolist (ability '("Errant :: Ability :: Physique"
+                    "Errant :: Ability :: Skill"
+                    "Errant :: Ability :: Mind"
+                    "Errant :: Ability :: Presence"))
   (random-table/register :name ability
     :store t
+    :private t
     :reuse ability ;; Because we might roll the Archetype first, which is
     ;; informed by the ability scores rolled.
     :roller "4d4"
     :data '(1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16)))
 
-(random-table/register :name "Character (Errant)"
+(random-table/register :name "Errant > Character"
   :data (list (concat
-                "\n- Archetype :: ${Archetype (Errant)}"
-                "\n- Ancestry :: ${Ancestry (Errant)}"
+                "\n- Archetype :: {Errant > Archetype}"
+                "\n- Ancestry :: {Errant > Ancestry}"
                 "\n"
-                "\n- Physique :: ${Ability > Physique (Errant)}"
-                "\n- Skill :: ${Ability > Skill (Errant)}"
-                "\n- Mind :: ${Ability > Mind (Errant)}"
-                "\n- Presence :: ${Ability > Presence (Errant)}"
+                "\n- Physique :: {Errant > Ability > Physique}"
+                "\n- Skill :: {Errant > Ability > Skill}"
+                "\n- Mind :: {Errant > Ability > Mind}"
+                "\n- Presence :: {Errant > Ability > Presence}"
                 "\n"
-                "\n- Failed Profession :: ${Failed Professions (Errant)}"
-                "\n- Keepsakes :: ${Keepsakes (Errant)}"
+                "\n- Failed Profession :: {Errant > Failed Professions}"
+                "\n- Keepsakes :: {Errant > Keepsakes}"
                 "\n"
                 "\nEquipment"
-                "${Archetype Equipment (Errant)}"
+                "{Errant > Archetype > Equipment}"
                 "\n- A backpack."
                 "\n- A medium weapon of their choice (1 item slot)."
                 "\n- A quiver of ammunition, if needed (1 item slot, depletion 2)."
@@ -206,16 +209,16 @@
                 "\n- A waterskin (1⁄4 item slot)."
                 "\n- 4 supply (1⁄4 item slot each).")))
 
-(random-table/register :name "Archetype Equipment (Errant)"
-  :reuse "Archetype (Errant)"
+(random-table/register :name "Errant > Archetype > Equipment"
+  :reuse "Errant :: Archetype"
   :fetcher (lambda (data roll) (alist-get (car roll) data nil nil #'string=))
   :data '(("Violent" . "\n- Heavy weapon (2 item slots) or a Small shield (1 item slot, 4 blocks) or Large shield (2 item slots,
 6 blocks)")
            ("Deviant" . "\n- Burglar’s tools (1 item slot) or an Alchemist’s kit (1 item slot)")
-           ("Occult" . "${Grimoire (Errant)}${Grimoire (Errant)}${Grimoire (Errant)}${Grimoire (Errant)}")
+           ("Occult" . "{Errant > Grimoire}{Errant > Grimoire}{Errant > Grimoire}{Errant > Grimoire}")
            ("Zealot" . "\n- One relic (Blade, Wand, Talisman, Calice see p. 75)")))
 
-(cl-defun random-table/roller/archetype (table &key (attribute-template "Ability > %s (Errant)"))
+(cl-defun random-table/roller/archetype (table &key (attribute-template "Errant :: Ability :: %s"))
   "Using the TABLE data determine Errant Archetype.
 
 This function rolls (or uses the rolls) of the corresponding
@@ -224,14 +227,14 @@ tables derived from the given ATTRIBUTE-TEMPLATE.
 This will return the CDR of a CONS pair of the given TABLE's data.  That way the
 value we cache is the Archetype.
 
-See “Archetype (Errant)” table."
+See “Errant :: Archetype” table."
   (let* ((attribute_archetypes (random-table-data table))
           ;; (("Physique" . 10) ("Skill" . 9) ("Mind" . 8) ("Presence" . 7)
           (attr_rolls
             (mapcar (lambda (attr_arch)
                       (cons (car attr_arch)
                         (string-to-number
-                          (random-table/roll/parse-text
+                          (random-table/parse
                             (format attribute-template (car attr_arch))))))
               attribute_archetypes))
           ;; (10 9)
@@ -258,7 +261,7 @@ See “Archetype (Errant)” table."
     ;; candidates = ("Physique" "Physique" "Skill")
     (alist-get (seq-random-elt candidates) attribute_archetypes)))
 
-(random-table/register :name "Archetype (Errant)"
+(random-table/register :name "Errant > Archetype"
   :private t
   :store t
   :roller #'random-table/roller/archetype
@@ -270,10 +273,10 @@ See “Archetype (Errant)” table."
            ("Mind" . "Occult")
            ("Presence" . "Zealot")))
 
-(random-table/register :name "Grimoire (Errant)"
-  :data '("\n- Grimoire (1⁄4 item slot)\n  - Essence :: ${Grimoire > Essence (Errant)}\n  - Sphere :: ${Grimoire > Sphere (Errant)}\n  - Theme :: ${Grimoire > Theme (Errant)}"))
+(random-table/register :name "Errant > Grimoire"
+  :data '("\n- Grimoire (1⁄4 item slot)\n  - Essence :: {Errant > Grimoire > Essence}\n  - Sphere :: {Errant > Grimoire > Sphere}\n  - Theme :: {Errant > Grimoire > Theme}"))
 
-(random-table/register :name "Grimoire > Essence (Errant)"
+(random-table/register :name "Errant > Grimoire > Essence"
   :private t
   :data '("Protect" "Summon" "Control" "Quicken" "Slow"
            "Comprehend" "Move" "Animate" "Link" "Command"
@@ -286,12 +289,12 @@ See “Archetype (Errant)” table."
            "Attract" "Repulse" "Absorb" "Increase" "Reduce"
            "Receive" "Aid" "Hinder" "Interrupt" "Harm"))
 
-(random-table/register :name "Grimoire > Sphere (Errant)"
+(random-table/register :name "Errant > Grimoire > Sphere"
   :private t
   :data '("Magic" "Space" "Time" "Mind" "Spirit" "Body"
            "Elements" "Dimensions" "Life" "Death" "Objects" "Biota"))
 
-(random-table/register :name "Grimoire > Theme (Errant)"
+(random-table/register :name "Errant > Grimoire > Theme"
   :private t
   :data '("reflection, mirror, prediction" "sound, music, resonance"
            "metal, restraint, imprisonment" "possession, betrayal, parasitism"
@@ -344,14 +347,14 @@ See “Archetype (Errant)” table."
            "prudence, reason, discernment" "temperance, appetites, production"
            "fortitude, courage, defence" "justice, proportionality, impartiality"))
 
-(random-table/register :name "Ancestry (Errant)"
+(random-table/register :name "Errant > Ancestry"
   :private t
   :data '("Tough (Once per session, when you would be reduced to 0 hp, you may choose to be reduced to 1 hp instead)."
            "Arcane (Once per session, you can attempt to perform a minor magic related to your ancestry: roll 2d6 and add your renown, on a 10+ you succeed, on a 7-9 a complication occurs, on a 6 or lower, failure)."
            "Cunning (Once per session, you may reroll any d20 roll)."
            "Adaptable (Once per session, you may choose to use one attribute for a check in lieu of another)."))
 
-(random-table/register :name "Keepsakes (Errant)"
+(random-table/register :name "Errant > Keepsakes"
   :data '("The sword of the hero Black Mask. Useless, but looks really cool."
            "Big, floppy cork hat. Waterproof."
            "Strange pair of boots, with four wheels attached to each sole."
@@ -453,7 +456,7 @@ See “Archetype (Errant)” table."
            "Jar of sweet, sticky honey."
            "Set of loaded dice."))
 
-(random-table/register :name "Failed Professions (Errant)"
+(random-table/register :name "Errant > Failed Professions"
   :data
   '("Acrobat" "Alewife" "Antiquarian" "Apothecary" "Armpit-hair plucker"
      "Baker" "Ball-fetcher" "Barber" "Barrel maker" "Beadle"
@@ -476,7 +479,7 @@ See “Archetype (Errant)” table."
      "Toad doctor" "Tosher" "Town crier" "Urinatores" "Usurer"
      "Water carrier" "Wheelwright" "Whipping boy" "Whiffler" "Worm rancher"))
 
-(random-table/register :name "General Event (Errant)"
+(random-table/register :name "Errant > General Event"
   :data '((1 . "Encounter")
            (2 . "Delay")
            (3 . "Resource use")
@@ -492,13 +495,13 @@ See “Archetype (Errant)” table."
   :type 'bound-integer-range
   :range '(-3 -2 -1 0 1 2 3))
 
-(random-table/register :name "General Downtime Turn Action (Errant)"
+(random-table/register :name "Errant > General Downtime Turn Action"
   :roller '(+ "2d6" "-3/+3 Modifier")
   :data '(((-10 . 6) . "Failure, no progress.")
            ((7 . 9) . "/Setback/, partial success, or progress.")
            ((10 . 22) . "Success, mark progress on /tracker/.")))
 
-(random-table/register :name "Chase Developments (Errant)"
+(random-table/register :name "Errant > Chase Developments"
   :data '((1 . "Hiding Spot - neither side has line of sight on the other. The character with the lowest spd makes a check to hide. If they succeed, they can’t be found and the chase ends; if they fail, the pursuers immediately make a movement roll.")
            (2 . "Throng - a crowd of people, a flock of animals, or some other group impedes progress. The characters on that side may attempt to convince the throng to assist them if possible, or else someone must make a check to clear a path. On a failed check, the opposing side immediately makes a movement roll.")
            (3 . "Dilemma - the characters face a decision between two unfavourable options, such as having to choose to divert to a more difficult path or plough through a crowd.")
@@ -510,15 +513,15 @@ See “Archetype (Errant)” table."
            (9 . "Separated - a character on the side which rolled this result is separated from the rest of their side, and is tracked separately till they can reunite with their group. If the character was on the pursuing side, they must make a check or be taken out of the chase.")
            (10 . "Twist - the situation changes in some way; perhaps a new group joins the chase, or the side that is pursuing and the side that is being pursued switch; the environment might change, as might the conditions that end the chase.")))
 
-(random-table/register :name "Downtime Event (Errant)"
+(random-table/register :name "Errant > Downtime Event"
   :data '((1 . "Encounter: the COMPANY encounters an NPC(s). The guide may wish to have a list of random encounters prepared.")
-           (2 . "Complication: a negative issue affects the region;\n- ${Downtime Event > Complications (Errant)}")
+           (2 . "Complication: a negative issue affects the region;\n- {Errant > Downtime Event > Complications}")
            (3 . "Expiration: any ongoing complications end. Any other temporary situations, arrangements, or benefits end.")
-           (4 . "Trend: a positive or novel issue affects the region;\n- ${Downtime Event > Trends (Errant)}")
+           (4 . "Trend: a positive or novel issue affects the region;\n- {Errant > Downtime Event > Trends}")
            (5 . "Intimation: the COMPANY receives some clue, perhaps relating to their next adventure, or to what the next encounter, complication, or trend may be.")
            (6 . "Free: nothing happens! The COMPANY gains a much needed reprieve and are allowed to complete their actions in peace.")))
 
-(random-table/register :name "Downtime Event > Complications (Errant)"
+(random-table/register :name "Errant > Downtime Event > Complications"
   :private t
   :roller "2d6"
   :data '((2 . "Natural disaster (e.g. a fire, a tornado, a meteor)." )
@@ -529,11 +532,11 @@ See “Archetype (Errant)” table."
            (7 . "An ERRANT’s ESTATE, INSTITUTION, infrastructure project, DOMAIN, or other goal suffers a setback." )
            (8 . "Legal claims are brought against the COMPANY or they are publicly slandered." )
            (9 . "An ally of the COMPANY loses trust in or cuts ties with them." )
-           (10 . "An insurrection or a siege occurs. If not dealt with in ${1d4} [1d4] DOWNTIME TURNS it will be successful." )
+           (10 . "An insurrection or a siege occurs. If not dealt with in {1d4} [1d4] DOWNTIME TURNS it will be successful." )
            (11 . "Two or more fACTIONS begin to oppose each other or actively go to war." )
            (12 . "An ally of the COMPANY dies." )))
 
-(random-table/register :name "Downtime Event > Trends (Errant)"
+(random-table/register :name "Errant > Downtime Event > Trends"
   :private t
   :roller "2d4"
   :data '((2 . "Two or more FACTIONS announce an alliance.")
@@ -544,66 +547,67 @@ See “Archetype (Errant)” table."
            (7 . "A discovery is made (e.g. new technology, new lands).")
            (8 . "A new FACTION emerges.")))
 
-(random-table/register :name "Weather (Errant)"
+(random-table/register :name "Errant > Weather"
   :roller #'random-table/roller/prompt-from-table-data
-  :data '(("Winter" . "Winter :: ${Weather > Winter (Errant)}")
-           ("Spring" . "Springer :: ${Weather > Spring (Errant)}")
-           ("Summer" . "Summer :: ${Weather > Summer (Errant)}")
-           ("Autumn" . "Autumn :: ${Weather > Autumn (Errant)}")))
+  :data '(("Winter" . "Winter :: {Errant > Weather > }")
+           ("Spring" . "Springer :: {Errant > Weather > Spring}")
+           ("Summer" . "Summer :: {Errant > Weather > Summer}")
+           ("Autumn" . "Autumn :: {Errant > Weather > Autumn}")))
 
-(random-table/prompt "Weather > Previous Day (Errant)"
+(random-table/prompt "Errant :: Weather :: Previous Day"
   :type #'completing-read
   :range '(("Overcast" . -2)
             ("Clear Skies" . 2)
             ("Other" . 0)))
 
-(random-table/register :name "Weather > Winter (Errant)"
+(random-table/register :name "Errant > Weather > "
   :private t
-  :roller '(+ "2d6" "Weather > Previous Day (Errant)")
+  :roller '(+ "2d6" "Errant :: Weather :: Previous Day")
   :data '(((0 . 2) . "/Severe weather/ (e.g. blizzard)")
            ((3 . 5) . "/Severe weather/ (e.g. hail storm)")
            ((6 . 8) . "/Inclement weather/ (e.g. sleet)")
            ((9 . 11) . "Overcast (-2 to next weather roll)")
            ((12 . 14) . "Clear skies (+2 to next weather roll)")))
 
-(random-table/register :name "Weather > Autumn (Errant)"
+(random-table/register :name "Errant > Weather > Autumn"
   :private t
-  :roller '(+ "2d6" "Weather > Previous Day (Errant)")
+  :roller '(+ "2d6" "Errant :: Weather :: Previous Day")
   :data '(((0 . 2) . "/Severe weather/ (e.g. hurricane)")
            ((3 . 5) . "/Inclement weather/ (e.g. fog)")
            ((6 . 8) . "Overcast (-2 to next weather roll)")
            ((9 . 11) .  "Cloudy")
            ((12 . 14) . "Clear skies (+2 to next weather roll)")))
 
-(random-table/register :name "Weather > Summer (Errant)"
+
+(random-table/register :name "Errant > Weather > Summer"
   :private t
-  :roller '(+ "2d6" "Weather > Previous Day (Errant)")
+  :roller '(+ "2d6" "Errant :: Weather :: Previous Day")
   :data '(((0 . 2) . "/Severe weather/ (e.g. thunderstorm)")
            ((3 . 5) . "/Inclement weather/ (e.g. heat wave)")
            ((6 . 8) . "Sunny")
            ((9 . 11) .  "Clear skies (+2 to next weather roll)")
            ((12 . 14) . "Beautiful day (only need to spend one TRAVEL TURN /sleeping/.")))
 
-(random-table/register :name "Weather > Spring (Errant)"
+(random-table/register :name "Errant > Weather > Spring"
   :private t
-  :roller '(+ "2d6" "Weather > Previous Day (Errant)")
+  :roller '(+ "2d6" "Errant :: Weather :: Previous Day")
   :data '(((0 . 2) . "/Inclement weather/ (e.g. down pour)")
            ((3 . 5) . "Cosmetic change (e.g. drizzle)")
            ((6 . 8) . "Cloudy")
            ((9 . 11) .  "Clear skies (+2 to next weather roll)")
            ((12 . 14) . "Beautiful day (only need to spend one TRAVEL TURN /sleeping/.")))
 
-(random-table/register :name "Debt Holder (Errant)"
-  :data '("${Debt Holder > Adjective (Errant)} ${Debt Holder > Person (Errant)}"))
+(random-table/register :name "Errant > Debt Holder"
+  :data '("[unctuous/sententious/truculent/supercilious/fulsome/vainglorious] [eunuch/merchant/clergyman/madam/officer/intellectual/cultist]"))
 
-(random-table/register :name "Conspicuous Consumption Failed Save (Errant)"
+(random-table/register :name "Errant > Conspicuous Consumption Failed Save"
   :data '((1 . "Something gets burned down or destroyed; roll a d6 to see how bad it was: on a 1, confined to a single building; on a 6, a big part of town has gone up. Future CONSPICUOUS CONSUMPTION rolls receive a penalty equal to the d6 roll till it’s repaired.  Roll another d6 to see who knows: on a 4 or lower, just the COMPANY knows; on a 5, a blackmailer knows; on a 6, EVERYBODY knows.")
            (2 . "Beaten and robbed: lose half HP and all items in inventory.")
            (3 . "Magical affliction: someone or something has put a curse on you, or transformed you into an animal.")
            (4 . "You’ve gotten into legal trouble. You’re due to appear in court. Roll a d6 to see how bad the charges are; the lower the roll the worse it is.")
            (5 . "You’ve contracted a disease or infection.")
            (6 . "You’ve made an enemy; a random npc now hates you. Roll a d6 to see how bad it is: on a 1, they can’t stand your presence, on a 6, they’re after your head.")
-           (7 . "You’ve insulted a local person or organisation of import. Lose ${1d4} [d4] FACTION reputation.")
+           (7 . "You’ve insulted a local person or organisation of import. Lose {1d4} [d4] FACTION reputation.")
            (8 . "You wake up in a random adjacent hex, stark naked, in someone or something’s house/lair. Your friends have all your stuff. Roll a REACTION ROLL for your host.")
            (9 . "You get into a brawl. Lose d6 HP.")
            (10 . "You’ve got a hangover. All checks for the next two TRAVEL TURNS have DV +2.")
@@ -611,29 +615,22 @@ See “Archetype (Errant)” table."
            (12 . "You’re betrothed. Calling off the marriage will incur the wrath of the family or your scorned lover. If you’re already married, this could get messy.")
            (13 . "You’ve earned notoriety as a gadabout. Your next CONSPICUOUS CONSUMPTION roll will be doubled.")
            (14 . "You’ve gotten a new tattoo or some other bodily alteration. Roll a d6 to see how bad it is: on a 1, it’s offensive to EVERYONE (-2 to all REACTION ROLLS while it’s visible); on a 6, it's actually pretty cool.")
-           (15 . "You’ve made an ass of yourself in town. No one will take you seriously for the next ${1d4} [d4] DOWNTIME TURNS.")
+           (15 . "You’ve made an ass of yourself in town. No one will take you seriously for the next {1d4} [d4] DOWNTIME TURNS.")
            (16 . "You’ve been initiated into a cult, secret society, or some other organisation.")
            (17 . "You’ve impressed someone, made an ally, or attracted a new retainer.")
            (18 . "You get a windfall. Receive half money spent on CONSPICUOUS CONSUMPTION back.")
            (19 . "You make a discovery or hear a rumour of some sort.")
            (20 . "You make an advancement. Increase rolled ATTRIBUTE by 1.")))
 
-(random-table/register :name "Debt Holder > Adjective (Errant)"
-  :private t
-  :data '("unctuous" "sententious" "truculent" "supercilious" "fulsome" "vainglorious"))
-
-(random-table/register :name "Debt Holder > Person (Errant)"
-  :private t
-  :data '("eunuch" "merchant" "clergyman" "madam" "officer" "intellectual"))
 
 ;;; Black Sword Hack
-(random-table/register :name "Demon Name (Black Sword Hack)"
+(random-table/register :name "Black Sword Hack > Demon Name"
   :data '("Beleth" "Abaddon" "Ulshedra" "Marduk" "Raum"
            "Halphas" "Ashurban" "Ordog" "Charun" "Surgat"
            "Ahriman" "Wissigo" "Furcas" "Keldim" "Gorgo"
            "Rahab" "Gaki" "Samnu" "Namtar" "Baalberith"))
 
-(random-table/register :name "Nickname (Black Sword Hack)"
+(random-table/register :name "Black Sword Hack > Nickname"
   :data '("The Graceless" "Two beards" "the Killing Machine" "Blue Belly"
            "the Moon Child" "the Giggling Killer" "the Unwise" "Starwatcher"
            "Cruddy" "the Inflexible" "Many Tongues" "the Duteous"
@@ -651,7 +648,7 @@ See “Archetype (Errant)” table."
            "Kingmaker" "the Holy Mumbler" "He Who Loves The Dead" "Dogface"
            "the Rationalist" "the Ethereal Cannibal" "The Wind Wanderer" "She Who Comes From Below…"))
 
-(random-table/register :name "How to find the demon you seek (Black Sword Hack)"
+(random-table/register :name "Black Sword Hack > How to find the demon you seek"
   :data '("By killing its master, a prominent figure in this town"
            "In a well, posing as a divining spirit,spreading awful rumours"
            "In the queen’s secret jewel cabinet"
@@ -673,16 +670,16 @@ See “Archetype (Errant)” table."
            "Hidden in its castle, on a nightmarish demonic plane"
            "In the mouth of a dead dragon, guarded by superstitious locals"))
 
-(random-table/register :name "Travel Event (Black Sword Hack)"
-  :data "\n  - Subject :: ${Travel Event > Subject (Black Sword Hack)}\n  - Theme :: ${Travel Event > Theme (Black Sword Hack)}")
+(random-table/register :name "Black Sword Hack > Travel Event"
+  :data "\n  - Subject :: {Black Sword Hack > Travel Event > Subject}\n  - Theme :: {Black Sword Hack > Travel Event > Theme}")
 
-(random-table/register :name "Travel Event > Theme (Black Sword Hack)"
+(random-table/register :name "Black Sword Hack > Travel Event > Theme"
   :private t
   :data
   '("Aggression" "Exchange" "Discovery" "Revelation" "Pursuit"
      "Lost" "Isolation" "Death" "Escape" "Change"))
 
-(random-table/register :name "Travel Event > Subject (Black Sword Hack)"
+(random-table/register :name "Black Sword Hack > Travel Event > Subject"
   :private t
   :data
   '("Antagonist" "Animal" "Hermit" "Spirit" "Potentate"
@@ -690,10 +687,10 @@ See “Archetype (Errant)” table."
      "Ruins" "Cult" "Community" "Ghost" "Outlaws"
      "Artists" "Soldiers" "Sorcerer" "Vagrant" "Natural disaster"))
 
-(random-table/register :name "Oracle Event (Black Sword Hack)"
-  :data '("\n  - Theme :: ${Oracle Event > Theme (Black Sword Hack)}\n  - Subject :: ${Oracle Event > Subject (Black Sword Hack)}"))
+(random-table/register :name "Black Sword Hack > Oracle Event"
+  :data '("\n  - Theme :: {Black Sword Hack > Oracle Event > Theme}\n  - Subject :: {Black Sword Hack > Oracle Event > Subject}"))
 
-(random-table/register :name "Oracle Event > Theme (Black Sword Hack)"
+(random-table/register :name "Black Sword Hack > Oracle Event > Theme"
   :private t
   :data
   '("Death" "Treachery" "Infiltration" "Desperation" "Instability" "Suspicion"
@@ -703,7 +700,7 @@ See “Archetype (Errant)” table."
      "Oppression" "Destruction" "Ignorance" "Purification" "Scarcity" "Quest"
      "Stagnation" "Redemption" "Failure" "Help" "Corruption" "Rebellion"))
 
-(random-table/register :name "Oracle Event > Subject (Black Sword Hack)"
+(random-table/register :name "Black Sword Hack > Oracle Event > Subject"
   :private t
   :data
   '("Army" "Church" "Ghost" "Nobility" "Otherworldly" "Plague"
@@ -713,10 +710,10 @@ See “Archetype (Errant)” table."
      "Healers" "Cult" "Guardian" "Settlers" "Monument" "Food"
      "Judges" "Storm" "Demon" "Court" "Theatre" "Assassins"))
 
-(random-table/register :name "Attributes (Black Sword Hack)"
-  :data '("\n- Strength :: ${Attribute Score (Black Sword Hack)}\n- Dexterity :: ${Attribute Score (Black Sword Hack)}\n- Constitution :: ${Attribute Score (Black Sword Hack)}\n- Intelligence :: ${Attribute Score (Black Sword Hack)}\n- Wisdom :: ${Attribute Score (Black Sword Hack)}\n- Charisma :: ${Attribute Score (Black Sword Hack)}"))
+(random-table/register :name "Black Sword Hack > Attributes"
+  :data '("\n- Strength :: {Black Sword Hack > Attribute Score}\n- Dexterity :: {Black Sword Hack > Attribute Score}\n- Constitution :: {Black Sword Hack > Attribute Score}\n- Intelligence :: {Black Sword Hack > Attribute Score}\n- Wisdom :: {Black Sword Hack > Attribute Score}\n- Charisma :: {Black Sword Hack > Attribute Score}"))
 
-(random-table/register :name "Attribute Score (Black Sword Hack)"
+(random-table/register :name "Black Sword Hack > Attribute Score"
   :private t
   :roller "2d6"
   :data '(((2 3) . "8")
@@ -746,20 +743,20 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
   (let ((likelihood (completing-read "Likelihood: " jf/gaming/black-sword-hack/table/oracle-question-likelihood nil t)))
     (funcall (alist-get likelihood jf/gaming/black-sword-hack/table/oracle-question-likelihood nil nil #'string=))))
 
-(random-table/register :name "Oracle Question (Black Sword Hack)"
+(random-table/register :name "Black Sword Hack > Oracle Question"
   :roller #'random-table/roller/oracle-question
   :fetcher (lambda (data index) (car data))
-  :data '("${Oracle Question > Answer (Black Sword Hack)}${Oracle Question > Unexpected Event (Black Sword Hack)}")
+  :data '("{Black Sword Hack > Oracle Question > Answer}{Black Sword Hack > Oracle Question > Unexpected Event}")
   :store t)
 
-(random-table/register :name "Oracle Question > Answer (Black Sword Hack)"
-  :reuse "Oracle Question (Black Sword Hack)"
+(random-table/register :name "Black Sword Hack > Oracle Question > Answer"
+  :reuse "Black Sword Hack :: Oracle Question"
   :private t
   :filter (lambda (&rest dice) "We have a pool of dice to pick one." (car (-list dice)))
   :data '("No and…" "No" "No but…" "Yes but…" "Yes" "Yes and…"))
 
-(random-table/register :name "Oracle Question > Unexpected Event (Black Sword Hack)"
-  :reuse "Oracle Question (Black Sword Hack)"
+(random-table/register :name "Black Sword Hack > Oracle Question > Unexpected Event"
+  :reuse "Black Sword Hack :: Oracle Question"
   :private t
   :filter (lambda (&rest dice) "We have a pool of dice to determine if there are dupes."
             (car (list-utils-dupes (-list dice))))
@@ -768,10 +765,10 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
   :data '("Very negative" "Negative" "Negative but…" "Positive but…" "Positive" "Very Positive"))
 
 ;;; OSE
-(random-table/register :name "Attributes (OSR) (3d6 Down the Line)"
-  :data '("\n- Strength :: ${3d6}\n- Intelligence :: ${3d6}\n- Wisdom :: ${3d6}\n- Dexterity :: ${3d6}\n- Constitution :: ${3d6}\n- Charisma :: ${3d6}"))
+(random-table/register :name "OSE > Attributes > 3d6 Down the Line"
+  :data '("\n- Strength :: {3d6}\n- Intelligence :: {3d6}\n- Wisdom :: {3d6}\n- Dexterity :: {3d6}\n- Constitution :: {3d6}\n- Charisma :: {3d6}"))
 
-(random-table/register :name "Secondary Skill (OSE)"
+(random-table/register :name "OSE > Secondary Skill"
   :roller "1d100"
   :data '(((1 . 3) . "Animal trainer")
            ((4 . 5) . "Armourer")
@@ -804,35 +801,35 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            ((91 . 93) . "Thatcher / roofer")
            ((94 . 96) . "Woodcutter")
            ((97 . 98) . "Vintner")
-           ((99 . 100) .  "${Secondary Skill (OSE)} and ${Secondary Skill (OSE)} ")))
+           ((99 . 100) .  "{OSE > Secondary Skill} and {OSE > Secondary Skill} ")))
 
 ;;; Random Names (from Stars without Number)
 (random-table/register :name "Name"
   :exclude-from-prompt t
-  :data '("${Arabic Name > Masculine Given Name} ${Arabic Name > Surname}"
-           "${Arabic Name > Feminine Given Name} ${Arabic Name > Surname}"
-           "${Chinese Name > Masculine Given Name} ${Chinese Name > Surname}"
-           "${Chinese Name > Feminine Given Name} ${Chinese Name > Surname}"
-           "${English Name > Masculine Given Name} ${English Name > Surname}"
-           "${English Name > Feminine Given Name} ${English Name > Surname}"
-           "${Greek Name > Masculine Given Name} ${Greek Name > Surname}"
-           "${Greek Name > Feminine Given Name} ${Greek Name > Surname}"
-           "${Indian Name > Masculine Given Name} ${Indian Name > Surname}"
-           "${Indian Name > Feminine Given Name} ${Indian Name > Surname}"
-           "${Japanese Name > Masculine Given Name} ${Japanese Name > Surname}"
-           "${Japanese Name > Feminine Given Name} ${Japanese Name > Surname}"
-           "${Latin Name > Masculine Given Name} ${Latin Name > Surname}"
-           "${Latin Name > Feminine Given Name} ${Latin Name > Surname}"
-           "${Nigerian Name > Masculine Given Name} ${Nigerian Name > Surname}"
-           "${Nigerian Name > Feminine Given Name} ${Nigerian Name > Surname}"
-           "${Russian Name > Masculine Given Name} ${Russian Name > Surname}"
-           "${Russian Name > Feminine Given Name} ${Russian Name > Surname}"
-           "${Spanish Name > Masculine Given Name} ${Spanish Name > Surname}"
-           "${Spanish Name > Feminine Given Name} ${Spanish Name > Surname}"
-           "${Norse Given Name} ${Norse Surname}"
-           "${Norse Given Name} ${Norse Surname}"
-           "${Breggle Name > Masculine Given Name} ${Breggle Name > Surname}"
-           "${Breggle Name > Feminine Given Name} ${Breggle Name > Surname}"))
+  :data '("{Arabic Name > Masculine Given Name} {Arabic Name > Surname}"
+           "{Arabic Name > Feminine Given Name} {Arabic Name > Surname}"
+           "{Chinese Name > Masculine Given Name} {Chinese Name > Surname}"
+           "{Chinese Name > Feminine Given Name} {Chinese Name > Surname}"
+           "{English Name > Masculine Given Name} {English Name > Surname}"
+           "{English Name > Feminine Given Name} {English Name > Surname}"
+           "{Greek Name > Masculine Given Name} {Greek Name > Surname}"
+           "{Greek Name > Feminine Given Name} {Greek Name > Surname}"
+           "{Indian Name > Masculine Given Name} {Indian Name > Surname}"
+           "{Indian Name > Feminine Given Name} {Indian Name > Surname}"
+           "{Japanese Name > Masculine Given Name} {Japanese Name > Surname}"
+           "{Japanese Name > Feminine Given Name} {Japanese Name > Surname}"
+           "{Latin Name > Masculine Given Name} {Latin Name > Surname}"
+           "{Latin Name > Feminine Given Name} {Latin Name > Surname}"
+           "{Nigerian Name > Masculine Given Name} {Nigerian Name > Surname}"
+           "{Nigerian Name > Feminine Given Name} {Nigerian Name > Surname}"
+           "{Russian Name > Masculine Given Name} {Russian Name > Surname}"
+           "{Russian Name > Feminine Given Name} {Russian Name > Surname}"
+           "{Spanish Name > Masculine Given Name} {Spanish Name > Surname}"
+           "{Spanish Name > Feminine Given Name} {Spanish Name > Surname}"
+           "{Norse Given Name} {Norse Surname}"
+           "{Norse Given Name} {Norse Surname}"
+           "{Breggle Name > Masculine Given Name} {Breggle Name > Surname}"
+           "{Breggle Name > Feminine Given Name} {Breggle Name > Surname}"))
 
 (random-table/register :name "Arabic Name > Masculine Given Name"
   :private t
@@ -886,7 +883,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
   :private t
   :data '("Adramyttion" "Kallisto" "Ainos" "Katerini" "Alikarnassos" "Kithairon" "Avydos" "Kydonia" "Dakia" "Lakonia" "Dardanos" "Leros" "Dekapoli" "Lesvos" "Dodoni" "Limnos" "Efesos" "Lykia" "Efstratios" "Megara" "Elefsina" "Messene" "Ellada" "Milos" "Epidavros" "Nikaia" "Erymanthos" "Orontis" "Evripos" "Parnasos" "Gavdos" "Petro" "Gytheio" "Samos" "Ikaria" "Syros" "Ilios" "Thapsos" "Illyria" "Thessalia" "Iraia" "Thira" "Irakleio" "Thiva" "Isminos" "Varvara" "Ithaki" "Voiotia" "Kadmeia" "Vyvlos"))
 
-;; Indian Name > Masculine Given Name
+;; Indian Name :: Masculine Given Name
 (random-table/register :name "Indian Name > Masculine Given Name"
   :private t
   :data '("Amrit" "Ashok" "Chand" "Dinesh" "Gobind" "Harinder" "Jagdish" "Johar" "Kurien" "Lakshman" "Madhav" "Mahinder" "Mohal" "Narinder" "Nikhil" "Omrao" "Prasad" "Pratap" "Ranjit" "Sanjay" "Shankar" "Thakur" "Vijay" "Vipul" "Yash"))
@@ -971,10 +968,10 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
 
 (random-table/register :name "Norse Surname"
   :private t
-  :data '("${Norse Given Name}son" "${Norse Given Name}dóttir"))
+  :data '("{Norse Given Name}son" "{Norse Given Name}dóttir"))
 
 (random-table/register :name "Person"
-  :data '("\n- Name :: ${Name}\n- Physique :: ${Person > Physique}\n- Skin :: ${Person > Skin}\n- Hair :: ${Person > Hair}\n- Face :: ${Person > Face}\n- Speech :: ${Person > Speech}\n- Virtue :: ${Person > Virtue}\n- Vice :: ${Person > Vice}"))
+  :data '("\n- Name :: {Name}\n- Physique :: {Person > Physique}\n- Skin :: {Person > Skin}\n- Hair :: {Person > Hair}\n- Face :: {Person > Face}\n- Speech :: {Person > Speech}\n- Virtue :: {Person > Virtue}\n- Vice :: {Person > Vice}"))
 
 (random-table/register :name "Person > Physique"
   :private t
@@ -1013,7 +1010,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
 
 ;;; Stars without Number
 (random-table/register :name "Corporation, Sci-Fi"
-  :data '("\n- Name :: ${Corporation, Sci-Fi > Prefix} ${Corporation, Sci-Fi > Suffix}\n- Business :: ${Corporation, Sci-Fi > Business}\n- Rumor :: ${Corporation, Sci-Fi > Rumor}"))
+  :data '("\n- Name :: {Corporation, Sci-Fi > Prefix} {Corporation, Sci-Fi > Suffix}\n- Business :: {Corporation, Sci-Fi > Business}\n- Rumor :: {Corporation, Sci-Fi > Rumor}"))
 
 (random-table/register :name "Corporation, Sci-Fi > Prefix"
   :private t
@@ -1069,7 +1066,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
      "Deeply entangled with the planetary underworl"))
 
 (random-table/register :name "Heresy"
-  :data '("\n- Founder :: ${Heresy > Founder}\n- Major Heresy :: ${Heresy > Major Heresy}\n- Attitude :: ${Heresy > Attitude}\n- Quirk :: ${Heresy > Quirk}"))
+  :data '("\n- Founder :: {Heresy > Founder}\n- Major Heresy :: {Heresy > Major Heresy}\n- Attitude :: {Heresy > Attitude}\n- Quirk :: {Heresy > Quirk}"))
 
 (random-table/register :name "Heresy > Founder"
   :private t
@@ -1134,95 +1131,95 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "Forbidden the use of certain technology"))
 
 ;;; Herbalist's Primer
-(random-table/register :name "Plant (Herbalist's Primer)"
-  :data '("${Plant > Name Prefix (Herbalist's Primer)}${Plant > Name Suffix (Herbalist's Primer)} is ${Plant > Rarity (Herbalist's Primer)} ${Plant > Habit (Herbalist's Primer)}, mostly prized for its ${Plant > Properties (Herbalist's Primer)} value.  It is a native to the ${Plant > Climate (Herbalist's Primer)} ${Plant > Biome (Herbalist's Primer)}.  Interestingly, it ${Plant > Quirk (Herbalist's Primer)}.${Plant > Property Description (Herbalist's Primer)}"))
+(random-table/register :name "Herbalist's Primer > Plant"
+  :data '("{Herbalist's Primer > Plant > Name Prefix}{Herbalist's Primer > Plant > Name Suffix} is {Herbalist's Primer > Plant > Rarity} {Herbalist's Primer > Plant > Habit}, mostly prized for its {Herbalist's Primer > Plant > Properties} value.  It is a native to the {Herbalist's Primer > Plant > Climate} {Herbalist's Primer > Plant > Biome}.  Interestingly, it {Herbalist's Primer > Plant > Quirk}.{Herbalist's Primer > Plant > Property Description}"))
 
-(random-table/register :name "Plant > Name Prefix (Herbalist's Primer)"
+(random-table/register :name "Herbalist's Primer > Plant > Name Prefix"
   :private t
   :data '("Arrow" "Blood" "Crimson" "Death" "Dragon" "Fire" "Gold" "Good" "Ice" "Life"
            "Raven" "Snake" "Spear" "Spirit" "Star" "Sword" "Truth" "Witch" "Wolf" "Worm"))
 
-(random-table/register :name "Plant > Name Suffix (Herbalist's Primer)"
+(random-table/register :name "Herbalist's Primer > Plant > Name Suffix"
   :private t
   :data '("bane" "bark" "bean" "berry" "bush" "fern" "flower" "fruit" "grass" "leaf"
            "nut" "plant" "root" "seed" "spice" "thorn" "tree" "weed" "wort" "wood"))
 
 ;; Todo consider altering the rarity
-(random-table/register :name "Plant > Rarity (Herbalist's Primer)"
+(random-table/register :name "Herbalist's Primer > Plant > Rarity"
   :private t
   :data '("a widespread" "an abundant" "a common" "a popular" "an uncommon"
            "a rare" "an endangered" "a near-extinct" "a legendary" "a mythical"))
 
-(random-table/register :name "Plant > Habit (Herbalist's Primer)"
+(random-table/register :name "Herbalist's Primer > Plant > Habit"
   :private t
   :data '("herb" "shrub" "tree"))
 
-(random-table/register :name "Plant > Properties (Herbalist's Primer)"
+(random-table/register :name "Herbalist's Primer > Plant > Properties"
   :private t
   :store t
   :data '("culinary" "industrial" "magical" "medicinal" "ornamental" "poisonous"))
 
-(random-table/register :name "Plant > Climate (Herbalist's Primer)"
+(random-table/register :name "Herbalist's Primer > Plant > Climate"
   :private t
   :data '("artic" "arid" "boreal" "cold" "continental"
            "dry" "high-altitude" "hot" "humid" "ice-bound"
            "island" "marine" "monsoon" "oceanic" "polar"
            "subartic" "subtropical" "temperate" "tropical" "wet"))
 
-(random-table/register :name "Plant > Biome (Herbalist's Primer)"
+(random-table/register :name "Herbalist's Primer > Plant > Biome"
   :private t
   :data '("caves" "deserts" "forests" "gardens" "hills"
            "lakes" "meadows" "mountains" "plains" "plantations"
            "riverbanks" "roadsides" "seas" "shores" "shrublands"
            "streams" "swamps" "urban areas" "volcanoes" "wastes"))
 
-(random-table/register :name "Plant > Quirk (Herbalist's Primer)"
+(random-table/register :name "Herbalist's Primer > Plant > Quirk"
   :private t
   :data '("is carnivorous" "is parasitic" "is symbiotic with another plant" "stores water in the stems" "has a strong, pleasant aroma"
            "is always warm to the touch" "is covered in sharp spikes" "is covered in a sticky sap" "smells of rotting meat" "grows in the tree crowns"
            "grows almost entirely underground" "only blooms at night" "is poisonous to other plants" "causes a strong allergic reaction" "produces a lot of pollen"
            "attracts all kinds of insects" "is a favorite snack of many animals" "often hosts bird nests" "has a lovely, sweet flavor" "grows incredibly fast"))
 
-(random-table/register :name "Plant > Property Description (Herbalist's Primer)"
+(random-table/register :name "Herbalist's Primer > Plant > Property Description"
   :private t
   :data
   '(nil ;; culinary
      nil ;; industrial
-     "  Magical Property: the plant’s ${Plant > Material (Herbalist's Primer)} ${Plant > Method (Herbalist's Primer)} will ${Plant > Effect > Magical (Herbalist's Primer)}.  One complication is that ${Plant > Complication (Herbalist's Primer)}." ;; magical
-     "  Medicinal Property: the plant’s ${Plant > Material (Herbalist's Primer)} ${Plant > Method (Herbalist's Primer)} will ${Plant > Effect > Medicinal (Herbalist's Primer)}.  One complication is that ${Plant > Complication (Herbalist's Primer)}." ;; magical
+     "  Magical Property: the plant’s {Herbalist's Primer > Plant > Material} {Herbalist's Primer > Plant > Method} will {Herbalist's Primer > Plant > Effect > Magical}.  One complication is that {Herbalist's Primer > Plant > Complication}." ;; magical
+     "  Medicinal Property: the plant’s {Herbalist's Primer > Plant > Material} {Herbalist's Primer > Plant > Method} will {Herbalist's Primer > Plant > Effect > Medicinal}.  One complication is that {Herbalist's Primer > Plant > Complication}." ;; magical
      nil ;; ornamental
-     "  Poisonous Property: the plant’s ${Plant > Material (Herbalist's Primer)} ${Plant > Method (Herbalist's Primer)} will ${Plant > Effect > Poisonous (Herbalist's Primer)}.  One complication is that ${Plant > Complication (Herbalist's Primer)}." ;; magical
+     "  Poisonous Property: the plant’s {Herbalist's Primer > Plant > Material} {Herbalist's Primer > Plant > Method} will {Herbalist's Primer > Plant > Effect > Poisonous}.  One complication is that {Herbalist's Primer > Plant > Complication}." ;; magical
      ))
 
-(random-table/register :name "Plant > Material (Herbalist's Primer)"
+(random-table/register :name "Herbalist's Primer > Plant > Material"
   :private t
   :data '("balsam" "bark" "bulbs" "buds" "cones"
            "flowers" "fruits" "galls" "gum" "juice"
            "leaves" "petals" "pollen" "resin" "rhizomes"
            "root" "seeds" "stems" "timber" "tubers"))
 
-(random-table/register :name "Plant > Method (Herbalist's Primer)"
+(random-table/register :name "Herbalist's Primer > Plant > Method"
   :private t
   :data '("applied to an inanimate object" "burned as incenses" "carried" "chewed" "distilled"
            "drank as tea" "grown" "held under the tongue" "ingested" "juiced and injected"
            "mixed with alchohol" "place under a pillow" "powdered and inhaled" "rubbed on skin" "scattered on the wind"
            "sewn inside clothing" "swallowed whole" "thrown at a target" "torn or shredded" "worn"))
 
-(random-table/register :name "Plant > Effect > Medicinal (Herbalist's Primer)"
+(random-table/register :name "Herbalist's Primer > Plant > Effect > Medicinal"
   :private t
   :data '("aid digestion" "alleviate allergy" "cure wounds" "destroy viruses" "fight the flu"
            "improve focus" "kill bacteria" "lower blood pressure" "mend bones" "neutralize poison"
            "reduce inflammation" "remove itching" "remove nausea" "remove pain" "sanitize the wound"
            "soothe the skin" "stop bleeding" "stop coughing" "strengthen the heart" "strenthen the immune system"))
 
-(random-table/register :name "Plant > Effect > Poisonous (Herbalist's Primer)"
+(random-table/register :name "Herbalist's Primer > Plant > Effect > Poisonous"
   :private t
   :data '("cause acute pain" "cause bleeding" "cause coma" "cause contact allergy" "cause death"
            "cause diarrhea" "cause dizziness" "cause hallucinations" "cause itching"
            "cause nausea" "cause neurological damage" "cause paralysis" "cause swelling" "cause violent spasms"
            "raise blood pressure" "remove a sense" "stop breathing" "stop the heart" "turn blood to ichor"))
 
-(random-table/register :name "Plant > Effect > Magical (Herbalist's Primer)"
+(random-table/register :name "Herbalist's Primer > Plant > Effect > Magical"
   :private t
   :data '("alert about danger" "allow seeing in the dark" "allow speaking with animals" "animate objects" "attract feyfolk"
            "attract love" "attract wealth" "bestow courage" "bestow luck" "bless the user"
@@ -1235,7 +1232,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "protect from compulsion" "protect from evil" "protect from harm" "purify the area" "put undead to rest"
            "raise the dead" "reflect malicious magic" "remove negative energy" "remove toxins" "stop shapeshifting"))
 
-(random-table/register :name "Plant > Complication (Herbalist's Primer)"
+(random-table/register :name "Herbalist's Primer > Plant > Complication"
   :private t
   :data '("dangerous animals often protect it"
            "it grows in a desolate far-away place"
@@ -1259,7 +1256,6 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "using it requires an obscure, elaborate ritual"))
 
 ;;; Solo GM-ing
-
 (random-table/register :name "The “But” is related to"
   :private t
   :data '("A twist to the relationship between people in the situation"
@@ -1270,7 +1266,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "Sublimely bad or good timing by a sudden event."))
 
 (random-table/register :name "Oracle"
-  :data '("- Action :: ${Oracle > Action}\n- Theme :: ${Oracle > Theme}"))
+  :data '("- Action :: {Oracle > Action}\n- Theme :: {Oracle > Theme}"))
 
 (random-table/register :name "Oracle > Action"
   :private t
@@ -1344,7 +1340,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
 
 ;; OSR Solo Rules written by Peter Rudin-Burgess Creative Common License Attribution 4.0 International (CC BY 4.0) https://creativecommons.org/licenses/by/4.0/
 (random-table/register :name "Plot Twist"
-  :data '("${Plot Twist > Subject} ${Plot Twist > Event}"))
+  :data '("{Plot Twist > Subject} {Plot Twist > Event}"))
 
 (random-table/register :name "Plot Twist > Subject"
   :private t
@@ -1394,7 +1390,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
 
 ;; Ask the Stars” by Chris McDowall, available at www.bastionland.com.
 (random-table/register :name "Ask the Stars"
-  :data '("\n- Answer :: ${Ask the Stars > Answer}\n- Symbol :: ${Ask the Stars > Symbol}\n- Position :: ${Ask the Stars > Position}"))
+  :data '("\n- Answer :: {Ask the Stars > Answer}\n- Symbol :: {Ask the Stars > Symbol}\n- Position :: {Ask the Stars > Position}"))
 
 (random-table/register :name "Ask the Stars > Answer"
   :roller "1d12"
@@ -1437,7 +1433,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            (11 . "Trading with…")
            (12 . "Fighting with…")))
 
-(random-table/register :name "Reaction Roll (OSE)"
+(random-table/register :name "OSE > Reaction Roll"
   :roller (lambda (table)
             (+ (random-table/roller/string "2d6")
               (string-to-number (completing-read "Charisma Modifier: "
@@ -1446,12 +1442,12 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
                                   '("-2" "-1" "0" "1" "2") nil t "0"))
               ))
   :data '(((-2 . 2) . "\n- Reaction :: Attacks")
-           ((3 . 5) . "\n- Reaction :: Hostile, may attack\n- Motivation :: ${Monster Motivation (OSE)}")
-           ((6 . 8) . "\n- Reaction :: Uncertain, confused\n- Motivation :: ${Monster Motivation (OSE)}")
-           ((9 . 11) . "\n- Reaction :: Indifferent, may negotiate\n- Motivation :: ${Monster Motivation (OSE)}")
+           ((3 . 5) . "\n- Reaction :: Hostile, may attack\n- Motivation :: {OSE > Monster Motivation}")
+           ((6 . 8) . "\n- Reaction :: Uncertain, confused\n- Motivation :: {OSE > Monster Motivation}")
+           ((9 . 11) . "\n- Reaction :: Indifferent, may negotiate\n- Motivation :: {OSE > Monster Motivation}")
            ((12 . 16) . "\n- Reaction :: Eager, friendly")))
 
-(random-table/register :name "Monster Motivation (OSE)"
+(random-table/register :name "OSE > Monster Motivation"
   :data '("Food: They’re hungry. You can distract them with rations, point them towards corpses, cast a food illusion. They could be hurt and in need of healing."
            "Gold: They want d100 GP x their HD. This could be a tax, a toll, tribute, tithe, or they could just be greedy bastards."
            "Treasure/Magic Items: They want a number of items equal to their HD. Scrolls and potions count as well."
@@ -1463,7 +1459,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "To Complete a Mission: They’re in service to the closest NPC in the dungeon and whatever that NPC wants, this monster is on a mission to help achieve that aim."
            "Directions: They’re lost and are looking for directions out, or for someone to escort them to a safe area."))
 
-(random-table/register :name "Random Dungeon Content (OSE)"
+(random-table/register :name "OSE > Random Dungeon Content"
   :roller "d66"
   :data '((11 . "Contents Empty with Treasure")
            ((12 . 16) . "Contents Empty")
@@ -1478,51 +1474,51 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            ((63 . 66) . "Trap with Treasure")))
 
 (random-table/register :name "The Anarchical Grimoire of Propylonic Discharges"
-  :data '("The Immediate Removal of ${AGoPD (d10)}."
-           "The Violent Eradicator of ${AGoPD (d10)}."
-           "The Animation of ${AGoPD (d10)}."
-           "Reverse ${AGoPD (d8)}."
-           "Symmetrical yet Unstable ${AGoPD (d8)}."
-           "Blatant and Ignited ${AGoPD (d8)}."
-           "An Unexpected Summoning ${AGoPD (d6)}."
-           "The Effulgent Translocation ${AGoPD (d6)}."
-           "Pandemonic Ramming ${AGoPD (d6)}."
-           "The Haunting of a Door by ${AGoPD (d4)}."
-           "The Possessing of the Caster by ${AGoPD (d4)}."
-           "The Efficacious Repelling of ${AGoPD (d4)}."))
+  :data '("The Immediate Removal of {AGoPD > d10}."
+           "The Violent Eradicator of {AGoPD > d10}."
+           "The Animation of {AGoPD > d10}."
+           "Reverse {AGoPD > d8}."
+           "Symmetrical yet Unstable {AGoPD > d8}."
+           "Blatant and Ignited {AGoPD > d8}."
+           "An Unexpected Summoning {AGoPD > d6}."
+           "The Effulgent Translocation {AGoPD > d6}."
+           "Pandemonic Ramming {AGoPD > d6}."
+           "The Haunting of a Door by {AGoPD > d4}."
+           "The Possessing of the Caster by {AGoPD > d4}."
+           "The Efficacious Repelling of {AGoPD > d4}."))
 
-(random-table/register :name "AGoPD (d10)"
+(random-table/register :name "AGoPD > d10"
   :private t
   :data '("Locks & Bolts" "Hinges & Rails" "Handles & Knobs"
            "Glyphs & Runes" "Door-steps" "Door-panels" "Door-mats"
            "Door-frames" "Knockers" "Peep-holes"))
 
-(random-table/register :name "AGoPD (d8)"
+(random-table/register :name "AGoPD > d8"
   :private t
-  :data '("By-passing of ${AGoPD (d10)}"
-           "Disappearance of ${AGoPD (d10)}"
-           "Transmutation of ${AGoPD (d10)}"
+  :data '("By-passing of {AGoPD > d10}"
+           "Disappearance of {AGoPD > d10}"
+           "Transmutation of {AGoPD > d10}"
            "Impotence"
            "Exhibition"
            "Walling"
            "Dead-bolting"
            "Entrance"))
 
-(random-table/register :name "AGoPD (d6)"
+(random-table/register :name "AGoPD > d6"
   :private t
   :data
-  '("of Helpful ${AGoPD (d4)}" "of Silver ${AGoPD (d10)}" "of the Magic-User"
+  '("of Helpful {AGoPD > d4}" "of Silver {AGoPD > d10}" "of the Magic-User"
      "Applied to One’s Enemies" "as Protection" "In a Delayed Fashion"))
 
-(random-table/register :name "AGoPD (d4)"
+(random-table/register :name "AGoPD > d4"
   :private t
   :data '("Cat-headed Things" "Heralds of the Termite People"
            "A Fae Porter-Knight" "The Ghost of Katastroph"))
 
-(random-table/register :name "NPC (Scarlet Heroes)"
-  :data '("\n- Actor :: ${Actor Type (Scarlet Heroes)}\n- Relation :: ${Actor > Relationship (Scarlet Heroes)}\n- Desire :: ${NPC > Immediate Desire (Scarlet Heroes)}\n- Temperment :: ${NPC > Ruling Temperament (Scarlet Heroes)}\n- Memorable Trait :: ${NPC > Memorable Traits (Scarlet Heroes)}"))
+(random-table/register :name "Scarlet Heroes > NPC"
+  :data '("\n- Actor :: {Scarlet Heroes > Actor Type}\n- Relation :: {Scarlet Heroes > Actor > Relationship}\n- Desire :: {Scarlet Heroes > NPC > Immediate Desire}\n- Temperment :: {Scarlet Heroes > NPC > Ruling Temperament}\n- Memorable Trait :: {Scarlet Heroes > NPC > Memorable Traits}"))
 
-(random-table/register :name "NPC > Immediate Desire (Scarlet Heroes)"
+(random-table/register :name "Scarlet Heroes > NPC > Immediate Desire"
   :private t
   :data '("Aiding a friend" "Avenging a slight" "Bribing an official"
            "Buying an object" "Collecting a bribe" "Collecting a debt"
@@ -1534,7 +1530,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "Selling an object" "Spreading a faith" "Spying on a person"
            "Stealing from the boss"))
 
-(random-table/register :name "NPC > Ruling Temperament (Scarlet Heroes)"
+(random-table/register :name "Scarlet Heroes > NPC > Ruling Temperament"
   :private t
   :data '("Ambitious" "Bigoted" "Capricious"
            "Cautious" "Compassionate" "Deceitful"
@@ -1546,7 +1542,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "Stubborn" "Valorous" "Vicious"
            "Wrathful"))
 
-(random-table/register :name "NPC > Memorable Traits (Scarlet Heroes)"
+(random-table/register :name "Scarlet Heroes > NPC > Memorable Traits"
   :private t
   :data '("Always carries things" "Always hurried" "Asthmatic"
            "Blind in an eye" "Careless dresser" "Constantly watchful"
@@ -1558,14 +1554,14 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "Stutters" "Subtle fragrance" "Tends work constantly"
            "Twitches regularly"))
 
-(random-table/register :name "Actor Type (Scarlet Heroes)"
+(random-table/register :name "Scarlet Heroes > Actor Type"
   :private t
   :roller #'random-table/roller/prompt-from-table-data
-  :data '(("Commoner" . "${Actor > Commoner (Scarlet Heroes)}")
-           ("Underworld" . "${Actor > Underworld (Scarlet Heroes)}")
-           ("Elite or Noble" . "${Actor > Elite and Noble (Scarlet Heroes)}")))
+  :data '(("Commoner" . "{Scarlet Heroes > Actor > Commoner}")
+           ("Underworld" . "{Scarlet Heroes > Actor > Underworld}")
+           ("Elite or Noble" . "{Scarlet Heroes > Actor > Elite and Noble}")))
 
-(random-table/register :name "Actor > Commoner (Scarlet Heroes)"
+(random-table/register :name "Scarlet Heroes > Actor > Commoner"
   :private t
   :data '("Ambitious scholar" "Battered ex-adventurer" "Beautiful young mistress"
            "Bold ship captain" "Commercial moneylender" "Cunning shipwright"
@@ -1582,7 +1578,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "Suspicious farm owner" "Veteran soldier" "Wealthy bachelor"
            "Weary physician"))
 
-(random-table/register :name "Actor > Underworld (Scarlet Heroes)"
+(random-table/register :name "Scarlet Heroes > Actor > Underworld"
   :private t
   :data '("Ambitious guttersnipe" "Amoral assassin" "Bitter pretender to rank"
            "Black marketeer" "Callous blackmailer" "Careworn priest"
@@ -1599,7 +1595,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "Street-worn prostitute" "Suspicious urchin" "World-weary madame"
            "Wretched miser"))
 
-(random-table/register :name "Actor > Elite and Noble (Scarlet Heroes)"
+(random-table/register :name "Scarlet Heroes > Actor > Elite and Noble"
   :private t
   :data '("Aged plutocrat"  "City magistrate" "Cynical watch leader" "Discreet banker"
            "Exiled pretender" "Famed courtesan" "Famous artist" "Favored concubine"
@@ -1612,7 +1608,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "Sorcerous “fixer”" "Steward of family lands" "Tong grandfather" "Veteran adventurer"
            "Wealthy heir" "Wealthy landowner" "Wealthy merchant prince" "Widely-sought maiden"))
 
-(random-table/register :name "Actor > Relationship (Scarlet Heroes)"
+(random-table/register :name "Scarlet Heroes > Actor > Relationship"
   :private t
   :data '("Business partner" "Child" "Childhood friend" "Co-workers" "Cousin"
            "Crime culprit" "Crime partner" "Crime victim" "Ex-lover" "Ex-spouse"
@@ -1620,16 +1616,16 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "Old favor" "Parent" "Rival" "Schoolmates" "Sibling"
            "Society fellows" "Spouse" "Subordinate" "Superior" "Uncle/Aunt"))
 
-(random-table/register :name "Reaction Roll (Scarlet Heroes)"
+(random-table/register :name "Scarlet Heroes > Reaction Roll"
   :roller #'random-table/roller/prompt-from-table-data
-  :data '(("Friendly" . "${Reaction Roll > Friendly (Scarlet Heroes)}")
-           ("Stranger" . "${Reaction Roll > Stranger (Scarlet Heroes)}")
-           ("Unfriendly" . "${Reaction Roll > Unfriendly (Scarlet Heroes)}")))
+  :data '(("Friendly" . "{Scarlet Heroes > Reaction Roll > Friendly}")
+           ("Stranger" . "{Scarlet Heroes > Reaction Roll > Stranger}")
+           ("Unfriendly" . "{Scarlet Heroes > Reaction Roll > Unfriendly}")))
 
-(random-table/register :name "Reaction Roll > Friendly (Scarlet Heroes)"
+(random-table/register :name "Scarlet Heroes > Reaction Roll > Friendly"
   :private t
   :roller '(+ "2d6" "Charisma Modifier" "Reaction Modifier")
-  :data '(((-9 . 1) . "${Reaction Roll > Stranger (Scarlet Heroes)}")
+  :data '(((-9 . 1) . "{Scarlet Heroes > Reaction Roll > Stranger}")
            (2 . "Sneering contempt")
            (3 . "Flat dismissal")
            (4 . "Reasoned refusal")
@@ -1642,10 +1638,10 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            (11 . "Firm commitment")
            ((12 . 23) . "Bold enthusiasm")))
 
-(random-table/register :name "Reaction Roll > Stranger (Scarlet Heroes)"
+(random-table/register :name "Scarlet Heroes > Reaction Roll > Stranger"
   :private t
   :roller '(+ "2d6" "Charisma Modifier" "Reaction Modifier")
-  :data '(((-9 . 1) . "${Reaction Roll > Unfriendly (Scarlet Heroes)}")
+  :data '(((-9 . 1) . "{Scarlet Heroes > Reaction Roll > Unfriendly}")
            (2 . "Anger")
            (3 . "Annoyance")
            (4 . "Dismissal")
@@ -1658,7 +1654,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            (11 . "Helpful consent")
            ((12 . 23) . "Admiring consent")))
 
-(random-table/register :name "Reaction Roll > Unfriendly (Scarlet Heroes)"
+(random-table/register :name "Scarlet Heroes > Reaction Roll > Unfriendly"
   :private t
   :roller '(+ "2d6" "Charisma Modifier" "Reaction Modifier")
   :data '(((-9 . 1) . "Violence or direct harm")
@@ -1698,15 +1694,15 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "Hildrup" "Hraigl" "Hwendl" "Hwoldrup" "Lindor"
            "Maybel" "Merrild" "Myrkle" "Nannigrew" "Pettigrew"))
 
-(random-table/register :name "Lock (Errant)"
-  :data '("- Type :: ${Lock > Type (Errant)}\n- Actions :: ${Lock > Actions (Errant)}\n- Modifier :: ${Lock > Modifier (Errant)}"))
+(random-table/register :name "Errant > Lock"
+  :data '("- Type :: {Errant > Lock > Type}\n- Actions :: {Errant > Lock > Actions}\n- Modifier :: {Errant > Lock > Modifier}"))
 
-(random-table/register :name "Lock > Type (Errant)"
+(random-table/register :name "Errant > Lock > Type"
   :private t
   :store t
   :data '("Strange" "Adamantine" "Mythril" "Diamond" "Dwarven" "Elvish" "Steel" "Iron" "Brass" "Copper" "Tin" "Crude"))
 
-(random-table/register :name "Lock > Actions (Errant)"
+(random-table/register :name "Errant > Lock > Actions"
   :roller (lambda (table)
             "Roll on TABLE, considering that types have same action in a campaign."
             ;; In Errant, once you encounter a given Lock Type (e.g. Elvish) it
@@ -1714,7 +1710,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
             ;; prompt.
             (let ((data (random-table-data table)))
               (if (yes-or-no-p (format "Lock action already established for %s type? "
-                                 (random-table/storage/results/get-data-value "Lock > Type (Errant)")))
+                                 (random-table/storage/results/get-data-value "Errant :: Lock :: Type")))
                 (completing-read "Lock’s Action: " data nil t)
                 (random-table/roller/string (format "1d%s" (length data))))))
   :private t
@@ -1728,14 +1724,14 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "/Tap/, /Turn/, /Twist/" "/Tap/, /Turn/, /Tap/" "/Turn/, /Twist/, /Tap/"
            "/Turn/, /Twist/, /Turn/" "/Turn/, /Tap/, /Twist/" "/Turn/, /Tap/, /Turn/"))
 
-(random-table/register :name "Death & Dying (Errant)"
+(random-table/register :name "Errant > Death & Dying"
   :roller #'random-table/roller/prompt-from-table-data
-  :data '(("Physical (Stabbing, Ripping, Crushing, etc.)" . "${Death & Dying > Physical (Errant)}")
-           ("Shocking (Electricity, Cold, Pyschic, etc.)" . "${Death & Dying > Shocking (Errant)}")
-           ("Burning (Fire, Acid, Lava, Digestive Enzymes, etc.)" . "${Death & Dying > Burning (Errant)}")
-           ("Toxic" . "")))
+  :data '(("Physical (Stabbing, Ripping, Crushing, etc.)" . "{Errant > Death & Dying > Physical}")
+           ("Shocking (Electricity, Cold, Pyschic, etc.)" . "{Errant > Death & Dying > Shocking}")
+           ("Burning (Fire, Acid, Lava, Digestive Enzymes, etc.)" . "{Errant > Death & Dying > Burning}")
+           ("Toxic" . "{Errant > Death & Dying > Toxic}")))
 
-(random-table/register :name "Death & Dying > Physical (Errant)"
+(random-table/register :name "Errant > Death & Dying > Physical"
   :data '((1 . "Slow internal bleeding. /On death’s door/, but in EXPLORATION TURNS.")
            (2 . "Leg mangled. Can’t run. If both legs go, you can’t walk.")
            (3 . "Arm wrecked. If both arms go, you can’t hold anything.")
@@ -1748,7 +1744,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            ((10 . 15) . "Dead.")
            ((16 . 100) . "Deader than Dead (unable to be revived or properly buried.)")))
 
-(random-table/register :name "Death & Dying > Shocking (Errant)"
+(random-table/register :name "Errant > Death & Dying > Shocking"
   :data '((1 . "Zapped. Stunned for an INITIATIVE TURN.")
            (2 . "Knocked out. Unconscious (DEPLETION 1).")
            (3 . "Concussed. Knocked out for d12 INITIATIVE TURNS and 1 point of EXHAUSTION.")
@@ -1761,7 +1757,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            ((10 . 15) . "Dead")
            ((16 . 100) . "Deader than Dead (unable to be revived or properly buried.)")))
 
-(random-table/register :name "Death & Dying > Burning (Errant)"
+(random-table/register :name "Errant > Death & Dying > Burning"
   :data '((1 . "Eye destroyed. If both eyes go, you’re blind.")
            (2 . "Mouth melted. Can’t speak, only grunt and moan (unable to cast SORCERIES or MIRACLES.)")
            (3 . "Face melted.")
@@ -1774,7 +1770,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            ((10 . 15) . "Dead")
            ((16 . 100) . "Deader than Dead (unable to be revived or properly buried.)")))
 
-(random-table/register :name "Death & Dying > Toxic (Errant)"
+(random-table/register :name "Errant > Death & Dying > Toxic"
   :data '((1 . "Nauseous. 1 point of EXHAUSTION.")
            (2 . "Immune system compro- mised. HP halved.")
            (3 . "Blood tainted. Can’t recover HP.")
@@ -1787,24 +1783,24 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            ((10 . 15) . "Dead")
            ((16 . 100) . "Deader than Dead (unable to be revived or properly buried.)")))
 
-(random-table/register :name "Lock > Modifier (Errant)"
+(random-table/register :name "Errant > Lock > Modifier"
   :private t
   :data '("Spiked" "Spiked" "Secured" "Secured"
            "Weathered" "Weathered" "Cracked" "Cracked"
            "Normal" "Normal" "Normal" "Normal"))
 
 ;;; Frog God Games
-(random-table/register :name "Inn (Borderlands)"
-  :data '("\n- Name :: The ${Inn > Creature Adjective} ${Inn > Creature}\n- Description :: ${Inn > Description}"
-           "\n- Name :: The ${Inn > Creature} and ${Inn > Creature}\n- Description :: ${Inn > Description}"
-           "\n- Name :: The ${Inn > Creature}’s ${Inn > Item}\n- Description :: ${Inn > Description}"
-           "\n- Name :: The ${Inn > Creature}\n- Description :: ${Inn > Description}"
-           "\n- Name :: The ${Inn > Item Adjective} ${Inn > Item}\n- Description :: ${Inn > Description}"
-           "\n- Name :: The ${Inn > Item} and ${Inn > Item}\n- Description :: ${Inn > Description}"))
+(random-table/register :name "Inn Name"
+  :data '("\n- Name :: The {Inn > Creature Adjective} {Inn > Creature}\n- Description :: {Inn > Description}"
+           "\n- Name :: The {Inn > Creature} and {Inn > Creature}\n- Description :: {Inn > Description}"
+           "\n- Name :: The {Inn > Creature}’s {Inn > Item}\n- Description :: {Inn > Description}"
+           "\n- Name :: The {Inn > Creature}\n- Description :: {Inn > Description}"
+           "\n- Name :: The {Inn > Item Adjective} {Inn > Item}\n- Description :: {Inn > Description}"
+           "\n- Name :: The {Inn > Item} and {Inn > Item}\n- Description :: {Inn > Description}"))
 
 (random-table/register :name "Inn > Creature Adjective"
   :private t
-  :data '("${1d6 + 1}" "Blind" "Bloody" "Blue" "Bouncing"
+  :data '("{1d6 + 1}" "Blind" "Bloody" "Blue" "Bouncing"
            "Bronze" "Cheerful" "Copper" "Dancing" "Drunken"
            "Fat" "Flying" "Golden" "Good" "Green"
            "Grey" "Growling" "Happy" "Hunting" "Jaunty"
@@ -1858,14 +1854,14 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
 (random-table/register :name "Inn > Description"
   :private t
   :roller "1d100"
-  :data '(((1 . 20) . "Main inn building, stable, outhouse, barn for chickens and ${1d4} [d4] cows. These are the least secure of roadside inns, and usually (but definitely not always) have the lowest quality food and lodgings. They do not have additional horses.")
-           ((21 . 25) . "Religious hostel with chapel, stone curtain-wall, main inn building, stable, smithy, barn, outhouse, ${1d3} [1d3] outbuildings (shed, dovecote, etc.), chicken coops and/or pigsties.")
-           ((26 . 30) . "Small tower, stone curtain-wall, main inn building, stable, smithy, barn, outhouse, ${1d3} [d3] outbuildings (shed, dovecote, etc.), chicken coops and/or pigsties, and ${1d3} [d3] small houses within the curtilage. These are usually built on the ruins of, or using remaining structures from, ancient Hyperborean road-forts. These highly-secure inns tend to be the most prosperous and the highest quality. A few horses are almost always for sale at these large stopping-places, along with a tailor, leatherworker, and one or two other craftsmen who live here.")
-           ((31 . 50) . "Stone curtain-wall, main inn building, stable, smithy, barn, outhouse, ${1d3} [d3] outbuildings (shed, dovecote, etc.), chicken coops and/or pigsties. Fresh mounts will be available here.")
-           ((51 . 75) . "Wooden palisade-wall, main inn building, stable, outhouse, ${1d3} [d3] outbuildings (shed, dovecote, etc.), chicken coops and/or pigsties. With no smithy, an inn this size generally does not have any additional horses.")
-           ((76 . 100) . "Wooden palisade-wall, main inn building, stable, smithy, barn, outhouse, ${1d3} outbuildings (shed, dovecote, etc.), chicken coops and/or pigsties. The presence of a smithy indicates that this size inn probably has one or more horses available for travelers in need of fresh mounts.")))
+  :data '(((1 . 20) . "Main inn building, stable, outhouse, barn for chickens and {1d4} [d4] cows. These are the least secure of roadside inns, and usually (but definitely not always) have the lowest quality food and lodgings. They do not have additional horses.")
+           ((21 . 25) . "Religious hostel with chapel, stone curtain-wall, main inn building, stable, smithy, barn, outhouse, {1d3} [1d3] outbuildings (shed, dovecote, etc.), chicken coops and/or pigsties.")
+           ((26 . 30) . "Small tower, stone curtain-wall, main inn building, stable, smithy, barn, outhouse, {1d3} [d3] outbuildings (shed, dovecote, etc.), chicken coops and/or pigsties, and {1d3} [d3] small houses within the curtilage. These are usually built on the ruins of, or using remaining structures from, ancient Hyperborean road-forts. These highly-secure inns tend to be the most prosperous and the highest quality. A few horses are almost always for sale at these large stopping-places, along with a tailor, leatherworker, and one or two other craftsmen who live here.")
+           ((31 . 50) . "Stone curtain-wall, main inn building, stable, smithy, barn, outhouse, {1d3} [d3] outbuildings (shed, dovecote, etc.), chicken coops and/or pigsties. Fresh mounts will be available here.")
+           ((51 . 75) . "Wooden palisade-wall, main inn building, stable, outhouse, {1d3} [d3] outbuildings (shed, dovecote, etc.), chicken coops and/or pigsties. With no smithy, an inn this size generally does not have any additional horses.")
+           ((76 . 100) . "Wooden palisade-wall, main inn building, stable, smithy, barn, outhouse, {1d3} outbuildings (shed, dovecote, etc.), chicken coops and/or pigsties. The presence of a smithy indicates that this size inn probably has one or more horses available for travelers in need of fresh mounts.")))
 
-(random-table/register :name "Place Names > Geographical > Suilley Rampart (Borderlands)"
+(random-table/register :name "Borderlands > Place Names > Geographical > Suilley Rampart"
   :private t
   :data '("Ej" "Bassin" "Bas" "Hilsej" "Pont"
            "Ribiere" "Broc" "Cair" "Caer" "Castel"
@@ -1888,7 +1884,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "Voir" "Eau" "Puit" "Ferme" "Ferme"
            "Foret" "Granja" "Patiaj" ))
 
-(random-table/register :name "Place Names > Geographical > Eastreach-Exeter (Borderlands)"
+(random-table/register :name "Borderlands > Place Names > Geographical > Eastreach-Exeter"
   :private t
   :data '("Bank" "Basin" "Botham" "Bray" "Bridge"
            "Brook" "Brook" "Cairn" "Caster" "Castle"
@@ -1913,7 +1909,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
 
 ;;; Knave
 
-(random-table/register :name "Wilderness Region (Knave)"
+(random-table/register :name "Knave > Wilderness Region"
   :data '("Ashland" "Badland" "Bamboo Forest" "Basalt Columns" "Bay" "Beach" "Bluff" "Bog" "Boulder Field" "Brook"
            "Butte" "Caldera" "Canyon" "Cave" "Cliff" "Cloud Forest" "Coniferous Forest" "Copse" "Crag" "Crater"
            "Creek" "Crossing" "Crystals" "Deciduous Forest" "Delta" "Den" "Dunes" "Dust Bowl" "Fen" "Fjord"
@@ -1925,7 +1921,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "Savanna" "Scree Slope" "Scrubland" "Sinkhole" "Spring" "Steppe" "Stream" "Sulfur Spring" "Swamp" "Taiga"
            "Tar Pit" "Thicket" "Tundra" "Valley" "Volcanic Plain" "Volcano" "Wasteland" "Waterfall" "Wetlands" "Whirlpool"))
 
-(random-table/register :name "Wilderness Structure (Knave)"
+(random-table/register :name "Knave > Wilderness Structure"
   :data '("Abbey" "Altar" "Amphitheater" "Aqueduct" "Archive" "Asylum" "Bandit Camp" "Barn" "Battlefield" "Bell Tower"
            "Bonfire" "Bower" "Brazier" "Cairn" "Cart Track" "Castle" "Catacomb" "Chapel" "City" "Cistern"
            "Convent" "Crossroads" "Dam" "Dirt Road" "Dolmen" "Dungeon" "Farm" "Ferry" "Festival" "Fishing Hut"
@@ -1938,7 +1934,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "Trail" "Trap" "Village" "Wall" "Watchtower" "Watermill" "Well" "Windmill" "Wizard Tower" "Wooden Bridge"))
 
 
-(random-table/register :name "Wilderness Trait (Knave)"
+(random-table/register :name "Knave > Wilderness Trait"
   :data '("Amber" "Ashen" "Bewitching" "Black" "Blasted" "Blessed" "Blighted" "Bloody" "Boiling" "Bright"
            "Broken" "Burning" "Cerulean" "Clouded" "Cracked" "Creeping" "Crimson" "Cursed" "Dark" "Dead"
            "Desolate" "Divine" "Doomed" "Echoing" "Eerie" "Elder" "Eldritch" "Emerald" "Endless" "Eternal"
@@ -1950,7 +1946,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "Stormy" "Sunken" "Swarming" "Sweltering" "Thorny" "Thundering" "Torrential" "Twisting" "Unquiet" "Vanishing"
            "Vast" "Violet" "Wandering" "Watching" "Whispering" "White" "Withered" "Wondrous" "Writhing" "Yellow"))
 
-(random-table/register :name "Wilderness Theme (Knave)"
+(random-table/register :name "Knave > Wilderness Theme"
   :data '("Blessings" "Blindness" "Blood" "Bones" "Books" "Brains" "Chaos" "Children" "Collapse" "Combat"
            "Confusion" "Corpses" "Corruption" "Creation" "Criminal Activity" "Crows" "Cults" "Curses" "Death" "Decay"
            "Disease" "Divination" "Dragons" "Drowning" "Echoes" "Eyes" "Faces" "Feasting" "Fog" "Gateways"
@@ -1962,7 +1958,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "Teeth" "Tentacles" "Tests and Trials" "The Moon" "The Night" "The Stars" "The Sun" "Thorns" "Trickery" "Tyranny"
            "Vampires" "Voids" "Water" "Whispers" "Wild Growth" "Wine" "Winter" "Wolves" "Worms" "Zealotry"))
 
-(random-table/register :name "Divine Domain (Knave)"
+(random-table/register :name "Knave > Divine Domain"
   :data '("Acid" "Alchemy" "Bees" "Beggars" "Betrayal" "Birds" "Blades" "Blood" "Blossoms" "Children"
            "Clay" "Clouds" "Commerce" "Courage" "Cowards" "Craftsmanship" "Crows" "Darkness" "Deserts" "Destruction"
            "Disease" "Doors" "Dreams" "Duels" "Eagles" "Earthquakes" "Fire" "Fish" "Forge" "Fungi"
@@ -1974,7 +1970,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "The Grave" "The Harvest" "The Hearth" "The Hunt" "The Law" "The Sea" "Thieves" "Thorns" "Travelers" "Trees"
            "Trickery" "Truth" "Tundra" "Tunnels" "Vermin" "Walls" "Wind" "Wine" "Winter" "Wolves"))
 
-(random-table/register :name "Divine Symbol (Knave)"
+(random-table/register :name "Knave > Divine Symbol"
   :data '("Antlers" "Arrow" "Axe" "Bear" "Bell" "Bird" "Blood drop" "Book" "Boots" "Bow"
            "Bowl" "Branch" "Brazier" "Cauldron" "Chain" "Chariot" "Circle" "Cloud" "Coin" "Comb"
            "Constellation" "Crab" "Cross" "Crown" "Crystal" "Dagger" "Deer" "Diamond" "Dice" "Doll"
@@ -1986,7 +1982,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "Spiral" "Square" "Staff" "Star" "Sun" "Sword" "Talons" "Tentacle" "Throne" "Tooth"
            "Torch" "Tree" "Triangle" "Turtle" "Wave" "Web" "Whale" "Whip" "Wings" "Wolf"))
 
-(random-table/register :name "Potion Effect (Knave)"
+(random-table/register :name "Knave > Potion Effect"
   :data '("Telepathy"  "Telekinesis"  "Clairvoyance"  "True Poison"  "True Glue"  "True Acid"  "True Grease"  "Grow"  "Shrink"  "Healing"
            "Rot"  "Love"  "Hate"  "Rage"  "Fear"  "Joy"  "Paranoia"  "Prophecy"  "Courage"  "Invisibility"
            "Strength"  "Speed"  "Jumping"  "Climbing"  "Swimming"  "Intangibility"  "Forgetfulness"  "Petrification"  "Polymorph"  "Gills"
@@ -2000,9 +1996,8 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
 
 (random-table/register :name "Deity"
   :roller "1d6"
-  :data '((1 . "\n- Domains :: ${Divine Domain (Knave)}\n- Symbol :: ${Divine Symbol (Knave)}")
-           ((2 . 4) . "\n- Domains :: ${Divine Domain (Knave)} and ${Divine Domain (Knave)}\n- Symbol :: ${Divine Symbol (Knave)}")
-           ((5 . 6) . "\n- Domains :: ${Divine Domain (Knave)}, ${Divine Domain (Knave)}, and ${Divine Domain (Knave)}\n- Symbol :: ${Divine Symbol (Knave)}")))
+  :data '(((1 . 3) . "\n- Domains :: {Knave > Divine Domain} and {Knave > Divine Domain}\n- Symbol :: {Knave > Divine Symbol}")
+           ((4 . 6) . "\n- Domains :: {Knave > Divine Domain}, {Knave > Divine Domain}, and {Knave > Divine Domain}\n- Symbol :: {Knave > Divine Symbol}")))
 
 ;; https://alldeadgenerations.blogspot.com/2019/07/time-risk-economy-part-ii.html
 (random-table/register :name "Escape the Dungeon"
@@ -2032,8 +2027,8 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
 ;; https://www.drivethrurpg.com/product/308789/Castle-Xyntillan
 (random-table/register :name "Random NPC Quirks"
   :data '("None"
-           "${Random NPC Quirks > Data}"
-           "${Random NPC Quirks > Data}  ${Random NPC Quirks > Data}"))
+           "{Random NPC Quirks > Data}"
+           "{Random NPC Quirks > Data}  {Random NPC Quirks > Data}"))
 
 (random-table/register :name "Random NPC Quirks > Data"
   :private t
@@ -2141,15 +2136,15 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
 ;; https://welshpiper.com/random-noble-houses/
 (random-table/register :name "Noble House"
   :data (list (concat
-                "\n- Atriarch Pronouns :: ${Noble House > Atriarch Pronouns}"
-                "\n- Atriarch Age :: ${Noble House > Atriarch Age}"
-                "\n- Alignment :: ${Noble House > Alignment}"
-                "\n- Influence :: ${Noble House > Influence}"
-                "\n- Holdings :: ${Noble House > Holdings}"
-                "\n- Relatives :: ${Noble House > Relatives}"
-                "\n- Recent Activity :: ${Noble House > Recent Activity}"
-                "\n- Current Ambition :: ${Noble House > Current Ambition}"
-                "\n- Closet Skeleton :: ${Noble House > Closet Skeleton}")))
+                "\n- Atriarch Pronouns :: {Noble House > Atriarch Pronouns}"
+                "\n- Atriarch Age :: {Noble House > Atriarch Age}"
+                "\n- Alignment :: {Noble House > Alignment}"
+                "\n- Influence :: {Noble House > Influence}"
+                "\n- Holdings :: {Noble House > Holdings}"
+                "\n- Relatives :: {Noble House > Relatives}"
+                "\n- Recent Activity :: {Noble House > Recent Activity}"
+                "\n- Current Ambition :: {Noble House > Current Ambition}"
+                "\n- Closet Skeleton :: {Noble House > Closet Skeleton}")))
 
 (random-table/register :name "Noble House > Atriarch Pronouns"
   :private t
@@ -2157,9 +2152,9 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
 
 (random-table/register :name "Noble House > Atriarch Age"
   :store t
-  :data '((1 . "Young (${Noble House > Atriarch > Young Personality})")
-           ((2 . 4) . "Middle-aged (${Noble House > Atriarch > Middle-aged Personality}})")
-           ((5 . 6) . "Old (${Noble House > Atriarch > Old Personality}})")))
+  :data '((1 . "Young ({Noble House > Atriarch > Young Personality})")
+           ((2 . 4) . "Middle-aged ({Noble House > Atriarch > Middle-aged Personality}})")
+           ((5 . 6) . "Old ({Noble House > Atriarch > Old Personality}})")))
 
 (random-table/register :name "Noble House > Atriarch > Young Personality"
   :private t
@@ -2185,100 +2180,124 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
 
 (random-table/register :name "Noble House > Holdings"
   :private t
-  :data '(((1 . 2) . "Modest (${1d10} 5-mile hexes)")
-           ((3 . 5) . "Appreciable (${1d10 + 10} 5-mile hexes)")
-           (6 . "Extensive (${1d10 + 10} 5-mile hexes)")))
+  :data '(((1 . 2) . "Modest ({1d10} 5-mile hexes)")
+           ((3 . 5) . "Appreciable ({1d10 + 10} 5-mile hexes)")
+           (6 . "Extensive ({1d10 + 10} 5-mile hexes)")))
 
 (random-table/register :name "Noble House > Relatives"
   :private t
-  :data '(((1 . 2) . "Small (${2d6} with claims to family resources)")
-           ((3 . 5) . "Medium (${2d6} with claims to family resources)")
-           (6 . "Large (${2d6 + 12} with claims to family resources)")))
+  :data '(((1 . 2) . "Small ({2d6} with claims to family resources)")
+           ((3 . 5) . "Medium ({2d6} with claims to family resources)")
+           (6 . "Large ({2d6 + 12} with claims to family resources)")))
 
 (random-table/register :name "Noble House > Recent Activity"
   :private t
-  :data '("Favoured by the king (d6: 1-2 staunch loyalty; 3-4 the Midas touch; 5-6 shrewd politicking)"
+  :data '("Favoured by the king [staunch loyalty/the Midas touch/shrewd politicking]"
            "Achieved overwhelming military victory"
            "Achieved Pyrrhic military victory"
            "Supported a new vassal"
            "Driven out/slain marauding monster"
-           "Returned after adventuring expedition to (d6: 1-3 local wilderness; 4-5 king’s wilderness; 6 foreign country)"
-           "Captured (d6: 1-3 outlaws; 4 spies; 5 marauding monster; 6 humanoid rabble)"
-           "Brokered diplomatic agreement on king’s behalf (d6: 1-3 trade agreement; 4-5 mutual defence pact; 6 truce)"
-           "Discovered valuable commodity (d6: 1-2 precious metal; 3-5 industrial material; 6 gemstones)"
+           "Returned after adventuring expedition to [local wilderness/king’s wilderness/foreign country]"
+           "Captured [outlaws/spies/marauding monster/humanoid rabble]"
+           "Brokered diplomatic agreement on king’s behalf [trade agreement/mutual defence pact/truce]"
+           "Discovered valuable commodity [precious metal/industrial material/gemstones]"
            "Birth in the family"
-           "Death in the family (d6: 1-2 natural causes; 3-4 battle; 5 accident 6 questionable circumstances)"
-           "Wilderness within fief is plagued by (d6: 1-2 outlaws; 3-4 wandering monster; 5 refugees; 6 humanoid band)"
-           "Family member ransomed by (d6: 1-2 foreign enemy; 3-4 outlaws; 5 humanoids; 6 unknown kidnapper)"
-           "Participated in a duel (d6: 1-2 won; 3-4 lost; 5-6 draw)"
+           "Death in the family [natural causes/battle/accident/questionable circumstances]"
+           "Wilderness within fief is plagued by [outlaws/wandering monster/refugees/humanoid band]"
+           "Family member ransomed by [foreign enemy/outlaws/humanoids/unknown kidnapper]"
+           "Participated in a duel [won/lost/draw]"
            "Afflicted by plague"
            "Adventuring family member(s) presumed lost or dead"
-           "Losing money as a result of (d6: 1 stolen heirloom; 2-3 bad business; 4 raiders; 5 rival noble; 6 freak accident)"
-           "Vassal settlement endangered by (d6: 1 attack; 2-3 plague; 4-5 low food supply; 6 bandits)"
+           "Losing money as a result of [stolen heirloom/bad business/raiders/rival noble/freak accident]"
+           "Vassal settlement endangered by [attack/plague/low food supply/bandits]"
            "Suffered military defeat"
-           "Snubbed by king for (d6: 1-2 poor military performance; 3-4 late rents; 5-6 causing trouble at court)"))
+           "Snubbed by king for [poor military performance/late rents/causing trouble at court]"))
 
 (random-table/register :name "Noble House > Current Ambition"
   :private t
-  :data '("Support the king’s top priority plan (d6: 1-2 expansion; 3 warfare; 4-5 diplomacy; 6 rooting out dissidents)"
-           "Advance the (d6: 1 church; 2-3 pet construction project; 4 local commodities; 5 military; 6 population size)"
-           "Acquire more land (d6: 1-2 strategic location; 3-5 valuable resource; 6 special feature)"
-           "Dispose of (d6: 1-2 another noble; 3 non-secular official; 4 military officer; 5 high-level bureaucrat; 6 powerful adventurer)"
-           "Marry into a particular family for (d6: 1 wealth; 2 love; 3-4 political advantage; 5 lust; 6 nefarious purposes)"
-           "Bring about (d6: 1-2 political; 3-4 economic; 5 religious; 6 judicial) reform"
+  :data '("Support the king’s top priority plan [expansion/warfare/diplomacy/rooting out dissidents]"
+           "Advance the [church/pet construction project/local commodities/military/population size]"
+           "Acquire more land [strategic location/valuable resource/special feature]"
+           "Dispose of [another noble/non-secular official/military officer/high-level bureaucrat/powerful adventurer]"
+           "Marry into a particular family for [wealth/love/political advantage/lust/nefarious purposes]"
+           "Bring about [political/economic/religious/judicial] reform"
            "Take a bite out of crime"
-           "Build fortification (d6: 1-2 defensive wall; 3-4 tower; 5 keep; 6 castle)"
+           "Build fortification [defensive wall/tower/keep/castle]"
            "Establish a new settlement"
-           "Build infrastructure (d6: 1-2 road; 3 bridge; 4 watch tower; 5 signal beacon; 6 folly)"
+           "Build infrastructure [road/bridge/watch tower/signal beacon/folly]"
            "Clear stain on family name"
-           "Make a name for the family via (d6: 1-2 adventuring/exploring; 3-4 amassing wealth; 5 military conquest; 6 political influence)"))
+           "Make a name for the family via [adventuring/exploring/amassing wealth/military conquest/political influence]"))
 
 (random-table/register :name "Noble House > Closet Skeleton"
   :private t
   :data '("None (outwardly, things seem a little too perfect…)"
-           "Engaged in treasonous activity with (d6: 1 independent actor; 2-3 official body; 4-5 foreign power; 6 dissident element)"
+           "Engaged in treasonous activity with [independent actor/official body/foreign power/dissident element]"
            "Perpetrated and covered up a capital crime (e.g., murder, rape, arson)"
-           "Under the enchantment of a (d6: 1-3 cursed item; 4 spell caster; 5 demon; 6 demanding immortal)"
-           "Fey creature; 6 geas (or similar spell))"
+           "Under the enchantment of a [cursed item/spell caster/demon/demanding immortal]"
+           "Fey creature"
            "Manipulates the system to avoid military service"
-           "Supports a band of (d6: 1-3 outlaws; 4 humanoids; 5 organised thieves; 6 dangerous mercenaries)"
-           "Withholds the king’s fees to (d6: 1-2 amass personal hoard; 3-4 divert funds; 5 cover gambling debts; 6 pay an extortionist)"
-           "Sideline poacher (d6: 1-2 fish & game; 3-5 natural resource; 6 valuable commodity)"
+           "Supports a band of [outlaws/humanoids/organised thieves/dangerous mercenaries]"
+           "Withholds the king’s fees to [amass personal hoard/divert funds/cover gambling debts/pay an extortionist]"
+           "Sideline poacher [fish & game/natural resource/valuable commodity]"
            "Afflicted with lycanthropy (or similar disease)"
            "Family history of mental illness"
-           "Member of (d6: 1-2 death cult; 3-4 outlawed profession (e.g. sorcerer); 5-6 seditious faction)"
-           "Addicted to (d6: 1-3 legal or widely available intoxicant; 4 committing crimes; 5 material possessions; 6 exotic drug)"))
+           "Member of [death cult/outlawed profession (e.g. sorcerer)/seditious faction]"
+           "Addicted to [legal or widely available intoxicant/committing crimes/material possessions/exotic drug]"))
 
-(random-table/register :name "Mortal Site > What is it"
+(random-table/register :name "Mortal Site"
+  :data '("\n- What Is It :: {Mortal Site > What is it}\n- Who Is Here :: {Mortal Site > Who Is Here}"))
+
+(random-table/register :name "Mortal Site > What Is It"
   :private t
   :data '("Campsite" "Hunting lodge" "Hermitage" "Church, monastery, or nunnery"
            "Workshop" "Farm" "Small fair" "Inn"
            "Forge" "Mill" "Woodcutter’s lodge" "Orphanage"
            "Pavilion" "Altar, statue, or shrine" "Road, path, or bridge" "Hamlet, village or towne"
-           "Manse" "Tower or small keep" "Castle" "Disguised as ${Mortal Site > What is it} but actually ${Mortal Site > What is it}"))
+           "Manse" "Tower or small keep" "Castle" "Disguised as {Mortal Site > What is it} but actually {Mortal Site > What is it}"))
 
-(random-table/register :name "Mortal Site > Who is here"
+(random-table/register :name "Mortal Site > Who Is Here"
   :private t
   :data '("Abandoned. No one is here; or roll on fey Who Is Here table (page 146)"
-           "${1d6} explorers, surveyors, or cartographers"
-           "${1d10} escaped slaves"
-           "${1d4} knights and their retinues"
-           "${1d6} poachers or outlaw loggers"
-           "${4d4} bandits, footpads, or ne’er-do-wells"
+           "{1d6} explorers, surveyors, or cartographers"
+           "{1d10} escaped slaves"
+           "{1d4} knights and their retinues"
+           "{1d6} poachers or outlaw loggers"
+           "{4d4} bandits, footpads, or ne’er-do-wells"
            "A hermit"
-           "${2d6} monks, nuns, or (gasp) both"
-           "${1d4} runaways or lost children"
-           "${1d20} poets, musicians, and/or artists"
-           "${3d4} adventurers or fortune seekers"
-           "${1d20} wizards, alchemists, and/or herbalists"
-           "${1d20} settlers"
-           "${1d6} prospectors or miners"
-           "${1d20} revelers or lovers"
-           "${1d4} witches, cabalists, or oracles"
-           "${1d6} ghosts, wraiths, or revenants"
-           "${2d6} nobles or aristocrats"
-           "${1d4} monarchs and their retinues"
-           "Disguised as ${Mortal Site > Who is here} but actually ${Mortal Site > Who is here}"))
+           "{2d6} monks, nuns, or (gasp) both"
+           "{1d4} runaways or lost children"
+           "{1d20} poets, musicians, and/or artists"
+           "{3d4} adventurers or fortune seekers"
+           "{1d20} wizards, alchemists, and/or herbalists"
+           "{1d20} settlers"
+           "{1d6} prospectors or miners"
+           "{1d20} revelers or lovers"
+           "{1d4} witches, cabalists, or oracles"
+           "{1d6} ghosts, wraiths, or revenants"
+           "{2d6} nobles or aristocrats"
+           "{1d4} monarchs and their retinues"
+           "Disguised as {Mundane Role} but actually {Mortal Site > Who Is Here}"))
+
+(random-table/register :name "Mundane Role"
+  :private t
+  :data '("explorers, surveyors, or cartographers"
+          "escaped slaves"
+          "knights and their retinues"
+          "poachers or outlaw loggers"
+          "bandits, footpads, or ne’er-do-wells"
+          "hermit"
+          "monks, nuns, or (gasp) both"
+          "runaways or lost children"
+          "poets, musicians, and/or artists"
+          "adventurers or fortune seekers"
+          "wizards, alchemists, and/or herbalists"
+          "settlers"
+          "prospectors or miners"
+          "revelers or lovers"
+          "witches, cabalists, or oracles"
+          "ghosts, wraiths, or revenants"
+          "nobles or aristocrats"
+          "monarchs and their retinues"))
 
 (random-table/register :name "Fey Site > What is it"
   :private t
@@ -2286,35 +2305,35 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "Military outpost" "Market" "Fair" "Garden"
            "Mortal observation post" "Amphitheater" "Band shell" "Observatory"
            "Standing stones" "Circus" "Wildlife museum" "Mushroom library"
-           "Holiday home (timeshare)" "Manse" "Castle" "Disguised as ${Fey Site > What is it} but actually ${Fey Site > What is it}"))
+           "Holiday home (timeshare)" "Manse" "Castle" "Disguised as {Fey Site > What is it} but actually {Fey Site > What is it}"))
 
 (random-table/register :name "Fey Site > Who is here"
   :private t
   :data '("Abandoned. No one is here; or roll on mortal Who Is Here table (page 144)"
-           "1d10 Seelies on a vision quest"
-           "1d10 Seelies banished from Faerie"
-           "1d6 Seelie aristocrats and their creature servants"
-           "1d6 Unseelie collectors of eyeballs"
-           "1d4 Unseelie trollriders"
+           "{1d10} Seelies on a vision quest"
+           "{1d10} Seelies banished from Faerie"
+           "{1d6} Seelie aristocrats and their creature servants"
+           "{1d6} Unseelie collectors of eyeballs"
+           "{1d4} Unseelie trollriders"
            "A Seelie and an Unseelie trysting"
-           "Unseelies spying on 1d10 Seelies having an important debate about something silly or a silly debate about something important"
-           "1d6 Seelie will-o’-the-wisp hunters"
-           "A troupe of 1d10 Seelie actors that only perform Shakespearian death scenes"
-           "A crowd of 1d20 bored Seelies waiting for something interesting to happen"
-           "1d10 Unseelie unicorn hunters"
-           "1d4 reformed Unseelies hoping to defect"
-           "1d4 Unseelie double agents meeting with their Seelie counterparts"
-           "2d6 mortal holy folk waiting to ambush fey folk, whom they consider unholy"
-           "1d4 mortal poets, musicians, and/or artists seeking out fey enchantments/inspiration"
-           "A Seelie tournament (1d100 in attendance)"
-           "An Unseelie riot (1d100 rioters)"
-           "A royal procession of 1d100 Seelies"
-           "Disguised as ${Fey Site > Who is here} but actually ${Fey Site > Who is here}"))
+           "Unseelies spying on {1d10} Seelies having an important debate about something silly or a silly debate about something important"
+           "{1d6} Seelie will-o’-the-wisp hunters"
+           "A troupe of {1d10} Seelie actors that only perform Shakespearian death scenes"
+           "A crowd of {1d20} bored Seelies waiting for something interesting to happen"
+           "{1d10} Unseelie unicorn hunters"
+           "{1d4} reformed Unseelies hoping to defect"
+           "{1d4} Unseelie double agents meeting with their Seelie counterparts"
+           "{2d6} mortal holy folk waiting to ambush fey folk, whom they consider unholy"
+           "{1d4} mortal poets, musicians, and/or artists seeking out fey enchantments/inspiration"
+           "A Seelie tournament ({1d100} in attendance)"
+           "An Unseelie riot ({1d100} rioters)"
+           "A royal procession of {1d100} Seelies"
+           "Disguised as {Fey Site > Who is here} but actually {Fey Site > Who is here}"))
 
-(random-table/register :name "Helveczia > In the stagecoach"
-  :data '("${Helveczia > In the stagecoach > Adjective} ${Helveczia > In the stagecoach > Person} ${Helveczia > In the stagecoach > Activity}"))
+(random-table/register :name "In the Shadows of Mont Brun > In the stagecoach"
+  :data '("{In the Shadows of Mont Brun > In the stagecoach > Adjective} {In the Shadows of Mont Brun > In the stagecoach > Person} {In the Shadows of Mont Brun > In the stagecoach > Activity}"))
 
-(random-table/register :name "Helveczia > In the stagecoach > Adjective"
+(random-table/register :name "In the Shadows of Mont Brun > In the stagecoach > Adjective"
   :private t
   :data '("belligerent" "cold" "curious" "deceitful"
            "dying" "flirty" "hypochondriac" "indiscreet"
@@ -2323,7 +2342,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "rueful" "scheming" "sickly" "taciturn"
            "talkative" "trusting" "worrisome" "wounded"))
 
-(random-table/register :name "Helveczia > In the stagecoach > Person"
+(random-table/register :name "In the Shadows of Mont Brun > In the stagecoach > Person"
   :private t
   :data '("aristocrat" "charlatan" "child" "clergyman"
            "convict" "courtesan" "craftsman" "diplomat"
@@ -2332,7 +2351,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "official" "rake" "secretary" "soldier"
            "student" "teacher" "underling" "vicar"))
 
-(random-table/register :name "Helveczia > In the stagecoach > Activity"
+(random-table/register :name "In the Shadows of Mont Brun > In the stagecoach > Activity"
   :private t
   :data '("running out of options" "in exile" "carrying important item" "fleeing from persecution"
            "fleeing from superiors" "fleeing heartbreak" "in adulterous affair" "on secret mission"
@@ -2342,18 +2361,18 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "spying on company" "trying to forget" "untangling a mystery" "visiting relatives"))
 
 (random-table/register :name "In the Shadows of Mont Brun > Names"
-  :data '("${German Name > Given Name > Masculine} ${German Name > Family Name > General}"
-           "${German Name > Given Name > Masculine} ${German Name > Family Name > Swiss}"
-           "${German Name > Given Name > Feminine} ${German Name > Family Name > General}"
-           "${German Name > Given Name > Feminine} ${German Name > Family Name > Swiss}"
-           "${Italian Name > Given Name > Masculine} ${Italian Name > Family Name > General}"
-           "${Italian Name > Given Name > Masculine} ${Italian Name > Family Name > Swiss}"
-           "${Italian Name > Given Name > Feminine} ${Italian Name > Family Name > General}"
-           "${Italian Name > Given Name > Feminine} ${Italian Name > Family Name > Swiss}"
-           "${French Name > Given Name > Masculine} ${French Name > Family Name > General}"
-           "${French Name > Given Name > Masculine} ${French Name > Family Name > Swiss}"
-           "${French Name > Given Name > Feminine} ${French Name > Family Name > General}"
-           "${French Name > Given Name > Feminine} ${French Name > Family Name > Swiss}"))
+  :data '("{German Name > Given Name > Masculine} {German Name > Family Name > General}"
+           "{German Name > Given Name > Masculine} {German Name > Family Name > Swiss}"
+           "{German Name > Given Name > Feminine} {German Name > Family Name > General}"
+           "{German Name > Given Name > Feminine} {German Name > Family Name > Swiss}"
+           "{Italian Name > Given Name > Masculine} {Italian Name > Family Name > General}"
+           "{Italian Name > Given Name > Masculine} {Italian Name > Family Name > Swiss}"
+           "{Italian Name > Given Name > Feminine} {Italian Name > Family Name > General}"
+           "{Italian Name > Given Name > Feminine} {Italian Name > Family Name > Swiss}"
+           "{French Name > Given Name > Masculine} {French Name > Family Name > General}"
+           "{French Name > Given Name > Masculine} {French Name > Family Name > Swiss}"
+           "{French Name > Given Name > Feminine} {French Name > Family Name > General}"
+           "{French Name > Given Name > Feminine} {French Name > Family Name > Swiss}"))
 
 (random-table/register :name "German Name > Given Name > Masculine"
   :private t
@@ -2513,30 +2532,31 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
 
 (random-table/register :name "Savoy Region > Random Encounter"
   :roller "1d6"
-  :data '(((1 . 3) . "${Savoy Region > Random Creature}")
-           ((4 . 5) . "${Savoy Region > Random Creature} and ${Savoy Region > Random Creature} ${[coming to blows/sharing a meal/conversing/shouting]}")
-           (6 . "${Savoy Region > Random Creature} pretending to be ${Savoy Region > Random Creature}")))
+  :data '(((1 . 3) . "{Savoy Region > Random Creature}")
+           ((4 . 5) . "{Savoy Region > Random Creature} and {Savoy Region > Random Creature} [coming to blows/sharing a meal/conversing/shouting]")
+           (6 . "{Savoy Region > Random Creature} pretending to be {Savoy Region > Random Creature}")))
 
 (random-table/register :name "Savoy Region > Random Creature"
   :private t
-  :data '((1 . "${1d6+3} ${[soldiers/brigands]}")
-           (2 . "${1d3} ${[Santémagîte/Catholic/Huegonot]} ${[pilgrims/itenerant priests/monks]}")
-           ((3 . 4) . "1 ${[peddler/merchant/leper]}")
-           (5 . "1 ${[stage coach/merchant]} and ${1d3} guards")
-           (6 . "${1d3+1} Chaos cultists pretending to be ${[pilgrims/lepers/merchants]}")))
+  :data '((1 . "{1d6+3} [soldiers/brigands]")
+           (2 . "{1d3} [Santémagîte/Catholic/Huegonot] [pilgrims/itenerant priests/monks]")
+           (3 . "1 [peddler/merchant/leper]")
+           (4 . "{Mortal Site > Who Is Here}")
+           (5 . "1 [stage coach/merchant] and {1d3} guards")
+           (6 . "{1d3+1} Chaos cultists pretending to be [pilgrims/lepers/merchants]")))
 
 (random-table/register :name "Mythical Castle Region Encounter"
-  :data '("A mountain hermit out ${[basking naked/whispering prayers/singing a hedonistic song/crouched and munching on mushrooms]}."
-           "A now startled animal ${[foraging/hunting]}."
-           "Adventuring company ${[skulking towards/boisterously marching to/tattered and fleeing from/cautiously and wearly departing]} the castle."
-           "A ${[Papal/French/Holy Roman Empirian/regional]} ${[company/individual/pair]} ${[surveying/chasing/hunting/fleeing/seeking]} something."
-           "${1d6} of The Fox’s Brigand ${[found dead and mangled/lying in wait/lost/whispering around a cook fire]}."
-           "Something fantastical…${Mythical Castle Region Fantastical Encounter}"))
+  :data '("A mountain hermit out [basking naked/whispering prayers/singing a hedonistic song/crouched and munching on mushrooms]."
+           "A now startled animal [foraging/hunting]."
+           "Adventuring company [skulking towards/boisterously marching to/tattered and fleeing from/cautiously and wearly departing] the castle."
+           "A [Papal/French/Holy Roman Empirian/regional] [company/individual/pair] [surveying/chasing/hunting/fleeing/seeking] something."
+           "{1d6} of The Fox’s Brigand [found dead and mangled/lying in wait/lost/whispering around a cook fire]."
+           "Something fantastical…{Mythical Castle Region Fantastical Encounter}"))
 
 (random-table/register :name "Mythical Castle Region Fantastical Encounter"
-  :data '("A manifestation of ${[Arioch/Mother Mary/Saint Boniface/Tambor/Alsidora]} demanding ${[patronage/information/a sacrifice/help]}."
-           "A ${[treant/troll/ghost/troupe of goblins/Tatzelwurm/troupe of dwarfs]}."
-           "A goblin market ${[just opening/in full swing/closing down]}."
-           "A ${[coven of witches/trio of witches/lone witch]} ${[performing a ritual/in flight/reciting epic poetry]}."
+  :data '("A manifestation of [Arioch/Mother Mary/Saint Boniface/Tambor/Alsidora] demanding [patronage/information/a sacrifice/help]."
+           "A [treant/troll/ghost/troupe of goblins/Tatzelwurm/troupe of dwarfs]."
+           "A goblin market [just opening/in full swing/closing down]."
+           "A [coven of witches/trio of witches/lone witch] [performing a ritual/in flight/reciting epic poetry]."
            "A large boulder stirring and slowly shifting…as though waking from a long slumber."
-           "${[4d6/3d20]} ${[skeletons/restless dead/apparations]} marching to ${[bolster/exact revenge on]} the castle."))
+           "[4d6/3d20] [skeletons/restless dead/apparations] marching to [bolster/exact revenge on] the castle."))
