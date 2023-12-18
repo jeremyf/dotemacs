@@ -109,7 +109,7 @@
   :data (list
           (concat "\n- Archetype :: {Errant > Henchman > Archetype}"
             "\n- Renown :: {Errant > Henchman > Renown}"
-            "\n- Morale :: [Errant :: Henchman :: Morale Base] + [Errant :: Henchman :: Morale Variable]"
+            "\n- Morale :: {(Errant :: Henchman :: Morale Base) + (Errant :: Henchman :: Morale Variable)}"
             "\n{Errant > Character}")))
 
 (random-table/register :name "Errant > Henchman > Archetype"
@@ -549,7 +549,7 @@ See “Errant :: Archetype” table."
 
 (random-table/register :name "Errant > Weather"
   :roller #'random-table/roller/prompt-from-table-data
-  :data '(("Winter" . "Winter :: {Errant > Weather > }")
+  :data '(("Winter" . "Winter :: {Errant > Weather > Winter}")
            ("Spring" . "Springer :: {Errant > Weather > Spring}")
            ("Summer" . "Summer :: {Errant > Weather > Summer}")
            ("Autumn" . "Autumn :: {Errant > Weather > Autumn}")))
@@ -560,7 +560,7 @@ See “Errant :: Archetype” table."
             ("Clear Skies" . 2)
             ("Other" . 0)))
 
-(random-table/register :name "Errant > Weather > "
+(random-table/register :name "Errant > Weather > Winter"
   :private t
   :roller '(+ "2d6" "Errant :: Weather :: Previous Day")
   :data '(((0 . 2) . "/Severe weather/ (e.g. blizzard)")
@@ -601,6 +601,7 @@ See “Errant :: Archetype” table."
   :data '("[unctuous/sententious/truculent/supercilious/fulsome/vainglorious] [eunuch/merchant/clergyman/madam/officer/intellectual/cultist]"))
 
 (random-table/register :name "Errant > Conspicuous Consumption Failed Save"
+  :roller "d20"
   :data '((1 . "Something gets burned down or destroyed; roll a d6 to see how bad it was: on a 1, confined to a single building; on a 6, a big part of town has gone up. Future CONSPICUOUS CONSUMPTION rolls receive a penalty equal to the d6 roll till it’s repaired.  Roll another d6 to see who knows: on a 4 or lower, just the COMPANY knows; on a 5, a blackmailer knows; on a 6, EVERYBODY knows.")
            (2 . "Beaten and robbed: lose half HP and all items in inventory.")
            (3 . "Magical affliction: someone or something has put a curse on you, or transformed you into an animal.")
@@ -806,30 +807,30 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
 ;;; Random Names (from Stars without Number)
 (random-table/register :name "Name"
   :exclude-from-prompt t
-  :data '("{Arabic Name > Masculine Given Name} {Arabic Name > Surname}"
-           "{Arabic Name > Feminine Given Name} {Arabic Name > Surname}"
-           "{Chinese Name > Masculine Given Name} {Chinese Name > Surname}"
-           "{Chinese Name > Feminine Given Name} {Chinese Name > Surname}"
-           "{English Name > Masculine Given Name} {English Name > Surname}"
-           "{English Name > Feminine Given Name} {English Name > Surname}"
-           "{Greek Name > Masculine Given Name} {Greek Name > Surname}"
-           "{Greek Name > Feminine Given Name} {Greek Name > Surname}"
-           "{Indian Name > Masculine Given Name} {Indian Name > Surname}"
-           "{Indian Name > Feminine Given Name} {Indian Name > Surname}"
-           "{Japanese Name > Masculine Given Name} {Japanese Name > Surname}"
-           "{Japanese Name > Feminine Given Name} {Japanese Name > Surname}"
-           "{Latin Name > Masculine Given Name} {Latin Name > Surname}"
-           "{Latin Name > Feminine Given Name} {Latin Name > Surname}"
-           "{Nigerian Name > Masculine Given Name} {Nigerian Name > Surname}"
-           "{Nigerian Name > Feminine Given Name} {Nigerian Name > Surname}"
-           "{Russian Name > Masculine Given Name} {Russian Name > Surname}"
-           "{Russian Name > Feminine Given Name} {Russian Name > Surname}"
-           "{Spanish Name > Masculine Given Name} {Spanish Name > Surname}"
-           "{Spanish Name > Feminine Given Name} {Spanish Name > Surname}"
-           "{Norse Given Name} {Norse Surname}"
-           "{Norse Given Name} {Norse Surname}"
-           "{Breggle Name > Masculine Given Name} {Breggle Name > Surname}"
-           "{Breggle Name > Feminine Given Name} {Breggle Name > Surname}"))
+  :data '("{Arabic Name > Masculine Given Name} {Arabic Name > Surname} (Arabic)"
+           "{Arabic Name > Feminine Given Name} {Arabic Name > Surname} (Arabic)"
+           "{Chinese Name > Masculine Given Name} {Chinese Name > Surname} (Chinese)"
+           "{Chinese Name > Feminine Given Name} {Chinese Name > Surname} (Chinese)"
+           "{English Name > Masculine Given Name} {English Name > Surname} (English)"
+           "{English Name > Feminine Given Name} {English Name > Surname} (English)"
+           "{Greek Name > Masculine Given Name} {Greek Name > Surname} (Greek)"
+           "{Greek Name > Feminine Given Name} {Greek Name > Surname} (Greek)"
+           "{Indian Name > Masculine Given Name} {Indian Name > Surname} (Indian)"
+           "{Indian Name > Feminine Given Name} {Indian Name > Surname} (Indian)"
+           "{Japanese Name > Masculine Given Name} {Japanese Name > Surname} (Japanese)"
+           "{Japanese Name > Feminine Given Name} {Japanese Name > Surname} (Japanese)"
+           "{Latin Name > Masculine Given Name} {Latin Name > Surname} (Latin)"
+           "{Latin Name > Feminine Given Name} {Latin Name > Surname} (Latin)"
+           "{Nigerian Name > Masculine Given Name} {Nigerian Name > Surname} (Nigerian)"
+           "{Nigerian Name > Feminine Given Name} {Nigerian Name > Surname} (Nigerian)"
+           "{Russian Name > Masculine Given Name} {Russian Name > Surname} (Russian)"
+           "{Russian Name > Feminine Given Name} {Russian Name > Surname} (Russian)"
+           "{Spanish Name > Masculine Given Name} {Spanish Name > Surname} (Spanish)"
+           "{Spanish Name > Feminine Given Name} {Spanish Name > Surname} (Spanish)"
+           "{Norse Given Name} {Norse Surname} (Norse)"
+           "{Norse Given Name} {Norse Surname} (Norse)"
+           "{Breggle Name > Masculine Given Name} {Breggle Name > Surname} (Breggle)"
+           "{Breggle Name > Feminine Given Name} {Breggle Name > Surname} (Breggle)"))
 
 (random-table/register :name "Arabic Name > Masculine Given Name"
   :private t
@@ -2280,24 +2281,25 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
 
 (random-table/register :name "Mundane Role"
   :private t
-  :data '("explorers, surveyors, or cartographers"
-          "escaped slaves"
-          "knights and their retinues"
-          "poachers or outlaw loggers"
-          "bandits, footpads, or ne’er-do-wells"
-          "hermit"
-          "monks, nuns, or (gasp) both"
-          "runaways or lost children"
-          "poets, musicians, and/or artists"
-          "adventurers or fortune seekers"
-          "wizards, alchemists, and/or herbalists"
-          "settlers"
-          "prospectors or miners"
-          "revelers or lovers"
-          "witches, cabalists, or oracles"
-          "ghosts, wraiths, or revenants"
-          "nobles or aristocrats"
-          "monarchs and their retinues"))
+  :data '("[explorers/surveyors/cartographers]"
+           "escaped slaves"
+           "knights and their retinues"
+           "[poachers/outlaw loggers]"
+           "[bandits/footpads/ne’er-do-wells]"
+           "hermit"
+           "[monks/nuns/nuns and monks (gasp)"
+           "[runaways/lost children]"
+           "[poets/musicians/artists]"
+           "[adventurers/fortune seekers]"
+           "[wizards/alchemists/herbalists]"
+           "settlers"
+           "[prospectors/miners]"
+           "[revelers/lovers]"
+           "[witches/cabalists/oracles]"
+           "[ghosts/wraiths/revenants]"
+           "nobles or aristocrats"
+           "witchfinders"
+           "monarchs and their retinues"))
 
 (random-table/register :name "Fey Site > What is it"
   :private t
@@ -2533,17 +2535,41 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
 (random-table/register :name "Savoy Region > Random Encounter"
   :roller "1d6"
   :data '(((1 . 3) . "{Savoy Region > Random Creature}")
-           ((4 . 5) . "{Savoy Region > Random Creature} and {Savoy Region > Random Creature} [coming to blows/sharing a meal/conversing/shouting]")
-           (6 . "{Savoy Region > Random Creature} pretending to be {Savoy Region > Random Creature}")))
+           ((3 . 4) . "{Savoy Region > Random Creature} and {Savoy Region > Random Creature} [coming to blows/sharing a meal/conversing/bickering/conspiring/celebrating]")
+           (5 . "{Savoy Region > Random Creature} pretending to be {Savoy Region > Mundane Role}")
+           (6 . "{Savoy Region > Random Fantastical Creature}")))
 
 (random-table/register :name "Savoy Region > Random Creature"
+  :roller "1d6"
   :private t
   :data '((1 . "{1d6+3} [soldiers/brigands]")
            (2 . "{1d3} [Santémagîte/Catholic/Huegonot] [pilgrims/itenerant priests/monks]")
-           (3 . "1 [peddler/merchant/leper]")
-           (4 . "{Mortal Site > Who Is Here}")
-           (5 . "1 [stage coach/merchant] and {1d3} guards")
-           (6 . "{1d3+1} Chaos cultists pretending to be [pilgrims/lepers/merchants]")))
+           ((3 . 4) . "[2/5/{1d3+1}/{2d4}/{1d20+1}/{1d100+1}] {Savoy Region > Mundane Role}")
+           (5 . "1 [stage coach/merchant] and {1d3+1} guards")
+           (6 . "{1d3+1} [Chaos cultists/Papal inquisitors] pretending to be {Savoy Region > Mundane Role}")))
+
+(random-table/register :name "Savoy Region > Mundane Role"
+  :private t
+  :data '("[explorers/surveyors/cartographers]"
+           "escaped slaves"
+           "knights and their retinues"
+           "[poachers/outlaw loggers]"
+           "[bandits/footpads/ne’er-do-wells]"
+           "[hermits/lepers]"
+           "[monks/nuns/nuns and monks (gasp)]"
+           "[runaways/lost children]"
+           "[poets/musicians/artists]"
+           "[adventurers/fortune seekers]"
+           "[wizards/alchemists/herbalists/scholars]"
+           "[settlers/roaming families]"
+           "peddlers"
+           "[prospectors/miners]"
+           "[revelers/lovers]"
+           "[witches/cabalists/oracles]"
+           "[ghosts/wraiths/revenants]"
+           "[nobles/aristocrats/courtiers]"
+           "witchfinders"
+           "monarchs and their retinues"))
 
 (random-table/register :name "Mythical Castle Region Encounter"
   :data '("A mountain hermit out [basking naked/whispering prayers/singing a hedonistic song/crouched and munching on mushrooms]."
@@ -2559,4 +2585,15 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "A goblin market [just opening/in full swing/closing down]."
            "A [coven of witches/trio of witches/lone witch] [performing a ritual/in flight/reciting epic poetry]."
            "A large boulder stirring and slowly shifting…as though waking from a long slumber."
-           "[4d6/3d20] [skeletons/restless dead/apparations] marching to [bolster/exact revenge on] the castle."))
+           "[{4d6}/{3d20}] [skeletons/restless dead/apparations] marching to [bolster/exact revenge on] the castle."))
+
+
+(random-table/register :name "Monster Overhaul > Reasons for Conflict"
+  :private t
+  :data '("Economic disparity" "Religious antipathy" "Local hostility" "Simmering rivalry" "Societal collapse"
+           "Slow revenge" "Wild overconfidence" "Drunk or addled" "Outside influence" "General confusion"))
+
+(random-table/register :name "Monster Overhaul > Obscure Motives"
+  :private t
+  :data '("Treasure division" "Academic bickering" "Legal requirement" "Death ritual" "Artistic disagreement"
+           "Landscape upheaval" "Hasty sacred oath" "Fleeing something" "Brain parasites" "Divine command"))
