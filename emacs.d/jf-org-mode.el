@@ -38,7 +38,7 @@ By default this is my example code project.")
 (defun jf/org-capf ()
   "The `completion-at-point-functions' I envision using for `org-mode'."
   (setq-local completion-at-point-functions
-    (list (cape-super-capf
+    (list (cape-capf-super
             #'jf/version-control/issue-capf
             #'jf/version-control/project-capf
             #'jf/org-capf-links

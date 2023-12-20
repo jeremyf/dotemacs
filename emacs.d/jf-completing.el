@@ -360,7 +360,7 @@ Useful if you want a more robust view into the recommend candidates."
   (corfu-popupinfo-mode))
 
 (use-package cape
-  ;; Completion at point functions, with the amazing `cape-super-capf' for
+  ;; Completion at point functions, with the amazing `cape-capf-super' for
   ;; granular configuration of specific mode completion behavior.
   :straight t
   :init

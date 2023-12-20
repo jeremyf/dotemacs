@@ -272,7 +272,7 @@ We want files to have the 'projects' `denote' keyword."
       ;; (if-let ((drawer (car (org-element-map task 'drawer #'identity))))
       ;; (goto-char (org-element-property :contents-end drawer))
       ;; (goto-char (org-element-property :contents-begin task)))
-      (goto-char (org-element-property :contents-end task))
+      (goto-char (org-element-property :contents-begin task))
       (progn
         (goto-char (point-max))
         ;; Yes make this a top-level element.  It is easy to demote and move

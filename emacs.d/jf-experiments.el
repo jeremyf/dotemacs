@@ -86,16 +86,16 @@
 
 I'm uncertain if this is useful/practical.  However there is
  literature regarding the benefits of transparency of files."
-   (interactive)
-   (let ((alpha (frame-parameter nil 'alpha)))
-     (set-frame-parameter
+  (interactive)
+  (let ((alpha (frame-parameter nil 'alpha)))
+    (set-frame-parameter
       nil 'alpha
       (if (eql (cond ((numberp alpha) alpha)
-                     ((numberp (cdr alpha)) (cdr alpha))
-                     ;; Also handle undocumented (<active> <inactive>) form.
-                     ((numberp (cadr alpha)) (cadr alpha)))
-               100)
-          '(75 . 50) '(100 . 100)))))
+                 ((numberp (cdr alpha)) (cdr alpha))
+                 ;; Also handle undocumented (<active> <inactive>) form.
+                 ((numberp (cadr alpha)) (cadr alpha)))
+            100)
+        '(75 . 50) '(100 . 100)))))
 
 
 ;; Going to experiment a moment with this.
@@ -140,50 +140,50 @@ of measurement (e.g., a word or sentence)."
   "Find and report the nearest repetitions of word at point."
   (interactive)
   (let* ((word (word-at-point))
-         (re (format "\\b%s\\b" (regexp-quote word)))
-         (case-fold-search t)
-         (prev (save-excursion
-                 (beginning-of-thing 'word)
-                 (when (re-search-backward re nil t)
-                   (point))))
-         (prev-overlay (when prev
-                         (make-overlay prev
-                                       (save-excursion
-                                         (goto-char prev)
-                                         (forward-word)
-                                         (point)))))
-         (next (save-excursion
-                 (end-of-thing 'word)
-                 (when (re-search-forward re nil t)
-                   (point))))
-         (next-overlay (when next
-                         (make-overlay next
-                                       (save-excursion
-                                         (goto-char next)
-                                         (backward-word)
-                                         (point)))))
-         (prev-words (save-excursion
-                       (beginning-of-thing 'word)
-                       (calculate-distance-to prev #'backward-word #'>)))
-         (next-words (save-excursion
-                       (end-of-thing 'word)
-                       (calculate-distance-to next #'forward-word #'<)))
-         (prev-sentences (save-excursion
-                           (beginning-of-thing 'sentence)
-                           (calculate-distance-to prev #'backward-sentence #'>)))
-         (next-sentences (save-excursion
-                           (end-of-thing 'sentence)
-                           (calculate-distance-to next #'forward-sentence #'<))))
+          (re (format "\\b%s\\b" (regexp-quote word)))
+          (case-fold-search t)
+          (prev (save-excursion
+                  (beginning-of-thing 'word)
+                  (when (re-search-backward re nil t)
+                    (point))))
+          (prev-overlay (when prev
+                          (make-overlay prev
+                            (save-excursion
+                              (goto-char prev)
+                              (forward-word)
+                              (point)))))
+          (next (save-excursion
+                  (end-of-thing 'word)
+                  (when (re-search-forward re nil t)
+                    (point))))
+          (next-overlay (when next
+                          (make-overlay next
+                            (save-excursion
+                              (goto-char next)
+                              (backward-word)
+                              (point)))))
+          (prev-words (save-excursion
+                        (beginning-of-thing 'word)
+                        (calculate-distance-to prev #'backward-word #'>)))
+          (next-words (save-excursion
+                        (end-of-thing 'word)
+                        (calculate-distance-to next #'forward-word #'<)))
+          (prev-sentences (save-excursion
+                            (beginning-of-thing 'sentence)
+                            (calculate-distance-to prev #'backward-sentence #'>)))
+          (next-sentences (save-excursion
+                            (end-of-thing 'sentence)
+                            (calculate-distance-to next #'forward-sentence #'<))))
     (message "%s\n%s\n%s"
-             (format "Word on point is `%s'." word)
-             (if prev
-                 (format "The previous occurrence was %s word(s)/%s sentence(s) ago."
-                         prev-words prev-sentences)
-               "This is the first occurrence.")
-             (if next
-                 (format "The next occurrence will be in %s word(s)/%s sentence(s)."
-                         next-words next-sentences)
-               "This is the last occurrence."))
+      (format "Word on point is `%s'." word)
+      (if prev
+        (format "The previous occurrence was %s word(s)/%s sentence(s) ago."
+          prev-words prev-sentences)
+        "This is the first occurrence.")
+      (if next
+        (format "The next occurrence will be in %s word(s)/%s sentence(s)."
+          next-words next-sentences)
+        "This is the last occurrence."))
     (when prev
       (overlay-put prev-overlay 'face 'show-paren-match)
       (run-at-time "4 sec" nil (lambda ()
@@ -198,36 +198,36 @@ of measurement (e.g., a word or sentence)."
   "Create a new frame and run `org-capture'."
   (interactive)
   (make-frame '((name . "capture")
-                (top . 300)
-                (left . 700)
-                (width . 80)
-                (height . 25)))
+                 (top . 300)
+                 (left . 700)
+                 (width . 80)
+                 (height . 25)))
   (select-frame-by-name "capture")
   (delete-other-windows)
   (cl-flet ((switch-to-buffer-other-window (buf) (switch-to-buffer buf)))
-          (org-capture)))
+    (org-capture)))
 
 (defadvice org-capture-finalize
-    (after delete-capture-frame activate)
+  (after delete-capture-frame activate)
   "Advise capture-finalize to close the frame."
   (if (equal "capture" (frame-parameter nil 'name))
-      (delete-frame)))
+    (delete-frame)))
 
 (defadvice org-capture-destroy
-    (after delete-capture-frame activate)
+  (after delete-capture-frame activate)
   "Advise capture-destroy to close the frame."
   (if (equal "capture" (frame-parameter nil 'name))
-      (delete-frame)))
+    (delete-frame)))
 
 (use-package eat
   :straight (:type git
-       :host codeberg
-       :repo "akib/emacs-eat"
-       :files ("*.el" ("term" "term/*.el") "*.texi"
-               "*.ti" ("terminfo/e" "terminfo/e/*")
-               ("terminfo/65" "terminfo/65/*")
-               ("integration" "integration/*")
-                (:exclude ".dir-locals.el" "*-tests.el"))))
+              :host codeberg
+              :repo "akib/emacs-eat"
+              :files ("*.el" ("term" "term/*.el") "*.texi"
+                       "*.ti" ("terminfo/e" "terminfo/e/*")
+                       ("terminfo/65" "terminfo/65/*")
+                       ("integration" "integration/*")
+                       (:exclude ".dir-locals.el" "*-tests.el"))))
 
 (use-package treemacs
   :straight t
@@ -240,6 +240,72 @@ of measurement (e.g., a word or sentence)."
 (use-package treemacs-magit
   :straight t
   :after (treemacs magit))
+
+(transient-define-prefix jf/isearch-menu ()
+  "isearch Menu"
+  [["Edit Search String"
+     ("e"
+       "Edit the search string (recursive)"
+       isearch-edit-string
+       :transient nil)
+     ("w"
+       "Pull next word or character word from buffer"
+       isearch-yank-word-or-char
+       :transient nil)
+     ("s"
+       "Pull next symbol or character from buffer"
+       isearch-yank-symbol-or-char
+       :transient nil)
+     ("l"
+       "Pull rest of line from buffer"
+       isearch-yank-line
+       :transient nil)
+     ("y"
+       "Pull string from kill ring"
+       isearch-yank-kill
+       :transient nil)
+     ("t"
+       "Pull thing from buffer"
+       isearch-forward-thing-at-point
+       :transient nil)]
+    ["Replace"
+      ("q"
+        "Start ‘query-replace’"
+        isearch-query-replace
+        :if-nil buffer-read-only
+        :transient nil)
+      ("x"
+        "Start ‘query-replace-regexp’"
+        isearch-query-replace-regexp
+        :if-nil buffer-read-only
+        :transient nil)]]
+  [["Toggle"
+     ("X"
+       "Toggle regexp searching"
+       isearch-toggle-regexp
+       :transient nil)
+     ("S"
+       "Toggle symbol searching"
+       isearch-toggle-symbol
+       :transient nil)
+     ("W"
+       "Toggle word searching"
+       isearch-toggle-word
+       :transient nil)
+     ("F"
+       "Toggle case fold"
+       isearch-toggle-case-fold
+       :transient nil)
+     ("L"
+       "Toggle lax whitespace"
+       isearch-toggle-lax-whitespace
+       :transient nil)]
+    ["Misc"
+      ("o"
+        "occur"
+        isearch-occur
+        :transient nil)]])
+(define-key isearch-mode-map (kbd "<f2>") #'jf/isearch-menu)
 
 (provide 'jf-experiments)
 ;;; jf-experiments.el ends here
