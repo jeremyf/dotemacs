@@ -223,7 +223,9 @@ method, get the containing class."
   :bind
   (:map ruby-mode-map (("C-M-h" . jf/treesit/function-select)
                         ("C-c y f" . jf/treesit/yank-qualified-method-fname)
-                        ("C-c w r" . jf/treesit/wrap-rubocop)))
+                        ("C-c w r" . jf/treesit/wrap-rubocop)
+                        ("M-{" . ruby-beginning-of-block)
+                        ("M-}" . ruby-end-of-block)))
   :hook ((ruby-mode ruby-ts-mode) .
           (lambda ()
             (eldoc-mode)
@@ -573,7 +575,9 @@ See `add-log-current-defun-function'."
   (define-key ruby-ts-mode-map (kbd "C-c y y") #'jf/ruby-mode/yank-yardoc)
   (define-key ruby-ts-mode-map (kbd "s-ESC") #'jf/comment-header-backward)
   (define-key ruby-ts-mode-map (kbd "C-s-]") #'jf/commend-header-forward)
-  (define-key ruby-ts-mode-map (kbd "C-c w r") #'jf/treesit/wrap-rubocop))
+  (define-key ruby-ts-mode-map (kbd "C-c w r") #'jf/treesit/wrap-rubocop)
+  (define-key ruby-ts-mode-map (kbd "M-{") #'ruby-beginning-of-block)
+  (define-key ruby-ts-mode-map (kbd "M-}") #'ruby-end-of-block))
 (add-hook 'ruby-ts-mode-hook #'jf/ruby-ts-mode-configurator)
 
 ;; From https://emacs.dyerdwelling.family/emacs/20230414111409-emacs--indexing-emacs-init/

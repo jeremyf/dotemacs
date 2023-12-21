@@ -133,7 +133,7 @@
   ;; replacement.  But I'll keep both of them around.
   :straight t
   :commands (color-rg-read-file-type color-rg-search-input color-rg-read-input)
-  :custom (color-rg-search-ignore-rules "-g '!node_modules' -g '!dist' -g '!coverage' -g '!doc'")
+  :custom (color-rg-search-ignore-rules "-g '!node_modules' -g '!dist' -g '!coverage' -g '!doc' -g '!log' -g '!tmp'")
   :config
   (defun jf/color-rg-search-project (prefix &optional keyword directory globs)
     "Dispatch to `color-rg-search-input' based on given PREFIX.
