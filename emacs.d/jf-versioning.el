@@ -161,9 +161,9 @@
   (defun jf/git-commit-mode-setup ()
     ;; Specify config capf
     (setq-local completion-at-point-functions
-		  (cons #'jf/version-control/issue-capf
-			  (cons #'jf/version-control/project-capf
-			    completion-at-point-functions)))
+                  (cons #'jf/version-control/issue-capf
+                          (cons #'jf/version-control/project-capf
+                            completion-at-point-functions)))
     (goto-char (point-min))
     (beginning-of-line-text)
     (when (looking-at-p "^$")

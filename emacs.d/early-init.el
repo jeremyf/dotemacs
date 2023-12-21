@@ -1,20 +1,24 @@
-;; See https://www.reddit.com/r/emacs/comments/ofhket/further_boost_start_up_time_with_a_simple_tweak/
-;;
-;; I saw a few comments recommending different way to manipulate the
-;; gc timing. Actually, I have tried most of them. My take is to
-;; moderately increase the threshold. I used to try a large threshold,
-;; then what happens is that emacs accumulates a lot of garbage and
-;; takes a few seconds to do the GC. This few-second-freeze make me
-;; outrage.
-;;
-;; So after all, I found the default approach is the most robust
-;; one. Instead of controlling the GC timing, just let it get things
-;; done quickly so that the user won't notice. So in practice, The
-;; best advice I read online is to double the GC threshold until you
-;; don't feel improvements. My value is (setq gc-cons-threshold
-;; 8000000) ;; ~8MB
+;; Warning this `most-positive-fixnum' should not be the "resting" value.  After
+;; we're done with initialization we want to set it to something more agreeable
+;; (e.g. 20 MB or so)
 (setq gc-cons-threshold most-positive-fixnum
       gc-cons-percentage 0.6)
+
+;; Same idea as above for the `file-name-handler-alist' and the
+;; `vc-handled-backends' with regard to startup speed optimisation.
+;; Here I am storing the default value with the intent of restoring it
+;; via the `emacs-startup-hook'.
+(defvar jf-emacs--file-name-handler-alist file-name-handler-alist)
+(defvar jf-emacs--vc-handled-backends vc-handled-backends)
+(setq file-name-handler-alist nil
+      vc-handled-backends nil)
+
+(add-hook 'emacs-startup-hook
+          (lambda ()
+            (setq gc-cons-threshold (* 1024 1024 20)
+                  gc-cons-percentage 0.2
+                  file-name-handler-alist prot-emacs--file-name-handler-alist
+                  vc-handled-backends prot-emacs--vc-handled-backends)))
 
 ;; From straight.el, "Users of Emacs versions >= 27 will want to add
 ;; the following:"

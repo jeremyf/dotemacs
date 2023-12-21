@@ -47,39 +47,39 @@
                            "19" "19.25" "19.5" "19.75" "20" "20.25" "20.5"
                            "20.75" "21" "21.25" "21.5" "21.75" "22" "22.25"
                            "22.5" "22.75" "23" "23.25" "23.5" "23.75" "24"))
-	          (phys (string-to-number (completing-read "Physique: " range nil t)))
-	          (skil (string-to-number (completing-read "Skill: " range nil t)))
-	          (slots-hand (string-to-number (completing-read "Slots in hand: "
+                  (phys (string-to-number (completing-read "Physique: " range nil t)))
+                  (skil (string-to-number (completing-read "Skill: " range nil t)))
+                  (slots-hand (string-to-number (completing-read "Slots in hand: "
                                             (subseq slot-range 0 9) nil t)))
-	          (slots-handy (string-to-number (completing-read "Slots in handy: "
+                  (slots-handy (string-to-number (completing-read "Slots in handy: "
                                              (subseq slot-range 0 17) nil t)))
-	          (slots-worn (string-to-number (completing-read "Slots in worn: "
+                  (slots-worn (string-to-number (completing-read "Slots in worn: "
                                             slot-range nil t)))
-	          (slots-pack (string-to-number (completing-read "Slots in pack: "
+                  (slots-pack (string-to-number (completing-read "Slots in pack: "
                                             slot-range nil t)))
             (text (format (concat "Errant Movement\n- Physique: %s · Skill: %s"
                             "\n- Slots Hand: %s · Handy: %s · Worn: %s · "
                             "Pack: %s")
-			              phys skil slots-hand slots-handy slots-worn slots-pack)))
+                                      phys skil slots-hand slots-handy slots-worn slots-pack)))
       (dolist (label-slots (list (cons "in hand, handy, worn, pack"
-				                           (+ slots-hand slots-handy slots-worn
+                                                           (+ slots-hand slots-handy slots-worn
                                      slots-pack))
-				                     (cons "in hand, handy, worn"
-				                       (+ slots-hand slots-handy slots-worn))
-				                     (cons "handy, worn"
-				                       (+ slots-handy slots-worn))
-				                     (cons "worn" slots-worn)
-				                     (cons "naked and free" 0)))
+                                                     (cons "in hand, handy, worn"
+                                                       (+ slots-hand slots-handy slots-worn))
+                                                     (cons "handy, worn"
+                                                       (+ slots-handy slots-worn))
+                                                     (cons "worn" slots-worn)
+                                                     (cons "naked and free" 0)))
         (let* ((slots (cdr label-slots))
                 (label (car label-slots))
                 (enc (if (>= phys slots)
-		                   (floor (* 4 slots) phys)
-		                   (+ 4 (- (floor slots) phys))))
+                                   (floor (* 4 slots) phys)
+                                   (+ 4 (- (floor slots) phys))))
                 (spd (if (>= skil enc) (- skil enc) 0))
                 (md (floor spd 4))
                 (md-text (if (= 0 md) "0" (format "%sd4" md))))
           (setq-local text (format "%s\n- %s\n  ENC: %s · SPD: %s· MD: %s"
-				                     text label enc spd md-text))))
+                                                     text label enc spd md-text))))
       (kill-new text)
       (message text))))
 
@@ -100,9 +100,9 @@
 
 (defun random-table/roller/prompt-from-table-data (table)
   "Prompt for picking a range from a TABLE."
-	(completing-read
-	  (format "%s via:" (random-table-name table))
-	  (random-table-data table) nil t))
+        (completing-read
+          (format "%s via:" (random-table-name table))
+          (random-table-data table) nil t))
 
 ;;; Errant
 (random-table/register :name "Errant > Henchman"

@@ -16,24 +16,24 @@
   "Create a help window with HEADER and BODY."
   (let ((qh-buff (concat "*Quick Help: " header "*")))
     (progn (or (get-buffer qh-buff)
-	       (progn (get-buffer-create qh-buff)
-		      (with-current-buffer qh-buff
-			(insert (concat "**" header "**\n" body))
-			(goto-char (point-min))
-			(not-modified)
-			(read-only-mode)
-			(special-mode)
-			(local-set-key (kbd "q") 'kill-buffer-and-window))))
-	   (pop-to-buffer qh-buff '((display-buffer-below-selected)
-				    ;; When sizing the buffer, if tab-line-format is
-				    ;; active then that "line" is not counted in
-				    ;; calculating the fit-to-window-buffer value.
-				    ;; Which means that the buffer flows into the
-				    ;; mode-line.  So turn it off for this buffer.
-				    (window-parameters . ((tab-line-format . none)
-							  (no-other-window . nil)))
-				    (window-height . fit-window-to-buffer)))
-	   (message "q - Remove Window"))))
+               (progn (get-buffer-create qh-buff)
+                      (with-current-buffer qh-buff
+                        (insert (concat "**" header "**\n" body))
+                        (goto-char (point-min))
+                        (not-modified)
+                        (read-only-mode)
+                        (special-mode)
+                        (local-set-key (kbd "q") 'kill-buffer-and-window))))
+           (pop-to-buffer qh-buff '((display-buffer-below-selected)
+                                    ;; When sizing the buffer, if tab-line-format is
+                                    ;; active then that "line" is not counted in
+                                    ;; calculating the fit-to-window-buffer value.
+                                    ;; Which means that the buffer flows into the
+                                    ;; mode-line.  So turn it off for this buffer.
+                                    (window-parameters . ((tab-line-format . none)
+                                                          (no-other-window . nil)))
+                                    (window-height . fit-window-to-buffer)))
+           (message "q - Remove Window"))))
 
 (cl-defmacro jf/transient-quick-help (name &key header label body)
   "Macro for creating callable functions that display help.

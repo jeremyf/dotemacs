@@ -100,7 +100,7 @@ When given PREFIX use `eww-browse-url'."
   (setq jf/bracket/left-brackets '())
   (dotimes (-x (- (length jf/bracket/brackets) 1))
     (when (= (% -x 2) 0)
-	    (push (char-to-string (elt jf/bracket/brackets -x))
+            (push (char-to-string (elt jf/bracket/brackets -x))
         jf/bracket/left-brackets)))
   (setq jf/bracket/left-brackets (reverse jf/bracket/left-brackets)))
 
@@ -110,7 +110,7 @@ When given PREFIX use `eww-browse-url'."
   (setq jf/bracket/right-brackets '())
   (dotimes (-x (- (length jf/bracket/brackets) 1))
     (when (= (% -x 2) 1)
-	    (push (char-to-string (elt jf/bracket/brackets -x))
+            (push (char-to-string (elt jf/bracket/brackets -x))
         jf/bracket/right-brackets)))
   (setq jf/bracket/right-brackets (reverse jf/bracket/right-brackets)))
 

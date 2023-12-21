@@ -1,14 +1,13 @@
 ;;; init.el --- Summary:
-;;; -*- lexical-binding: t; -*-
+  ;;; -*- lexical-binding: t; -*-
 ;;
 ;;  Emacs configuration for Jeremy Friesen
 ;;
-;;; Commentary:
+  ;;; Commentary:
 ;;
 ;;  This is my journey into Emacs.  Let's see where we go!
 ;;
-;;; CODE:
-
+  ;;; CODE:
 (add-to-list 'load-path "~/git/dotemacs/emacs.d")
 (setq custom-file (concat user-emacs-directory "custom.el"))
 (load custom-file :noerror)
@@ -46,12 +45,12 @@
 (setq jf/artist-mode-spraycan "🞄⁛◌🞆⊖⊗⁛●◯⦿⬤")
 (load (concat user-emacs-directory "hide-comnt.el") :noerror)
 
-(server-start)
+(require 'server)
+(setq server-client-instructions nil)
+(unless (server-running-p)
+  (server-start))
 
 (add-hook 'after-init-hook #'jf/enable-indent-for-tab-command)
 
-(setq gc-cons-threshold (expt 2 24) ;; 16777216
-      gc-cons-percentage 0.1)
-
 (provide 'init)
-;;; init.el ends here
+  ;;; init.el ends here

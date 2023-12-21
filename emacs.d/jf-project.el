@@ -61,7 +61,7 @@ Determine the PROJECT by querying `jf/project/list-projects'."
   (interactive)
   (let* ((project (or (s-presence project)
                     (jf/project/find-dwim)))
-	        (filename (cdar (jf/project/list-projects :project project))))
+                (filename (cdar (jf/project/list-projects :project project))))
     (find-file filename)))
 
 ;; I work on several different projects each day; helping folks get unstuck.  I
@@ -108,8 +108,8 @@ With one PREFIX go to place where we would jump on capture."
         (dired path))
       ((f-file-p path)
         (if (string= "pdf" (f-ext path))
-	        (shell-command (concat "open " path))
-	        (find-file path)))
+                (shell-command (concat "open " path))
+                (find-file path)))
       ;; Try the path as an org-link (e.g. path == "denote:20230328T093100")
       (t (when-let* ((type-target (s-split ":" path))
                       ;; There's a registered handler for the protocol
@@ -119,9 +119,9 @@ With one PREFIX go to place where we would jump on capture."
            (funcall follow-func (cadr type-target))
            ;; We tried...and don't know how to handle this.
            (progn
-	           (message "WARNING: Project %s missing path name \"%s\" (with path %s)"
-		           project path-name path)
-	           (jf/project/jump-to/notes :project project)))))))
+                   (message "WARNING: Project %s missing path name \"%s\" (with path %s)"
+                           project path-name path)
+                   (jf/project/jump-to/notes :project project)))))))
 
 (defun jf/project/project-paths-for (filename)
   "Find the project paths for the given FILENAME.
@@ -133,7 +133,7 @@ Added in cases where we want to inject the actual file."
 
 ;;;; Support Functions
 (cl-defun jf/project/list-projects (&key (project ".+")
-					                           (directory org-directory))
+                                                                   (directory org-directory))
   "Return a list of `cons' that match the given PROJECT.
 
 The `car' of the `cons' is the project (e.g. \"Take on Rules\").
@@ -141,17 +141,17 @@ The `cdr' is the fully qualified path to that projects notes file.
 
 The DIRECTORY defaults to `org-directory' but you can specify otherwise."
   (mapcar (lambda (line)
-	          (let* ((slugs (s-split ":" line))
-		                (proj (s-trim (car (cdr slugs))))
-		                (filename (s-trim (car slugs))))
-	            (cons proj filename)))
-	  (split-string-and-unquote
-	    (shell-command-to-string
-	      (concat
-	        "rg \"^#\\+PROJECT_NAME: +(" project ") *$\" " directory
-	        " --only-matching --no-ignore-vcs --with-filename -r '$1' "
-	        "| tr '\n' '@'"))
-	    "@")))
+                  (let* ((slugs (s-split ":" line))
+                                (proj (s-trim (car (cdr slugs))))
+                                (filename (s-trim (car slugs))))
+                    (cons proj filename)))
+          (split-string-and-unquote
+            (shell-command-to-string
+              (concat
+                "rg \"^#\\+PROJECT_NAME: +(" project ") *$\" " directory
+                " --only-matching --no-ignore-vcs --with-filename -r '$1' "
+                "| tr '\n' '@'"))
+            "@")))
 
 (cl-defun jf/project/get-project-from/project-source-code (&key (directory org-directory))
   "Return the current \"noted\" project name.
@@ -164,13 +164,13 @@ Noted projects would be found within the given DIRECTORY."
                                   project_path_to_code_truename)))
       ;; How to handle multiple projects?  Prompt to pick one
       (let ((filename (s-trim (shell-command-to-string
-			                          (concat
-				                          "rg \"^#\\+PROJECT_PATHS: .*"
-				                          project_path_to_code " *\\\"\" "
-				                          directory " --files-with-matches "
-				                          " --no-ignore-vcs --ignore-case")))))
-	      (unless (string-equal "" filename)
-	        (with-current-buffer (find-file-noselect (file-truename filename))
+                                                  (concat
+                                                          "rg \"^#\\+PROJECT_PATHS: .*"
+                                                          project_path_to_code " *\\\"\" "
+                                                          directory " --files-with-matches "
+                                                          " --no-ignore-vcs --ignore-case")))))
+              (unless (string-equal "" filename)
+                (with-current-buffer (find-file-noselect (file-truename filename))
             (jf/project/get-project-from/current-buffer-is-project)))))))
 
 (defun jf/project/get-project-from/current-clock ()
@@ -178,10 +178,10 @@ Noted projects would be found within the given DIRECTORY."
   ;; This is a naive implementation that assumes a :task: has the clock.  A
   ;; :task:'s immediate ancestor is a :projects:.
   (when-let ((m (and
-		              (fboundp 'org-clocking-p) ;; If this isn't set, we ain't
-		              ;; clocking.
-		              (org-clocking-p)
-		              org-clock-marker)))
+                              (fboundp 'org-clocking-p) ;; If this isn't set, we ain't
+                              ;; clocking.
+                              (org-clocking-p)
+                              org-clock-marker)))
     (with-current-buffer (marker-buffer m)
       (goto-char m)
       (jf/project/get-project-from/current-buffer-is-project))))
@@ -197,10 +197,10 @@ When the `current-prefix-arg' is set always prompt for the project."
   ;; `jf/project/get-project-from/current-agenda-buffer'
   (or
     (and (not current-prefix-arg)
-	    (or
+            (or
         (jf/project/get-project-from/current-buffer-is-project)
-	      (jf/project/get-project-from/current-clock)
-	      (jf/project/get-project-from/project-source-code)))
+              (jf/project/get-project-from/current-clock)
+              (jf/project/get-project-from/project-source-code)))
     (completing-read "Project: " (jf/project/list-projects))))
 
 ;; The default relevant `magit-list-repositories'

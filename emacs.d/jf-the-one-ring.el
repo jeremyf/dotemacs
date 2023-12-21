@@ -38,15 +38,15 @@
 
 (defconst jf/gaming/the-one-ring/feat-die-favourability
   '(("Favoured" . (lambda (table)
-		    (nth (max (random (length table))
-			      (random (length table)))
-			 table)))
+                    (nth (max (random (length table))
+                              (random (length table)))
+                         table)))
     ("Neutral" . (lambda (table)
-		   (seq-random-elt table)))
+                   (seq-random-elt table)))
     ("Ill-Favoured" . (lambda (table)
-			(nth (min (random (length table))
-				  (random (length table)))
-			     table))))
+                        (nth (min (random (length table))
+                                  (random (length table)))
+                             table))))
   "Favourability options and associated roller.")
 
 (defconst jf/gaming/the-one-ring/table/nameless-things
@@ -103,86 +103,86 @@
 ;;;;; Strider Mode
 (defconst jf/gaming/the-one-ring/strider-mode/event-table
   '(:table (:terrible-misfortune :despair :ill-choices :ill-choices
-				:mishap :mishap :mishap :mishap
-				:short-cut :short-cut :chance-meeting :joyful-sight)
-	  :details
-	  ( :terrible-misfortune
-	    ( :consequence "If the roll fails, the target is Wounded."
-	      :title "Terrible Misfortune"
-	      :fatigue 3
-	      :events
-	      (("Dire confrontation" . "Noteworthy Encounter")
-	       ("Rival Predator" . "HUNTING to avoid becoming the hunted")
-	       ("Violent weather" . "EXPLORE to find shelter")
-	       ("Hidden hazard" . "AWARENESS to avoid stumbling into danger")
-	       ("Dangerous terrain" . "EXPLORE to find a safer route")
-	       ("Stalking enemy" . "AWARENESS to spot the foul presence")))
-	    :despair
-	    ( :consequence "If the roll fails, gain 2 Shadow points (Dread)."
-	      :title "Despair"
-	      :fatigue 2
-	      :events
-	      (("Servants of the Enemy" . "Noteworthy Encounter")
-	       ("Torrential weather" . "EXPLORE to find the least exposed path")
-	       ("Nightmarish presence" . "AWARENESS to sense the danger")
-	       ("Fading vigour" . "HUNTING to gain sustenance")
-	       ("Corrupted site" . "EXPLORE to find your way out")
-	       ("Grisly scene or foreboding portent" . "AWARENESS to be forewarned")))
-	    :mishap
-	    ( :consequence "If the roll fails, add 1 day to the length of the journey, and gain 1 additional Fatigue."
-	      :title "Mishap"
-	      :fatigue 2
-	      :events
-	      (("Sparse wildlife" . "HUNTING to forage what you can")
-	       ("Lost direction" . "EXPLORE to find your way")
-	       ("Obstructed path" . "AWARENESS to spot a way around")
-	       ("Elusive quarry" . "HUNTING to track it down")
-	       ("Rough terrain" . "EXPLORE to safely traverse")
-	       ("Wandering enemies" . "AWARENESS to sense their coming")))
-	    :ill-choices
-	    ( :consequence "If the roll fails, gain 1 Shadow point (Dread)."
-	      :title "Ill Choices"
-	      :fatigue 2
-	      :events
-	      (("Mismanaged provisions" . "HUNTING to replenish stores")
-	       ("Wayward path" . "EXPLORE to retrace your steps")
-	       ("Overlooked hazard" . "AWARENESS to escape safely")
-	       ("Lost quarry" . "HUNTING to follow its tracks")
-	       ("Disorienting environs" . "EXPLORE to find your way")
-	       ("Haunting visions" . "AWARENESS to over- come darkness")))
-	    :short-cut
-	    ( :consequence "If the roll succeeds, reduce the length of the journey by 1 day."
-	      :title "Short Cut"
-	      :fatigue 1
-	      :events
-	      (("Game trail" . "HUNTING to traverse the path")
-	       ("Secluded path" . "EXPLORE to navigate the wilds")
-	       ("Helpful tracks" . "AWARENESS to follow the tracks")
-	       ("Animal guide" . "HUNTING to follow at a distance")
-	       ("Favourable weather" . "EXPLORE to make the most of it")
-	       ("Familiar waypoint" . "AWARENESS to recognize the landmark")))
-	    :chance-meeting
-	    ( :consequence "If the roll succeeds, no Fatigue is gained, and you may envision a favourable encounter."
-	      :title "Chance Meeting"
-	      :fatigue 1
-	      :events
-	      (("Lone hunter" . "HUNTING to trade stories")
-	       ("Fellow traveller" . "EXPLORE to learn about the path ahead")
-	       ("Discreet watcher" . "AWARENESS to spot them")
-	       ("Noble beast" . "HUNTING to commune")
-	       ("Secluded encampment" . "EXPLORE to find your way off the beaten path")
-	       ("Auspicious gathering" . "Noteworthy Encounter")))
-	    :joyful-sight
-	    ( :consequence "If the roll succeeds, regain 1 Hope."
-	      :title "Joyful Sight"
-	      :fatigue 0
-	      :events
-	      (("Majestic creatures" . "HUNTING to observe without startling them")
-	       ("Inspiring vista" . "EXPLORE to reach a vantage point")
-	       ("Benevolent being" . "AWARENESS to sense their presence")
-	       ("Abundant foraging" . "HUNTING to replenish your rations")
-	       ("Ancient monument" . "AWARENESS to recognize its significance")
-	       ("Peaceful sanctuary" . "Noteworthy Encounter"))))))
+                                :mishap :mishap :mishap :mishap
+                                :short-cut :short-cut :chance-meeting :joyful-sight)
+          :details
+          ( :terrible-misfortune
+            ( :consequence "If the roll fails, the target is Wounded."
+              :title "Terrible Misfortune"
+              :fatigue 3
+              :events
+              (("Dire confrontation" . "Noteworthy Encounter")
+               ("Rival Predator" . "HUNTING to avoid becoming the hunted")
+               ("Violent weather" . "EXPLORE to find shelter")
+               ("Hidden hazard" . "AWARENESS to avoid stumbling into danger")
+               ("Dangerous terrain" . "EXPLORE to find a safer route")
+               ("Stalking enemy" . "AWARENESS to spot the foul presence")))
+            :despair
+            ( :consequence "If the roll fails, gain 2 Shadow points (Dread)."
+              :title "Despair"
+              :fatigue 2
+              :events
+              (("Servants of the Enemy" . "Noteworthy Encounter")
+               ("Torrential weather" . "EXPLORE to find the least exposed path")
+               ("Nightmarish presence" . "AWARENESS to sense the danger")
+               ("Fading vigour" . "HUNTING to gain sustenance")
+               ("Corrupted site" . "EXPLORE to find your way out")
+               ("Grisly scene or foreboding portent" . "AWARENESS to be forewarned")))
+            :mishap
+            ( :consequence "If the roll fails, add 1 day to the length of the journey, and gain 1 additional Fatigue."
+              :title "Mishap"
+              :fatigue 2
+              :events
+              (("Sparse wildlife" . "HUNTING to forage what you can")
+               ("Lost direction" . "EXPLORE to find your way")
+               ("Obstructed path" . "AWARENESS to spot a way around")
+               ("Elusive quarry" . "HUNTING to track it down")
+               ("Rough terrain" . "EXPLORE to safely traverse")
+               ("Wandering enemies" . "AWARENESS to sense their coming")))
+            :ill-choices
+            ( :consequence "If the roll fails, gain 1 Shadow point (Dread)."
+              :title "Ill Choices"
+              :fatigue 2
+              :events
+              (("Mismanaged provisions" . "HUNTING to replenish stores")
+               ("Wayward path" . "EXPLORE to retrace your steps")
+               ("Overlooked hazard" . "AWARENESS to escape safely")
+               ("Lost quarry" . "HUNTING to follow its tracks")
+               ("Disorienting environs" . "EXPLORE to find your way")
+               ("Haunting visions" . "AWARENESS to over- come darkness")))
+            :short-cut
+            ( :consequence "If the roll succeeds, reduce the length of the journey by 1 day."
+              :title "Short Cut"
+              :fatigue 1
+              :events
+              (("Game trail" . "HUNTING to traverse the path")
+               ("Secluded path" . "EXPLORE to navigate the wilds")
+               ("Helpful tracks" . "AWARENESS to follow the tracks")
+               ("Animal guide" . "HUNTING to follow at a distance")
+               ("Favourable weather" . "EXPLORE to make the most of it")
+               ("Familiar waypoint" . "AWARENESS to recognize the landmark")))
+            :chance-meeting
+            ( :consequence "If the roll succeeds, no Fatigue is gained, and you may envision a favourable encounter."
+              :title "Chance Meeting"
+              :fatigue 1
+              :events
+              (("Lone hunter" . "HUNTING to trade stories")
+               ("Fellow traveller" . "EXPLORE to learn about the path ahead")
+               ("Discreet watcher" . "AWARENESS to spot them")
+               ("Noble beast" . "HUNTING to commune")
+               ("Secluded encampment" . "EXPLORE to find your way off the beaten path")
+               ("Auspicious gathering" . "Noteworthy Encounter")))
+            :joyful-sight
+            ( :consequence "If the roll succeeds, regain 1 Hope."
+              :title "Joyful Sight"
+              :fatigue 0
+              :events
+              (("Majestic creatures" . "HUNTING to observe without startling them")
+               ("Inspiring vista" . "EXPLORE to reach a vantage point")
+               ("Benevolent being" . "AWARENESS to sense their presence")
+               ("Abundant foraging" . "HUNTING to replenish your rations")
+               ("Ancient monument" . "AWARENESS to recognize its significance")
+               ("Peaceful sanctuary" . "Noteworthy Encounter"))))))
 
 (defconst jf/gaming/the-one-ring/strider-mode/fortune-tables
   '(("ᚠ" .
@@ -215,41 +215,41 @@
 (defconst jf/gaming/the-one-ring/strider-mode/lore-table
   '(
     :action ("⏿ Abandon" "⏿ Attack" "⏿ Betray" "⏿ Corrupt" "⏿ Defeat" "⏿ Weaken" ;; Eye of Sauron
-	     "Aid" "Arrive" "Await" "Breach" "Break" "Capture" ;; 1
-	     "Change" "Chase" "Command" "Control" "Create" "Defy" ;; 2
-	     "Demand" "Discover" "Disguise" "Endure" "Escape" "Evade" ;; 3
-	     "Explore" "Find" "Focus" "Gather" "Guard" "Guide" ;; 4
-	     "Hide" "Hinder" "Hoard" "Hold" "Hunt" "Journey" ;; 5
-	     "Lead" "Learn" "Leave" "Lose" "Mourn" "Move" ;; 6
-	     "Persist" "Preserve" "Prevent" "Refuse" "Reject" "Remove" ;; 7
-	     "Replenish" "Restore" "Scheme" "Search" "Seize" "Share" ;; 8
-	     "Slay" "Steal" "Summon" "Surrender" "Surround" "Threaten" ;; 9
-	     "Transform" "Trap" "Trick" "Uncover" "Uphold" "Withstand" ;; 10
-	     "ᚠ Believe" "ᚠ Bolster" "ᚠ Defend" "ᚠ Forgive" "ᚠ Resist" "ᚠ Strengthen") ;; Rune of Gandalf
+             "Aid" "Arrive" "Await" "Breach" "Break" "Capture" ;; 1
+             "Change" "Chase" "Command" "Control" "Create" "Defy" ;; 2
+             "Demand" "Discover" "Disguise" "Endure" "Escape" "Evade" ;; 3
+             "Explore" "Find" "Focus" "Gather" "Guard" "Guide" ;; 4
+             "Hide" "Hinder" "Hoard" "Hold" "Hunt" "Journey" ;; 5
+             "Lead" "Learn" "Leave" "Lose" "Mourn" "Move" ;; 6
+             "Persist" "Preserve" "Prevent" "Refuse" "Reject" "Remove" ;; 7
+             "Replenish" "Restore" "Scheme" "Search" "Seize" "Share" ;; 8
+             "Slay" "Steal" "Summon" "Surrender" "Surround" "Threaten" ;; 9
+             "Transform" "Trap" "Trick" "Uncover" "Uphold" "Withstand" ;; 10
+             "ᚠ Believe" "ᚠ Bolster" "ᚠ Defend" "ᚠ Forgive" "ᚠ Resist" "ᚠ Strengthen") ;; Rune of Gandalf
     :aspect ("⏿ Corrupted" "⏿ Cruel" "⏿ Deceptive" "⏿ Fell" "⏿ Ruined" "⏿ Treacherous" ;; Eye of Sauron
-	     "Active" "Ancient" "Bold" "Bright" "Broken" "Cheerless" ;; 1
-	     "Cold" "Concealed" "Dangerous" "Dark" "Dead" "Defended" ;; 2
-	     "Desolate" "Destroyed" "Dreadful" "Empty" "Evil" "Faded" ;; 3
-	     "Far-reaching" "Fierce" "Foreboding" "Forgotten" "Fragile" "Ghastly" ;; 4
-	     "Gloomy" "Growing" "Hidden" "Ill-fated" "Impenetrable" "Inspiring" ;; 5
-	     "Isolated" "Lofty" "Lost" "Menacing" "Mighty" "Mysterious" ;; 6
-	     "Noble" "Obstructed" "Old" "Ominous" "Open" "Peaceful" ;; 7
-	     "Restored" "Sheltered" "Silent" "Simple" "Small" "Sombre" ;; 8
-	     "Stony" "Stout" "Stricken" "Stubborn" "Twisted" "Unnatural" ;; 9
-	     "Veiled" "Vigorous" "Weary" "Wild" "Wretched" "Young" ;; 10
-	     "ᚠ Flourishing" "ᚠ Beautiful" "ᚠ Good" "ᚠ Kind" "ᚠ Gentle" "ᚠ Wondrous") ;; Rune of Gandalf
+             "Active" "Ancient" "Bold" "Bright" "Broken" "Cheerless" ;; 1
+             "Cold" "Concealed" "Dangerous" "Dark" "Dead" "Defended" ;; 2
+             "Desolate" "Destroyed" "Dreadful" "Empty" "Evil" "Faded" ;; 3
+             "Far-reaching" "Fierce" "Foreboding" "Forgotten" "Fragile" "Ghastly" ;; 4
+             "Gloomy" "Growing" "Hidden" "Ill-fated" "Impenetrable" "Inspiring" ;; 5
+             "Isolated" "Lofty" "Lost" "Menacing" "Mighty" "Mysterious" ;; 6
+             "Noble" "Obstructed" "Old" "Ominous" "Open" "Peaceful" ;; 7
+             "Restored" "Sheltered" "Silent" "Simple" "Small" "Sombre" ;; 8
+             "Stony" "Stout" "Stricken" "Stubborn" "Twisted" "Unnatural" ;; 9
+             "Veiled" "Vigorous" "Weary" "Wild" "Wretched" "Young" ;; 10
+             "ᚠ Flourishing" "ᚠ Beautiful" "ᚠ Good" "ᚠ Kind" "ᚠ Gentle" "ᚠ Wondrous") ;; Rune of Gandalf
     :focus ("⏿ Curse" "⏿ Despair" "⏿ Enemy" "⏿ Fear" "⏿ Shadow" "⏿ War" ;; Eye of Sauron
-	    "Battle" "Border" "Burden" "Council" "Court" "Creature" ;; 1
-	    "Darkness" "Death" "Defence" "Depths" "Doubt" "Dreams" ;; 2
-	    "Fate" "Fire" "Folk" "Followers" "Greed" "Haven" ;; 3
-	    "History" "Honour" "Journey" "Kindred" "Knowledge" "Land" ;; 4
-	    "Leader" "Legend" "Life" "Light" "Luck" "Memory" ;; 5
-	    "Message" "Might" "Nature" "Pain" "Path" "Patron" ;; 6
-	    "Peril" "Plan" "Power" "Prophecy" "Quest" "Refuge" ;; 7
-	    "Riddle" "Ruins" "Rumour" "Secret" "Skill" "Song" ;; 8
-	    "Story" "Strength" "Time" "Tool" "Treasure" "Trust" ;; 9
-	    "Truth" "Vengeance" "Wealth" "Weapon" "Wilds" "Wish" ;; 10
-	    "ᚠ Courage" "ᚠ Duty" "ᚠ Fellowship" "ᚠ Hope" "ᚠ Love" "ᚠ Peace") ;; Rune of Gandalf
+            "Battle" "Border" "Burden" "Council" "Court" "Creature" ;; 1
+            "Darkness" "Death" "Defence" "Depths" "Doubt" "Dreams" ;; 2
+            "Fate" "Fire" "Folk" "Followers" "Greed" "Haven" ;; 3
+            "History" "Honour" "Journey" "Kindred" "Knowledge" "Land" ;; 4
+            "Leader" "Legend" "Life" "Light" "Luck" "Memory" ;; 5
+            "Message" "Might" "Nature" "Pain" "Path" "Patron" ;; 6
+            "Peril" "Plan" "Power" "Prophecy" "Quest" "Refuge" ;; 7
+            "Riddle" "Ruins" "Rumour" "Secret" "Skill" "Song" ;; 8
+            "Story" "Strength" "Time" "Tool" "Treasure" "Trust" ;; 9
+            "Truth" "Vengeance" "Wealth" "Weapon" "Wilds" "Wish" ;; 10
+            "ᚠ Courage" "ᚠ Duty" "ᚠ Fellowship" "ᚠ Hope" "ᚠ Love" "ᚠ Peace") ;; Rune of Gandalf
     )
   "From Strider Mode p11-12")
 
@@ -272,20 +272,20 @@
   ;; List contains 12 elements; 0th index is "Sauron", then 1st through 10th are
   ;; 1 through 10 and 11th is "Gandalf".
   '(("Certain" . ("⏿ No with an extreme result or twist"
-		  "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes"
-		  "ᚠ Yes with an extreme result or twist"))
+                  "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes"
+                  "ᚠ Yes with an extreme result or twist"))
     ("Likely" . ("⏿ No with an extreme result or twist"
-		 "No" "No" "No" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes"
-		 "ᚠ Yes with an extreme result or twist"))
+                 "No" "No" "No" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes" "Yes"
+                 "ᚠ Yes with an extreme result or twist"))
     ("Middling" . ("⏿ No with an extreme result or twist"
-		   "No" "No" "No" "No" "No" "Yes" "Yes" "Yes" "Yes" "Yes"
-		   "ᚠ Yes with an extreme result or twist"))
+                   "No" "No" "No" "No" "No" "Yes" "Yes" "Yes" "Yes" "Yes"
+                   "ᚠ Yes with an extreme result or twist"))
     ("Doubtful" . ("⏿ No with an extreme result or twist"
-		   "No" "No" "No" "No" "No" "No" "No" "Yes" "Yes" "Yes"
-		   "ᚠ Yes with an extreme result or twist"))
+                   "No" "No" "No" "No" "No" "No" "No" "Yes" "Yes" "Yes"
+                   "ᚠ Yes with an extreme result or twist"))
     ("Unthinkable" . ("⏿ No with an extreme result or twist"
-		      "No" "No" "No" "No" "No" "No" "No" "No" "No" "Yes"
-		      "ᚠ Yes with an extreme result or twist")))
+                      "No" "No" "No" "No" "No" "No" "No" "No" "No" "Yes"
+                      "ᚠ Yes with an extreme result or twist")))
   "An translation of the Telling Table from Strider Mode.")
 
 
@@ -315,31 +315,31 @@
 (cl-defun jf/gaming/the-one-ring/roll/favorability-with-table (&key favorability table)
   "Roll on the TABLE using the FAVORABILITY."
   (funcall (alist-get favorability
-		      jf/gaming/the-one-ring/feat-die-favourability
-		      nil
-		      nil
-		      #'string=)
-	   table))
+                      jf/gaming/the-one-ring/feat-die-favourability
+                      nil
+                      nil
+                      #'string=)
+           table))
 
 (cl-defun jf/gaming/the-one-ring/roll/feat-die (favorability)
   "Return a random result of the feat die based on the given FAVORABILITY."
   (interactive (list (completing-read "Favourability: "
-				      jf/gaming/the-one-ring/feat-die-favourability)))
+                                      jf/gaming/the-one-ring/feat-die-favourability)))
   (jf/gaming/the-one-ring/roll/favorability-with-table :favorability favorability
-						       :table jf/gaming/the-one-ring/feat-die))
+                                                       :table jf/gaming/the-one-ring/feat-die))
 
 (defun jf/gaming/the-one-ring/roll/fortune-table (fortune_type)
   "Return a random fortune based given FORTUNE_TYPE."
   (interactive (list
-		(completing-read "Fortune Type: "
-				 jf/gaming/the-one-ring/strider-mode/fortune-tables)))
+                (completing-read "Fortune Type: "
+                                 jf/gaming/the-one-ring/strider-mode/fortune-tables)))
   (format "Fortune %s: “%s”"
-	  fortune_type
-	  (jf/roll-on-table (alist-get fortune_type
-			     jf/gaming/the-one-ring/strider-mode/fortune-tables
-			     nil
-			     nil
-			     #'string=))))
+          fortune_type
+          (jf/roll-on-table (alist-get fortune_type
+                             jf/gaming/the-one-ring/strider-mode/fortune-tables
+                             nil
+                             nil
+                             #'string=))))
 
 (cl-defun jf/gaming/the-one-ring/roll/lore-table
     (question
@@ -347,74 +347,74 @@
      (lore-table jf/gaming/the-one-ring/strider-mode/lore-table))
   "Return the response from asking the lore table the given QUESTION."
   (interactive (list
-		(read-string "Open-ended Question: ")))
+                (read-string "Open-ended Question: ")))
   (concat "{{{i(Lore Table)}}}:\n"
-	  "\n"
-	  "- Question :: “" question "”\n"
-	  "- Action :: " (jf/roll-on-table (plist-get lore-table :action)) "\n"
-	  "- Aspect :: " (jf/roll-on-table (plist-get lore-table :aspect)) "\n"
-	  "- Focus :: " (jf/roll-on-table (plist-get lore-table :focus)) "\n"))
+          "\n"
+          "- Question :: “" question "”\n"
+          "- Action :: " (jf/roll-on-table (plist-get lore-table :action)) "\n"
+          "- Aspect :: " (jf/roll-on-table (plist-get lore-table :aspect)) "\n"
+          "- Focus :: " (jf/roll-on-table (plist-get lore-table :focus)) "\n"))
 
 (cl-defun jf/gaming/the-one-ring/roll/skill-check (dice
-						   favorability
-						   &key
-						   (is_weary
-						    jf/gaming/the-one-ring/character-is-weary))
+                                                   favorability
+                                                   &key
+                                                   (is_weary
+                                                    jf/gaming/the-one-ring/character-is-weary))
   "Return the verbose results of rolling the DICE with the given FAVORABILITY for the feat die."
   (interactive (list
-		(read-number "Number of D6s: ")
-		(completing-read "Favourability: "
-				 jf/gaming/the-one-ring/feat-die-favourability)))
+                (read-number "Number of D6s: ")
+                (completing-read "Favourability: "
+                                 jf/gaming/the-one-ring/feat-die-favourability)))
   (let* ((feat-die (jf/gaming/the-one-ring/roll/feat-die favorability))
-	 (success-dice (jf/gaming/the-one-ring/roll/success-dice :dice dice :is_weary is_weary))
-	 (weary_message (if is_weary " with Weary condition" ""))
-	 (prefix (format "%s %sd6%s [Feat: %s  Success: %s]"
-			 favorability
-			 dice
-			 weary_message
-			 feat-die
-			 (plist-get success-dice :rolls))))
+         (success-dice (jf/gaming/the-one-ring/roll/success-dice :dice dice :is_weary is_weary))
+         (weary_message (if is_weary " with Weary condition" ""))
+         (prefix (format "%s %sd6%s [Feat: %s  Success: %s]"
+                         favorability
+                         dice
+                         weary_message
+                         feat-die
+                         (plist-get success-dice :rolls))))
     (cond
      ((numberp feat-die)
       (format "%s: %s %sՇ "
-	      prefix
-	      (+ feat-die (plist-get success-dice :total))
-	      (plist-get success-dice :sixes)))
+              prefix
+              (+ feat-die (plist-get success-dice :total))
+              (plist-get success-dice :sixes)))
      ((string= "⏿" feat-die)
       (format "%s: %s %s %sՇ"
-	      prefix
-	      feat-die
-	      (plist-get success-dice :total)
-	      (plist-get success-dice :sixes)))
+              prefix
+              feat-die
+              (plist-get success-dice :total)
+              (plist-get success-dice :sixes)))
      ((string= "ᚠ" feat-die)
       (format "%s: %s %sՇ"
-	      prefix
-	      feat-die
-	      (plist-get success-dice :sixes))))))
+              prefix
+              feat-die
+              (plist-get success-dice :sixes))))))
 
 (defun jf/gaming/the-one-ring/roll/solo-event-table (favorability)
   "Return the results of rolling on the solo event table with the given FAVORABILITY."
   (interactive (list (completing-read "Favourability: "
-				      jf/gaming/the-one-ring/feat-die-favourability)))
+                                      jf/gaming/the-one-ring/feat-die-favourability)))
   (let* ((subtable-name (jf/gaming/the-one-ring/roll/favorability-with-table
-			 :favorability favorability
-			 :table (plist-get jf/gaming/the-one-ring/strider-mode/event-table :table)))
-	 (details (plist-get jf/gaming/the-one-ring/strider-mode/event-table :details))
-	 (subtable (plist-get details subtable-name))
-	 (subtable-events (jf/roll-on-table (plist-get subtable :events))))
+                         :favorability favorability
+                         :table (plist-get jf/gaming/the-one-ring/strider-mode/event-table :table)))
+         (details (plist-get jf/gaming/the-one-ring/strider-mode/event-table :details))
+         (subtable (plist-get details subtable-name))
+         (subtable-events (jf/roll-on-table (plist-get subtable :events))))
     (format "%s: %s\n\n- Fatigue :: %s\n- Consequence :: %s\n- Task :: %s\n"
-	    (plist-get subtable :title)
-	    (car subtable-events)
-	    (plist-get subtable :fatigue)
-	    (plist-get subtable :consequence)
-	    (cdr subtable-events))))
+            (plist-get subtable :title)
+            (car subtable-events)
+            (plist-get subtable :fatigue)
+            (plist-get subtable :consequence)
+            (cdr subtable-events))))
 
 (cl-defun jf/gaming/the-one-ring/roll/success-dice (&key dice (is_weary nil))
   "Roll a number of \"The One Ring\" success DICE.  And reject some results when character IS_WEARY."
   (let ((total 0)
-	(sixes 0)
-	(rolls (list))
-	(roll 0))
+        (sixes 0)
+        (rolls (list))
+        (roll 0))
     (while (> dice 0)
       (setq roll (1+ (random 6)))
       (push roll rolls)
@@ -426,14 +426,14 @@
 (defun jf/gaming/the-one-ring/roll/telling-table (question likelihood)
   "Return the response from asking the telling table a yes/no QUESTION with a given LIKELIHOOD."
   (interactive (list
-		(read-string "Yes/No Question: ")
-		(completing-read "Likelihood of yes: " jf/gaming/the-one-ring/strider-mode/telling-table)))
+                (read-string "Yes/No Question: ")
+                (completing-read "Likelihood of yes: " jf/gaming/the-one-ring/strider-mode/telling-table)))
   (concat "{{{i(Telling Table)}}}:\n"
-	  "\n"
-	  "- Question :: “" question "”\n"
-	  "- Likelihood :: " likelihood "\n"
-	  "- Answer :: “" (jf/roll-on-table (alist-get likelihood jf/gaming/the-one-ring/strider-mode/telling-table nil nil #'string=)) "”"
-	  "\n"))
+          "\n"
+          "- Question :: “" question "”\n"
+          "- Likelihood :: " likelihood "\n"
+          "- Answer :: “" (jf/roll-on-table (alist-get likelihood jf/gaming/the-one-ring/strider-mode/telling-table nil nil #'string=)) "”"
+          "\n"))
 
 ;;;; Session Tracking
 (defvar jf/gaming/the-one-ring/strider-mode/character-sheet-filename
@@ -443,11 +443,11 @@
   (file-truename "~/git/org/denote/indices/20221129T091857--the-travels-of-duinhir-tailwind__rpgs_the-one-ring.org"))
 
 (cl-defun jf/sidebar--build (&key
-			     buffer-name
-			     (body nil)
-			     (read-only nil)
-			     (position nil)
-			     (mode nil))
+                             buffer-name
+                             (body nil)
+                             (read-only nil)
+                             (position nil)
+                             (mode nil))
   "Build the sidebar from the given buffer attributes.
 
 Find or create the BUFFER_NAME with the given BODY and move to
@@ -459,21 +459,21 @@ to READ_ONLY."
     (progn
       (get-buffer-create buffer-name)
       (with-current-buffer buffer-name
-	(insert (or body (buffer-string)))
-	(goto-char (or position (point-min)))
-	(not-modified)
-	(if mode (funcall mode) (special-mode))
-	(when read-only (read-only-mode)))))
+        (insert (or body (buffer-string)))
+        (goto-char (or position (point-min)))
+        (not-modified)
+        (if mode (funcall mode) (special-mode))
+        (when read-only (read-only-mode)))))
   (with-current-buffer buffer-name
     (local-set-key (kbd "s-w") 'kill-buffer-and-window)
     (let ((display-buffer-mark-dedicated t))
       (pop-to-buffer buffer-name '((display-buffer-in-side-window)
-				   (side . right)
-				   (window-width 72)
-				   (window-parameters
-				    (tab-line-format . none)
-				    (mode-line-format . none)
-				    (no-delete-other-windows . t)))))
+                                   (side . right)
+                                   (window-width 72)
+                                   (window-parameters
+                                    (tab-line-format . none)
+                                    (mode-line-format . none)
+                                    (no-delete-other-windows . t)))))
     (message "s-q - Remove Window")
     (require 'pulsar)
     (pulsar-pulse-line)))
@@ -491,23 +491,23 @@ to READ_ONLY."
 (cl-defmacro jf/gaming/the-one-ring/register-condition (&key condition)
   "Generate the `transient' suffix and variable for the given CONDITION."
   (let* ((var-sym (intern (concat "jf/gaming/the-one-ring/character-is-" condition)))
-	 (var-docstring (concat "Is the current character is " condition "?"))
+         (var-docstring (concat "Is the current character is " condition "?"))
          (fun-sym (intern (concat "jf/gaming/the-one-ring/character-is-" condition "/set")))
-	 (fun-docstring (concat "Toggle current character's \"" condition "\" condition status.")))
+         (fun-docstring (concat "Toggle current character's \"" condition "\" condition status.")))
     `(progn
        (defvar ,var-sym
-	 nil
-	 ,var-docstring)
+         nil
+         ,var-docstring)
        (transient-define-suffix ,fun-sym ()
-	 ,fun-docstring
-	 :description '(lambda ()
-			 (concat
-			  (s-titleize ,condition) ": "
-			  (propertize
-			   (format "%s" (if ,var-sym "Yes" "No"))
-			   'face 'transient-argument)))
-	 (interactive)
-	 (setq ,var-sym (not ,var-sym))))))
+         ,fun-docstring
+         :description '(lambda ()
+                         (concat
+                          (s-titleize ,condition) ": "
+                          (propertize
+                           (format "%s" (if ,var-sym "Yes" "No"))
+                           'face 'transient-argument)))
+         (interactive)
+         (setq ,var-sym (not ,var-sym))))))
 
 (jf/gaming/the-one-ring/register-condition :condition "miserable")
 (jf/gaming/the-one-ring/register-condition :condition "weary")
@@ -525,15 +525,15 @@ to READ_ONLY."
      (lambda ()
        (interactive)
        (insert
-	(concat "Distinctive Features: "
-		"“" (jf/roll-on-table jf/gaming/the-one-ring/distinctive-features-table) "” "
-		"“" (jf/roll-on-table jf/gaming/the-one-ring/distinctive-features-table) "”"))))
+        (concat "Distinctive Features: "
+                "“" (jf/roll-on-table jf/gaming/the-one-ring/distinctive-features-table) "” "
+                "“" (jf/roll-on-table jf/gaming/the-one-ring/distinctive-features-table) "”"))))
     ("r f" "Feat die…"
      (lambda ()
        (interactive)
        (insert
-	(format "Feat Die: %s"
-		(call-interactively 'jf/gaming/the-one-ring/roll/feat-die)))))
+        (format "Feat Die: %s"
+                (call-interactively 'jf/gaming/the-one-ring/roll/feat-die)))))
     ("r F" "Fortune table"
      (lambda ()
        (interactive)
@@ -550,7 +550,7 @@ to READ_ONLY."
      (lambda ()
        (interactive)
        (insert (concat "Revelation Episode: "
-		       (jf/roll-on-table jf/gaming/the-one-ring/strider-mode/revelation-episode-table)))))
+                       (jf/roll-on-table jf/gaming/the-one-ring/strider-mode/revelation-episode-table)))))
     ("r s" "Skill check…"
      (lambda ()
        (interactive)
@@ -570,12 +570,12 @@ to READ_ONLY."
      (lambda ()
        (interactive)
        (jf/gaming/the-one-ring/strider-mode/pop-open-filename
-	:filename jf/gaming/the-one-ring/strider-mode/character-sheet-filename)))
+        :filename jf/gaming/the-one-ring/strider-mode/character-sheet-filename)))
     ("j i" "Index of Campaign"
      (lambda ()
        (interactive)
        (jf/gaming/the-one-ring/strider-mode/pop-open-filename
-	:filename jf/gaming/the-one-ring/strider-mode/campaign-index-filename)))
+        :filename jf/gaming/the-one-ring/strider-mode/campaign-index-filename)))
     ("j x" jf/gaming/the-one-ring/strider-mode/experience-milestones)
     ]])
 

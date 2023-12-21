@@ -166,14 +166,14 @@ first matching link."
 
   (transient-define-suffix jf/denote-org-capture/filename-set ()
     "Work with `jf/denote-org-capture/filename'"
-	 :description '(lambda ()
-			 (concat
-			   "Denote Capture Filename: "
+         :description '(lambda ()
+                         (concat
+                           "Denote Capture Filename: "
          (propertize (format "%s" (and denote-last-path
                                     (file-exists-p denote-last-path)
                                     (denote-retrieve-filename-title denote-last-path)))
            'face 'transient-argument)))
-	  (interactive)
+          (interactive)
     (if denote-last-path
       (setq denote-last-path nil)
       (let ((fname (buffer-file-name (current-buffer))))

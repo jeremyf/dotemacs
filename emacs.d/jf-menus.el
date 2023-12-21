@@ -30,7 +30,7 @@
 (transient-define-suffix jf/shr/toggle-images ()
   "Toggle showing or hiding images"
   :description (lambda ()
-			           (format "Show SHR Images (%s)"
+                                   (format "Show SHR Images (%s)"
                    (if shr-inhibit-images " " "*")))
   (interactive)
   (setq shr-inhibit-images (not shr-inhibit-images)))

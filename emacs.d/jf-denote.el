@@ -218,8 +218,8 @@ ID-ONLY link without title."
   (if (and target (file-exists-p target))
     (let ((type (denote-filetype-heuristics target)))
       (denote-link target type
-		    (denote--link-get-description target type)
-		    id-only)
+                    (denote--link-get-description target type)
+                    id-only)
       )
     (denote--command-with-title-history #'denote-link-after-creating)))
 
@@ -324,10 +324,10 @@ See `denote-file-prompt'"
   "Find a draft FILENAME in the \"blog-posts\" sub-directory of denote-directory."
   (interactive
     (list (jf/find-file-via-matching
-	          :prompt "Draft filename: "
-	          :matching "^#\\+ROAM_REFS:"
+                  :prompt "Draft filename: "
+                  :matching "^#\\+ROAM_REFS:"
             :switch "--files-without-match"
-	          :in (f-join (denote-directory) "blog-posts"))))
+                  :in (f-join (denote-directory) "blog-posts"))))
   (find-file filename))
 (bind-key "H-d f B" #'jf/denote/find-file--blog-posts-draft)
 
@@ -796,20 +796,20 @@ When USE_HUGO_SHORTCODE is given use glossary based exporting."
   (interactive)
   (let* ((url (elfeed-entry-link elfeed-show-entry))
           (title (elfeed-entry-title elfeed-show-entry))
-	        (html (elfeed-deref (elfeed-entry-content elfeed-show-entry)))
-	        (content (jf/convert-via-pandoc html :from "html" :to "org")))
+                (html (elfeed-deref (elfeed-entry-content elfeed-show-entry)))
+                (content (jf/convert-via-pandoc html :from "html" :to "org")))
     (jf/denote/capture-reference :url url :title title :content content)))
 
 (cl-defun jf/convert-via-pandoc (text &key (from "html") (to "org"))
   "Convert TEXT, via pandoc, FROM one content-type TO another."
   (with-temp-buffer
-		(insert text)
-		(shell-command-on-region
-			(point-min) (point-max)
-			(concat (executable-find "pandoc") " -f " from " -t " to " --wrap=none")
+                (insert text)
+                (shell-command-on-region
+                        (point-min) (point-max)
+                        (concat (executable-find "pandoc") " -f " from " -t " to " --wrap=none")
       ;;| rg \"(\\\\\\\\)\" -r ''")
-			t t)
-		(buffer-substring-no-properties (point-min) (point-max))))
+                        t t)
+                (buffer-substring-no-properties (point-min) (point-max))))
 
 (cl-defun jf/denote/capture-reference (&key
                                         title

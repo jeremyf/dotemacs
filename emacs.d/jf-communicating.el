@@ -13,7 +13,7 @@
 (use-package mastodon
   :straight t
   :config (setq mastodon-instance-url "https://dice.camp"
-		          mastodon-active-user "takeonrules"))
+                          mastodon-active-user "takeonrules"))
 
 (bind-key "s-3" #'jf/browsing-menu)
 (transient-define-prefix jf/browsing-menu ()
