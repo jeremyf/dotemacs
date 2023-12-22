@@ -17,8 +17,8 @@
           (lambda ()
             (setq gc-cons-threshold (* 1024 1024 20)
                   gc-cons-percentage 0.2
-                  file-name-handler-alist prot-emacs--file-name-handler-alist
-                  vc-handled-backends prot-emacs--vc-handled-backends)))
+                  file-name-handler-alist jf-emacs--file-name-handler-alist
+                  vc-handled-backends jf-emacs--vc-handled-backends)))
 
 ;; From straight.el, "Users of Emacs versions >= 27 will want to add
 ;; the following:"
