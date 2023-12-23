@@ -9,7 +9,7 @@
 ;;
   ;;; CODE:
 (add-to-list 'load-path "~/git/dotemacs/emacs.d")
-(setq custom-file (concat user-emacs-directory "custom.el"))
+(setq custom-file (make-temp-file "emacs-custom-"))
 (load custom-file :noerror)
 
 (require 'jf-launching)
@@ -51,6 +51,18 @@
   (server-start))
 
 (add-hook 'after-init-hook #'jf/enable-indent-for-tab-command)
+
+(setq safe-local-variable-values
+    '((eval setq-local org-export-with-properties
+        '("PRONOUNS" "BACKGROUND" "ANCESTRY" "KEEPSAKE" "ARCHETYPE" "SESSION_DATE" "START_LOCATION" "CAMPAIGN_START_DATE" "CAMPAIGN_END_DATE" "END_LOCATION"))
+       (projectile-git-fd-args . "-H -0 -E hyrax-webapp -E .git -tf --strip-cwd-prefix -c never")
+       (projectile-git-submodule-command . "")
+       (jf/tor-minor-mode . 1)
+       (projectile-require-project-root)
+       (projectile-git-command . "git ls-files -zco --exclude-from=.projectile.gitignore")
+       (org-insert-tilde-language . ruby)
+       (org-insert-tilde-language . emacs-lisp)
+       (encoding . utf-8)))
 
 (provide 'init)
   ;;; init.el ends here

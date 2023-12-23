@@ -110,6 +110,8 @@
 
   global-mark-ring-max 32
 
+  global-display-line-numbers-mode t
+
   help-window-select t
 
   idle-update-delay 1.1       ;; Slow down the UI being updated to improve
@@ -155,6 +157,7 @@
 
   line-move-visual t)
 
+
 (bind-key "H-s" 'save-buffer)
 ;; With subword-mode, HelloWorld is two words for navigation.
 (global-subword-mode)
@@ -191,6 +194,11 @@
 (global-set-key (kbd "s-w") 'kill-current-buffer)
 (global-set-key (kbd "C-x C-b") 'ibuffer)
 (global-set-key (kbd "M-RET") 'newline-and-indent)
+
+(use-package dired
+  :straight (:type built-in)
+  :custom (dired-listing-switches "-laGhpX")
+  (dired-use-ls-dired t))
 
 (use-package minions
   :straight t
