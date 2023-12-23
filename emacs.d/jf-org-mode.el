@@ -973,14 +973,14 @@ I envision this function called from the command-line."
          :empty-lines-before 1
          :empty-lines-after 1)))
 
-(use-package org-noter
-             :straight
-             (:repo "org-noter/org-noter"
-                    :host github
-                    :type git
-               :files ("*.el" "modules/*.el"))
-  :config
-  (setq org-noter-doc-split-fraction '(0.67 . 0.33)))
+;; (use-package org-noter
+;;              :straight
+;;              (:repo "org-noter/org-noter"
+;;                     :host github
+;;                     :type git
+;;                :files ("*.el" "modules/*.el"))
+;;   :config
+;;   (setq org-noter-doc-split-fraction '(0.67 . 0.33)))
 
 (use-package org-bookmark-heading
   ;; Capture more robust org-mode bookmarks
