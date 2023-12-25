@@ -959,6 +959,10 @@ I envision this function called from the command-line."
          plain (clock)
          "%i%?"
          :immediate-finish t)
+       ("l" "#Lore24 Entry"
+         entry (file+olp+datetree "~/git/org/denote/melange/20231225T130631--lore24-in-the-shadows-of-mont-brun__campaigns_lore24_rpgs.org")
+         :clock-in t
+         :clock-keep t)
        ("t" "Task (for Project)"
          plain (function jf/org-mode/capture/project-task/find)
          "%?"
@@ -966,7 +970,7 @@ I envision this function called from the command-line."
          :empty-lines-after 1
          :clock-in t
          :clock-keep t
-         :jump-to-capture t)
+         :jump-to-captured t)
        ("n" "Note for project task"
          plain (function jf/org-mode/capture/project-task/find)
          "%T\n\n%?"

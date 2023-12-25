@@ -257,6 +257,11 @@ With a PREFIX jump to the agenda without starting the clock."
               :repo "OlMon/consult-projectile"
               :branch "master")
   :config
+  ;; I want recent files as well as project files as well as recent project
+  ;; files...Hence the override fb
+  (setq jf/consult--source-recent-file consult--source-recent-file)
+  (plist-put jf/consult--source-recent-file :narrow ?R)
+  (plist-put jf/consult--source-recent-file :name "Recent File")
   (setq consult-projectile-sources
     '( ;; key b
        consult-projectile--source-projectile-buffer
@@ -270,8 +275,11 @@ With a PREFIX jump to the agenda without starting the clock."
        consult--source-bookmark
        ;; key r
        consult-projectile--source-projectile-recentf
+       ;; key R
+       jf/consult--source-recent-file
        ;; key *
        consult--source-modified-buffer))
+
 
   (defun consult-find-file-with-preview (prompt &optional dir default mustmatch initial pred)
     (interactive)

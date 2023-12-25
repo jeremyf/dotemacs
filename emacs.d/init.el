@@ -11,6 +11,7 @@
 (add-to-list 'load-path "~/git/dotemacs/emacs.d")
 (setq custom-file (make-temp-file "emacs-custom-"))
 (load custom-file :noerror)
+(set-frame-parameter nil 'fullscreen 'fullboth)
 
 (require 'jf-launching)
 (require 'jf-minor-mode-maker)
