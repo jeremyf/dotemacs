@@ -74,7 +74,28 @@ It will display entries without switching to them."
   :straight t
   :after elfeed
   :config (elfeed-org)
-  (setq rmh-elfeed-org-files (list "~/git/org/elfeed.org")))
+  (defun jf/export-public-elfeed-opml ()
+    "Export public OPML file."
+    (let ((opml-body (cl-loop for org-file in '("~/git/org/public-elfeed.org")
+                       concat
+                       (with-temp-buffer
+                         (insert-file-contents
+                           (expand-file-name org-file org-directory))
+                         (rmh-elfeed-org-convert-org-to-opml
+                           (current-buffer))))))
+      (with-current-buffer (find-file-noselect "~/git/takeonrules.source/static/blogroll.opml")
+        (erase-buffer)
+        (insert "<?xml version=\"1.0\"?>\n")
+        (insert "<opml version=\"1.0\">\n")
+        (insert "  <head>\n")
+        (insert "    <title>Take on Rules Public Blogroll</title>\n")
+        (insert "  </head>\n")
+        (insert "  <body>\n")
+        (insert opml-body)
+        (insert "  </body>\n")
+        (insert "</opml>\n")
+        (save-buffer))))
+  (setq rmh-elfeed-org-files '("~/git/org/public-elfeed.org" "~/git/org/private-elfeed.org")))
 
 (use-package elfeed-curate
   :straight (:host github :repo "rnadler/elfeed-curate")

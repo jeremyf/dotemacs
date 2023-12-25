@@ -960,9 +960,12 @@ I envision this function called from the command-line."
          "%i%?"
          :immediate-finish t)
        ("l" "#Lore24 Entry"
-         entry (file+olp+datetree "~/git/org/denote/melange/20231225T130631--lore24-in-the-shadows-of-mont-brun__campaigns_lore24_rpgs.org")
+         plain (file+olp+datetree "~/git/org/denote/melange/20231225T130631--lore24-in-the-shadows-of-mont-brun__campaigns_lore24_rpgs.org")
+         "%?"
          :clock-in t
-         :clock-keep t)
+         :clock-keep t
+         :empty-lines-before 1
+         :jump-to-captured t)
        ("t" "Task (for Project)"
          plain (function jf/org-mode/capture/project-task/find)
          "%?"
