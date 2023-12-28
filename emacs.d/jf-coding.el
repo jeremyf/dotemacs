@@ -258,6 +258,7 @@ method, get the containing class."
   :config (magit-todos-mode)
   :commands (magit-todos-list)
   :custom (magit-todos-exclude-globs '(".git/" "public/"))
+  (magit-todos-insert-after '(bottom) nil nil "Changed by setter of obsolete option `magit-todos-insert-at'")
   :straight (:host github :repo "alphapapa/magit-todos"))
 
 (use-package lua-mode

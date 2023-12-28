@@ -33,6 +33,8 @@
     (list #'tmr-print-message-for-completed-timer
       #'tmr-sound-play
       #'jf/tmr-notification-notify))
+  (tmr-timer-finished-functions
+    (list #'tmr-print-message-for-completed-timer #'tmr-sound-play #'jf/tmr-notification-notify) nil nil "Customized with use-package tmr")
   :straight (tmr :host nil :type git
               :repo "https://git.sr.ht/~protesilaos/tmr"))
 

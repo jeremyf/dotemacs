@@ -133,7 +133,7 @@ Take on Rules using the \"blockquote\" special block."
             "\n#+HUGO_CUSTOM_FRONT_MATTER: :date " (format-time-string "%Y-%m-%d %H:%M:%S %z")
             "\n#+HUGO_CUSTOM_FRONT_MATTER: :type post"
             "\n#+HUGO_CUSTOM_FRONT_MATTER: :layout post"
-            "\n#+HUGO_CUSTOM_FRONT_MATTER: :licenses '(all-rights-reserved)"
+            "\n#+HUGO_CUSTOM_FRONT_MATTER: :licenses '(by-nc-nd-4_0)"
             "\n#+HUGO_CUSTOM_FRONT_MATTER: :draft true"
             "\n#+HUGO_CUSTOM_FRONT_MATTER: :org_id " identifier
             "\n#+INCLUDE: " jf/org-macros-setup-filename))

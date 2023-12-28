@@ -38,6 +38,7 @@
 
 (setq straight-repository-branch "develop")
 (straight-use-package 'use-package)
+(setq use-package-always-ensure t)
 
 (use-package exec-path-from-shell
   ;; https://xenodium.com/trying-out-gccemacs-on-macos/
@@ -81,7 +82,9 @@
 (make-directory "~/.emacs.d/autosaves/" t) ;; Ensuring I have an autosave
 ;; directory.
 (recentf-mode 1) ;; Track recent
-(run-at-time nil (* 2 60) 'recentf-save-list) ;; Save files every 2 minutes
+
+;; Quietly save the recent file list every 60 seconds.
+(run-at-time nil 60 (lambda () (let ((save-silently t)) (recentf-save-list))))
 (global-auto-revert-mode)
 
 (setq-default fill-column 80)
@@ -109,8 +112,6 @@
   echo-key-strokes 0.2
 
   global-mark-ring-max 32
-
-  global-display-line-numbers-mode t
 
   help-window-select t
 

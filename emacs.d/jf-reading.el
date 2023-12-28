@@ -111,9 +111,9 @@ It will display entries without switching to them."
   ;; A plain text browser.  Use this to see just how bad much of the web has
   ;; become.
   :straight t
+  :custom (eww-auto-rename-buffer 'title)
   :config
   (setq shr-cookie-policy nil)
-  (setq eww-auto-rename-buffer 'title)
   (defun shr-tag-dfn (dom)
     (shr-fontize-dom dom 'italic))
 

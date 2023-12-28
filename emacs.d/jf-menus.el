@@ -119,6 +119,7 @@
       ("C-t" "Start a timer…" tmr-with-description)
       ("C-M-s-t" "Archive month as timesheet…" jf/denote/archive-timesheet-month)
       ("t" "Todo for project…" magit-todos-list)
+      ("T" "Mastodon Toot…" mastodon-toot)
       ("u" jf/org-mode/agenda-files-update)
       ("w" "Weekly hours report" jf/org-mode-weekly-report)]
     ["Denote"

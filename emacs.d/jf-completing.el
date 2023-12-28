@@ -33,6 +33,10 @@
 (use-package emacs
   :bind ("C-M-i" . completion-at-point)
   ("TAB" . indent-for-tab-command)
+  :custom (delete-selection-mode t)
+  (global-display-line-numbers-mode t)
+  (column-number-mode t)
+  (auto-save-file-name-transforms '((".*" "~/.emacs.d/autosaves/\\1" t)))
   :init
   ;; Emacs 28: Hide commands in M-x which do not apply to the current mode.
   ;; Corfu commands are hidden, since they are not supposed to be used via M-x.

@@ -122,7 +122,7 @@ I'm uncertain if this is useful/practical.  However there is
 
 (use-package stem-reading-mode
   :straight t
-  :config (setq stem-reading-overlay t))
+  :custom (stem-reading-overlay t))
 
 (defun calculate-distance-to (to fun pred)
   "Calculate distance from BEG to END in units of FUN.
