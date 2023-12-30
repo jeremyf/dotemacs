@@ -33,9 +33,11 @@
 (use-package emacs
   :bind ("C-M-i" . completion-at-point)
   ("TAB" . indent-for-tab-command)
-  :custom (delete-selection-mode t)
+  :custom
   (global-display-line-numbers-mode t)
   (column-number-mode t)
+  (global-display-fill-column-indicator-mode t)
+  (delete-selection-mode t)
   (auto-save-file-name-transforms '((".*" "~/.emacs.d/autosaves/\\1" t)))
   :init
   ;; Emacs 28: Hide commands in M-x which do not apply to the current mode.

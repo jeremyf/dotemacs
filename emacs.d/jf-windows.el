@@ -169,6 +169,8 @@ setting up an IDE-like layout)."
          ((,c :bold t :slant italic :foreground ,fg-alt)))
       `(font-lock-misc-punctuation-face
          ((,c :foreground ,green-warmer)))
+      `(mode-line
+         ((,c :foreground ,fg-mark-select :background ,bg-mark-select)))
       `(org-block
          ((,c :background ,bg-ochre)))
       `(org-block-begin-line
