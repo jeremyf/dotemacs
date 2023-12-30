@@ -2737,7 +2737,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "You can only make one dot at a time"
            "You don't have to be ashamed of using your own ideas"))
 
-(random-table/register :data "Lore24 Insipiration"
+(random-table/register :name "Lore24 Insipiration"
 		       :roller "2d4"
 		       :data '((2 . "History")
 			       (3 . "Fantastical")
