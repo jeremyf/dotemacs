@@ -3223,6 +3223,7 @@
     ("responsibilites" "responsibilities" nil :count 1)
     ("responsiblities" "responsibilities" nil :count 1)
     ("responsiblity" "responsibility" nil :count 1)
+    ("resposne" "response" nil :count 1)
     ("ressemblance" "resemblance" nil :count 1)
     ("ressemble" "resemble" nil :count 1)
     ("ressembled" "resembled" nil :count 1)
