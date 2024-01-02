@@ -499,6 +499,7 @@ See `add-log-current-defun-function'."
     ;; I'll type my own parenthesis thank you very much.
     ;; (electric-pair-mode)
     (flymake-mode 1)
+    (setq truncate-lines t)
     (which-function-mode)))
 
 (use-package copilot
