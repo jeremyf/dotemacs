@@ -489,6 +489,59 @@ If `consult--read' is defined, use that.  Otherwise fallback to
 ;;
 ;;******************************************************************************
 
+(cl-defun jf/create-lore-24-blog-entry ()
+  "Create #Lore24 entry from current node."
+  (interactive)
+  ;; Guard against running this on non- `jf/lore24-filename'.
+  (unless (string=
+            (jf/filename/tilde-based (buffer-file-name (current-buffer)))
+            jf/lore24-filename)
+    (user-error "You must be in %S" jf/lore24-filename))
+  ;; Now that we know we're on the right buffer...
+  (let* (
+          ;; Get the node of the current entry I'm working from
+          (node-id (org-id-get-create))
+
+          ;; Prompt for a name.
+          (name (read-string "#Lore24 Blog Post Name: "))
+
+          ;; Determine the last blog post created.
+          (previous-post-basename
+            (s-trim (shell-command-to-string
+                      (concat
+                        "cd ~/git/org/denote/blog-posts; "
+                        "find *--lore24-entry-* | sort | tail -1"))))
+
+          ;; From the last blog post, derive the next index value.
+          (next-index (format "%03d"
+                   (+ 1
+                     (string-to-number
+                       (progn
+                         (string-match
+                           "--lore24-entry-\\([[:digit:]]+\\)-"
+                           previous-post-basename)
+                         (match-string-no-properties 1
+                           previous-post-basename))))))
+
+          ;; We must name the post.  "Lore 24 - Entry NNN: Name"
+          (title (format "Lore24 - Entry %s: %s" next-index name ))
+
+          ;; The body of the blog post; by default I leverage
+          ;; `org-transclusion'.
+          (template (concat "#+HUGO_CUSTOM_FRONT_MATTER: :series %s"
+                        "\n\n#+TRANSCLUDE: [[id:%s]] :only-contents "
+                        ":exclude-elements \"drawer keyword headline\""
+                        "in-the-shadows-of-mont-brun"
+                      node-id)))
+
+    ;; Create the blog post
+    (denote
+      title
+      '("lore24" "rpgs") ;; List of keywords
+      'org ;; Format of the file
+      (f-join (denote-directory) "blog-posts") ;; Sub-directory
+      nil ;; Default to today's date
+      template)))
 
 (fset 'jf/tidy-ox-hugo-header-export
   (kmacro-lambda-form [?\C-c ?\C-n ?\s-f ?\{ return ?\C-b ?\C-b ?\C-k] 0 "%d"))

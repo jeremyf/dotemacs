@@ -30,6 +30,9 @@ By default this is my example code project.")
 (defconst jf/agenda-filename/personal
   "~/git/org/agenda.org")
 
+(defconst jf/lore24-filename
+  "~/git/org/denote/indices/20231225T130631--lore24-in-the-shadows-of-mont-brun__campaigns_lore24_rpgs.org")
+
 (defvar jf/primary-agenda-filename-for-machine
   (if (jf/is-work-machine?)
     jf/agenda-filename/scientist
@@ -960,7 +963,7 @@ I envision this function called from the command-line."
          "%i%?"
          :immediate-finish t)
        ("l" "#Lore24 Entry"
-         plain (file+olp+datetree "~/git/org/denote/melange/20231225T130631--lore24-in-the-shadows-of-mont-brun__campaigns_lore24_rpgs.org")
+         plain (file+olp+datetree jf/lore24-filename)
          "%?"
          :clock-in t
          :clock-keep t
