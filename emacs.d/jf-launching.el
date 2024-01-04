@@ -155,7 +155,7 @@
   ;; https://protesilaos.com/emacs/modus-themes
 
   ns-right-command-modifier 'hyper ;; Exposing one additional modifier key.
-
+  ns-right-alternate-modifier 'meta
   line-move-visual t)
 
 (bind-key "H-s" 'save-buffer)
