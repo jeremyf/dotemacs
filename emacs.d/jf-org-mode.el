@@ -1085,6 +1085,15 @@ holding contextual information."
   plist)
 (add-to-list 'org-export-filter-options-functions #'jf/org-export-change-options)
 
+;; https://stackoverflow.com/questions/13340616/assign-ids-to-every-entry-in-org-mode
+(defun jf/org-add-ids-to-headlines-in-file ()
+  "Conditionally add ID properties to all file's headlines without an ID."
+  (interactive)
+  (org-map-entries 'org-id-get-create))
+
+(add-hook 'org-mode-hook
+  (lambda ()
+    (add-hook 'before-save-hook 'jf/org-add-ids-to-headlines-in-file nil 'local)))
 
 (provide 'jf-org-mode)
 ;;; jf-org-mode.el ends here
