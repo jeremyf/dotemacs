@@ -103,6 +103,7 @@
      ("j a" "Agenda" jf/project/jump-to-task)
      ("j A" jf/jump-to/agenda-personal)
      ("j c" "Capture Backlog" jf/jump-to/code-backlog)
+     ("j d" "Denote File" jf/jump_to_corresponding_denote_file :if-derived markdown-mode)
      ("j g" "Global Mark" consult-global-mark)
      ("j h" "Hugo File" jf/jump_to_corresponding_hugo_file :if-derived org-mode)
      ("j m" "Mark" consult-mark)

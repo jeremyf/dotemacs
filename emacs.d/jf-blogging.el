@@ -186,9 +186,20 @@ Take on Rules using the \"blockquote\" special block."
     (save-excursion
       (goto-char (point-min))
       (save-match-data
-        (if (re-search-forward "\n:ROAM_REFS:.+\\(https?://takeonrules\.com[^ \n]*\\)" nil t)
+        (if (re-search-forward "^\\#\\+ROAM_REFS:.+\\(https?://takeonrules\.com[^ \n]*\\)" nil t)
           (jf/tor-find-hugo-file-by-url (match-string 1))
           (message "Unable to find Take on Rules URL in buffer."))))))
+
+(cl-defun jf/jump_to_corresponding_denote_file (&key (buffer (current-buffer)))
+  "Find the org_id in the BUFFER and jump to corresponding `denote' file."
+  (interactive)
+  (with-current-buffer buffer
+    (save-excursion
+      (goto-char (point-min))
+      (save-match-data
+        (if (re-search-forward "^org_id: \\([[:digit:]]+T[[:digit:]]+\\)$" nil t)
+          (find-file (denote-get-path-by-id (match-string 1)))
+          (message "Unable to find Denote ID in buffer."))))))
 
 (defun jf/org-mode-get-keyword-key-value (kwd)
   "Map KWD to list."

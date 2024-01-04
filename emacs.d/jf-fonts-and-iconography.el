@@ -96,13 +96,13 @@
   ;; example in text-mode, when I type three periods (e.g. “.”) typopunct
   ;; replaces that with an ellipsis (e.g. “…”)
   :straight t
+  :custom (typopunct-buffer-language 'english)
   :config
   (add-hook 'org-mode-hook 'jf/typopunct-init)
   (defun jf/typopunct-init ()
     (require 'typopunct)
     (typopunct-change-language 'english)
     (typopunct-mode 1))
-  (setq typopunct-buffer-language 'english)
   ;; To insert a typographical ellipsis sign (…) on three consecutive
   ;; dots, or a middle dot (·) on ‘^.’
   (defconst typopunct-ellipsis (decode-char 'ucs #x2026))
