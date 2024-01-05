@@ -514,24 +514,25 @@ If `consult--read' is defined, use that.  Otherwise fallback to
 
           ;; From the last blog post, derive the next index value.
           (next-index (format "%03d"
-                   (+ 1
-                     (string-to-number
-                       (progn
-                         (string-match
-                           "--lore24-entry-\\([[:digit:]]+\\)-"
-                           previous-post-basename)
-                         (match-string-no-properties 1
-                           previous-post-basename))))))
+                        (+ 1
+                          (string-to-number
+                            (progn
+                              (string-match
+                                "--lore24-entry-\\([[:digit:]]+\\)-"
+                                previous-post-basename)
+                              (match-string-no-properties 1
+                                previous-post-basename))))))
 
           ;; We must name the post.  "Lore 24 - Entry NNN: Name"
           (title (format "Lore24 - Entry %s: %s" next-index name ))
 
           ;; The body of the blog post; by default I leverage
           ;; `org-transclusion'.
-          (template (concat "#+HUGO_CUSTOM_FRONT_MATTER: :series %s"
+          (template (format
+                      (concat "#+HUGO_CUSTOM_FRONT_MATTER: :series %s"
                         "\n\n#+TRANSCLUDE: [[id:%s]] :only-contents "
-                        ":exclude-elements \"drawer keyword headline\""
-                        "in-the-shadows-of-mont-brun"
+                        ":exclude-elements \"drawer keyword headline\"")
+                      "in-the-shadows-of-mont-brun"
                       node-id)))
 
     ;; Create the blog post
