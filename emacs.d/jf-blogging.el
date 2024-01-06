@@ -489,8 +489,11 @@ If `consult--read' is defined, use that.  Otherwise fallback to
 ;;
 ;;******************************************************************************
 
-(cl-defun jf/create-lore-24-blog-entry ()
-  "Create #Lore24 entry from current node."
+(cl-defun jf/create-lore-24-blog-entry (&key (series "in-the-shadows-of-mont-brun")
+                                         (keywords '("lore24" "rpgs")))
+  "Create #Lore24 entry from current node.
+
+Add the blog post to the given SERIES with the given KEYWORDS."
   (interactive)
   ;; Guard against running this on non- `jf/lore24-filename'.
   (unless (string=
@@ -532,17 +535,16 @@ If `consult--read' is defined, use that.  Otherwise fallback to
                       (concat "#+HUGO_CUSTOM_FRONT_MATTER: :series %s"
                         "\n\n#+TRANSCLUDE: [[id:%s]] :only-contents "
                         ":exclude-elements \"drawer keyword headline\"")
-                      "in-the-shadows-of-mont-brun"
-                      node-id)))
+                      series
+                      node-id))
+          ;; This will be a blog post.
+          (directory (f-join (denote-directory) "blog-posts"))
+
+          ;; Series are added as signature.
+          (signature (denote-sluggify-signature series)))
 
     ;; Create the blog post
-    (denote
-      title
-      '("lore24" "rpgs") ;; List of keywords
-      'org ;; Format of the file
-      (f-join (denote-directory) "blog-posts") ;; Sub-directory
-      nil ;; Default to today's date
-      template)))
+    (denote title keywords 'org directory nil template signature)))
 
 (fset 'jf/tidy-ox-hugo-header-export
   (kmacro-lambda-form [?\C-c ?\C-n ?\s-f ?\{ return ?\C-b ?\C-b ?\C-k] 0 "%d"))

@@ -108,11 +108,12 @@
   ;; they are a garbled word salad.
   (denote-allow-multi-word-keywords nil)
   ;; And `org-read-date' is an amazing bit of tech
-  (denote-date-prompt-denote-date-prompt-use-org-read-date t))
-
-;; (use-package denote-explore
-;;   :straight (:host github :repo "pprevos/denote-explore")
-;;   :after (denote))
+  (denote-date-prompt-denote-date-prompt-use-org-read-date t)
+  :config
+  (defun jf/denote-sluggify-signature (args)
+    "Coerce the ARGS to replace '-' with '_' and then sign."
+    (list (s-replace "-" "_" (car args))))
+  (advice-add #'denote-sluggify-signature :filter-args #'jf/denote-sluggify-signature))
 
 (use-package consult-notes
   ;;Let’s add another way at looking up files.  I appreciate the ability to
@@ -844,7 +845,7 @@ Capturing for the given CONTENT, DOMAIN, and KEYWORDS prompt."
 (cl-defun jf/org-mode/add-series-to-file (&key file series drop-tags all)
   "Add SERIES to FILE.
 
-Optionally DROP-TAGS."
+Optionally DROP-TAGS, as there may have been a TAG associated with the series."
   (interactive)
   (with-current-buffer (if file (find-file-noselect file) (current-buffer))
     (when (or all (jf/org-mode/blog-entry?))
@@ -862,7 +863,7 @@ Optionally DROP-TAGS."
                 (title (denote-retrieve-title-value file file-type))
                 (sluggified-title (denote-sluggify (s-replace "…" "" title) 'title))
                 (keywords (seq-difference (denote-retrieve-keywords-value file file-type) (-flatten drop-tags)))
-	              (signature (denote-sluggify-signature (s-replace "-" "_" series)))
+	              (signature (denote-sluggify-signature series))
                 (extension (denote-get-file-extension file))
                 (dir (file-name-directory file))
                 (new-name (denote-format-file-name dir id keywords sluggified-title extension signature)))
