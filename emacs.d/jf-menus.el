@@ -57,16 +57,6 @@
       (re-search-forward "^$")
       (insert "\n#+HUGO_CUSTOM_FRONT_MATTER: :abstract " abstract))))
 
-(transient-define-suffix jf/org-mode/add-series (series)
-  "Add SERIES to `org-mode'"
-  :description "Add Series…"
-  (interactive (list (completing-read "Series: " (jf/tor-series-list))))
-  (when (jf/org-mode/blog-entry?)
-    (save-excursion
-      (goto-char (point-min))
-      (re-search-forward "^$")
-      (insert "\n#+HUGO_CUSTOM_FRONT_MATTER: :series " series))))
-
 (transient-define-suffix jf/org-mode/add-session-report (date game location)
   "Add session report metadata (DATE, GAME, and LOCATION) to current buffer."
   :description "Add Session…"
@@ -131,7 +121,7 @@
     ["Blogging"
       ("b a" jf/org-mode/add-abstract :if jf/org-mode/blog-entry?)
       ("b r" jf/org-mode/add-session-report :if jf/org-mode/blog-entry?)
-      ("b s" jf/org-mode/add-series :if jf/org-mode/blog-entry?)
+      ("b s" "Add Series…" jf/org-mode/add-series-to-file :if jf/org-mode/blog-entry?)
       ("b x" "Export to TakeOnRules…" jf/export-org-to-tor :if jf/org-mode/blog-entry?)]]
   [["Modes"
      ;; I could write functions for these, but this is concise enough

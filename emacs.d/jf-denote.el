@@ -99,13 +99,14 @@
                                (expand-file-name "denote/glossary" org-directory)
                                " --only-matching"
                                " --no-filename "
-                               " --replace '$1'"))
+                               " --replace '$1' | "
+                               "sed 's/-//g'"))
                            "\n"))
   ;; Explicitly ensuring that tags can be multi-word (e.g. two or more
   ;; words joined with a dash).  Given that I export these tags, they
   ;; should be accessible to screen-readers.  And without the dashes
   ;; they are a garbled word salad.
-  (denote-allow-multi-word-keywords t)
+  (denote-allow-multi-word-keywords nil)
   ;; And `org-read-date' is an amazing bit of tech
   (denote-date-prompt-denote-date-prompt-use-org-read-date t))
 
@@ -438,15 +439,15 @@ Default the note’s title to the first NTH-WORDS of the BODY."
           (keywords (list)))
     ;; Add both "abbr" and the abbr to the keywords; both help in searching
     ;; results
-    (when (s-present? abbr)
-      (progn (add-to-list 'keywords "abbr") (add-to-list 'keywords abbr)))
+    (when (s-present? abbr) (add-to-list 'keywords "abbr"))
     (when is-a-game (add-to-list 'keywords "game"))
     (denote title
       keywords
       'org
       (f-join (denote-directory) "glossary")
       nil
-      template)))
+      template
+      (when (s-present? abbr) (progn (denote-sluggify-signature abbr))))))
 
 (jf/denote/create-functions-for :domain "glossary"
   :key ?g
@@ -839,6 +840,34 @@ Capturing for the given CONTENT, DOMAIN, and KEYWORDS prompt."
       (f-join (denote-directory) "scientist"))
     (yank)
     (save-buffer)))
+
+(cl-defun jf/org-mode/add-series-to-file (&key file series drop-tags all)
+  "Add SERIES to FILE.
+
+Optionally DROP-TAGS."
+  (interactive)
+  (with-current-buffer (if file (find-file-noselect file) (current-buffer))
+    (when (or all (jf/org-mode/blog-entry?))
+      (let ((series (or series (completing-read "Series: " (jf/tor-series-list) nil t))))
+        (unless (and (jf/org-mode/blog-entry?)
+                  (s-contains? "#+HUGO_CUSTOM_FRONT_MATTER: :series " (buffer-substring-no-properties (point-min) (point-max))))
+          (save-excursion
+            (goto-char (point-min))
+            (re-search-forward "^$")
+            (insert "\n#+HUGO_CUSTOM_FRONT_MATTER: :series " series)
+            (save-buffer)))
+        (let* ((file (buffer-file-name))
+                (id (denote-retrieve-filename-identifier file :no-error))
+                (file-type 'org)
+                (title (denote-retrieve-title-value file file-type))
+                (sluggified-title (denote-sluggify (s-replace "…" "" title) 'title))
+                (keywords (seq-difference (denote-retrieve-keywords-value file file-type) (-flatten drop-tags)))
+	              (signature (denote-sluggify-signature (s-replace "-" "_" series)))
+                (extension (denote-get-file-extension file))
+                (dir (file-name-directory file))
+                (new-name (denote-format-file-name dir id keywords sluggified-title extension signature)))
+          (denote-rename-file-and-buffer file new-name)
+          (denote-update-dired-buffers))))))
 
 (provide 'jf-denote)
 ;;; jf-denote.el ends here
