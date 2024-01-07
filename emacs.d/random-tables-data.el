@@ -747,23 +747,23 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
 
 (random-table/register :name "Black Sword Hack > Oracle Question"
   :roller #'random-table/roller/oracle-question
-  :fetcher (lambda (data index) (car data))
+  :fetcher (lambda (data &rest args) (car data))
   :data '("{Black Sword Hack > Oracle Question > Answer}{Black Sword Hack > Oracle Question > Unexpected Event}")
   :store t)
 
 (random-table/register :name "Black Sword Hack > Oracle Question > Answer"
-  :reuse "Black Sword Hack :: Oracle Question"
+  :reuse "Black Sword Hack > Oracle Question"
   :private t
   :filter (lambda (&rest dice) "We have a pool of dice to pick one." (car (-list dice)))
   :data '("No and…" "No" "No but…" "Yes but…" "Yes" "Yes and…"))
 
 (random-table/register :name "Black Sword Hack > Oracle Question > Unexpected Event"
-  :reuse "Black Sword Hack :: Oracle Question"
+  :reuse "Black Sword Hack > Oracle Question"
   :private t
   :filter (lambda (&rest dice) "We have a pool of dice to determine if there are dupes."
             (car (list-utils-dupes (-list dice))))
-  :fetcher (lambda (data index)
-             (when index (concat " with unexpected “" (nth (- (car (-list index)) 1) data) "” event")))
+  :fetcher (lambda (data &rest index)
+            (when index (concat " with unexpected “" (nth (- (car (-list index)) 1) data) "” event")))
   :data '("Very negative" "Negative" "Negative but…" "Positive but…" "Positive" "Very Positive"))
 
 ;;; OSE
@@ -1712,19 +1712,25 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
             ;; prompt.
             (let ((data (random-table-data table)))
               (if (yes-or-no-p (format "Lock action already established for %s type? "
-                                 (random-table/storage/results/get-data-value "Errant :: Lock :: Type")))
+                                 (random-table/storage/results/get-text-for-roll "Errant > Lock > Type")))
                 (completing-read "Lock’s Action: " data nil t)
                 (random-table/roller/string (format "1d%s" (length data))))))
   :private t
-  :fetcher (lambda (data choice)
+  :fetcher (lambda (data &rest choice)
              "We may have picked the string...Or rolled."
              (if (numberp (car choice))
                (nth (- (car choice) 1) data)
                (car choice)))
-  :data '("/Twist/, /Tap/, /Twist/" "/Twist/, /Tap/, /Turn/" "/Twist/, /Turn/, /Twist/"
-           "/Twist/, /Turn/, /Tap/" "/Tap/, /Twist/, /Tap/" "/Tap/, /Twist/, /Turn/"
-           "/Tap/, /Turn/, /Twist/" "/Tap/, /Turn/, /Tap/" "/Turn/, /Twist/, /Tap/"
-           "/Turn/, /Twist/, /Turn/" "/Turn/, /Tap/, /Twist/" "/Turn/, /Tap/, /Turn/"))
+  :data '("Twist, Tap, Twist" "Twist, Tap, Turn" "Twist, Turn, Twist"
+           "Twist, Turn, Tap" "Tap, Twist, Tap" "Tap, Twist, Turn"
+           "Tap, Turn, Twist" "Tap, Turn, Tap" "Turn, Twist, Tap"
+           "Turn, Twist, Turn" "Turn, Tap, Twist" "Turn, Tap, Turn"))
+
+(random-table/register :name "Errant > Lock > Modifier"
+  :private t
+  :data '("Spiked" "Spiked" "Secured" "Secured"
+           "Weathered" "Weathered" "Cracked" "Cracked"
+           "Normal" "Normal" "Normal" "Normal"))
 
 (random-table/register :name "Errant > Death & Dying"
   :roller #'random-table/roller/prompt-from-table-data
@@ -1784,12 +1790,6 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            (9 . "Total organ failure. /Consigned to the reaper/ and /out of action/.")
            ((10 . 15) . "Dead")
            ((16 . 100) . "Deader than Dead (unable to be revived or properly buried.)")))
-
-(random-table/register :name "Errant > Lock > Modifier"
-  :private t
-  :data '("Spiked" "Spiked" "Secured" "Secured"
-           "Weathered" "Weathered" "Cracked" "Cracked"
-           "Normal" "Normal" "Normal" "Normal"))
 
 ;;; Frog God Games
 (random-table/register :name "Inn Name"

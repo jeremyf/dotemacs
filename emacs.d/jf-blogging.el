@@ -128,7 +128,7 @@ Take on Rules using the \"blockquote\" special block."
   (goto-char (point-min))
   (search-forward-regexp "#\\+HUGO_FRONT_MATTER_FORMAT: yaml")
   (insert (concat
-            "\n#+HUGO_CUSTOM_FRONT_MATTER: :slug " (jf/tor-convert-text-to-slug title)
+            "\n#+HUGO_CUSTOM_FRONT_MATTER: :slug " (denote-sluggify title)
             ;; 2022-02-26 07:46:15.000000000 -04:00
             "\n#+HUGO_CUSTOM_FRONT_MATTER: :date " (format-time-string "%Y-%m-%d %H:%M:%S %z")
             "\n#+HUGO_CUSTOM_FRONT_MATTER: :type post"

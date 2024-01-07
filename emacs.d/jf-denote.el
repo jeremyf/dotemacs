@@ -110,10 +110,34 @@
   ;; And `org-read-date' is an amazing bit of tech
   (denote-date-prompt-denote-date-prompt-use-org-read-date t)
   :config
-  (defun jf/denote-sluggify-signature (args)
-    "Coerce the ARGS to replace '-' with '_' and then sign."
-    (list (s-replace "-" "_" (car args))))
-  (advice-add #'denote-sluggify-signature :filter-args #'jf/denote-sluggify-signature))
+  (defvar jf/diacritics-to-non-diacritics-map
+  '(("ž" . "z") ("Ž" . "Z")
+     ("ý" . "y") ("ÿ" . "y") ("Ÿ" . "Y")
+     ("š" . "s") ("Š" . "S")
+     ("ñ" . "n") ("Ñ" . "N")
+     ("ü" . "u") ("û" . "u") ("ú" . "u") ("ù" . "u") ("Ü" . "U") ("Û" . "U") ("Ú" . "U") ("Ù" . "U")
+     ("ï" . "i") ("î" . "i") ("í" . "i") ("ì" . "i") ("Ï" . "I") ("Î" . "I") ("Í" . "I") ("Ì" . "I")
+     ("Ð" . "D")
+     ("ç" . "c") ("Ç" . "C")
+     ("ð" . "e") ("ë" . "e") ("ê" . "e") ("é" . "e") ("è" . "e")
+     ("Ë" . "E") ("Ê" . "E") ("É" . "E") ("È" . "E")
+     ("ø" . "o") ("ö" . "o") ("õ" . "o") ("ô" . "o") ("ó" . "o") ("ò" . "o") ("Ø" . "O") ("Ö" . "O") ("Õ" . "O") ("Ô" . "O") ("Ó" . "O") ("Ò" . "O")
+     ("å" . "a") ("ä" . "a") ("ã" . "a") ("â" . "a") ("á" . "a") ("à" . "a") ("Å" . "A") ("Ä" . "A") ("Ã" . "A") ("Â" . "A") ("Á" . "A") ("À" . "A"))
+    "Map of diacritic to non-diacritic form.")
+  (defun jf/remove-diacritics-from (string)
+    "Remove the diacritics from STRING."
+    (cl-reduce (lambda (text diacritic-map-element)
+                 (s-replace (car diacritic-map-element)
+                   (cdr diacritic-map-element) text))
+        jf/diacritics-to-non-diacritics-map
+        :initial-value string))
+  (defun jf/denote-sluggify (args)
+    "Coerce the `car' of ARGS for slugification."
+    (remove nil (list (jf/remove-diacritics-from
+            (s-replace "=" "_" (s-replace "-" "_" (car args))))
+      (cdr args))))
+  (advice-add #'denote-sluggify-signature :filter-args #'jf/denote-sluggify)
+  (advice-add #'denote-sluggify :filter-args #'jf/denote-sluggify))
 
 (use-package consult-notes
   ;;Let’s add another way at looking up files.  I appreciate the ability to

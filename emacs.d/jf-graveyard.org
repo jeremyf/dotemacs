@@ -1,6 +1,9 @@
 Welcome to the graveyard; I'm not ready to fully say good-bye, but these are not part of my required code.
 
 ** My Collection of Org Roam interactions
+:PROPERTIES:
+:ID:       C5FFA2DD-B321-4579-8D85-6F50C854A1EF
+:END:
 
 The =node-id= below is an [[denote:20221009T115044][Org-Roam]] node, something I’ve moved away from in favor of Denote.  My reason for keeping this is a reminder of the =seq-mapcat= function.
 
@@ -62,6 +65,9 @@ Related are the following commands:
 #+end_src
 
 ** Logic for Parsing My Local Post
+:PROPERTIES:
+:ID:       60E9FC3A-9E31-4D02-B67D-11897671905E
+:END:
 
 #+begin_src emacs-lisp
   (cl-defun jf/tor-view-blog-post (&key
@@ -93,6 +99,9 @@ Related are the following commands:
 #+end_src
 
 ** Finding Draft File
+:PROPERTIES:
+:ID:       F57621D5-9C92-47FD-8B28-B29300D82D29
+:END:
 
 #+begin_src emacs-lisp
   (defun jf/tor-find-file-draft (filename)
@@ -106,6 +115,9 @@ Related are the following commands:
 #+end_src
 
 ** Automation Now Favored By Denote
+:PROPERTIES:
+:ID:       E61F385C-8B0B-44A1-893A-7E3457B95CD4
+:END:
 
 A massive function for helping make the preliminaries of a blog post.
 
@@ -132,7 +144,7 @@ A massive function for helping make the preliminaries of a blog post.
                                 "content" "posts"
                                 (format-time-string "%Y/")))
 
-            (slug (jf/tor-convert-text-to-slug title))
+            (slug (denote-sluggify title))
             (fpath (expand-file-name
                      (concat default-directory slug ".md"))))
       ;; If the file does not exist, create the file with the proper
@@ -190,6 +202,9 @@ A massive function for helping make the preliminaries of a blog post.
 
 
 ** Some Org Roam Note Exporting
+:PROPERTIES:
+:ID:       92361757-90E8-4053-81BA-AF2C1BD21340
+:END:
 
 #+begin_src emacs-lisp
   (cl-defun jf/org-markdown-export-format-link-for (&key node desc)
