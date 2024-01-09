@@ -1098,5 +1098,8 @@ holding contextual information."
   (lambda ()
     (add-hook 'before-save-hook 'jf/org-add-ids-to-headlines-in-file nil 'local)))
 
+(use-package org-web-tools
+  :straight t)
+
 (provide 'jf-org-mode)
 ;;; jf-org-mode.el ends here
