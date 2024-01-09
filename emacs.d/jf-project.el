@@ -276,7 +276,16 @@ We want files to have the 'projects' `denote' keyword."
       ;; (if-let ((drawer (car (org-element-map task 'drawer #'identity))))
       ;; (goto-char (org-element-property :contents-end drawer))
       ;; (goto-char (org-element-property :contents-begin task)))
-      (goto-char (org-element-property :contents-begin task))
+      (let* ((subtasks (jf/org-mode/existing-sub-tasks :task task))
+             (subtask-name (completing-read (format "Subtask for %s: " task-name) subtasks)))
+        (if-let (subtask (alist-get subtask-name subtasks nil nil #'string=))
+          (goto-char (org-element-property :contents-end subtask))
+          (if current-prefix-arg
+            ;; We don't want to edit this thing
+            (goto-char (org-element-property :begin task))
+            (progn
+              (goto-char (org-element-property :contents-end task))
+              (insert "** " subtask "\n\n")))))
       (progn
         (goto-char (point-max))
         ;; Yes make this a top-level element.  It is easy to demote and move
@@ -299,6 +308,21 @@ Members of the sequence either have a tag 'tasks' or are in a todo state."
           (and
             (or (eq (org-element-property :todo-type headline) 'todo)
               (member "tasks" (org-element-property :tags headline)))
+            headline))))))
+
+(cl-defun jf/org-mode/existing-sub-tasks (&key task)
+  "Return an alist of existing sub-tasks for the given TASK element.
+
+Each member's `car' is title and `cdr' is `org-mode' element."
+  (let ((subtask-level (+ 1 (org-element-property :level task))))
+    (mapcar (lambda (headline)
+              (cons (org-element-property :title headline) headline))
+      (org-element-map
+        task
+        'headline
+        (lambda (headline)
+          (and
+            (eq (org-element-property :level headline) subtask-level)
             headline))))))
 
 (defun jf/org-mode/blog-entry? (&optional buffer)
