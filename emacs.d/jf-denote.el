@@ -798,64 +798,50 @@ When USE_HUGO_SHORTCODE is given use glossary based exporting."
   "Create an `denote' entry from Firefox page."
   (interactive)
   (require 'grab-mac-link)
-  (let* ((link-title-pair (grab-mac-link-firefox-1))
-          (url (car link-title-pair))
-          (title (cadr link-title-pair)))
-    (jf/denote/capture-reference :url url :title title)))
+  (jf/denote/capture-reference :url (car (grab-mac-link-firefox-1))))
 
 (defun jf/menu--org-capture-safari ()
   "Create an `denote' entry from Safari page."
   (interactive)
   (require 'grab-mac-link)
-  (let* ((link-title-pair (grab-mac-link-safari-1))
-          (url (car link-title-pair))
-          (title (cadr link-title-pair)))
-    (jf/denote/capture-reference :url url :title title)))
+  (jf/denote/capture-reference :url (car (grab-mac-link-safari-1))))
 
 (defun jf/capture/denote/from/eww-data ()
   "Create an `denote' entry from `eww' data."
   (interactive)
-  (let* ((url (plist-get eww-data :url))
-          (title (plist-get eww-data :title))
-          (html (plist-get eww-data :source))
-          (content (jf/convert-via-pandoc html :from "html" :to "org")))
-    (jf/denote/capture-reference :url url :title title :content content)))
+  (jf/denote/capture-reference :url (plist-get eww-data :url)))
+
 
 (defun jf/capture/denote/from/elfeed-show-entry ()
   "Create `denote' entry from `elfeed-show-entry'."
   (interactive)
-  (let* ((url (elfeed-entry-link elfeed-show-entry))
-          (title (elfeed-entry-title elfeed-show-entry))
-                (html (elfeed-deref (elfeed-entry-content elfeed-show-entry)))
-                (content (jf/convert-via-pandoc html :from "html" :to "org")))
-    (jf/denote/capture-reference :url url :title title :content content)))
+  (jf/denote/capture-reference :url (elfeed-entry-link elfeed-show-entry)))
 
-(cl-defun jf/convert-via-pandoc (text &key (from "html") (to "org"))
-  "Convert TEXT, via pandoc, FROM one content-type TO another."
+;; I'd love to avoid re-fetching the content.
+(cl-defun jf/sanitized-dom (&key html)
+  "Convert HTML to sanitized dom."
   (with-temp-buffer
-                (insert text)
-                (shell-command-on-region
-                        (point-min) (point-max)
-                        (concat (executable-find "pandoc") " -f " from " -t " to " --wrap=none")
-      ;;| rg \"(\\\\\\\\)\" -r ''")
-                        t t)
-                (buffer-substring-no-properties (point-min) (point-max))))
+    (insert html)
+    (org-web-tools--sanitized-dom)
+    (buffer-string)))
 
-(cl-defun jf/denote/capture-reference (&key
-                                        title
-                                        url
-                                        (content "")
+(cl-defun jf/denote/capture-reference (&key url
                                         (keywords (denote-keywords-prompt))
                                         (domain "references"))
-  "Create a `denote' entry for the TITLE and URL.
+  "Create a `denote' entry in DOMAIN for URL with KEYWORDS.
 
-Capturing for the given CONTENT, DOMAIN, and KEYWORDS prompt."
-  (denote title
-    keywords
-    'org
-    (f-join (denote-directory) domain)
-    nil
-    (concat "#+ROAM_REFS: " url "\n\n" (or content ""))))
+The DOM could be as sanitized by `org-web-tools--sanitized-dom'."
+  (-let* ((url (or url (org-web-tools--get-first-url)))
+           (dom (or dom (plz 'get url :as #'org-web-tools--sanitized-dom)))
+           ((title . readable) (org-web-tools--eww-readable dom))
+           (title (org-web-tools--cleanup-title (or title "")))
+           (article (org-web-tools--html-to-org-with-pandoc readable)))
+    (denote title
+      keywords
+      'org
+      (f-join (denote-directory) domain)
+      nil
+      (concat "#+ROAM_REFS: " url "\n\n" article))))
 
 (defun jf/denote/archive-timesheet-month ()
   "Cut the month agenda and create a `denote' note."
