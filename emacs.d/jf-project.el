@@ -260,32 +260,40 @@ We want files to have the 'projects' `denote' keyword."
 ;; (advice-add 'org-todo-list :before #'jf/org-mode/agenda-files-update)
 (add-hook 'after-init-hook #'jf/org-mode/agenda-files-update)
 
+(cl-defun jf/alist-prompt (prompt collection &rest args)
+  (let ((string (completing-read prompt collection args)))
+    (cons string (alist-get string collection nil nil #'string=))))
+
 (defun jf/org-mode/capture/project-task/find ()
   "Find the project file and position to the selected task."
   (let* ((project (completing-read "Project: " (jf/project/list-projects)))
           (filename (cdar (jf/project/list-projects :project project)))
-          (tasks (jf/org-mode/existing-tasks filename))
-          (task-name (completing-read (format "Task for %s: " project) tasks)))
+          (name-and-task (jf/alist-prompt
+                           (format "Task for %s: " project)
+                           (jf/org-mode/existing-tasks filename)))
+          (task-name (car name-and-task)))
     ;; Defer finding this file as long as possible.
     (find-file filename)
 
-    (if-let (task (alist-get task-name tasks nil nil #'string=))
+    (if-let ((task (cdr name-and-task)))
       ;; I like having the most recent writing close to the headline; showing a
       ;; reverse order.  This also allows me to have sub-headings within a task
       ;; and not insert content and clocks there.
       ;; (if-let ((drawer (car (org-element-map task 'drawer #'identity))))
       ;; (goto-char (org-element-property :contents-end drawer))
       ;; (goto-char (org-element-property :contents-begin task)))
-      (let* ((subtasks (jf/org-mode/existing-sub-tasks :task task))
-             (subtask-name (completing-read (format "Subtask for %s: " task-name) subtasks)))
-        (if-let (subtask (alist-get subtask-name subtasks nil nil #'string=))
+      (let* ((name-and-subtask (jf/alist-prompt
+                               (format "Sub-Task for %s: " task-name)
+                                 (jf/org-mode/existing-sub-tasks :task task)))
+              (subtask-name (car name-and-subtask)))
+        (if-let ((subtask (cdr name-and-subtask)))
           (goto-char (org-element-property :contents-end subtask))
           (if current-prefix-arg
             ;; We don't want to edit this thing
             (goto-char (org-element-property :begin task))
             (progn
               (goto-char (org-element-property :contents-end task))
-              (insert "** " subtask "\n\n")))))
+              (insert "** " subtask-name "\n\n")))))
       (progn
         (goto-char (point-max))
         ;; Yes make this a top-level element.  It is easy to demote and move
