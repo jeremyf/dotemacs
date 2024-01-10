@@ -542,6 +542,8 @@ Assumes that I'm on a :projects: headline.
 (add-to-list 'org-export-global-macros
   '("newpage" . "@@latex:\newpage@@"))
 (add-to-list 'org-export-global-macros
+  '("rune" . "@@hugo:<span class=\"rune\">@@$1@@hugo:</span>@@"))
+(add-to-list 'org-export-global-macros
   '("linkToSeries" . "@@hugo:{{< linkToSeries \"@@$1@@hugo:\" >}}@@"))'
 
 (defun jf/org-link-delete-link ()

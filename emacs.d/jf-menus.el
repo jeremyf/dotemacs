@@ -47,15 +47,15 @@
 ;;   (interactive "r\nP")
 ;;   (jf/org-mode/capture/insert-content-dwim b e p))
 
-(transient-define-suffix jf/org-mode/add-abstract (abstract)
-  "Add ABSTRACT to `org-mode'"
-  :description "Add Abstract…"
-  (interactive (list (read-string "Abstract: ")))
+(transient-define-suffix jf/org-mode/add-description (description)
+  "Add Description to `org-mode'"
+  :description "Add Description…"
+  (interactive (list (read-string "Description: ")))
   (when (jf/org-mode/blog-entry?)
     (save-excursion
       (goto-char (point-min))
       (re-search-forward "^$")
-      (insert "\n#+HUGO_CUSTOM_FRONT_MATTER: :abstract " abstract))))
+      (insert "\n#+DESCRIPTION: " description))))
 
 (transient-define-suffix jf/org-mode/add-session-report (date game location)
   "Add session report metadata (DATE, GAME, and LOCATION) to current buffer."
@@ -119,7 +119,7 @@
       ("d p" jf/project/convert-document-to-project :if jf/denote?)
       ]
     ["Blogging"
-      ("b a" jf/org-mode/add-abstract :if jf/org-mode/blog-entry?)
+      ("b d" jf/org-mode/add-description :if jf/org-mode/blog-entry?)
       ("b r" jf/org-mode/add-session-report :if jf/org-mode/blog-entry?)
       ("b s" "Add Series…" jf/org-mode/add-series-to-file :if jf/org-mode/blog-entry?)
       ("b x" "Export to TakeOnRules…" jf/export-org-to-tor :if jf/org-mode/blog-entry?)]]

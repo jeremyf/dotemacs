@@ -1,4 +1,1 @@
 # -*- mode: org; -*-
-
-#+MACRO: cite @@hugo:<cite>@@$1@@hugo:</cite>@@
-#+MACRO: rune @@hugo:<span class="rune">@@$1@@hugo:</span>@@

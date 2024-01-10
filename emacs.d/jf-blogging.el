@@ -128,15 +128,14 @@ Take on Rules using the \"blockquote\" special block."
   (goto-char (point-min))
   (search-forward-regexp "#\\+HUGO_FRONT_MATTER_FORMAT: yaml")
   (insert (concat
-            "\n#+HUGO_CUSTOM_FRONT_MATTER: :slug " (denote-sluggify title)
+            "\n#+HUGO_SLUG: " (denote-sluggify title)
             ;; 2022-02-26 07:46:15.000000000 -04:00
-            "\n#+HUGO_CUSTOM_FRONT_MATTER: :date " (format-time-string "%Y-%m-%d %H:%M:%S %z")
-            "\n#+HUGO_CUSTOM_FRONT_MATTER: :type post"
-            "\n#+HUGO_CUSTOM_FRONT_MATTER: :layout post"
+            "\n#+HUGO_PUBLISHDATE: " (format-time-string "%Y-%m-%d %H:%M:%S %z")
+            "\n#+HUGO_TYPE: post"
+            "\n#+HUGO_LAYOUT: post"
+            "\n#+HUGO_DRAFT: true"
             "\n#+HUGO_CUSTOM_FRONT_MATTER: :licenses '(by-nc-nd-4_0)"
-            "\n#+HUGO_CUSTOM_FRONT_MATTER: :draft true"
-            "\n#+HUGO_CUSTOM_FRONT_MATTER: :org_id " identifier
-            "\n#+INCLUDE: " jf/org-macros-setup-filename))
+            "\n#+HUGO_CUSTOM_FRONT_MATTER: :org_id " identifier))
   (when-let ((kw-plist (jf/org-keywords-as-plist
                          :keywords-regexp "\\(SESSION_REPORT_DATE\\|SESSION_REPORT_LOCATION\\|SESSION_REPORT_GAME\\)")))
     (insert
@@ -178,6 +177,18 @@ Take on Rules using the \"blockquote\" special block."
     'keyword
     (lambda (el)
       (when (string-match property (org-element-property :key el)) el))))
+
+(cl-defun jf/blog-post/tootify ()
+  "Create a toot from the current buffer."
+  (interactive)
+  (if (jf/org-mode/blog-entry?)
+    (let* ((metadata (jf/org-keywords-as-plist :keywords-regexp "\\(ROAM_REFS\\|DESCRIPTION\\)"))
+            (url (lax-plist-get metadata "ROAM_REFS"))
+            (description (lax-plist-get metadata "DESCRIPTION")))
+      (call-interactively #'mastodon-toot)
+      (end-of-buffer)
+      (insert (s-join "\n\n" (-flatten (list description url)))))
+    (user-error "Current buffer is not a blog post.")))
 
 (cl-defun jf/jump_to_corresponding_hugo_file (&key (buffer (current-buffer)))
   "Find the TakeOnRules.com url in the BUFFER and jump to corresponding Hugo file."
