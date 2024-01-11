@@ -560,5 +560,68 @@ Add the blog post to the given SERIES with the given KEYWORDS."
 (fset 'jf/tidy-ox-hugo-header-export
   (kmacro-lambda-form [?\C-c ?\C-n ?\s-f ?\{ return ?\C-b ?\C-b ?\C-k] 0 "%d"))
 
+;;; Org-Mode link to table numbers.
+(defun jf/path-to-table-number (table-number)
+  (let* ((table-filename
+	  (f-join jf/tor-home-directory "data/list_of_all_tables.yml"))
+	 (path (s-trim (shell-command-to-string
+			(concat "rg \"^- table_number:\\s" table-number "$\" -A4 "
+				table-filename
+				" | rg \"^ +path: +\\\"([^\\\"]+)\\\"\" -r '$1' "
+				"--only-matching")))))
+
+    (s-trim (shell-command-to-string
+	     (concat "rg \"^#\\+ROAM_REFS: .*(https://takeonrules.com"
+		     path ")\" -r '$1' --files-with-matches " org-directory)))))
+
+(defun jf/list-blog-tables (&optional table-number)
+  "Return a list of blog tables of the form \"TABLE-NUMBER: CAPTION\"."
+  (let* ((table-filename
+	  (f-join jf/tor-home-directory "data/list_of_all_tables.yml"))
+	 (match (or table-number "\\d+")))
+    (s-split
+     "\n"
+     (s-trim
+      (shell-command-to-string
+       (concat "rg \"^- table_number: (" match ")\\n\\s+caption: (.*)\""
+	       " --multiline --replace '$1: $2' --only-matching "
+	       table-filename))))))
+
+(defun jf/org/link-table-complete ()
+  "Complete a file from table."
+  (completing-read "Table: " (jf/list-blog-tables) nil t))
+
+(defun jf/org/link-table-follow (link _)
+  "Open a file from table for LINK."
+  (find-file (jf/path-to-table-number link)))
+
+(defun jf/org/link-table-export (table-number desc format _)
+  "Export TABLE-NUMBER with DESC for FORMAT."
+  (let ((desc (concat "Table " table-number ": "
+		      (string-trim
+		       (cadr
+			(s-split ":"
+				 (car (jf/list-blog-tables table-number)))))))
+	(link (format "https://takeonrules.com/tables/%s" table-number)))
+       (pcase format
+	 ((or 'html '11ty)
+	  (if use_hugo_shortcode
+	      (format "{{< linkToTable %s >}}" table-number)
+	      (format "<a href=\"%s\">%s</a>" link desc)))
+         ('md (if use_hugo_shortcode
+		  (format "{{< linkToTable %s >}}" table-number)
+		  (format "[%s](%s)" desc link)))
+         ('latex (format "\\href{%s}{%s}" link desc))
+         ('texinfo (format "@uref{%s,%s}" link desc))
+         ('ascii (format "%s (%s)" desc link))
+         (_ (format "%s (%s)" desc link)))))
+
+(with-eval-after-load 'org
+  (org-link-set-parameters
+   "table"
+   :complete #'jf/org/link-table-complete
+   :export #'jf/org/link-table-export
+   :follow #'jf/org/link-table-follow))
+
 (provide 'jf-blogging)
 ;;; jf-blogging.el ends here
