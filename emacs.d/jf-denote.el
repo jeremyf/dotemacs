@@ -830,7 +830,7 @@ When USE_HUGO_SHORTCODE is given use glossary based exporting."
 
 The DOM could be as sanitized by `org-web-tools--sanitized-dom'."
   (-let* ((url (or url (org-web-tools--get-first-url)))
-           (dom (or dom (plz 'get url :as #'org-web-tools--sanitized-dom)))
+           (dom (plz 'get url :as #'org-web-tools--sanitized-dom))
            ((title . readable) (org-web-tools--eww-readable dom))
            (title (org-web-tools--cleanup-title (or title "")))
            (article (org-web-tools--html-to-org-with-pandoc readable)))

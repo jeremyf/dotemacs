@@ -80,7 +80,7 @@ With one PREFIX go to place where we would jump on capture."
         (progn
           (org-link-open-as-file (concat filename "::*Timeblock") nil)
           (org-next-visible-heading 1)
-          (next-line 1)
+          (search-forward "#+BEGIN:")
           (org-dblock-update))
         (org-capture-goto-target "t")))
     ((>= prefix 4)
