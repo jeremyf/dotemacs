@@ -558,9 +558,7 @@ PARG is part of the method signature for `org-link-parameters'."
                                                  protocol
                                                  &key
                                                  keyword
-                                                 additional-hugo-parameters
-                                                 (use_hugo_shortcode
-                                                   jf/exporting-org-to-tor))
+                                                 additional-hugo-parameters)
   "Export a LINK with DESCRIPTION for the given PROTOCOL and FORMAT.
 
     FORMAT is an Org export backend.  We will discard the given
@@ -573,7 +571,7 @@ PARG is part of the method signature for `org-link-parameters'."
           (key (car (alist-get "GLOSSARY_KEY" keyword-alist nil nil #'string=))))
     (cond
       ((or (eq format 'html) (eq format 'md))
-        (if use_hugo_shortcode
+        (if jf/exporting-org-to-tor
           (format "{{< glossary key=\"%s\" %s >}}"
             key
             additional-hugo-parameters)
@@ -657,14 +655,14 @@ PARG is for a conformant method signature."
                                             description format protocol
                                             &key
                                             additional-hugo-parameters
-                                            (use_hugo_shortcode
+                                            (jf/exporting-org-to-tor
                                               jf/exporting-org-to-tor))
   "Export the epigraph for the given LINK, DESCRIPTION, PROTOCOL, and FORMAT.
 
   NOTE: This only works for blog export.
   TODO: Consider how to expand beyond blog support."
   (cond
-    ((and use_hugo_shortcode (or (eq format 'html) (eq format 'md)))
+    ((and jf/exporting-org-to-tor (or (eq format 'html) (eq format 'md)))
       (format "{{< epigraph key=\"%s\" >}}" link))
     ((or (eq format 'html) (eq format 'md))
       (concat "<blockquote>\n"
@@ -716,7 +714,7 @@ PARG is for a conformant method signature."
                                      format
                                      protocol
                                      &key
-                                     (use_hugo_shortcode
+                                     (jf/exporting-org-to-tor
                                        jf/exporting-org-to-tor))
   "Export a `denote:' link from Org files.
 
@@ -733,10 +731,10 @@ When USE_HUGO_SHORTCODE is given use glossary based exporting."
           (desc (or description title)))
     (if url
       (cond
-        ((and use_hugo_shortcode glossary_key)
+        ((and jf/exporting-org-to-tor glossary_key)
           (format "{{< glossary key=\"%s\" >}}" glossary_key))
         ;; Use the TakeOnRules shortcode that leverages Hugo built-in
-        ((and use_hugo_shortcode (s-starts-with? "https://takeonrules.com/" url))
+        ((and jf/exporting-org-to-tor (s-starts-with? "https://takeonrules.com/" url))
           (format "{{< linkToPath \"%s\" >}}"
             (s-trim (s-replace "https://takeonrules.com/" "/" url))))
         ((eq format 'html)

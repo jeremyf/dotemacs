@@ -598,23 +598,23 @@ Add the blog post to the given SERIES with the given KEYWORDS."
 (defun jf/org/link-table-export (table-number desc format _)
   "Export TABLE-NUMBER with DESC for FORMAT."
   (let ((desc (concat "Table " table-number ": "
-		      (string-trim
-		       (cadr
-			(s-split ":"
-				 (car (jf/list-blog-tables table-number)))))))
-	(link (format "https://takeonrules.com/tables/%s" table-number)))
-       (pcase format
-	 ((or 'html '11ty)
-	  (if use_hugo_shortcode
-	      (format "{{< linkToTable %s >}}" table-number)
-	      (format "<a href=\"%s\">%s</a>" link desc)))
-         ('md (if use_hugo_shortcode
-		  (format "{{< linkToTable %s >}}" table-number)
-		  (format "[%s](%s)" desc link)))
-         ('latex (format "\\href{%s}{%s}" link desc))
-         ('texinfo (format "@uref{%s,%s}" link desc))
-         ('ascii (format "%s (%s)" desc link))
-         (_ (format "%s (%s)" desc link)))))
+		            (string-trim
+		              (cadr
+			              (s-split ":"
+				              (car (jf/list-blog-tables table-number)))))))
+	       (link (format "https://takeonrules.com/tables/%s" table-number)))
+    (pcase format
+	    ((or 'html '11ty)
+	      (if jf/exporting-org-to-tor
+	        (format "{{< linkToTable %s >}}" table-number)
+	        (format "<a href=\"%s\">%s</a>" link desc)))
+      ('md (if jf/exporting-org-to-tor
+		         (format "{{< linkToTable %s >}}" table-number)
+		         (format "[%s](%s)" desc link)))
+      ('latex (format "\\href{%s}{%s}" link desc))
+      ('texinfo (format "@uref{%s,%s}" link desc))
+      ('ascii (format "%s (%s)" desc link))
+      (_ (format "%s (%s)" desc link)))))
 
 (with-eval-after-load 'org
   (org-link-set-parameters
