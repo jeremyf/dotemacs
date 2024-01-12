@@ -307,5 +307,14 @@ of measurement (e.g., a word or sentence)."
         :transient nil)]])
 (define-key isearch-mode-map (kbd "<f2>") #'jf/isearch-menu)
 
+(use-package nano-agenda
+  :straight (:host github :repo "rougier/nano-agenda"))
+
+(use-package svg-lib
+  :straight (:host github :repo "rougier/svg-lib"))
+
+(use-package org-margin
+  :straight (:host github :repo "rougier/org-margin"))
+
 (provide 'jf-experiments)
 ;;; jf-experiments.el ends here
