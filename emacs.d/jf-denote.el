@@ -81,7 +81,19 @@
   (org-mode . denote-rename-buffer-mode)
   :init
   (require 'denote-org-dblock)
+  (setq denote-known-keywords
+    (split-string-and-unquote
+      (shell-command-to-string
+        (concat
+          "rg \"#\\+TAG:\\s([\\w-]+)\" "
+          (expand-file-name "denote/glossary" org-directory)
+          " --only-matching"
+          " --no-filename "
+          " --replace '$1' | "
+          "ruby -ne 'puts $_.gsub(/^(\\w)\\w+-/) { |m| m[0].upcase + m[1..-1] }.gsub(/-(\\w)/) { |m| m[1].upcase }'"))
+      "\n"))
   :custom
+  (denote-infer-keywords nil)
   (denote-file-name-letter-casing '((title . downcase)
                                      (signature . downcase)
                                      (keywords . verbatim)
@@ -99,16 +111,17 @@
   ;; call, however there was a timing conflict with requiring denote-org-dblock
   ;; and when/where I declared the previous function.  By "inlining" the
   ;; function, I remove that temporal dependency.
-  (denote-known-keywords (split-string-and-unquote
-                           (shell-command-to-string
-                             (concat
-                               "rg \"#\\+TAG:\\s([\\w-]+)\" "
-                               (expand-file-name "denote/glossary" org-directory)
-                               " --only-matching"
-                               " --no-filename "
-                               " --replace '$1' | "
-                               "ruby -ne 'puts $_.gsub(/^(\\w)\\w+-/) { |m| m[0].upcase + m[1..-1] }.gsub(/-(\\w)/) { |m| m[1].upcase }'"))
-                           "\n"))
+
+    ;; (split-string-and-unquote
+    ;;                        (shell-command-to-string
+    ;;                          (concat
+    ;;                            "rg \"#\\+TAG:\\s([\\w-]+)\" "
+    ;;                            (expand-file-name "denote/glossary" org-directory)
+    ;;                            " --only-matching"
+    ;;                            " --no-filename "
+    ;;                            " --replace '$1' | "
+    ;;                            "ruby -ne 'puts $_.gsub(/^(\\w)\\w+-/) { |m| m[0].upcase + m[1..-1] }.gsub(/-(\\w)/) { |m| m[1].upcase }'"))
+    ;;   "\n")
   ;; Explicitly ensuring that tags can be multi-word (e.g. two or more
   ;; words joined with a dash).  Given that I export these tags, they
   ;; should be accessible to screen-readers.  And without the dashes
@@ -119,7 +132,6 @@
   :config
   (defvar jf/diacritics-to-non-diacritics-map
     '(("ž" . "z") ("Ž" . "Z")
-       ("–" . "-") ("—" . "-")
        ("ý" . "y") ("ÿ" . "y") ("Ÿ" . "Y")
        ("š" . "s") ("Š" . "S")
        ("ñ" . "n") ("Ñ" . "N")
