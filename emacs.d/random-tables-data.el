@@ -2746,3 +2746,60 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
 			       (6 . "Downtime Trend")
 			       (7 . "Monster")
 			       (8 . "Covenant")))
+
+(random-table/register :name "Ironsworn > Action Oracle"
+  :data '("Scheme" "Clash" "Weaken" "Initiate" "Create" "Swear" "Avenge" "Guard" "Defeat" "Control"
+            "Break" "Risk" "Surrender" "Inspect" "Raid" "Evade" "Assault" "Deflect" "Threaten" "Attack"
+            "Leave" "Preserve" "Manipulate" "Remove" "Eliminate" "Withdraw" "Abandon" "Investigate" "Hold" "Focus"
+            "Uncover" "Breach" "Aid" "Uphold" "Falter" "Suppress" "Hunt" "Share" "Destroy" "Avoid"
+            "Reject" "Demand" "Explore" "Bolster" "Seize" "Mourn" "Reveal" "Gather" "Defy" "Transform"
+            "Persevere" "Serve" "Begin" "Move" "Coordinate" "Resist" "Await" "Impress" "Take" "Oppose"
+            "Capture" "Overwhelm" "Challenge" "Acquire" "Protect" "Finish" "Strengthen" "Restore" "Advance" "Command"
+            "Refuse" "Find" "Deliver" "Hide" "Fortify" "Betray" "Secure" "Arrive" "Affect" "Change"
+            "Defend" "Debate" "Support" "Follow" "Construct" "Locate" "Endure" "Release" "Lose" "Reduce"
+            "Escalate" "Distract" "Journey" "Escort" "Learn" "Communicate" "Depart" "Search" "Charge" "Summon"))
+
+(random-table/register :name "Ironsworn > Theme Oracle"
+  :data '("Risk" "Ability" "Price" "Ally" "Battle" "Safety" "Survival" "Weapon" "Wound" "Shelter"
+            "Leader" "Fear" "Time" "Duty" "Secret" "Innocence" "Renown" "Direction" "Death" "Honor"
+            "Labor" "Solution" "Tool" "Balance" "Love" "Barrier" "Creation" "Decay" "Trade" "Bond"
+            "Hope" "Superstition" "Peace" "Deception" "History" "World" "Vow" "Protection" "Nature" "Opinion"
+            "Burden" "Vengeance" "Opportunity" "Faction" "Danger" "Corruption" "Freedom" "Debt" "Hate" "Possession"
+            "Stranger" "Passage" "Land" "Creature" "Disease" "Advantage" "Blood" "Language" "Rumor" "Weakness"
+            "Greed" "Family" "Resource" "Structure" "Dream" "Community" "War" "Portent" "Prize" "Destiny"
+            "Momentum" "Power" "Memory" "Ruin" "Mysticism" "Rival" "Problem" "Idea" "Revenge" "Health"
+            "Fellowship" "Enemy" "Religion" "Spirit" "Fame" "Desolation" "Strength" "Knowledge" "Truth" "Quest"
+           "Pride" "Loss" "Law" "Path" "Warning" "Relationship" "Wealth" "Home" "Strategy" "Supply"))
+
+(random-table/register :name "Laws of the Land"
+  :data '("The land is {Laws of the Land > Nature's Nature} and {Laws of the Land > Nature's Nature}; and you must not {Laws of the Land > You Must Not} nor {Laws of the Land > You Must Not}"))
+
+  (random-table/register :name "Laws of the Land > Nature's Nature"
+    :private t
+  :data '("forested" "stony" "marshy" "humid" "foggy"
+    "arid" "freezing" "volcanic" "windswept" "flowering"
+    "steep" "riverside" "grassy" "fungal" "hilly"
+    "flat" "oceanic" "freshwater" "sunken" "fruited"))
+
+  (random-table/register :name "Laws of the Land > You Must Not"
+    :private t
+  :data '("bring [animals or livestock/food/liquid]"
+           "kill [plants/animals/people/anything]"
+           "be quiet"
+           "create [noise/light/fire]"
+           "look at anything"
+           "listen to anything"
+           "stand [close to one another/on the ground]"
+           "go off on your own"
+           "stop traveling"
+           "leave the trail"
+           "travel [quickly/slowly]"
+           "make sudden movements"
+           "leave a trail"
+           "stand upright"
+           "fall"
+           "speak [about the past/about the future/even a word]"
+           "sleep"
+           "breathe the unfiltered air"
+           "drink water from here"
+           "expose [skin/metal/leather/wood/blood/paper]"))

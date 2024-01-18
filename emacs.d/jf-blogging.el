@@ -569,7 +569,6 @@ Add the blog post to the given SERIES with the given KEYWORDS."
 				table-filename
 				" | rg \"^ +path: +\\\"([^\\\"]+)\\\"\" -r '$1' "
 				"--only-matching")))))
-
     (s-trim (shell-command-to-string
 	     (concat "rg \"^#\\+ROAM_REFS: .*(https://takeonrules.com"
 		     path ")\" -r '$1' --files-with-matches " org-directory)))))
