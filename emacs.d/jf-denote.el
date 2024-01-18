@@ -79,11 +79,17 @@
   ("H-i" . 'jf/denote/link-or-create)
   :hook (dired-mode . denote-dired-mode)
   (org-mode . denote-rename-buffer-mode)
-  :custom (denote-org-capture-specifiers
-            "%(jf/denote/capture-wrap :link \"%L\" :content \"%i\")")
   :init
   (require 'denote-org-dblock)
   :custom
+  (denote-file-name-letter-casing '((title . downcase)
+                                     (signature . downcase)
+                                     (keywords . verbatim)
+                                     (t . downcase)))
+  (denote-excluded-punctuation-regexp "[][{}!@#$%^&*()=+'\"?,.|;:~`‘’“”/—–]*")
+  (denote-modules '(xref ffap))
+  (denote-org-capture-specifiers
+            "%(jf/denote/capture-wrap :link \"%L\" :content \"%i\")")
   (denote-directory (expand-file-name "denote" org-directory))
   ;; These are the minimum viable prompts for notes
   (denote-prompts '(title keywords))
@@ -101,7 +107,7 @@
                                " --only-matching"
                                " --no-filename "
                                " --replace '$1' | "
-                               "sed 's/-//g'"))
+                               "ruby -ne 'puts $_.gsub(/^(\\w)\\w+-/) { |m| m[0].upcase + m[1..-1] }.gsub(/-(\\w)/) { |m| m[1].upcase }'"))
                            "\n"))
   ;; Explicitly ensuring that tags can be multi-word (e.g. two or more
   ;; words joined with a dash).  Given that I export these tags, they
