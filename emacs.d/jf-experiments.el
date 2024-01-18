@@ -313,8 +313,5 @@ of measurement (e.g., a word or sentence)."
 (use-package svg-lib
   :straight (:host github :repo "rougier/svg-lib"))
 
-(use-package org-margin
-  :straight (:host github :repo "rougier/org-margin"))
-
 (provide 'jf-experiments)
 ;;; jf-experiments.el ends here
