@@ -310,8 +310,5 @@ of measurement (e.g., a word or sentence)."
 (use-package nano-agenda
   :straight (:host github :repo "rougier/nano-agenda"))
 
-(use-package svg-lib
-  :straight (:host github :repo "rougier/svg-lib"))
-
 (provide 'jf-experiments)
 ;;; jf-experiments.el ends here

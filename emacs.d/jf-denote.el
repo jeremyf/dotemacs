@@ -93,7 +93,7 @@
           "ruby -ne 'puts $_.gsub(/^(\\w)\\w+-/) { |m| m[0].upcase + m[1..-1] }.gsub(/-(\\w)/) { |m| m[1].upcase }'"))
       "\n"))
   :custom
-  (denote-infer-keywords nil)
+  (denote-infer-keywords t)
   (denote-file-name-letter-casing '((title . downcase)
                                      (signature . downcase)
                                      (keywords . verbatim)

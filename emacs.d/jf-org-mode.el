@@ -31,7 +31,7 @@ By default this is my example code project.")
   "~/git/org/agenda.org")
 
 (defconst jf/lore24-filename
-  "~/git/org/denote/indices/20231225T130631--lore24-in-the-shadows-of-mont-brun__campaigns_lore24_rpgs.org")
+  "~/git/org/denote/indices/20231225T130631--lore24-in-the-shadows-of-mont-brun__Lore24_campaigns_rpgs.org")
 
 (defvar jf/primary-agenda-filename-for-machine
   (if (jf/is-work-machine?)
