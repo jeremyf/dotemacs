@@ -422,6 +422,11 @@ method, get the containing class."
   ;; bit imprecise.  Still better than JSON; which doesn't allow for comments.
   :straight t)
 
+(use-package yaml-pro
+  :straight t)
+
+(add-hook 'yaml-ts-mode #'yaml-pro-ts-mode)
+
 (use-package yard-mode
   ;; My prefered Ruby documentation syntax
   :straight t
