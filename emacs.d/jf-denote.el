@@ -880,7 +880,7 @@ The DOM could be as sanitized by `org-web-tools--sanitized-dom'."
 Optionally DROP-TAGS, as there may have been a TAG associated with the series."
   (interactive)
   (with-current-buffer (if file (find-file-noselect file) (current-buffer))
-    (when (or all (jf/org-mode/blog-entry?))
+    (when (or current-prefix-arg all (jf/org-mode/blog-entry?))
       (let ((series (or series (completing-read "Series: " (jf/tor-series-list) nil t))))
         (unless (and (jf/org-mode/blog-entry?)
                   (s-contains? "#+HUGO_CUSTOM_FRONT_MATTER: :series " (buffer-substring-no-properties (point-min) (point-max))))
