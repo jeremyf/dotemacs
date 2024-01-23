@@ -133,6 +133,12 @@ first matching link."
   (setq org-export-headline-levels 4)
   ;; When I would load the agenda, I'd invariably type "l" to list the entries.
   (setq org-agenda-start-with-log-mode t)
+  ;; I continue to encounter issues with not properly generating table of
+  ;; contents.
+  ;; https://emacs.stackexchange.com/questions/76255/why-is-the-toc-missing-in-org-mode-latex-output
+  (setq org-latex-pdf-process
+      '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+        "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
   (setq org-confirm-babel-evaluate #'jf/org-confirm-babel-evaluate
     org-fontify-quote-and-verse-blocks t
     ;; I'd prefer to use the executable, but that doe not appear to be the
