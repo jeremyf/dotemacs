@@ -68,9 +68,7 @@
   ;; A narrow focus tool for organizing notes.  I appreciate the design
   ;; constraints and lack of external dependencies.  This package provides
   ;; portability.  It sits as an alternate to the amazing `org-roam' package.
-  :straight (denote :host nil
-              :type git
-              :repo "https://git.sr.ht/~protesilaos/denote")
+  :straight (:host github :type git :repo "jeremyf/denote")
   :commands (denote-directory
               denote-file-prompt
               denote--title-prompt
@@ -80,7 +78,7 @@
   :hook (dired-mode . denote-dired-mode)
   (org-mode . denote-rename-buffer-mode)
   :init
-  (require 'denote-org-dblock)
+  (require 'denote-org-extras)
   (setq denote-known-keywords
     (split-string-and-unquote
       (shell-command-to-string
@@ -101,7 +99,7 @@
   (denote-excluded-punctuation-regexp "[][{}!@#$%^&*()=+'\"?,.|;:~`‘’“”/—–]*")
   (denote-modules '(xref ffap))
   (denote-org-capture-specifiers
-            "%(jf/denote/capture-wrap :link \"%L\" :content \"%i\")")
+    "%(jf/denote/capture-wrap :link \"%L\" :content \"%i\")")
   (denote-directory (expand-file-name "denote" org-directory))
   ;; These are the minimum viable prompts for notes
   (denote-prompts '(title keywords))
@@ -112,16 +110,16 @@
   ;; and when/where I declared the previous function.  By "inlining" the
   ;; function, I remove that temporal dependency.
 
-    ;; (split-string-and-unquote
-    ;;                        (shell-command-to-string
-    ;;                          (concat
-    ;;                            "rg \"#\\+TAG:\\s([\\w-]+)\" "
-    ;;                            (expand-file-name "denote/glossary" org-directory)
-    ;;                            " --only-matching"
-    ;;                            " --no-filename "
-    ;;                            " --replace '$1' | "
-    ;;                            "ruby -ne 'puts $_.gsub(/^(\\w)\\w+-/) { |m| m[0].upcase + m[1..-1] }.gsub(/-(\\w)/) { |m| m[1].upcase }'"))
-    ;;   "\n")
+  ;; (split-string-and-unquote
+  ;;                        (shell-command-to-string
+  ;;                          (concat
+  ;;                            "rg \"#\\+TAG:\\s([\\w-]+)\" "
+  ;;                            (expand-file-name "denote/glossary" org-directory)
+  ;;                            " --only-matching"
+  ;;                            " --no-filename "
+  ;;                            " --replace '$1' | "
+  ;;                            "ruby -ne 'puts $_.gsub(/^(\\w)\\w+-/) { |m| m[0].upcase + m[1..-1] }.gsub(/-(\\w)/) { |m| m[1].upcase }'"))
+  ;;   "\n")
   ;; Explicitly ensuring that tags can be multi-word (e.g. two or more
   ;; words joined with a dash).  Given that I export these tags, they
   ;; should be accessible to screen-readers.  And without the dashes
@@ -153,20 +151,24 @@
     (cl-reduce (lambda (text diacritic-map-element)
                  (s-replace (car diacritic-map-element)
                    (cdr diacritic-map-element) text))
-        jf/diacritics-to-non-diacritics-map
-        :initial-value string))
+      jf/diacritics-to-non-diacritics-map
+      :initial-value string))
   (defun jf/denote-sluggify (args)
     "Coerce the `car' of ARGS for slugification."
     (remove nil (list (jf/remove-diacritics-from
-            (s-replace "=" "_" (s-replace "-" "_" (car args))))
-      (cdr args))))
+                        (s-replace "=" "_" (s-replace "-" "_" (car args))))
+                  (cdr args))))
+  (defun jf/denote-link-ol-get-id ()
+    "Use `org-id-get' to find/create ID."
+    (org-id-get (point) 'create))
   (advice-add #'denote-sluggify-signature :filter-args #'jf/denote-sluggify)
-  (advice-add #'denote-sluggify :filter-args #'jf/denote-sluggify))
+  (advice-add #'denote-sluggify :filter-args #'jf/denote-sluggify)
+  (advice-add #'denote-link-ol-get-id :override #'jf/denote-link-ol-get-id))
 
 (use-package consult-notes
   ;;Let’s add another way at looking up files.  I appreciate the ability to
-  ;;search all files and start with a character (e.g. =b=) followed by <space> to
-  ;;filter to the note source keyed as =s= (e.g. Scientist).
+  ;;search all files and start with a character (e.g. =b=) followed by <space>
+  ;;to filter to the note source keyed as =s= (e.g. Scientist).
   :straight (:type git :host github :repo "mclear-tools/consult-notes")
   ;; :after (consult denote)
   :bind
