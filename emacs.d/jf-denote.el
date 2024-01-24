@@ -153,6 +153,7 @@
                    (cdr diacritic-map-element) text))
       jf/diacritics-to-non-diacritics-map
       :initial-value string))
+
   (defun jf/denote-sluggify (args)
     "Coerce the `car' of ARGS for slugification."
     (remove nil (list (jf/remove-diacritics-from
@@ -161,9 +162,40 @@
   (defun jf/denote-link-ol-get-id ()
     "Use `org-id-get' to find/create ID."
     (org-id-get (point) 'create))
+
   (advice-add #'denote-sluggify-signature :filter-args #'jf/denote-sluggify)
-  (advice-add #'denote-sluggify :filter-args #'jf/denote-sluggify)
+  (advice-add #'denote-sluggify-title :filter-args #'jf/denote-sluggify)
   (advice-add #'denote-link-ol-get-id :override #'jf/denote-link-ol-get-id))
+
+(cl-defun jf/rename-file-to-denote-schema (&optional file &key dir id title keywords date signature force)
+  (interactive)
+  (let* ((file
+           (or file (buffer-file-name)))
+          (title
+            (or title (read-string "Title: " (s-titleize (f-base file)))))
+          (id
+            (or id (denote-create-unique-file-identifier
+                     file (denote--get-all-used-ids))))
+          (keywords
+            (or keywords (denote-keywords-prompt)))
+          (signature
+            (or signature (completing-read "Signature: "
+                            (jf/tor-series-list))))
+          (dir
+            (f-join (or dir (f-dirname file)) "./"))
+          (extension
+            (f-ext file t))
+          (new-name (denote-format-file-name
+                      dir
+                      id
+                      keywords
+                      title
+                      extension
+                      signature)))
+    (when (or force (denote-rename-file-prompt file new-name))
+      (denote-rename-file-and-buffer file new-name)
+      (denote-update-dired-buffers))
+    new-name))
 
 (use-package consult-notes
   ;;Let’s add another way at looking up files.  I appreciate the ability to
