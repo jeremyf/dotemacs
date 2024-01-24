@@ -155,17 +155,11 @@
         jf/diacritics-to-non-diacritics-map
         :initial-value string)))
 
-  (defun jf/denote-sluggify-signature (args)
+  (defun jf/denote-sluggify (args)
     "Coerce the `car' of ARGS for slugification."
     (remove nil (list (jf/remove-diacritics-from
                         (s-replace "=" "_" (s-replace "-" "_" (car args))))
                   (cdr args))))
-
-  (defun jf/denote-sluggify (args)
-    (remove nil
-      (if (eq (type-of (car args)) 'string)
-        (list (jf/remove-diacritics-from (car args)) (cdr args))
-        (list (car args) (jf/remove-diacritics-from (cadr args))))))
 
   (defun jf/denote-link-ol-get-id ()
     "Use `org-id-get' to find/create ID."
@@ -173,7 +167,7 @@
 
   (advice-add #'denote-sluggify-signature :filter-args #'jf/denote-sluggify-signature)
   (advice-add #'denote-sluggify-title :filter-args #'jf/denote-sluggify-signature)
-  (advice-add #'denote-sluggify :filter-args #'jf/denote-sluggify)
+  (advice-add #'denote-sluggify-keyword :filter-args #'jf/denote-sluggify-signature)
   (advice-add #'denote-link-ol-get-id :override #'jf/denote-link-ol-get-id))
 
 (cl-defun jf/rename-file-to-denote-schema (&key
@@ -543,7 +537,7 @@ Default the note’s title to the first NTH-WORDS of the BODY."
 
     NOTE: At present there is no consideration for uniqueness."
   (interactive)
-  (let* ((key (downcase (denote-sluggify 'title (if (s-present? abbr) abbr title))))
+  (let* ((key (downcase (denote-sluggify-title (if (s-present? abbr) abbr title))))
           (template (concat "#+GLOSSARY_KEY: " key "\n"
                       (when (s-present? abbr)
                         (concat "#+ABBR: " abbr "\n"))
@@ -969,7 +963,7 @@ Optionally DROP-TAGS, as there may have been a TAG associated with the series."
                 (id (denote-retrieve-filename-identifier file :no-error))
                 (file-type 'org)
                 (title (denote-retrieve-title-value file file-type))
-                (sluggified-title (denote-sluggify 'title (s-replace "…" "" title) 'title))
+                (sluggified-title (denote-sluggify-title (s-replace "…" "" title) 'title))
                 (keywords (seq-difference (denote-retrieve-keywords-value file file-type) (-flatten drop-tags)))
 	              (signature (denote-sluggify-signature series))
                 (extension (denote-get-file-extension file))
