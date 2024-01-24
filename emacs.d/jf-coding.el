@@ -362,9 +362,18 @@ method, get the containing class."
   ;; Ruby land when you have lib/my_file.rb, the corresponding spec should be in
   ;; spec/my_file_spec.rb; and when you have app/models/my_file.rb, the spec
   ;; should be in spec/models/my_file_spec.rb
-  :bind (:map rspec-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
+  :bind (:map rspec-mode-map (("s-." . 'rspec-toggle-spec-and-target)
+                               ("C-c y r" . 'jf/yank-bundle-exec-rspec-to-clipboard)))
   :bind (:map ruby-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
   :preface
+  (defun jf/yank-bundle-exec-rspec-to-clipboard ()
+    "Grab a ready to run rspec command."
+    (interactive)
+    (let* ((filename (file-relative-name (buffer-file-name) (projectile-project-root)))
+            (text (format "bundle exec rspec %s:%s" filename (line-number-at-pos))))
+      (kill-new text)
+      (message "Added to kill ring...%s" text)
+      text))
   (defun jf/rspec-spring-p ()
     "Check the project for spring as part of the Gemfile.lock."
     (let ((gemfile-lock (f-join (projectile-project-root) "Gemfile.lock")))
