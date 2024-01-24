@@ -162,7 +162,10 @@
                   (cdr args))))
 
   (defun jf/denote-sluggify (args)
-    (list (car args) (jf/remove-diacritics-from (cadr args))))
+    (remove nil
+      (if (eq (type-of (car args)) 'string)
+        (list (jf/remove-diacritics-from (car args)) (cdr args))
+        (list (car args) (jf/remove-diacritics-from (cadr args))))))
 
   (defun jf/denote-link-ol-get-id ()
     "Use `org-id-get' to find/create ID."
@@ -540,7 +543,7 @@ Default the note’s title to the first NTH-WORDS of the BODY."
 
     NOTE: At present there is no consideration for uniqueness."
   (interactive)
-  (let* ((key (downcase (denote-sluggify (if (s-present? abbr) abbr title))))
+  (let* ((key (downcase (denote-sluggify 'title (if (s-present? abbr) abbr title))))
           (template (concat "#+GLOSSARY_KEY: " key "\n"
                       (when (s-present? abbr)
                         (concat "#+ABBR: " abbr "\n"))
@@ -966,7 +969,7 @@ Optionally DROP-TAGS, as there may have been a TAG associated with the series."
                 (id (denote-retrieve-filename-identifier file :no-error))
                 (file-type 'org)
                 (title (denote-retrieve-title-value file file-type))
-                (sluggified-title (denote-sluggify (s-replace "…" "" title) 'title))
+                (sluggified-title (denote-sluggify 'title (s-replace "…" "" title) 'title))
                 (keywords (seq-difference (denote-retrieve-keywords-value file file-type) (-flatten drop-tags)))
 	              (signature (denote-sluggify-signature series))
                 (extension (denote-get-file-extension file))
