@@ -148,53 +148,92 @@
     "Map of diacritic to non-diacritic form.")
   (defun jf/remove-diacritics-from (string)
     "Remove the diacritics from STRING."
-    (cl-reduce (lambda (text diacritic-map-element)
-                 (s-replace (car diacritic-map-element)
-                   (cdr diacritic-map-element) text))
-      jf/diacritics-to-non-diacritics-map
-      :initial-value string))
+    (when string
+      (cl-reduce (lambda (text diacritic-map-element)
+                   (s-replace (car diacritic-map-element)
+                     (cdr diacritic-map-element) text))
+        jf/diacritics-to-non-diacritics-map
+        :initial-value string)))
 
-  (defun jf/denote-sluggify (args)
+  (defun jf/denote-sluggify-signature (args)
     "Coerce the `car' of ARGS for slugification."
     (remove nil (list (jf/remove-diacritics-from
                         (s-replace "=" "_" (s-replace "-" "_" (car args))))
                   (cdr args))))
+
+  (defun jf/denote-sluggify (args)
+    (list (car args) (jf/remove-diacritics-from (cadr args))))
+
   (defun jf/denote-link-ol-get-id ()
     "Use `org-id-get' to find/create ID."
     (org-id-get (point) 'create))
 
-  (advice-add #'denote-sluggify-signature :filter-args #'jf/denote-sluggify)
-  (advice-add #'denote-sluggify-title :filter-args #'jf/denote-sluggify)
+  (advice-add #'denote-sluggify-signature :filter-args #'jf/denote-sluggify-signature)
+  (advice-add #'denote-sluggify-title :filter-args #'jf/denote-sluggify-signature)
+  (advice-add #'denote-sluggify :filter-args #'jf/denote-sluggify)
   (advice-add #'denote-link-ol-get-id :override #'jf/denote-link-ol-get-id))
 
-(cl-defun jf/rename-file-to-denote-schema (&optional file &key dir id title keywords date signature force)
+(cl-defun jf/rename-file-to-denote-schema (&key
+                                            (file (buffer-file-name))
+                                            dir id title keywords
+                                            date signature
+                                            force dry-run)
+  "Rename FILE using `denote' schema.
+
+When no FILE is provided use `buffer-file-name'.
+
+- DIR: target directory to move the file to; by default put the
+       new file in the same directory.
+
+- ID: the identifier for this file, defaulting to one created via
+      `denote-create-unique-file-identifier'.
+
+- TITLE: The tile for this file; default's to a
+         `s-titleized-words' of the given FILE's base name.
+
+- KEYWORDS: A list of keywords to apply to the file.  When passed
+            :none, skip prompting, via `denote-keywords-prompt'
+            for a list of keywords.
+
+- SIGNATURE: The optional signature of the file.  When passed
+             :none, skip prompting for a signature.
+
+- DATE: When non-nil, use this date for creating the ID via
+        `denote-create-unique-file-identifier'.
+
+- FORCE: When non-nil, rename the file without prompting to
+         confirm the change.
+
+- DRY-RUN: When non-nil, do not perform the name change but
+           instead message the file's new name."
   (interactive)
-  (let* ((file
-           (or file (buffer-file-name)))
-          (title
-            (or title (read-string "Title: " (s-titleize (f-base file)))))
+  (let* ((title
+           (or title (read-string "Title: "
+                       (s-titleized-words (f-base file)))))
           (id
             (or id (denote-create-unique-file-identifier
-                     file (denote--get-all-used-ids))))
+                     file (denote--get-all-used-ids) date)))
           (keywords
-            (or keywords (denote-keywords-prompt)))
+            (if (equal keywords :none)
+              '()
+              (or keywords (denote-keywords-prompt))))
           (signature
-            (or signature (completing-read "Signature: "
-                            (jf/tor-series-list))))
+            (if (equal signature :none)
+              ""
+              (or signature
+		            (completing-read "Signature: " (jf/tor-series-list)))))
           (dir
             (f-join (or dir (f-dirname file)) "./"))
           (extension
             (f-ext file t))
           (new-name (denote-format-file-name
-                      dir
-                      id
-                      keywords
-                      title
-                      extension
-                      signature)))
-    (when (or force (denote-rename-file-prompt file new-name))
-      (denote-rename-file-and-buffer file new-name)
-      (denote-update-dired-buffers))
+                      dir id keywords
+                      title extension signature)))
+    (if dry-run
+      (message "Changing %S to %S" filename new-name)
+      (when (or force (denote-rename-file-prompt file new-name))
+        (denote-rename-file-and-buffer file new-name)
+        (denote-update-dired-buffers)))
     new-name))
 
 (use-package consult-notes
@@ -302,7 +341,7 @@ ID-ONLY link without title."
   (if (and target (file-exists-p target))
     (let ((type (denote-filetype-heuristics target)))
       (denote-link target type
-                    (denote--link-get-description target type)
+                    (denote--link-get-description target)
                     id-only)
       )
     (denote--command-with-title-history #'denote-link-after-creating)))
