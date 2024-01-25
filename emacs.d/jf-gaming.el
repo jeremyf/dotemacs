@@ -385,7 +385,7 @@ Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
   "data-lifepath="
   "All lines in `jf/bwg-lifepath--path-to-html-file' that have this substring contain filterable data.")
 
-(global-set-key (kbd "C-M-s-b") 'jf/menu--bwg)
+(keymap-global-set "C-M-s-b" 'jf/menu--bwg)
 (transient-define-prefix jf/menu--bwg ()
   "Define the BWG help prefix."
   ["Burning Wheel"

@@ -277,7 +277,7 @@ setting up an IDE-like layout)."
 
 
 ;; https://macowners.club/posts/custom-functions-5-navigation/
-(global-set-key (kbd "C-x 2") #'jf/nav-split-and-follow-below)
+(keymap-global-set "C-x 2" #'jf/nav-split-and-follow-below)
 (defun jf/nav-split-and-follow-below ()
   "Split the selected window in two with the new window is below.
 This uses `split-window-below' but follows with the cursor."
@@ -285,7 +285,7 @@ This uses `split-window-below' but follows with the cursor."
   (split-window-below)
   (other-window 1))
 
-(global-set-key (kbd "C-x 3") #'jf/nav-split-and-follow-right)
+(keymap-global-set "C-x 3" #'jf/nav-split-and-follow-right)
 (defun jf/nav-split-and-follow-right ()
   "Split the selected window in two with the new window is to the right.
 This uses `split-window-right' but follows with the cursor."
@@ -293,7 +293,7 @@ This uses `split-window-right' but follows with the cursor."
   (split-window-right)
   (other-window 1))
 
-(global-set-key (kbd "s-\\") #'jf/nav-toggle-split-direction)
+(keymap-global-set "s-\\" #'jf/nav-toggle-split-direction)
 (defun jf/nav-toggle-split-direction ()
   "Toggle window split from vertical to horizontal.
 This work the other way around as well.

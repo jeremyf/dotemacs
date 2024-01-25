@@ -169,7 +169,7 @@
     (when (looking-at-p "^$")
       (jf/insert-task-type-at-point :at (point-min)))))
 
-(global-set-key (kbd "s-7") #'jf/insert-task-type-at-point)
+(keymap-global-set "s-7" #'jf/insert-task-type-at-point)
 (cl-defun jf/insert-task-type-at-point (&key (splitter ":") (padding " ") (at nil))
   "Select and insert task type.
 

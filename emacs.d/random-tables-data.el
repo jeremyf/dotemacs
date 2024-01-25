@@ -4,8 +4,8 @@
     :straight (:host github :repo "jeremyf/random-table.el")))
 (setq random-table/reporter #'random-table/reporter/as-insert)
 
-(global-set-key (kbd "H-r") #'random-table/roll)
-(global-set-key (kbd "C-H-r") #'random-table/roll-region)
+(keymap-global-set "H-r" #'random-table/roll)
+(keymap-global-set "C-H-r" #'random-table/roll-region)
 
 (random-table/prompt "Charisma Modifier"
   :type #'read-number

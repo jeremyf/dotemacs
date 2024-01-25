@@ -187,13 +187,13 @@
 (unbind-key "C-c o") ;; was bound to open a file externally
 (unbind-key "C-x C-c") ;; was `save-buffers-kill-terminal'
 
-(global-set-key (kbd "<M-delete>") 'kill-word)
-(global-set-key (kbd "<s-down>") 'end-of-buffer)
-(global-set-key (kbd "<s-up>") 'beginning-of-buffer)
-(global-set-key (kbd "s-q") 'save-buffers-kill-terminal)
-(global-set-key (kbd "s-w") 'kill-current-buffer)
-(global-set-key (kbd "C-x C-b") 'ibuffer)
-(global-set-key (kbd "M-RET") 'newline-and-indent)
+(keymap-global-set "M-<delete>" 'kill-word)
+(keymap-global-set "s-<down>" 'end-of-buffer)
+(keymap-global-set "s-<up>" 'beginning-of-buffer)
+(keymap-global-set "s-q" 'save-buffers-kill-terminal)
+(keymap-global-set "s-w" 'kill-current-buffer)
+(keymap-global-set "C-x C-b" 'ibuffer)
+(keymap-global-set "M-RET" 'newline-and-indent)
 
 (use-package dired
   :straight (:type built-in)

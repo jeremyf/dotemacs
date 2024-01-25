@@ -44,4 +44,4 @@
     (set-face-attribute 'jf/make-mark-visible/face nil :background 'unspecified :foreground 'unspecified))
   (jf/make-mark-visible/draw-mark))
 
-(global-set-key (kbd "C-c v") 'jf/make-mark-visible/toggle-mark-visibility)
+(keymap-global-set "C-c v" 'jf/make-mark-visible/toggle-mark-visibility)

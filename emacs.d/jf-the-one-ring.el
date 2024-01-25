@@ -517,7 +517,7 @@ to READ_ONLY."
 ;;       And function to "write" that to character sheet.
 
 ;;;; Menu
-(global-set-key (kbd "H-1") 'jf/gaming/the-one-ring/menu)
+(keymap-global-set "H-1" 'jf/gaming/the-one-ring/menu)
 (transient-define-prefix jf/gaming/the-one-ring/menu ()
   ["The One Ring\n"
    ["Rolls"

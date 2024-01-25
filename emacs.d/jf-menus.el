@@ -81,11 +81,11 @@
 (transient-define-suffix jf/enable-indent-for-tab-command ()
   :description "Enable `indent-for-tab-command'"
   (interactive)
-  (global-set-key (kbd "TAB") #'indent-for-tab-command))
+  (keymap-global-set "TAB" #'indent-for-tab-command))
 
 ;; this suffix provides a dynamic description of the current host I want to use
 ;; for my blog.  And the prefix’s function toggles the host.
-(global-set-key (kbd "s-1") 'jf/menu)
+(keymap-global-set "s-1" 'jf/menu)
 (transient-define-prefix jf/menu ()
   "A context specific \"mega\" menu."
   ;; Todo, can I get this section into a function so I can duplicate it in the jf/menu--tor?

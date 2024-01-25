@@ -255,7 +255,7 @@ Else, evaluate the whole buffer."
       (eval-region (region-beginning) (region-end)))
     (setq-local deactivate-mark t)))
 
-(global-set-key (kbd "C-k") 'jf/kill-line-or-region)
+(keymap-global-set "C-k" 'jf/kill-line-or-region)
 (defun jf/kill-line-or-region (&optional arg)
   "Kill the selected region otherwise kill the ARG number of lines."
   (interactive "P")
@@ -263,8 +263,8 @@ Else, evaluate the whole buffer."
     (kill-region (region-beginning) (region-end))
     (kill-line arg)))
 
-(global-set-key (kbd "C-c n") 'jf/yank-file-name-to-clipboard) ;; Deprecated
-(global-set-key (kbd "C-c y n") 'jf/yank-file-name-to-clipboard)
+(keymap-global-set "C-c n" 'jf/yank-file-name-to-clipboard) ;; Deprecated
+(keymap-global-set "C-c y n" 'jf/yank-file-name-to-clipboard)
 (defun jf/yank-file-name-to-clipboard (arg)
   "Nab, I mean copy, the current buffer file name to the clipboard.
 
@@ -317,8 +317,8 @@ Else, evaluate the whole buffer."
 ;; Sometimes I just want to duplicate an area without copy and paste.  This
 ;; helps that process.  It’s not as smart as TextMate’s equivalent function,
 ;; but it’s close enough.
-(global-set-key (kbd "C-M-d") 'jf/duplicate-current-line-or-lines-of-region)
-(global-set-key (kbd "C-c d") 'jf/duplicate-current-line-or-lines-of-region)
+(keymap-global-set "C-M-d" 'jf/duplicate-current-line-or-lines-of-region)
+(keymap-global-set "C-c d" 'jf/duplicate-current-line-or-lines-of-region)
 (defun jf/duplicate-current-line-or-lines-of-region (arg)
   "Duplicate ARG times current line or the lines of the current region."
   (interactive "p")
@@ -343,7 +343,7 @@ Else, evaluate the whole buffer."
 
 ;; A simple wrapper around scratch, that helps name it and sets the major mode
 ;; to `org-mode'.
-(global-set-key (kbd "<f12>") 'jf/create-scratch-buffer)
+(keymap-global-set "<f12>" 'jf/create-scratch-buffer)
 (cl-defun jf/create-scratch-buffer (&optional arg)
   "Create a `scratch' buffer; if ARG given create a `denote' scratch note."
   (interactive "P")
@@ -356,7 +356,7 @@ Else, evaluate the whole buffer."
 
 ;; Sometimes I want to move, without renaming, a file.  This function helps
 ;; make that easy.
-(global-set-key (kbd "C-x m") 'jf/move-file)
+(keymap-global-set "C-x m" 'jf/move-file)
 (defun jf/move-file (target-directory)
   "Write this file to TARGET-DIRECTORY, and delete old one."
   (interactive "DTarget Directory: ")
@@ -369,7 +369,7 @@ Else, evaluate the whole buffer."
     (rename-file source target)
     (kill-current-buffer)))
 
-(global-set-key (kbd "s-5") 'jf/org-insert-immediate-active-timestamp)
+(keymap-global-set "s-5" 'jf/org-insert-immediate-active-timestamp)
 (defun jf/org-insert-immediate-active-timestamp (arg)
   "Insert an active date for today.
 
@@ -385,9 +385,9 @@ Else, evaluate the whole buffer."
                       nil nil))
       ((>= prefix 16)  (org-insert-time-stamp nil t nil)))))
 
-(global-set-key (kbd "C-w") 'jf/delete-region-or-backward-word)
-(global-set-key (kbd "M-DEL") 'jf/delete-region-or-backward-word)
-(global-set-key (kbd "<C-M-backspace>") 'backward-kill-paragraph)
+(keymap-global-set "C-w" 'jf/delete-region-or-backward-word)
+(keymap-global-set "M-DEL" 'jf/delete-region-or-backward-word)
+(keymap-global-set "C-M-<backspace>" 'backward-kill-paragraph)
 (defun jf/delete-region-or-backward-word (&optional arg)
   "Delete selected region otherwise delete backwards the ARG number of words."
   (interactive "p")

@@ -670,7 +670,7 @@ Useful if you want a more robust view into the recommend candidates."
   (load "~/.emacs.d/straight/build/vertico/vertico-repeat.el"
     nil
     jf/silence-loading-log)
-  (global-set-key (kbd "M-r") #'vertico-repeat)
+  (keymap-global-set "M-r" #'vertico-repeat)
   (add-hook 'minibuffer-setup-hook #'vertico-repeat-save))
 
 (use-package which-key
