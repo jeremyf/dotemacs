@@ -165,9 +165,9 @@
     "Use `org-id-get' to find/create ID."
     (org-id-get (point) 'create))
 
-  (advice-add #'denote-sluggify-signature :filter-args #'jf/denote-sluggify-signature)
-  (advice-add #'denote-sluggify-title :filter-args #'jf/denote-sluggify-signature)
-  (advice-add #'denote-sluggify-keyword :filter-args #'jf/denote-sluggify-signature)
+  (advice-add #'denote-sluggify-signature :filter-args #'jf/denote-sluggify)
+  (advice-add #'denote-sluggify-title :filter-args #'jf/denote-sluggify)
+  (advice-add #'denote-sluggify-keyword :filter-args #'jf/denote-sluggify)
   (advice-add #'denote-link-ol-get-id :override #'jf/denote-link-ol-get-id))
 
 (cl-defun jf/rename-file-to-denote-schema (&key
