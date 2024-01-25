@@ -92,10 +92,6 @@
       "\n"))
   :custom
   (denote-infer-keywords t)
-  (denote-file-name-letter-casing '((title . downcase)
-                                     (signature . downcase)
-                                     (keywords . verbatim)
-                                     (t . downcase)))
   (denote-excluded-punctuation-regexp "[][{}!@#$%^&*()=+'\"?,.|;:~`‘’“”/—–]*")
   (denote-modules '(xref ffap))
   (denote-org-capture-specifiers
@@ -127,7 +123,15 @@
   (denote-allow-multi-word-keywords nil)
   ;; And `org-read-date' is an amazing bit of tech
   (denote-date-prompt-denote-date-prompt-use-org-read-date t)
+  (denote-file-name-slug-functions
+    '((title . jf/denote-sluggify-title)
+       (signature . jf/denote-sluggify-signature)
+       (keyword . jf/denote-sluggify-keyword)))
   :config
+  (setq denote-file-name-letter-casing '((title . downcase)
+                                     (signature . downcase)
+                                     (keywords . verbatim)
+                                     (t . downcase)))
   (defvar jf/diacritics-to-non-diacritics-map
     '(("ž" . "z") ("Ž" . "Z")
        ("ý" . "y") ("ÿ" . "y") ("Ÿ" . "Y")
@@ -155,19 +159,21 @@
         jf/diacritics-to-non-diacritics-map
         :initial-value string)))
 
-  (defun jf/denote-sluggify (args)
-    "Coerce the `car' of ARGS for slugification."
-    (remove nil (list (jf/remove-diacritics-from
-                        (s-replace "=" "_" (s-replace "-" "_" (car args))))
-                  (cdr args))))
+  (defun jf/denote-sluggify-title (str)
+    (denote-sluggify-title (jf/remove-diacritics-from str)))
+
+  (defun jf/denote-sluggify-keyword (str)
+    (jf/remove-diacritics-from str))
+
+  (defun jf/denote-sluggify-signature (str)
+    (denote-sluggify-signature
+      (jf/remove-diacritics-from
+        (s-replace "=" "_" (s-replace "-" "_" str)))))
 
   (defun jf/denote-link-ol-get-id ()
     "Use `org-id-get' to find/create ID."
     (org-id-get (point) 'create))
 
-  (advice-add #'denote-sluggify-signature :filter-args #'jf/denote-sluggify)
-  (advice-add #'denote-sluggify-title :filter-args #'jf/denote-sluggify)
-  (advice-add #'denote-sluggify-keyword :filter-args #'jf/denote-sluggify)
   (advice-add #'denote-link-ol-get-id :override #'jf/denote-link-ol-get-id))
 
 (cl-defun jf/rename-file-to-denote-schema (&key

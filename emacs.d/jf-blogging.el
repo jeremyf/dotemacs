@@ -61,6 +61,16 @@ CONTENTS is nil.  INFO is a plist holding contextual information."
   :override (lambda (&rest rest) ())
   '((name . "wrapper")))
 
+(advice-add #'org-hugo−-get-front-matter :filter-return #'jf/org-hugo-rewrite-tags)
+(defun jf/org-hugo-rewrite-tags (info)
+  "Turn OneWordTags into one-word-tags."
+  (require 's)
+  (dolist (field '(:categories :tags))
+    (when (plist-get info field)
+      (plist-put info field
+		    (mapcar #'s-dashed-words (plist-get info field)))))
+  info)
+
 (defun jf/org-md-quote-block (quote-block contents info)
   "Render a QUOTE-BLOCK with CONTENTS and INFO.
 
