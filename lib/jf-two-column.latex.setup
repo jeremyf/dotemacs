@@ -1,4 +1,3 @@
-#+LATEX_COMPILER: lualatex
 #+LATEX_CLASS: jf/article
 #+LATEX_CLASS_OPTIONS: [11pt]
 #+LATEX_HEADER: \usepackage[linktocpage=true]{hyperref}

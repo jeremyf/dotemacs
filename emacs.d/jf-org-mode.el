@@ -104,7 +104,7 @@ first matching link."
 
 ;;; Begin Org Mode (all it's glory)
 (use-package org
-  :straight (org :type built-in)
+  :straight (org :type git :host github :repo "emacsmirror/org")
   :hook
   (org-mode . (lambda ()
                 (jf/org-capf)
@@ -134,11 +134,15 @@ first matching link."
   ;; When I would load the agenda, I'd invariably type "l" to list the entries.
   (setq org-agenda-start-with-log-mode t)
   ;; I continue to encounter issues with not properly generating table of
-  ;; contents.
+  ;; contents.  As such I used the following:
+  ;;
   ;; https://emacs.stackexchange.com/questions/76255/why-is-the-toc-missing-in-org-mode-latex-output
-  (setq org-latex-pdf-process
-      '("pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-        "pdflatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+  ;;
+  ;; Note, I did change from pdflatex to lualatex as the LaTeX class I'm often
+  ;; using are only available in Lua processing.
+  (setq org-latex-pdf-process '("lualatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+         "lualatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+  (setq org-latex-compiler "lualatex")
   (setq org-confirm-babel-evaluate #'jf/org-confirm-babel-evaluate
     org-fontify-quote-and-verse-blocks t
     ;; I'd prefer to use the executable, but that doe not appear to be the
