@@ -973,7 +973,8 @@ Optionally DROP-TAGS, as there may have been a TAG associated with the series."
     (when (or current-prefix-arg all (jf/org-mode/blog-entry?))
       (let ((series (or series (completing-read "Series: " (jf/tor-series-list) nil t))))
         (unless (and (jf/org-mode/blog-entry?)
-                  (s-contains? "#+HUGO_CUSTOM_FRONT_MATTER: :series " (buffer-substring-no-properties (point-min) (point-max))))
+                  (s-contains? "#+HUGO_CUSTOM_FRONT_MATTER: :series "
+                    (buffer-substring-no-properties (point-min) (point-max))))
           (save-excursion
             (goto-char (point-min))
             (re-search-forward "^$")
