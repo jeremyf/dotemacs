@@ -13,48 +13,6 @@
 (require 'jf-quick-help)
 (require 'jf-org-mode)
 
-(if (f-file?  "~/git/emacs-rpgtk/rpgtk-messages.el")
-  (progn
-    ;; Favor my clone of the code.
-    (use-package rpgtk-messages
-      :straight (:type git :local-repo "~/git/emacs-rpgtk/" :files ("rpgtk-messages.el")))
-    (use-package rpgtk-dice
-      :straight (:type git :local-repo "~/git/emacs-rpgtk/" :files ("rpgtk-dice.el")))
-    (use-package rpgtk-tables
-      :straight (:type git :local-repo "~/git/emacs-rpgtk/" :files ("rpgtk-tables.el"))
-      :custom (rpgtk-tables-choose-predicate #'jf/rpgtk-tables-choose-predicate)
-      :config
-      (defun jf/rpgtk-tables-choose-predicate ()
-        "Skip any tables that have a parent directory of \"/_private/\"."
-        (-reject (lambda (el) (s-contains? "/_private/" el))
-          (funcall #'rpgtk-tables-choose-default-predicate))))
-    (use-package rpgtk-org
-      :straight (:type git :local-repo "~/git/emacs-rpgtk/" :files ("rpgtk-org.el"))))
-  (progn
-    (use-package rpgtk-messages
-      :straight (:host codeberg
-                  :repo "takeonrules/emacs-rpgtk"
-                  :type git
-                  :files ("rpgtk-messages.el")))
-    (use-package rpgtk-dice
-      :init (use-package rpgtk-messages :straight t)
-      :straight (:host codeberg
-                  :repo "takeonrules/emacs-rpgtk"
-                  :type git
-                  :files ("rpgtk-dice.el")))
-    (use-package rpgtk-tables
-      :init (use-package rpgtk-messages :straight t)
-      :straight (:host codeberg
-                  :repo "takeonrules/emacs-rpgtk"
-                  :type git
-                  :files ("rpgtk-tables.el")))
-    (use-package rpgtk-org
-      :init (use-package rpgtk-messages :straight t)
-      :straight (:host codeberg
-                  :repo "takeonrules/emacs-rpgtk"
-                  :type git
-                  :files ("rpgtk-org.el")))))
-
 ;;;; General
 
 (defconst jf/gaming/runes
