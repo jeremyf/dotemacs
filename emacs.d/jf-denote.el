@@ -176,12 +176,12 @@
 
   (advice-add #'denote-link-ol-get-id :override #'jf/denote-link-ol-get-id))
 
-(cl-defun jf/rename-file-to-denote-schema (&key
-                                            (file (buffer-file-name))
-                                            dir id title keywords
-                                            date signature
+(cl-defun jf/rename-file-to-denote-schema (&key file id title keywords
+                                            dir date signature
                                             force dry-run)
   "Rename FILE using `denote' schema.
+
+When `current-prefix-arg' is non-nil prompt for many of the parameters.
 
 When no FILE is provided use `buffer-file-name'.
 
@@ -210,34 +210,48 @@ When no FILE is provided use `buffer-file-name'.
 - DRY-RUN: When non-nil, do not perform the name change but
            instead message the file's new name."
   (interactive)
-  (let* ((title
-           (or title (read-string "Title: "
-                       (s-titleized-words (f-base file)))))
+  (let* ((file
+           (or file (if current-prefix-arg
+                        (call-interactively (lambda (f)
+                                              (interactive "f") f))
+                      (buffer-file-name))))
+          (title
+            (or title
+              (read-string "Title: " (s-titleized-words (f-base file)))))
           (id
-            (or id (denote-create-unique-file-identifier
+            (or (denote-retrieve-filename-identifier file)
+              id
+              (denote-create-unique-file-identifier
                      file (denote--get-all-used-ids) date)))
           (keywords
             (if (equal keywords :none)
               '()
-              (or keywords (denote-keywords-prompt))))
+              (or keywords
+                (denote-keywords-prompt))))
           (signature
-            (if (equal signature :none)
-              ""
-              (or signature
-		            (completing-read "Signature: " (jf/tor-series-list)))))
+            (or (when (equal signature :none) "")
+              signature
+              (when current-prefix-arg
+		            (completing-read "Signature: " (jf/tor-series-list)))
+              ""))
           (dir
-            (f-join (or dir (f-dirname file)) "./"))
+            (f-join
+              (or dir
+                (if current-prefix-arg
+                  (call-interactively (lambda (d)
+                                        (interactive "D") d))
+                  (f-dirname file)))
+              "./"))
           (extension
             (f-ext file t))
-          (new-name (denote-format-file-name
-                      dir id keywords
-                      title extension signature)))
+          (new-file (denote-format-file-name
+                      dir id keywords title extension signature)))
     (if dry-run
-      (message "Changing %S to %S" filename new-name)
-      (when (or force (denote-rename-file-prompt file new-name))
-        (denote-rename-file-and-buffer file new-name)
+      (message "Changing %S to %S" file new-file)
+      (when (or force (denote-rename-file-prompt file new-file))
+        (denote-rename-file-and-buffer file new-file)
         (denote-update-dired-buffers)))
-    new-name))
+    new-file))
 
 (use-package consult-notes
   ;;Let’s add another way at looking up files.  I appreciate the ability to
