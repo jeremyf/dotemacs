@@ -154,7 +154,7 @@ method, get the containing class."
   (editorconfig-mode 1))
 
 (use-package eglot
-  :straight (:host github :repo "joaotavora/eglot")
+  :straight (:type built-in)
   ;; The Language Server Protocol (LSP) is a game changer; having access to that
   ;; tooling is very much a nice to have.
   :hook ((css-mode css-ts-mode
@@ -173,7 +173,6 @@ method, get the containing class."
     (setq eldoc-documentation-strategy
       'eldoc-documentation-compose-eagerly))
   :config
-  (setq eglot-events-buffer-size 0)
   ;; (use-package eglot-tempel
   ;; ;; I use `tempel' and I use `eglot'; having some glue between those helps.
   ;; :straight (eglot-tempel :host github :repo "fejfighter/eglot-tempel"))
@@ -190,11 +189,11 @@ method, get the containing class."
     ;; https://stackoverflow.com/questions/72601990/how-to-show-suggestions-for-yasnippets-when-using-eglot
     (setq-local completion-at-point-functions
       (list (cape-capf-super
-              #'jf/version-control/project-capf
-              #'jf/version-control/issue-capf
               #'eglot-completion-at-point
               #'tempel-expand
-              #'cape-keyword)))))
+              #'cape-file
+              #'cape-keyword))))
+  (add-hook 'eglot-managed-mode-hook #'jf/eglot-capf))
 
 (use-package eldoc
   ;; Helps with rendering documentation

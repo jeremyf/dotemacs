@@ -42,8 +42,6 @@ By default this is my example code project.")
   "The `completion-at-point-functions' I envision using for `org-mode'."
   (setq-local completion-at-point-functions
     (list (cape-capf-super
-            #'jf/version-control/issue-capf
-            #'jf/version-control/project-capf
             #'jf/org-capf-links
             #'tempel-expand
             #'cape-file))))
@@ -516,9 +514,10 @@ Assumes that I'm on a :projects: headline.
             (org-modern-hide-stars nil))
   :config (global-org-modern-mode))
 
-(use-package org-appear
-  :straight (:type git :host github :repo "awth13/org-appear")
-  :hook (org-mode . org-appear-mode))
+;; For automatically showing the invisible parts of org-mode.
+;; (use-package org-appear
+;;   :straight (:type git :host github :repo "awth13/org-appear")
+;;   :hook (org-mode . org-appear-mode))
 
 ;;; Org Export and Composition Functionality
 (setq org-export-global-macros (list))

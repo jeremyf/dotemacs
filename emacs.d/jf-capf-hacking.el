@@ -62,8 +62,8 @@
         #'jf/version-control/unfurl-issue-to-url
         :exclusive 'no))))
 
-(add-to-list 'completion-at-point-functions #'jf/version-control/issue-capf)
-(add-to-list 'completion-at-point-functions #'jf/version-control/project-capf)
+;; (add-to-list 'completion-at-point-functions #'jf/version-control/issue-capf)
+;; (add-to-list 'completion-at-point-functions #'jf/version-control/project-capf)
 
 ;;;; Service functions
 

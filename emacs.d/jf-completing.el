@@ -339,6 +339,7 @@ With a PREFIX jump to the agenda without starting the clock."
   (corfu-preview-current 'insert)       ; Preview current candidate?
   (corfu-preselect-first t)             ; Preselect first candidate?
   :preface
+  (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
   (defun corfu-move-to-minibuffer ()
     "Move \"popup\" completion candidates to minibuffer.
 Useful if you want a more robust view into the recommend candidates."
