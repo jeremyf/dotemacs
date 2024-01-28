@@ -134,7 +134,7 @@
 
   recentf-max-menu-items 50
 
-  recentf-max-saved-items 50
+  recentf-max-saved-items 200
 
   require-final-newline t
 
