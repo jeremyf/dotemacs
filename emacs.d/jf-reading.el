@@ -181,5 +181,10 @@ Alternative suggestions are: - '(\"\\\"“\" . \"\\\"\")"
   (text-scale-set 2)
   (turn-on-visual-line-mode))
 
+;; A package that emboldens word stems, helping read a bit faster.
+(use-package stem-reading-mode
+  :straight t
+  :custom (stem-reading-overlay t))
+
 (provide 'jf-reading)
 ;;; jf-reading.el ends here

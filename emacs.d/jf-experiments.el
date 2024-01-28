@@ -112,10 +112,6 @@ I'm uncertain if this is useful/practical.  However there is
 ;;               :host github
 ;;               :repo "ichernyshovvv/org-timeblock"))
 
-(use-package stem-reading-mode
-  :straight t
-  :custom (stem-reading-overlay t))
-
 (defun calculate-distance-to (to fun pred)
   "Calculate distance from BEG to END in units of FUN.
 Assume BEG <= END.  FUN is a function moving forward by one unit
