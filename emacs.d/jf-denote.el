@@ -148,7 +148,11 @@
        ("ø" . "o") ("ö" . "o") ("õ" . "o") ("ô" . "o") ("ó" . "o") ("ò" . "o")
        ("Ø" . "O") ("Ö" . "O") ("Õ" . "O") ("Ô" . "O") ("Ó" . "O") ("Ò" . "O")
        ("å" . "a") ("ä" . "a") ("ã" . "a") ("â" . "a") ("á" . "a") ("à" . "a")
-       ("Å" . "A") ("Ä" . "A") ("Ã" . "A") ("Â" . "A") ("Á" . "A") ("À" . "A"))
+       ("Å" . "A") ("Ä" . "A") ("Ã" . "A") ("Â" . "A") ("Á" . "A") ("À" . "A")
+       ("…" . "")  ;; Ellipsis
+       ("—" . "-") ;; em dash
+       ("–" . "-") ;; en dash
+       )
     "Map of diacritic to non-diacritic form.")
   (defun jf/remove-diacritics-from (string)
     "Remove the diacritics from STRING."
@@ -174,6 +178,15 @@
     "Use `org-id-get' to find/create ID."
     (org-id-get (point) 'create))
 
+  (defun jf/denote-sluggify (args)
+    (let ((type (car args))
+           (text (cadr args)))
+      (list type (cond
+                   ((eq 'title type) (jf/denote-sluggify-title text))
+                   ((eq 'signature type) (jf/denote-sluggify-signature text))
+                   (t text)))))
+
+  (advice-add #'denote-sluggify :filter-args #'jf/denote-sluggify)
   (advice-add #'denote-link-ol-get-id :override #'jf/denote-link-ol-get-id))
 
 (cl-defun jf/rename-file-to-denote-schema (&key file id title keywords
