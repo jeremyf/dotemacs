@@ -13,18 +13,18 @@
   :straight t
   :hook (dired-mode . org-download-enable))
 
-(use-package parsebib
-  :straight t)
+;; (use-package parsebib
+;;   :straight t)
 
-(use-package ebib
-  :straight t)
+;; (use-package ebib
+;;   :straight t)
 
-(use-package citar
-  :custom (citar-bibliography '("~/git/org/bibliography.bib"))
-  :straight t)
+;; (use-package citar
+;;   :custom (citar-bibliography '("~/git/org/bibliography.bib"))
+;;   :straight t)
 
-(use-package citar-denote
-  :straight t)
+;; (use-package citar-denote
+;;   :straight t)
 
 ;; https://github.com/ruediger/qrencode-el/
 ;;
@@ -32,14 +32,6 @@
 ;; characters)
 (use-package qrencode
   :straight t)
-
-;; I'm a huge fan of the Tufte style; my blog is based on that stylesheet and
-;; then further simplified
-(use-package org-tufte
-  :straight (org-tufte :host github :repo "Zilong-Li/org-tufte")
-  :config
-  (require 'org-tufte)
-  (setq org-tufte-htmlize-code t))
 
 ;; ;; A package to browse/read reddit in emacs and `org-mode' format.
 ;; (use-package reddigg
