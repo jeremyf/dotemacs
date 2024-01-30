@@ -63,10 +63,6 @@
   :init
   (add-hook 'logos-page-motion-hook #'logos--reveal-entry))
 
-(use-package spacious-padding
-  :straight t
-  :config (spacious-padding-mode 1))
-
 (use-package "nov.el"
   ;; A package to help in reading epubs.
   :straight t

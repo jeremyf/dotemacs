@@ -123,30 +123,6 @@ setting up an IDE-like layout)."
   "Set the various custom faces for both `treesit' and `tree-sitter'."
   (modus-themes-with-colors
     (custom-set-faces
-      `(rpgtk-critical-success-roll
-         ((,c :weight ultra-bold :foreground ,green)))
-      `(rpgtk-successful-roll
-          ((,c :weight bold :foreground ,olive)))
-      `(rpgtk-failed-roll
-         ((,c :weight bold :foreground ,rust)))
-      `(rpgtk-critical-failure-roll
-         ((,c :weight ultra-bold :foreground ,red-intense)))
-      `(rpgtk-middlin-roll
-         ((,c :weight bold :foreground ,yellow-intense)))
-      `(rpgtk-other-roll
-         ((,c :weight bold :foreground ,gold)))
-      `(rpgtk-roll-expression
-         ((,c :foreground ,gold)))
-      `(rpgtk-display-dice-sequence
-         ((,c :foreground ,fg-dim)))
-      `(rpgtk-display-dice-sequence-separator
-         ((,c :foreground ,fg-space)))
-      `(rpgtk-display-dice-sequence-border
-         ((,c :foreground ,fg-space)))
-      `(rpgtk-dimmed-display
-         ((,c :foreground ,fg-space)))
-      `(rpgtk-bright-display
-         ((,c :foreground ,fg-main)))
       ;; `(org-meta-line
       ;;   ((,c (:foreground ,yellow-faint))))
       `(denote-faces-link
