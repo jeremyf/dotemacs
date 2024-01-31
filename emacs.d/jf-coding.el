@@ -15,6 +15,10 @@
 ;;;; Pre-requisites
 (require 'jf-writing)
 
+(use-package adaptive-wrap
+  :custom (adaptive-wrap-extra-indent 4)
+  :straight t)
+
 (use-package treesit
   :straight (:type built-in)
   :init
