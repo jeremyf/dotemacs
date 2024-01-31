@@ -131,7 +131,7 @@
   (setq denote-file-name-letter-casing '((title . downcase)
                                      (signature . downcase)
                                      (keywords . verbatim)
-                                     (t . downcase)))
+                                          (t . downcase)))
   (defvar jf/diacritics-to-non-diacritics-map
     '(("ž" . "z") ("Ž" . "Z")
        ("ý" . "y") ("ÿ" . "y") ("Ÿ" . "Y")
@@ -268,6 +268,7 @@ When no FILE is provided use `buffer-file-name'.
 
 (require 'denote-org-extras)
 (require 'denote-journal-extras)
+(add-to-list 'org-tags-exclude-from-inheritance denote-journal-extras-keyword)
 (add-hook 'denote-journal-extras-hook #'jf/org-mode/agenda-files-update)
 
 (use-package consult-notes

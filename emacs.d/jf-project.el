@@ -76,7 +76,7 @@ With one PREFIX go to place where we would jump on capture."
   (require 'pulsar)
   (cond
     ((>= prefix 16)
-      (if-let ((filename (cdar (jf/project/list-projects :project "SoftServ"))))
+      (if-let ((filename (f-join denote-journal-extras-directory "20240131T000000--time-reporting.org")))
         (progn
           (org-link-open-as-file (concat filename "::*Timeblock") nil)
           (org-next-visible-heading 1)
