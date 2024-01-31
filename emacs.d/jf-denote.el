@@ -186,8 +186,19 @@
                    ((eq 'signature type) (jf/denote-sluggify-signature text))
                    (t text)))))
 
+  (defun jf/denote-filename-is-note-p (filename)
+    "Return non-nil if FILENAME is a valid name for a Denote note.
+For our purposes, its path must be part of the variable
+`denote-directory', it must have a Denote identifier in its name,
+and use one of the extensions implied by `denote-file-type'."
+    (and (or
+           (string-match-p "/Documents/denote-" (expand-file-name filename))
+           (string-prefix-p (denote-directory) (expand-file-name filename)))
+      (denote-file-has-identifier-p filename)
+      (denote-file-has-supported-extension-p filename)))
   (advice-add #'denote-sluggify :filter-args #'jf/denote-sluggify)
-  (advice-add #'denote-link-ol-get-id :override #'jf/denote-link-ol-get-id))
+  (advice-add #'denote-link-ol-get-id :override #'jf/denote-link-ol-get-id)
+  (advice-add #'denote-filename-is-note-p :override #'jf/denote-filename-is-note-p))
 
 (cl-defun jf/rename-file-to-denote-schema (&key file id title keywords
                                             dir date signature
@@ -268,6 +279,7 @@ When no FILE is provided use `buffer-file-name'.
 
 (require 'denote-org-extras)
 (require 'denote-journal-extras)
+(add-to-list 'denote-templates '(journal . "#+CATEGORY: Journal"))
 (add-to-list 'org-tags-exclude-from-inheritance denote-journal-extras-keyword)
 (add-hook 'denote-journal-extras-hook #'jf/org-mode/agenda-files-update)
 
@@ -512,6 +524,9 @@ See `denote-file-prompt'"
 
 (jf/denote/create-functions-for :domain "private"
   :key ?v)
+
+(jf/denote/create-functions-for :domain "journal"
+  :key ?j)
 
 ;;;;;; Epigraphs
 (cl-defun jf/denote/create-epigraph (&key

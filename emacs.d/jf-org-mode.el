@@ -495,9 +495,9 @@ Assumes that I'm on a :projects: headline.
   :config (global-org-modern-mode))
 
 ;; For automatically showing the invisible parts of org-mode.
-;; (use-package org-appear
-;;   :straight (:type git :host github :repo "awth13/org-appear")
-;;   :hook (org-mode . org-appear-mode))
+(use-package org-appear
+  :straight (:type git :host github :repo "awth13/org-appear")
+  :hook (org-mode . org-appear-mode))
 
 ;;; Org Export and Composition Functionality
 (setq org-export-global-macros (list))
@@ -962,7 +962,7 @@ I envision this function called from the command-line."
          :jump-to-captured t)
        ("t" "Task (via Journal)"
          entry (function denote-journal-extras-new-or-existing-entry)
-         "* %^{Task: } :%(jf/project-as-tag):\n\n- Link to Project :: %(jf/project-as-link)\n\n%?"
+         "* %^{Task} :%(jf/project-as-tag):\n\n- Link to Project :: %(jf/project-as-link)\n\n%?"
          :empty-lines-before 1
          :empty-lines-after 1
          :clock-in t
