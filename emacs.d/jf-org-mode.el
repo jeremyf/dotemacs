@@ -105,6 +105,9 @@ first matching link."
   :straight (org :type git :host github :repo "emacsmirror/org")
   :hook
   (org-mode . (lambda ()
+                (add-hook 'org-mode-hook
+                  (lambda ()
+                    (add-hook 'before-save-hook 'jf/org-add-ids-to-headlines-in-file nil 'local)))
                 (jf/org-capf)
                 (turn-on-visual-line-mode)
                 (electric-pair-mode -1)))
@@ -115,10 +118,13 @@ first matching link."
   ;; (org-mode . org-indent-mode)
   :bind ("C-c C-j" . jf/project/jump-to-task)
   ("C-c C-x C-j" . org-clock-goto)
-  :bind (:map org-mode-map (("C-c C-j" . jf/project/jump-to-task)
+  :bind (:map org-mode-map (("C-c j" . org-goto)
+                             ("C-c C-j" . jf/project/jump-to-task)
                              ("C-x n t" . jf/org-mode/narrow-to-date)
                              ("C-j" . avy-goto-char-timer)))
   :custom (org-use-speed-commands t)
+  (org-outline-path-complete-in-steps nil)
+  (org-goto-interface #'outline-path-completion)
   (org-time-stamp-rounding-minutes '(0 15))
   (org-clock-rounding-minutes 15)
   (org-link-frame-setup '((vm . vm-visit-folder-other-frame)
@@ -197,6 +203,13 @@ first matching link."
       (let ((denote-directory (f-join denote-directory "blog-posts")))
         (denote-org-capture))))
 
+  ;; https://stackoverflow.com/questions/13340616/assign-ids-to-every-entry-in-org-mode
+  (defun jf/org-add-ids-to-headlines-in-file ()
+    "Conditionally add ID properties to all file's headlines without an ID."
+    (interactive)
+    (org-map-entries 'org-id-get-create))
+
+
   (setq org-latex-default-class "jf/article")
 
   (org-babel-do-load-languages 'org-babel-load-languages
@@ -246,39 +259,6 @@ first matching link."
 (defun jf/org-confirm-babel-evaluate (lang body)
   "Regardless of LANG and BODY approve it."
   nil)
-
-;;; Additional Functionality for Org Mode
-;; Cribbed from https://xenodium.com/emacs-dwim-do-what-i-mean/
-(defun jf/org-insert-link-dwim (parg &rest args)
-  "Like `org-insert-link' but with personal dwim preferences.
-
-  With PARG, skip personal dwim preferences.  Pass ARGS."
-  (interactive "P")
-  (let* ((point-in-link (org-in-regexp org-link-any-re 1))
-          (clipboard-url (when (string-match-p "^http" (current-kill 0))
-                           (current-kill 0)))
-          (region-content (when (region-active-p)
-                            (buffer-substring-no-properties (region-beginning)
-                              (region-end)))))
-    (cond
-      ((car parg)
-        (call-interactively 'org-insert-link nil nil))
-      ((and region-content clipboard-url (not point-in-link))
-        (delete-region (region-beginning) (region-end))
-        (insert (org-make-link-string clipboard-url region-content)))
-      ((and clipboard-url (not point-in-link))
-        (insert (org-make-link-string
-                  clipboard-url
-                  (read-string "Title: "
-                    (with-current-buffer
-                      (url-retrieve-synchronously clipboard-url)
-                      (dom-text (car
-                                  (dom-by-tag (libxml-parse-html-region
-                                                (point-min)
-                                                (point-max))
-                                    'title))))))))
-      (t
-        (call-interactively 'org-insert-link)))))
 
 ;;; Org Mode time tracking and task tracking adjustments
 
@@ -980,7 +960,15 @@ I envision this function called from the command-line."
          :clock-keep t
          :empty-lines-before 1
          :jump-to-captured t)
-       ("t" "Task (for Project)"
+       ("t" "Task (via Journal)"
+         entry (function denote-journal-extras-new-or-existing-entry)
+         "* %^{Task: } :%(jf/project-as-tag):\n\n- Link to Project :: %(jf/project-as-link)\n\n%?"
+         :empty-lines-before 1
+         :empty-lines-after 1
+         :clock-in t
+         :clock-keep t
+         :jump-to-captured t)
+       ("T" "Task (via Project)"
          plain (function jf/org-mode/capture/project-task/find)
          "%?"
          :empty-lines-before 1
@@ -994,6 +982,27 @@ I envision this function called from the command-line."
          :empty-lines-before 1
          :empty-lines-after 1)))
 
+(defvar jf/link-to-project nil)
+
+(defun jf/project-as-tag ()
+  "Prompt for project and kill link to project."
+  (let* ((project
+           (completing-read "Project: " (jf/project/list-projects)))
+          (keyword
+            (denote-sluggify-keyword project))
+          (file
+            (cdar (jf/project/list-projects :project project)))
+          (identifier (denote-retrieve-filename-identifier file)))
+    (setq jf/link-to-project (format "[[denote:%s][%s]]" identifier project))
+    keyword))
+
+(defun jf/project-as-link ()
+  (let ((link jf/link-to-project))
+    (setq jf/link-to-project nil)
+    link))
+
+(defun jf/derive-project-tag ()
+  )
 ;; (use-package org-noter
 ;;              :straight
 ;;              (:repo "org-noter/org-noter"
@@ -1098,16 +1107,6 @@ holding contextual information."
      (plist-put plist :section-numbers nil)))
   plist)
 (add-to-list 'org-export-filter-options-functions #'jf/org-export-change-options)
-
-;; https://stackoverflow.com/questions/13340616/assign-ids-to-every-entry-in-org-mode
-(defun jf/org-add-ids-to-headlines-in-file ()
-  "Conditionally add ID properties to all file's headlines without an ID."
-  (interactive)
-  (org-map-entries 'org-id-get-create))
-
-(add-hook 'org-mode-hook
-  (lambda ()
-    (add-hook 'before-save-hook 'jf/org-add-ids-to-headlines-in-file nil 'local)))
 
 (use-package org-web-tools
   :straight t)

@@ -78,7 +78,6 @@
   :hook (dired-mode . denote-dired-mode)
   (org-mode . denote-rename-buffer-mode)
   :init
-  (require 'denote-org-extras)
   (setq denote-known-keywords
     (split-string-and-unquote
       (shell-command-to-string
@@ -91,6 +90,7 @@
           "ruby -ne 'puts $_.gsub(/^(\\w)\\w+-/) { |m| m[0].upcase + m[1..-1] }.gsub(/-(\\w)/) { |m| m[1].upcase }'"))
       "\n"))
   :custom
+  (denote-journal-extras-title-format 'day-date-month-year)
   (denote-infer-keywords t)
   (denote-excluded-punctuation-regexp "[][{}!@#$%^&*()=+'\"?,.|;:~`‘’“”/—–]*")
   (denote-modules '(xref ffap))
@@ -265,6 +265,10 @@ When no FILE is provided use `buffer-file-name'.
         (denote-rename-file-and-buffer file new-file)
         (denote-update-dired-buffers)))
     new-file))
+
+(require 'denote-org-extras)
+(require 'denote-journal-extras)
+(add-hook 'denote-journal-extras-hook #'jf/org-mode/agenda-files-update)
 
 (use-package consult-notes
   ;;Let’s add another way at looking up files.  I appreciate the ability to
