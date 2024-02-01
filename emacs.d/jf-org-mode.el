@@ -123,6 +123,7 @@ first matching link."
                              ("C-x n t" . jf/org-mode/narrow-to-date)
                              ("C-j" . avy-goto-char-timer)))
   :config
+  (org-clock-persistence-insinuate)
   (setq org-use-speed-commands t)
   (setq org-outline-path-complete-in-steps nil)
   (setq org-goto-interface #'outline-path-completion)
@@ -209,9 +210,6 @@ first matching link."
     (interactive)
     (org-map-entries 'org-id-get-create))
 
-
-  (setq org-latex-default-class "jf/article")
-
   (org-babel-do-load-languages 'org-babel-load-languages
     (append org-babel-load-languages
       '((emacs-lisp . t)
@@ -223,21 +221,9 @@ first matching link."
   (add-to-list 'org-structure-template-alist '("S" . "summary"))
   (add-to-list 'org-structure-template-alist '("U" . "update"))
   (add-to-list 'org-structure-template-alist '("i" . "inlinecomment"))
-  :init
-  (require 'ox)
   ;; I grabbed from the following LaTeX class from
   ;; https://www.reddit.com/r/emacs/comments/3zcr43/nooborgmode_custom_latexpdf_export_custom_style/.
   ;; I’m trash with LaTeX, but like the layout thusfar.
-
-  ;; (setq org-latex-classes '())
-  (add-to-list 'org-latex-classes
-    '("jf/article"
-       "\\documentclass[11pt,a4paper]{article}"
-       ("\\section{%s}" . "\\section{%s}")
-       ("\\subsection{%s}" . "\\subsection{%s}")
-       ("\\subsubsection{%s}" . "\\subsubsection{%s}")
-       ("\\paragraph{%s}" . "\\paragraph{%s}")
-       ("\\subparagraph{%s}" . "\\subparagraph{%s}")))
 
   ;; \\hypersetup{colorlinks=false,pdfborderstyle={/S/U/W 1},pdfborder=0 0 1}"
   ;; Make TAB act as if it were issued from the buffer of the languages's major
@@ -254,7 +240,80 @@ first matching link."
           ("C-s-t" . org-toggle-link-display)))
 
 (with-eval-after-load 'org
-  (org-clock-persistence-insinuate))
+  (use-package ox
+    :straight (ox :type built-in)
+    :config
+    (add-to-list 'org-export-global-macros
+      '("kbd" . "@@html:<kbd>@@$1@@html:</kbd>@@"))
+    (add-to-list 'org-export-global-macros
+      '("cite" . "@@html:<cite>@@$1@@html:</cite>@@"))
+    (add-to-list 'org-export-global-macros
+      '("dfn" . "@@html:<dfn>@@$1@@html:</dfn>@@"))
+    (add-to-list 'org-export-global-macros
+      '("mark" . "@@html:<mark>@@$1@@html:</mark>@@"))
+    (add-to-list 'org-export-global-macros
+      '("scene-date" . "#+begin_marginnote\nThe scene occurs on @@html:<span class=\"time\">@@$1@@html:</span>@@.\n#+end_marginnote"))
+    (add-to-list 'org-export-global-macros
+      '("mention" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" >}}@@"))
+    (add-to-list 'org-export-global-macros
+      '("abbr" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" abbr=\"t\" >}}@@"))
+    (add-to-list 'org-export-global-macros
+      '("abbr-plural" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" abbr=\"t\" plural=\"t\" >}}@@"))
+    (add-to-list 'org-export-global-macros
+      '("i" . "@@html:<i class=\"dfn\">@@$1@@html:</i>@@"))
+    (add-to-list 'org-export-global-macros
+      '("mechanic" . "@@html:<i class=\"mechanic\">@@$1@@html:</i>@@"))
+    (add-to-list 'org-export-global-macros
+      '("m" . "@@html:<i class=\"mechanic\">@@$1@@html:</i>@@"))
+    (add-to-list 'org-export-global-macros
+      '("newline" . "@@latex:\\@@ @@html:<br />@@"))
+    (add-to-list 'org-export-global-macros
+      '("newpage" . "@@latex:\newpage@@"))
+    (add-to-list 'org-export-global-macros
+      '("rune" . "@@hugo:<span class=\"rune\">@@$1@@hugo:</span>@@"))
+    (add-to-list 'org-export-global-macros
+      '("linkToSeries" . "@@hugo:{{< linkToSeries \"@@$1@@hugo:\" >}}@@"))
+    (add-to-list 'org-latex-classes
+      '("jf/article"
+         "\\documentclass[11pt,a4paper]{article}"
+         ("\\section{%s}" . "\\section{%s}")
+         ("\\subsection{%s}" . "\\subsection{%s}")
+         ("\\subsubsection{%s}" . "\\subsubsection{%s}")
+         ("\\paragraph{%s}" . "\\paragraph{%s}")
+         ("\\subparagraph{%s}" . "\\subparagraph{%s}")))
+    (setq org-latex-default-class "jf/article"))
+  (require 'ox)
+
+  (use-package ox-gfm
+    :straight t
+    :init
+    (require 'ox-gfm))
+
+
+  ;; In
+  ;; https://takeonrules.com/2022/02/26/note-taking-with-org-roam-and-transclusion/,
+  ;; I wrote about ~org-transclusion~.  The quick version, ~org-transclusion~
+  ;; allows you to include text from one file into another.  This allows for
+  ;; document composition.
+  (use-package org-transclusion
+    :straight t
+    :init (setq org-transclusion-exclude-elements '(property-drawer keyword)))
+
+
+  ;; I love the work of Daniel Mendler (https://github.com/minad).
+  ;; This package gives a bit of visual chrome to org files.
+  (use-package org-modern
+    :straight (:host github :repo "minad/org-modern")
+    :custom ((org-modern-star '("◉" "○" "◈" "◇" "•"))
+              ;; Showing the depth of stars helps with the speed keys as well as
+              ;; gives a clearer indicator of the depth of the outline.
+              (org-modern-hide-stars nil))
+    :config (global-org-modern-mode))
+
+  ;; For automatically showing the invisible parts of org-mode.
+  (use-package org-appear
+    :straight (:type git :host github :repo "awth13/org-appear")
+    :hook (org-mode . org-appear-mode)))
 
 (defun jf/org-confirm-babel-evaluate (lang body)
   "Regardless of LANG and BODY approve it."
@@ -473,67 +532,8 @@ Assumes that I'm on a :projects: headline.
 ;; smartquote handling.
 (require 'jf-formatting)
 
-
-;; In
-;; https://takeonrules.com/2022/02/26/note-taking-with-org-roam-and-transclusion/,
-;; I wrote about ~org-transclusion~.  The quick version, ~org-transclusion~
-;; allows you to include text from one file into another.  This allows for
-;; document composition.
-(use-package org-transclusion
-  :straight t
-  :init (setq org-transclusion-exclude-elements '(property-drawer keyword)))
-
-
-;; I love the work of Daniel Mendler (https://github.com/minad).
-;; This package gives a bit of visual chrome to org files.
-(use-package org-modern
-  :straight (:host github :repo "minad/org-modern")
-  :custom ((org-modern-star '("◉" "○" "◈" "◇" "•"))
-            ;; Showing the depth of stars helps with the speed keys as well as
-            ;; gives a clearer indicator of the depth of the outline.
-            (org-modern-hide-stars nil))
-  :config (global-org-modern-mode))
-
-;; For automatically showing the invisible parts of org-mode.
-(use-package org-appear
-  :straight (:type git :host github :repo "awth13/org-appear")
-  :hook (org-mode . org-appear-mode))
-
 ;;; Org Export and Composition Functionality
 (setq org-export-global-macros (list))
-(use-package ox
-  :straight (ox :type built-in)
-  :config
-  (add-to-list 'org-export-global-macros
-    '("kbd" . "@@html:<kbd>@@$1@@html:</kbd>@@"))
-  (add-to-list 'org-export-global-macros
-    '("cite" . "@@html:<cite>@@$1@@html:</cite>@@"))
-  (add-to-list 'org-export-global-macros
-    '("dfn" . "@@html:<dfn>@@$1@@html:</dfn>@@"))
-  (add-to-list 'org-export-global-macros
-    '("mark" . "@@html:<mark>@@$1@@html:</mark>@@"))
-  (add-to-list 'org-export-global-macros
-    '("scene-date" . "#+begin_marginnote\nThe scene occurs on @@html:<span class=\"time\">@@$1@@html:</span>@@.\n#+end_marginnote")))
-(add-to-list 'org-export-global-macros
-  '("mention" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" >}}@@"))
-(add-to-list 'org-export-global-macros
-  '("abbr" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" abbr=\"t\" >}}@@"))
-(add-to-list 'org-export-global-macros
-  '("abbr-plural" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" abbr=\"t\" plural=\"t\" >}}@@"))
-(add-to-list 'org-export-global-macros
-  '("i" . "@@html:<i class=\"dfn\">@@$1@@html:</i>@@"))
-(add-to-list 'org-export-global-macros
-  '("mechanic" . "@@html:<i class=\"mechanic\">@@$1@@html:</i>@@"))
-(add-to-list 'org-export-global-macros
-  '("m" . "@@html:<i class=\"mechanic\">@@$1@@html:</i>@@"))
-(add-to-list 'org-export-global-macros
-  '("newline" . "@@latex:\\@@ @@html:<br />@@"))
-(add-to-list 'org-export-global-macros
-  '("newpage" . "@@latex:\newpage@@"))
-(add-to-list 'org-export-global-macros
-  '("rune" . "@@hugo:<span class=\"rune\">@@$1@@hugo:</span>@@"))
-(add-to-list 'org-export-global-macros
-  '("linkToSeries" . "@@hugo:{{< linkToSeries \"@@$1@@hugo:\" >}}@@"))'
 
 (defun jf/org-link-delete-link ()
   "Remove the link part of `org-mode' keeping only description."
@@ -652,7 +652,7 @@ Assumes that I'm on a :projects: headline.
   (defun jf/org-copy-region-as-markdown ()
     "Copy the region (in Org) to the system clipboard as Markdown."
     (interactive)
-    (require 'ox)
+
     (if (use-region-p)
       (let* ((region
                (buffer-substring-no-properties
