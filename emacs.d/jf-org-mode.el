@@ -122,17 +122,17 @@ first matching link."
                              ("C-c C-j" . jf/project/jump-to-task)
                              ("C-x n t" . jf/org-mode/narrow-to-date)
                              ("C-j" . avy-goto-char-timer)))
-  :custom (org-use-speed-commands t)
-  (org-outline-path-complete-in-steps nil)
-  (org-goto-interface #'outline-path-completion)
-  (org-time-stamp-rounding-minutes '(0 15))
-  (org-clock-rounding-minutes 15)
-  (org-link-frame-setup '((vm . vm-visit-folder-other-frame)
+  :config
+  (setq org-use-speed-commands t)
+  (setq org-outline-path-complete-in-steps nil)
+  (setq org-goto-interface #'outline-path-completion)
+  (setq org-time-stamp-rounding-minutes '(0 15))
+  (setq org-clock-rounding-minutes 15)
+  (setq org-link-frame-setup '((vm . vm-visit-folder-other-frame)
                            (vm-imap . vm-visit-imap-folder-other-frame)
                            (gnus . org-gnus-no-new-news)
                            (file . find-file)
                            (wl . wl-other-frame)))
-  :config
   (setq org-clock-persist 'history)
   (setq org-export-headline-levels 4)
   ;; When I would load the agenda, I'd invariably type "l" to list the entries.
@@ -228,8 +228,8 @@ first matching link."
   ;; I grabbed from the following LaTeX class from
   ;; https://www.reddit.com/r/emacs/comments/3zcr43/nooborgmode_custom_latexpdf_export_custom_style/.
   ;; I’m trash with LaTeX, but like the layout thusfar.
-  (progn
-  (setq org-latex-classes '())
+
+  ;; (setq org-latex-classes '())
   (add-to-list 'org-latex-classes
     '("jf/article"
        "\\documentclass[11pt,a4paper]{article}"
@@ -237,7 +237,7 @@ first matching link."
        ("\\subsection{%s}" . "\\subsection{%s}")
        ("\\subsubsection{%s}" . "\\subsubsection{%s}")
        ("\\paragraph{%s}" . "\\paragraph{%s}")
-       ("\\subparagraph{%s}" . "\\subparagraph{%s}"))))
+       ("\\subparagraph{%s}" . "\\subparagraph{%s}")))
 
   ;; \\hypersetup{colorlinks=false,pdfborderstyle={/S/U/W 1},pdfborder=0 0 1}"
   ;; Make TAB act as if it were issued from the buffer of the languages's major
