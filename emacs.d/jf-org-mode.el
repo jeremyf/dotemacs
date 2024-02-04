@@ -109,6 +109,7 @@ first matching link."
                   (lambda ()
                     (add-hook 'before-save-hook 'jf/org-add-ids-to-headlines-in-file nil 'local)))
                 (jf/org-capf)
+                (setq-local tab-width 8)
                 (turn-on-visual-line-mode)
                 (electric-pair-mode -1)))
   ;; Disable org-indent-mode; it's easy enough to enable.  The primary reason is
@@ -241,49 +242,47 @@ first matching link."
 
 (with-eval-after-load 'org
   (use-package ox
-    :straight (ox :type built-in)
-    :config
-    (add-to-list 'org-export-global-macros
-      '("kbd" . "@@html:<kbd>@@$1@@html:</kbd>@@"))
-    (add-to-list 'org-export-global-macros
-      '("cite" . "@@html:<cite>@@$1@@html:</cite>@@"))
-    (add-to-list 'org-export-global-macros
-      '("dfn" . "@@html:<dfn>@@$1@@html:</dfn>@@"))
-    (add-to-list 'org-export-global-macros
-      '("mark" . "@@html:<mark>@@$1@@html:</mark>@@"))
-    (add-to-list 'org-export-global-macros
-      '("scene-date" . "#+begin_marginnote\nThe scene occurs on @@html:<span class=\"time\">@@$1@@html:</span>@@.\n#+end_marginnote"))
-    (add-to-list 'org-export-global-macros
-      '("mention" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" >}}@@"))
-    (add-to-list 'org-export-global-macros
-      '("abbr" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" abbr=\"t\" >}}@@"))
-    (add-to-list 'org-export-global-macros
-      '("abbr-plural" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" abbr=\"t\" plural=\"t\" >}}@@"))
-    (add-to-list 'org-export-global-macros
-      '("i" . "@@html:<i class=\"dfn\">@@$1@@html:</i>@@"))
-    (add-to-list 'org-export-global-macros
-      '("mechanic" . "@@html:<i class=\"mechanic\">@@$1@@html:</i>@@"))
-    (add-to-list 'org-export-global-macros
-      '("m" . "@@html:<i class=\"mechanic\">@@$1@@html:</i>@@"))
-    (add-to-list 'org-export-global-macros
-      '("newline" . "@@latex:\\@@ @@html:<br />@@"))
-    (add-to-list 'org-export-global-macros
-      '("newpage" . "@@latex:\newpage@@"))
-    (add-to-list 'org-export-global-macros
-      '("rune" . "@@hugo:<span class=\"rune\">@@$1@@hugo:</span>@@"))
-    (add-to-list 'org-export-global-macros
-      '("linkToSeries" . "@@hugo:{{< linkToSeries \"@@$1@@hugo:\" >}}@@"))
-    (add-to-list 'org-latex-classes
-      '("jf/article"
-         "\\documentclass[11pt,a4paper]{article}"
-         ("\\section{%s}" . "\\section{%s}")
-         ("\\subsection{%s}" . "\\subsection{%s}")
-         ("\\subsubsection{%s}" . "\\subsubsection{%s}")
-         ("\\paragraph{%s}" . "\\paragraph{%s}")
-         ("\\subparagraph{%s}" . "\\subparagraph{%s}")))
-    (setq org-latex-default-class "jf/article"))
-  (require 'ox)
+    :straight (ox :type built-in))
 
+  (add-to-list 'org-export-global-macros
+    '("kbd" . "@@html:<kbd>@@$1@@html:</kbd>@@"))
+  (add-to-list 'org-export-global-macros
+    '("cite" . "@@html:<cite>@@$1@@html:</cite>@@"))
+  (add-to-list 'org-export-global-macros
+    '("dfn" . "@@html:<dfn>@@$1@@html:</dfn>@@"))
+  (add-to-list 'org-export-global-macros
+    '("mark" . "@@html:<mark>@@$1@@html:</mark>@@"))
+  (add-to-list 'org-export-global-macros
+    '("scene-date" . "#+begin_marginnote\nThe scene occurs on @@html:<span class=\"time\">@@$1@@html:</span>@@.\n#+end_marginnote"))
+  (add-to-list 'org-export-global-macros
+    '("mention" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" >}}@@"))
+  (add-to-list 'org-export-global-macros
+    '("abbr" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" abbr=\"t\" >}}@@"))
+  (add-to-list 'org-export-global-macros
+    '("abbr-plural" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" abbr=\"t\" plural=\"t\" >}}@@"))
+  (add-to-list 'org-export-global-macros
+    '("i" . "@@html:<i class=\"dfn\">@@$1@@html:</i>@@"))
+  (add-to-list 'org-export-global-macros
+    '("mechanic" . "@@html:<i class=\"mechanic\">@@$1@@html:</i>@@"))
+  (add-to-list 'org-export-global-macros
+    '("m" . "@@html:<i class=\"mechanic\">@@$1@@html:</i>@@"))
+  (add-to-list 'org-export-global-macros
+    '("newline" . "@@latex:\\@@ @@html:<br />@@"))
+  (add-to-list 'org-export-global-macros
+    '("newpage" . "@@latex:\newpage@@"))
+  (add-to-list 'org-export-global-macros
+    '("rune" . "@@hugo:<span class=\"rune\">@@$1@@hugo:</span>@@"))
+  (add-to-list 'org-export-global-macros
+    '("linkToSeries" . "@@hugo:{{< linkToSeries \"@@$1@@hugo:\" >}}@@"))
+  (add-to-list 'org-latex-classes
+    '("jf/article"
+       "\\documentclass[11pt,a4paper]{article}"
+       ("\\section{%s}" . "\\section{%s}")
+       ("\\subsection{%s}" . "\\subsection{%s}")
+       ("\\subsubsection{%s}" . "\\subsubsection{%s}")
+       ("\\paragraph{%s}" . "\\paragraph{%s}")
+       ("\\subparagraph{%s}" . "\\subparagraph{%s}")))
+  (setq org-latex-default-class "jf/article")
   (use-package ox-gfm
     :straight t
     :init

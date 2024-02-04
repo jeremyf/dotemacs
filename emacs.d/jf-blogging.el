@@ -9,10 +9,10 @@
 ;; Packages specifically here for helping with my writing activities.
 
 ;;; Code:
-(require 'ox)
-
 (require 'jf-formatting)
+(with-eval-after-load 'org
 
+  (require 'ox)
 (use-package ox-hugo
   :straight t
   :custom
@@ -625,7 +625,7 @@ Add the blog post to the given SERIES with the given KEYWORDS."
       ('ascii (format "%s (%s)" desc link))
       (_ (format "%s (%s)" desc link)))))
 
-(with-eval-after-load 'org
+
   (org-link-set-parameters
    "table"
    :complete #'jf/org/link-table-complete
