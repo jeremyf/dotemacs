@@ -126,6 +126,7 @@ first matching link."
   :config
   (org-clock-persistence-insinuate)
   (setq org-use-speed-commands t)
+  (setq org-agenda-clockreport-parameter-plist '(:link t :maxlevel 2 :stepskip0 t :fileskip0 t :filetitle t :tags t))
   (setq org-outline-path-complete-in-steps nil)
   (setq org-goto-interface #'outline-path-completion)
   (setq org-time-stamp-rounding-minutes '(0 15))
