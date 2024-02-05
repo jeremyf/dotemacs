@@ -200,6 +200,18 @@ and use one of the extensions implied by `denote-file-type'."
   (advice-add #'denote-link-ol-get-id :override #'jf/denote-link-ol-get-id)
   (advice-add #'denote-filename-is-note-p :override #'jf/denote-filename-is-note-p))
 
+(defun jf/dired-rename-files-to-denote-schema ()
+  "Rename marked files in `dired-mode'."
+  (interactive)
+  (when (seq-find (lambda (file)
+                    (member (file-name-nondirectory file) '("." "..")))
+                  (dired-get-marked-files))
+    (user-error "Can't rename \".\" or \"..\" files"))
+  (dolist (file (dired-get-marked-files))
+    (let ((current-prefix-arg nil))
+      (apply #'jf/rename-file-to-denote-schema
+        (list :file file :signature :prompt)))))
+
 (cl-defun jf/rename-file-to-denote-schema (&key file id title keywords
                                             dir date signature
                                             force dry-run)
@@ -241,7 +253,10 @@ When no FILE is provided use `buffer-file-name'.
                       (buffer-file-name))))
           (title
             (or title
-              (read-string "Title: " (s-titleized-words (f-base file)))))
+              (read-string "Title: "
+                (denote-desluggify-title
+                  (or (denote-retrieve-filename-title file)
+                    (s-titleized-words (f-base file)))))))
           (id
             (or (denote-retrieve-filename-identifier file)
               id
@@ -254,14 +269,14 @@ When no FILE is provided use `buffer-file-name'.
                 (denote-keywords-prompt))))
           (signature
             (or (when (equal signature :none) "")
-              signature
-              (when current-prefix-arg
+              (and signature (not (equal signature :prompt)))
+              (when (or current-prefix-arg (equal signature :prompt))
 		            (completing-read "Signature: " (jf/tor-series-list)))
               ""))
           (dir
             (f-join
-              (or dir
-                (if current-prefix-arg
+              (or (and dir (not (equal dir :prompt)))
+                (if (or current-prefix-arg (equal dir :prompt))
                   (call-interactively (lambda (d)
                                         (interactive "D") d))
                   (f-dirname file)))
