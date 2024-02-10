@@ -415,28 +415,6 @@ With ARG, do this that many times."
 
 (add-to-list 'find-file-not-found-functions #'jf/auto-create-missing-dirs)
 
-(use-package run-command
-  ;; A means of registering shell commands that I can easily run in Emacs.
-  :straight t
-  :preface
-  (defun jf/run-command-recipes ()
-    "Run command recipes"
-    (list
-      (let ((dir (projectile-project-root)))
-        (when (f-exists? (f-join (projectile-project-root) "Gemfile.lock"))
-          (list :command-name "run-command-samvera-versions"
-            ;; TODO: Extract some of this as a command.
-            :command-line (format "cd %s; rg \"^ +((bulk|hy)rax([-_].*)?|\\(*.\\)iiif\\(*.\\)|rails|qa|blacklight([-_].*)?) \\(\\d+\\.\\d+\\.\\d+\" Gemfile.lock | sort" dir)
-            :display (format "Samvera gem versions for %s" dir))))
-      (list :command-name "install-dotzshrc-files"
-        :command-line "cd ~/git/dotzshrc; ruby install.rb"
-        :display "Install dotzshrc files")
-      (list :command-name "run-command-takeonrules-server"
-        :command-line "cd ~/git/takeonrules.source/; bin/rake knowledge_manager:pull"
-        :display "Serve takeonrules.com locally")))
-  :config
-  (add-to-list 'run-command-recipes 'jf/run-command-recipes))
-
 (defun jf/get-line-text (&optional delta)
   "Copy the text of the line at DELTA lines from point.
 
