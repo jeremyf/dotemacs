@@ -35,7 +35,7 @@
       (user-error "No function to select")))
 
   (defun jf/treesit/wrap-rubocop (&optional given-cops)
-    "Wrap the current ruby active region or function by disabling/enabling the GIVEN-COPS."
+    "Wrap the current ruby region by disabling/enabling the GIVEN-COPS."
     (interactive)
     (if (derived-mode-p 'ruby-ts-mode 'ruby-mode)
       (if-let ((beg (if (use-region-p)
@@ -159,6 +159,7 @@ method, get the containing class."
 
 (use-package eglot
   :straight (:type built-in)
+  ;; :straight (:type built-in)
   ;; The Language Server Protocol (LSP) is a game changer; having access to that
   ;; tooling is very much a nice to have.
   :hook ((css-mode css-ts-mode
@@ -261,7 +262,9 @@ method, get the containing class."
   :config (magit-todos-mode)
   :commands (magit-todos-list)
   :custom (magit-todos-exclude-globs '(".git/" "public/"))
-  (magit-todos-insert-after '(bottom) nil nil "Changed by setter of obsolete option `magit-todos-insert-at'")
+  (magit-todos-insert-after
+    '(bottom) nil nil
+    "Changed by setter of obsolete option `magit-todos-insert-at'")
   :straight (:host github :repo "alphapapa/magit-todos"))
 
 (use-package lua-mode
@@ -284,9 +287,13 @@ method, get the containing class."
       (save-excursion
         (goto-char (point-min))
         (while (re-search-forward "^\\(##+\\)\\s-+\\(.*\\)" nil t)
-          (let* ((level (length (match-string 1)))
-                  (heading-text (match-string 2))
-                  (heading-id (downcase (replace-regexp-in-string "[[:space:]]+" "-" heading-text))))
+          (let* ((level
+                   (length (match-string 1)))
+                  (heading-text
+                    (match-string 2))
+                  (heading-id
+                    (downcase (replace-regexp-in-string
+                                "[[:space:]]+" "-" heading-text))))
             (when (<= level max-depth)
               (push (cons level (cons heading-text heading-id)) toc-list)))))
       (setq toc-list (reverse toc-list))
@@ -365,15 +372,19 @@ method, get the containing class."
   ;; Ruby land when you have lib/my_file.rb, the corresponding spec should be in
   ;; spec/my_file_spec.rb; and when you have app/models/my_file.rb, the spec
   ;; should be in spec/models/my_file_spec.rb
-  :bind (:map rspec-mode-map (("s-." . 'rspec-toggle-spec-and-target)
-                               ("C-c y r" . 'jf/yank-bundle-exec-rspec-to-clipboard)))
+  :bind (:map rspec-mode-map (("s-." .
+                                'rspec-toggle-spec-and-target)
+                               ("C-c y r" .
+                                 'jf/yank-bundle-exec-rspec-to-clipboard)))
   :bind (:map ruby-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
   :preface
   (defun jf/yank-bundle-exec-rspec-to-clipboard ()
     "Grab a ready to run rspec command."
     (interactive)
-    (let* ((filename (file-relative-name (buffer-file-name) (projectile-project-root)))
-            (text (format "bundle exec rspec %s:%s" filename (line-number-at-pos))))
+    (let* ((filename
+             (file-relative-name (buffer-file-name) (projectile-project-root)))
+            (text
+              (format "bundle exec rspec %s:%s" filename (line-number-at-pos))))
       (kill-new text)
       (message "Added to kill ring...%s" text)
       text))
@@ -545,7 +556,8 @@ See `add-log-current-defun-function'."
 (defun jf/commend-header-forward ()
   "Move to next line matching `jf/comment-header-regexp/ruby-mode'."
   (interactive)
-  (let ((regexp (alist-get major-mode jf/comment-header-regexp/major-modes-alist)))
+  (let ((regexp
+          (alist-get major-mode jf/comment-header-regexp/major-modes-alist)))
     (when (string-match-p
             regexp
             (buffer-substring-no-properties
@@ -562,7 +574,8 @@ See `add-log-current-defun-function'."
 
 (defun jf/comment-header-backward ()
   (interactive)
-    (let ((regexp (alist-get major-mode jf/comment-header-regexp/major-modes-alist)))
+  (let ((regexp
+          (alist-get major-mode jf/comment-header-regexp/major-modes-alist)))
   (when (string-match-p
           regexp
           (buffer-substring-no-properties
@@ -588,15 +601,24 @@ See `add-log-current-defun-function'."
   "Configure the `treesit' provided `ruby-ts-mode'."
   ;; I encountered some loading issues where ruby-ts-mode was not available
   ;; during my understanding of the use-package life-cycle.
-  (setq-local add-log-current-defun-function #'jf/treesit/yank-qualified-method-fname)
-  (define-key ruby-ts-mode-map (kbd "C-M-h") #'jf/treesit/function-select)
-  (define-key ruby-ts-mode-map (kbd "C-c y f") #'jf/yank-current-scoped-function-name)
-  (define-key ruby-ts-mode-map (kbd "C-c y y") #'jf/ruby-mode/yank-yardoc)
-  (define-key ruby-ts-mode-map (kbd "s-ESC") #'jf/comment-header-backward)
-  (define-key ruby-ts-mode-map (kbd "C-s-]") #'jf/commend-header-forward)
-  (define-key ruby-ts-mode-map (kbd "C-c w r") #'jf/treesit/wrap-rubocop)
-  (define-key ruby-ts-mode-map (kbd "M-{") #'ruby-beginning-of-block)
-  (define-key ruby-ts-mode-map (kbd "M-}") #'ruby-end-of-block))
+  (setq-local add-log-current-defun-function
+    #'jf/treesit/yank-qualified-method-fname)
+  (define-key ruby-ts-mode-map (kbd "C-M-h")
+    #'jf/treesit/function-select)
+  (define-key ruby-ts-mode-map
+    (kbd "C-c y f") #'jf/yank-current-scoped-function-name)
+  (define-key ruby-ts-mode-map
+    (kbd "C-c y y") #'jf/ruby-mode/yank-yardoc)
+  (define-key ruby-ts-mode-map
+    (kbd "s-ESC") #'jf/comment-header-backward)
+  (define-key ruby-ts-mode-map
+    (kbd "C-s-]") #'jf/commend-header-forward)
+  (define-key ruby-ts-mode-map
+    (kbd "C-c w r") #'jf/treesit/wrap-rubocop)
+  (define-key ruby-ts-mode-map
+    (kbd "M-{") #'ruby-beginning-of-block)
+  (define-key ruby-ts-mode-map
+    (kbd "M-}") #'ruby-end-of-block))
 (add-hook 'ruby-ts-mode-hook #'jf/ruby-ts-mode-configurator)
 
 ;; From https://emacs.dyerdwelling.family/emacs/20230414111409-emacs--indexing-emacs-init/
@@ -608,13 +630,20 @@ See `add-log-current-defun-function'."
     (setq imenu-sort-function 'imenu--sort-by-name)
     (setq imenu-generic-expression
       '((nil "^;;[[:space:]]+-> \\(.*\\)$" 1)
-         ("defvar" "^([[:space:]]*\\(cl-\\)?defvar[[:space:]]+\\([^ ]*\\)$" 2)
-         ("defconst" "^([[:space:]]*\\(cl-\\)?defconst[[:space:]]+\\([^ ]*\\)$" 2)
-         ("defcustom" "^([[:space:]]*\\(cl-\\)?defcustom[[:space:]]+\\([^ ]*\\)$" 2)
-         ("defun" "^([[:space:]]*\\(cl-\\)?defun[[:space:]]+\\([^(]+\\)" 2)
-         ("macro" "^([[:space:]]*\\(cl-\\)?defmacro[[:space:]]+\\([^(]+\\)" 2)
-         ("struct" "^([[:space:]]*\\(cl-\\)?defstruct[[:space:]]+\\([^(]+\\)" 2)
-         ("use-package" "^.*([[:space:]]*use-package[[:space:]]+\\([[:word:]-]+\\)" 1)))
+         ("defvar"
+           "^([[:space:]]*\\(cl-\\)?defvar[[:space:]]+\\([^ ]*\\)$" 2)
+         ("defconst"
+           "^([[:space:]]*\\(cl-\\)?defconst[[:space:]]+\\([^ ]*\\)$" 2)
+         ("defcustom"
+           "^([[:space:]]*\\(cl-\\)?defcustom[[:space:]]+\\([^ ]*\\)$" 2)
+         ("defun"
+           "^([[:space:]]*\\(cl-\\)?defun[[:space:]]+\\([^(]+\\)" 2)
+         ("macro"
+           "^([[:space:]]*\\(cl-\\)?defmacro[[:space:]]+\\([^(]+\\)" 2)
+         ("struct"
+           "^([[:space:]]*\\(cl-\\)?defstruct[[:space:]]+\\([^(]+\\)" 2)
+         ("use-package"
+           "^.*([[:space:]]*use-package[[:space:]]+\\([[:word:]-]+\\)" 1)))
     (imenu-add-menubar-index)))
 
 (defvar jf/rubocop/list-all-cops
