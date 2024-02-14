@@ -289,6 +289,11 @@ first matching link."
     :init
     (require 'ox-gfm))
 
+  (use-package igist
+    :straight t
+    :config
+    (setq igist-current-user-name "jeremyf")
+    (setq igist-auth-marker 'igist))
 
   ;; In
   ;; https://takeonrules.com/2022/02/26/note-taking-with-org-roam-and-transclusion/,
