@@ -386,7 +386,7 @@ method, get the containing class."
             (text
               (format "bundle exec rspec %s:%s" filename (line-number-at-pos))))
       (kill-new text)
-      (message "Added to kill ring...%s" text)
+      (message "Killed: %s" text)
       text))
   (defun jf/rspec-spring-p ()
     "Check the project for spring as part of the Gemfile.lock."

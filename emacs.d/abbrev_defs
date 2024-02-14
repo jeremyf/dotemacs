@@ -1015,6 +1015,7 @@
     ("coordiantion" "coordination" nil :count 1)
     ("coorperations" "corporations" nil :count 1)
     ("copmetitors" "competitors" nil :count 1)
+    ("coppers" "endless and ever appeasing of the coppers" nil :count 2)
     ("coputer" "computer" nil :count 1)
     ("copywrite" "copyright" nil :count 1)
     ("coridal" "cordial" nil :count 1)
@@ -4099,4 +4100,3 @@
     ("yuo" "you" nil :count 1)
     ("zeebra" "zebra" nil :count 1)
    ))
-
