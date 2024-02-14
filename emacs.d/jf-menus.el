@@ -104,7 +104,6 @@
      ("j v" jf/jump-to/violet-board)]
     ["Tasks"
       ("i" "Clock in…" consult-clock-in)
-      ("r" "Run command…" run-command)
       ("s" "Search note content…" consult-notes-search-in-all-notes)
       ("S" "Search note filename…" consult-notes)
       ("C-t" "Start a timer…" tmr-with-description)

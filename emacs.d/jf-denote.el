@@ -89,18 +89,18 @@
           " --replace '$1' | "
           "ruby -ne 'puts $_.gsub(/^(\\w)\\w+-/) { |m| m[0].upcase + m[1..-1] }.gsub(/-(\\w)/) { |m| m[1].upcase }'"))
       "\n"))
-  :custom
-  (denote-journal-extras-title-format 'day-date-month-year)
-  (denote-infer-keywords t)
-  (denote-excluded-punctuation-regexp "[][{}!@#$%^&*()=+'\"?,.|;:~`‘’“”/—–]*")
-  (denote-modules '(xref ffap))
-  (denote-org-capture-specifiers
+  :config
+  (setq denote-journal-extras-title-format 'day-date-month-year)
+  (setq denote-infer-keywords t)
+  (setq denote-excluded-punctuation-regexp "[][{}!@#$%^&*()=+'\"?,.|;:~`‘’“”/—–]*")
+  (setq denote-modules '(xref ffap))
+  (setq denote-org-capture-specifiers
     "%(jf/denote/capture-wrap :link \"%L\" :content \"%i\")")
-  (denote-directory (expand-file-name "denote" org-directory))
+  (setq denote-directory (expand-file-name "denote" org-directory))
   ;; These are the minimum viable prompts for notes
-  (denote-prompts '(title keywords))
+  (setq denote-prompts '(title keywords))
   ;; I love ‘org-mode format; reading ahead I'm setting this
-  (denote-file-type 'org)
+  (setq denote-file-type 'org)
   ;; Our controlled vocabulary...if you will.  This originally was a function
   ;; call, however there was a timing conflict with requiring denote-org-dblock
   ;; and when/where I declared the previous function.  By "inlining" the
@@ -116,18 +116,13 @@
   ;;                            " --replace '$1' | "
   ;;                            "ruby -ne 'puts $_.gsub(/^(\\w)\\w+-/) { |m| m[0].upcase + m[1..-1] }.gsub(/-(\\w)/) { |m| m[1].upcase }'"))
   ;;   "\n")
-  ;; Explicitly ensuring that tags can be multi-word (e.g. two or more
-  ;; words joined with a dash).  Given that I export these tags, they
-  ;; should be accessible to screen-readers.  And without the dashes
-  ;; they are a garbled word salad.
-  (denote-allow-multi-word-keywords nil)
   ;; And `org-read-date' is an amazing bit of tech
-  (denote-date-prompt-denote-date-prompt-use-org-read-date t)
-  (denote-file-name-slug-functions
+  (setq denote-date-prompt-denote-date-prompt-use-org-read-date t)
+  (setq denote-file-name-slug-functions
     '((title . jf/denote-sluggify-title)
        (signature . jf/denote-sluggify-signature)
        (keyword . jf/denote-sluggify-keyword)))
-  :config
+
   (setq denote-file-name-letter-casing '((title . downcase)
                                      (signature . downcase)
                                      (keywords . verbatim)
@@ -1029,15 +1024,13 @@ Optionally DROP-TAGS, as there may have been a TAG associated with the series."
             (insert "\n#+HUGO_CUSTOM_FRONT_MATTER: :series " series)
             (save-buffer)))
         (let* ((file (buffer-file-name))
-                (id (denote-retrieve-filename-identifier file :no-error))
+                (id (denote-retrieve-filename-identifier file))
                 (file-type 'org)
                 (title (denote-retrieve-title-value file file-type))
-                (sluggified-title (denote-sluggify-title (s-replace "…" "" title) 'title))
                 (keywords (seq-difference (denote-retrieve-keywords-value file file-type) (-flatten drop-tags)))
-	              (signature (denote-sluggify-signature series))
                 (extension (denote-get-file-extension file))
                 (dir (file-name-directory file))
-                (new-name (denote-format-file-name dir id keywords sluggified-title extension signature)))
+                (new-name (denote-format-file-name dir id keywords title extension series)))
           (denote-rename-file-and-buffer file new-name)
           (denote-update-dired-buffers))))))
 

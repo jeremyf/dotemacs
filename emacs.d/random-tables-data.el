@@ -48,39 +48,39 @@
                            "19" "19.25" "19.5" "19.75" "20" "20.25" "20.5"
                            "20.75" "21" "21.25" "21.5" "21.75" "22" "22.25"
                            "22.5" "22.75" "23" "23.25" "23.5" "23.75" "24"))
-                  (phys (string-to-number (completing-read "Physique: " range nil t)))
-                  (skil (string-to-number (completing-read "Skill: " range nil t)))
-                  (slots-hand (string-to-number (completing-read "Slots in hand: "
+            (phys (string-to-number (completing-read "Physique: " range nil t)))
+            (skil (string-to-number (completing-read "Skill: " range nil t)))
+            (slots-hand (string-to-number (completing-read "Slots in hand: "
                                             (subseq slot-range 0 9) nil t)))
-                  (slots-handy (string-to-number (completing-read "Slots in handy: "
+            (slots-handy (string-to-number (completing-read "Slots in handy: "
                                              (subseq slot-range 0 17) nil t)))
-                  (slots-worn (string-to-number (completing-read "Slots in worn: "
+            (slots-worn (string-to-number (completing-read "Slots in worn: "
                                             slot-range nil t)))
-                  (slots-pack (string-to-number (completing-read "Slots in pack: "
+            (slots-pack (string-to-number (completing-read "Slots in pack: "
                                             slot-range nil t)))
             (text (format (concat "Errant Movement\n- Physique: %s · Skill: %s"
                             "\n- Slots Hand: %s · Handy: %s · Worn: %s · "
                             "Pack: %s")
-                                      phys skil slots-hand slots-handy slots-worn slots-pack)))
+                    phys skil slots-hand slots-handy slots-worn slots-pack)))
       (dolist (label-slots (list (cons "in hand, handy, worn, pack"
-                                                           (+ slots-hand slots-handy slots-worn
+                                   (+ slots-hand slots-handy slots-worn
                                      slots-pack))
-                                                     (cons "in hand, handy, worn"
-                                                       (+ slots-hand slots-handy slots-worn))
-                                                     (cons "handy, worn"
-                                                       (+ slots-handy slots-worn))
-                                                     (cons "worn" slots-worn)
-                                                     (cons "naked and free" 0)))
+                             (cons "in hand, handy, worn"
+                               (+ slots-hand slots-handy slots-worn))
+                             (cons "handy, worn"
+                               (+ slots-handy slots-worn))
+                             (cons "worn" slots-worn)
+                             (cons "naked and free" 0)))
         (let* ((slots (cdr label-slots))
                 (label (car label-slots))
                 (enc (if (>= phys slots)
-                                   (floor (* 4 slots) phys)
-                                   (+ 4 (- (floor slots) phys))))
+                       (floor (* 4 slots) phys)
+                       (+ 4 (- (floor slots) phys))))
                 (spd (if (>= skil enc) (- skil enc) 0))
                 (md (floor spd 4))
                 (md-text (if (= 0 md) "0" (format "%sd4" md))))
           (setq-local text (format "%s\n- %s\n  ENC: %s · SPD: %s· MD: %s"
-                                                     text label enc spd md-text))))
+                             text label enc spd md-text))))
       (kill-new text)
       (message text))))
 
@@ -101,9 +101,9 @@
 
 (defun random-table/roller/prompt-from-table-data (table)
   "Prompt for picking a range from a TABLE."
-        (completing-read
-          (format "%s via:" (random-table-name table))
-          (random-table-data table) nil t))
+  (completing-read
+    (format "%s via:" (random-table-name table))
+    (random-table-data table) nil t))
 
 ;;; Errant
 (random-table/register :name "Errant > Henchman"
@@ -171,10 +171,10 @@
 
 ;; We're registering this to generate the correct Archetype based on the rolled
 ;; ability scores.  Hence the :reuse declaration and it's :private nature.
-(dolist (ability '("Errant :: Ability :: Physique"
-                    "Errant :: Ability :: Skill"
-                    "Errant :: Ability :: Mind"
-                    "Errant :: Ability :: Presence"))
+(dolist (ability '("Errant > Ability > Physique"
+                    "Errant > Ability > Skill"
+                    "Errant > Ability > Mind"
+                    "Errant > Ability > Presence"))
   (random-table/register :name ability
     :store t
     :private t
@@ -219,7 +219,7 @@
            ("Occult" . "{Errant > Grimoire}{Errant > Grimoire}{Errant > Grimoire}{Errant > Grimoire}")
            ("Zealot" . "\n- One relic (Blade, Wand, Talisman, Calice see p. 75)")))
 
-(cl-defun random-table/roller/archetype (table &key (attribute-template "Errant :: Ability :: %s"))
+(cl-defun random-table/roller/archetype (table &key (attribute-template "Errant > Ability > %s"))
   "Using the TABLE data determine Errant Archetype.
 
 This function rolls (or uses the rolls) of the corresponding
@@ -763,7 +763,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
   :filter (lambda (&rest dice) "We have a pool of dice to determine if there are dupes."
             (car (list-utils-dupes (-list dice))))
   :fetcher (lambda (data &rest index)
-            (when index (concat " with unexpected “" (nth (- (car (-list index)) 1) data) "” event")))
+             (when index (concat " with unexpected “" (nth (- (car (-list index)) 1) data) "” event")))
   :data '("Very negative" "Negative" "Negative but…" "Positive but…" "Positive" "Very Positive"))
 
 ;;; OSE
@@ -2738,51 +2738,51 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "You don't have to be ashamed of using your own ideas"))
 
 (random-table/register :name "Lore24 Insipiration"
-		       :roller "2d4"
-		       :data '((2 . "History")
-			       (3 . "Fantastical")
-			       (4 . "Random Encounter")
-			       (5 . "Local Effect")
-			       (6 . "Downtime Trend")
-			       (7 . "Monster")
-			       (8 . "Covenant")))
+	:roller "2d4"
+	:data '((2 . "History")
+			     (3 . "Fantastical")
+			     (4 . "Random Encounter")
+			     (5 . "Local Effect")
+			     (6 . "Downtime Trend")
+			     (7 . "Monster")
+			     (8 . "Covenant")))
 
 (random-table/register :name "Ironsworn > Action Oracle"
   :data '("Scheme" "Clash" "Weaken" "Initiate" "Create" "Swear" "Avenge" "Guard" "Defeat" "Control"
-            "Break" "Risk" "Surrender" "Inspect" "Raid" "Evade" "Assault" "Deflect" "Threaten" "Attack"
-            "Leave" "Preserve" "Manipulate" "Remove" "Eliminate" "Withdraw" "Abandon" "Investigate" "Hold" "Focus"
-            "Uncover" "Breach" "Aid" "Uphold" "Falter" "Suppress" "Hunt" "Share" "Destroy" "Avoid"
-            "Reject" "Demand" "Explore" "Bolster" "Seize" "Mourn" "Reveal" "Gather" "Defy" "Transform"
-            "Persevere" "Serve" "Begin" "Move" "Coordinate" "Resist" "Await" "Impress" "Take" "Oppose"
-            "Capture" "Overwhelm" "Challenge" "Acquire" "Protect" "Finish" "Strengthen" "Restore" "Advance" "Command"
-            "Refuse" "Find" "Deliver" "Hide" "Fortify" "Betray" "Secure" "Arrive" "Affect" "Change"
-            "Defend" "Debate" "Support" "Follow" "Construct" "Locate" "Endure" "Release" "Lose" "Reduce"
-            "Escalate" "Distract" "Journey" "Escort" "Learn" "Communicate" "Depart" "Search" "Charge" "Summon"))
+           "Break" "Risk" "Surrender" "Inspect" "Raid" "Evade" "Assault" "Deflect" "Threaten" "Attack"
+           "Leave" "Preserve" "Manipulate" "Remove" "Eliminate" "Withdraw" "Abandon" "Investigate" "Hold" "Focus"
+           "Uncover" "Breach" "Aid" "Uphold" "Falter" "Suppress" "Hunt" "Share" "Destroy" "Avoid"
+           "Reject" "Demand" "Explore" "Bolster" "Seize" "Mourn" "Reveal" "Gather" "Defy" "Transform"
+           "Persevere" "Serve" "Begin" "Move" "Coordinate" "Resist" "Await" "Impress" "Take" "Oppose"
+           "Capture" "Overwhelm" "Challenge" "Acquire" "Protect" "Finish" "Strengthen" "Restore" "Advance" "Command"
+           "Refuse" "Find" "Deliver" "Hide" "Fortify" "Betray" "Secure" "Arrive" "Affect" "Change"
+           "Defend" "Debate" "Support" "Follow" "Construct" "Locate" "Endure" "Release" "Lose" "Reduce"
+           "Escalate" "Distract" "Journey" "Escort" "Learn" "Communicate" "Depart" "Search" "Charge" "Summon"))
 
 (random-table/register :name "Ironsworn > Theme Oracle"
   :data '("Risk" "Ability" "Price" "Ally" "Battle" "Safety" "Survival" "Weapon" "Wound" "Shelter"
-            "Leader" "Fear" "Time" "Duty" "Secret" "Innocence" "Renown" "Direction" "Death" "Honor"
-            "Labor" "Solution" "Tool" "Balance" "Love" "Barrier" "Creation" "Decay" "Trade" "Bond"
-            "Hope" "Superstition" "Peace" "Deception" "History" "World" "Vow" "Protection" "Nature" "Opinion"
-            "Burden" "Vengeance" "Opportunity" "Faction" "Danger" "Corruption" "Freedom" "Debt" "Hate" "Possession"
-            "Stranger" "Passage" "Land" "Creature" "Disease" "Advantage" "Blood" "Language" "Rumor" "Weakness"
-            "Greed" "Family" "Resource" "Structure" "Dream" "Community" "War" "Portent" "Prize" "Destiny"
-            "Momentum" "Power" "Memory" "Ruin" "Mysticism" "Rival" "Problem" "Idea" "Revenge" "Health"
-            "Fellowship" "Enemy" "Religion" "Spirit" "Fame" "Desolation" "Strength" "Knowledge" "Truth" "Quest"
+           "Leader" "Fear" "Time" "Duty" "Secret" "Innocence" "Renown" "Direction" "Death" "Honor"
+           "Labor" "Solution" "Tool" "Balance" "Love" "Barrier" "Creation" "Decay" "Trade" "Bond"
+           "Hope" "Superstition" "Peace" "Deception" "History" "World" "Vow" "Protection" "Nature" "Opinion"
+           "Burden" "Vengeance" "Opportunity" "Faction" "Danger" "Corruption" "Freedom" "Debt" "Hate" "Possession"
+           "Stranger" "Passage" "Land" "Creature" "Disease" "Advantage" "Blood" "Language" "Rumor" "Weakness"
+           "Greed" "Family" "Resource" "Structure" "Dream" "Community" "War" "Portent" "Prize" "Destiny"
+           "Momentum" "Power" "Memory" "Ruin" "Mysticism" "Rival" "Problem" "Idea" "Revenge" "Health"
+           "Fellowship" "Enemy" "Religion" "Spirit" "Fame" "Desolation" "Strength" "Knowledge" "Truth" "Quest"
            "Pride" "Loss" "Law" "Path" "Warning" "Relationship" "Wealth" "Home" "Strategy" "Supply"))
 
 (random-table/register :name "Laws of the Land"
   :data '("The land is {Laws of the Land > Nature's Nature} and {Laws of the Land > Nature's Nature}; and you must not {Laws of the Land > You Must Not} nor {Laws of the Land > You Must Not}"))
 
-  (random-table/register :name "Laws of the Land > Nature's Nature"
-    :private t
+(random-table/register :name "Laws of the Land > Nature's Nature"
+  :private t
   :data '("forested" "stony" "marshy" "humid" "foggy"
-    "arid" "freezing" "volcanic" "windswept" "flowering"
-    "steep" "riverside" "grassy" "fungal" "hilly"
-    "flat" "oceanic" "freshwater" "sunken" "fruited"))
+           "arid" "freezing" "volcanic" "windswept" "flowering"
+           "steep" "riverside" "grassy" "fungal" "hilly"
+           "flat" "oceanic" "freshwater" "sunken" "fruited"))
 
-  (random-table/register :name "Laws of the Land > You Must Not"
-    :private t
+(random-table/register :name "Laws of the Land > You Must Not"
+  :private t
   :data '("bring [animals or livestock/food/liquid]"
            "kill [plants/animals/people/anything]"
            "be quiet"
@@ -2803,3 +2803,104 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "breathe the unfiltered air"
            "drink water from here"
            "expose [skin/metal/leather/wood/blood/paper]"))
+
+;;; Holy Roman Empire using Cepheus Engine
+(dolist (ability '("HRE > Ability > STR"
+                    "HRE > Ability > DEX"
+                    "HRE > Ability > END"
+                    "HRE > Ability > INT"))
+  (random-table/register :name ability
+    :store t
+    :private t
+    :reuse ability
+    :roller "2d6"
+    :data '(2 3 4 5 6 7 8 9 10 11 12)))
+
+(random-table/register :name "HRE > Ability > SOC"
+  :roller "2d6"
+  :reuse "HRE > SOC"
+  :store t
+  :data '((2 . "{CURRENT_ROLL}\tUnclean")
+           ((3 . 5) . "{CURRENT_ROLL}\tPeasant: Agriculture, Archery, Driving, Grappling, Watercraft, Survival.")
+           ((6 . 7) . "{CURRENT_ROLL}\tTownsman: Carousing, Driving, Grappling, Streetwise, Trade (select), Watercraft.")
+           ((8 . 9) . "{CURRENT_ROLL}\tBürgher: EDU + 1, Carousing, Fencing, Firearms, Streetwise, Statecraft, Trade (select).")
+           ((10 . 11) . "{CURRENT_ROLL}\tGentry: EDU +1, Agriculture, Etiquette, Fencing, Language (Latin), Survival, Statecraft, Riding.")
+           ((12 . 20) . "{CURRENT_ROLL}\tNobility: EDU +1, Art (any), Etiquette, Fencing, Language (Latin), Persuasion, Statecraft, Riding.")))
+
+(random-table/register :name "HRE > Ability > SOC > Modifier to EDU"
+  :reuse "HRE > SOC"
+  :private t
+  :exclude-from-prompt t
+  :filter (lambda (&rest dice) (if (>= (car dice) 8) 0 1))
+  :data '(0 1))
+
+(random-table/register :name "HRE > Ability > EDU"
+  :roller '(+ "2d6" "HRE > Ability > SOC > Modifier to EDU")
+  :reuse "HRE > Ability > EDU"
+  :store t
+  :private t
+  :data '(((2 . 7) . "{CURRENT_ROLL}\tSimple cultural knowledge.  Illiterate.")
+           (8 . "{CURRENT_ROLL}\tBasic Grammar, Arithmetic, and Literacy.  Attended civic, private, or religious primary school; literate in native language.")
+           (9 . "{CURRENT_ROLL}\tLatin, Grammar, Logic, Rhetoric.  University student to Bachelor of Arts (+2 Starting Age). Character is literate in any language known.")
+           (10 . "{CURRENT_ROLL}\tArithmetic, Geometry, Music, Astronomy, Metaphysics, Occult.  Master of Arts (+4 Starting Age) Completion of University. Can earn money tutoring.")
+           (11 . "{CURRENT_ROLL}\tLaw, Theology, Natural Sciences, Moral Philosophy, Philology.  Doctorate (+6 Starting Age). Begins specializing in a scholarly trade.")
+           ((12 . 20) . "{CURRENT_ROLL}\tSpecialization in previous subjects.  May indicate a Rector or Chair position and a University staff position (+8 Starting Age).")))
+
+(random-table/register :name "HRE"
+  :data '("\n- STR :: {HRE > Ability > STR}\n- DEX :: {HRE > Ability > DEX}\n- END :: {HRE > Ability > END}\n- INT :: {HRE > Ability > INT}\n- EDU :: {HRE > Ability > EDU}\n- SOC :: {HRE > Ability > SOC}"))
+
+(random-table/register :name "HRE > Contact"
+  :data '("Kacker" "Thief" "Hanse merchange" "Barber-surgeon" "Musician" "Apothecary"
+           "Executioner" "Cunning folk" "Beggar" "Ship's captain" "Scholar" "Military quartermaster"
+           "Village schultz" "Hunter" "Monk/nun/friar" "Herbalist" "Lawyer" "Alchemist"
+           "Craftsman" "Gang boss" "Caravan guard" "Laborer" "Brigand" "Prostitute"
+           "Priest" "Midwife" "Bürghermeister" "Military officer" "Spy" "Magistrate"
+           "Wealthy großbürger" "Courtier" "Actor" "Duke's chamberlain" "Bishop" "Guild master"))
+
+(random-table/register :name "HRE > Random Encounter > Wilderness"
+  :data '("Overgrown Village or Castle" "Bear with {1D6-3} cubs" "Forester thinks PCs poaching"
+           "{1d6} Smugglers" "{1d6} Deer" "Merchant Caravan with {3d6} people"
+           "{1d6} Brigand Camp" "{1d6} Wolves" "{2d6} Refugees asking alms"
+           "Ambush by {1d6} Brigand" "{1d6} Wandering Lepers" "{1d3} Patch of useful herbs"
+           "Snare, pit, or other trap" "Logger or Charcoaler Camp" "Boar"
+           "{1d6} Pilgrims" "{1d6} Slain Bodies" "Lynx on the prowl"
+           "Religious Hermit" "Caravan Under Attack" "Royal hunting party"
+           "Räubreiter collecting tolls" "Peasants clearing land" "Impassable vegetation"
+           "Shepherd with flock" "{1d3} Poachers" "Knight Errant seeking a duel"
+           "Ancient pagan cairn or altar" "Heretics worshiping in secret" "A beautiful, peaceful glade"
+           "Venomous Snake" "{1d6} Foreign soldiers raiding" "Mad Prophet"
+           "{HRE > Random Encounter > Wilderness} and {HRE > Random Encounter > Wilderness}"
+           "{HRE > Random Encounter > Wilderness} and {HRE > Random Encounter > Wilderness}"
+           "{HRE > Random Encounter > Wilderness} and {HRE > Random Encounter > Wilderness}"))
+
+(random-table/register :name "HRE > Random Encounter > Wetlands or Coastal"
+  :data '("Sunken boat with skeleton" "Blinding fog for {2d6} hours" "{1d6+2} Wreckers looting ship"
+           "Hunter’s Camp" "Venomous Snake" "Merchant river boats {1d6}"
+           "Boar {1d6}" "Ambush by {1d6} Vagabond" "Cunning Folk Cottage"
+           "Peasants draining wetland/bog" "{1d6} Patch of useful herbs" "{1d6} Fisherman"
+           "{1d6} Deer" "Nest with {1d6} eggs" "Vagabond Camp {2d6}"
+           "Pilgrims {1d6}" "Quicksand" "Pirate Camp {2d6}"
+           "Refugee Camp {3d6}" "Fishing Encampment {2d6}" "Mendicant Monk preaching"
+           "Gallows Tree & {1d6} Bodies" "{1d6} Wolves on the hunt" "{1d6} Black Sabbath \"witches\""
+           "Hunting Party/Fowlers {1d6}" "{1d3} Rotting Corpses " "Flash Flood"
+           "Lynx on the hunt" "{1d6} Brigand Ambush" "{1d6} Smugglers"
+           "Sailor repairing boat" "{1d6} Foreign soldiers raiding" "Recently killed reiter w/horse"
+           "{HRE > Random Encounter > Wetlands or Coastal} and {HRE > Random Encounter > Wetlands or Coastal}"
+           "{HRE > Random Encounter > Wetlands or Coastal} and {HRE > Random Encounter > Wetlands or Coastal}"
+           "{HRE > Random Encounter > Wetlands or Coastal} and {HRE > Random Encounter > Wetlands or Coastal}"))
+
+(random-table/register :name "HRE > Random Encounter > Urban"
+:data '("Public execution" "Fire! Fire!" "Sewage leak"
+         "Plague outbreak!" "Fechtschule / Carnival" "A fiery heretic preacher"
+         "Convicts being whipped/exiled" "Pack of {1d6} mongrels attack!" "Urchins swarm the PCs"
+         "Guild protests in street" "City Watch chasing a thief" "Street performers"
+         "{2d6} Beggars accost party" "Pickpocket strikes!" "Swarm of beggars accost party"
+         "Controversial pamphlets" "Priest selling indulgences, 1fl" "Religious procession"
+         "Gang fight" "Bear baiting, place your bets" "Out of control horse charges!"
+         "{1d6} Muggers attack" "Herald makes announcements" "Apprentice/student street brawl"
+         "A PC is challenged to a duel" "Accosted by the watch" "Bear escapes from dog fight!"
+         "Public execution" "Clergy demands donations" "Jester begins mocking party"
+         "Market day" "Shops closed for local festival" "Royal Procession"
+         "{HRE > Random Encounter > Urban} and {HRE > Random Encounter > Urban}"
+         "{HRE > Random Encounter > Urban} and {HRE > Random Encounter > Urban}"
+         "{HRE > Random Encounter > Urban} and {HRE > Random Encounter > Urban}"))
