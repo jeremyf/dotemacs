@@ -16,29 +16,118 @@
 (use-package window
   ;; Wrangle up how windows and buffers display.
   :straight (:type built-in)
-  :custom
-  (display-buffer-alist
-    '(;; no windows
-       ("\\*elfeed-curate-annotation\\*"
-         (display-buffer-in-side-window)
-         (window-height . 0.33)
-         (side . bottom)
-         (window-parameters . ((mode-line-format . (" %b")))))
+  :config
+  (setq display-buffer-alist
+    `(;; no window
        ("\\`\\*Async Shell Command\\*\\'"
          (display-buffer-no-window))
-       ;; I like the slide out window for this "context-type menus"
-       ;; ("\\*\\(eldoc\\|Ilist\\|Embark Actions\\|helpful .*\\)\\*"
-       ;;   (display-buffer-in-side-window)
-       ;;   (window-width . 0.5)
-       ;;   (side . right)
-       ;;   (slot . 0)
-       ;;   (window-parameters . ((mode-line-format . (" %b")))))
-       ("\\*\\(eldoc\\|Ilist\\|Embark Actions\\|helpful .*\\)\\*"
-         (display-buffer-reuse-window))
-       ("*Register Preview*" (display-buffer-reuse-window))))
+       ("\\`\\*\\(Warnings\\|Compile-Log\\|Org Links\\)\\*\\'"
+         (display-buffer-no-window)
+         (allow-no-window . t))
+       ;; bottom side window
+       ("\\*Org \\(Select\\|Note\\)\\*" ; the `org-capture' key selection and `org-add-log-note'
+         (display-buffer-in-side-window)
+         (dedicated . t)
+         (side . bottom)
+         (slot . 0)
+         (window-parameters . ((mode-line-format . (" %b")))))
+       ;; bottom buffer (NOT side window)
+       ((or . ((derived-mode . flymake-diagnostics-buffer-mode)
+                (derived-mode . flymake-project-diagnostics-mode)
+                (derived-mode . messages-buffer-mode)
+                (derived-mode . backtrace-mode)))
+         (display-buffer-reuse-mode-window display-buffer-at-bottom)
+         (window-height . 0.3)
+         (dedicated . t)
+         (preserve-size . (t . t)))
+       ("\\*Embark Actions\\*"
+         (display-buffer-reuse-mode-window display-buffer-below-selected)
+         (window-height . fit-window-to-buffer)
+         (window-parameters . ((no-other-window . t)
+                                (mode-line-format . (" %b")))))
+       ("\\*\\(Output\\|Register Preview\\).*"
+         (display-buffer-reuse-mode-window display-buffer-at-bottom))
+       ;; below current window
+       ("\\(\\*Capture\\*\\|CAPTURE-.*\\)"
+         (display-buffer-reuse-mode-window display-buffer-below-selected))
+       ("\\*\\vc-\\(incoming\\|outgoing\\|git : \\).*"
+         (display-buffer-reuse-mode-window display-buffer-below-selected)
+         (window-height . 0.1)
+         (dedicated . t)
+         (preserve-size . (t . t)))
+       ((derived-mode . reb-mode) ; M-x re-builder
+         (display-buffer-reuse-mode-window display-buffer-below-selected)
+         (window-height . 4) ; note this is literal lines, not relative
+         (dedicated . t)
+         (preserve-size . (t . t)))
+       ((or . ((derived-mode . occur-mode)
+                (derived-mode . grep-mode)
+                (derived-mode . Buffer-menu-mode)
+                (derived-mode . log-view-mode)
+                (derived-mode . help-mode) ; See the hooks for `visual-line-mode'
+                "\\*\\(|Buffer List\\|Occur\\|vc-change-log\\).*"))
+         (prot-window-display-buffer-below-or-pop)
+         (dedicated . t)
+         (body-function . prot-window-select-fit-size))
+       ("\\*\\(Calendar\\|Bookmark Annotation\\|ert\\).*"
+         (display-buffer-reuse-mode-window display-buffer-below-selected)
+         (dedicated . t)
+         (window-height . fit-window-to-buffer))
+       ;; NOTE 2022-09-10: The following is for `ispell-word', though
+       ;; it only works because I override `ispell-display-buffer'
+       ;; with `prot-spell-ispell-display-buffer' and change the
+       ;; value of `ispell-choices-buffer'.
+       ("\\*ispell-top-choices\\*.*"
+         (display-buffer-reuse-mode-window display-buffer-below-selected)
+         (window-height . fit-window-to-buffer))
+       ;; same window
+
+       ;; NOTE 2023-02-17: `man' does not fully obey the
+       ;; `display-buffer-alist'.  It works for new frames and for
+       ;; `display-buffer-below-selected', but otherwise is
+       ;; unpredictable.  See `Man-notify-method'.
+       ((or . ((derived-mode . Man-mode)
+                (derived-mode . woman-mode)
+                "\\*\\(Man\\|woman\\).*"))
+         (display-buffer-same-window))))
+  (setq confirm-kill-emacs #'yes-or-no-p)
   :bind (("s-q" . #'jf/bury-or-unbury-buffer))
-  :config (setq confirm-kill-emacs #'yes-or-no-p)
   :preface
+  (defun prot-window-select-fit-size (window &rest _)
+    "Select WINDOW and resize it.
+The resize pertains to the maximum and minimum values for height
+and width, per `prot-window-window-sizes'.
+
+Use this as the `body-function' in a `display-buffer-alist' entry."
+    (select-window window)
+    (fit-window-to-buffer
+      window
+      (prot-window--get-window-size :max-height)
+      (prot-window--get-window-size :min-height)
+      (prot-window--get-window-size :max-width)
+      (prot-window--get-window-size :min-width)))
+
+  (defvar prot-window-window-sizes
+    '( :max-height (lambda () (floor (frame-height) 3))
+       :min-height 10
+       :max-width (lambda () (floor (frame-width) 4))
+       :min-width 20)
+    "Property list of maximum and minimum window sizes.
+The property keys are `:max-height', `:min-height', `:max-width',
+and `:min-width'.  They all accept a value of either a
+number (integer or floating point) or a function.")
+
+  (defun prot-window--get-window-size (key)
+    "Extract the value of KEY from `prot-window-window-sizes'."
+    (when-let ((value (plist-get prot-window-window-sizes key)))
+      (cond
+        ((functionp value)
+          (funcall value))
+        ((numberp value)
+          value)
+        (t
+          (error "The value of `%s' is neither a number nor a function" key)))))
+
   ;; For some reason, the C-x 5 0 keybindings don't set in my brain.
   (defun jf/bury-or-unbury-buffer (&optional prefix)
     "Without PREFIX `bury-buffer' a buffer.
@@ -277,11 +366,11 @@ This work the other way around as well.
 Credit: https://github.com/olivertaylor/dotfiles/blob/master/emacs/init.el"
   (interactive)
   (if (> (length (window-list)) 2)
-      (error "Can't toggle with more than 2 windows")
+    (error "Can't toggle with more than 2 windows")
     (let ((was-full-height (window-full-height-p)))
       (delete-other-windows)
       (if was-full-height
-          (split-window-vertically)
+        (split-window-vertically)
         (split-window-horizontally))
       (save-selected-window
         (other-window 1)
