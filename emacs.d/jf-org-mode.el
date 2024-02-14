@@ -953,6 +953,9 @@ I envision this function called from the command-line."
          plain (clock)
          "%i%?"
          :immediate-finish t)
+       ("k" "Kill to Clock"
+         plain (clock)
+         "%c" :immediate-finish t)
        ("l" "#Lore24 Entry"
          plain (file+olp+datetree jf/lore24-filename)
          "%?"
