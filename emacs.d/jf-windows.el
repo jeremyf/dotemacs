@@ -13,6 +13,8 @@
 ;;;; Themes
 (mapc #'disable-theme custom-enabled-themes)
 
+(require 'prot-window)
+
 (use-package window
   ;; Wrangle up how windows and buffers display.
   :straight (:type built-in)
@@ -93,41 +95,6 @@
   (setq confirm-kill-emacs #'yes-or-no-p)
   :bind (("s-q" . #'jf/bury-or-unbury-buffer))
   :preface
-  (defun prot-window-select-fit-size (window &rest _)
-    "Select WINDOW and resize it.
-The resize pertains to the maximum and minimum values for height
-and width, per `prot-window-window-sizes'.
-
-Use this as the `body-function' in a `display-buffer-alist' entry."
-    (select-window window)
-    (fit-window-to-buffer
-      window
-      (prot-window--get-window-size :max-height)
-      (prot-window--get-window-size :min-height)
-      (prot-window--get-window-size :max-width)
-      (prot-window--get-window-size :min-width)))
-
-  (defvar prot-window-window-sizes
-    '( :max-height (lambda () (floor (frame-height) 3))
-       :min-height 10
-       :max-width (lambda () (floor (frame-width) 4))
-       :min-width 20)
-    "Property list of maximum and minimum window sizes.
-The property keys are `:max-height', `:min-height', `:max-width',
-and `:min-width'.  They all accept a value of either a
-number (integer or floating point) or a function.")
-
-  (defun prot-window--get-window-size (key)
-    "Extract the value of KEY from `prot-window-window-sizes'."
-    (when-let ((value (plist-get prot-window-window-sizes key)))
-      (cond
-        ((functionp value)
-          (funcall value))
-        ((numberp value)
-          value)
-        (t
-          (error "The value of `%s' is neither a number nor a function" key)))))
-
   ;; For some reason, the C-x 5 0 keybindings don't set in my brain.
   (defun jf/bury-or-unbury-buffer (&optional prefix)
     "Without PREFIX `bury-buffer' a buffer.
