@@ -274,6 +274,7 @@ method, get the containing class."
 
 (use-package markdown-mode
   :straight t
+  :bind (:map markdown-mode-map ("C-c C-j" . jf/project/jump-to-task))
   :hook (((markdown-mode markdown-ts-mode) . turn-on-visual-line-mode))
   :mode (("README\\.md\\'" . gfm-mode)
           ("\\.md\\'" . markdown-mode)
