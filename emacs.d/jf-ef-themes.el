@@ -1,23 +1,3 @@
-(use-package ef-themes
-  :straight t)
-
-(setq ef-themes-headings ; read the manual's entry or the doc string
-  '((0 . (bold 1.4))
-      (1 . (variable-pitch bold 1.7))
-       (2 . (overline semibold 1.5))
-       (3 . (monochrome overline 1.4 background))
-       (4 . (overline 1.3))
-       (5 . (rainbow 1.2))
-       (6 . (rainbow 1.15))
-       (t . (rainbow 1.1))))
-
-;; They are nil by default...
-(setq ef-themes-mixed-fonts t
-  ef-themes-variable-pitch-ui t)
-
-;; Load the theme of choice:
-(add-hook 'ef-themes-post-load-hook #'jf/theme-custom-faces)
-
 ;; And now the theme.  I’ve chosen the modus themes (e.g. ~modus-vivendi~ and
 ;; ~modus-operandi~).  They provide a light and dark theme with a focus on visual
 ;; accessibility.
@@ -50,11 +30,11 @@
          ((,c :foreground ,cyan :background ,bg-cyan-subtle)))
       `(org-block
          ;; ((,c :background ,bg-yellow-subtle)))
-         ((,c :background ,bg-changed-faint)))
+         ((,c :background ,bg-added)))
       `(org-block-begin-line
-         ((,c :background ,bg-removed-faint)))
+         ((,c :background ,bg-green-intense)))
       `(org-block-end-line
-         ((,c :background ,bg-removed-faint)))
+         ((,c :background ,bg-green-intense)))
       `(hl-todo
          ((,c :foreground ,red-faint)))
       `(color-rg-font-lock-header-line-text
@@ -88,3 +68,23 @@
          ((,c :width ultra-condensed :background ,bg-dim :foreground ,bg-dim)))
       `(font-lock-regexp-face
          ((,c :foreground ,red))))))
+
+(use-package ef-themes
+  :straight t)
+
+(setq ef-themes-headings ; read the manual's entry or the doc string
+  '((0 . (bold 1.4))
+      (1 . (variable-pitch bold 1.7))
+       (2 . (overline semibold 1.5))
+       (3 . (monochrome overline 1.4 background))
+       (4 . (overline 1.3))
+       (5 . (rainbow 1.2))
+       (6 . (rainbow 1.15))
+       (t . (rainbow 1.1))))
+
+;; They are nil by default...
+(setq ef-themes-mixed-fonts t
+  ef-themes-variable-pitch-ui t)
+
+;; Load the theme of choice:
+(add-hook 'ef-themes-post-load-hook #'jf/theme-custom-faces)

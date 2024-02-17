@@ -30,11 +30,11 @@
          ((,c :foreground ,cyan :background ,bg-cyan-subtle)))
       `(org-block
          ;; ((,c :background ,bg-yellow-subtle)))
-         ((,c :background ,bg-changed-faint)))
+         ((,c :background ,bg-added-faint)))
       `(org-block-begin-line
-         ((,c :background ,bg-removed-faint)))
+         ((,c :background ,bg-added-refine)))
       `(org-block-end-line
-         ((,c :background ,bg-removed-faint)))
+         ((,c :background ,bg-added-refine)))
       `(hl-todo
          ((,c :foreground ,red-faint)))
       `(color-rg-font-lock-header-line-text
