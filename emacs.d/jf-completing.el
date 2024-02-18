@@ -257,11 +257,14 @@ With a PREFIX jump to the agenda without starting the clock."
   ;; buffers in the project.  Or =p= + =space= to narrow to other projects; and
   ;; then select a file within that project.
   :commands (consult-projectile)
+  :bind ("C-x 4 p" . consult-projectile-find-file-other-window)
   :straight (consult-projectile
               :type git
               :host gitlab
               :repo "OlMon/consult-projectile"
               :branch "master")
+
+
   :config
   ;; I want recent files as well as project files as well as recent project
   ;; files...Hence the override fb
