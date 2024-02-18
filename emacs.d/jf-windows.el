@@ -179,6 +179,17 @@ setting up an IDE-like layout)."
     (font-lock-add-keywords nil '(("﻿" . 'jf/bom-face)))
     ))
 
+(defvar jf/themes-plist '()
+  "The named themes by pallette.")
+
+(load "jf-modus-themes.el")
+;; (load "jf-ef-themes.el")
+
+(defun jf/emacs-theme-by-osx-appearance ()
+  "Function to load named theme."
+  (load-theme (plist-get jf/themes-plist (jf/current-macos-interface-style))))
+
+;;; Theming hooks to further customize colors
 (defvar after-enable-theme-hook nil
    "Normal hook run after enabling a theme.")
 

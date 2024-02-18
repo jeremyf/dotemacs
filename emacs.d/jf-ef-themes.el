@@ -30,11 +30,11 @@
          ((,c :foreground ,cyan :background ,bg-cyan-subtle)))
       `(org-block
          ;; ((,c :background ,bg-yellow-subtle)))
-         ((,c :background ,bg-added)))
+         ((,c :background ,bg-added-faint)))
       `(org-block-begin-line
-         ((,c :background ,bg-green-intense)))
+         ((,c :background ,bg-added-refine)))
       `(org-block-end-line
-         ((,c :background ,bg-green-intense)))
+         ((,c :background ,bg-added-refine)))
       `(hl-todo
          ((,c :foreground ,red-faint)))
       `(color-rg-font-lock-header-line-text
@@ -60,8 +60,7 @@
       `(color-rg-font-lock-match
          ((,c :background ,cyan-cooler :foreground ,bg-cyan-subtle)))
       `(color-rg-font-lock-mark-changed
-         ((,c :backgr
-            ound ,bg-changed :foreground ,fg-changed)))
+         ((,c :background ,bg-changed :foreground ,fg-changed)))
       `(color-rg-font-lock-mark-deleted
          ((,c :background ,bg-removed :foreground ,fg-removed)))
       `(fill-column-indicator
@@ -70,21 +69,19 @@
          ((,c :foreground ,red))))))
 
 (use-package ef-themes
-  :straight t)
-
-(setq ef-themes-headings ; read the manual's entry or the doc string
-  '((0 . (bold 1.4))
-      (1 . (variable-pitch bold 1.7))
+  :straight t
+  :config
+  (setq ef-themes-headings ; read the manual's entry or the doc string
+    '((0 . (bold 1.4))
+       (1 . (variable-pitch bold 1.7))
        (2 . (overline semibold 1.5))
        (3 . (monochrome overline 1.4 background))
        (4 . (overline 1.3))
        (5 . (rainbow 1.2))
        (6 . (rainbow 1.15))
        (t . (rainbow 1.1))))
+  ;; They are nil by default...
+  (setq ef-themes-mixed-fonts t
+    ef-themes-variable-pitch-ui t))
 
-;; They are nil by default...
-(setq ef-themes-mixed-fonts t
-  ef-themes-variable-pitch-ui t)
-
-;; Load the theme of choice:
-(add-hook 'ef-themes-post-load-hook #'jf/theme-custom-faces)
+(setq jf/themes-plist '(:dark ef-autumn :light ef-spring))
