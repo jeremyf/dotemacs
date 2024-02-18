@@ -83,9 +83,10 @@ It will display entries without switching to them."
                            (expand-file-name org-file org-directory))
                          (rmh-elfeed-org-convert-org-to-opml
                            (current-buffer))))))
-      (with-current-buffer (find-file-noselect "~/git/takeonrules.source/static/blogroll.opml")
+      (with-current-buffer (find-file-noselect "~/git/takeonrules.source/static/blogroll.xml")
         (erase-buffer)
         (insert "<?xml version=\"1.0\"?>\n")
+        (insert "<?xml-stylesheet type=\"text/xsl\" href=\"/blogroll.xsl\"?>\n")
         (insert "<opml version=\"1.0\">\n")
         (insert "  <head>\n")
         (insert "    <title>Take on Rules Public Blogroll</title>\n")
