@@ -83,8 +83,8 @@
 ;; directory.
 (recentf-mode 1) ;; Track recent
 
-;; Quietly save the recent file list every 60 seconds.
-(run-at-time nil 60 (lambda () (let ((save-silently t)) (recentf-save-list))))
+;; Quietly save the recent file list every 10 minutes.
+(run-at-time nil 600 (lambda () (let ((save-silently t)) (recentf-save-list))))
 (global-auto-revert-mode)
 
 (setq-default fill-column 80)
