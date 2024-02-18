@@ -549,11 +549,17 @@ Useful if you want a more robust view into the recommend candidates."
           ;;; but rather prepended to the default completion-styles.
     ;; completion-category-overrides '((file (styles orderless
     ;; partial-completion))) ;; orderless is tried first
-    completion-category-overrides '((file (styles partial-completion))
+    completion-category-overrides '((file
+                                      (styles partial-completion))
                                      ;; enable initialism by default for symbols
-                                     (command (styles +orderless-with-initialism))
-                                     (variable (styles +orderless-with-initialism))
-                                     (symbol (styles +orderless-with-initialism)))
+                                     (command
+                                       (styles +orderless-with-initialism))
+                                     (variable
+                                       (styles +orderless-with-initialism))
+                                     (symbol
+                                       (styles +orderless-with-initialism))
+                                     (eglot
+                                       (styles orderless)))
     orderless-component-separator #'orderless-escapable-split-on-space
     orderless-style-dispatchers '(+orderless-dispatch)))
 

@@ -104,11 +104,18 @@ With two universal PREFIX `delete-frame'.
 With three or more universal PREFIX `save-buffers-kill-emacs'."
     (interactive "p")
     (cond
-      ((eq prefix nil) (if buffer-read-only (kill-current-buffer) (bury-buffer)))
-      ((>= prefix 64) (save-buffers-kill-emacs t))
-      ((>= prefix 16) (delete-frame))
-      ((>= prefix 4) (unbury-buffer))
-      (t (if buffer-read-only (kill-current-buffer) (bury-buffer)))))
+      ((eq prefix nil)
+        (if buffer-read-only (kill-current-buffer) (bury-buffer)))
+      ((>= prefix 64)
+        (progn
+          (let ((save-silently t)) (recentf-save-list))
+          (save-buffers-kill-emacs t)))
+      ((>= prefix 16)
+        (delete-frame))
+      ((>= prefix 4)
+        (unbury-buffer))
+      (t
+        (if buffer-read-only (kill-current-buffer) (bury-buffer)))))
   (cl-defun jf/side-window-toggle ()
     "Either bury the dedicated buffer or open one based on `current-buffer'."
     (interactive)
