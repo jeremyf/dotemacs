@@ -306,7 +306,7 @@ method, get the containing class."
           (setq markdown-toc (concat markdown-toc (concat indentation line)))))
       (insert markdown-toc)))
   :init
-  (setq markdown-command "/opt/homebrew/bin/pandoc")
+  (setq markdown-command "/usr/local/bin/pandoc")
   (font-lock-add-keywords 'markdown-mode
     '(("{{[^}]+}}" . 'font-lock-function-name-face))))
 
