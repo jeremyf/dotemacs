@@ -211,7 +211,7 @@
                 "\n- 4 supply (1⁄4 item slot each).")))
 
 (random-table/register :name "Errant > Archetype > Equipment"
-  :reuse "Errant :: Archetype"
+  :reuse "Errant > Archetype"
   :fetcher (lambda (data roll) (alist-get (car roll) data nil nil #'string=))
   :data '(("Violent" . "\n- Heavy weapon (2 item slots) or a Small shield (1 item slot, 4 blocks) or Large shield (2 item slots,
 6 blocks)")
@@ -551,7 +551,7 @@ See “Errant :: Archetype” table."
 (random-table/register :name "Errant > Weather"
   :roller #'random-table/roller/prompt-from-table-data
   :data '(("Winter" . "Winter :: {Errant > Weather > Winter}")
-           ("Spring" . "Springer :: {Errant > Weather > Spring}")
+           ("Spring" . "Spring :: {Errant > Weather > Spring}")
            ("Summer" . "Summer :: {Errant > Weather > Summer}")
            ("Autumn" . "Autumn :: {Errant > Weather > Autumn}")))
 
@@ -578,7 +578,6 @@ See “Errant :: Archetype” table."
            ((6 . 8) . "Overcast (-2 to next weather roll)")
            ((9 . 11) .  "Cloudy")
            ((12 . 14) . "Clear skies (+2 to next weather roll)")))
-
 
 (random-table/register :name "Errant > Weather > Summer"
   :private t
