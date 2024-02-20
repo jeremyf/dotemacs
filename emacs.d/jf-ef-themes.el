@@ -84,4 +84,4 @@
   (setq ef-themes-mixed-fonts t
     ef-themes-variable-pitch-ui t))
 
-(setq jf/themes-plist '(:dark ef-autumn :light ef-spring))
+(setq jf/themes-plist '(:dark ef-bio :light ef-frost))

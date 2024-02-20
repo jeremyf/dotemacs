@@ -181,8 +181,8 @@ setting up an IDE-like layout)."
 (defvar jf/themes-plist '()
   "The named themes by pallette.")
 
-(load "jf-modus-themes.el")
-;; (load "jf-ef-themes.el")
+;; (load "jf-modus-themes.el")
+(load "jf-ef-themes.el")
 
 (defun jf/emacs-theme-by-osx-appearance ()
   "Function to load named theme."

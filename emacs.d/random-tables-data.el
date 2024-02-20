@@ -2363,6 +2363,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "spying on company" "trying to forget" "untangling a mystery" "visiting relatives"))
 
 (random-table/register :name "In the Shadows of Mont Brun > Names"
+  :store t
   :data '("{German Name > Given Name > Masculine} {German Name > Family Name > General}"
            "{German Name > Given Name > Masculine} {German Name > Family Name > Swiss}"
            "{German Name > Given Name > Feminine} {German Name > Family Name > General}"
