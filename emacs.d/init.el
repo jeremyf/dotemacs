@@ -55,7 +55,7 @@
 
 (setq safe-local-variable-values
     '((eval setq-local org-export-with-properties
-        '("PRONOUNS" "BACKGROUND" "ANCESTRY" "KEEPSAKE" "ARCHETYPE" "SESSION_DATE" "START_LOCATION" "CAMPAIGN_START_DATE" "CAMPAIGN_END_DATE" "END_LOCATION"))
+        '("PRONOUNS" "ALIGNMENT" "BACKGROUND" "DEMEANOR" "ANCESTRY" "KEEPSAKE" "LOCATIONS" "FACTIONS" "ARCHETYPE" "SESSION_DATE" "START_LOCATION"  "CAMPAIGN_START_DATE" "CAMPAIGN_END_DATE" "END_LOCATION")
        (projectile-git-fd-args . "-H -0 -E hyrax-webapp -E .git -tf --strip-cwd-prefix -c never")
        (projectile-git-submodule-command . "")
        (jf/tor-minor-mode . 1)
