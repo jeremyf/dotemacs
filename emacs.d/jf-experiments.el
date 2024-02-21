@@ -295,8 +295,5 @@ of measurement (e.g., a word or sentence)."
         :transient nil)]])
 (define-key isearch-mode-map (kbd "<f2>") #'jf/isearch-menu)
 
-(use-package nano-agenda
-  :straight (:host github :repo "rougier/nano-agenda"))
-
 (provide 'jf-experiments)
 ;;; jf-experiments.el ends here
