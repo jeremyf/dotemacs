@@ -85,11 +85,11 @@ first matching link."
                  (lambda (link)
                    (when-let* ((left (org-element-property :contents-begin link))
                                 (right (org-element-property :contents-end link)))
-                   (let ((returning (propertize
-                                      (buffer-substring-no-properties
-                                        left
-                                        right)
-                                      'link (org-element-property :raw-link link))))
+                     (let ((returning (propertize
+                                        (buffer-substring-no-properties
+                                          left
+                                          right)
+                                        'link (org-element-property :raw-link link))))
                        (if given-link
                          (when (string= given-link returning) returning)
                          returning))))
@@ -132,10 +132,10 @@ first matching link."
   (setq org-time-stamp-rounding-minutes '(0 15))
   (setq org-clock-rounding-minutes 15)
   (setq org-link-frame-setup '((vm . vm-visit-folder-other-frame)
-                           (vm-imap . vm-visit-imap-folder-other-frame)
-                           (gnus . org-gnus-no-new-news)
-                           (file . find-file)
-                           (wl . wl-other-frame)))
+                                (vm-imap . vm-visit-imap-folder-other-frame)
+                                (gnus . org-gnus-no-new-news)
+                                (file . find-file)
+                                (wl . wl-other-frame)))
   (setq org-clock-persist 'history)
   (setq org-export-headline-levels 4)
   ;; When I would load the agenda, I'd invariably type "l" to list the entries.
@@ -148,7 +148,7 @@ first matching link."
   ;; Note, I did change from pdflatex to lualatex as the LaTeX class I'm often
   ;; using are only available in Lua processing.
   (setq org-latex-pdf-process '("lualatex -shell-escape -interaction nonstopmode -output-directory %o %f"
-         "lualatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+                                 "lualatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
   (setq org-latex-compiler "lualatex")
   (setq org-confirm-babel-evaluate #'jf/org-confirm-babel-evaluate
     org-fontify-quote-and-verse-blocks t
@@ -186,14 +186,14 @@ first matching link."
 
   (transient-define-suffix jf/denote-org-capture/filename-set ()
     "Work with `jf/denote-org-capture/filename'"
-         :description '(lambda ()
-                         (concat
-                           "Denote Capture Filename: "
-         (propertize (format "%s" (and denote-last-path
-                                    (file-exists-p denote-last-path)
-                                    (denote-retrieve-filename-title denote-last-path)))
-           'face 'transient-argument)))
-          (interactive)
+    :description '(lambda ()
+                    (concat
+                      "Denote Capture Filename: "
+                      (propertize (format "%s" (and denote-last-path
+                                                 (file-exists-p denote-last-path)
+                                                 (denote-retrieve-filename-title denote-last-path)))
+                        'face 'transient-argument)))
+    (interactive)
     (if denote-last-path
       (setq denote-last-path nil)
       (let ((fname (buffer-file-name (current-buffer))))
@@ -241,6 +241,7 @@ first matching link."
           ("C-c c" . org-capture)
           ("C-s-t" . org-toggle-link-display)))
 
+
 (with-eval-after-load 'org
   (use-package ox
     :straight (ox :type built-in))
@@ -284,6 +285,7 @@ first matching link."
        ("\\paragraph{%s}" . "\\paragraph{%s}")
        ("\\subparagraph{%s}" . "\\subparagraph{%s}")))
   (setq org-latex-default-class "jf/article")
+
   (use-package ox-gfm
     :straight t
     :init
@@ -893,7 +895,7 @@ The return value is a list of `cons' with the `car' values of:
       ((or (string= "http" type) (string= "https" type))
         (save-excursion
           (concat "#+attr_shortcode: :cite_url " link
-              "\n#+begin_blockquote\n" content "\n#+end_blockquote\n%?")))
+            "\n#+begin_blockquote\n" content "\n#+end_blockquote\n%?")))
       (t (concat "\n#+begin_example\n" content "\n#+end_example")))))
 (defun jf/org-mode/capture/parameters (prefix)
   "A logic lookup table by PREFIX."
@@ -931,64 +933,99 @@ I envision this function called from the command-line."
       (goto-char (point-max))
       (insert "\n" text))))
 
-;; (defun jf/org-mode/open-all-unresolved-pull-requests ()
-;;   "Opens all unresolved pull requests identified in agenda."
-;;   (interactive)
-;;   (dolist (url (-distinct
-;;                  (org-map-entries
-;;                    (lambda ()
-;;                      (org-element-property :raw-value (org-element-at-point)))
-;;                    "+LEVEL=5+mergerequests+TODO=\"STARTED\"" 'agenda)))
-;;     (eww-browse-with-external-browser url)))
+(setq jf/campaign/file-name
+  "~/git/org/denote/indices/20231127T184806--the-shadows-of-mont-brun-status-document__campaigns_projects_rpgs_StatusDocuments.org")
 
+(cl-defun jf/campaign/named-element (&key property tag)
+  "Fetch PROPERTY from headlines with parent that has given TAG."
+  (with-current-buffer (find-file-noselect jf/campaign-file-name)
+    (org-element-map
+      (org-element-parse-buffer 'headline)
+      'headline
+      (lambda (headline)
+        (and (member tag
+               (org-element-property
+                 :tags
+                 (car (org-element-lineage headline))))
+          (org-entry-get headline property))))))
+
+(defun jf/campaign/random-npc-as-entry ()
+  "Create an NPC entry."
+  (let* ((random-table/reporter
+           (lambda (expression results) (format "%s" results)))
+          (name
+            (random-table/roll "In the Shadows of Mont Brun > Names"))
+          (quirk
+            (random-table/roll "Random NPC Quirks"))
+          (alignment
+            (random-table/roll "Noble House > Alignment"))
+          (lore-table
+            (random-table/roll "The One Ring > Lore"))
+          (locations
+            (s-join ", "
+              (completing-read-multiple
+                "Location(s): "
+                (jf/campaign/named-element :property "NAME" :tag "locations"))))
+          (factions
+            (s-join ", "
+              (completing-read-multiple
+                "Faction(s): "
+                (jf/campaign/named-element :property "NAME" :tag "factions")))))
+    (format "<<<%s>>>\n:PROPERTIES:\n:NAME:  %s\n:BACKGROUND:\n:LOCATIONS:  %s\n:DEMEANOR:\n:ALIGNMENT:  %s\n:QUIRKS:  %s\n:FACTIONS:  %s\n:END:\n\n%s"
+      name name locations alignment quirk factions lore-table)))
 
 (setq org-capture-templates
-    '(("d" "To Denote"
-        plain (file denote-last-path)
-        #'jf/denote-org-capture
-        :no-save t
-        :immediate-finish nil
-        :kill-buffer t
-        :jump-to-captured t)
-       ("c" "Content to Clock"
-         plain (clock)
-         "%(jf/denote/capture-wrap :link \"%L\" :content \"%i\")"
-         :empty-lines 1)
-       ("i" "Immediate to Clock"
-         plain (clock)
-         "%i%?"
-         :immediate-finish t)
-       ("k" "Kill to Clock"
-         plain (clock)
-         "%c" :immediate-finish t)
-       ("l" "#Lore24 Entry"
-         plain (file+olp+datetree jf/lore24-filename)
-         "%?"
-         :clock-in t
-         :clock-keep t
-         :empty-lines-before 1
-         :jump-to-captured t)
-       ("t" "Task (via Journal)"
-         entry (function denote-journal-extras-new-or-existing-entry)
-         "* %^{Task} :%(jf/project-as-tag):\n\n- Link to Project :: %(jf/project-as-link)\n\n%?"
-         :empty-lines-before 1
-         :empty-lines-after 1
-         :clock-in t
-         :clock-keep t
-         :jump-to-captured t)
-       ("T" "Task (via Project)"
-         plain (function jf/org-mode/capture/project-task/find)
-         "%?"
-         :empty-lines-before 1
-         :empty-lines-after 1
-         :clock-in t
-         :clock-keep t
-         :jump-to-captured t)
-       ("n" "Note for project task"
-         plain (function jf/org-mode/capture/project-task/find)
-         "%T\n\n%?"
-         :empty-lines-before 1
-         :empty-lines-after 1)))
+  '(("d" "To Denote"
+      plain (file denote-last-path)
+      #'jf/denote-org-capture
+      :no-save t
+      :immediate-finish nil
+      :kill-buffer t
+      :jump-to-captured t)
+     ("c" "Content to Clock"
+       plain (clock)
+       "%(jf/denote/capture-wrap :link \"%L\" :content \"%i\")"
+       :empty-lines 1)
+     ("i" "Immediate to Clock"
+       plain (clock)
+       "%i%?"
+       :immediate-finish t)
+     ("k" "Kill to Clock"
+       plain (clock)
+       "%c" :immediate-finish t)
+     ("l" "#Lore24 Entry"
+       plain (file+olp+datetree jf/lore24-filename)
+       "%?"
+       :clock-in t
+       :clock-keep t
+       :empty-lines-before 1
+       :jump-to-captured t)
+     ("n" "NPC"
+       entry (file+headline jf/campaign/file-name "Non-Player Characters")
+       "* %(jf/campaign/random-npc-as-entry)\n%?"
+       :empty-lines-after 1
+       :jump-to-captured t)
+     ("t" "Task (via Journal)"
+       entry (function denote-journal-extras-new-or-existing-entry)
+       "* %^{Task} :%(jf/project-as-tag):\n\n- Link to Project :: %(jf/project-as-link)\n\n%?"
+       :empty-lines-before 1
+       :empty-lines-after 1
+       :clock-in t
+       :clock-keep t
+       :jump-to-captured t)
+     ("T" "Task (via Project)"
+       plain (function jf/org-mode/capture/project-task/find)
+       "%?"
+       :empty-lines-before 1
+       :empty-lines-after 1
+       :clock-in t
+       :clock-keep t
+       :jump-to-captured t)
+     ("n" "Note for project task"
+       plain (function jf/org-mode/capture/project-task/find)
+       "%T\n\n%?"
+       :empty-lines-before 1
+       :empty-lines-after 1)))
 
 (defvar jf/link-to-project nil)
 
@@ -1108,11 +1145,11 @@ holding contextual information."
 (defun jf/org-export-change-options (plist backend)
   (cond
     ((equal backend 'html)
-     (plist-put plist :with-toc nil)
-     (plist-put plist :section-numbers nil))
+      (plist-put plist :with-toc nil)
+      (plist-put plist :section-numbers nil))
     ((equal backend 'latex)
-     (plist-put plist :with-toc 3)
-     (plist-put plist :section-numbers nil)))
+      (plist-put plist :with-toc 3)
+      (plist-put plist :section-numbers nil)))
   plist)
 (add-to-list 'org-export-filter-options-functions #'jf/org-export-change-options)
 
