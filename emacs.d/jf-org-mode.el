@@ -1123,23 +1123,28 @@ APP is the parameters for saving the bookmark."
 (setq org-export-filter-node-property-functions
   (list
     (lambda (data back-end channel)
-      (cond
-        ((eq back-end 'latex)
-          (let ((field-value (s-split ":" data)))
-            ;; (format "\\item\\textbf{%s:} %s\n"
-            (format "\\item[{%s:}] %s\n"
-              (s-titleize (s-replace "_" " " (car field-value)))
-              (s-trim (cadr field-value)))))
-        (t data)))))
+      (let* ((field-value (s-split ":" data))
+              (term (s-titleize (s-replace "_" " " (car field-value))))
+              (value (s-trim (cadr field-value))))
+        (if (s-blank? value)
+          ""
+          (cond
+            ((eq back-end 'latex)
+              (format "\\item[{%s:}] %s\n" term value))
+            ((eq back-end 'md)
+              (format "%s\n: %s\n" term value))
+            (t data)))))))
 
 (defun jf/org-latex-property-drawer (_property-drawer contents _info)
   "Transcode a PROPERTY-DRAWER element from Org to LaTeX.
 CONTENTS holds the contents of the drawer.  INFO is a plist
 holding contextual information."
   (and (org-string-nw-p contents)
-    (format "\\begin{description}\n%s\\end{description}" contents)))
+    (format "\\begin{description}\n%s\\end{description}\n\\vspace{5mm}" contents)))
 
 (advice-add #'org-latex-property-drawer :override #'jf/org-latex-property-drawer)
+
+
 
 ;; Without these, I've lost table of contents in PDF exports.
 (defun jf/org-export-change-options (plist backend)
