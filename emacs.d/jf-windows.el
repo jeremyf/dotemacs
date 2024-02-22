@@ -19,6 +19,10 @@
   ;; Wrangle up how windows and buffers display.
   :straight (:type built-in)
   :config
+  (defun jf/body-function/rspec-compilation (window)
+    "Select the WINDOW and move to `end-of-buffer'."
+    (select-window window)
+    (end-of-buffer))
   (setq display-buffer-alist
     `(;; no window
        ("\\`\\*Async Shell Command\\*\\'"
@@ -57,6 +61,9 @@
          (window-height . 0.1)
          (dedicated . t)
          (preserve-size . (t . t)))
+       ("\\*rspec-compilation\\*"
+         (display-buffer-reuse-mode-window display-buffer-below-selected)
+         (body-function . jf/body-function/rspec-compilation))
        ((derived-mode . reb-mode) ; M-x re-builder
          (display-buffer-reuse-mode-window display-buffer-below-selected)
          (window-height . 4) ; note this is literal lines, not relative
