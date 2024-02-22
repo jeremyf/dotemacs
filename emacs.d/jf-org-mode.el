@@ -1158,6 +1158,36 @@ holding contextual information."
   plist)
 (add-to-list 'org-export-filter-options-functions #'jf/org-export-change-options)
 
+
+;;; From https://emacs.stackexchange.com/questions/22210/auto-update-org-tables-before-each-export
+;; Recalculate all org tables in the buffer when saving.
+(defvar-local jf/org-enable-buffer-wide-recalculation t
+  "When non-nil, recalculate all dynamic regions when saving the file.
+
+This variable is buffer local.")
+;; Mark `jf/org-enable-buffer-wide-recalculation' as a safe local
+;; variable as long as its value is t or nil. That way you are not prompted
+;; to add that to `safe-local-variable-values' in custom.el.
+(put 'jf/org-enable-buffer-wide-recalculation 'safe-local-variable #'booleanp)
+
+(defun jf/org-recalculate-buffer-tables (&rest args)
+  "Wrapper function for `org-table-recalculate-buffer-tables' and
+`org-dblock-update' that runs that function only if
+`jf/org-enable-buffer-wide-recalculation' is non-nil.
+
+Also, this function has optional ARGS that is needed for any function that is
+added to `org-export-before-processing-hook'. This would be useful if this
+function is ever added to that hook."
+  (when jf/org-enable-buffer-wide-recalculation
+    (progn
+      (org-table-recalculate-buffer-tables)
+      (org-dblock-update '(4)))))
+
+(defun jf/org-recalculate-before-save ()
+  "Recalculate dynamic buffer regions before saving."
+  (add-hook 'before-save-hook #'jf/org-recalculate-buffer-tables nil :local))
+(add-hook 'org-mode-hook #'jf/org-recalculate-before-save)
+
 (use-package org-web-tools
   :straight t)
 
