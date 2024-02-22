@@ -97,7 +97,7 @@ first matching link."
                  given-link)))
     ;; Ensure that we have a distinct list.
     (if (listp links)
-      (-distinct links)
+      (seq-uniq links)
       (list links))))
 
 ;;; Begin Org Mode (all it's glory)
@@ -336,7 +336,7 @@ first matching link."
   (completing-read
     "Project: "
     (sort
-      (-distinct
+      (seq-uniq
         (org-map-entries
           (lambda ()
             (org-element-property :raw-value (org-element-at-point)))

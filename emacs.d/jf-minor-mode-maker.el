@@ -30,7 +30,7 @@ And assign a KEYMAP."
            :keymap ,keymap
            :lighter ,lighter)
          (when ,hooks
-           (-each ,hooks (lambda(hook) (add-hook hook (lambda () (,mode-name)))))))))
+           (seq-each ,hooks (lambda(hook) (add-hook hook (lambda () (,mode-name)))))))))
 
 (provide 'jf-minor-mode-maker)
 ;;; jf-minor-mode-maker.el ends here

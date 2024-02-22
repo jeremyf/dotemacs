@@ -982,7 +982,7 @@ When USE_HUGO_SHORTCODE is given use glossary based exporting."
   "Create a `denote' entry in DOMAIN for URL with KEYWORDS.
 
 The DOM could be as sanitized by `org-web-tools--sanitized-dom'."
-  (-let* ((url (or url (org-web-tools--get-first-url)))
+  (let* ((url (or url (org-web-tools--get-first-url)))
            (dom (plz 'get url :as #'org-web-tools--sanitized-dom))
            ((title . readable) (org-web-tools--eww-readable dom))
            (title (org-web-tools--cleanup-title (or title "")))
@@ -1027,7 +1027,7 @@ Optionally DROP-TAGS, as there may have been a TAG associated with the series."
                 (id (denote-retrieve-filename-identifier file))
                 (file-type 'org)
                 (title (denote-retrieve-title-value file file-type))
-                (keywords (seq-difference (denote-retrieve-keywords-value file file-type) (-flatten drop-tags)))
+                (keywords (seq-difference (denote-retrieve-keywords-value file file-type) (flatten-list drop-tags)))
                 (extension (denote-get-file-extension file))
                 (dir (file-name-directory file))
                 (new-name (denote-format-file-name dir id keywords title extension series)))

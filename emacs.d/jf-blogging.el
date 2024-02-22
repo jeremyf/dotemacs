@@ -174,7 +174,7 @@ Take on Rules using the \"blockquote\" special block."
   "TakeOnRules session report locations.")
 
 (cl-defun jf/org-keywords-as-plist (&key (keywords-regexp "\\(IDENTIFIER\\|FILETAGS\\|HUGO_FRONT_MATTER_FORMAT\\|HUGO_SECTION\\|HUGO_BASE_DIR\\|TITLE\\|SUBTITLE\\)"))
-  (-flatten (mapcar (lambda (prop)
+  (flatten-list (mapcar (lambda (prop)
                       (list (org-element-property :key prop)
                         (org-element-property :value prop)))
               (jf/org-global-props keywords-regexp))))
@@ -197,7 +197,7 @@ Take on Rules using the \"blockquote\" special block."
             (description (lax-plist-get metadata "DESCRIPTION")))
       (call-interactively #'mastodon-toot)
       (end-of-buffer)
-      (insert (s-join "\n\n" (-flatten (list description url)))))
+      (insert (s-join "\n\n" (flatten-list (list description url)))))
     (user-error "Current buffer is not a blog post.")))
 
 (cl-defun jf/jump_to_corresponding_hugo_file (&key (buffer (current-buffer)))

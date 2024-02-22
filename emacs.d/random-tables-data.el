@@ -240,7 +240,7 @@ See “Errant :: Archetype” table."
               attribute_archetypes))
           ;; (10 9)
           (top_ability_scores
-            (take 2 (-distinct (sort (mapcar #'cdr attr_rolls) #'>))))
+            (take 2 (seq-uniq (sort (mapcar #'cdr attr_rolls) #'>))))
           (candidates '())
           ;; We always want to add candidates to the list, hence the
           ;; compare is via no-comp
