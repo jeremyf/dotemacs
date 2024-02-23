@@ -938,7 +938,7 @@ I envision this function called from the command-line."
 
 (cl-defun jf/campaign/named-element (&key property tag)
   "Fetch PROPERTY from headlines with parent that has given TAG."
-  (with-current-buffer (find-file-noselect jf/campaign-file-name)
+  (with-current-buffer (find-file-noselect jf/campaign/file-name)
     (org-element-map
       (org-element-parse-buffer 'headline)
       'headline
@@ -952,27 +952,33 @@ I envision this function called from the command-line."
 (defun jf/campaign/random-npc-as-entry ()
   "Create an NPC entry."
   (let* ((random-table/reporter
-           (lambda (expression results) (format "%s" results)))
-          (name
-            (random-table/roll "In the Shadows of Mont Brun > Names"))
-          (quirk
-            (random-table/roll "Random NPC Quirks"))
-          (alignment
-            (random-table/roll "Noble House > Alignment"))
-          (lore-table
-            (random-table/roll "The One Ring > Lore"))
-          (locations
-            (s-join ", "
-              (completing-read-multiple
-                "Location(s): "
-                (jf/campaign/named-element :property "NAME" :tag "locations"))))
-          (factions
-            (s-join ", "
-              (completing-read-multiple
-                "Faction(s): "
-                (jf/campaign/named-element :property "NAME" :tag "factions")))))
-    (format "<<<%s>>>\n:PROPERTIES:\n:NAME:  %s\n:BACKGROUND:\n:LOCATIONS:  %s\n:DEMEANOR:\n:ALIGNMENT:  %s\n:QUIRKS:  %s\n:FACTIONS:  %s\n:END:\n\n%s"
-      name name locations alignment quirk factions lore-table)))
+          (lambda (expression results) (format "%s" results)))
+         (name
+          (random-table/roll "In the Shadows of Mont Brun > Names"))
+         (quirk
+          (random-table/roll "Random NPC Quirks"))
+         (alignment
+          (random-table/roll "Noble House > Alignment"))
+         (lore-table
+          (random-table/roll "The One Ring > Lore"))
+         (locations
+          (s-join ", "
+                  (completing-read-multiple
+                   "Location(s): "
+                   (jf/campaign/named-element :property "NAME"
+                                              :tag "locations"))))
+         (factions
+          (s-join ", "
+                  (completing-read-multiple
+                   "Faction(s): "
+                   (jf/campaign/named-element :property "NAME"
+                                              :tag "factions")))))
+    (format (concat
+             "<<<%s>>>\n:PROPERTIES:\n:NAME:  %s\n:BACKGROUND:\n"
+             ":LOCATIONS:  %s\n:DEMEANOR:\n:ALIGNMENT:  %s\n"
+             ":QUIRKS:  %s\n:FACTIONS:  %s\n:END:\n\n%s")
+    name name locations alignment quirk factions lore-table)))
+
 
 (setq org-capture-templates
   '(("d" "To Denote"
@@ -1021,7 +1027,7 @@ I envision this function called from the command-line."
        :clock-in t
        :clock-keep t
        :jump-to-captured t)
-     ("n" "Note for project task"
+     ("N" "Note for project task"
        plain (function jf/org-mode/capture/project-task/find)
        "%T\n\n%?"
        :empty-lines-before 1
