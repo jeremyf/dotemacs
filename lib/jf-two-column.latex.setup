@@ -29,8 +29,6 @@
 #+LATEX_HEADER: \setcounter{secnumdepth}{1}
 
 # If this is a header; it will affect the table of contents.  But as a LATEX
-# command, it happens in the processing order ofthe org file.
+# command, it happens in the processing order of the org file.
 #+LATEX: \let\oldsection\section
 #+LATEX: \renewcommand{\section}[1]{\newpage\end{multicols}\oldsection{#1}\begin{multicols}{2}}
-
-# lualatex  -interaction=nonstopmode -recorder --output-format=pdf path/to/file.tex

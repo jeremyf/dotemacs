@@ -952,6 +952,9 @@ I envision this function called from the command-line."
 (defun jf/campaign/random-npc-as-entry ()
   "Create an NPC entry."
   (let* ((random-table/reporter
+           ;; Bind a function that will only output the results of the
+           ;; table, excluding the expression that generated the
+           ;; results.
           (lambda (expression results) (format "%s" results)))
          (name
           (random-table/roll "In the Shadows of Mont Brun > Names"))
@@ -1126,20 +1129,26 @@ APP is the parameters for saving the bookmark."
 ;;     (add-hook 'pdf-annot-activate-handler-functions #'org-noter-pdftools-jump-to-note)))
 
 
+;; Convert the data ":PROPERTY: VALUE" into a latex item or markdown definition
+;; term and detail.
 (setq org-export-filter-node-property-functions
-  (list
-    (lambda (data back-end channel)
-      (let* ((field-value (s-split ":" data))
-              (term (s-titleize (s-replace "_" " " (car field-value))))
-              (value (s-trim (cadr field-value))))
-        (if (s-blank? value)
-          ""
-          (cond
-            ((eq back-end 'latex)
-              (format "\\item[{%s:}] %s\n" term value))
-            ((eq back-end 'md)
-              (format "%s\n: %s\n" term value))
-            (t data)))))))
+  '(jf/ox/transform-node-property-to-item))
+
+(defun jf/ox/transform-node-property-to-item (data back-end channel)
+  "Convert DATA to appropriate markup for given BACK-END.
+
+CHANNEL is ignored."
+  (let* ((field-value (s-split ":" data))
+          (term (s-titleize (s-replace "_" " " (car field-value))))
+          (value (s-trim (cadr field-value))))
+    (if (s-blank? value)
+      ""
+      (cond
+        ((eq back-end 'latex)
+          (format "\\item[{%s:}] %s\n" term value))
+        ((eq back-end 'md)
+          (format "%s\n: %s\n" term value))
+        (t data)))))
 
 (defun jf/org-latex-property-drawer (_property-drawer contents _info)
   "Transcode a PROPERTY-DRAWER element from Org to LaTeX.
@@ -1163,7 +1172,6 @@ holding contextual information."
       (plist-put plist :section-numbers nil)))
   plist)
 (add-to-list 'org-export-filter-options-functions #'jf/org-export-change-options)
-
 
 ;;; From https://emacs.stackexchange.com/questions/22210/auto-update-org-tables-before-each-export
 ;; Recalculate all org tables in the buffer when saving.
