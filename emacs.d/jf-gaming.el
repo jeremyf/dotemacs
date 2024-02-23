@@ -21,16 +21,16 @@
     ("⏿" . "Eye of Sauron for the One Ring") ;; (Observer Eye Symbol) Sauron symbol
     ))
 ;;;; Burning Wheel Code
-(jf/minor-mode-maker :title "Burning Wheel Gold"
-         ;; Being a programmer and someone who plays table top
-         ;; role-playing games (TTRPG), I’ve often used the TTRPG
-         ;; rules-set or systems to explore programming languages
-         ;; and processes.  After all, I understand the TTRPG rules
-         ;; well enough (or the algorithm’s description) that I can
-         ;; spend time thinking through my approach in a
-         ;; programming language.
-                     :abbr "bwg"
-                     :hooks (list 'org-mode-hook 'markdown-mode-hook))
+;; (jf/minor-mode-maker :title "Burning Wheel Gold"
+;;          ;; Being a programmer and someone who plays table top
+;;          ;; role-playing games (TTRPG), I’ve often used the TTRPG
+;;          ;; rules-set or systems to explore programming languages
+;;          ;; and processes.  After all, I understand the TTRPG rules
+;;          ;; well enough (or the algorithm’s description) that I can
+;;          ;; spend time thinking through my approach in a
+;;          ;; programming language.
+;;                      :abbr "bwg"
+;;                      :hooks (list 'org-mode-hook 'markdown-mode-hook))
 
 (jf/transient-quick-help jf/bwg-qh-wises
   :label "Wises"
@@ -359,9 +359,9 @@ Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
 
 ;;;; Core RPG
 
-(jf/minor-mode-maker :title "CORE RPG"
-                     :abbr "core"
-                     :hooks (list 'org-mode-hook 'markdown-mode-hook))
+;; (jf/minor-mode-maker :title "CORE RPG"
+;;                      :abbr "core"
+;;                      :hooks (list 'org-mode-hook 'markdown-mode-hook))
 
 (jf/transient-quick-help jf/rpg-core-qh-stat-scores
   :label "Stat Descriptors"
@@ -507,9 +507,9 @@ Returns a list of 6 elements: Su, Li, Mi, Se, Tr, and Mo"
    '("Miss 2 or more ... Help gets -1")))
 
 ;;;; Eberron
-(jf/minor-mode-maker :title "Eberron"
-                     :abbr "eb"
-                     :hooks (list 'org-mode-hook 'markdown-mode-hook))
+;; (jf/minor-mode-maker :title "Eberron"
+;;                      :abbr "eb"
+;;                      :hooks (list 'org-mode-hook 'markdown-mode-hook))
 
 (jf/transient-quick-help jf/eberron-qh-dragonmarks
   :label "Dragonmarks"
