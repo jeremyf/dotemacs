@@ -1159,7 +1159,11 @@ holding contextual information."
 
 (advice-add #'org-latex-property-drawer :override #'jf/org-latex-property-drawer)
 
-
+(defun jf/org-latex-format-basic-headline-function
+  (_todo _todo-type _priority text _tags _info)
+  "Only render the TEXT of the headlin.
+See `org-latex-format-headline-function' for details."
+  text)
 
 ;; Without these, I've lost table of contents in PDF exports.
 (defun jf/org-export-change-options (plist backend)
