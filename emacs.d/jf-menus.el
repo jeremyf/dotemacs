@@ -110,8 +110,7 @@
       ("C-M-s-t" "Archive month as timesheet…" jf/denote/archive-timesheet-month)
       ("t" "Todo for project…" magit-todos-list)
       ("T" "Mastodon Toot…" mastodon-toot)
-      ("u" jf/org-mode/agenda-files-update)
-      ("w" "Weekly hours report" jf/org-mode-weekly-report)]
+      ("u" jf/org-mode/agenda-files-update)]
     ["Denote"
       ("d a" jf/project/add-project-path :if jf/denote?)
       ("d c" jf/denote-org-capture/filename-set)

@@ -225,3 +225,294 @@ A massive function for helping make the preliminaries of a blog post.
   ;; (message "%s" (jf/org-markdown-export-format-link-for :node (org-roam-node-from-id "FC017488-D8EC-43DE-A35D-4D10A87B6A0D") :desc "Burning Wheel Gold"))
   ;; (message "%s" (jf/org-markdown-export-format-link-for :node (org-roam-node-from-id "86F3E44F-AA0E-4B08-B0D8-30A764B4CD13") :desc "Org Roam"))
 #+end_src
+
+** Org Mode and Projects
+:PROPERTIES:
+:ID:       095A9509-CAA4-439E-8006-0F8152E13C46
+:END:
+
+These are functions I onced used for my project time tracking.  What I have with dailies appears to be doing an adequate job.  These are here for posterity.
+
+#+begin_src emacs-lisp
+  ;; (defun jf/force-org-rebuild-cache (prefix-arg)
+  ;;   "Call functions to rebuild the applicable `org-mode' and `org-roam' cache(s).
+
+  ;; When given PREFIX_ARG, clear the org-roam database (via
+  ;;  `org-roam-db-clear-all') then sync.  This will slow down the sync."
+  ;;   (interactive "P")
+  ;;   (org-id-update-id-locations)
+  ;;   (when (fboundp 'org-roam-db-clear-all)
+  ;;     (progn
+  ;;       (when (car prefix-arg) (org-roam-db-clear-all))
+  ;;       (org-roam-db-sync)
+  ;;       (org-roam-update-org-id-locations))))
+
+  (cl-defun jf/org-agenda/send-forward-task ()
+    "Send an `org-mode' task node forward."
+    (interactive)
+    (save-excursion
+      (let* ((day-project-task
+              (jf/org-agenda/timesheet/get-day-and-project-and-task-at-point))
+             (from-project (plist-get day-project-task :project))
+             (from-task (plist-get day-project-task :task)))
+        ;; Narrowing the region to perform quicker queries on the element
+        (narrow-to-region (org-element-property :begin from-task)
+  			(org-element-property :end from-task))
+
+        ;; Grab each section for the from-task and convert that into text.
+        ;;
+        ;; Yes we have the from-task, however, we haven't parsed that entity.
+        ;; Without parsing that element, the `org-element-contents' returns nil.
+        (let ((content (s-join "\n" (org-element-map (org-element-parse-buffer)
+                                        'section
+                                      (lambda (section)
+                                        (mapconcat
+                                         (lambda (element)
+                                           (pcase (org-element-type element)
+                                             ;; I want to skip my time entries
+                                             ('drawer nil)
+                                             (_ (buffer-substring-no-properties
+                                                 (org-element-property
+                                                  :begin element)
+                                                 (org-element-property
+                                                  :end element)))))
+                                         (org-element-contents section)
+                                         "\n"))))))
+          (widen)
+          (org-capture-string (format "%s %s :%s:\n\n%s %s %s :%s:\n%s"
+  				    (s-repeat (org-element-property :level from-project) "*")
+  				    (org-element-property :raw-value from-project)
+  				    (s-join ":" (org-element-property :tags from-project))
+  				    (s-repeat (org-element-property :level from-task) "*")
+  				    (org-element-property :todo-keyword from-task)
+  				    (org-element-property :raw-value from-task)
+  				    (s-join ":" (org-element-property :tags from-task))
+  				    content)
+  			    "d"))
+        ;; Now that we've added the content, let's tidy up the from-task.
+        (goto-char (org-element-property :contents-begin from-task))
+        ;; Prompt for the todo state of the original task.
+        (call-interactively 'org-todo))))
+
+  (defun jf/org-agenda/timesheet/get-day-and-project-and-task-at-point ()
+    "Return a plist of :day, :project, and :task for element at point."
+    (let* ((task (jf/org-agenda-headline-for-level :level 5))
+           (project (progn
+                      (org-up-heading-safe)
+                      (org-element-at-point)))
+           (day (progn
+                  (org-up-heading-safe)
+                  (org-element-at-point))))
+      (list :project project :task task :day day)))
+
+  (cl-defun jf/org-agenda-headline-for-level (&key (level 5))
+    "Find the `org-mode' ancestor headline with LEVEL."
+    (let ((element (org-element-at-point)))
+      (if (eq 'headline (org-element-type element))
+  	(let ((element-level (org-element-property :level element)))
+            (cond
+             ((= level element-level)
+              (progn (message "Found %s" element) element))
+             ((> level element-level)
+              (user-error "Selected element %s is higher level." element-level))
+             ((< level element-level)
+              (progn (org-up-heading-safe) (jf/org-agenda-headline-for-level :level level)))))
+        (progn
+          (org-back-to-heading)
+          (jf/org-agenda-headline-for-level :level level)))))
+
+
+  (defun jf/org-mode-agenda-project-prompt ()
+    "Prompt for project based on existing projects in agenda file.
+
+        Note: I tried this as interactive, but the capture templates
+        insist that it should not be interactive."
+    (completing-read
+     "Project: "
+     (sort
+      (seq-uniq
+       (org-map-entries
+        (lambda ()
+          (org-element-property :raw-value (org-element-at-point)))
+        "+LEVEL=4+projects" 'agenda))
+      #'string<)))
+
+  ;; When I jump to a new task for the day, I want to position that task within
+  ;; the prompted project.  Inspiration from
+  ;; https://gist.github.com/webbj74/0ab881ed0ce61153a82e.
+  (cl-defun jf/org-mode-agenda-find-project-node
+      (&key
+       (tag "projects")
+       (project (jf/org-mode-agenda-project-prompt))
+       ;; The `file+olp+datetree` directive creates a headline like “2022-09-03 Saturday”.
+       (within_headline (format-time-string "%Y-%m-%d %A")))
+    "Position `point' at the end of the given PROJECT WITHIN_HEADLINE.
+
+    And use the given TAG."
+    ;; We need to be using the right agenda file.
+    (with-current-buffer (find-file-noselect
+                          jf/primary-agenda-filename-for-machine)
+      (let ((existing-position (org-element-map
+                                   (org-element-parse-buffer)
+                                   'headline
+                                 ;; Finds the end position of:
+                                 ;; - a level 4 headline
+                                 ;; - that is tagged as a :projects:
+                                 ;; - is titled as the given project
+                                 ;; - and is within the given headline
+                                 (lambda (hl)
+                                   (and (=(org-element-property :level hl) 4)
+                                        ;; I can't use the :title attribute as it
+                                        ;; is a more complicated structure; this
+                                        ;; gets me the raw string.
+                                        (string= project
+  					       (plist-get (cadr hl) :raw-value))
+                                        (member tag
+  					      (org-element-property :tags hl))
+                                        ;; The element must have an ancestor with
+                                        ;; a headline of today
+                                        (string= within_headline
+  					       (plist-get
+  						;; I want the raw title, no
+  						;; styling nor tags
+  						(cadr
+  						 (car
+  						  (org-element-lineage hl)))
+  						:raw-value))
+                                        (org-element-property :end hl)))
+                                 nil t)))
+        (if existing-position
+            ;; Go to the existing position for this project
+            (goto-char existing-position)
+          (progn
+            ;; Go to the end of the file and append the project to the end
+            (goto-char (point-max))
+            ;; Ensure we have a headline for the given day
+            (unless (org-element-map
+                        (org-element-parse-buffer)
+                        'headline
+                      (lambda (hl)
+                        (string= within_headline
+                                 (plist-get
+  				;; I want the raw title, no styling nor tags
+  				(cadr (car (org-element-lineage hl)))
+  				:raw-value))))
+              (insert (concat "\n\n*** "within_headline)))
+            (insert (concat "\n\n**** " project " :" tag ":\n\n")))))))
+
+  (cl-defun jf/org-mode-agenda-find-blocked-node ()
+    "Add a blocker node to today."
+    (jf/org-mode-agenda-find-project-node :tag "blockers"
+  					:project (concat
+  						  "Blockers for "
+  						  (format-time-string
+  						   "%Y-%m-%d"))))
+
+  (cl-defun jf/org-mode-agenda-find-merge-request-node ()
+    "Add a mergerequest node to today."
+    (jf/org-mode-agenda-find-project-node :tag "mergerequests"
+  					:project (concat "Merge Requests for "
+  							 (format-time-string
+  							  "%Y-%m-%d"))))
+
+  ;; Takes my notes for the day and formats them for a summary report.
+  (defun jf/org-mode-agenda-to-stand-up-summary (parg)
+    "Copy to the kill ring the day's time-tracked summary.
+
+    When given PARG, prompt for the day of interest.
+
+    NOTE: This follows the convention that projects are on headline 4 and
+    tasks within projects are headline 5."
+    (interactive "P")
+    (with-current-buffer (find-file-noselect
+                          jf/primary-agenda-filename-for-machine)
+      (save-excursion
+        (let ((within_headline
+               ;; Use the CCYY-MM-DD Dayname format and prompt for a date if
+               ;; PREFIX-ARG given.
+               (format-time-string "%Y-%m-%d %A"
+  				 (when (car parg)
+  				   (org-read-date nil t nil "Pick a day:" )))))
+          (kill-new
+           (concat "*Summary of " within_headline "*\n\n"
+  		 (s-trim
+                    (s-join
+                     "\n"
+                     (org-element-map
+                         (org-element-parse-buffer)
+                         'headline
+                       (lambda (hl)
+                         (when (member
+                                within_headline
+                                (mapcar
+                                 (lambda (ancestor)
+                                   (plist-get (cadr ancestor) :raw-value))
+                                 (org-element-lineage hl)))
+                           (pcase (org-element-property :level hl)
+                             (4 (concat "\n" (plist-get (cadr hl) :raw-value)))
+                             (5 (if (and
+                                     (member "mergerequest" (org-element-property :tags hl))
+                                     (eq 'done (org-element-property :todo-type hl)))
+  				  nil
+  				(concat "- " (plist-get (cadr hl) :raw-value))))
+                             (_ nil)))))))))
+          (jf/create-scratch-buffer)
+          (yank)))))
+
+  (defun jf/org-mode/narrow-to-date (date)
+    "Narrow agenda to given DATE agenda subtree."
+    (interactive (list (if current-prefix-arg
+                           (org-read-date nil nil nil "Pick a day:")
+                         (format-time-string "%Y-%m-%d"))))
+    (widen)
+    (goto-char (point-max))
+    (re-search-backward (concat "^\*\*\* " date))
+    (end-of-line)
+    (org-narrow-to-subtree)
+    (message "Narrowing to %s agenda" date))
+
+  ;; I’m responsible for tracking my work time.  I want a way to quickly see what
+  ;; that is for the current week.
+  ;;
+  ;; A utility function providing an overrview
+  (cl-defun jf/org-mode-weekly-report ()
+    "Jump to my weekly time tracker.
+
+    Useful for providing me with an overview of my total tracked time
+    for the week."
+    (interactive)
+    (find-file jf/primary-agenda-filename-for-machine)
+    (require 'pulsar)
+    (pulsar-pulse-line)
+    (org-clock-report 4))
+
+  ;; Another task at end of month is to transcribing my agenda’s timesheet to
+  ;; entries in our time tracking software.  From the day’s project link in the
+  ;; =org-clock-report=, I want to copy the headlines of each of the tasks.  I
+  ;; fill out my time sheets one day at a time.
+  (defun jf/org-mode-time-entry-for-project-and-day ()
+    "Function to help report time for Scientist.com.
+
+    Assumes that I'm on a :projects: headline.
+
+    - Sum the hours (in decimal form) for the tasks.
+    - Create a list of the tasks.
+    - Write this information to the message buffer.
+    - Then move to the next heading level."
+    (interactive)
+    (let* ((project (plist-get (cadr (org-element-at-point)) :raw-value))
+           (tasks (s-join "\n"
+  			(org-with-wide-buffer
+  			 (when (org-goto-first-child)
+                             (cl-loop collect (concat "- "
+  						    (org-no-properties
+  						     (org-get-heading t t t t)))
+  				    while (outline-get-next-sibling))))))
+           (hours (/ (org-clock-sum-current-item) 60.0))
+           (output (format "Tasks:\n%s\nProject: %s\nHours: %s\n"
+  			 tasks
+  			 project
+  			 hours)))
+      (kill-new tasks)
+      (message output)))
+#+end_src

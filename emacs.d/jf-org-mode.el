@@ -235,6 +235,7 @@ first matching link."
   :bind (:map org-mode-map
           ("C-c l u" . jf/org-mode/convert-link-type)
           ("C-c l i" . org-insert-link)
+          ("C-c l h" . jf/org-link-to-headline)
           ("M-g o" . consult-org-heading))
   :bind (("C-c l s" . org-store-link)
           ("C-c a" . org-agenda)
@@ -245,6 +246,8 @@ first matching link."
 (with-eval-after-load 'org
   (use-package ox
     :straight (ox :type built-in))
+   ;;; Org Export and Composition Functionality
+  (setq org-export-global-macros (list))
 
   (add-to-list 'org-export-global-macros
     '("kbd" . "@@html:<kbd>@@$1@@html:</kbd>@@"))
@@ -539,9 +542,6 @@ Assumes that I'm on a :projects: headline.
 ;; smartquote handling.
 (require 'jf-formatting)
 
-;;; Org Export and Composition Functionality
-(setq org-export-global-macros (list))
-
 (defun jf/org-link-delete-link ()
   "Remove the link part of `org-mode' keeping only description."
   (interactive)
@@ -699,14 +699,10 @@ When given the PREFIX arg, paste the content into TextEdit (for future copy)."
         ))))
 
 ;; https://www.reddit.com/r/emacs/comments/yjobc2/what_method_do_you_use_to_create_internal_links/
-(defun jf/org-parse-headline (headline)
-  "Raw value of the given HEADLINE plist."
-  (plist-get (cadr headline) :raw-value))
-
 (defun jf/org-get-headlines ()
-  "Get a plist of `org-mode' headlines within the current buffer."
-  (org-element-map (org-element-parse-buffer)
-    'headline #'jf/org-parse-headline))
+  "Get `org-mode' headline text within current buffer."
+  (org-element-map (org-element-parse-buffer 'headline nil t)
+    'headline (lambda (headline) (org-element-property :title headline))))
 
 (defun jf/org-link-to-headline ()
   "Insert an internal link to a headline."

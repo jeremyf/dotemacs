@@ -435,5 +435,16 @@ I'm okay with that behavior, but I'm putting it here to mention it â€œout loudâ€
   (string-replace (getenv "HOME") "~"
     (if (consp filename) (cadr filename) filename)))
 
+(defun jf/utility/maybe-url-domain-from-string (string)
+  "Return domain from STRING when URL scheme present.
+
+Else fallback to provided STRING"
+  (require 's)
+  (if (s-contains? "://" string)
+      (s-join "."
+              (cl-subseq
+               (s-split "\\." (nth 2 (s-split "/" string))) -2))
+    string))
+
 (provide 'jf-utility)
 ;;; jf-utility.el ends here
