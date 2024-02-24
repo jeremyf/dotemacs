@@ -888,8 +888,11 @@ When USE_HUGO_SHORTCODE is given use glossary based exporting."
           (format "{{< glossary key=\"%s\" >}}" glossary_key))
         ;; Use the TakeOnRules shortcode that leverages Hugo built-in
         ((and jf/exporting-org-to-tor (s-starts-with? "https://takeonrules.com/" url))
-          (format "{{< linkToPath \"%s\" >}}"
-            (s-trim (s-replace "https://takeonrules.com/" "/" url))))
+          (if (s-contains? "/series/")
+            (format "{{< linkToSeries \"%s\" >}}"
+              (nth 4 (s-split "/" "https://takeonrules.com/series/one-two-three/")))
+            (format "{{< linkToPath \"%s\" >}}"
+              (s-trim (s-replace "https://takeonrules.com/" "/" url)))))
         ((eq format 'html)
           (format "<a href=\"%s\">%s</a>" url desc))
         ((eq format 'md) (format "[%s](%s)" desc url))
