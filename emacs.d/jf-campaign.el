@@ -61,12 +61,13 @@ When given no TABLE, prompt for an expression to evaluate via
   (let* ((level 1)
           (headline (or headline
                       (completing-read "Headline: "
-                        (jf/org-get-headlines level))))
+                        (jf/org-get-headlines level) nil t)))
           (property (or property
                       ;; TODO: Get list of properties for the specified
                       ;; headline.  But allow for non-existent
                       ;; headlines.
-                      (read-string "Property: ")))
+                      (completing-read "Property: "
+                        (org-read-property-name))))
           (table (or table
                    (completing-read "Table: "
                      random-table/storage/tables)))
@@ -75,6 +76,10 @@ When given no TABLE, prompt for an expression to evaluate via
             ;; table, excluding the expression that generated the
             ;; results.
             (lambda (expression results) (format "%s" results))))
+    (unless (org--valid-property-p property)
+      (user-error "Invalid property name: \"%s\"" property))
+    ;; Now that we have the information, let’s start rolling on some
+    ;; tables.
     (org-element-map
       (org-element-parse-buffer)
       'headline
@@ -93,5 +98,9 @@ When given no TABLE, prompt for an expression to evaluate via
           ;; We have finally found the element, now roll on the table
           ;; and populate.
           (org-entry-put
+            ;; We need to position point to the element we're updating.
+            ;;
+            ;; TODO: Will the :begin property continue to be correct as we make
+            ;; adjustments to other elements.
             (org-element-property :begin el)
             property (random-table/roll table)))))))
