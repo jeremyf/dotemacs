@@ -936,7 +936,7 @@ I envision this function called from the command-line."
 (setq jf/campaign/file-name
   "~/git/org/denote/indices/20231127T184806--the-shadows-of-mont-brun-status-document__campaigns_projects_rpgs_StatusDocuments.org")
 
-(cl-defun jf/campaign/named-element (&key property tag)
+(cl-defun jf/campaign/named-element (&key tag)
   "Fetch PROPERTY from headlines with parent that has given TAG."
   (with-current-buffer (find-file-noselect jf/campaign/file-name)
     (org-element-map
@@ -946,8 +946,9 @@ I envision this function called from the command-line."
         (and (member tag
                (org-element-property
                  :tags
+                 ;; Get immediate parent
                  (car (org-element-lineage headline))))
-          (org-entry-get headline property))))))
+          (org-element-property :title headline))))))
 
 (defun jf/campaign/random-npc-as-entry ()
   "Create an NPC entry."
@@ -968,14 +969,12 @@ I envision this function called from the command-line."
           (s-join ", "
                   (completing-read-multiple
                    "Location(s): "
-                   (jf/campaign/named-element :property "NAME"
-                                              :tag "locations"))))
+                   (jf/campaign/named-element :tag "locations"))))
          (factions
           (s-join ", "
                   (completing-read-multiple
                    "Faction(s): "
-                   (jf/campaign/named-element :property "NAME"
-                                              :tag "factions")))))
+                   (jf/campaign/named-element :tag "factions")))))
     (format (concat
              "<<<%s>>>\n:PROPERTIES:\n:NAME:  %s\n:BACKGROUND:\n"
              ":LOCATIONS:  %s\n:DEMEANOR:\n:ALIGNMENT:  %s\n"
