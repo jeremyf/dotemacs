@@ -699,10 +699,15 @@ When given the PREFIX arg, paste the content into TextEdit (for future copy)."
         ))))
 
 ;; https://www.reddit.com/r/emacs/comments/yjobc2/what_method_do_you_use_to_create_internal_links/
-(defun jf/org-get-headlines ()
+(defun jf/org-get-headlines (&optional max-depth)
   "Get `org-mode' headline text within current buffer."
   (org-element-map (org-element-parse-buffer 'headline nil t)
-    'headline (lambda (headline) (org-element-property :title headline))))
+    'headline (lambda (headline)
+                (and
+                  (if (integerp max-depth)
+                    (>= max-depth (org-element-property :level headline))
+                    t)
+                  (org-element-property :title headline)))))
 
 (defun jf/org-link-to-headline ()
   "Insert an internal link to a headline."
@@ -928,56 +933,7 @@ I envision this function called from the command-line."
     (with-current-buffer (window-buffer)
       (goto-char (point-max))
       (insert "\n" text))))
-
-(setq jf/campaign/file-name
-  "~/git/org/denote/indices/20231127T184806--the-shadows-of-mont-brun-status-document__campaigns_projects_rpgs_StatusDocuments.org")
-
-(cl-defun jf/campaign/named-element (&key tag)
-  "Fetch PROPERTY from headlines with parent that has given TAG."
-  (with-current-buffer (find-file-noselect jf/campaign/file-name)
-    (org-element-map
-      (org-element-parse-buffer 'headline)
-      'headline
-      (lambda (headline)
-        (and (member tag
-               (org-element-property
-                 :tags
-                 ;; Get immediate parent
-                 (car (org-element-lineage headline))))
-          (org-element-property :title headline))))))
-
-(defun jf/campaign/random-npc-as-entry ()
-  "Create an NPC entry."
-  (let* ((random-table/reporter
-           ;; Bind a function that will only output the results of the
-           ;; table, excluding the expression that generated the
-           ;; results.
-          (lambda (expression results) (format "%s" results)))
-         (name
-          (random-table/roll "In the Shadows of Mont Brun > Names"))
-         (quirk
-          (random-table/roll "Random NPC Quirks"))
-         (alignment
-          (random-table/roll "Noble House > Alignment"))
-         (lore-table
-          (random-table/roll "The One Ring > Lore"))
-         (locations
-          (s-join ", "
-                  (completing-read-multiple
-                   "Location(s): "
-                   (jf/campaign/named-element :tag "locations"))))
-         (factions
-          (s-join ", "
-                  (completing-read-multiple
-                   "Faction(s): "
-                   (jf/campaign/named-element :tag "factions")))))
-    (format (concat
-             "<<<%s>>>\n:PROPERTIES:\n:NAME:  %s\n:BACKGROUND:\n"
-             ":LOCATIONS:  %s\n:DEMEANOR:\n:ALIGNMENT:  %s\n"
-             ":QUIRKS:  %s\n:FACTIONS:  %s\n:END:\n\n%s")
-    name name locations alignment quirk factions lore-table)))
-
-
+(load "jf-campaign.el")
 (setq org-capture-templates
   '(("d" "To Denote"
       plain (file denote-last-path)

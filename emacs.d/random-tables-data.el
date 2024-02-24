@@ -2949,3 +2949,9 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "Story" "Strength" "Time" "Tool" "Treasure" "Trust"
            "Truth" "Vengeance" "Wealth" "Weapon" "Wilds" "Wish"
            "ᚠ Courage" "ᚠ Duty" "ᚠ Fellowship" "ᚠ Hope" "ᚠ Love" "ᚠ Peace"))
+
+(random-table/register :name "Errant > Alignment"
+  :roller "2d6"
+  :data '((2 . "C3") (3 . "C2") (4 . "C1")
+           ((5 . 8) . "N")
+           ((9 . 10) . "L1") (11 . "L2") (12 . "L3")))
