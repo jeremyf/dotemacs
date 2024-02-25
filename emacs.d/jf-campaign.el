@@ -63,11 +63,7 @@ When given no TABLE, prompt for an expression to evaluate via
                       (completing-read "Headline: "
                         (jf/org-get-headlines level) nil t)))
           (property (or property
-                      ;; TODO: Get list of properties for the specified
-                      ;; headline.  But allow for non-existent
-                      ;; headlines.
-                      (completing-read "Property: "
-                        (org-read-property-name))))
+                      (org-read-property-name)))
           (table (or table
                    (completing-read "Table: "
                      random-table/storage/tables)))
@@ -78,29 +74,36 @@ When given no TABLE, prompt for an expression to evaluate via
             (lambda (expression results) (format "%s" results))))
     (unless (org--valid-property-p property)
       (user-error "Invalid property name: \"%s\"" property))
-    ;; Now that we have the information, let’s start rolling on some
-    ;; tables.
-    (org-element-map
-      (org-element-parse-buffer)
-      'headline
-      (lambda (el)
-        (and
-          (= ;; We want the children of the given level
-            (+ 1 level) (org-element-property :level el))
-          (string=
-            ;; Match the text
-            (org-element-property
-              :raw-value
-              (car (org-element-lineage el))) ;; Get immediate parent
-            headline)
-          ;; Don't clobber already set values
-          (not (org-element-property property el))
-          ;; We have finally found the element, now roll on the table
-          ;; and populate.
-          (org-entry-put
-            ;; We need to position point to the element we're updating.
-            ;;
-            ;; TODO: Will the :begin property continue to be correct as we make
-            ;; adjustments to other elements.
-            (org-element-property :begin el)
-            property (random-table/roll table)))))))
+    (save-excursion
+      ;; Now that we have the information, let’s start rolling on some
+      ;; tables.
+      (dolist
+        ;; Because we will not be recalculating heading positions, we
+        ;; need to reverse the list, as updates to the last element will
+        ;; not alter the position of the next to last element.
+        (subheading (reverse
+                      (org-element-map
+                        (org-element-parse-buffer)
+                        'headline
+                        (lambda (el)
+                          (and
+                            ;; We want the children of the given level
+                            (=
+                              (+ 1 level)
+                              (org-element-property :level el))
+                            (string=
+                              ;; Match the text
+                              (org-element-property
+                                :raw-value
+                                (car (org-element-lineage el)))
+                              headline)
+                            ;; Don't clobber already set values
+                            (not (org-element-property property el))
+                            ;; We found a match now return it
+                            el)))))
+        ;; We have finally found the element, now roll on the table and
+        ;; populate.  Unfortunately this does not re-calculate
+        ;; positions.
+        (org-entry-put
+          (goto-char (org-element-property :begin subheading))
+          property (random-table/roll table))))))
