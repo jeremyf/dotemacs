@@ -122,53 +122,6 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
         (unbury-buffer))
       (t
         (if buffer-read-only (kill-current-buffer) (bury-buffer)))))
-  (cl-defun jf/side-window-toggle ()
-    "Either bury the dedicated buffer or open one based on `current-buffer'."
-    (interactive)
-    (if (window-dedicated-p)
-      (bury-buffer)
-      (call-interactively #'jf/display-buffer-in-side-window)))
-  ;; Inspired by
-  ;; https://www.reddit.com/r/emacs/comments/12l6c19/comment/jg98fk4/
-  (cl-defun jf/display-buffer-in-side-window (&optional (buffer (current-buffer))
-                                               &key (side 'right) (size 0.4) (slot 0))
-    "Display BUFFER in dedicated side window.
-
-With universal prefix, use left SIDE instead of right.  With two
-universal prefixes, prompt for SIDE and SLOT and SIZE (which allows
-setting up an IDE-like layout)."
-    (interactive (list (current-buffer)
-                   :side (pcase current-prefix-arg
-                           ('nil 'right)
-                           ('(4) 'left)
-                           (_ (intern (completing-read "Side: "
-                                        '(left right top bottom) nil t))))
-                   :size (pcase current-prefix-arg
-                           ('nil 0.45)
-                           ('(4) 0.45)
-                           (_ (read-number "Size: " 0.45)))
-                   :slot (pcase current-prefix-arg
-                           ('nil 0)
-                           ('(4) 0)
-                           (_ (read-number "Slot: ")))))
-    (let ((display-buffer-mark-dedicated t)
-           (size-direction (pcase side
-                             ('right 'window-width)
-                             ('left 'window-width)
-                             (_ 'window-height))))
-      ;; Question: Do I assume that I'll be focused in that new window?  If so,
-      ;; consider `pop-to-buffer'.  Otherwise `display-buffer' will open the
-      ;; buffer but leave focus in the originating window.
-      (display-buffer buffer
-        `(display-buffer-in-side-window
-           (,size-direction . ,size)
-           (side . ,side)
-           (slot . ,slot)
-           (window-parameters
-             (mode-line-format . (" Dedicate: %b"))
-             (no-delete-other-windows . t))))
-      ;; The pulse makes sense when I'm using `display-buffer'.
-      (pulsar-pulse-line-green))))
 
 ;; Show tabs as they are tricky little creatures
 (defface jf/tabs-face '((default :inherit font-lock-misc-punctuation-face))
