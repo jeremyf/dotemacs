@@ -4,6 +4,25 @@
 (defun jf/theme-custom-faces ()
   "Set the various custom faces for both `treesit' and `tree-sitter'."
   (ef-themes-with-colors
+    (setq hl-todo-keyword-faces
+          `(("HOLD" . ,yellow)
+            ("TODO" . ,red)
+            ("NEXT" . ,blue)
+            ("THEM" . ,magenta)
+            ("PROG" . ,cyan-warmer)
+            ("OKAY" . ,green-warmer)
+            ("DONT" . ,yellow-warmer)
+            ("FAIL" . ,red-warmer)
+            ("BUG" . ,red-warmer)
+            ("DONE" . ,green)
+            ("NOTE" . ,blue-warmer)
+            ("KLUDGE" . ,cyan)
+            ("HACK" . ,cyan)
+            ("TEMP" . ,red)
+            ("FIXME" . ,red-warmer)
+            ("XXX+" . ,red-warmer)
+            ("REVIEW" . ,red)
+            ("DEPRECATED" . ,yellow)))
     (custom-set-faces
       `(denote-faces-link
          ((,c (:inherit link

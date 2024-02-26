@@ -250,10 +250,7 @@ method, get the containing class."
 
 (use-package hl-todo
   :straight t
-  :config (global-hl-todo-mode)
-  (setq hl-todo-keyword-faces
-    '(("TODO"   . "#7f0000") ;; red-intense
-       ("FIXME"  . "#7f0000")))) ;; red-intense
+  :config (global-hl-todo-mode))
 
 ;;
 ;; https://github.com/alphapapa/magit-todos.git

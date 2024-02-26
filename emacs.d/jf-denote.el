@@ -862,13 +862,7 @@ PARG is for a conformant method signature."
   :group 'denote-faces
   :package-version '(denote . "0.5.0"))
 
-(cl-defun jf/denote/link-ol-export (link
-                                     description
-                                     format
-                                     protocol
-                                     &key
-                                     (jf/exporting-org-to-tor
-                                       jf/exporting-org-to-tor))
+(defun jf/denote/link-ol-export (link description format)
   "Export a `denote:' link from Org files.
 
 The LINK, DESCRIPTION, FORMAT, and PROTOCOL are handled by the
@@ -888,7 +882,7 @@ When USE_HUGO_SHORTCODE is given use glossary based exporting."
           (format "{{< glossary key=\"%s\" >}}" glossary_key))
         ;; Use the TakeOnRules shortcode that leverages Hugo built-in
         ((and jf/exporting-org-to-tor (s-starts-with? "https://takeonrules.com/" url))
-          (if (s-contains? "/series/")
+          (if (s-contains? "/series/" url)
             (format "{{< linkToSeries \"%s\" >}}"
               (nth 4 (s-split "/" "https://takeonrules.com/series/one-two-three/")))
             (format "{{< linkToPath \"%s\" >}}"
