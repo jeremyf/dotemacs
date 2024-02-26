@@ -257,6 +257,5 @@ Credit: https://github.com/olivertaylor/dotfiles/blob/master/emacs/init.el"
         (other-window 1)
         (switch-to-buffer (other-buffer))))))
 
-
 (provide 'jf-windows)
 ;;; jf-windows.el ends here
