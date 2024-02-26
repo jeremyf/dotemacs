@@ -121,7 +121,7 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
       ((>= prefix 4)
         (unbury-buffer))
       (t
-        (if buffer-read-only (kill-current-buffer) (bury-buffer)))))
+        (if buffer-read-only (kill-current-buffer) (bury-buffer))))))
 
 ;; Show tabs as they are tricky little creatures
 (defface jf/tabs-face '((default :inherit font-lock-misc-punctuation-face))
