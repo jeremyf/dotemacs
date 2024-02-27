@@ -115,6 +115,9 @@
 
   help-window-select t
 
+  isearch-lazy-count t ;; Show index and count of search results
+  lazy-count-prefix-format "(%s/%s) "
+
   idle-update-delay 1.1       ;; Slow down the UI being updated to improve
   ;; performance
 
