@@ -141,6 +141,8 @@
 
   require-final-newline t
 
+  search-whitespace-regexp ".*?" ;; Make regular Isearch interpret empty space
+                                 ;; as regular expression
   show-trailing-whitespace t
 
   switch-to-buffer-obey-display-actions t ;; https://www.masteringemacs.org/article/demystifying-emacs-window-manager
