@@ -229,10 +229,11 @@ method, get the containing class."
                         ("C-c w r" . jf/treesit/wrap-rubocop)
                         ("M-{" . ruby-beginning-of-block)
                         ("M-}" . ruby-end-of-block)))
-  :hook ((ruby-mode ruby-ts-mode) .
-          (lambda ()
-            (eldoc-mode)
-            (setq fill-column 100))))
+  :hook ((ruby-mode ruby-ts-mode) . #'jf/ruby-mode-configurator)
+  :config
+  (defun jf/ruby-mode-configurator ()
+    (eldoc-mode)
+    (setq fill-column 80)))
 
 ;; An odd little creature, hide all comment lines.  Sometimes this can be a
 ;; useful tool for viewing implementation details.
@@ -622,26 +623,26 @@ See `add-log-current-defun-function'."
 ;;
 ;; Creating some outline modes.  Which has me thinking about an outline mode for
 ;; my agenda file.
-(add-hook 'emacs-lisp-mode-hook
-  (lambda ()
-    (setq imenu-sort-function 'imenu--sort-by-name)
-    (setq imenu-generic-expression
-      '((nil "^;;[[:space:]]+-> \\(.*\\)$" 1)
-         ("defvar"
-           "^([[:space:]]*\\(cl-\\)?defvar[[:space:]]+\\([^ ]*\\)$" 2)
-         ("defconst"
-           "^([[:space:]]*\\(cl-\\)?defconst[[:space:]]+\\([^ ]*\\)$" 2)
-         ("defcustom"
-           "^([[:space:]]*\\(cl-\\)?defcustom[[:space:]]+\\([^ ]*\\)$" 2)
-         ("defun"
-           "^([[:space:]]*\\(cl-\\)?defun[[:space:]]+\\([^(]+\\)" 2)
-         ("macro"
-           "^([[:space:]]*\\(cl-\\)?defmacro[[:space:]]+\\([^(]+\\)" 2)
-         ("struct"
-           "^([[:space:]]*\\(cl-\\)?defstruct[[:space:]]+\\([^(]+\\)" 2)
-         ("use-package"
-           "^.*([[:space:]]*use-package[[:space:]]+\\([[:word:]-]+\\)" 1)))
-    (imenu-add-menubar-index)))
+(defun jf/emacs-lisp-mode-configurator ()
+  (setq imenu-sort-function 'imenu--sort-by-name)
+  (setq imenu-generic-expression
+    '((nil "^;;[[:space:]]+-> \\(.*\\)$" 1)
+       ("Variables"
+         "^([[:space:]]*\\(cl-\\)?defvar[[:space:]]+\\([^ ]*\\)$" 2)
+       ("Variables"
+         "^([[:space:]]*\\(cl-\\)?defconst[[:space:]]+\\([^ ]*\\)$" 2)
+       ("Variables"
+         "^([[:space:]]*\\(cl-\\)?defcustom[[:space:]]+\\([^ ]*\\)$" 2)
+       ("Functions"
+         "^([[:space:]]*\\(cl-\\)?defun[[:space:]]+\\([^(]+\\)" 2)
+       ("Macros"
+         "^([[:space:]]*\\(cl-\\)?defmacro[[:space:]]+\\([^(]+\\)" 2)
+       ("Types"
+         "^([[:space:]]*\\(cl-\\)?defstruct[[:space:]]+\\([^(]+\\)" 2)
+       ("Packages"
+         "^.*([[:space:]]*use-package[[:space:]]+\\([[:word:]-]+\\)" 1)))
+  (imenu-add-menubar-index))
+(add-hook 'emacs-lisp-mode-hook #'jf/emacs-lisp-mode-configurator)
 
 (defvar jf/rubocop/list-all-cops
   ;; rubocop --show-cops | rg "^([A-Z][\w/]+):" -r '$1' | pbcopy
