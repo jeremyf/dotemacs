@@ -226,6 +226,15 @@ With a PREFIX jump to the agenda without starting the clock."
   (autoload 'projectile-project-root "projectile")
   (setq consult-project-root-function #'projectile-project-root))
 
+(require 'consult-imenu)
+(add-to-list 'consult-imenu-config
+  '(ruby-ts-mode
+     :toplevel "Method"
+     :types ((?p "Property" font-lock-variable-name-face)
+              (?c "Class" font-lock-type-face)
+              (?C "Constant" font-lock-type-face)
+              (?M "Module" font-lock-type-face)
+              (?m "Method" font-lock-function-name-face))))
 
 (use-package embark-consult
   ;; I use ~embark.el~ and ~consult.el~, let’s add a little bit more connective
