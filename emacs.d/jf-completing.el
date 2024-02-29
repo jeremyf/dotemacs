@@ -211,30 +211,20 @@ With a PREFIX jump to the agenda without starting the clock."
   (consult-customize
     consult-line consult-ripgrep consult-find
     :initial (when (use-region-p)
-               (buffer-substring-no-properties (region-beginning) (region-end)))
-    ;; https://github.com/minad/consult/wiki#org-clock
-    consult-clock-in
-    :prompt "Clock in: "
-    :preview-key "M-."
-    :group
-    (lambda (cand transform)
-      (let* ((marker (get-text-property 0 'consult--candidate cand))
-              (name (if (member marker org-clock-history)
-                      "*Recent*"
-                      (buffer-name (marker-buffer marker)))))
-        (if transform (substring cand (1+ (length name))) name))))
+               (buffer-substring-no-properties (region-beginning) (region-end))))
   (autoload 'projectile-project-root "projectile")
   (setq consult-project-root-function #'projectile-project-root))
 
 (require 'consult-imenu)
-(add-to-list 'consult-imenu-config
-  '(ruby-ts-mode
-     :toplevel "Method"
-     :types ((?p "Property" font-lock-variable-name-face)
-              (?c "Class" font-lock-type-face)
-              (?C "Constant" font-lock-type-face)
-              (?M "Module" font-lock-type-face)
-              (?m "Method" font-lock-function-name-face))))
+(dolist (ruby '(ruby-mode ruby-ts-mode))
+  (add-to-list 'consult-imenu-config
+    `(,ruby
+       :toplevel "Method"
+       :types ((?p "Property" font-lock-variable-name-face)
+                (?c "Class" font-lock-type-face)
+                (?C "Constant" font-lock-type-face)
+                (?M "Module" font-lock-type-face)
+                (?m "Method" font-lock-function-name-face)))))
 
 (use-package embark-consult
   ;; I use ~embark.el~ and ~consult.el~, let’s add a little bit more connective
@@ -323,7 +313,6 @@ With a PREFIX jump to the agenda without starting the clock."
   :straight t
   ;; Optionally use TAB for cycling, default is `corfu-complete'.
   :bind (:map corfu-map
-          ("M-m" . corfu-move-to-minibuffer)
           ("<escape>". corfu-quit)
           ("<return>" . corfu-insert)
           ("M-d" . corfu-show-documentation)

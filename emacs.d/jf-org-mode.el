@@ -136,6 +136,12 @@ first matching link."
                                 (gnus . org-gnus-no-new-news)
                                 (file . find-file)
                                 (wl . wl-other-frame)))
+  (setq org-babel-ruby-wrapper-method "results = self.instance_exec { %s }
+File.open('%s', 'w'){ |f| f.write((results.class == String) ? results : results.inspect) }")
+
+  (setq org-babel-ruby-pp-wrapper-method "require 'pp'
+results = self.instance_exec { %s }
+File.open('%s', 'w') { |f| $stdout = f; pp results }")
   (setq org-clock-persist 'history)
   (setq org-export-headline-levels 4)
   ;; When I would load the agenda, I'd invariably type "l" to list the entries.
@@ -1158,7 +1164,9 @@ function is ever added to that hook."
 (add-hook 'org-mode-hook #'jf/org-recalculate-before-save)
 
 (use-package org-web-tools
-  :straight t)
+  :straight t
+  :config
+  (setq org-web-tools-pandoc-sleep-time 1.5))
 
 (provide 'jf-org-mode)
 ;;; jf-org-mode.el ends here

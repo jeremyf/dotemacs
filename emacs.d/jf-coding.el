@@ -363,9 +363,12 @@ method, get the containing class."
   (rspec-use-docker-when-possible t)
   (rspec-docker-cwd "./")
   (rspec-docker-command "docker compose exec")
+  :init
+  (add-to-list 'auto-mode-alist '("_spec\\.rb$" . rspec-mode))
   :hook ((dired-mode . rspec-dired-mode)
-          (ruby-mode . rspec-mode)
-          (ruby-ts-mode . rspec-mode))
+          ;; (ruby-mode . rspec-mode)
+          ;; (ruby-ts-mode . rspec-mode)
+          )
   ;; Dear reader, make sure that you can jump from spec and definition.  And in
   ;; Ruby land when you have lib/my_file.rb, the corresponding spec should be in
   ;; spec/my_file_spec.rb; and when you have app/models/my_file.rb, the spec
