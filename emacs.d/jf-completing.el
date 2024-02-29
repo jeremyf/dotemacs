@@ -642,7 +642,13 @@ Useful if you want a more robust view into the recommend candidates."
   :preface
   ;; https://github.com/minad/vertico/wiki#restrict-the-set-of-candidates
   (defun jf/vertico-restrict-to-matches ()
-    "Restrict set of candidates to visible candidates"
+    "Restrict set of candidates to visible candidates.
+
+This will narrow the candidates to what matched.  Then clears the
+prompt and allows further narrowing.
+
+Useful when you want to mix selector semantics (e.g. start with a
+literal then add a fuzzy search)."
     (interactive)
     (let ((inhibit-read-only t))
       (goto-char (point-max))
@@ -654,15 +660,7 @@ Useful if you want a more robust view into the recommend candidates."
            rear-nonsticky t))))
   :config
   (define-key vertico-map (kbd "C-SPC") #'jf/vertico-restrict-to-matches)
-  (vertico-mode)
-  ;; Use `consult-completion-in-region' if Vertico is enabled.
-  ;; Otherwise use the default `completion--in-region' function.
-  (setq completion-in-region-function
-    (lambda (&rest args)
-      (apply (if vertico-mode
-               #'consult-completion-in-region
-               #'completion--in-region)
-        args)))
+  (vertico-mode 1)
   (setq read-file-name-completion-ignore-case t
     read-buffer-completion-ignore-case t
     completion-ignore-case t)
@@ -680,6 +678,10 @@ Useful if you want a more robust view into the recommend candidates."
     nil
     jf/silence-loading-log)
   (keymap-global-set "M-r" #'vertico-repeat)
+  ;; When I type ~/ in the `find-file' selector, then it will clear the existing
+  ;; path and go to ~/
+  ;; From Prot's video presentation
+  (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
   (add-hook 'minibuffer-setup-hook #'vertico-repeat-save))
 
 (use-package which-key
