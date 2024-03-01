@@ -363,12 +363,8 @@ method, get the containing class."
   (rspec-use-docker-when-possible t)
   (rspec-docker-cwd "./")
   (rspec-docker-command "docker compose exec")
-  :init
-  (add-to-list 'auto-mode-alist '("_spec\\.rb$" . rspec-mode))
-  :hook ((dired-mode . rspec-dired-mode)
-          ;; (ruby-mode . rspec-mode)
-          ;; (ruby-ts-mode . rspec-mode)
-          )
+    :hook ((dired-mode . rspec-dired-mode)
+          (rspec-mode . jf/rspec-mode-hook))
   ;; Dear reader, make sure that you can jump from spec and definition.  And in
   ;; Ruby land when you have lib/my_file.rb, the corresponding spec should be in
   ;; spec/my_file_spec.rb; and when you have app/models/my_file.rb, the spec
@@ -379,6 +375,10 @@ method, get the containing class."
                                  'jf/yank-bundle-exec-rspec-to-clipboard)))
   :bind (:map ruby-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
   :preface
+  (defun jf/rspec-mode-hook ()
+    (setq imenu-generic-expression
+      '(("Method" "^\\s *def\\s +\\([^\(\n; ]+\\)" 1)
+         ("Describe" "^\\( *\\(its?\\|specify\\|example\\|describe\\|context\\|feature\\|scenario\\) +.+\\)" 1))))
   (defun jf/yank-bundle-exec-rspec-to-clipboard ()
     "Grab a ready to run rspec command."
     (interactive)
@@ -602,6 +602,8 @@ See `add-log-current-defun-function'."
   "Configure the `treesit' provided `ruby-ts-mode'."
   ;; I encountered some loading issues where ruby-ts-mode was not available
   ;; during my understanding of the use-package life-cycle.
+  (cond ((string-match "_spec.rb$" buffer-file-name)
+          (rspec-mode 1)))
   (setq-local add-log-current-defun-function
     #'jf/treesit/yank-qualified-method-fname)
   (define-key ruby-ts-mode-map (kbd "C-M-h")

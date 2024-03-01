@@ -223,6 +223,7 @@ With a PREFIX jump to the agenda without starting the clock."
        :types ((?p "Property" font-lock-variable-name-face)
                 (?c "Class" font-lock-type-face)
                 (?C "Constant" font-lock-type-face)
+                (?e "Example" font-lock-doc-face)
                 (?M "Module" font-lock-type-face)
                 (?m "Method" font-lock-function-name-face)))))
 
