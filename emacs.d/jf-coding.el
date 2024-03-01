@@ -204,8 +204,10 @@ method, get the containing class."
   ;; https://www.masteringemacs.org/article/seamlessly-merge-multiple-documentation-sources-eldoc
   :config
   (add-to-list 'display-buffer-alist
-    '("^\\*eldoc for" display-buffer-at-bottom
-       (window-height . 4)))
+    '("^\\*eldoc"
+       (display-buffer-reuse-mode-window display-buffer-below-selected)
+       (dedicated . t)
+       (window-height . fit-window-to-buffer)))
   (setq eldoc-documentation-strategy 'eldoc-documentation-compose-eagerly)
   :straight t)
 
