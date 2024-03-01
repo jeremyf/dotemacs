@@ -54,34 +54,6 @@
          ((,c :background ,bg-added-refine)))
       `(org-block-end-line
          ((,c :background ,bg-added-refine)))
-      `(hl-todo
-         ((,c :foreground ,red-faint)))
-      `(color-rg-font-lock-header-line-text
-         ((,c :foreground ,green)))
-      `(color-rg-font-lock-header-line-keyword
-         ((,c :foreground ,keybind)))
-      `(color-rg-font-lock-function-location
-         ((,c :foreground ,keybind)))
-      `(color-rg-font-lock-header-line-edit-mode
-         ((,c :foreground ,keybind)))
-      `(color-rg-font-lock-header-line-directory
-         ((,c :foreground ,cyan :background ,bg-cyan-subtle)))
-      `(color-rg-font-lock-command
-         ((,c :foreground ,fg-alt :background ,bg-inactive)))
-      `(color-rg-font-lock-file
-         ((,c :foreground ,cyan :background ,bg-cyan-subtle)))
-      `(color-rg-font-lock-line-number
-         ((,c :background ,bg-dim :foreground ,fg-dim)))
-      `(color-rg-font-lock-column-number
-         ((,c :background ,bg-dim :foreground ,fg-dim)))
-      `(color-rg-font-lock-position-splitter
-         ((,c :background ,bg-dim :foreground ,fg-dim)))
-      `(color-rg-font-lock-match
-         ((,c :background ,cyan-cooler :foreground ,bg-cyan-subtle)))
-      `(color-rg-font-lock-mark-changed
-         ((,c :background ,bg-changed :foreground ,fg-changed)))
-      `(color-rg-font-lock-mark-deleted
-         ((,c :background ,bg-removed :foreground ,fg-removed)))
       `(fill-column-indicator
          ((,c :width ultra-condensed :background ,bg-dim :foreground ,bg-dim)))
       `(font-lock-regexp-face

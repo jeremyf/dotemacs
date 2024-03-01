@@ -128,41 +128,6 @@
   ;; :init (setq ripgrep-arguments "--ignore-case")
   :straight t)
 
-(use-package color-rg
-  ;; This command provides an interface to ripgrep with results buffer that
-  ;; provides a modeline with available commands.  Were it not for
-  ;; `consult-ripgrep' interaction with `orderless', it would be a complete
-  ;; replacement.  But I'll keep both of them around.
-  :straight t
-  :commands (color-rg-read-file-type color-rg-search-input color-rg-read-input)
-  :custom (color-rg-search-ignore-rules "-g '!node_modules' -g '!dist' -g '!coverage' -g '!doc' -g '!log' -g '!tmp'")
-  :config
-  (defun jf/color-rg-search-project (prefix &optional keyword directory globs)
-    "Dispatch to `color-rg-search-input' based on given PREFIX.
-
-Prompt, via `color-rg-search-input', for KEYWORD when none is given.
-
-No PREFIX given: search in current DIRECTORY.
-One PREFIX given: prompt for a DIRECTORY.
-Two PREFIX given: prompt for DIRECTORY and filename GLOBs."
-    (interactive "p")
-    (let ((keyword (or keyword (color-rg-read-input)))
-           (directory (or directory
-                        (if (>= (or prefix 0) 4)
-                        ;; A kludge to prompt for a directory
-                        (call-interactively (lambda (dir) (interactive "D") dir))
-                        (color-rg-project-root-dir))))
-           (globs (or globs (when (>= (or prefix 0) 16)
-                      (color-rg-read-file-type "Filter file by type (default: [ %s ]): ")))))
-      (color-rg-search-input keyword directory globs)))
-  :bind
-  ("C-c f f" . jf/color-rg-search-project)
-  ("C-c f <RET>" . jf/color-rg-search-project)
-  ("C-c f l" . color-rg-search-input-in-current-file)
-  ("C-c f r" . consult-ripgrep)
-  (:map color-rg-mode-map (("p" . color-rg-jump-prev-keyword)
-                           ("n" . color-rg-jump-next-keyword))))
-
 (use-package visual-regexp
   ;; I haven't used much search and replace but the visual queues are useful.
   ;; And I learned about ,\ in this play.  ,\(upcase \1) will upcase the first
