@@ -448,10 +448,11 @@ method, get the containing class."
   ;; bit imprecise.  Still better than JSON; which doesn't allow for comments.
   :straight t)
 
-(use-package yaml-pro
-  :straight t)
-
-(add-hook 'yaml-ts-mode #'yaml-pro-ts-mode)
+(use-package combobulate
+  :straight (:host github :repo "mickeynp/combobulate")
+  :hook ((json-ts-mode . combobulate-mode)
+          (html-ts-mode . combobulate-mode)
+          (yaml-ts-mode . combobulate-mode)))
 
 (use-package yard-mode
   ;; My prefered Ruby documentation syntax
@@ -595,10 +596,13 @@ See `add-log-current-defun-function'."
       (pulsar-pulse-line))
     (error (goto-char (point-min))))))
 
-(define-key ruby-mode-map (kbd "s-ESC") #'jf/comment-header-backward)
-(define-key emacs-lisp-mode-map (kbd "s-ESC") #'jf/comment-header-backward)
-(define-key ruby-mode-map (kbd "C-s-]") #'jf/commend-header-forward)
-(define-key emacs-lisp-mode-map (kbd "C-s-]") #'jf/commend-header-forward)
+(dolist (el jf/comment-header-regexp/major-modes-alist)
+  (let ((jf-map (intern (format "%s-map" (car el)))))
+    ;; The treesitter mode maps don't seem to exist at this point
+    (unless (s-contains? "-ts-" (format "%s" (car el)))
+      (progn
+        (define-key (symbol-value jf-map) (kbd "s-ESC") #'jf/comment-header-backward)
+        (define-key (symbol-value jf-map) (kbd "C-s-]") #'jf/commend-header-forward)))))
 
 (defun jf/ruby-ts-mode-configurator ()
   "Configure the `treesit' provided `ruby-ts-mode'."
