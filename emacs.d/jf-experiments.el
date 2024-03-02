@@ -33,46 +33,6 @@
 (use-package qrencode
   :straight t)
 
-;; ;; A package to browse/read reddit in emacs and `org-mode' format.
-;; (use-package reddigg
-;;   :straight (:host github :repo "jeremyf/emacs-reddigg")
-;;   :config (setq reddigg--sub-url "https://www.reddit.com/r/%s/new.json?count=25")
-;;   :custom (reddigg-subs '(emacs planetemacs orgmode wwn swn ruby rubyonrails)))
-
-;; ;; Some customizations to the behavior of a reddit buffer.
-;; (advice-add 'reddigg--ensure-modes
-;;   :after (lambda ()
-;;            ;; This seems like a good idea to limit behavior to only reddit.
-;;            (setq-local org-confirm-elisp-link-function nil)
-;;            ;; It's rather odd to consider adding GET request
-;;            (read-only-mode)))
-
-;; May as well make a menu for this experiment.
-;; (defmacro jf/reddigg/create-view-function-for (sub)
-;;   (let* ((fn (intern (concat "jf/reddigg/view-" sub)))
-;;           (doc (concat "View /r/" sub))
-;;           (desc (concat "/r/" sub)))
-;;     `(transient-define-suffix ,fn ()
-;;       ,doc
-;;       :description ,desc
-;;       (interactive)
-;;        (reddigg-view-sub ,sub))))
-
-;; (jf/reddigg/create-view-function-for "emacs")
-;; (jf/reddigg/create-view-function-for "orgmode")
-;; (jf/reddigg/create-view-function-for "planetemacs")
-;; (jf/reddigg/create-view-function-for "ruby")
-;; (jf/reddigg/create-view-function-for "rubyonrails")
-;; (jf/reddigg/create-view-function-for "swn")
-;; (jf/reddigg/create-view-function-for "wwn")
-
-;; Removing as of <2023-08-05 Sat> as I don't use it and I was seein gmany
-;; errors
-;;
-;; (use-package breadcrumb
-;;   :straight (:host github :repo "joaotavora/breadcrumb")
-;;   :config (breadcrumb-mode))
-
 (defun toggle-transparency ()
   "Toggle on and off transparency.
 
