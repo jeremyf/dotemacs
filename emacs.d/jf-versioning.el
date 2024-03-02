@@ -179,36 +179,15 @@ provided AT, insert character there."
       (jf/open-pull-request-for-current-line)))
   :custom
   (git-messenger:use-magit-popup t)
-  :bind (:map git-messenger-map (("p" . 'jf/open-pull-request-for-current-line)
-                                  ("l" . 'git-link)))
+  :bind (:map git-messenger-map (("l" . 'git-link)))
   :bind (("s-6" . jf/git-messenger-popup)
           ("C-x g b" . jf/git-messenger-popup))
   :straight t)
-
-(use-package blamer
-  ;; When working in code, I want different ways to view the metadata around the
-  ;; code.  This adds a quick annotation to the current line; When did the last
-  ;; person touch this and what was the message.  It's most useful aspect is
-  ;; seeing multiple lines without relying on the blame.
-  :straight (blamer :host github :repo "Artawower/blamer.el")
-  :custom
-  ;; Set to 0 because I don’t enable by default.  So I’m in a mindset of show
-  ;; me who and when.
-  (blamer-idle-time 0.0)
-  (blamer-author-formatter "✎ %s ")
-  (blamer-datetime-formatter "[%s] ")
-  (blamer-commit-formatter "● %s")
-  (blamer-min-offset 40)
-  (blamer-max-commit-message-length 20))
 
 (use-package savehist
   ;; Save my history.
   :init
   (savehist-mode))
-
-;; (use-package savekill
-;;   ;; Write "kill" command inputs to disk.
-;;   :straight t)
 
 (use-package undo-tree
   ;; Provides a UI for undo trees.  I'm not certain what I want to do with this.
