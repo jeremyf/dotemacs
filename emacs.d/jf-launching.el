@@ -210,7 +210,8 @@
 (use-package dired
   :straight (:type built-in)
   :custom (dired-listing-switches "-laGhpX")
-  (dired-use-ls-dired t))
+  (dired-use-ls-dired t)
+  :hook (dired-mode . dired-hide-details-mode))
 
 (use-package minions
   :straight t
