@@ -558,10 +558,11 @@ See `add-log-current-defun-function'."
   "AList of major modes and their comment headers.")
 
 (defun jf/commend-header-forward ()
-  "Move to next line matching `jf/comment-header-regexp/ruby-mode'."
+  "Move to next line matching `jf/comment-header-regexp/major-modes-alis'."
   (interactive)
   (let ((regexp
-          (alist-get major-mode jf/comment-header-regexp/major-modes-alist)))
+          (alist-get major-mode
+            jf/comment-header-regexp/major-modes-alist)))
     (when (string-match-p
             regexp
             (buffer-substring-no-properties
@@ -577,9 +578,11 @@ See `add-log-current-defun-function'."
       (error (goto-char (point-max))))))
 
 (defun jf/comment-header-backward ()
+  "Move to previous line matching `jf/comment-header-regexp/major-modes-alis'."
   (interactive)
   (let ((regexp
-          (alist-get major-mode jf/comment-header-regexp/major-modes-alist)))
+          (alist-get major-mode
+            jf/comment-header-regexp/major-modes-alist)))
   (when (string-match-p
           regexp
           (buffer-substring-no-properties
@@ -601,13 +604,15 @@ See `add-log-current-defun-function'."
     ;; The treesitter mode maps don't seem to exist at this point
     (unless (s-contains? "-ts-" (format "%s" (car el)))
       (progn
-        (define-key (symbol-value jf-map) (kbd "s-ESC") #'jf/comment-header-backward)
-        (define-key (symbol-value jf-map) (kbd "C-s-]") #'jf/commend-header-forward)))))
+        (define-key (symbol-value jf-map)
+          (kbd "s-ESC") #'jf/comment-header-backward)
+        (define-key (symbol-value jf-map)
+          (kbd "C-s-]") #'jf/commend-header-forward)))))
 
 (defun jf/ruby-ts-mode-configurator ()
   "Configure the `treesit' provided `ruby-ts-mode'."
-  ;; I encountered some loading issues where ruby-ts-mode was not available
-  ;; during my understanding of the use-package life-cycle.
+  ;; I encountered some loading issues where ruby-ts-mode was not
+  ;; available during my understanding of the use-package life-cycle.
   (cond ((string-match "_spec.rb$" buffer-file-name)
           (rspec-mode 1)))
   (setq-local add-log-current-defun-function
