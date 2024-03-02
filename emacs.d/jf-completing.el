@@ -258,8 +258,8 @@ With a PREFIX jump to the agenda without starting the clock."
   ;; then select a file within that project.
   :commands (consult-projectile)
   :bind (("C-x 4 p" . consult-projectile-find-file-other-window)
-          ("C-c f r" . consult-ripgrep)
-          ("C-c f f" . projectile-ripgrep))
+          ("M-s r" . consult-ripgrep)
+          ("M-s f" . projectile-ripgrep))
   :straight (consult-projectile
               :type git
               :host gitlab

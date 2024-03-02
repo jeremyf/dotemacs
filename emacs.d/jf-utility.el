@@ -70,27 +70,6 @@
   ;; (See https://github.com/magnars/s.el/)
   :straight t)
 
-(use-package deadgrep
-  ;; Where consult-rg provides a live search feature, deadgrep provides a
-  ;; resulting search buffer.  You submit your search term and get the metadata
-  ;; and the matches.
-  :custom (deadgrep-display-buffer-function
-            (lambda (buffer) (display-buffer-same-window buffer '())))
-  :straight t
-  :preface
-  (defun jf/deadgrep/exit-with-save ()
-    "Exit deadgrep edit mode and prompt to save buffers."
-    (interactive)
-    (when (eq major-mode #'deadgrep-edit-mode)
-      (progn
-        (deadgrep-mode)
-        (call-interactively 'save-some-buffers))))
-  :bind (:map deadgrep-mode-map
-          (("C-c C-p" . deadgrep-edit-mode)
-            ("e" . deadgrep-edit-mode))
-          :map deadgrep-edit-mode-map
-          ("C-c C-c" . jf/deadgrep/exit-with-save)))
-
 (use-package wgrep
   ;; “Edit a grep buffer and apply those changes to the file buffer.”  In other
   ;; words, after “searching” for something, sending the results to a buffer
@@ -124,8 +103,46 @@
 (use-package rg
   ;; A highly performant successor to the venerable grep.
   :after (wgrep)
+  :custom (rg-keymap-prefix (kbd "C-c f"))
   :config (rg-enable-menu)
-  ;; :init (setq ripgrep-arguments "--ignore-case")
+  ;; https://github.com/dajva/rg.el/issues/142 Give focus to *rg* buffer.
+  (add-to-list 'rg-finish-functions (lambda (buffer _) (pop-to-buffer buffer)))
+  ;; Remember to keep these alphabetized
+  (when (f-dir-p "~/git/blacklight/")
+    (rg-define-search rg-projects-blacklight
+      "Search Blacklight."
+      :dir "~/git/blacklight/"
+      :files "*.*"
+      :menu ("Projects" "j b" "Blacklight")))
+
+  (when (f-dir-p "~/git/bulkrax/")
+    (rg-define-search rg-projects-bulkrax
+      "Search Bulkrax."
+      :dir "~/git/bulkrax/"
+      :files "*.*"
+      :menu ("Projects" "j B" "Bulkrax")))
+
+  (when (f-dir-p "~/git/dotemacs/")
+    (rg-define-search rg-projects-dotemacs
+      "Search Dotemacs."
+      :dir "~/git/dotemacs/"
+      :files "*.*"
+      :menu ("Projects" "j d" "Dotemacs")))
+
+  (when (f-dir-p "~/git/hyku/")
+    (rg-define-search rg-projects-hyku
+      "Search Hyku."
+      :dir "~/git/hyku/"
+      :files "*.*"
+      :menu ("Projects" "j h" "Hyku")))
+
+  (when (f-dir-p "~/git/hyrax/")
+    (rg-define-search rg-projects-hyrax
+      "Search Hyrax."
+      :dir "~/git/hyrax/"
+      :files "*.*"
+      :menu ("Projects" "j H" "Hyrax")))
+  :init (setq ripgrep-arguments "--ignore-case")
   :straight t)
 
 (use-package visual-regexp
