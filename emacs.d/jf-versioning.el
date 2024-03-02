@@ -44,91 +44,19 @@
            (:help-echo "Local changes not in upstream")))
        ("Branch"  25 magit-repolist-column-branch ())
        ("Path"    99 magit-repolist-column-path ())))
-  ;; Have magit-status go full screen and quit to previous
-  ;; configuration.  Taken from
-  ;; http://whattheemacsd.com/setup-magit.el-01.html#comment-748135498
-  ;; and http://irreal.org/blog/?p=2253
-  ;; (defadvice magit-status (around magit-fullscreen activate)
-  ;;   (window-configuration-to-register :magit-fullscreen)
-  ;;   ad-do-it
-  ;;   (delete-other-windows))
-  ;; (defadvice magit-mode-quit-window (after magit-restore-screen activate)
-  ;;   (jump-to-register :magit-fullscreen))
   :config
-  ;; (use-package libgit :straight t)
+  (setq magit-display-buffer-function #'magit-display-buffer-fullframe-status-v1)
+  (setq magit-bury-buffer-function #'magit-restore-window-configuration)
   (remove-hook 'magit-status-sections-hook 'magit-insert-tags-header)
-  :preface
-  (defun jf/magit-browse-pull-request ()
-    "In `magit-log-mode' open the associated pull request
-  at point.
-
-  Assumes that the commit log title ends in the PR #, which
-  is the case when you use the Squash and Merge strategy.
-
-  This implementation is dependent on `magit' and `s'."
-    (interactive)
-    (let* ((beg (line-beginning-position))
-            (end (line-end-position))
-            (summary
-              (buffer-substring-no-properties
-                beg end)))
-      (jf/open-pull-request-for :summary summary)))
-  (defun jf/git-current-remote-url ()
-    "Get the current remote url."
-    (s-trim
-      (shell-command-to-string
-        (concat
-          "git remote get-url "
-          (format "%s" (magit-get-current-remote))))))
-  (cl-defun jf/open-pull-request-for (&key summary)
-    "Given the SUMMARY open the related pull request.
-
-  This method assumes you're using Github's Squash and Strategy."
-    (let ((remote-url (jf/git-current-remote-url)))
-      (save-match-data
-        (and (string-match "(\\#\\([0-9]+\\))$" summary)
-          (browse-url
-            (concat
-              ;; I tend to favor HTTPS and the repos end in ".git"
-              (s-replace ".git" "" remote-url)
-              "/pull/"
-              (match-string 1 summary)))))))
-  (defun jf/open-pull-request-for-current-line ()
-    "For the current line open the applicable pull request."
-    (interactive)
-    (let ((summary
-            (s-trim
-              (shell-command-to-string
-                (concat "git --no-pager annotate "
-                  "-w -L "
-                  (format "%s" (line-number-at-pos))
-                  ",+1 "
-                  "--porcelain "
-                  buffer-file-name
-                  " | rg \"^summary\"")))))
-      (jf/open-pull-request-for :summary summary)))
   :bind (("C-c m" . magit-status)
           ("C-x g m" . magit-status)
           ("C-x g f" . magit-file-dispatch)
           ("C-x g d" . magit-dispatch))
-  ;; In other situations I bind s-6 to `git-messenger:popup-message'
-  :bind (:map magit-log-mode-map ("C-x g b" . #'jf/magit-browse-pull-request))
-  :hook ((with-editor-post-finish . #'magit-status)
-          (git-commit-mode . (lambda () (setq fill-column git-commit-fill-column)))))
+  :hook ((with-editor-post-finish . #'magit-status)))
 
-(defadvice magit-status (around magit-fullscreen activate)
-  (window-configuration-to-register :magit-fullscreen)
-  ad-do-it
-  (delete-other-windows))
-(defadvice magit-mode-quit-window (after magit-restore-screen activate)
-  (jump-to-register :magit-fullscreen))
-
-(setq auth-sources (list "~/.authinfo"))
+(setq auth-sources (list "~/.authinfo.pgp" "~/.authinfo"))
 
 (use-package forge
-  ;; :commands (forge-mode)
-  ;; :hook ((magit-status-sections . #'forge-insert-pullreqs)
-  ;;         (magit-status-sections . #'forge-insert-assigned-issues))
   :bind ("C-s-f" . #'forge-dispatch)
   :straight (:host github :repo "magit/forge"))
 
@@ -167,6 +95,7 @@
   :preface
   (defun jf/git-commit-mode-setup ()
     ;; Specify config capf
+    (setq fill-column git-commit-fill-column)
     (setq-local completion-at-point-functions
                   (cons #'jf/version-control/issue-capf
                           (cons #'jf/version-control/project-capf
