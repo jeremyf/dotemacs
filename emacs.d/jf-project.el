@@ -137,7 +137,7 @@ Added in cases where we want to inject the actual file."
 
 ;;;; Support Functions
 (cl-defun jf/project/list-projects (&key (project ".+")
-                                                                   (directory org-directory))
+                                     (directory org-directory))
   "Return a list of `cons' that match the given PROJECT.
 
 The `car' of the `cons' is the project (e.g. \"Take on Rules\").
@@ -201,10 +201,10 @@ When the `current-prefix-arg' is set always prompt for the project."
   ;; `jf/project/get-project-from/current-agenda-buffer'
   (or
     (and (not current-prefix-arg)
-            (or
+      (or
         (jf/project/get-project-from/current-buffer-is-project)
-              (jf/project/get-project-from/current-clock)
-              (jf/project/get-project-from/project-source-code)))
+        (jf/project/get-project-from/current-clock)
+        (jf/project/get-project-from/project-source-code)))
     (completing-read "Project: " (jf/project/list-projects))))
 
 ;; The default relevant `magit-list-repositories'
@@ -247,8 +247,10 @@ We want files to have the 'projects' `denote' keyword."
   (let ((projects (mapcar (lambda (el) (cdr el)) (jf/project/list-projects))))
     (dolist (file (jf/journal/list-current-journals))
       (setq projects (cons file projects)))
-    (when (file-exists-p jf/agenda-filename/scientist) (setq projects (cons jf/agenda-filename/scientist projects)))
-    (when (file-exists-p jf/agenda-filename/personal) (setq projects (cons jf/agenda-filename/personal projects)))
+    (when (file-exists-p jf/agenda-filename/scientist)
+      (setq projects (cons jf/agenda-filename/scientist projects)))
+    (when (file-exists-p jf/agenda-filename/personal)
+      (setq projects (cons jf/agenda-filename/personal projects)))
     projects))
 
 (transient-define-suffix jf/org-mode/agenda-files-update (&rest _)
@@ -258,8 +260,6 @@ We want files to have the 'projects' `denote' keyword."
   (message "Updating `org-agenda-files'")
   (setq org-agenda-files (jf/org-mode/agenda-files)))
 
-;; (advice-add 'org-agenda :before #'jf/org-mode/agenda-files-update)
-;; (advice-add 'org-todo-list :before #'jf/org-mode/agenda-files-update)
 (add-hook 'after-init-hook #'jf/org-mode/agenda-files-update)
 
 (defun jf/journal/list-current-journals ()
@@ -317,7 +317,8 @@ We want files to have the 'projects' `denote' keyword."
 Each member's `car' is title and `cdr' is `org-mode' element.
 
 Members of the sequence either have a tag 'tasks' or are in a todo state."
-  (with-current-buffer (or (and filename (find-file-noselect filename)) (current-buffer))
+  (with-current-buffer (or (and filename (find-file-noselect filename))
+                         (current-buffer))
     (mapcar (lambda (headline)
               (cons (org-element-property :title headline) headline))
       (org-element-map
