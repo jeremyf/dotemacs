@@ -86,16 +86,7 @@
   :config (setq wgrep-auto-save-buffer t)
   (setq wgrep-change-readonly-file t)
   :straight t
-  :preface
-  (defun jf/wgrep-finish-edit ()
-    "Finish a `wgrep' edit session."
-    (interactive)
-    (wgrep-save-all-buffers)
-    (wgrep-finish-edit))
-  :bind (:map wgrep-mode-map
-          ;; Added keybinding to echo Magit behavior
-          ("C-c C-c" . jf/wgrep-finish-edit)
-          :map grep-mode-map
+  :bind (:map grep-mode-map
           ("e" . wgrep-change-to-wgrep-mode)
           :map ripgrep-search-mode-map
           ("e" . wgrep-change-to-wgrep-mode)))
@@ -110,38 +101,45 @@
   ;; Remember to keep these alphabetized
   (when (f-dir-p "~/git/blacklight/")
     (rg-define-search rg-projects-blacklight
-      "Search Blacklight."
+      "Search Blacklight"
       :dir "~/git/blacklight/"
       :files "*.*"
       :menu ("Projects" "j b" "Blacklight")))
 
   (when (f-dir-p "~/git/bulkrax/")
     (rg-define-search rg-projects-bulkrax
-      "Search Bulkrax."
+      "Search Bulkrax"
       :dir "~/git/bulkrax/"
       :files "*.*"
       :menu ("Projects" "j B" "Bulkrax")))
 
   (when (f-dir-p "~/git/dotemacs/")
     (rg-define-search rg-projects-dotemacs
-      "Search Dotemacs."
+      "Search Dotemacs"
       :dir "~/git/dotemacs/"
       :files "*.*"
       :menu ("Projects" "j d" "Dotemacs")))
 
   (when (f-dir-p "~/git/hyku/")
     (rg-define-search rg-projects-hyku
-      "Search Hyku."
+      "Search Hyku"
       :dir "~/git/hyku/"
       :files "*.*"
       :menu ("Projects" "j h" "Hyku")))
 
   (when (f-dir-p "~/git/hyrax/")
     (rg-define-search rg-projects-hyrax
-      "Search Hyrax."
+      "Search Hyrax"
       :dir "~/git/hyrax/"
       :files "*.*"
       :menu ("Projects" "j H" "Hyrax")))
+
+  (when (f-dir-p "~/git/iiif_print/")
+    (rg-define-search rg-projects-iiif_print
+      "Search IIIF Print"
+      :dir "~/git/iiif_print/"
+      :files "*.*"
+      :menu ("Projects" "j i" "IIIF Print")))
   :init (setq ripgrep-arguments "--ignore-case")
   :straight t)
 
