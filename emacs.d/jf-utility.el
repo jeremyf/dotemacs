@@ -395,21 +395,6 @@ With ARG, do this that many times."
 
 (add-to-list 'find-file-not-found-functions #'jf/auto-create-missing-dirs)
 
-(defun jf/get-line-text (&optional delta)
-  "Copy the text of the line at DELTA lines from point.
-
-TODO: This function pollutes the `mark-ring' and `kill-ring'; I think
-I'm okay with that behavior, but I'm putting it here to mention it “out loud”."
-  (interactive "P")
-  (save-excursion
-    (when delta (forward-line (if (numberp delta) delta (car delta))))
-    (beginning-of-line)
-    (set-mark (point))
-    (end-of-line)
-    (copy-region-as-kill (mark) (point)))
-  (let ((text (substring-no-properties (car kill-ring))))
-    text))
-
 (defun jf/filename/tilde-based (filename)
   "Return ~/ relative FILENAME."
   (string-replace (getenv "HOME") "~"
