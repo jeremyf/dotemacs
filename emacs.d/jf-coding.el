@@ -517,6 +517,13 @@ See `add-log-current-defun-function'."
   :straight t
   :commands (devdocs-install))
 
+;; An alternate to devdocs.  Facilitates downloading HTML files and index.
+(use-package dash-docs
+  :straight t)
+
+(use-package consult-dash
+  :straight t)
+
 (use-package flymake
   :straight t
   ;; Don't be so hasty in syntax checking.
