@@ -208,8 +208,7 @@ and use one of the extensions implied by `denote-file-type'."
         (list :file file :signature :prompt)))))
 
 (cl-defun jf/rename-file-to-denote-schema (&key file id title keywords
-                                            dir date signature
-                                            force dry-run)
+                                            dir signature force dry-run)
   "Rename FILE using `denote' schema.
 
 When `current-prefix-arg' is non-nil prompt for many of the parameters.
@@ -232,9 +231,6 @@ When no FILE is provided use `buffer-file-name'.
 - SIGNATURE: The optional signature of the file.  When passed
              :none, skip prompting for a signature.
 
-- DATE: When non-nil, use this date for creating the ID via
-        `denote-create-unique-file-identifier'.
-
 - FORCE: When non-nil, rename the file without prompting to
          confirm the change.
 
@@ -253,10 +249,10 @@ When no FILE is provided use `buffer-file-name'.
                   (or (denote-retrieve-filename-title file)
                     (s-titleized-words (f-base file)))))))
           (id
-            (or (denote-retrieve-filename-identifier file)
-              id
+            (or id
+              (denote-retrieve-filename-identifier file)
               (denote-create-unique-file-identifier
-                     file (denote--get-all-used-ids) date)))
+                  file (denote--get-all-used-ids))))
           (keywords
             (if (equal keywords :none)
               '()
