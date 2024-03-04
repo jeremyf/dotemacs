@@ -155,9 +155,9 @@
 
 ;; https://github.com/hokomo/query-replace-parallel
 ;; Presented at https://pad.emacsconf.org/2023-parallel
-(use-package query-replace-parallel
-  :straight (:host github :repo "hokomo/query-replace-parallel")
-  :commands (query-replace-parallel query-replace-parallel-regexp))
+;; (use-package query-replace-parallel
+;;   :straight (:host github :repo "hokomo/query-replace-parallel")
+;;   :commands (query-replace-parallel query-replace-parallel-regexp))
 
 (use-package crux
   ;; A mix of a few odd and useful functions.

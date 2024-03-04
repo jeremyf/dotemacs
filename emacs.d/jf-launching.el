@@ -213,6 +213,12 @@
   (dired-use-ls-dired t)
   :hook (dired-mode . dired-hide-details-mode))
 
+(with-eval-after-load 'dired
+  ;; Bind dired-x-find-file.
+  (setq dired-x-hands-off-my-keys nil)
+  (require 'dired-x))
+
+
 (use-package minions
   :straight t
   :custom (minions-prominent-modes '(flymake-mode))
