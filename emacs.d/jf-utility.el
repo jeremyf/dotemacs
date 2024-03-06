@@ -98,6 +98,17 @@
   :config (rg-enable-menu)
   ;; https://github.com/dajva/rg.el/issues/142 Give focus to *rg* buffer.
   (add-to-list 'rg-finish-functions (lambda (buffer _) (pop-to-buffer buffer)))
+
+  ;; Override the baseline rg-project to include files
+  (rg-define-search rg-project
+    :dir project
+    :files "*.*")
+
+  ;; Prompt for file types
+  (rg-define-search rg-project-prompt-for-files
+    :dir project
+    :menu ("Search" "P" "Project prompt file type"))
+
   ;; Remember to keep these alphabetized
   (when (f-dir-p "~/git/blacklight/")
     (rg-define-search rg-projects-blacklight
@@ -140,6 +151,13 @@
       :dir "~/git/iiif_print/"
       :files "*.*"
       :menu ("Projects" "j i" "IIIF Print")))
+
+  (when (f-dir-p "~/git/valkyrie/")
+    (rg-define-search rg-projects-valkyrie
+      "Search Valkyrie"
+      :dir "~/git/valkyrie/"
+      :files "*.*"
+      :menu ("Projects" "j v" "Valkyrie")))
   :init (setq ripgrep-arguments "--ignore-case")
   :straight t)
 
