@@ -95,21 +95,30 @@
   (setq grep-program "rg"))
 
 (setq
-  backup-by-copying t         ;; Don't delink hardlinks
+  ;; Don't delink hardlinks
+  backup-by-copying t
 
   backup-directory-alist '((".*" . "~/.emacs.d/backups/"))
 
-  bookmark-default-file "~/git/emacs-bookmarks/bookmarks.el"
+  bookmark-default-file "~/emacs-bookmarks.el"
+
   bookmark-save-flag 1
 
-  custom-safe-themes t        ;; I may as well trust themes.
+  ;; I may as well trust themes.
+  custom-safe-themes t
 
-  create-lockfiles nil        ;; Don't create lock files.
+  ;; Don't create lock files.  It's only me on this maching.
+  create-lockfiles nil
 
+  ;; Instead of delete being gone forever, throw it in the trashbin which I must
+  ;; take out
   delete-by-moving-to-trash t
 
-  delete-old-versions t       ;; Automatically delete excess backups
-  dired-dwim-target t ;; https://www.reddit.com/r/emacs/comments/102y0n4/weekly_tips_tricks_c_thread/
+  ;; Automatically delete excess backups
+  delete-old-versions t
+
+  ;; https://www.reddit.com/r/emacs/comments/102y0n4/weekly_tips_tricks_c_thread/
+  dired-dwim-target t
 
   echo-key-strokes 0.2
 
@@ -117,25 +126,33 @@
 
   help-window-select t
 
-  isearch-lazy-count t ;; Show index and count of search results
+  ;; Show index and count of search results
+  isearch-lazy-count t
   lazy-count-prefix-format "(%s/%s) "
 
-  idle-update-delay 1.1       ;; Slow down the UI being updated to improve
-  ;; performance
+  ;; Slow down the UI being updated to improve performance
+  idle-update-delay 0.5
 
-  indent-tabs-mode nil        ;; Ensure tabs are expanded, not inserted
+  ;; Ensure tabs are expanded, not inserted
+  indent-tabs-mode nil
 
-  inhibit-startup-screen t    ;; Don't include the  emacs "start" window
+  ;; Don't include the  emacs "start" window
+  inhibit-startup-screen t
 
-  kept-new-versions 20        ;; how many of the newest versions to keep
+  ;; how many of the newest versions to keep
+  kept-new-versions 20
 
-  kept-old-versions 5         ;; and how many of the old
+  ;; and how many of the old
+  kept-old-versions 5
 
-  kill-ring-max 120           ;; Set a generous kill ring size.
+  ;; Set a generous kill ring size.
+  kill-ring-max 120
 
-  load-prefer-newer t ;; Favor new bit code
+  ;; Favor new bit code
+  load-prefer-newer t
 
-  read-process-output-max (* 6 512 1024)  ;; Increase read size per process
+  ;; Increase read size per process
+  read-process-output-max (* 6 512 1024)
 
   recentf-max-menu-items 50
 
@@ -143,25 +160,32 @@
 
   require-final-newline t
 
-  search-whitespace-regexp ".*?" ;; Make regular Isearch interpret empty space
-                                 ;; as regular expression
+  ;; Make regular Isearch interpret empty space as regular expression
+  search-whitespace-regexp ".*?"
+
+  ;; Type C-u C-SPC to pop the mark, then C-SPC to pop again.
+  ;; Without this variable, it's C-u C-SPC everytime
+  set-mark-command-repeat-pop t
+
   show-trailing-whitespace t
 
-  switch-to-buffer-obey-display-actions t ;; https://www.masteringemacs.org/article/demystifying-emacs-window-manager
-
-  ;; split-width-threshold nil ;; 160 * 8
+  ;; https://www.masteringemacs.org/article/demystifying-emacs-window-manager
+  switch-to-buffer-obey-display-actions t
 
   ;; https://github.com/maryrosecook/emacs/blob/6ef574e27f33f08a81b26970b5fb9b4c9c1f9eff/init.el#L745
-  split-height-threshold 99999999999999999 ;; make emacs only add vertical split panes
+  ;; make emacs only add vertical split panes
+  ;; split-height-threshold 99999999999999999
+  ;; Follow symlinks instead of prompting.
+  vc-follow-symlinks t
 
-  vc-follow-symlinks t        ;; Follow symlinks instead of prompting.
+  ;; Use version numbers on backups
+  version-control t
 
-  version-control t           ;; Use version numbers on backups
+  ;; Recommendation from https://protesilaos.com/emacs/modus-themes
+  x-underline-at-descent-line t
 
-  x-underline-at-descent-line t ;; Recommendation from
-  ;; https://protesilaos.com/emacs/modus-themes
-
-  ns-right-command-modifier 'hyper ;; Exposing one additional modifier key.
+  ;; Exposing one additional modifier key.
+  ns-right-command-modifier 'hyper
   ns-right-alternate-modifier 'meta
   line-move-visual t)
 

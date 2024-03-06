@@ -626,6 +626,8 @@ See `add-log-current-defun-function'."
     #'jf/treesit/yank-qualified-method-fname)
   (define-key ruby-ts-mode-map (kbd "C-M-h")
     #'jf/treesit/function-select)
+  (define-key ruby-ts-mode-map (kbd "M-.")
+    #'xref-find-definitions)
   (define-key ruby-ts-mode-map (kbd "s-.")
     #'rspec-toggle-spec-and-target)
   (define-key ruby-ts-mode-map

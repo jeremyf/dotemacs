@@ -29,7 +29,8 @@
     (interactive)
     (require 's)
     (dolist (proj projectile-known-projects)
-      (unless (s-starts-with? projectile-project-search-path proj)
+      (dolist (search-path projectile-project-search-path)
+      (unless (s-starts-with? search-path proj)
         (projectile-remove-known-project proj)))))
 
 (provide 'jf-organizing)

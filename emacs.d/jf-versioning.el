@@ -186,8 +186,10 @@ provided AT, insert character there."
 
 (use-package savehist
   ;; Save my history.
+  :config
+  (setq savehist-additional-variables '(register-alist kill-ring))
   :init
-  (savehist-mode))
+  (savehist-mode 1))
 
 (use-package undo-tree
   ;; Provides a UI for undo trees.  I'm not certain what I want to do with this.
