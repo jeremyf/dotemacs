@@ -1012,8 +1012,6 @@ I envision this function called from the command-line."
     (setq jf/link-to-project nil)
     link))
 
-(defun jf/derive-project-tag ()
-  )
 ;; (use-package org-noter
 ;;              :straight
 ;;              (:repo "org-noter/org-noter"
