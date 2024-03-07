@@ -207,6 +207,14 @@ and use one of the extensions implied by `denote-file-type'."
       (apply #'jf/rename-file-to-denote-schema
         (list :file file :signature :prompt)))))
 
+(defun jf/denote-sort-dired ()
+  "Sort current directory using `denote-sort-dired'."
+  (interactive)
+  (if (eq major-mode 'dired-mode)
+    (let ((denote-directory default-directory))
+      (call-interactively #'denote-sort-dired)
+    (user-error "Current buffer not dired-mode"))))
+
 (cl-defun jf/rename-file-to-denote-schema (&key file id title keywords
                                             dir signature force dry-run)
   "Rename FILE using `denote' schema.
@@ -239,8 +247,8 @@ When no FILE is provided use `buffer-file-name'.
   (interactive)
   (let* ((file
            (or file (if current-prefix-arg
-                        (call-interactively (lambda (f)
-                                              (interactive "f") f))
+                      (call-interactively (lambda (f)
+                                            (interactive "f") f))
                       (buffer-file-name))))
           (title
             (or title
@@ -252,17 +260,22 @@ When no FILE is provided use `buffer-file-name'.
             (or id
               (denote-retrieve-filename-identifier file)
               (denote-create-unique-file-identifier
-                  file (denote--get-all-used-ids))))
+                file (denote--get-all-used-ids))))
           (keywords
             (if (equal keywords :none)
               '()
               (or keywords
-                (denote-keywords-prompt))))
+                (let ((kws (denote-extract-keywords-from-path file)))
+                  (completing-read-multiple "Keywords: "
+                    (delete-dups (append kws (denote-keywords)))
+                    nil nil (when kws (concat (s-join "," kws) ",")))))))
           (signature
             (or (when (equal signature :none) "")
               (and signature (not (equal signature :prompt)))
               (when (or current-prefix-arg (equal signature :prompt))
-		            (completing-read "Signature: " (jf/tor-series-list)))
+		            (completing-read "Signature: "
+                  (jf/tor-series-list) nil nil
+                  (denote-retrieve-filename-signature file)))
               ""))
           (dir
             (f-join
@@ -275,7 +288,8 @@ When no FILE is provided use `buffer-file-name'.
           (extension
             (f-ext file t))
           (new-file (denote-format-file-name
-                      dir id keywords title extension signature)))
+                      dir id (cl-sort keywords #'string<)
+                      title extension signature)))
     (if dry-run
       (message "Changing %S to %S" file new-file)
       (when (or force (denote-rename-file-prompt file new-file))
