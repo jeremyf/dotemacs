@@ -21,27 +21,36 @@
     ;; I'm naming the presets as "actions"; the mindset that I'm using when
     ;; wanting that font.
     '((compact
-        :default-height 110)
+        :default-height 100)
        (default
-         :default-height 140)
+         :default-height 120)
        (comfy
          :default-height 160)
+       (alt-coding
+         :default-height 140
+         :default-weight regular
+         :bold-weight bold
+         :default-family "Iosevka Comfy Motion Fixed")
        (coding
-         :default-height 140)
+         :default-family "Intel One Mono"
+         :default-weight light
+         :bold-weight medium
+         :default-height 120)
        (presenting
-         :default-weight semilight
+         :default-weight light
          :default-height 220
-         :bold-weight extrabold)
+         :bold-weight bold)
        (reading
          :default-weight semilight
          :default-family "ETBembo"
          :default-height 220
-         :bold-weight extrabold)
+         :bold-weight bold)
        (t
          ;; Following Prot’s example, keeping these for for didactic purposes.
-         :default-family "Iosevka Comfy Motion Fixed"
-         :default-weight regular
-         :default-height 140
+         ;; :default-family "Iosevka Comfy Motion Fixed"
+         :default-family "Intel One Mono"
+         :default-weight light
+         :default-height 120
          :fixed-pitch-family nil ; falls back to :default-family
          :fixed-pitch-weight nil ; falls back to :default-weight
          :fixed-pitch-height 1.0
@@ -52,7 +61,7 @@
          :variable-pitch-weight nil
          :variable-pitch-height 1.0
          :bold-family nil ; use whatever the underlying face has
-         :bold-weight bold
+         :bold-weight medium
          :italic-family nil
          :italic-slant italic
          :line-spacing nil)))
