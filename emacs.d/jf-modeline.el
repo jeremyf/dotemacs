@@ -1,4 +1,4 @@
-(setq-default mode-line-format '("%e" mode-line-front-space
+(defvar-default mode-line-format '("%e" mode-line-front-space
                                   (:propertize
                                     ("" mode-line-mule-info mode-line-client mode-line-modified mode-line-remote)
                                     display
@@ -47,23 +47,50 @@
      (when (and (featurep 'eglot) (mode-line-window-selected-p))
        '(eglot--managed-mode eglot--mode-line-format))))
 
+(defvar-local jf/mode-line-format/vc-branch
+    '(:eval
+      (when-let* (((mode-line-window-selected-p))
+                  (file (buffer-file-name))
+                  (backend (vc-backend file))
+                  ;; ((vc-git-registered file))
+                  (branch (jf/mode-line-format/vc-branch-name file backend))
+                   ;; (face (prot-modeline--vc-face file backend))
+                   )
+        (jf/mode-line-format/vc-details file branch))))
+
+(defun jf/mode-line-format/vc-details (file branch)
+  (concat
+    (propertize (char-to-string #xE0A0) 'face 'shadow)
+    " "
+    branch))
+
+(defun jf/mode-line-format/vc-branch-name (file backend)
+  "Return VC branch name for FILE with BACKEND."
+  (when-let ((rev (vc-working-revision file backend))
+             (branch (or (vc-git--symbolic-ref file)
+                         (substring rev 0 7))))
+    branch))
+
 (dolist (construct '(
+                      jf/mode-line-format/eglot
                       jf/mode-line-format/kbd-macro
+                      jf/mode-line-format/major-mode-name
+                      jf/mode-line-format/misc-info
                       jf/mode-line-format/narrow
                       jf/mode-line-format/read-only-status
-                      jf/mode-line-format/major-mode-name
-                      jf/mode-line-format/narrow
-                      jf/mode-line-format/misc-info
-                      jf/mode-line-format/eglot
+                      jf/mode-line-format/vc-branch
                       ))
   (put construct 'risky-local-variable t))
 
-(setq-default mode-line-format '("%e"
+(defvar-local mode-line-format '("%e"
+                                  " "
                                   jf/mode-line-format/kbd-macro
                                   jf/mode-line-format/narrow
                                   jf/mode-line-format/read-only-status
+
                                   jf/mode-line-format/major-mode-name
                                   flymake-mode-line-format
+                                  jf/mode-line-format/vc-branch
                                   jf/mode-line-format/eglot
                                   jf/mode-line-format/misc-info
                                   ))
