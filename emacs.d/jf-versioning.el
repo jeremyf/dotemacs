@@ -144,7 +144,7 @@ provided AT, insert character there."
   ("C-x g p" . git-gutter:previous-hunk)
   ("C-x g n" . git-gutter:next-hunk)
   :init (global-git-gutter-mode t)
-  (setq git-gutter:modified-sign "Δ"
+  (setq git-gutter:modified-sign "%"
     git-gutter:added-sign "+"
     git-gutter:deleted-sign "-"))
 
