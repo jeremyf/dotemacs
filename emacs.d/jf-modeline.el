@@ -80,7 +80,7 @@
                       ))
   (put construct 'risky-local-variable t))
 
-(setq-local mode-line-format '("%e"
+(setq-default mode-line-format '("%e"
                                 " "
                                 jf/mode-line-format/kbd-macro
                                 jf/mode-line-format/narrow
