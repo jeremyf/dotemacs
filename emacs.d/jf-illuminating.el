@@ -152,5 +152,7 @@
   ;; useful for feeding a macro.
   :straight t)
 
+(require 'jf-modeline)
+
 (provide 'jf-illuminating)
 ;;; jf-illuminating.el ends here

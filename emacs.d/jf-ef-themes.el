@@ -33,6 +33,8 @@
          ((,c (:width ultra-expanded :box (:line-width (2 . 2)
                                             :color ,underline-err
                                             :style released-button)))))
+      `(jf/mode-line-format/face-shadow
+         ((,c :foreground ,fg-mode-line)))
       `(jf/tabs-face
          ((,c :underline (:style wave :color ,bg-blue-intense))))
       `(jf/org-faces-date
