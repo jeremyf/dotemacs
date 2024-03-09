@@ -47,8 +47,8 @@
          ((,c :bold t :slant italic :foreground ,fg-alt)))
       `(font-lock-misc-punctuation-face
          ((,c :foreground ,green-warmer)))
-      `(mode-line
-         ((,c :foreground ,cyan :background ,bg-cyan-subtle)))
+      ;; `(mode-line
+      ;;    ((,c :foreground ,cyan :background ,bg-cyan-subtle)))
       `(org-block
          ;; ((,c :background ,bg-yellow-subtle)))
          ((,c :background ,bg-added-faint)))

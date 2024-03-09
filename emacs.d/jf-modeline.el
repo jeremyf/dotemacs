@@ -28,7 +28,7 @@
            ;; filename
            (format " %s %s " (char-to-string #xE0A2) name)
            name)
-         'face 'mode-line-emphasis
+         'face 'mode-line-buffer-id
          'local-map jf/mode-line-format/map-buffer-name))))
 
 (defvar jf/mode-line-format/map-buffer-name
@@ -56,7 +56,7 @@
 
 (defun jf/mode-line-format/major-mode-name ()
   (propertize (capitalize (string-replace "-mode" "" (symbol-name major-mode)))
-    'face 'mode-line-emphasis))
+    'face 'mode-line))
 
 (defvar-local jf/mode-line-format/major-mode
   '(:eval
@@ -95,8 +95,10 @@
 (defvar-local jf/mode-line-format/vc-branch
   '(:eval
      (when-let* (((mode-line-window-selected-p))
-                  (file (buffer-file-name))
-                  (backend (vc-backend file))
+                  (file (if (equal major-mode 'dired-mode)
+                          default-directory
+                          (buffer-file-name)))
+                  (backend (or (vc-backend file) 'git))
                   (branch (jf/mode-line-format/vc-branch-name file backend)))
        (jf/mode-line-format/vc-details file branch))))
 
@@ -129,15 +131,15 @@
 
 (defvar-local jf/mode-line-format/flymake
   '(:eval
-     (when (mode-line-window-selected-p)
+     (when (and flymake--state
+             (mode-line-window-selected-p))
        flymake-mode-line-format)))
 
 (defvar-local jf/mode-line-format/project
   '(:eval
      (when (projectile-project-p)
        (propertize
-         (concat " "
-           (project-name (project-current)))
+         (concat " " (project-name (project-current)))
          'face 'jf/mode-line-format/face-shadow))))
 
 (dolist (construct '(
@@ -172,7 +174,7 @@
      jf/mode-line-format/vc-branch "  "
      jf/mode-line-format/flymake "  "
      jf/mode-line-format/eglot "  "
-     jf/mode-line-format/misc-info
+     ;; jf/mode-line-format/misc-info
      ))
 (provide 'jf-modeline)
 ;;; jf-modeline.el ends here
