@@ -27,7 +27,7 @@
 
 (defvar-local jf/mode-line-format/major-mode-name
   '(:eval
-     (capitalize (symbol-name major-mode))))
+     (symbol-name major-mode)))
 
 (defvar-local jf/mode-line-format/narrow
   '(:eval
