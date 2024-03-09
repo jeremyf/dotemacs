@@ -182,7 +182,7 @@ method, get the containing class."
   ;; (use-package eglot-tempel
   ;; ;; I use `tempel' and I use `eglot'; having some glue between those helps.
   ;; :straight (eglot-tempel :host github :repo "fejfighter/eglot-tempel"))
-  (add-to-list 'eglot-stay-out-of 'flymake)
+  ;; (add-to-list 'eglot-stay-out-of 'flymake)
   (add-to-list 'eglot-server-programs
     `(ruby-mode . ("solargraph" "socket" "--port" :autoport)))
   (add-to-list 'eglot-server-programs

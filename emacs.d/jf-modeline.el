@@ -28,7 +28,10 @@
            ;; filename
            (format " %s %s " (char-to-string #xE0A2) name)
            name)
-         'face 'mode-line-buffer-id
+         'face
+         (if (mode-line-window-selected-p)
+           'mode-line-buffer-id
+           'mode-line-inactive)
          'local-map jf/mode-line-format/map-buffer-name))))
 
 (defvar jf/mode-line-format/map-buffer-name
@@ -52,11 +55,15 @@
                      ((derived-mode-p 'prog-mode) "λ")
                      ((derived-mode-p 'comint-mode) ">_")
                      (t "◦"))))
-    (propertize indicator 'face 'jf/mode-line-format/face-shadow)))
+    (propertize indicator
+      'face
+      (if (mode-line-window-selected-p)
+        'jf/mode-line-format/face-shadow
+        'mode-line-inactive))))
 
 (defun jf/mode-line-format/major-mode-name ()
   (propertize (capitalize (string-replace "-mode" "" (symbol-name major-mode)))
-    'face 'mode-line))
+    'face (if (mode-line-window-selected-p) 'mode-line 'mode-line-inactive)))
 
 (defvar-local jf/mode-line-format/major-mode
   '(:eval
@@ -110,7 +117,9 @@
   "Return the FILE and BRANCH."
   (propertize
     (concat
-      (propertize (char-to-string #xE0A0) 'face 'jf/mode-line-format/face-shadow)
+      (propertize (char-to-string #xE0A0)
+        'face
+        'jf/mode-line-format/face-shadow)
       " "
       branch)
     'local-map jf/mode-line-format/map-vc
@@ -140,7 +149,10 @@
      (when (projectile-project-p)
        (propertize
          (concat " " (project-name (project-current)))
-         'face 'jf/mode-line-format/face-shadow))))
+         'face
+         (if (mode-line-window-selected-p)
+           'jf/mode-line-format/face-shadow
+           'mode-line-inactive)))))
 
 (dolist (construct '(
                       jf/mode-line-format/buffer-name-and-status

@@ -104,14 +104,7 @@ first matching link."
 (use-package org
   :straight (org :type git :host github :repo "emacsmirror/org")
   :hook
-  (org-mode . (lambda ()
-                (add-hook 'org-mode-hook
-                  (lambda ()
-                    (add-hook 'before-save-hook 'jf/org-add-ids-to-headlines-in-file nil 'local)))
-                (jf/org-capf)
-                (setq-local tab-width 8)
-                (turn-on-visual-line-mode)
-                (electric-pair-mode -1)))
+  (org-mode . jf/org-mode-configurator)
   ;; Disable org-indent-mode; it's easy enough to enable.  The primary reason is
   ;; that it does not play nice with the multi-cursor package.  And I'd prefer
   ;; to have that work better by default.
@@ -205,6 +198,14 @@ File.open('%s', 'w') { |f| $stdout = f; pp results }")
       (let ((fname (buffer-file-name (current-buffer))))
         (setq denote-last-path (and (denote-file-is-note-p  fname) fname)))))
 
+  (defun jf/org-mode-configurator ()
+    (add-hook 'org-mode-hook
+                  (lambda ()
+                    (add-hook 'before-save-hook 'jf/org-add-ids-to-headlines-in-file nil 'local)))
+    (jf/org-capf)
+    (setq-local tab-width 8)
+    (turn-on-visual-line-mode)
+    (electric-pair-mode -1))
   (defun jf/denote-org-capture ()
     "An org-capture conformant function for capturing to a blog-post."
     (if denote-last-path

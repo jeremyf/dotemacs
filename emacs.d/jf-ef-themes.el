@@ -77,4 +77,4 @@
   (setq ef-themes-mixed-fonts t
     ef-themes-variable-pitch-ui t))
 
-(setq jf/themes-plist '(:dark ef-bio :light ef-frost))
+(setq jf/themes-plist '(:dark ef-bio :light ef-cyprus))
