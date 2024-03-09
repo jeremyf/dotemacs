@@ -216,13 +216,22 @@ With a PREFIX jump to the agenda without starting the clock."
   (setq consult-project-root-function #'projectile-project-root))
 
 (require 'consult-imenu)
+(dolist (python '(python-mode python-ts-mode))
+  (add-to-list 'consult-imenu-config
+    `(,python
+       :toplevel "Method"
+       :types ((?f "Field" font-lock-variable-name-face)
+                (?c "Class" font-lock-type-face)
+                (?m "Method" font-lock-function-name-face)
+                (?v "Variable" font-lock-variable-name-face)
+                ))))
 (dolist (ruby '(ruby-mode ruby-ts-mode))
   (add-to-list 'consult-imenu-config
     `(,ruby
        :toplevel "Method"
-       :types ((?p "Property" font-lock-variable-name-face)
+       :types ((?p "Property" font-lock-property-name-face)
                 (?c "Class" font-lock-type-face)
-                (?C "Constant" font-lock-type-face)
+                (?C "Constant" font-lock-constant-face)
                 (?e "Example" font-lock-doc-face)
                 (?M "Module" font-lock-type-face)
                 (?m "Method" font-lock-function-name-face)))))

@@ -168,6 +168,7 @@ method, get the containing class."
            html-mode html-ts-mode
            js-mode js-ts-mode
            json-mode json-ts-mode
+           python-mode python-ts-mode
            scss-mode scss-ts-mode)
           . eglot-ensure)
   :hook ((eglot-managed-mode . jf/eglot-eldoc)
@@ -234,8 +235,27 @@ method, get the containing class."
   :hook ((ruby-mode ruby-ts-mode) . #'jf/ruby-mode-configurator)
   :config
   (defun jf/ruby-mode-configurator ()
-    (eldoc-mode)
-    (setq fill-column 80)))
+    (eldoc-mode t)
+    (setq-local fill-column 80)))
+
+(use-package python
+  :straight (:type built-in)
+  :hook (python-mode . jf/python-mode-configurator)
+  :config
+  (defun jf/python-mode-configurator ()
+    (eldoc-mode t)
+    (python-docstring-mode t)
+    (setq-default python-indent-offset 4)
+    (setq-local fill-column 80)))
+
+(add-hook 'python-ts-mode-hook #'jf/python-mode-configurator)
+
+(use-package flymake-ruff
+  :straight t
+  :hook (eglot-managed-mode . flymake-ruff-load))
+
+(use-package python-docstring
+  :straight t)
 
 ;; An odd little creature, hide all comment lines.  Sometimes this can be a
 ;; useful tool for viewing implementation details.
