@@ -167,16 +167,6 @@ of measurement (e.g., a word or sentence)."
   (if (equal "capture" (frame-parameter nil 'name))
     (delete-frame)))
 
-(use-package eat
-  :straight (:type git
-              :host codeberg
-              :repo "akib/emacs-eat"
-              :files ("*.el" ("term" "term/*.el") "*.texi"
-                       "*.ti" ("terminfo/e" "terminfo/e/*")
-                       ("terminfo/65" "terminfo/65/*")
-                       ("integration" "integration/*")
-                       (:exclude ".dir-locals.el" "*-tests.el"))))
-
 (transient-define-prefix jf/isearch-menu ()
   "isearch Menu"
   [["Edit Search String"
