@@ -208,7 +208,7 @@ method, get the containing class."
     '("^\\*eldoc"
        (display-buffer-reuse-mode-window display-buffer-below-selected)
        (dedicated . t)
-       (window-height . fit-window-to-buffer)))
+       (body-function . prot-window-select-fit-size)))
   (setq eldoc-documentation-strategy 'eldoc-documentation-compose-eagerly)
   :straight t)
 
@@ -241,8 +241,11 @@ method, get the containing class."
 (use-package python
   :straight (:type built-in)
   :hook (python-mode . jf/python-mode-configurator)
+  :bind (:map python-mode ("M-." . xref-find-definitions))
   :config
   (defun jf/python-mode-configurator ()
+    (define-key python-ts-mode
+      (kbd "M-.") #'xref-find-definitions)
     (eldoc-mode t)
     (python-docstring-mode t)
     (setq-default python-indent-offset 4)
@@ -256,6 +259,20 @@ method, get the containing class."
 
 (use-package python-docstring
   :straight t)
+
+(use-package virtualenvwrapper
+  :straight t
+  :config
+  ;; if you want interactive shell support
+  (venv-initialize-interactive-shells)
+  ;; if you want eshell support note that setting `venv-location` is not necessary
+  ;; if you use the default location (`~/.virtualenvs`), or if the the environment
+  ;; variable `WORKON_HOME` points to the right place
+  (venv-initialize-eshell)
+  (setq projectile-switch-project-action
+      '(lambda ()
+         (venv-projectile-auto-workon)
+         (projectile-find-file))))
 
 ;; An odd little creature, hide all comment lines.  Sometimes this can be a
 ;; useful tool for viewing implementation details.
