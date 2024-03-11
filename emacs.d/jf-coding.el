@@ -241,17 +241,20 @@ method, get the containing class."
 (use-package python
   :straight (:type built-in)
   :hook (python-mode . jf/python-mode-configurator)
-  :bind (:map python-mode ("M-." . xref-find-definitions))
+  :bind (:map python-mode-map ("M-." . xref-find-definitions))
   :config
   (defun jf/python-mode-configurator ()
-    (define-key python-ts-mode
-      (kbd "M-.") #'xref-find-definitions)
     (eldoc-mode t)
     (python-docstring-mode t)
     (setq-default python-indent-offset 4)
     (setq-local fill-column 80)))
 
-(add-hook 'python-ts-mode-hook #'jf/python-mode-configurator)
+(defun jf/python-ts-mode-configurator ()
+  (define-key python-ts-mode-map
+    (kbd "M-.") #'xref-find-definitions)
+  (jf/python-mode-configurator))
+
+(add-hook 'python-ts-mode-hook #'jf/python-ts-mode-configurator)
 
 (use-package flymake-ruff
   :straight t
@@ -259,6 +262,17 @@ method, get the containing class."
 
 (use-package python-docstring
   :straight t)
+
+(use-package pydoc-info
+  :straight t
+  :config
+  (dolist (python '(python-mode python-ts-mode))
+    (info-lookup-add-help
+      :mode python
+      :parse-rule 'pydoc-info-python-symbol-at-point
+      :doc-spec
+      '(("(python)Index" pydoc-info-lookup-transform-entry)
+         ("(sphinx)Index" pydoc-info-lookup-transform-entry)))))
 
 (use-package virtualenvwrapper
   :straight t
