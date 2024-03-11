@@ -33,6 +33,30 @@
 (use-package qrencode
   :straight t)
 
+(use-package pdf-tools
+  :pin manual ;; manually update
+  :straight t
+  :defer t
+  :ensure t
+  :config (pdf-tools-install) ;; initialise
+  (setq-default pdf-view-display-size 'fit-page) ;; open pdfs scaled to fit page
+  (setq pdf-annot-activate-created-annotations t) ;; automatically annotate highlights
+  (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward);; use normal isearch
+  )
+
+(use-package org-noter
+  :straight t
+  :config (setq org-noter-doc-split-percentage '(0.75 . 0.25))
+  (org-noter-enable-update-renames)
+  (setq org-noter-notes-search-path '())
+  (dolist (path '("~/Library/CloudStorage/ProtonDrive-jeremy@jeremyfriesen.com/"
+                   "~/Documents/"))
+    (when (f-dir-p path)
+      ;; Add element to end of list.
+      (add-to-list 'org-noter-notes-search-path path t)))
+  (setq org-noter-default-notes-file-names
+    '("Notes.org")))
+
 (defun toggle-transparency ()
   "Toggle on and off transparency.
 
