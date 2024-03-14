@@ -709,9 +709,10 @@ literal then add a fuzzy search)."
   (which-key-max-description-length 90)
   (which-key-show-docstrings t)
   (which-key-add-column-padding 2)
+  (which-key-max-display-columns 2)
   :config
   (which-key-mode)
-  (which-key-setup-side-window-right)
+  (which-key-setup-side-window-bottom)
   (which-key-show-major-mode))
 
 (provide 'jf-completing)

@@ -46,7 +46,7 @@
 
 (use-package org-noter
   :straight t
-  :config (setq org-noter-doc-split-percentage '(0.75 . 0.25))
+  :config (setq org-noter-doc-split-percentage '(0.67 . 0.33))
   (org-noter-enable-update-renames)
   (setq org-noter-notes-search-path '())
   (dolist (path '("~/Library/CloudStorage/ProtonDrive-jeremy@jeremyfriesen.com/"
