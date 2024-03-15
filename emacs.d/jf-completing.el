@@ -706,7 +706,7 @@ literal then add a fuzzy search)."
   :custom
   (which-key-side-window-max-width 0.5)
   (which-key-min-column-description-width 60)
-  (which-key-max-description-length 90)
+  (which-key-max-description-length nil)
   (which-key-show-docstrings t)
   (which-key-add-column-padding 2)
   (which-key-max-display-columns 2)

@@ -14,13 +14,65 @@
   :straight t
   :custom (aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
   :bind (("C-x o" . ace-window)
-   ("M-o" . ace-window)))
+          ("M-o" . ace-window)))
 
 (use-package avy
   ;; Pick a letter, avy finds all words with that at the beginning of it.  Narrow
   ;; results from there.
   :bind (("C-j" . avy-goto-char-timer))
-  :straight t)
+  :straight t
+  :config
+  (setq avy-dispatch-alist
+    '((?. . jf/avy-action-embark)
+       (?x . avy-action-kill-move)
+       (?X . avy-action-kill-stay)
+       (?y . avy-action-yank)
+       (?Y . jf/avy-action-yank-whole-line)
+       (?w . avy-action-copy)
+       (?W . jf/avy-action-copy-whole-line)
+       (?k . avy-action-kill)
+       (?K . jf/avy-action-kill-whole-line)
+       (?t . avy-action-teleport)
+       (?T . jf/avy-action-teleport-whole-line))))
+
+;; https://karthinks.com/software/avy-can-do-anything/#remembering-to-avy
+(defun jf/avy-action-kill-whole-line (pt)
+  (save-excursion
+    (goto-char pt)
+    (kill-whole-line))
+  (select-window
+    (cdr
+      (ring-ref avy-ring 0)))
+  t)
+
+(defun jf/avy-action-copy-whole-line (pt)
+  (save-excursion
+    (goto-char pt)
+    (cl-destructuring-bind (start . end)
+      (bounds-of-thing-at-point 'line)
+      (copy-region-as-kill start end)))
+  (select-window
+    (cdr
+      (ring-ref avy-ring 0)))
+  t)
+
+(defun jf/avy-action-yank-whole-line (pt)
+  (jf/avy-action-copy-whole-line pt)
+  (save-excursion (yank))
+  t)
+
+(defun jf/avy-action-teleport-whole-line (pt)
+  (jf/avy-action-kill-whole-line pt)
+  (save-excursion (yank)) t)
+
+(defun jf/avy-action-embark (pt)
+  (unwind-protect
+    (save-excursion
+      (goto-char pt)
+      (embark-act))
+    (select-window
+      (cdr (ring-ref avy-ring 0))))
+  t)
 
 (use-package browse-at-remote
   ;; Because I sometimes want to jump to the source code.  And in looking at
@@ -60,33 +112,7 @@ When given PREFIX use `eww-browse-url'."
     (interactive "P")
     (let ((browse-url-browser-function
             (if prefix #'eww-browse-url browse-url-browser-function)))
-        (link-hint-open-link))))
-
-;;;; Custom Functions
-;; (defun jf/scroll-down-half-page ()
-;;   "Scroll down half a page while keeping the cursor centered"
-;;   ;; See https://www.reddit.com/r/emacs/comments/r7l3ar/how_do_you_scroll_half_a_page/
-;;   (interactive)
-;;   (let ((ln (line-number-at-pos (point)))
-;;         (lmax (line-number-at-pos (point-max))))
-;;     (cond ((= ln 1) (move-to-window-line nil))
-;;           ((= ln lmax) (recenter (window-end)))
-;;           (t (progn
-;;                (move-to-window-line -1)
-;;                (recenter))))))
-
-;; (defun jf/scroll-up-half-page ()
-;;   "Scroll up half a page while keeping the cursor centered"
-;;   ;; See https://www.reddit.com/r/emacs/comments/r7l3ar/how_do_you_scroll_half_a_page/
-;;   (interactive)
-;;   (let ((ln (line-number-at-pos (point)))
-;;         (lmax (line-number-at-pos (point-max))))
-;;     (cond ((= ln 1) nil)
-;;           ((= ln lmax) (move-to-window-line nil))
-;;           (t (progn
-;;                (move-to-window-line 0)
-;;                (recenter))))))
-
+      (link-hint-open-link))))
 
 ;; https://github.com/baron42bba/.emacs.d/blob/master/bba.org
 (defvar jf/bracket/brackets nil "String of left/right brackets pairs.")
@@ -100,7 +126,7 @@ When given PREFIX use `eww-browse-url'."
   (setq jf/bracket/left-brackets '())
   (dotimes (-x (- (length jf/bracket/brackets) 1))
     (when (= (% -x 2) 0)
-            (push (char-to-string (elt jf/bracket/brackets -x))
+      (push (char-to-string (elt jf/bracket/brackets -x))
         jf/bracket/left-brackets)))
   (setq jf/bracket/left-brackets (reverse jf/bracket/left-brackets)))
 
@@ -110,7 +136,7 @@ When given PREFIX use `eww-browse-url'."
   (setq jf/bracket/right-brackets '())
   (dotimes (-x (- (length jf/bracket/brackets) 1))
     (when (= (% -x 2) 1)
-            (push (char-to-string (elt jf/bracket/brackets -x))
+      (push (char-to-string (elt jf/bracket/brackets -x))
         jf/bracket/right-brackets)))
   (setq jf/bracket/right-brackets (reverse jf/bracket/right-brackets)))
 

@@ -105,8 +105,8 @@
          ((,c :background ,bg-changed :foreground ,fg-changed)))
       `(color-rg-font-lock-mark-deleted
          ((,c :background ,bg-removed :foreground ,fg-removed)))
-      `(fill-column-indicator
-         ((,c :width ultra-condensed :background ,bg-dim :foreground ,bg-dim)))
+      ;; `(fill-column-indicator
+      ;;    ((,c :width ultra-condensed :background ,bg-dim :foreground ,bg-dim)))
       `(font-lock-regexp-face
          ((,c :foreground ,red))))))
 
