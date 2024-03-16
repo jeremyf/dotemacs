@@ -43,6 +43,7 @@ By default this is my example code project.")
   (setq-local completion-at-point-functions
     (list (cape-capf-super
             #'jf/org-capf-links
+            #'jf/org-capf-macros
             #'tempel-expand
             #'cape-file))))
 
@@ -70,6 +71,51 @@ By default this is my example code project.")
         ;; do not match. This allows the default Org capfs or custom capfs
         ;; of lower priority to run.
         :exclusive 'no))))
+
+(defun jf/org-capf-macros ()
+  "Complete macros.
+
+And 3 shall be the magic number."
+  ;; We're looking backwards for one to three '{' characters.
+  (when (and (looking-back "{+" 3)
+          (not (org-in-src-block-p)))
+    (list
+      ;; The beginning of the match is between 1 and 3 characters before
+      ;; `point'.  The math works out:
+      ;; `point' - 3 + number of '{' we found
+      (+ (- (point) 3)
+        (string-match "{+" (buffer-substring (- (point) 3) (point))))
+      (point)
+      ;; Call without parameters, getting all of the macros.
+      (jf/org-macros)
+      :exit-function
+      (lambda (text _status)
+        (let ((macro (car (jf/org-macros text))))
+          (delete-char (- (length text)))
+          (insert macro)))
+      ;; Proceed with the next completion function if the returned titles
+      ;; do not match. This allows the default Org capfs or custom capfs
+      ;; of lower priority to run.
+      :exclusive 'no)))
+
+(defun jf/org-macros (&optional given-macro)
+  (let ((macros (jf/regexp-matches-for-text "{{{[^}]+}}}")))
+    (if given-macro
+      (when (member given-macro macros) (list given-macro))
+      macros)))
+
+(defun jf/regexp-matches-for-text (regexp &optional string)
+  "Get a list of all REGEXP matches in the STRING."
+  (save-match-data
+    (seq-uniq
+      (let ((string (or string (buffer-string)))
+             (pos 0) matches)
+        (while (string-match regexp string pos)
+          (let ((text (match-string 0 string)))
+            (set-text-properties 0 (length text) nil text)
+            (push text matches))
+          (setq pos (match-end 0)))
+        matches))))
 
 (defun jf/org-links-with-text (&optional given-link)
   "Return the `distinct-' `org-mode' links in the `current-buffer'.
