@@ -131,12 +131,6 @@
   :straight t
   :config (whole-line-or-region-global-mode))
 
-;; Since writing the comment about folding, I haven't used it.
-;; (use-package yafolding
-;;   ;; It can be helpful to fold regions; I don't do it much but it can be
-;;   ;; helpful.
-;;   :straight t)
-
 (use-package keycast
   ;; When I turn on `keycast-mode-line' each key press will echo in the
   ;; mode-line.  There are other options for logging which could be conceptually
