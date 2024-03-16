@@ -14,7 +14,6 @@
 (set-frame-parameter nil 'fullscreen 'fullboth)
 
 (require 'jf-launching)
-(require 'jf-minor-mode-maker)
 (require 'jf-illuminating)
 (require 'jf-navigating)
 (require 'jf-fonts-and-iconography)

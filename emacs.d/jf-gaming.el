@@ -9,7 +9,6 @@
 ;;; Code:
 
 ;;;; Dependencies
-(require 'jf-minor-mode-maker)
 (require 'jf-quick-help)
 (require 'jf-org-mode)
 

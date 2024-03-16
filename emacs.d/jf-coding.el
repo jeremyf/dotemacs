@@ -157,61 +157,7 @@ method, get the containing class."
   :config
   (editorconfig-mode 1))
 
-(use-package eglot
-  :straight (:type built-in)
-  ;; :straight (:type built-in)
-  ;; The Language Server Protocol (LSP) is a game changer; having access to that
-  ;; tooling is very much a nice to have.
-  :hook ((css-mode css-ts-mode
-           ruby-mode ruby-ts-mode
-           ;; yaml-mode yaml-ts-mode
-           html-mode html-ts-mode
-           js-mode js-ts-mode
-           json-mode json-ts-mode
-           python-mode python-ts-mode
-           scss-mode scss-ts-mode)
-          . eglot-ensure)
-  :hook ((eglot-managed-mode . jf/eglot-eldoc)
-          (eglot-managed-mode . jf/eglot-capf))
-  :preface
-  (defun jf/eglot-eldoc ()
-    ;; https://www.masteringemacs.org/article/seamlessly-merge-multiple-documentation-sources-eldoc
-    (setq eldoc-documentation-strategy
-      'eldoc-documentation-compose-eagerly))
-  :config
-  ;; (use-package eglot-tempel
-  ;; ;; I use `tempel' and I use `eglot'; having some glue between those helps.
-  ;; :straight (eglot-tempel :host github :repo "fejfighter/eglot-tempel"))
-  ;; (add-to-list 'eglot-stay-out-of 'flymake)
-  (add-to-list 'eglot-server-programs
-    `(ruby-mode . ("solargraph" "socket" "--port" :autoport)))
-  (add-to-list 'eglot-server-programs
-    `(ruby-ts-mode . ("solargraph" "socket" "--port" :autoport)))
-  (defun jf/eglot-capf ()
-    ;; I don't want `eglot-completion-at-point' to trample my other completion
-    ;; options.
-    ;;
-    ;; https://stackoverflow.com/questions/72601990/how-to-show-suggestions-for-yasnippets-when-using-eglot
-    (setq-local completion-at-point-functions
-      (list (cape-capf-super
-              #'eglot-completion-at-point
-              #'tempel-expand
-              #'cape-file
-              #'cape-keyword))))
-  (add-hook 'eglot-managed-mode-hook #'jf/eglot-capf))
-
-(use-package eldoc
-  ;; Helps with rendering documentation
-  ;; https://www.masteringemacs.org/article/seamlessly-merge-multiple-documentation-sources-eldoc
-  :config
-  (add-to-list 'display-buffer-alist
-    '("^\\*eldoc"
-       (display-buffer-reuse-mode-window display-buffer-below-selected)
-       (dedicated . t)
-       (body-function . prot-window-select-fit-size)))
-  (setq eldoc-documentation-strategy 'eldoc-documentation-compose-eagerly)
-  :straight t)
-
+(require 'jf-lsp)
 ;; I don't use this package (I think...):
 ;; (use-package emmet-mode
 ;;   :straight t
@@ -257,8 +203,8 @@ method, get the containing class."
 (add-hook 'python-ts-mode-hook #'jf/python-ts-mode-configurator)
 
 (use-package flymake-ruff
-  :straight t
-  :hook (eglot-managed-mode . flymake-ruff-load))
+  :straight t)
+;;   :hook (eglot-managed-mode . flymake-ruff-load))
 
 (use-package python-docstring
   :straight t)
