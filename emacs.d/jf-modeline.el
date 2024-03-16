@@ -14,6 +14,14 @@
 
 (require 'vc-git)
 
+;; With the modeline I define later, I do not need minions; a package that hides
+;; the various minor modes behind a menu.
+;;
+;; (use-package minions
+;;   :straight t
+;;   :custom (minions-prominent-modes '(flymake-mode))
+;;   :config (minions-mode 1))
+
 (defvar-local jf/mode-line-format/kbd-macro
   '(:eval
      (when (and (mode-line-window-selected-p) defining-kbd-macro)

@@ -23,7 +23,6 @@
 ;; "use-package" which is why most of my package declarations look as
 ;; they do.
 (defvar bootstrap-version)
-(defvar bootstrap-version)
 (let ((bootstrap-file
         (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
        (bootstrap-version 6))
@@ -78,17 +77,19 @@
      In a previous iteration, I loaded lots of separate '*.el' files.
      This flag allowed me to more easily troubleshoot those load
      attempts.")
+ ;; Ensuring I have an autosave directory.
+(make-directory "~/.emacs.d/autosaves/" t)
 
-(make-directory "~/.emacs.d/autosaves/" t) ;; Ensuring I have an autosave
-;; directory.
-(recentf-mode 1) ;; Track recent
+;; Track recent
+(recentf-mode 1)
 
 ;; Quietly save the recent file list every 10 minutes.
 (run-at-time nil 600 (lambda () (let ((save-silently t)) (recentf-save-list))))
 (global-auto-revert-mode)
 
 (setq-default fill-column 80)
-(setq-default cursor-type 'bar) ;; Doing a bit of configuration of my cursors
+;; Doing a bit of configuration of my cursors
+(setq-default cursor-type 'bar)
 (blink-cursor-mode t)
 
 (when (executable-find "rg")
@@ -200,7 +201,6 @@
 ;; With subword-mode, HelloWorld is two words for navigation.
 (global-subword-mode)
 
-
 ;; When you open Emacs, grab all the space on the screen
 (add-to-list 'initial-frame-alist '(fullscreen . maximized))
 
@@ -243,12 +243,6 @@
   ;; Bind dired-x-find-file.
   (setq dired-x-hands-off-my-keys nil)
   (require 'dired-x))
-
-
-(use-package minions
-  :straight t
-  :custom (minions-prominent-modes '(flymake-mode))
-  :config (minions-mode 1))
 
 (use-package gcmh
   ;; *Gcmh* does garbage collection (GC) when the user is idle.
