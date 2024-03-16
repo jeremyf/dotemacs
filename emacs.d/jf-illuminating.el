@@ -59,17 +59,8 @@
   ;; (svg-lib-icons-dir (no-littering-expand-var-file-name "svg-lib/cache/")) ;
   ;; Change cache dir
   :config
-                                        ; Enable `kind-icon'
-  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter)
-  ;; Add hook to reset cache so the icon colors match my theme
-  ;; NOTE 2022-02-05: This is a hook which resets the cache whenever I switch
-  ;; the theme using my custom defined command for switching themes. If I don't
-  ;; do this, then the backgound color will remain the same, meaning it will not
-  ;; match the background color corresponding to the current theme. Important
-  ;; since I have a light theme and dark theme I switch between. This has no
-  ;; function unless you use something similar
-  (add-hook 'kb/themes-hooks
-    #'(lambda () (interactive) (kind-icon-reset-cache))))
+                                        ; Enable-Recursive-Minibuffers `kind-icon'
+  (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
 (use-package lin
   ;;  “LIN locally remaps the hl-line face to a style that is optimal for major
