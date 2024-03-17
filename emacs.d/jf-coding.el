@@ -38,15 +38,18 @@
     "Wrap the current ruby region by disabling/enabling the GIVEN-COPS."
     (interactive)
     (if (derived-mode-p 'ruby-ts-mode 'ruby-mode)
-      (if-let ((beg (if (use-region-p)
-                               (region-beginning)
-                               (treesit-node-start (treesit-defun-at-point))))
-                (end (if (use-region-p)
-                              (region-end)
-                               (treesit-node-end (treesit-defun-at-point)))))
-        (let ((cops (or given-cops
-                      (completing-read-multiple "Cops to Disable: "
-                        jf/rubocop/list-all-cops nil t))))
+      (if-let ((beg
+                 (if (use-region-p)
+                   (region-beginning)
+                   (treesit-node-start (treesit-defun-at-point))))
+                (end
+                  (if (use-region-p)
+                    (region-end)
+                    (treesit-node-end (treesit-defun-at-point)))))
+        (let ((cops
+                (or given-cops
+                  (completing-read-multiple "Cops to Disable: "
+                    jf/rubocop/list-all-cops nil t))))
           (save-excursion
             (goto-char beg)
             (let ((indentation (s-repeat (current-column) " ")))
@@ -54,41 +57,47 @@
               (beginning-of-line)
               (insert
                 (s-join "\n"
-                  (mapcar (lambda (cop)
-                            (concat indentation "# rubocop:disable " cop))
+                  (mapcar
+                    (lambda (cop)
+                      (concat indentation "# rubocop:disable " cop))
                     cops))
                 "\n" indentation)
               (yank)
               (insert "\n"
                 (s-join "\n"
-                  (mapcar (lambda (cop)
-                            (concat indentation "# rubocop:enable " cop))
+                  (mapcar
+                    (lambda (cop)
+                      (concat indentation "# rubocop:enable " cop))
                     cops))))))
         (user-error "Not a region nor a function"))
       (user-error "%s is not derived from a ruby mode" major-mode)))
 
-  ;; This function, tested against Ruby, will return the module space qualified
-  ;; method name (e.g. Hello::World#method_name).
+  ;; This function, tested against Ruby, will return the module space
+  ;; qualified method name (e.g. Hello::World#method_name).
   (cl-defun jf/treesit/yank-qualified-method-fname ()
     "Return the fully qualified name of method at point.  If not on a
 method, get the containing class."
     (if-let ((func (treesit-defun-at-point)))
       ;; Instance method or class method?
-      (let* ((method_type (if (string= "method"
-                                (treesit-node-type func))
-                            "#" "."))
-              (method_name (treesit-node-text
-                             (car (treesit-filter-child
-                                    func
-                                    (lambda (node)
-                                      (string= "identifier"
-                                        (treesit-node-type node)))))))
-              (module_space (s-join "::" (jf/treesit/module_space func))))
+      (let* ((method_type
+               (if (string= "method"
+                     (treesit-node-type func))
+                 "#" "."))
+              (method_name
+                (treesit-node-text
+                  (car (treesit-filter-child
+                         func
+                         (lambda (node)
+                           (string= "identifier"
+                             (treesit-node-type node)))))))
+              (module_space
+                (s-join "::" (jf/treesit/module_space func))))
         (if current-prefix-arg
           module_space
           (concat module_space method_type method_name)))
       (let ((current-node (treesit-node-at (point))))
         (s-join "::" (jf/treesit/module_space current-node)))))
+
   ;; Handles the following Ruby code:
   ;;
   ;;   module A::B
@@ -101,17 +110,19 @@ method, get the containing class."
   ;;   end
   ;; Special thanks to https://eshelyaron.com/posts/2023-04-01-take-on-recursion.html
   (defun jf/treesit/module_space (node &optional acc)
-    (if-let ((parent (treesit-parent-until
-                       node
-                       (lambda (n) (member (treesit-node-type n)
-                                     '("class" "module" "assignment")))))
-              (parent_name (treesit-node-text
-                             (car
-                               (treesit-filter-child
-                                 parent
-                                 (lambda (n)
-                                   (member (treesit-node-type n)
-                                     '("constant" "scope_resolution"))))))))
+    (if-let ((parent
+               (treesit-parent-until
+                 node
+                 (lambda (n) (member (treesit-node-type n)
+                               '("class" "module" "assignment")))))
+              (parent_name
+                (treesit-node-text
+                  (car
+                    (treesit-filter-child
+                      parent
+                      (lambda (n)
+                        (member (treesit-node-type n)
+                          '("constant" "scope_resolution"))))))))
       (jf/treesit/module_space parent (cons parent_name acc))
       acc)))
 
@@ -122,15 +133,19 @@ method, get the containing class."
   (global-treesit-auto-mode))
 
 (use-package scopeline
-  ;; Show the scope info of methods, blocks, if/case statements.  This is done
-  ;; via an overlay for "blocks" that are more than 5 (default) lines
+  ;; Show the scope info of methods, blocks, if/case statements.  This
+  ;; is done via an overlay for "blocks" that are more than 5 (default)
+  ;; lines
   :straight (:host github :repo "jeremyf/scopeline.el")
   :hook ((ruby-mode ruby-ts-mode) . scopeline-mode))
 
 ;;;; Other packages and their configurations
 (use-package bundler
   ;; For Ruby package management
-  :straight (bundler :type git :host github :repo "endofunky/bundler.el"))
+  :straight (bundler
+              :type git
+              :host github
+              :repo "endofunky/bundler.el"))
 
 (use-package csv-mode
   :straight t
@@ -151,13 +166,21 @@ method, get the containing class."
 
 (use-package editorconfig
   ;; “EditorConfig helps maintain consistent coding styles for multiple
-  ;; developers working on the same project across various editors and IDEs.”
-  ;; See https://editorconfig.org/#overview for more details.
+  ;; developers working on the same project across various editors and
+  ;; IDEs.”  See https://editorconfig.org/#overview for more details.
   :straight t
   :config
   (editorconfig-mode 1))
 
 (require 'jf-lsp)
+
+(use-package emacs
+  :hook (emacs-lisp-mode . jf/emacs-lisp-mode-hook)
+  :preface
+  (defun jf/emacs-lisp-mode-hook ()
+    ;; 72 is what I've found works best on exporting to my blog.
+    (setq-local fill-column 72)))
+
 ;; I don't use this package (I think...):
 ;; (use-package emmet-mode
 ;;   :straight t
@@ -173,11 +196,12 @@ method, get the containing class."
   :straight (:type built-in)
   :custom (ruby-flymake-use-rubocop-if-available nil)
   :bind
-  (:map ruby-mode-map (("C-M-h" . jf/treesit/function-select)
-                        ("C-c y f" . jf/treesit/yank-qualified-method-fname)
-                        ("C-c w r" . jf/treesit/wrap-rubocop)
-                        ("M-{" . ruby-beginning-of-block)
-                        ("M-}" . ruby-end-of-block)))
+  (:map ruby-mode-map
+    (("C-M-h" . jf/treesit/function-select)
+      ("C-c y f" . jf/treesit/yank-qualified-method-fname)
+      ("C-c w r" . jf/treesit/wrap-rubocop)
+      ("M-{" . ruby-beginning-of-block)
+      ("M-}" . ruby-end-of-block)))
   :hook ((ruby-mode ruby-ts-mode) . #'jf/ruby-mode-configurator)
   :config
   (defun jf/ruby-mode-configurator ()
@@ -225,17 +249,18 @@ method, get the containing class."
   :config
   ;; if you want interactive shell support
   (venv-initialize-interactive-shells)
-  ;; if you want eshell support note that setting `venv-location` is not necessary
-  ;; if you use the default location (`~/.virtualenvs`), or if the the environment
-  ;; variable `WORKON_HOME` points to the right place
+  ;; if you want eshell support note that setting `venv-location` is not
+  ;; necessary if you use the default location (`~/.virtualenvs`), or if
+  ;; the the environment variable `WORKON_HOME` points to the right
+  ;; place
   (venv-initialize-eshell)
   (setq projectile-switch-project-action
       '(lambda ()
          (venv-projectile-auto-workon)
          (projectile-find-file))))
 
-;; An odd little creature, hide all comment lines.  Sometimes this can be a
-;; useful tool for viewing implementation details.
+;; An odd little creature, hide all comment lines.  Sometimes this can
+;; be a useful tool for viewing implementation details.
 (require 'hide-comnt)
 
 (use-package json-mode
@@ -277,7 +302,7 @@ method, get the containing class."
           ("\\.markdown\\'" . markdown-mode))
   :preface
   (defun jf/markdown-toc (&optional depth)
-    "Extract DEPTH (default 3) of headings from the current Markdown buffer.
+    "Extract DEPTH of headings from the current Markdown buffer.
    The generated and indented TOC will be inserted at point."
     (interactive "P")
     (let ((max-depth (or depth 3)) toc-list)
@@ -292,15 +317,23 @@ method, get the containing class."
                     (downcase (replace-regexp-in-string
                                 "[[:space:]]+" "-" heading-text))))
             (when (<= level max-depth)
-              (push (cons level (cons heading-text heading-id)) toc-list)))))
+              (push (cons level
+                      (cons heading-text heading-id))
+                toc-list)))))
       (setq toc-list (reverse toc-list))
       (dolist (item toc-list)
-        (let* ((level (car item))
-                (heading-text (cadr item))
-                (heading-id (cddr item))
-                (indentation (make-string (- (* 2 (1- level)) 2) ?\ ))
-                (line (format "- [%s](#%s)\n" heading-text heading-id)))
-          (setq markdown-toc (concat markdown-toc (concat indentation line)))))
+        (let* ((level
+                 (car item))
+                (heading-text
+                  (cadr item))
+                (heading-id
+                  (cddr item))
+                (indentation
+                  (make-string (- (* 2 (1- level)) 2) ?\ ))
+                (line
+                  (format "- [%s](#%s)\n" heading-text heading-id)))
+          (setq markdown-toc
+            (concat markdown-toc (concat indentation line)))))
       (insert markdown-toc)))
   :init
   (setq markdown-command "/usr/local/bin/pandoc")
@@ -325,7 +358,8 @@ method, get the containing class."
 
 (defun jf/require-debugger ()
   "Determine the correct debugger based on the Gemfile."
-  (let ((gemfile-lock (f-join (projectile-project-root) "Gemfile.lock")))
+  (let ((gemfile-lock
+          (f-join (projectile-project-root) "Gemfile.lock")))
     (if-let* ((f-exists? gemfile-lock)
                (debuggers
                  (s-split "\n"
@@ -335,24 +369,20 @@ method, get the containing class."
                        gemfile-lock
                        " -r '$1' --only-matching | uniq")))))
       (cond
-        ((member "byebug" debuggers) "require 'byebug'; byebug")
-        ((member "debug" debuggers) "require 'debug'; binding.break")
-        ((member "debugger" debuggers) "require 'debugger'; debugger")
-        ((member "pry-byebug" debuggers) "require 'pry-byebug'; binding.pry")
+        ((member "byebug" debuggers)
+          "require 'byebug'; byebug")
+        ((member "debug" debuggers)
+          "require 'debug'; binding.break")
+        ((member "debugger" debuggers)
+          "require 'debugger'; debugger")
+        ((member "pry-byebug" debuggers)
+          "require 'pry-byebug'; binding.pry")
         (t "require 'debug'; binding.break"))
       "require 'debug'; binding.break")))
 
-;; (unbind-key "C-x C-r")
-;; (use-package repl-driven-development
-;;   ;; Type C-u and the command to print to the buffer.
-;;   :straight t
-;;   :config
-;;   (repl-driven-development [C-x C-r b] "bash")
-;;   (repl-driven-development [C-x C-r r] "irb --inf-ruby-mode" :prompt "irb(main):.*>"))
-
 (use-package rspec-mode
-  ;; I write most of my Ruby tests using rspec.  This tool helps manage that
-  ;; process.
+  ;; I write most of my Ruby tests using rspec.  This tool helps manage
+  ;; that process.
   :straight t
   ;; Ensure that we’re loading ruby-mode before we do any rspec loading.
   :after ruby-mode
@@ -364,14 +394,16 @@ method, get the containing class."
   (rspec-docker-command "docker compose exec")
     :hook ((dired-mode . rspec-dired-mode)
           (rspec-mode . jf/rspec-mode-hook))
-  ;; Dear reader, make sure that you can jump from spec and definition.  And in
-  ;; Ruby land when you have lib/my_file.rb, the corresponding spec should be in
-  ;; spec/my_file_spec.rb; and when you have app/models/my_file.rb, the spec
-  ;; should be in spec/models/my_file_spec.rb
-  :bind (:map rspec-mode-map (("s-." .
-                                'rspec-toggle-spec-and-target)
-                               ("C-c y r" .
-                                 'jf/yank-bundle-exec-rspec-to-clipboard)))
+  ;; Dear reader, make sure that you can jump from spec and definition.
+  ;; And in Ruby land when you have lib/my_file.rb, the corresponding
+  ;; spec should be in spec/my_file_spec.rb; and when you have
+  ;; app/models/my_file.rb, the spec should be in
+  ;; spec/models/my_file_spec.rb
+  :bind (:map rspec-mode-map
+          (("s-." .
+             'rspec-toggle-spec-and-target)
+            ("C-c y r" .
+              'jf/yank-bundle-exec-rspec-to-clipboard)))
   :bind (:map ruby-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
   :preface
   (defun jf/rspec-mode-hook ()
@@ -382,22 +414,26 @@ method, get the containing class."
     "Grab a ready to run rspec command."
     (interactive)
     (let* ((filename
-             (file-relative-name (buffer-file-name) (projectile-project-root)))
+             (file-relative-name (buffer-file-name)
+               (projectile-project-root)))
             (text
-              (format "bundle exec rspec %s:%s" filename (line-number-at-pos))))
+              (format "bundle exec rspec %s:%s"
+                filename (line-number-at-pos))))
       (kill-new text)
       (message "Killed: %s" text)
       text))
   (defun jf/rspec-spring-p ()
     "Check the project for spring as part of the Gemfile.lock."
-    (let ((gemfile-lock (f-join (projectile-project-root) "Gemfile.lock")))
+    (let ((gemfile-lock
+            (f-join (projectile-project-root) "Gemfile.lock")))
       (and (f-exists? gemfile-lock)
         (s-present?
           (shell-command-to-string
-            (concat "rg \"^ +spring-commands-rspec \" " gemfile-lock))))))
-  ;; Out of the box, for my typical docker ecosystem, the `rspec-spring-p'
-  ;; function does not work.  So I'm overriding the default behavior to match my
-  ;; ecosystem.
+            (concat "rg \"^ +spring-commands-rspec \" "
+              gemfile-lock))))))
+  ;; Out of the box, for my typical docker ecosystem, the
+  ;; `rspec-spring-p' function does not work.  So I'm overriding the
+  ;; default behavior to match my ecosystem.
   (advice-add #'rspec-spring-p :override #'jf/rspec-spring-p))
 
 (use-package ruby-interpolation
@@ -415,8 +451,8 @@ method, get the containing class."
   :straight t)
 
 (use-package typescript-mode
-  ;; I have this for the work I once did a few years ago.  I am happiest when
-  ;; I'm not working in Javascript.
+  ;; I have this for the work I once did a few years ago.  I am happiest
+  ;; when I'm not working in Javascript.
   :straight t)
 
 (use-package vterm
@@ -435,14 +471,15 @@ method, get the containing class."
   (add-to-list `auto-mode-alist '("\\.svg\\'" . xml-mode)))
 
 (use-package xml-format
-  ;; Encountering unformatted XML is jarring; this package helps formatt it for
-  ;; human legibility.
+  ;; Encountering unformatted XML is jarring; this package helps format
+  ;; it for human legibility.
   :straight t
   :after nxml-mode)
 
 (use-package yaml-mode
-  ;; Oh yaml, I once thought you better than XML.  Now, you are ubiquitous and a
-  ;; bit imprecise.  Still better than JSON; which doesn't allow for comments.
+  ;; Oh yaml, I once thought you better than XML.  Now, you are
+  ;; ubiquitous and a bit imprecise.  Still better than JSON; which
+  ;; doesn't allow for comments.
   :straight t)
 
 (use-package combobulate
@@ -455,20 +492,22 @@ method, get the containing class."
   ;; My prefered Ruby documentation syntax
   :straight t
   :preface
-  ;; This is not working as I had tested; it's very dependent on the little
-  ;; details.  I think I may want to revisit to just work on the current line.
+  ;; This is not working as I had tested; it's very dependent on the
+  ;; little details.  I think I may want to revisit to just work on the
+  ;; current line.
   (defun jf/ruby-mode/yank-yardoc ()
     "Add parameter yarddoc stubs for the current method."
     (interactive)
     (save-excursion
       (when-let* ((func (treesit-defun-at-point))
                    (method_parameters_text
-                     (treesit-node-text (car
-                                          (treesit-filter-child
-                                            func
-                                            (lambda (node)
-                                              (string= "method_parameters"
-                                                (treesit-node-type node))))))))
+                     (treesit-node-text
+                       (car
+                         (treesit-filter-child
+                           func
+                           (lambda (node)
+                             (string= "method_parameters"
+                               (treesit-node-type node))))))))
         (goto-char (treesit-node-start func))
         ;; Grab the parameter names.
         (let* ((identifiers (mapcar (lambda (token)
@@ -488,12 +527,14 @@ method, get the containing class."
                                param
                                " [Object]"))
                            identifiers)))))))
-  :bind* (:map ruby-mode-map (("C-c y f" . jf/yank-current-scoped-function-name)
-                               ("C-c y y" . jf/ruby-mode/yank-yardoc)))
+  :bind* (:map ruby-mode-map
+           (("C-c y f" . jf/yank-current-scoped-function-name)
+             ("C-c y y" . jf/ruby-mode/yank-yardoc)))
   :hook ((ruby-mode ruby-ts-mode) . yard-mode))
 
-;; I didn't know about `add-log-current-defun-function' until a blog reader
-;; reached out.  Now, I'm making a general function for different modes.
+;; I didn't know about `add-log-current-defun-function' until a blog
+;; reader reached out.  Now, I'm making a general function for different
+;; modes.
 (defun jf/yank-current-scoped-function-name ()
   "Echo and kill the current scoped function name.
 
@@ -504,17 +545,20 @@ See `add-log-current-defun-function'."
       (message "%s" text)
       (kill-new (substring-no-properties text)))
     (user-error "Warning: Point not on function")))
-(bind-key "C-c y f" #'jf/yank-current-scoped-function-name prog-mode-map)
-(bind-key "C-c y f" #'jf/yank-current-scoped-function-name emacs-lisp-mode-map)
+(bind-key "C-c y f"
+  #'jf/yank-current-scoped-function-name prog-mode-map)
+(bind-key "C-c y f"
+  #'jf/yank-current-scoped-function-name emacs-lisp-mode-map)
 
 (use-package devdocs
-  ;; Download and install documents from https://devdocs.io/
-  ;; Useful for having local inline docs.  Perhaps not always in the format that
-  ;; I want, but can't have everything.
+  ;; Download and install documents from https://devdocs.io/ Useful for
+  ;; having local inline docs.  Perhaps not always in the format that I
+  ;; want, but can't have everything.
   :straight t
   :commands (devdocs-install))
 
-;; An alternate to devdocs.  Facilitates downloading HTML files and index.
+;; An alternate to devdocs.  Facilitates downloading HTML files and
+;; index.
 (use-package dash-docs
   :straight t)
 
@@ -539,15 +583,16 @@ See `add-log-current-defun-function'."
     (which-function-mode)))
 
 (use-package copilot
-  ;; I want to explore this a bit, but by default want it "off" and to be
-  ;; as unobtrusive.
+  ;; I want to explore this a bit, but by default want it "off" and to
+  ;; be as unobtrusive.
   :straight (:host github :repo "zerolfx/copilot.el" :files ("dist" "*.el"))
-  :bind (:map copilot-mode-map (("C-c 0 <return>" . copilot-accept-completion)
-                                 ("C-c 0 <down>" .  copilot-next-completion)
-                                 ("C-c 0 <up>" . copilot-previous-completion)
-                                 ("C-c 0 DEL" . copilot-clear-overlay)
-                                 ("C-c 0 TAB" . copilot-panel-complete)
-                                 ("C-c 0 ESC" . copilot-mode)))
+  :bind (:map copilot-mode-map
+          (("C-c 0 <return>" . copilot-accept-completion)
+            ("C-c 0 <down>" .  copilot-next-completion)
+            ("C-c 0 <up>" . copilot-previous-completion)
+            ("C-c 0 DEL" . copilot-clear-overlay)
+            ("C-c 0 TAB" . copilot-panel-complete)
+            ("C-c 0 ESC" . copilot-mode)))
   :bind ("C-c 0 ESC" . copilot-mode)
   :custom
   ;; Copilot...never give me code comment recommendations.
@@ -556,13 +601,15 @@ See `add-log-current-defun-function'."
   :ensure t)
 
 (defvar jf/comment-header-regexp/major-modes-alist
-  '((emacs-lisp-mode . "^;;;;*")
-     (ruby-mode . "^[[:space:]]*###*$")
-     (ruby-ts-mode . "^[[:space:]]*###*$"))
+  '((emacs-lisp-mode . "^;;;+$")
+     (ruby-mode . "^[[:space:]]*##+$")
+     (ruby-ts-mode . "^[[:space:]]*##+$"))
   "AList of major modes and their comment headers.")
 
 (defun jf/commend-header-forward ()
-  "Move to next line matching `jf/comment-header-regexp/major-modes-alis'."
+  "Move to previous line that starts a comment block.
+
+See `jf/comment-header-regexp/major-modes-alis'."
   (interactive)
   (let ((regexp
           (alist-get major-mode
@@ -582,7 +629,8 @@ See `add-log-current-defun-function'."
       (error (goto-char (point-max))))))
 
 (defun jf/comment-header-backward ()
-  "Move to previous line matching `jf/comment-header-regexp/major-modes-alis'."
+  "Move to previous line that starts a comment block.
+ See `jf/comment-header-regexp/major-modes-alis'."
   (interactive)
   (let ((regexp
           (alist-get major-mode
@@ -643,10 +691,11 @@ See `add-log-current-defun-function'."
     (kbd "M-}") #'ruby-end-of-block))
 (add-hook 'ruby-ts-mode-hook #'jf/ruby-ts-mode-configurator)
 
-;; From https://emacs.dyerdwelling.family/emacs/20230414111409-emacs--indexing-emacs-init/
+;; From
+;; https://emacs.dyerdwelling.family/emacs/20230414111409-emacs--indexing-emacs-init/
 ;;
-;; Creating some outline modes.  Which has me thinking about an outline mode for
-;; my agenda file.
+;; Creating some outline modes.  Which has me thinking about an outline
+;; mode for my agenda file.
 (defun jf/emacs-lisp-mode-configurator ()
   (setq imenu-sort-function 'imenu--sort-by-name)
   (setq imenu-generic-expression
