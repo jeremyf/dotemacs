@@ -80,14 +80,41 @@
         ("C-r" . isearch-backward))
   :config (global-so-long-mode 1))
 
+;;;
+;; A package to "narrow" focus; providing a visually appealing interface
 (use-package olivetti
   :straight t
-  :custom
-  (olivetti-body-width 0.6)
-  (olivetti-minimum-body-width 80)
-  (olivetti-recall-visual-line-mode-entry-state t))
+  :hook (olivetti-mode-on . jf/olivetti-mode-on-hook)
+  (olivetti-mode-off . jf/olivetti-mode-off-hook)
+  :config
+  ;; I'm typically aiming for 80 character fill-column.
+  (setq olivetti-body-width 80)
+  (setq olivetti-minimum-body-width 80)
+  (setq olivetti-style 'fancy)
+  (setq olivetti-recall-visual-line-mode-entry-state t)
+  :preface
+  (defun jf/olivetti-mode-on-hook ()
+    "Remove some visual chatter."
+    (setq-local original-display-fill-column-indicator-mode
+      display-fill-column-indicator-mode)
+    (setq-local original-git-gutter-mode
+      git-gutter-mode)
+    (setq-local original-display-line-numbers-mode
+      display-line-numbers-mode)
+    (display-line-numbers-mode -1)
+    (display-fill-column-indicator-mode -1)
+    (git-gutter-mode -1))
 
-;;; qPresentation mode leveraging logos
+  (defun jf/olivetti-mode-off-hook ()
+    "Restore some visual chatter."
+    (display-fill-column-indicator-mode
+      original-display-fill-column-indicator-mode)
+    (display-line-numbers-mode
+      original-display-line-numbers-mode)
+    (git-gutter-mode
+      original-git-gutter-mode)))
+
+;;; Presentation mode leveraging logos
 
 (defvar jf/minor-mode/presenter-map
   (let ((map (make-sparse-keymap)))
