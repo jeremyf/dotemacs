@@ -46,7 +46,7 @@
   ;; (svg-lib-icons-dir (no-littering-expand-var-file-name "svg-lib/cache/")) ;
   ;; Change cache dir
   :config
-                                        ; Enable-Recursive-Minibuffers `kind-icon'
+  ;; Enable-Recursive-Minibuffers `kind-icon'
   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
 (use-package lin
