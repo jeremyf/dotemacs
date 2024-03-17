@@ -23,7 +23,7 @@
     '((compact
         :default-height 100)
        (default
-         :default-height 130)
+         :default-height 120)
        (comfy
          :default-height 160)
        (alt-coding
@@ -35,7 +35,7 @@
          :default-family "Intel One Mono"
          :default-weight light
          :bold-weight medium
-         :default-height 130)
+         :default-height 120)
        (presenting
          :default-weight light
          :default-height 220
@@ -50,7 +50,7 @@
          ;; :default-family "Iosevka Comfy Motion Fixed"
          :default-family "Intel One Mono"
          :default-weight light
-         :default-height 130
+         :default-height 120
          :fixed-pitch-family nil ; falls back to :default-family
          :fixed-pitch-weight nil ; falls back to :default-weight
          :fixed-pitch-height 1.0
