@@ -20,13 +20,15 @@
   (setq fontaine-presets
     ;; I'm naming the presets as "actions"; the mindset that I'm using when
     ;; wanting that font.
-    '((compact
+    '((smallest
         :default-height 100)
+       (smaller
+        :default-height 120)
        (default
-         :default-height 120)
-       (comfy
+         :default-height 130)
+       (bigger
          :default-height 160)
-       (alt-coding
+       (iosevka
          :default-height 140
          :default-weight regular
          :bold-weight bold
@@ -35,8 +37,8 @@
          :default-family "Intel One Mono"
          :default-weight light
          :bold-weight medium
-         :default-height 120)
-       (presenting
+         :default-height 130)
+       (biggest
          :default-weight light
          :default-height 220
          :bold-weight bold)
@@ -50,7 +52,7 @@
          ;; :default-family "Iosevka Comfy Motion Fixed"
          :default-family "Intel One Mono"
          :default-weight light
-         :default-height 120
+         :default-height 130
          :fixed-pitch-family nil ; falls back to :default-family
          :fixed-pitch-weight nil ; falls back to :default-weight
          :fixed-pitch-height 1.0
