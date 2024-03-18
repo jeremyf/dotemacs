@@ -21,11 +21,14 @@
            json-mode json-ts-mode
            python-mode python-ts-mode
            scss-mode scss-ts-mode)
-          . jf/eglot-ensure))
+          . eglot-ensure)
+  :hook ((eglot-managed-mode . jf/eglot-capf)))
 
-(defun jf/eglot-ensure ()
-  (eglot-ensure)
-  (jf/eglot-capf))
+;; (defun jf/eglot-ensure ()
+;;   (eglot-ensure)
+;;   (jf/eglot-capf))
+
+(advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
 
 (defun jf/eglot-capf ()
   "Ensure `eglot-completion-at-point' preceeds everything."

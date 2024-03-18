@@ -184,6 +184,7 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
 This uses `split-window-below' but follows with the cursor."
   (interactive)
   (split-window-below)
+  (balance-windows)
   (other-window 1))
 
 (keymap-global-set "C-x 3" #'jf/nav-split-and-follow-right)
@@ -192,7 +193,10 @@ This uses `split-window-below' but follows with the cursor."
 This uses `split-window-right' but follows with the cursor."
   (interactive)
   (split-window-right)
+  (balance-windows)
   (other-window 1))
+
+(advice-add #'kill-buffer-and-window :after #'balance-windows)
 
 (keymap-global-set "s-\\" #'jf/nav-toggle-split-direction)
 (defun jf/nav-toggle-split-direction ()
