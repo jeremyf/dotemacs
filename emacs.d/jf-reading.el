@@ -21,11 +21,17 @@
   ;; and the principles apply for Elfeed.
   :straight t
   :after org
-  :hook ((elfeed-show-mode . jf/reader-visual))
+  :preface
+  (defun jf/elfeed-show-entry-switch(buffer)
+    (switch-to-buffer buffer)
+    (olivetti-mode 1)
+    (text-scale-set 2)
+    (elfeed-show-refresh))
   :custom
   (elfeed-curl-timeout 90)
   (elfeed-db-directory "~/Documents/.elfeed")
   :config
+  (setq elfeed-show-entry-switch #'jf/elfeed-show-entry-switch)
   (setq-default elfeed-search-filter "@2-days-ago +unread ")
   :bind ((:map elfeed-search-mode-map
            ("q" . jf/elfeed-save-db-and-bury))))
