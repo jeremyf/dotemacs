@@ -179,8 +179,8 @@ Alternative suggestions are: - '(\"\\\"“\" . \"\\\"\")"
 (defun jf/reader-visual ()
   "A method to turn on visual line mode and adjust text scale."
   ;; A little bit of RSS beautification.
-  (text-scale-set 2)
-  (turn-on-visual-line-mode))
+  (olivetti-mode 1)
+  (text-scale-set 2))
 
 ;; A package that emboldens word stems, helping read a bit faster.
 (use-package stem-reading-mode

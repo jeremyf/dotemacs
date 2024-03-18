@@ -95,24 +95,40 @@
   :preface
   (defun jf/olivetti-mode-on-hook ()
     "Remove some visual chatter."
+    (setq-local original-flymake-fringe-indicator-position
+      flymake-fringe-indicator-position)
+    (setq-local original-vi-tilde-fringe-mode
+      vi-tilde-fringe-mode)
     (setq-local original-display-fill-column-indicator-mode
       display-fill-column-indicator-mode)
     (setq-local original-git-gutter-mode
       git-gutter-mode)
     (setq-local original-display-line-numbers-mode
       display-line-numbers-mode)
+    (setq-local original-org-modern-block-fringe
+      org-modern-block-fringe)
+    ;; The of org-modern blocks is not quite right with olivetti.
+    (setq-local org-modern-block-fringe nil)
+    (setq-local flymake-fringe-indicator-position nil)
+    (vi-tilde-fringe-mode -1)
     (display-line-numbers-mode -1)
     (display-fill-column-indicator-mode -1)
     (git-gutter-mode -1))
 
   (defun jf/olivetti-mode-off-hook ()
     "Restore some visual chatter."
+    (setq-local flymake-fringe-indicator-position
+      original-flymake-fringe-indicator-position)
+    (vi-tilde-fringe-mode
+      original-vi-tilde-fringe-mode)
     (display-fill-column-indicator-mode
       original-display-fill-column-indicator-mode)
     (display-line-numbers-mode
       original-display-line-numbers-mode)
     (git-gutter-mode
-      original-git-gutter-mode)))
+      original-git-gutter-mode)
+    (setq-local org-modern-block-fringe
+      original-org-modern-block-fringe)))
 
 ;;; Presentation mode leveraging logos
 
