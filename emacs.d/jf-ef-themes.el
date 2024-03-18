@@ -29,6 +29,8 @@
                 :box (:line-width (1 . 1)
                        :color ,border
                        :style released-button)))))
+      `(olivetti-fringe
+         ((,c (:inherit fringe :background ,bg-dim))))
       `(jf/bom-face
          ((,c (:width ultra-expanded :box (:line-width (2 . 2)
                                             :color ,underline-err
