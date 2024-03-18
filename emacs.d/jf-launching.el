@@ -162,7 +162,7 @@
   require-final-newline t
 
   ;; Make regular Isearch interpret empty space as regular expression
-  search-whitespace-regexp ".*?"
+  ;; search-whitespace-regexp ".*?"
 
   ;; Type C-u C-SPC to pop the mark, then C-SPC to pop again.
   ;; Without this variable, it's C-u C-SPC everytime

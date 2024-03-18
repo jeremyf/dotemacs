@@ -23,7 +23,7 @@
     '((smallest
         :default-height 100)
        (smaller
-        :default-height 120)
+         :default-height 120)
        (default
          :default-height 130)
        (bigger
