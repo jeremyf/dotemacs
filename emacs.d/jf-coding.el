@@ -38,30 +38,23 @@
     "Wrap the current ruby region by disabling/enabling the GIVEN-COPS."
     (interactive)
     (if (derived-mode-p 'ruby-ts-mode 'ruby-mode)
-      (if-let ((beg
-                 (if (use-region-p)
-                   (region-beginning)
-                   (treesit-node-start (treesit-defun-at-point))))
-                (end
-                  (if (use-region-p)
-                    (region-end)
-                    (treesit-node-end (treesit-defun-at-point)))))
+      (if-let ((region (jf/treesit/derive-region-for-rubocop)))
         (let ((cops
                 (or given-cops
                   (completing-read-multiple "Cops to Disable: "
                     jf/rubocop/list-all-cops nil t))))
           (save-excursion
-            (goto-char end)
+            (goto-char (cdr region))
             (call-interactively #'crux-move-beginning-of-line)
             (let ((indentation (s-repeat (current-column) " ")))
-              (goto-char end)
+              (goto-char (cdr region))
               (insert "\n"
                 (s-join "\n"
                   (mapcar
                     (lambda (cop)
                       (concat indentation "# rubocop:enable " cop))
                     cops)))
-              (goto-char beg)
+              (goto-char (car region))
               (beginning-of-line)
               (insert
                 (s-join "\n"
@@ -72,6 +65,26 @@
                 "\n"))))
         (user-error "Not a region nor a function"))
       (user-error "%s is not derived from a ruby mode" major-mode)))
+
+  (defun jf/treesit/derive-region-for-rubocop ()
+    "Return `cons' of begin and end positions of region."
+    (cond
+      ;; When given, first honor the explicit region
+      ((use-region-p)
+        (cons (region-beginning) (region-end)))
+      ;; Then honor the current function
+      ((treesit-defun-at-point)
+        (cons (treesit-node-start (treesit-defun-at-point))
+          (treesit-node-end (treesit-defun-at-point))))
+      ;; Then fallback to attempting to find the containing
+      ;; class/module.
+      (t
+        (when-let ((node
+                     (treesit-parent-until
+                       (treesit-node-at (point))
+                       (lambda (n) (member (treesit-node-type n)
+                                     '("class" "module"))))))
+          (cons (treesit-node-start node) (treesit-node-end node))))))
 
   ;; This function, tested against Ruby, will return the module space
   ;; qualified method name (e.g. Hello::World#method_name).
