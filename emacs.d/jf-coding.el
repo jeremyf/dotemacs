@@ -51,9 +51,17 @@
                   (completing-read-multiple "Cops to Disable: "
                     jf/rubocop/list-all-cops nil t))))
           (save-excursion
-            (goto-char beg)
+            (goto-char end)
+            (call-interactively #'crux-move-beginning-of-line)
             (let ((indentation (s-repeat (current-column) " ")))
-              (kill-region beg end)
+              (goto-char end)
+              (insert "\n"
+                (s-join "\n"
+                  (mapcar
+                    (lambda (cop)
+                      (concat indentation "# rubocop:enable " cop))
+                    cops)))
+              (goto-char beg)
               (beginning-of-line)
               (insert
                 (s-join "\n"
@@ -61,14 +69,7 @@
                     (lambda (cop)
                       (concat indentation "# rubocop:disable " cop))
                     cops))
-                "\n" indentation)
-              (yank)
-              (insert "\n"
-                (s-join "\n"
-                  (mapcar
-                    (lambda (cop)
-                      (concat indentation "# rubocop:enable " cop))
-                    cops))))))
+                "\n"))))
         (user-error "Not a region nor a function"))
       (user-error "%s is not derived from a ruby mode" major-mode)))
 
