@@ -3097,3 +3097,177 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
 ;;            ((44 . 45) . "Need for more")
 ;;            ((46 . 47) . "Part of a cult")
 ;;            (48 . "Seeking company")))
+
+(random-table/register :name "Mausritter > Mouse Given Name"
+  :data '("Ada" "Agate" "Agnes" "Aloe" "April" "Azalea" "Bay" "Belladonna" "Blossom" "Brie"
+           "Brynn" "Cherry" "Claire" "Crocus" "Dahlia" "Daisy" "Else" "Emerald" "Erin" "Grace"
+           "Gwendoline" "Hazel" "Heather" "Hette" "Holly" "Hyacinth" "Iris" "Juniper" "Lavender" "Lily"
+           "Magnolia" "Marigold" "Marjoram" "Myrtle" "Odette" "Olive" "Opal" "Pearl" "Pepper" "Poppy"
+           "Rosemary" "Rue" "Saffron" "Sandy" "Sassafras" "Shale" "Susan" "Thistle" "Violet" "Willow"
+           "Alder" "Ambrose" "Anise" "Annotto" "August" "Avens" "Basil" "Beryl" "Birch" "Boldo"
+           "Bill" "Burdock" "Butter" "Cassia" "Chicory" "Clive" "Colby" "Dill" "Dock" "Eared"
+           "Edmund" "Elmer" "Ernest" "Fennel" "Festus" "Francis" "Gil" "Hawthorn" "Heath" "Horatio"
+           "Jack" "Jasper" "Konrad" "Larkspur" "Laurel" "Lorenz" "Mace" "Oliver" "Orin" "Reepicheep"
+           "Rowan" "Simon" "Sorrel" "Stilton" "Tarragon" "Warren" "Wattle" "Whitacre" "Wormwood" "Yarrow"))
+
+(random-table/register :name "Mausritter > Mouse Family Name"
+  :data '("Baiter" "Black" "Buckthorne" "Burley" "Butterball" "Catreizen" "Danger" "Deerider" "Grant" "Halva"
+           "Maker" "Pipp" "Seedfall" "Snow" "Summerholme" "Thorne" "Tunneler" "White" "Winterholme" "Witter"))
+
+(random-table/register :name "Mausritter > Carried bric-a-brac"
+  :data '("[d8] pips" "[d8] pips" "[d8] pips" "[d8] pips" "[d8] pips" "[d8] pips" "[d8] pips" "[d8] pips"
+           "Dried five-leaf clover, carefully folded" "Stone pendant of the Mother" "Stub of a pencil" "Dried herbs in waterproof bag" "Wire bent into the shape of a moth" "Letter of writ from a noblemouse" "Smooth piece of coloured glass" "Half-eaten piece of cheese, wrapped in paper"
+           "Smoke-blackened bat tooth" "Metal cup etched with hunting scenes" "Oddly shimmering opal in silver wire setting" "Knife cut from a tin can" "Clay jar of thick honey mead" "Bee stinger wired to wooden handle" "Piece of candied berry" "Butterfly wings pressed between parchment"
+           "Map showing treasure hidden in a settlement" "Note from a cat lord regarding a player mouse" "Wooden idol of centipede eating its own tail" "Tooth of a human child" "Pot of bright paint" "Angry ant queen in a glass jar" "Rolled tapestry depicting ancient battle" "Ball of wet clay that never dries out"
+           "Lock of a faerie's hair" "Vial of red ink" "Straw basket with leather carrying straps" "Fragment of a spell tablet" "Dried, poisonous mushroom" "Pink plastic furbrush" "Collection of dried leaves, bound with twine" "Pipe carved of shell"
+           "Scrap of sheepskin" "Quiver of silver-tipped arrows" "Wreath of silver wire" "Very strong magnet" "Bouncy rubber ball" "Fish leather satchel" "Extremely spicy chilli pepper" "Fly preserved in tree sap"))
+
+(random-table/register :name "Mausritter > Birthsign"
+  :data '("Star (Brave / Reckless)"
+           "Wheel (Industrious / Unimaginative)"
+           "Acorn (Inquisitive / Stubborn)"
+           "Storm (Generous / Wrathful)"
+           "Moon (Wise / Mysterious)"
+           "Mother (Nurturing / Worrying)"))
+
+(random-table/register :name "Mausritter > Coat Color"
+  :private t
+  :data ("Chocolate" "Black" "White" "Tan" "Grey" "Blue"))
+
+(random-table/register :name "Mausritter > Coat Pattern"
+  :private t
+  :data ("Solid" "Brindle" "Patchy" "Banded" "Marbled" "Flecked"))
+
+(random-table/register :name "Mausritter > Physical Detail"
+  :private t
+  :data '("Scarred body" "Groomed fur" "Corpulent body" "Dreadlocks" "Skeletal body" "Dyed fur"
+  "Willowy body" "Shaved fur" "Tiny body" "Frizzy fur" "Massive body" "Silky fur"
+  "War paint" "Night black eyes" "Foreign clothes" "Eye patch" "Elegant clothes" "Blood red eyes"
+  "Patched clothes" "Wise eyes" "Fashionable clothes" "Sharp eyes" "Unwashed clothes" "Luminous eyes"
+  "Missing ear" "Cropped tail" "Lumpy face" "Whip-like tail" "Beautiful face" "Tufted tail"
+  "Round face" "Stubby tail" "Delicate face" "Prehensile tail" "Elongated face" "Curly tail"))
+
+(random-table/register :name "Mausritter > Weather > Spring"
+  :roller "2d6"
+  :data '((2 . "Rain Storm †")
+           ((3 . 5) . "Drizzle")
+           ((6 . 8) . "Overcast")
+           ((9 . 11) . "Bright and sunny")
+           ((12) . "Clear and warm")))
+
+(random-table/register :name "Mausritter > Weather > Summer"
+  :roller "2d6"
+  :data '((2 . "Thunder storm †")
+           ((3 . 5) . "Very hot  †")
+           ((6 . 8) . "Clear, hot")
+           ((9 . 11) . "Pleasantly sunny")
+           ((12) . "Beautifully warm")))
+
+(random-table/register :name "Mausritter > Weather > Autumn"
+  :roller "2d6"
+  :data '((2 . "Wild winds †")
+           ((3 . 5) . "Heavy rain  †")
+           ((6 . 8) . "Cool")
+           ((9 . 11) . "Patchy rain")
+           ((12) . "Clear and crisp")))
+
+(random-table/register :name "Mausritter > Weather > Winter"
+  :roller "2d6"
+  :data '((2 . "Snow storm †")
+           ((3 . 5) . "Sleet  †")
+           ((6 . 8) . "Bitter cold †")
+           ((9 . 11) . "Overcast")
+           ((12) . "Clear and crisp")))
+
+(random-table/register :name "Mausritter > Settlement > Inhabitants"
+  :private t
+  :data '("Shave elaborate patterns in their fur" "Intoxicated by strange plants"
+           "Wary of doing business with outsiders" "Curious for news from afar"
+           "Believe grooming their fur is bad luck" "Wear finely embroidered clothes"
+           "Brew honey-mead, flavoured with pungent herbs" "Cover their faces with long hoods"
+           "Impoverished by a cat lord’s tithes" "Ceremonially crop their tails"
+           "Brave hunters of large beasts" "All descended from single matriarch"
+           "Bake delicious berry pies" "Lab escapees, naive about the world"
+           "Spend their days lazing by a stream" "Long-standing blood feud with another settlement"
+           "Dig grand tunnels, overseen by the guild" "Wear large, wide-brimmed hats"
+           "Have laws and customs confusing to outsiders" "On friendly terms with a predator"))
+
+(random-table/register :name "Mausritter > Settlement > Notable Feature"
+  :private t
+  :data '("Maze of defensive, trap-filled tunnels" "Exceedingly comfortable, well-appointed inn"
+           "Shrine carved of black wood" "Meditative mushroom garden"
+           "Cow skull, repurposed as a guildhouse" "Mess of closely packed shanties"
+           "Neat rows of hanging wooden houses" "Ornate gate, guarded by statues"
+           "Secret bat cult temple" "Beetle racing rink"
+           "Storehouse, stocked with preserves" "Hidden riverboat dock"
+           "Crumbling marble palace, built by ancient mice" "Scavenged human machine, working"
+           "Wooden bridge connects the settlement" "Unnervingly tall, twisting tower"
+           "Beautiful flower garden" "Pigeon rider’s roost"
+           "Overgrown statue of an ancient hero" "Spiral stairwell, leading deep underground"))
+
+(random-table/register :name "Mausritter > Settlement > Settlement Size"
+  :private t
+  :store t
+  :data '("Farm/manor (1-3 families)" "Crossroads (3-5 families)"
+           "Hamlet (50-150 mice)" "Village (150-300 mice)"
+           "Town (300-1000 mice)" "City (1000+ mice)"))
+
+(random-table/register :name "Mausritter > Settlement > Governance"
+  :private t
+  :roller '(+ "1d6" "Mausritter > Settlement > Settlement Size")
+  :data '(((2 . 3) . "Guided by village elders")
+           ((4 . 5) . "Administered by a knight or lower-caste lord")
+           ((6 . 7) . "Organised by a guild committee")
+           ((8 . 9) . "Free settlement, governed by council of burghermice")
+           ((10 . 11) . "House of an upper caste noblemouse")
+           (12 . "Seat of baronial power")))
+
+(random-table/register :name "Mausritter > Settlement > Industry"
+  :roller "Mausritter > Settlement > Settlement Size"
+  :data '("{Mausritter > Settlement > Possible Industry}"
+           "{Mausritter > Settlement > Possible Industry}"
+           "{Mausritter > Settlement > Possible Industry}"
+           "{Mausritter > Settlement > Possible Industry}"
+           "{Mausritter > Settlement > Possible Industry} and {Mausritter > Settlement > Possible Industry}"
+           "{Mausritter > Settlement > Possible Industry} and {Mausritter > Settlement > Possible Industry}"))
+
+(random-table/register :name "Mausritter > Settlement > Possible Industry"
+  ;; Towns and cities have 2.
+  :private t
+  :data '("Farmers, tending to towering crops" "Woodcutters, with saws and harnesses"
+           "Rough and scarred fishermice, with nets and rafts" "Dark and musty mushroom farm"
+           "Grains drying on every flat surface" "Pungent cheese, cured for years"
+           "Gardens of rare herbs. Drying racks are guarded" "Hive of bees and their veiled keepers"
+           "Merchants and traders, often in need of guards" "Stonemasons, working a nearby quarry"
+           "Flour mill, driven by a large water-wheel" "Deep mine for iron, silver or tin"
+           "Keep silkworms and weave fine cloth" "Expert explorers of caves and tunnels"
+           "Kiln-fired pottery, glazed in cheerful colours" "Wool mill, draped in bright cloth"
+           "Excellent school, rowdy pupils" "Bustling, well-stocked market"
+           "Smelly scavenged trash pile, carefully picked over" "Beautiful furniture of carved and polished wood"))
+
+(random-table/register :name "Mausritter > Settlement > Event"
+  :private t
+  :data '("Disaster, everyone packing to leave" "Wedding, streets decked in flowers"
+           "Preparing for grand seasonal feast" "An illness has struck"
+           "Storehouse has been plundered by insects" "Market day, farmers flock to the settlement"
+           "Mice are at each other’s throats" "Warband forming to defeat a beast"
+           "Several children have gone missing" "Noblemouse makes a frivolous demand"
+           "Traveling theatre troupe arrives" "Funeral, streets thick with smoke"
+           "Conman whips up an irrational scheme" "Pet beetle gone mad, attacking mice"
+           "Faerie emissary with an impossible request" "Strangely quick-growing plant nearby"
+           "Valuable heirloom has a been stolen" "Cat lord demands a heavy tithe"
+           "Coming of age ceremony for the young mice" "Wizard tower arrives on tortoise-back"))
+
+(random-table/register :name "Mausritter > Tavern and Inn"
+  :data '("The {Mausritter > Tavern and Inn > Name} serves a specialty of {Mausritter > Tavern and Inn > Specialty Meal}"))
+
+(random-table/register :name "Mausritter > Tavern and Inn > Name"
+  :private t
+  :data '("[White/Green/Black/Red/Silver/Crooked/Friendly/Hidden/Wiley/Glass/Thorny/Broken] [Beetle/Fox/Wedge/Kernel/Rat/Cheese/Eagle/Worm/Bee/Lantern/Rose/Knight]"))
+
+(random-table/register :name "Mausritter > Tavern and Inn > Specialty Meal"
+  :private t
+  :data '("Spiced baked carrot" "Boiled worm broth" "Blackberry pie"
+           "Pungent aged cheese" "Barley porridge" "Thick river-fish steak"
+           "Baked apple" "Fried, crumbed insect legs" "Fresh buttered bread"
+           "Scavenged candy" "Honey-roasted seeds" "Mushroom stew"))
