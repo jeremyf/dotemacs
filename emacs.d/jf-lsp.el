@@ -24,16 +24,12 @@
           . eglot-ensure)
   :hook ((eglot-managed-mode . jf/eglot-capf)))
 
-;; (defun jf/eglot-ensure ()
-;;   (eglot-ensure)
-;;   (jf/eglot-capf))
-
 (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
 
 (defun jf/eglot-capf ()
   "Ensure `eglot-completion-at-point' preceeds everything."
-  ;; I don't want `eglot-completion-at-point' to trample my other completion
-  ;; options.
+  ;; I don't want `eglot-completion-at-point' to trample my other
+  ;; completion options.
   ;;
   ;; https://stackoverflow.com/questions/72601990/how-to-show-suggestions-for-yasnippets-when-using-eglot
   (setq-local completion-at-point-functions
