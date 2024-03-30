@@ -3132,11 +3132,11 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
 
 (random-table/register :name "Mausritter > Coat Color"
   :private t
-  :data ("Chocolate" "Black" "White" "Tan" "Grey" "Blue"))
+  :data '("Chocolate" "Black" "White" "Tan" "Grey" "Blue"))
 
 (random-table/register :name "Mausritter > Coat Pattern"
   :private t
-  :data ("Solid" "Brindle" "Patchy" "Banded" "Marbled" "Flecked"))
+  :data '("Solid" "Brindle" "Patchy" "Banded" "Marbled" "Flecked"))
 
 (random-table/register :name "Mausritter > Physical Detail"
   :private t
