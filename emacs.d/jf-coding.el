@@ -203,6 +203,16 @@ method, get the containing class."
 ;;          (html-mode . emmet-mode)
 ;;          (css-mode . emmet-mode)))
 
+(use-package go-mode
+  :straight t)
+
+(use-package go-imenu
+  :straight t
+  :hook (go-mode . go-imenu-setup))
+
+(use-package flymake-go
+  :straight t)
+
 (require 'gherkin-mode)
 
 (use-package ruby-mode

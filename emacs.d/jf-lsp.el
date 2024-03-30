@@ -17,6 +17,7 @@
            ruby-mode ruby-ts-mode
            ;; yaml-mode yaml-ts-mode
            html-mode html-ts-mode
+           go-mode go-ts-mode
            js-mode js-ts-mode
            json-mode json-ts-mode
            python-mode python-ts-mode
