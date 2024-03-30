@@ -24,6 +24,7 @@
   :preface
   (defun jf/elfeed-show-entry-switch(buffer)
     (switch-to-buffer buffer)
+    (setq-local shr-inhibit-images t)
     (olivetti-mode 1)
     (text-scale-set 2)
     (elfeed-show-refresh))
