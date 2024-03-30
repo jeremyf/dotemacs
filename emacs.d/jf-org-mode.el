@@ -1026,14 +1026,20 @@ I envision this function called from the command-line."
        :clock-in t
        :clock-keep t
        :jump-to-captured t)
-     ("T" "Task (via Project)"
-       plain (function jf/org-mode/capture/project-task/find)
-       "%?"
-       :empty-lines-before 1
-       :empty-lines-after 1
-       :clock-in t
-       :clock-keep t
-       :jump-to-captured t)
+     ("T" "Today I Learned"
+       plain (file+olp+datetree "~/git/org/denote/glossary/20221009T115751--today-i-learned__TodayILearned.org")
+       "[[date:%(format-time-string \"%Y-%m-%d\")][Today]] I learned:\n\n%?"
+       :clock-keep t)
+     ;; ;; As of <2024-03-30 Sat> I'm no longer using the Tasks on a
+     ;; ;; project.  Instead favoring the Task (via Journal).
+     ;; ("T" "Task (via Project)"
+     ;;   plain (function jf/org-mode/capture/project-task/find)
+     ;;   "%?"
+     ;;   :empty-lines-before 1
+     ;;   :empty-lines-after 1
+     ;;   :clock-in t
+     ;;   :clock-keep t
+     ;;   :jump-to-captured t)
      ("N" "Note for project task"
        plain (function jf/org-mode/capture/project-task/find)
        "%T\n\n%?"
