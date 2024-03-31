@@ -58,6 +58,9 @@
          ((,c :background ,bg-added-refine)))
       `(org-block-end-line
          ((,c :background ,bg-added-refine)))
+      `(org-modern-priority
+         ((,c :foreground ,fg-term-red-bright
+             :box (:color ,fg-term-red-bright :line-width (-1 . -1)))))
       `(fill-column-indicator
          ((,c :width ultra-condensed :background ,bg-dim :foreground ,bg-dim)))
       `(font-lock-regexp-face
