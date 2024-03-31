@@ -131,9 +131,10 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   "Help me see BOM characters \"﻿\"; they are tricky!")
 
 (add-hook 'prog-mode-hook
-  (lambda () (font-lock-add-keywords nil '(("\t" . 'jf/tabs-face)))
-    (font-lock-add-keywords nil '(("﻿" . 'jf/bom-face)))
-    ))
+  (lambda ()
+    (unless (member major-mode '(go-mode go-ts-mode))
+    (font-lock-add-keywords nil '(("\t" . 'jf/tabs-face)))
+    (font-lock-add-keywords nil '(("﻿" . 'jf/bom-face))))))
 (add-hook 'text-mode-hook
   (lambda () (font-lock-add-keywords nil '(("\t" . 'jf/tabs-face)))
     (font-lock-add-keywords nil '(("﻿" . 'jf/bom-face)))
