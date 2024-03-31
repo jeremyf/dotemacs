@@ -216,8 +216,8 @@ method, get the containing class."
   :straight t
   :hook (go-mode . go-imenu-setup))
 
-(use-package flymake-go
-  :straight t)
+;; (use-package flymake-go
+;;   :straight t)
 
 (require 'gherkin-mode)
 

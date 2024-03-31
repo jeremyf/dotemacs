@@ -1028,7 +1028,7 @@ I envision this function called from the command-line."
        :jump-to-captured t)
      ("T" "Today I Learned"
        plain (file+olp+datetree "~/git/org/denote/glossary/20221009T115751--today-i-learned__TodayILearned.org")
-       "[[date:%(format-time-string \"%Y-%m-%d\")][Today]] I learned:\n\n%?"
+       "[[date:%(format-time-string \"%Y-%m-%d\")][Today]] I learned %?"
        :clock-keep t)
      ;; ;; As of <2024-03-30 Sat> I'm no longer using the Tasks on a
      ;; ;; project.  Instead favoring the Task (via Journal).
@@ -1045,6 +1045,8 @@ I envision this function called from the command-line."
        "%T\n\n%?"
        :empty-lines-before 1
        :empty-lines-after 1)))
+
+(add-hook 'focus-out-hook #'org-save-all-org-buffers)
 
 (defvar jf/link-to-project nil)
 

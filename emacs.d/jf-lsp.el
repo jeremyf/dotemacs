@@ -54,7 +54,8 @@
        (body-function . prot-window-select-fit-size)))
   :straight t)
 
-
+(use-package dap-mode
+  :straight t)
 
 (provide 'jf-lsp)
 ;;; jf-lsp.el ends here
