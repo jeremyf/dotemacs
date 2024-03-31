@@ -204,7 +204,13 @@ method, get the containing class."
 ;;          (css-mode . emmet-mode)))
 
 (use-package go-mode
-  :straight t)
+  :straight t
+  :hook ((go-mode go-ts-mode) . jf/go-mode)
+  :config
+  (defun jf/go-mode ()
+    (setq-local tab-width 2)))
+
+(setq go-ts-mode-indent-offset 2)
 
 (use-package go-imenu
   :straight t
