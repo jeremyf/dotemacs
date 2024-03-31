@@ -216,5 +216,27 @@ Credit: https://github.com/olivertaylor/dotfiles/blob/master/emacs/init.el"
         (other-window 1)
         (switch-to-buffer (other-buffer))))))
 
+;; I've been stepping away from multiple tabs, however as I further
+;; explored.  I need to think of these tabs as contained frames.  They
+;; can save window configuration.
+(define-key global-map (kbd "C-c t t") #'tab-bar-mode)
+
+(add-hook 'tab-bar-mode-hook #'jf/tab-bar-mode-hook)
+(defun jf/tab-bar-mode-hook ()
+  "Expose key binding for switching tabs."
+  (define-key global-map
+    (kbd "C-c t n")
+    #'tab-bar-new-tab
+    (not tab-bar-mode))
+  (define-key global-map
+    (kbd "C-c t k")
+    #'tab-bar-close-tab
+    (not tab-bar-mode))
+  (define-key global-map
+    (kbd "C-c t s")
+    #'tab-bar-switch-to-tab
+    ;; Remove the binding when we're NOT in tab-bar-mode.
+    (not tab-bar-mode)))
+
 (provide 'jf-windows)
 ;;; jf-windows.el ends here
