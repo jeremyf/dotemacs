@@ -39,7 +39,7 @@
 ;; emacs.d/jf-reading.el:13:  :bind (:map doc-view-mode-map
 ;; emacs.d/jf-reading.el:29:  :bind ((:map elfeed-search-mode-map
 ;; emacs.d/jf-reading.el:139:  :bind (:map eww-mode-map ("U" . eww-up-url))
-;; emacs.d/jf-reading.el:140:  :bind (("C-s-w" . browse-url-at-point))
+;; emacs.d/jf-reading.el:140:  :bind (("C-s-o" . browse-url-at-point))
 ;; emacs.d/jf-illuminating.el:22:  :bind (("C-=" . er/expand-region)
 ;; emacs.d/jf-illuminating.el:103:  :bind (("C-c C-l" . jf/pulse)))
 ;; emacs.d/jf-illuminating.el:153:;;   :bind (:map symbol-overlay-mode-map

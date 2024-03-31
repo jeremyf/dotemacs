@@ -180,7 +180,7 @@ Alternative suggestions are: - '(\"\\\"“\" . \"\\\"\")"
 
   (setq browse-url-browser-function 'browse-url-default-macosx-browser)
   :bind (:map eww-mode-map ("U" . eww-up-url))
-  :bind (("C-s-w" . browse-url-at-point))
+  :bind (("C-s-o" . browse-url-at-point))
   :hook ((eww-mode . jf/reader-visual)))
 
 (defun jf/reader-visual ()
