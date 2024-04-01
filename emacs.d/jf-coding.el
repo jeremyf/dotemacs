@@ -151,6 +151,10 @@ method, get the containing class."
   ;; is done via an overlay for "blocks" that are more than 5 (default)
   ;; lines
   :straight (:host github :repo "jeremyf/scopeline.el")
+  ;; The original scopeline prefix was creating line height issues for
+  ;; my font of choice.  Namely adding just a bit more spacing for the
+  ;; scopeline overlay, thus making line heights inconsistent.
+  :config (setq scopeline-overlay-prefix "  ~ ")
   :hook ((ruby-mode ruby-ts-mode) . scopeline-mode))
 
 ;;;; Other packages and their configurations

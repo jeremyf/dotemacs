@@ -110,15 +110,18 @@
     ;; The of org-modern blocks is not quite right with olivetti.
     (setq-local org-modern-block-fringe nil)
     (setq-local flymake-fringe-indicator-position nil)
+    ;; By restarting org-modern-mode, I hide the expansive fringe; thus
+    ;; preserving the "beauty" of Olivetti
+    (org-modern-mode 1)
     (vi-tilde-fringe-mode -1)
     (display-line-numbers-mode -1)
     (display-fill-column-indicator-mode -1)
     (git-gutter-mode -1))
-
   (defun jf/olivetti-mode-off-hook ()
     "Restore some visual chatter."
     (setq-local flymake-fringe-indicator-position
       original-flymake-fringe-indicator-position)
+    (org-modern-mode 1)
     (vi-tilde-fringe-mode
       original-vi-tilde-fringe-mode)
     (display-fill-column-indicator-mode
@@ -128,7 +131,13 @@
     (git-gutter-mode
       original-git-gutter-mode)
     (setq-local org-modern-block-fringe
-      original-org-modern-block-fringe)))
+      original-org-modern-block-fringe))
+  (defun jf/olivetti-mode (&rest args)
+    ;; I want to turn off org-modern-mode as it's drawing of the
+    ;; overlays conflicts with Olivetti.  We'll turn it on later.
+    (org-modern-mode -1)))
+
+(advice-add 'olivetti-mode :before #'jf/olivetti-mode)
 
 ;;; Presentation mode leveraging logos
 
