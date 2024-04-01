@@ -76,6 +76,7 @@
      "⚙️: config changes"
      "🎬: initial commit or setup of project/component"
      "🚧: work in progress (WIP)"
+     "🗡: stab in the dark"
      "🤖: continuous integration (CI) changes")
   ;; The following list was pulled from http://udacity.github.io/git-styleguide/
   ;;
