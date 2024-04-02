@@ -1029,6 +1029,8 @@ I envision this function called from the command-line."
      ("T" "Today I Learned"
        plain (file+olp+datetree "~/git/org/denote/glossary/20221009T115751--today-i-learned__TodayILearned.org")
        "[[date:%(format-time-string \"%Y-%m-%d\")][Today]] I learned %?"
+       :empty-lines-before 1
+       :empty-lines-after 1
        :clock-keep t)
      ;; ;; As of <2024-03-30 Sat> I'm no longer using the Tasks on a
      ;; ;; project.  Instead favoring the Task (via Journal).
