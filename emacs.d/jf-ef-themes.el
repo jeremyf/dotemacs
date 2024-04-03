@@ -29,6 +29,8 @@
                 :box (:line-width (1 . 1)
                        :color ,border
                        :style released-button)))))
+      `(ef-themes-fixed-pitch
+         ((,c (:family "Intel One Mono"))))
       `(olivetti-fringe
          ((,c (:inherit fringe :background ,bg-dim))))
       `(jf/bom-face

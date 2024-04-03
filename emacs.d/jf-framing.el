@@ -112,7 +112,8 @@
     (setq-local flymake-fringe-indicator-position nil)
     ;; By restarting org-modern-mode, I hide the expansive fringe; thus
     ;; preserving the "beauty" of Olivetti
-    (org-modern-mode 1)
+    (when (eq major-mode 'org-mode)
+      (org-modern-mode 1))
     (vi-tilde-fringe-mode -1)
     (display-line-numbers-mode -1)
     (display-fill-column-indicator-mode -1)
@@ -121,7 +122,8 @@
     "Restore some visual chatter."
     (setq-local flymake-fringe-indicator-position
       original-flymake-fringe-indicator-position)
-    (org-modern-mode 1)
+    (when (eq major-mode 'org-mode)
+      (org-modern-mode 1))
     (vi-tilde-fringe-mode
       original-vi-tilde-fringe-mode)
     (display-fill-column-indicator-mode
@@ -135,7 +137,8 @@
   (defun jf/olivetti-mode (&rest args)
     ;; I want to turn off org-modern-mode as it's drawing of the
     ;; overlays conflicts with Olivetti.  We'll turn it on later.
-    (org-modern-mode -1)))
+    (when (eq major-mode 'org-mode)
+    (org-modern-mode -1))))
 
 (advice-add 'olivetti-mode :before #'jf/olivetti-mode)
 
