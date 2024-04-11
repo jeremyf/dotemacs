@@ -25,6 +25,11 @@
           . eglot-ensure)
   :hook ((eglot-managed-mode . jf/eglot-capf)))
 
+(use-package eglot-booster
+  :straight (:host github :repo "jdtsmith/eglot-booster")
+	:after eglot
+	:config	(eglot-booster-mode))
+
 (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
 
 (defun jf/eglot-capf ()
