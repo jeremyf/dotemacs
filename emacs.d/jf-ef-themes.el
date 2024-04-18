@@ -51,6 +51,10 @@
          ((,c :bold t :slant italic :foreground ,fg-alt)))
       `(font-lock-misc-punctuation-face
          ((,c :foreground ,green-warmer)))
+      `(elixir-ts-comment-doc-identifier
+         ((,c :foreground ,comment)))
+      `(elixir-ts-comment-doc-attribute
+         ((,c :foreground ,comment)))
       ;; `(mode-line
       ;;    ((,c :foreground ,cyan :background ,bg-cyan-subtle)))
       `(org-block

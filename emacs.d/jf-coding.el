@@ -190,6 +190,25 @@ method, get the containing class."
   :config
   (editorconfig-mode 1))
 
+(use-package heex-ts-mode
+  :straight t)
+
+(use-package mix
+  :straight t
+  :config
+  (keymap-set mix-minor-mode-map "C-c e" 'mix-minor-mode-command-map)
+  (keymap-set mix-minor-mode-map "C-c d" 'jf/duplicate-current-line-or-lines-of-region)
+  (add-hook 'elixir-ts-mode-hook 'mix-minor-mode))
+
+(use-package elixir-ts-mode
+  :after heex-ts-mode
+  :straight t)
+
+;; (use-package flymake-elixir
+;;   :straight t
+;;   :config
+;;   (add-hook 'elixir-ts-mode-hook 'flymake-elixir-load))
+
 (require 'jf-lsp)
 
 (use-package emacs
