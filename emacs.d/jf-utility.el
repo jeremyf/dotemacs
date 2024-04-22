@@ -158,13 +158,17 @@
       :dir "~/git/valkyrie/"
       :files "*.*"
       :menu ("Projects" "j v" "Valkyrie")))
-  :init (setq ripgrep-arguments "--ignore-case")
+  :init (setq ripgrep-arguments "--ignore-case --follow")
+  ;; I want to ensure that I'm following symlinks.  This is important
+  ;; for my Personal Knowledge Management file structure and ensuring
+  ;; that private and public concepts don't bleed across machines.
+  (add-to-list 'rg-required-command-line-flags "--follow")
   :straight t)
 
 (use-package visual-regexp
-  ;; I haven't used much search and replace but the visual queues are useful.
-  ;; And I learned about ,\ in this play.  ,\(upcase \1) will upcase the first
-  ;; capture region.
+  ;; I haven't used much search and replace but the visual queues are
+  ;; useful.  And I learned about ,\ in this play.  ,\(upcase \1) will
+  ;; upcase the first capture region.
   :straight t
   :bind ("C-c C-r r" . vr/replace)
   ("C-c C-r m" . vr/mc-mark)

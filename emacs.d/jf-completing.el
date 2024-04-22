@@ -167,6 +167,7 @@
   (consult-ripgrep-command
     (concat "rg --null --hidden --line-buffered --color=ansi --max-columns=1000 "
       "--smart-case --no-heading --line-number --no-ignore-vcs "
+      "--follow "
       "--glob !vendor/ --glob !coverage/ --glob !**/tmp/ --glob !**/log/ "
       "--glob !public/ --glob !node_modules/ --glob !.git/ --glob !doc/ "
       "--glob !.yardoc/ --glob !.byebug_history "
@@ -174,6 +175,7 @@
   (consult-ripgrep-args
     (concat "rg --null --hidden --line-buffered --color=never --max-columns=1000 "
       "--path-separator / --no-ignore-vcs --smart-case --no-heading "
+      "--follow "
       "--glob !vendor/ --glob !coverage/ --glob !**/tmp/ --glob !**/log/ "
       "--glob !public/ --glob !node_modules/ --glob !.git/ --glob !doc/ "
       "--glob !.yardoc/ --glob !.byebug_history "

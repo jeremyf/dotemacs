@@ -480,29 +480,30 @@ See `denote-file-prompt'"
                                        domain
                                        "\" subdirectory of "
                                        "`denote-directory'.")))
-    `(progn
-       (add-to-list 'jf/denote/subdirectories ,domain)
-       (when (boundp 'consult-notes-sources)
-         (add-to-list 'consult-notes-sources '(,domain ,key ,subdirectory)))
-       (defun ,default-create-fn ()
-         ,default-create-docstring
-         (interactive)
-         (let ((denote-directory (f-join (denote-directory) ,domain)))
-           (call-interactively #'denote)))
-       (bind-key (format "H-d c %c" ,key) (or ,create-fn ',default-create-fn))
-       (bind-key (format "H-d f %c" ,key) ',finder-fn)
-       (defun ,finder-fn ()
-         ,finder-docstring
-         (interactive)
-         (let ((denote-directory (f-join (denote-directory) ,domain)))
-           (call-interactively #'jf/denote/find-file)))
-       (bind-key (format "H-d l %c" ,key) ',link-or-creator-fn)
-       (defun ,link-or-creator-fn ()
-         ,link-or-creator-docstring
-         (interactive)
-         (let ((denote-directory (f-join (denote-directory) ,domain)))
-           (call-interactively #'denote-link-or-create)))
-       )))
+    (when (f-exists? subdirectory)
+      `(progn
+         (add-to-list 'jf/denote/subdirectories ,domain)
+         (when (boundp 'consult-notes-sources)
+           (add-to-list 'consult-notes-sources '(,domain ,key ,subdirectory)))
+         (defun ,default-create-fn ()
+           ,default-create-docstring
+           (interactive)
+           (let ((denote-directory (f-join (denote-directory) ,domain)))
+             (call-interactively #'denote)))
+         (bind-key (format "H-d c %c" ,key) (or ,create-fn ',default-create-fn))
+         (bind-key (format "H-d f %c" ,key) ',finder-fn)
+         (defun ,finder-fn ()
+           ,finder-docstring
+           (interactive)
+           (let ((denote-directory (f-join (denote-directory) ,domain)))
+             (call-interactively #'jf/denote/find-file)))
+         (bind-key (format "H-d l %c" ,key) ',link-or-creator-fn)
+         (defun ,link-or-creator-fn ()
+           ,link-or-creator-docstring
+           (interactive)
+           (let ((denote-directory (f-join (denote-directory) ,domain)))
+             (call-interactively #'denote-link-or-create)))
+         ))))
 
 ;;;;;; Blog Posts
 ;; The blog-post domain is for things that I have, will, or might publish to
