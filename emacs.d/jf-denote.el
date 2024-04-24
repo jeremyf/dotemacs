@@ -90,7 +90,7 @@
           "ruby -ne 'puts $_.gsub(/^(\\w)\\w+-/) { |m| m[0].upcase + m[1..-1] }.gsub(/-(\\w)/) { |m| m[1].upcase }'"))
       "\n"))
   :config
-  (setq denote-journal-extras-title-format 'day-date-month-year)
+  ;; (setq denote-journal-extras-title-format 'day-date-month-year)
   (setq denote-infer-keywords t)
   (setq denote-excluded-punctuation-regexp "[][{}!@#$%^&*()=+'\"?,.|;:~`‘’“”/—–]*")
   (setq denote-modules '(xref ffap))
@@ -297,11 +297,13 @@ When no FILE is provided use `buffer-file-name'.
         (denote-update-dired-buffers)))
     new-file))
 
-(require 'denote-org-extras)
-(require 'denote-journal-extras)
-(add-to-list 'denote-templates '(journal . "#+CATEGORY: Journal"))
-(add-to-list 'org-tags-exclude-from-inheritance denote-journal-extras-keyword)
-(add-hook 'denote-journal-extras-hook #'jf/org-mode/agenda-files-update)
+;;; Disable Journal functions
+
+;; (require 'denote-org-extras)
+;; (require 'denote-journal-extras)
+;; (add-to-list 'denote-templates '(journal . "#+CATEGORY: Journal"))
+;; (add-to-list 'org-tags-exclude-from-inheritance denote-journal-extras-keyword)
+;; (add-hook 'denote-journal-extras-hook #'jf/org-mode/agenda-files-update)
 
 (use-package consult-notes
   ;;Let’s add another way at looking up files.  I appreciate the ability to
@@ -546,8 +548,8 @@ See `denote-file-prompt'"
 (jf/denote/create-functions-for :domain "private"
   :key ?v)
 
-(jf/denote/create-functions-for :domain "journal"
-  :key ?j)
+;; (jf/denote/create-functions-for :domain "journal"
+;;   :key ?j)
 
 ;;;;;; Epigraphs
 (cl-defun jf/denote/create-epigraph (&key

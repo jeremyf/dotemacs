@@ -75,14 +75,14 @@ With one PREFIX go to place where we would jump on capture."
   (require 'org-capture)
   (require 'pulsar)
   (cond
-    ((>= prefix 16)
-      (if-let ((filename (f-join denote-journal-extras-directory "20240131T000000--time-reporting.org")))
-        (progn
-          (org-link-open-as-file (concat filename "::*Timeblock") nil)
-          (org-next-visible-heading 1)
-          (search-forward "#+BEGIN:")
-          (org-dblock-update))
-        (org-capture-goto-target "t")))
+    ;; ((>= prefix 16)
+    ;;   (if-let ((filename (f-join denote-journal-extras-directory "20240131T000000--time-reporting.org")))
+    ;;     (progn
+    ;;       (org-link-open-as-file (concat filename "::*Timeblock") nil)
+    ;;       (org-next-visible-heading 1)
+    ;;       (search-forward "#+BEGIN:")
+    ;;       (org-dblock-update))
+    ;;     (org-capture-goto-target "t")))
     ((>= prefix 4)
       (org-capture-goto-target "t"))
     (t (progn
@@ -245,10 +245,10 @@ Uses the fd command (see https://github.com/sharkdp/fd)
 
 We want files to have the 'projects' `denote' keyword."
   (let ((projects (mapcar (lambda (el) (cdr el)) (jf/project/list-projects))))
-    (dolist (file (jf/journal/list-current-journals))
-      (setq projects (cons file projects)))
-    (when (file-exists-p jf/agenda-filename/scientist)
-      (setq projects (cons jf/agenda-filename/scientist projects)))
+    ;; (dolist (file (jf/journal/list-current-journals))
+    ;;   (setq projects (cons file projects)))
+    ;; (when (file-exists-p jf/agenda-filename/scientist)
+    ;;   (setq projects (cons jf/agenda-filename/scientist projects)))
     (when (file-exists-p jf/agenda-filename/personal)
       (setq projects (cons jf/agenda-filename/personal projects)))
     projects))
@@ -262,14 +262,14 @@ We want files to have the 'projects' `denote' keyword."
 
 (add-hook 'after-init-hook #'jf/org-mode/agenda-files-update)
 
-(defun jf/journal/list-current-journals ()
-  "Return the last 14 daily journal entries."
-  (split-string-and-unquote
-    (shell-command-to-string
-      (concat
-        "fd _journal --absolute-path "
-        denote-journal-extras-directory " | sort | tail -14"))
-  "\n"))
+;; (defun jf/journal/list-current-journals ()
+;;   "Return the last 14 daily journal entries."
+;;   (split-string-and-unquote
+;;     (shell-command-to-string
+;;       (concat
+;;         "fd _journal --absolute-path "
+;;         denote-journal-extras-directory " | sort | tail -14"))
+;;   "\n"))
 
 (cl-defun jf/alist-prompt (prompt collection &rest args)
   (let ((string (completing-read prompt collection args)))

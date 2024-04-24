@@ -1018,15 +1018,15 @@ I envision this function called from the command-line."
        "* %(jf/campaign/random-npc-as-entry)\n%?"
        :empty-lines-after 1
        :jump-to-captured t)
-     ("t" "Task (via Journal)"
-       entry (function denote-journal-extras-new-or-existing-entry)
-       "* %^{Task} :%(jf/project-as-tag):\n\n- Link to Project :: %(jf/project-as-link)\n\n%?"
-       :empty-lines-before 1
-       :empty-lines-after 1
-       :clock-in t
-       :clock-keep t
-       :jump-to-captured t)
-     ("T" "Today I Learned"
+     ;; ("t" "Task (via Journal)"
+     ;;   entry (function denote-journal-extras-new-or-existing-entry)
+     ;;   "* %^{Task} :%(jf/project-as-tag):\n\n- Link to Project :: %(jf/project-as-link)\n\n%?"
+     ;;   :empty-lines-before 1
+     ;;   :empty-lines-after 1
+     ;;   :clock-in t
+     ;;   :clock-keep t
+     ;;   :jump-to-captured t)
+     ("t" "Today I Learned"
        plain (file+olp+datetree "~/git/org/denote/glossary/20221009T115751--today-i-learned__TodayILearned.org")
        "[[date:%(format-time-string \"%Y-%m-%d\")][Today]] I learned %?"
        :empty-lines-before 1
