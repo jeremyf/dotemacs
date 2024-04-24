@@ -153,7 +153,7 @@ The DIRECTORY defaults to `org-directory' but you can specify otherwise."
             (shell-command-to-string
               (concat
                 "rg \"^#\\+PROJECT_NAME: +(" project ") *$\" " directory
-                " --only-matching --no-ignore-vcs --with-filename -r '$1' "
+                " --follow --only-matching --no-ignore-vcs --with-filename -r '$1' "
                 "| tr '\n' '@'"))
             "@")))
 
