@@ -86,6 +86,7 @@
           (expand-file-name "denote/glossary" org-directory)
           " --only-matching"
           " --no-filename "
+          " --follow "
           " --replace '$1' | "
           "ruby -ne 'puts $_.gsub(/^(\\w)\\w+-/) { |m| m[0].upcase + m[1..-1] }.gsub(/-(\\w)/) { |m| m[1].upcase }'"))
       "\n"))
@@ -321,7 +322,7 @@ When no FILE is provided use `buffer-file-name'.
     (concat
       "rg --null --line-buffered --color=never --max-columns=1000 "
       "--path-separator / --ignore-case --no-heading --line-number "
-      "--hidden --glob=!.git/ -L --sortr=accessed"))
+      "--follow --hidden --glob=!.git/ -L --sortr=accessed"))
   :commands (consult-notes
               consult-notes-search-in-all-notes))
 

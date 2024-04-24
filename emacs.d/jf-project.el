@@ -230,7 +230,7 @@ repositories that are generally available on both machines.")
         (concat
           "rg \"^#\\+PROJECT_PATHS: +[^\\.]+\\. +\\\"(~/git/[^/]+/)\\\"\\)\" "
           "~/git/org --no-ignore-vcs --replace='$1' "
-          "--only-matching --no-filename")))
+          "--only-matching --no-filename --follow")))
     "\n"))
 
 (dolist (path (jf/git-project-paths/dynamic))
