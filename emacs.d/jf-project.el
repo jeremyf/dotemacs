@@ -249,8 +249,8 @@ We want files to have the 'projects' `denote' keyword."
     ;;   (setq projects (cons file projects)))
     ;; (when (file-exists-p jf/agenda-filename/scientist)
     ;;   (setq projects (cons jf/agenda-filename/scientist projects)))
-    (when (file-exists-p jf/agenda-filename/personal)
-      (setq projects (cons jf/agenda-filename/personal projects)))
+    (when (file-exists-p jf/agenda-filename/local)
+      (setq projects (cons jf/agenda-filename/local projects)))
     projects))
 
 (transient-define-suffix jf/org-mode/agenda-files-update (&rest _)

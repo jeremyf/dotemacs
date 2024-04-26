@@ -351,7 +351,7 @@ These are functions I onced used for my project time tracking.  What I have with
     And use the given TAG."
     ;; We need to be using the right agenda file.
     (with-current-buffer (find-file-noselect
-                          jf/primary-agenda-filename-for-machine)
+                          jf/agenda-filename/local)
       (let ((existing-position (org-element-map
                                    (org-element-parse-buffer)
                                    'headline
@@ -425,7 +425,7 @@ These are functions I onced used for my project time tracking.  What I have with
     tasks within projects are headline 5."
     (interactive "P")
     (with-current-buffer (find-file-noselect
-                          jf/primary-agenda-filename-for-machine)
+                          jf/agenda-filename/local)
       (save-excursion
         (let ((within_headline
                ;; Use the CCYY-MM-DD Dayname format and prompt for a date if
@@ -481,7 +481,7 @@ These are functions I onced used for my project time tracking.  What I have with
     Useful for providing me with an overview of my total tracked time
     for the week."
     (interactive)
-    (find-file jf/primary-agenda-filename-for-machine)
+    (find-file jf/agenda-filename/local)
     (require 'pulsar)
     (pulsar-pulse-line)
     (org-clock-report 4))

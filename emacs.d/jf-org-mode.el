@@ -11,32 +11,22 @@
 ;;; Code:
 (require 'cl-lib)
 
-;; I maintain a list of data directories, each might have “relevant to
-;; org-mode” files.  The `jf/org-mode/agenda-files' reads the file system to gather
-;; sources for `org-mode' agenda.
-(defun jf/is-work-machine? ()
-  "Am I working on my company machine machine."
-  (string= (getenv "USER") "jeremy"))
-
 (defvar jf/org-mode/capture/filename
   "~/git/org/denote/melange/20230210T184422--example-code__programming.org"
   "The file where I'm capturing content.
 
 By default this is my example code project.")
 
-(defconst jf/agenda-filename/scientist
-  "~/git/org/denote/scientist/20221021T221357--scientist-agenda__agenda_scientist.org")
+(defconst jf/agenda-filename/local
+  "~/git/org/denote/indices/20200501T120000--agenda.org"
+  "A local (to the machine) agenda.
 
-(defconst jf/agenda-filename/personal
-  "~/git/org/agenda.org")
+Note, there's an assumption that a file of the given name will
+exist on each machine, but its contents will be different based
+on the needs/constraints of the locality.")
 
 (defconst jf/lore24-filename
   "~/git/org/denote/indices/20231225T130631--lore24-in-the-shadows-of-mont-brun__Lore24_campaigns_rpgs.org")
-
-(defvar jf/primary-agenda-filename-for-machine
-  (if (jf/is-work-machine?)
-    jf/agenda-filename/scientist
-    jf/agenda-filename/personal))
 
 (defun jf/org-capf ()
   "The `completion-at-point-functions' I envision using for `org-mode'."
@@ -413,7 +403,7 @@ File.open('%s', 'w') { |f| $stdout = f; pp results }")
 And use the given TAG."
   ;; We need to be using the right agenda file.
   (with-current-buffer (find-file-noselect
-                         jf/primary-agenda-filename-for-machine)
+                         jf/agenda-filename/local)
     (let ((existing-position (org-element-map
                                (org-element-parse-buffer)
                                'headline
@@ -487,7 +477,7 @@ NOTE: This follows the convention that projects are on headline 4 and
 tasks within projects are headline 5."
   (interactive "P")
   (with-current-buffer (find-file-noselect
-                         jf/primary-agenda-filename-for-machine)
+                         jf/agenda-filename/local)
     (save-excursion
       (let ((within_headline
               ;; Use the CCYY-MM-DD Dayname format and prompt for a date if
@@ -543,7 +533,7 @@ tasks within projects are headline 5."
 Useful for providing me with an overview of my total tracked time
 for the week."
   (interactive)
-  (find-file jf/primary-agenda-filename-for-machine)
+  (find-file jf/agenda-filename/local)
   (require 'pulsar)
   (pulsar-pulse-line)
   (org-clock-report 4))

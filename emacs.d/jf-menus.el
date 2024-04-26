@@ -13,19 +13,11 @@
 (bind-key "M-]" #'forward-paragraph)
 (bind-key "s-]" #'forward-paragraph)
 
-(transient-define-suffix jf/jump-to/violet-board ()
-  "Jump to 💜 Violet 💜"
-  :description "Jump to Violet"
+(transient-define-suffix jf/jump-to/agenda-local ()
+  "Jump to local agenda"
+  :description "Agenda (Local)"
   (interactive)
-  (require 'eww)
-  (eww-browse-with-external-browser "https://github.com/orgs/scientist-softserv/projects/43"))
-(bind-key "C-c l v" #'jf/jump-to/violet-board)
-
-(transient-define-suffix jf/jump-to/agenda-personal ()
-  "Jump to personal agenda"
-  :description "Agenda, Personal"
-  (interactive)
-  (find-file "~/git/org/agenda.org"))
+  (find-file jf/agenda-filename/local))
 
 (transient-define-suffix jf/shr/toggle-images ()
   "Toggle showing or hiding images"
@@ -90,8 +82,7 @@
   "A context specific \"mega\" menu."
   ;; Todo, can I get this section into a function so I can duplicate it in the jf/menu--tor?
   [["Jump to"
-     ("j a" "Agenda" jf/project/jump-to-task)
-     ("j A" jf/jump-to/agenda-personal)
+     ("j a" jf/jump-to/agenda-local)
      ("j c" "Capture Backlog" jf/jump-to/code-backlog)
      ("j d" "Denote File" jf/jump_to_corresponding_denote_file :if-derived markdown-mode)
      ("j g" "Global Mark" consult-global-mark)
@@ -103,11 +94,9 @@
      ;; ("j s" "Jump to Shortdoc" shortdoc-display-group)
      ("j v" jf/jump-to/violet-board)]
     ["Tasks"
-      ("i" "Clock in…" consult-clock-in)
       ("s" "Search note content…" consult-notes-search-in-all-notes)
       ("S" "Search note filename…" consult-notes)
       ("C-t" "Start a timer…" tmr-with-description)
-      ("C-M-s-t" "Archive month as timesheet…" jf/denote/archive-timesheet-month)
       ("t" "Todo for project…" magit-todos-list)
       ("T" "Mastodon Toot…" mastodon-toot)
       ("u" jf/org-mode/agenda-files-update)]
