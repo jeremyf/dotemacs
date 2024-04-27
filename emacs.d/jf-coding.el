@@ -615,8 +615,10 @@ See `add-log-current-defun-function'."
 (use-package dash-docs
   :straight t)
 
-(use-package consult-dash
-  :straight t)
+;;; Commented out as work machine does not like codeberg.org git URLs
+;;
+;; (use-packaqge consult-dash
+;;   :straight t)
 
 (use-package flymake
   :straight t
