@@ -11,7 +11,7 @@
 ;;; Code
 
 (use-package mastodon
-  :straight t
+  :straight (:host github :repo "jeremyf/mastodon.el")
   :config (setq mastodon-instance-url "https://dice.camp"
                           mastodon-active-user "takeonrules"))
 
