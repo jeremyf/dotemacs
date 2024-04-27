@@ -535,11 +535,11 @@ method, get the containing class."
   ;; doesn't allow for comments.
   :straight t)
 
-(use-package combobulate
-  :straight (:host github :repo "mickeynp/combobulate")
-  :hook ((json-ts-mode . combobulate-mode)
-          (html-ts-mode . combobulate-mode)
-          (yaml-ts-mode . combobulate-mode)))
+;; (use-package combobulate
+;;   :straight (:host github :repo "mickeynp/combobulate")
+;;   :hook ((json-ts-mode . combobulate-mode)
+;;           (html-ts-mode . combobulate-mode)
+;;           (yaml-ts-mode . combobulate-mode)))
 
 (use-package yard-mode
   ;; My prefered Ruby documentation syntax
