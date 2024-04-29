@@ -83,7 +83,7 @@ It will display entries without switching to them."
   :config (elfeed-org)
   (defun jf/export-public-elfeed-opml ()
     "Export public OPML file."
-    (let ((opml-body (cl-loop for org-file in '("~/git/pkm-local/public-elfeed.org")
+    (let ((opml-body (cl-loop for org-file in '("~/git/org/denote/indices/public-elfeed.org")
                        concat
                        (with-temp-buffer
                          (insert-file-contents
@@ -104,8 +104,8 @@ It will display entries without switching to them."
         (insert "</opml>\n")
         (save-buffer))))
   (setq rmh-elfeed-org-files nil)
-  (dolist (file '("~/git/pkm-local/public-elfeed.org"
-                   "~/git/pkm-local/private-elfeed.org"))
+  (dolist (file '("~/git/org/denote/indices/public-elfeed.org"
+                   "~/git/org/denote/indices/private-elfeed.org"))
     (when (f-exists? file)
       (add-to-list 'rmh-elfeed-org-files file))))
 

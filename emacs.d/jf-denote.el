@@ -91,6 +91,7 @@
           "ruby -ne 'puts $_.gsub(/^(\\w)\\w+-/) { |m| m[0].upcase + m[1..-1] }.gsub(/-(\\w)/) { |m| m[1].upcase }'"))
       "\n"))
   :config
+  (require 'denote-org-extras)
   ;; (setq denote-journal-extras-title-format 'day-date-month-year)
   (setq denote-infer-keywords t)
   (setq denote-excluded-punctuation-regexp "[][{}!@#$%^&*()=+'\"?,.|;:~`‘’“”/—–]*")

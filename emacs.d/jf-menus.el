@@ -92,7 +92,8 @@
      ("j r" "Jump to Git Related" consult-git-related-find-file)
      ("j l" "Jump to Magit Project Lists" magit-list-repositories)
      ;; ("j s" "Jump to Shortdoc" shortdoc-display-group)
-     ("j v" jf/jump-to/violet-board)]
+     ;; ("j v" jf/jump-to/violet-board)
+     ]
     ["Tasks"
       ("s" "Search note content…" consult-notes-search-in-all-notes)
       ("S" "Search note filename…" consult-notes)

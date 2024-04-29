@@ -978,7 +978,12 @@ I envision this function called from the command-line."
       (insert "\n" text))))
 (load "jf-campaign.el")
 (setq org-capture-templates
-  '(("d" "To Denote"
+  '(("a" "To Agenda"
+      entry (file jf/agenda-filename/local)
+      "* TODO %?"
+      :clock-keep t
+      :jump-to-captured t)
+     ("d" "To Denote"
       plain (file denote-last-path)
       #'jf/denote-org-capture
       :no-save t

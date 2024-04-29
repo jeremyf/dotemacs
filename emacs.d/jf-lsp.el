@@ -21,13 +21,14 @@
                elixir-ts-mode
                ;; yaml-mode yaml-ts-mode
                html-mode html-ts-mode
-               go-mode go-ts-mode
+               go-mode go-ts-mode ;; https://github.com/golang/tools/tree/master/gopls
                js-mode js-ts-mode
                json-mode json-ts-mode
                python-mode python-ts-mode
                scss-mode scss-ts-mode)
               . eglot-ensure)
       :config
+      ;; https://github.com/elixir-lsp/elixir-ls?tab=readme-ov-file
       (add-to-list 'eglot-server-programs '(elixir-ts-mode "~/elixir-ls/v0.20.0/language_server.sh"))
       :hook ((eglot-managed-mode . jf/eglot-capf)))
 
@@ -71,6 +72,7 @@
     (use-package lsp-mode
       :straight t
       :hook ((elixir-ts-mode . lsp)
+              (go-ts-mode . lsp)
               (lsp-mode . lsp-enable-which-key-integration))
       :commands lsp)
 
