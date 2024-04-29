@@ -113,7 +113,6 @@
       ("b x" "Export to TakeOnRules…" jf/export-org-to-tor :if jf/org-mode/blog-entry?)]]
   [["Modes"
      ;; I could write functions for these, but this is concise enough
-     ("m h" jf/hammerspoon-toggle-mode  :if-non-nil hammerspoon-edit-minor-mode)
      ("m t" "Typopunct ( )" typopunct-mode :if-nil typopunct-mode)
      ("m t" "Typopunct (*)" typopunct-mode :if-non-nil typopunct-mode)
      ("m o" "MacOS Native Option ( )" jf/toggle-osx-alternate-modifier :if-non-nil ns-alternate-modifier)

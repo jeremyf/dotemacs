@@ -342,8 +342,7 @@ method, get the containing class."
   :straight (:host github :repo "alphapapa/magit-todos"))
 
 (use-package lua-mode
-  ;; For working with https://www.hammerspoon.org; which provides me the
-  ;; wonderful https://github.com/dmgerman/editWithEmacs.spoon/
+  ;; For working with https://www.hammerspoon.org/
   :straight t)
 
 (use-package markdown-mode

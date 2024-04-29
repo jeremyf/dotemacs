@@ -196,32 +196,20 @@
               :repo "shankar2k/math-at-point")
   :bind ("C-c =" . math-at-point))
 
-;;;; Hammerspoon --------------------------------------------------------------
-
-;; Hammerspoon is a Lua application that provides a consistent API for
-;; interacting with MacOS.  The editWithEmacs.spoon allows me to copy text from
-;; one region, edit it in Emacs, and paste it back into the Application.
-(when (file-directory-p
-        "~/git/dotzshrc/symlinks/.hammerspoon/Spoons/editWithEmacs.spoon")
-  (load
-    "~/git/dotzshrc/symlinks/.hammerspoon/Spoons/editWithEmacs.spoon/hammerspoon.el"
-    nil
-    jf/silence-loading-log))
-
-(require 'transient)
-;; this suffix provides a dynamic description of the current major mode for a
-;; `hammerspoon-edit-minor-mode' buffer.  And the prefix’s function toggles
-;; that mode.
-(transient-define-suffix jf/hammerspoon-toggle-mode ()
-  "Set the hammerspoon mode."
-  :description '(lambda ()
-                  (concat
-                    "Hammerspoon Mode: "
-                    (propertize
-                      (format "%s" major-mode)
-                      'face 'transient-argument)))
-  (interactive)
-  (hammerspoon-toggle-mode))
+;; Favor this over the hammerspoon editWithEmacs command.  Why?  This
+;; command is more generalized and is getting more traction amongst
+;; folks in the #emacs fediverse.  Hence something that is more likely
+;; to see maintenance.
+(use-package emacs-everywhere
+  :straight t
+  :config
+  (setq emacs-everywhere-frame-parameters
+    '((name . "emacs-everywhere")
+       (fullscreen)
+       (width . 0.33)
+       (height . 0.5)
+       (top . 0)
+       (left . 0))))
 
 ;; The following function facilitates a best of both worlds.  By default, I
 ;; want Option to be Meta (e.g. \"M-\") in Emacs.  However, I can toggle that
