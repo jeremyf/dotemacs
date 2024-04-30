@@ -105,5 +105,7 @@
   ;; points.
   :straight t)
 
+(setq-default ispell-program-name "aspell")
+
 (provide 'jf-writing)
 ;;; jf-writing.el ends here

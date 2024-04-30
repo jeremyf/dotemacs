@@ -230,8 +230,11 @@ method, get the containing class."
   :straight t
   :hook ((go-mode go-ts-mode) . jf/go-mode)
   :config
+  ;; See https://pkg.go.dev/golang.org/x/tools/cmd/goimports
+  (setq gofmt-command "goimports")
   (defun jf/go-mode ()
     (setq-local tab-width 2)))
+(add-hook 'before-save-hook 'gofmt-before-save)
 
 (setq go-ts-mode-indent-offset 2)
 
@@ -388,7 +391,13 @@ method, get the containing class."
             (concat markdown-toc (concat indentation line)))))
       (insert markdown-toc)))
   :init
-  (setq markdown-command "/usr/local/bin/pandoc")
+  (setq markdown-command
+    ;; In the early days of Apple Silicon, Pandoc was only available
+    ;; through an odd installation.  As those early days have passed,
+    ;; Pandoc is now available in a native form for Apple Silicon.
+    (if (file-exists-p "/opt/homebrew/bin/pandoc")
+      "/opt/homebrew/bin/pandoc"
+      "/usr/local/bin/pandoc"))
   (font-lock-add-keywords 'markdown-mode
     '(("{{[^}]+}}" . 'font-lock-function-name-face))))
 
