@@ -95,6 +95,7 @@
      ;; ("j v" jf/jump-to/violet-board)
      ]
     ["Tasks"
+      ("n" "Github Notifications…" gh-notify)
       ("s" "Search note content…" consult-notes-search-in-all-notes)
       ("S" "Search note filename…" consult-notes)
       ("C-t" "Start a timer…" tmr-with-description)

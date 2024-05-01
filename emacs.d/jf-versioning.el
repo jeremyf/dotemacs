@@ -60,6 +60,13 @@
   :bind ("C-s-f" . #'forge-dispatch)
   :straight (:host github :repo "magit/forge"))
 
+;; A super-fast overlay of forge notifications (something which I
+;; haven't previously used).
+;;
+;;
+(use-package gh-notify
+  :straight t)
+
 (defvar jf/version-control/valid-commit-title-prefixes
   '("🎁: feature (A new feature)"
      "🐛: bug fix (A bug fix)"
