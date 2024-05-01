@@ -904,7 +904,8 @@ See `jf/comment-header-regexp/major-modes-alis'."
 (use-package annotate
   :straight t
   :config (setq annotate-annotation-position-policy :margin)
-  :hook (prog-mode . annotate-mode))
+  :hook ((text-mode . annotate-mode)
+          (prog-mode . annotate-mode)))
 
 (setq annotate-mode-map
   (let ((map (make-sparse-keymap)))
