@@ -21,7 +21,7 @@
   :straight t)
 
 ;; For remote code sharing/pairing
-(use-package cdrt
+(use-package crdt
   :straight t)
 
 ;; Shall we review code via Magit?  I believe the answer must be yes.
@@ -31,7 +31,12 @@
              :type git
              :host github
              :repo "phelrine/code-review"
-             :branch "fix/closql-update"))
+              :branch "fix/closql-update")
+  :bind (:map forge-pullreq-mode-map
+          (("C-c r" . #'code-review-forge-pr-at-point)))
+  :config
+  (add-hook 'code-review-mode-hook #'emojify-mode)
+  (setq code-review-fill-column 80))
 
 (use-package treesit
   :straight (:type built-in)
@@ -248,6 +253,109 @@ method, get the containing class."
   (defun jf/go-mode ()
     (setq-local tab-width 2)))
 (add-hook 'before-save-hook 'gofmt-before-save)
+
+(use-package go-ts-mode
+  :straight (:type built-in)
+  :config
+  ;; Copied from
+  ;; https://github.com/Homebrew/brew/blob/c2ed3327c605c3e738359c9807b8f4cd6fec09eb/Cellar/emacs-plus%4029/29.3/share/emacs/29.3/lisp/progmodes/go-ts-mode.el#L115-L206
+  ;;
+  ;; Modifications made to remove parse error.
+  (setq go-ts-mode--font-lock-settings
+    (treesit-font-lock-rules
+      :language 'go
+      :feature 'bracket
+      '((["(" ")" "[" "]" "{" "}"]) @font-lock-bracket-face)
+
+      :language 'go
+      :feature 'comment
+      '((comment) @font-lock-comment-face)
+
+      :language 'go
+      :feature 'constant
+      `([(false) (nil) (true)] @font-lock-constant-face
+         ,@(when (go-ts-mode--iota-query-supported-p)
+             '((iota) @font-lock-constant-face))
+         (const_declaration
+           (const_spec name: (identifier) @font-lock-constant-face)))
+
+      :language 'go
+      :feature 'delimiter
+      '((["," "." ";" ":"]) @font-lock-delimiter-face)
+
+      :language 'go
+      :feature 'definition
+      '((function_declaration
+          name: (identifier) @font-lock-function-name-face)
+         (method_declaration
+           name: (field_identifier) @font-lock-function-name-face)
+         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+         ;;; method_spec is, as of 2024-05-01 and Emacs v29.3, something
+         ;;; that breaks with the installed tree-sitter language.
+         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+         ;; (method_spec
+         ;;  name: (field_identifier) @font-lock-function-name-face)
+         (field_declaration
+           name: (field_identifier) @font-lock-property-name-face)
+         (parameter_declaration
+           name: (identifier) @font-lock-variable-name-face)
+         (short_var_declaration
+           left: (expression_list
+                   (identifier) @font-lock-variable-name-face
+                   ("," (identifier) @font-lock-variable-name-face)*))
+         (var_spec name: (identifier) @font-lock-variable-name-face
+           ("," name: (identifier) @font-lock-variable-name-face)*))
+
+      :language 'go
+      :feature 'function
+      '((call_expression
+          function: (identifier) @font-lock-function-call-face)
+         (call_expression
+           function: (selector_expression
+                       field: (field_identifier) @font-lock-function-call-face)))
+
+      :language 'go
+      :feature 'keyword
+      `([,@go-ts-mode--keywords] @font-lock-keyword-face)
+
+      :language 'go
+      :feature 'label
+      '((label_name) @font-lock-constant-face)
+
+      :language 'go
+      :feature 'number
+      '([(float_literal)
+          (imaginary_literal)
+          (int_literal)] @font-lock-number-face)
+
+      :language 'go
+      :feature 'string
+      '([(interpreted_string_literal)
+          (raw_string_literal)
+          (rune_literal)] @font-lock-string-face)
+
+      :language 'go
+      :feature 'type
+      '([(package_identifier) (type_identifier)] @font-lock-type-face)
+
+      :language 'go
+      :feature 'property
+      '((selector_expression field: (field_identifier) @font-lock-property-use-face)
+         (keyed_element (_ (identifier) @font-lock-property-use-face)))
+
+      :language 'go
+      :feature 'variable
+      '((identifier) @font-lock-variable-use-face)
+
+      :language 'go
+      :feature 'escape-sequence
+      :override t
+      '((escape_sequence) @font-lock-escape-face)
+
+      :language 'go
+      :feature 'error
+      :override t
+      '((ERROR) @font-lock-warning-face))))
 
 (setq go-ts-mode-indent-offset 2)
 
