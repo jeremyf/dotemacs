@@ -7,8 +7,9 @@
 
 ;;; Commentary:
 
-;; Coding is writing, but not all writing is coding.  This configures and
-;; extends packages specifically here for helping with my coding activities.
+;; Coding is writing, but not all writing is coding.  This configures
+;; and extends packages specifically here for helping with my coding
+;; activities.
 
 ;;; Code:
 
@@ -18,6 +19,19 @@
 (use-package adaptive-wrap
   :custom (adaptive-wrap-extra-indent 4)
   :straight t)
+
+;; For remote code sharing/pairing
+(use-package cdrt
+  :straight t)
+
+;; Shall we review code via Magit?  I believe the answer must be yes.
+(use-package code-review
+  :after magit
+  :straight (code-review
+             :type git
+             :host github
+             :repo "phelrine/code-review"
+             :branch "fix/closql-update"))
 
 (use-package treesit
   :straight (:type built-in)
@@ -139,7 +153,6 @@ method, get the containing class."
                           '("constant" "scope_resolution"))))))))
       (jf/treesit/module_space parent (cons parent_name acc))
       acc)))
-
 
 (use-package treesit-auto
   :straight (:host github :repo "renzmann/treesit-auto")
