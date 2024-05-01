@@ -437,7 +437,7 @@ See `denote-file-prompt'"
                (file (funcall project-read-file-name-function
                        "Select note" files nil 'file-name-history)))
     (let ((completion-ignore-case read-file-name-completion-ignore-case))
-      (add-to-history 'denote--file-history file)
+      (add-to-history 'denote-file-history file)
       file)))
 
 (setq consult-notes-sources (list))
@@ -715,7 +715,7 @@ PARG is part of the method signature for `org-link-parameters'."
                   (denote-all-files)
                   ;; Filter might be nil; if so pass nil.  Otherwise the string.
                   (when filter (lambda (fname) (s-contains? filter fname t)))
-                  'denote--file-history)))
+                  'denote-file-history)))
     ;; This leverages a post v1.0.0 parameter of Denote
     ;; See https://git.sr.ht/~protesilaos/denote/commit/c6c3fc95c66ba093a266c775f411c0c8615c14c7
     (concat scheme ":" (denote-retrieve-filename-identifier file))))
