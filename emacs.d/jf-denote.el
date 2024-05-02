@@ -625,14 +625,12 @@ Default the note’s title to the first NTH-WORDS of the BODY."
                       (when is-a-game (concat "#+GAME: " key "\n"))
                       "#+ITEMID:\n"
                       "#+ITEMTYPE:\n"
-                      "#+MENTION_AS:\n"
                       "#+NO_TITLE:\n"
-                      "#+OFFER:\n"
-                      "#+PLURAL_ABBR:\n"
-                      "#+PLURAL_TITLE:\n"
-                      "#+SAME_AS:\n"
+                      (when (s-present? abbr)
+                        "#+PLURAL_ABBR:\n#+PLURAL_TITLE:\n")
+                      "#+ROAM_REFS:\n"
                       "#+TAG:\n" ;; TODO: Assert uniqueness
-                      "#+VERBOSE_TITLE:\n"))
+                      ))
           (keywords (list)))
     ;; Add both "abbr" and the abbr to the keywords; both help in searching
     ;; results
