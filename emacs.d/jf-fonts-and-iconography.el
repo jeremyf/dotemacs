@@ -28,13 +28,8 @@
          :default-height 130)
        (bigger
          :default-height 160)
-       (iosevka
-         :default-height 140
-         :default-weight regular
-         :bold-weight bold
-         :default-family "Iosevka Comfy Motion Fixed")
        (coding
-         :default-family "Intel One Mono"
+         :default-family "IntoneMono Nerd Font Mono"
          :default-weight light
          :bold-weight medium
          :default-height 130)
@@ -48,9 +43,7 @@
          :default-height 220
          :bold-weight bold)
        (t
-         ;; Following Prot’s example, keeping these for for didactic purposes.
-         ;; :default-family "Iosevka Comfy Motion Fixed"
-         :default-family "Intel One Mono"
+         :default-family "IntoneMono Nerd Font Mono"
          :default-weight light
          :default-height 130
          :fixed-pitch-family nil ; falls back to :default-family
@@ -59,7 +52,7 @@
          :fixed-pitch-serif-family nil ; falls back to :default-family
          :fixed-pitch-serif-weight nil ; falls back to :default-weight
          :fixed-pitch-serif-height 1.0
-         :variable-pitch-family "ETBembo"
+         :variable-pitch-family "IntoneMono Nerd Font Propo"
          :variable-pitch-weight nil
          :variable-pitch-height 1.0
          :bold-family nil ; use whatever the underlying face has
@@ -71,27 +64,32 @@
 
 ;;;; Icons
 
+(use-package nerd-icons
+  :straight t
+  :config (setq nerd-icons-font-family "IntoneMono Nerd Font Mono"))
+
 (use-package all-the-icons
   ;; It's nice to see icons as a quick visual helper.
   :straight t
-  :config
-  (cl-defmacro jf/all-the-icons--with(&key name)
-    "A macro to provide functions for icon names."
-    (let ((defun-fn (intern (concat "jf/all-the-icons--with-" name)))
-           (icon-fn (intern (concat "all-the-icons-" name)))
-           (docstring (concat
-                        "Displays an ICON from `all-the-icons-" name "'.")))
-      `(defun ,defun-fn (icon str &optional height v-adjust)
-         ,docstring
-         (s-concat (,icon-fn
-                     icon
-                     :v-adjust (or v-adjust 0)
-                     :height (or height 1))
-           " " str))))
-  (jf/all-the-icons--with :name "faicon")
-  (jf/all-the-icons--with :name "material")
-  (jf/all-the-icons--with :name "octicon")
-  (jf/all-the-icons--with :name "alltheicon"))
+  ;; :config
+  ;; (cl-defmacro jf/all-the-icons--with(&key name)
+  ;;   "A macro to provide functions for icon names."
+  ;;   (let ((defun-fn (intern (concat "jf/all-the-icons--with-" name)))
+  ;;          (icon-fn (intern (concat "all-the-icons-" name)))
+  ;;          (docstring (concat
+  ;;                       "Displays an ICON from `all-the-icons-" name "'.")))
+  ;;     `(defun ,defun-fn (icon str &optional height v-adjust)
+  ;;        ,docstring
+  ;;        (s-concat (,icon-fn
+  ;;                    icon
+  ;;                    :v-adjust (or v-adjust 0)
+  ;;                    :height (or height 1))
+  ;;          " " str))))
+  ;; (jf/all-the-icons--with :name "faicon")
+  ;; (jf/all-the-icons--with :name "material")
+  ;; (jf/all-the-icons--with :name "octicon")
+  ;; (jf/all-the-icons--with :name "alltheicon")
+  )
 
 (use-package all-the-icons-dired
   ;; Incorporates file icons with file listings of dired.  /Note/: On 2021-04-11

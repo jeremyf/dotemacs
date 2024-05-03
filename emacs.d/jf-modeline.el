@@ -125,7 +125,8 @@
   "Return the FILE and BRANCH."
   (propertize
     (concat
-      (propertize (char-to-string #xE0A0)
+      ;; 
+      (propertize "" ;; (char-to-string #xE0A0)
         'face
         'jf/mode-line-format/face-shadow)
       " "

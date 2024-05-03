@@ -405,7 +405,7 @@ method, get the containing class."
 
 (use-package flymake-ruff
   :straight t)
-;;   :hook (eglot-managed-mode . flymake-ruff-load))
+  ;; :hook (eglot-managed-mode . flymake-ruff-load))
 
 (use-package python-docstring
   :straight t)

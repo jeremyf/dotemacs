@@ -65,7 +65,27 @@
 ;;
 ;;
 (use-package gh-notify
-  :straight t)
+  :straight t
+  :config
+  (setq gh-notify-exclude-repo-limit
+    '("samvera-labs/geomash"
+       "samvera-labs/hyku_knapsack"
+       "samvera/bulkrax"
+       "samvera/hyku"
+       "samvera/valkyrie"
+       "scientist-softserv/actions"
+       "scientist-softserv/adventist-dl"
+       "scientist-softserv/adventist_knapsack"
+       "scientist-softserv/atla-hyku"
+       "scientist-softserv/britishlibrary"
+       "scientist-softserv/derivative_rodeo"
+       "scientist-softserv/hykuup_knapsack"
+       "scientist-softserv/iiif_print"
+       "scientist-softserv/palni-palci"
+       "scientist-softserv/palni_palci_knapsack"
+       "scientist-softserv/utk-hyku"
+       "harvard-lts/CURIOSity"
+       "WGBH-MLA/ams")))
 
 (defvar jf/version-control/valid-commit-title-prefixes
   '("🎁: feature (A new feature)"

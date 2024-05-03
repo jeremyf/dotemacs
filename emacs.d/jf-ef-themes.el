@@ -84,8 +84,9 @@
        (5 . (rainbow 1.2))
        (6 . (rainbow 1.15))
        (t . (rainbow 1.1))))
-  ;; They are nil by default...
+  ;; When these are non-nil, the mode line uses the proportional font
   (setq ef-themes-mixed-fonts t
-    ef-themes-variable-pitch-ui t))
+    ef-themes-variable-pitch-ui t)
+  )
 
 (setq jf/themes-plist '(:dark ef-bio :light ef-cyprus))

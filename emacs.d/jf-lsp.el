@@ -16,20 +16,32 @@
       ;; :straight (:type built-in)
       ;; The Language Server Protocol (LSP) is a game changer; having access to that
       ;; tooling is very much a nice to have.
-      :hook ((css-mode css-ts-mode
-               ruby-mode ruby-ts-mode
-               elixir-ts-mode
+      :hook ((
                ;; yaml-mode yaml-ts-mode
-               html-mode html-ts-mode
+               ;; angular-mode angular-ts-mode ;; npm install -g @angular/language-service@next typescript @angular/language-server
+               css-mode css-ts-mode
+               elixir-ts-mode
                go-mode go-ts-mode ;; https://github.com/golang/tools/tree/master/gopls
+               html-mode html-ts-mode
                js-mode js-ts-mode
                json-mode json-ts-mode
                python-mode python-ts-mode
-               scss-mode scss-ts-mode)
+               ruby-mode ruby-ts-mode
+               scss-mode scss-ts-mode
+               typescript-ts-mode typescript-mode ;; https://github.com/typescript-language-server/typescript-language-server
+               )
               . eglot-ensure)
       :config
       ;; https://github.com/elixir-lsp/elixir-ls?tab=readme-ov-file
       (add-to-list 'eglot-server-programs '(elixir-ts-mode "~/elixir-ls/v0.20.0/language_server.sh"))
+      ;; https://github.com/emacs-lsp/lsp-mode/wiki/Install-Angular-Language-server
+      ;; with modifications for homebrew
+      (add-to-list 'eglot-servier-programs
+        '(angular-mode
+           "node /opt/homebrew/lib/node_modules/@angular/language-server --ngProbeLocations /opt/homebrew/lib/node_modules --tsProbeLocations /opt/homebrew/lib/node_modules --stdio"))
+      (add-to-list 'eglot-servier-programs
+        '(angular-ts-mode
+           "node /opt/homebrew/lib/node_modules/@angular/language-server --ngProbeLocations /opt/homebrew/lib/node_modules --tsProbeLocations /opt/homebrew/lib/node_modules --stdio"))
       :hook ((eglot-managed-mode . jf/eglot-capf)))
 
 
