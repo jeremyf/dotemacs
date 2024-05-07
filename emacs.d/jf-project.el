@@ -211,29 +211,13 @@ When the `current-prefix-arg' is set always prompt for the project."
 ;; The following command shows all "project" directories
 ;;
 (defvar jf/git-project-paths
-  '(("~/git/takeonrules.source/" . 1)
-     ("~/git/burning_wheel_lifepaths/" . 1)
-     ("~/git/dotzshrc/" .  1)
-     ("~/git/dotemacs/" . 1)
-     ("~/git/emacs-bookmarks/" . 1)
-     ("~/git/org" . 1)
-     ("~/git/takeonrules.source/themes/hugo-tufte" . 1))
-  "A list of `con' cells where the `car' is the name of a directory
-and the `cdr' is a ranking.  I have pre-populated this list with
-repositories that are generally available on both machines.")
+  (mapcar (lambda (el) (cons el 1)) projectile-known-projects)
+  "An alist of project directories.")
 
-(defun jf/git-project-paths/dynamic ()
-  "Return a list of code repository paths."
-  (split-string-and-unquote
-    (s-trim-right
-      (shell-command-to-string
-        (concat
-          "rg \"^#\\+PROJECT_PATHS: +[^\\.]+\\. +\\\"(~/git/[^/]+/)\\\"\\)\" "
-          "~/git/org --no-ignore-vcs --replace='$1' "
-          "--only-matching --no-filename --follow")))
-    "\n"))
-
-(dolist (path (jf/git-project-paths/dynamic))
+(dolist (path
+          (s-split "\n"
+            (s-trim
+              (shell-command-to-string "ls ~/git/org/denote/"))))
   (add-to-list 'jf/git-project-paths (cons path 1)))
 
 (setq magit-repository-directories jf/git-project-paths)
