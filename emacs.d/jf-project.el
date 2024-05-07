@@ -207,21 +207,6 @@ When the `current-prefix-arg' is set always prompt for the project."
         (jf/project/get-project-from/project-source-code)))
     (completing-read "Project: " (jf/project/list-projects))))
 
-;; The default relevant `magit-list-repositories'
-;; The following command shows all "project" directories
-;;
-(defvar jf/git-project-paths
-  (mapcar (lambda (el) (cons el 1)) projectile-known-projects)
-  "An alist of project directories.")
-
-(dolist (path
-          (s-split "\n"
-            (s-trim
-              (shell-command-to-string "ls ~/git/org/denote/"))))
-  (add-to-list 'jf/git-project-paths (cons path 1)))
-
-(setq magit-repository-directories jf/git-project-paths)
-
 (defun jf/org-mode/agenda-files ()
   "Return a list of note files containing 'agenda' tag.
 
@@ -382,6 +367,7 @@ This encodes the logic for creating a project."
         (end-of-line)
         (progn (goto-line 6) (re-search-forward "^$" nil t)))
       (insert "\n#+PROJECT_PATHS: (\"" (s-trim label) "\" . \"" (s-trim path) "\")"))))
+
 
 (provide 'jf-project)
 ;;; jf-project.el ends here

@@ -30,8 +30,23 @@
     (require 's)
     (dolist (proj projectile-known-projects)
       (dolist (search-path projectile-project-search-path)
-      (unless (s-starts-with? search-path proj)
-        (projectile-remove-known-project proj))))))
+        (unless (s-starts-with? search-path proj)
+          (projectile-remove-known-project proj)))))
+
+  ;; The default relevant `magit-list-repositories'
+  ;; The following command shows all "project" directories
+  (defvar jf/git-project-paths
+    (mapcar (lambda (el) (cons el 1)) projectile-known-projects)
+    "An alist of project directories.")
+
+  (dolist (path
+            (s-split "\n"
+              (s-trim
+                (shell-command-to-string "ls ~/git/org/denote/"))))
+    (add-to-list 'jf/git-project-paths
+      (cons (concat "~/git/org/denote" path) 1)))
+
+  (setq magit-repository-directories jf/git-project-paths))
 
 (provide 'jf-organizing)
 ;;; jf-organizing.el ends here
