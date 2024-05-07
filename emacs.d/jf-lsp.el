@@ -84,6 +84,9 @@
     (use-package lsp-mode
       :straight t
       :hook ((elixir-ts-mode . lsp)
+              (angular-ts-mode . lsp)
+              (ruby-ts-mode . lsp)
+              (python-ts-mode . lsp)
               (go-ts-mode . lsp)
               (lsp-mode . lsp-enable-which-key-integration))
       :commands lsp)
