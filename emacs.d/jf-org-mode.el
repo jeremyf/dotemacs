@@ -89,7 +89,7 @@ And 3 shall be the magic number."
       :exclusive 'no)))
 
 (defun jf/org-macros (&optional given-macro)
-  (let ((macros (jf/regexp-matches-for-text "{{{[^}]+}}}")))
+  (let ((macros (jf/regexp-matches-for-text "{{{[^{}]+}}}")))
     (if given-macro
       (when (member given-macro macros) (list given-macro))
       macros)))
@@ -388,6 +388,54 @@ File.open('%s', 'w') { |f| $stdout = f; pp results }")
             (org-element-property :raw-value (org-element-at-point)))
           "+LEVEL=4+projects" 'agenda))
       #'string<)))
+
+(cl-defun jf/org-mode/headlines-with-property (&key property title)
+  "Find all headlines with PROPERTY.
+
+When you provide a TITLE limit the headlines to those titles that match.
+
+Hopefully only one of them."
+  (with-current-buffer (current-buffer)
+    (org-element-map
+      (org-element-parse-buffer)
+      '(keyword node-property headline)
+      (lambda (element)
+        (and
+          (org-element-type-p element 'headline)
+          (not (s-blank? (org-entry-get element property)))
+          (if title
+            (string= (org-element-property :raw-value element) title)
+            t)
+          (org-element-property :title element))))))
+
+(setq jf/org-mode/headline-property-adjusters
+  '(("PROGRESS" . #'jf/org-mode/headline-property-adjuster/progress)))
+
+(setq jf/org-mode/headline-property-adjuster/progress-rank-incrementer
+  '(("TROUBLESOME" . 12)
+     ("DANGEROUS" . 8)
+     ("FORMIDABLE" . 4)
+     ("EXTREME" . 2)
+     ("EPIC" . 1)))
+
+(defun jf/org-mode/headline-property-adjuster/progress (element)
+  "Given the ELEMENT adjust the PROGRESS property."
+  (let* ((progress
+           (org-entry-get element property))
+          (rank
+            (org-entry-get element "RANK"))
+          (increment
+            (alist-get
+              rank
+              jf/org-mode/headline-property-adjuster/progress-rank-incrementer
+              nil
+              nil
+              #'string=)))
+    ;; List the current value of the element.
+    ;; Prompt for the incrementation value.
+    ;; Return the value.
+    ))
+
 
 ;; When I jump to a new task for the day, I want to position that task within
 ;; the prompted project.  Inspiration from

@@ -7,6 +7,26 @@
 (keymap-global-set "H-r" #'random-table/roll)
 (keymap-global-set "C-H-r" #'random-table/roll-region)
 
+(defun random-table/roll/ironsworn (modifier)
+  "Roll for an Ironsworn action with the given MODIFIER."
+  (interactive "NModifier: ")
+  (let* ((action_roll (+ (random 6) 1 (or modifier 0)))
+          (challenge_roll_one (+ (random 10) 1))
+          (challenge_roll_two (+ (random 10) 1))
+          (result (cond
+                    ((and (> action_roll challenge_roll_one)
+                       (> action_roll challenge_roll_two))
+                      "strong hit")
+                    ((and (>= challenge_roll_one action_roll)
+                       (>= challenge_roll_two action_roll))
+                      "miss")
+                    (t "weak hit"))))
+    (insert (format "%s (%s vs [%s, %s])"
+              result
+              action_roll
+              challenge_roll_one
+              challenge_roll_two))))
+
 (random-table/prompt "Charisma Modifier"
   :type #'read-number
   :default 0)
@@ -739,7 +759,7 @@ rolls.
 
 From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
 
-(defun random-table/roller/oracle-question (table)
+(defun random-table/roller/oracle-question (&optional table)
   "Prompt for likelihood and return corresponding roller for TABLE."
   (let ((likelihood (completing-read "Likelihood: " jf/gaming/black-sword-hack/table/oracle-question-likelihood nil t)))
     (funcall (alist-get likelihood jf/gaming/black-sword-hack/table/oracle-question-likelihood nil nil #'string=))))
@@ -761,8 +781,9 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
   :private t
   :filter (lambda (&rest dice) "We have a pool of dice to determine if there are dupes."
             (car (list-utils-dupes (-list dice))))
-  :fetcher (lambda (data &rest index)
-             (when index (concat " with unexpected “" (nth (- (car (-list index)) 1) data) "” event")))
+  :fetcher (lambda (data &rest rest)
+             (when-let ((index (car rest)))
+               (concat " with unexpected “" (nth (- index 1) data) "” event")))
   :data '("Very negative" "Negative" "Negative but…" "Positive but…" "Positive" "Very Positive"))
 
 ;;; OSE

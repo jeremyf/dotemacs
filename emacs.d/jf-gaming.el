@@ -14,6 +14,86 @@
 
 ;;;; General
 
+(defvar jf/gaming/clocks
+  '("" "󰪞" "󰪟" "󰪠" "󰪡" "󰪢" "󰪣" "󰪤" "󰪥")
+  "Useful for gaming clocks")
+
+(defvar jf/gaming/ticks-by-rank
+  '(("troublesome" . 12)
+     ("dangerous" . 8)
+     ("formidable" . 4)
+     ("extreme" . 2)
+     ("epic" . 1))
+  "An alist of track rank and the corresponding number of ticks.")
+
+(defun jf/gaming/insert-clock (position)
+  "Prompt for a clock POSITION then insert."
+  (interactive (list
+                 (completing-read
+                   "Clock face: " jf/gaming/clocks nil t)))
+  (insert position))
+
+(defun jf/gaming/insert-clock-track (capacity)
+  "Create a track of CAPACITY number of clocks."
+  (interactive "nCapacity: ")
+  (let ((track
+          (s-repeat capacity "")))
+    (insert
+      (if current-prefix-arg
+        (jf/gaming/clock-track-incremement
+          :track track
+          :ticks (read-number "Starting number of ticks: " 0))
+        track))))
+
+(defun jf/gaming/clock-track-increment-by-rank (track rank)
+  "Increment the TRACK by RANK."
+  (if-let ((ticks
+             (alist-get
+               (s-downcase rank)
+               jf/gaming/ticks-by-rank nil nil #'string=)))
+    (jf/gaming/clock-track-incremement track ticks)
+    (user-error "Unable to find rank %s" rank)))
+
+(defun jf/gaming/clock-track-incremement (track ticks)
+  "Return a TRACK incremented by a number of TICKS."
+  (let*((track
+          ;; String empty spaces in the track
+          (replace-regexp-in-string "[[:space:]]+" "" track))
+         (len
+           (length track))
+         (capacity
+           (* len 4))
+         (initial-value
+           (cl-reduce
+             (lambda (acc clock)
+               (+
+                 acc
+                 (cond
+                   ((string= "" clock) 0)
+                   ((string= "󰪟" clock) 1)
+                   ((string= "󰪡" clock) 2)
+                   ((string= "󰪣" clock) 3)
+                   ((string= "󰪥" clock) 4)
+                   (t
+                     (user-error
+                       "Expected %s to be a quarter-increment clock"
+                       track)))))
+             (split-string track "" t)
+             :initial-value 0))
+         (updated-value
+           (+ initial-value ticks))
+         (remainder (mod updated-value 4))
+         (filled-clocks (/ updated-value 4)))
+         (concat
+             (s-repeat filled-clocks "󰪥")
+             (cond
+               ((= 0 remainder) "")
+               ((= 1 remainder) "󰪟")
+               ((= 2 remainder) "󰪡")
+               ((= 3 remainder) "󰪣")
+               ((= 4 remainder) "󰪥"))
+             (s-repeat (- len filled-clocks 1) ""))))
+
 (defconst jf/gaming/runes
   '(("ᚠ" . "Gandalf Rune for the One Ring") ;; (Runic Letter Fehu Feoh Fe F) Gandalf rune
     ("Շ" . "Success Icon for the One Ring") ;; (Armenian Capital Letter Sha) Success Icon

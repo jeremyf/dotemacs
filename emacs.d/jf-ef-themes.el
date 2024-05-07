@@ -30,7 +30,7 @@
                        :color ,border
                        :style released-button)))))
       `(ef-themes-fixed-pitch
-         ((,c (:family "Intel One Mono"))))
+         ((,c (:family "IntoneMono Nerd Font Mono"))))
       `(olivetti-fringe
          ((,c (:inherit fringe :background ,bg-dim))))
       `(jf/bom-face
