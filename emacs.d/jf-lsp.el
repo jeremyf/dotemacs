@@ -17,8 +17,8 @@
       ;; The Language Server Protocol (LSP) is a game changer; having access to that
       ;; tooling is very much a nice to have.
       :hook ((
-               ;; yaml-mode yaml-ts-mode
-               ;; angular-mode angular-ts-mode ;; npm install -g @angular/language-service@next typescript @angular/language-server
+               yaml-mode yaml-ts-mode
+               angular-mode angular-ts-mode ;; npm install -g @angular/language-service@next typescript @angular/language-server
                css-mode css-ts-mode
                elixir-ts-mode
                go-mode go-ts-mode ;; https://github.com/golang/tools/tree/master/gopls
