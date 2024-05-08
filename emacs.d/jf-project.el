@@ -61,7 +61,7 @@ Determine the PROJECT by querying `jf/project/list-projects'."
   (interactive)
   (let* ((project (or (s-presence project)
                     (jf/project/find-dwim)))
-                (filename (cdar (jf/project/list-projects :project project))))
+          (filename (cdar (jf/project/list-projects :project project))))
     (find-file filename)))
 
 ;; I work on several different projects each day; helping folks get unstuck.  I
@@ -112,8 +112,8 @@ With one PREFIX go to place where we would jump on capture."
         (dired path))
       ((f-file-p path)
         (if (string= "pdf" (f-ext path))
-                (shell-command (concat "open " path))
-                (find-file path)))
+          (shell-command (concat "open " path))
+          (find-file path)))
       ;; Try the path as an org-link (e.g. path == "denote:20230328T093100")
       (t (when-let* ((type-target (s-split ":" path))
                       ;; There's a registered handler for the protocol
@@ -123,9 +123,9 @@ With one PREFIX go to place where we would jump on capture."
            (funcall follow-func (cadr type-target))
            ;; We tried...and don't know how to handle this.
            (progn
-                   (message "WARNING: Project %s missing path name \"%s\" (with path %s)"
-                           project path-name path)
-                   (jf/project/jump-to/notes :project project)))))))
+             (message "WARNING: Project %s missing path name \"%s\" (with path %s)"
+               project path-name path)
+             (jf/project/jump-to/notes :project project)))))))
 
 (defun jf/project/project-paths-for (filename)
   "Find the project paths for the given FILENAME.
@@ -145,17 +145,17 @@ The `cdr' is the fully qualified path to that projects notes file.
 
 The DIRECTORY defaults to `org-directory' but you can specify otherwise."
   (mapcar (lambda (line)
-                  (let* ((slugs (s-split ":" line))
-                                (proj (s-trim (car (cdr slugs))))
-                                (filename (s-trim (car slugs))))
-                    (cons proj filename)))
-          (split-string-and-unquote
-            (shell-command-to-string
-              (concat
-                "rg \"^#\\+PROJECT_NAME: +(" project ") *$\" " directory
-                " --follow --only-matching --no-ignore-vcs --with-filename -r '$1' "
-                "| tr '\n' '@'"))
-            "@")))
+            (let* ((slugs (s-split ":" line))
+                    (proj (s-trim (car (cdr slugs))))
+                    (filename (s-trim (car slugs))))
+              (cons proj filename)))
+    (split-string-and-unquote
+      (shell-command-to-string
+        (concat
+          "rg \"^#\\+PROJECT_NAME: +(" project ") *$\" " directory
+          " --follow --only-matching --no-ignore-vcs --with-filename -r '$1' "
+          "| tr '\n' '@'"))
+      "@")))
 
 (cl-defun jf/project/get-project-from/project-source-code (&key (directory org-directory))
   "Return the current \"noted\" project name.
@@ -168,13 +168,13 @@ Noted projects would be found within the given DIRECTORY."
                                   project_path_to_code_truename)))
       ;; How to handle multiple projects?  Prompt to pick one
       (let ((filename (s-trim (shell-command-to-string
-                                                  (concat
-                                                          "rg \"^#\\+PROJECT_PATHS: .*"
-                                                          project_path_to_code " *\\\"\" "
-                                                          directory " --files-with-matches "
-                                                          " --no-ignore-vcs --ignore-case")))))
-              (unless (string-equal "" filename)
-                (with-current-buffer (find-file-noselect (file-truename filename))
+                                (concat
+                                  "rg \"^#\\+PROJECT_PATHS: .*"
+                                  project_path_to_code " *\\\"\" "
+                                  directory " --files-with-matches "
+                                  " --no-ignore-vcs --ignore-case")))))
+        (unless (string-equal "" filename)
+          (with-current-buffer (find-file-noselect (file-truename filename))
             (jf/project/get-project-from/current-buffer-is-project)))))))
 
 (defun jf/project/get-project-from/current-clock ()
@@ -182,10 +182,10 @@ Noted projects would be found within the given DIRECTORY."
   ;; This is a naive implementation that assumes a :task: has the clock.  A
   ;; :task:'s immediate ancestor is a :projects:.
   (when-let ((m (and
-                              (fboundp 'org-clocking-p) ;; If this isn't set, we ain't
-                              ;; clocking.
-                              (org-clocking-p)
-                              org-clock-marker)))
+                  (fboundp 'org-clocking-p) ;; If this isn't set, we ain't
+                  ;; clocking.
+                  (org-clocking-p)
+                  org-clock-marker)))
     (with-current-buffer (marker-buffer m)
       (goto-char m)
       (jf/project/get-project-from/current-buffer-is-project))))
@@ -263,7 +263,7 @@ We want files to have the 'projects' `denote' keyword."
       ;; (goto-char (org-element-property :contents-end drawer))
       ;; (goto-char (org-element-property :contents-begin task)))
       (let* ((name-and-subtask (jf/alist-prompt
-                               (format "Sub-Task for %s: " task-name)
+                                 (format "Sub-Task for %s: " task-name)
                                  (jf/org-mode/existing-sub-tasks :task task)))
               (subtask-name (car name-and-subtask)))
         (if-let ((subtask (cdr name-and-subtask)))
@@ -334,14 +334,14 @@ This encodes the logic for creating a project."
     (with-current-buffer buffer
       (if-let* ((file (buffer-file-name buffer))
                  (_proceed (and
-                   (denote-file-is-note-p file)
-                   (derived-mode-p 'org-mode)
-                   (not (jf/project/get-project-from/current-buffer-is-project))))
+                             (denote-file-is-note-p file)
+                             (derived-mode-p 'org-mode)
+                             (not (jf/project/get-project-from/current-buffer-is-project))))
                  (existing-title (org-get-title))
-                 (file-type (denote-filetype-heuristics file))
-                 (keywords (denote-retrieve-keywords-value file file-type)))
-        (progn
-          ;; Goto the 5th line
+                 (file-type (denote-filetype-heuristics file)))
+        (let ((keywords
+                (denote-retrieve-keywords-value file file-type)))
+          ;; The 5th line is after the `denote' file metadata
           (goto-line 5)
           (insert "\n#+PROJECT_NAME: " existing-title
             "\n#+CATEGORY: " existing-title)
