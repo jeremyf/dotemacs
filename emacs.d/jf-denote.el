@@ -972,11 +972,20 @@ When USE_HUGO_SHORTCODE is given use glossary based exporting."
   (interactive)
   (jf/denote/capture-reference :url (plist-get eww-data :url)))
 
-
 (defun jf/capture/denote/from/elfeed-show-entry ()
   "Create `denote' entry from `elfeed-show-entry'."
   (interactive)
   (jf/denote/capture-reference :url (elfeed-entry-link elfeed-show-entry)))
+
+(defun jf/menu--bookmark-safari ()
+  "Create `bookmark+' for current Safari page."
+  (interactive)
+  (require 'grab-mac-link)
+  (let* ((url-and-title (grab-mac-link-safari-1))
+          (title (read-string
+                   (concat "URL: " (car url-and-title) "\nTitle: ")
+                   (cadr url-and-title))))
+    (bmkp-url-target-set (car url-and-title) nil title)))
 
 ;; I'd love to avoid re-fetching the content.
 (cl-defun jf/sanitized-dom (&key html)

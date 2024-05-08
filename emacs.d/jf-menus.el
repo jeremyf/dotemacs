@@ -126,7 +126,9 @@
       ("g f" "Firefox" jf/menu--org-capture-firefox)
       ("g s" "Safari" jf/menu--org-capture-safari)
       ("g w" "Eww" jf/capture/denote/from/eww-data :if-derived eww-mode)
-      ]])
+      ]
+    ["Mark"
+      ("M s" "Safari" jf/menu--bookmark-safari)]])
 
 ;; (use-package file-info
 ;;   ;; Show the metadata of the current buffer's file; and then copy those values.
