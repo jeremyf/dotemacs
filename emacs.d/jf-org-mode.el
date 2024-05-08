@@ -214,8 +214,9 @@ File.open('%s', 'w') { |f| $stdout = f; pp results }")
     org-log-done 'time
     org-todo-keywords '((type "TODO(t)"
                           "STARTED(s!)"
-                          "|"
+                          "BLOCKED(b@/!)"
                           "WAITING(w@/!)"
+                          "|"
                           "CANCELED(c@/!)"
                           "DONE(d!)")))
 
@@ -1030,6 +1031,7 @@ I envision this function called from the command-line."
       entry (file jf/agenda-filename/local)
       "* TODO %?"
       :clock-keep t
+      :empty-lines-before 1
       :jump-to-captured t)
      ("d" "To Denote"
       plain (file denote-last-path)

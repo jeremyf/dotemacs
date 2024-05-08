@@ -7,6 +7,7 @@
     (setq hl-todo-keyword-faces
           `(("HOLD" . ,yellow)
             ("TODO" . ,red)
+            ("BLOCKED" . ,yellow)
             ("NEXT" . ,blue)
             ("THEM" . ,magenta)
             ("PROG" . ,cyan-warmer)
