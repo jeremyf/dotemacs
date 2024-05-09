@@ -409,34 +409,26 @@ Hopefully only one of them."
             t)
           (org-element-property :title element))))))
 
-(setq jf/org-mode/headline-property-adjusters
-  '(("PROGRESS" . #'jf/org-mode/headline-property-adjuster/progress)))
+(defvar jf/org-mode/headline-property-adjusters
+  nil
+  "An alist of property and function.
 
-(setq jf/org-mode/headline-property-adjuster/progress-rank-incrementer
-  '(("TROUBLESOME" . 12)
-     ("DANGEROUS" . 8)
-     ("FORMIDABLE" . 4)
-     ("EXTREME" . 2)
-     ("EPIC" . 1)))
+The function takes has one parameter: an `org-mode' element.")
 
-(defun jf/org-mode/headline-property-adjuster/progress (element)
-  "Given the ELEMENT adjust the PROGRESS property."
-  (let* ((progress
-           (org-entry-get element property))
-          (rank
-            (org-entry-get element "RANK"))
-          (increment
-            (alist-get
-              rank
-              jf/org-mode/headline-property-adjuster/progress-rank-incrementer
-              nil
-              nil
-              #'string=)))
-    ;; List the current value of the element.
-    ;; Prompt for the incrementation value.
-    ;; Return the value.
-    ))
-
+(defun jf/org-mode/increment-progress (&optional element)
+  "Increment 'PROGRESS' property for `org-mode' ELEMENT."
+  (interactive)
+  (save-excursion
+    (when-let*
+      ((candidates
+         (jf/org-mode/headlines-with-property :property "PROGRESS"))
+        (element
+          (or element
+            (completing-read "Progress Tracks: "
+              candidates nil t)))
+        (new-rank
+          (jf/org-mode/increment-progress-for-element element)))
+      (org-entry-put element "PROGRESS" new-rank))))
 
 ;; When I jump to a new task for the day, I want to position that task within
 ;; the prompted project.  Inspiration from

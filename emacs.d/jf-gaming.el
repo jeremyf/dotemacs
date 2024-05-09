@@ -33,6 +33,9 @@
                    "Clock face: " jf/gaming/clocks nil t)))
   (insert position))
 
+(add-to-list 'jf/org-mode/headline-property-adjusters
+  '("PROGRESS" . #'jf/gaming/clock-track-increment-by-rank))
+
 (defun jf/gaming/insert-clock-track (capacity)
   "Create a track of CAPACITY number of clocks."
   (interactive "nCapacity: ")
@@ -45,14 +48,46 @@
           :ticks (read-number "Starting number of ticks: " 0))
         track))))
 
-(defun jf/gaming/clock-track-increment-by-rank (track rank)
-  "Increment the TRACK by RANK."
-  (if-let ((ticks
-             (alist-get
-               (s-downcase rank)
-               jf/gaming/ticks-by-rank nil nil #'string=)))
+(defun jf/org-mode/increment-progress (&optional element)
+  "Increment 'PROGRESS' property for `org-mode' ELEMENT."
+  (interactive)
+  (save-excursion
+    (if-let*
+      ((title (if element
+                (org-element-property :raw-value element)
+                (completing-read "Progress Tracks: "
+                  (jf/org-mode/headlines-with-property
+                    :property "PROGRESS")
+                  nil t)))
+      (element
+         (or element
+           (car
+             (jf/org-mode/headlines-with-property
+               :property "PROGRESS"
+               :title title))))
+        (new-rank
+          (jf/org-mode/increment-progress-for-element element)))
+      (progn
+        (message "Updating %s to %s" title new-rank)
+        (org-entry-put element "PROGRESS" new-rank))
+      (message "Headling %s; New Rank: %s" title new-rank))))
+
+(defun jf/org-mode/increment-progress-for-element (element)
+  "Given the ELEMENT adjust the 'PROGRESS' property.
+
+Using the 'PROGRESS' and 'RANK' to calculate the incrementation."
+  (message "%S" element)
+  (if-let* ((progress
+              (org-entry-get element "PROGRESS"))
+             (rank
+               (s-downcase (org-entry-get element "RANK")))
+             (ticks
+               (alist-get
+                 (s-downcase rank)
+                 jf/gaming/ticks-by-rank nil nil #'string=)))
     (jf/gaming/clock-track-incremement track ticks)
-    (user-error "Unable to find rank %s" rank)))
+    (user-error "Element: %S; Progress: %S; Rank: %S"
+      element progress rank)))
 
 (defun jf/gaming/clock-track-incremement (track ticks)
   "Return a TRACK incremented by a number of TICKS."
