@@ -14,18 +14,16 @@
 ;;; Code:
 
 ;;;; Pre-requisites
-(require 'jf-writing)
-
 (use-package adaptive-wrap
   :custom (adaptive-wrap-extra-indent 4)
   :straight t)
 
-;; For remote code sharing/pairing
 (use-package crdt
+  ;; For remote code sharing/pairing
   :straight t)
 
-;; Shall we review code via Magit?  I believe the answer must be yes.
 (use-package code-review
+  ;; Shall we review code via Magit?  I believe the answer must be yes.
   :after magit
   :straight (code-review
              :type git
@@ -190,8 +188,8 @@ method, get the containing class."
   ;; Always enter CSV mode in align mode; makes it easier to read.
   :hook (csv-mode . csv-align-mode))
 
-;; https://github.com/Silex/docker.el
 (use-package docker
+  ;; https://github.com/Silex/docker.el
   ;; A reality of modern development is that things happen in Docker.
   :straight t)
 
@@ -227,8 +225,6 @@ method, get the containing class."
 ;;   :config
 ;;   (add-hook 'elixir-ts-mode-hook 'flymake-elixir-load))
 
-(require 'jf-lsp)
-
 (use-package emacs
   :hook (emacs-lisp-mode . jf/emacs-lisp-mode-hook)
   :preface
@@ -251,12 +247,13 @@ method, get the containing class."
   ;; See https://pkg.go.dev/golang.org/x/tools/cmd/goimports
   (setq gofmt-command "goimports")
   (defun jf/go-mode ()
-    (setq-local tab-width 2)))
-(add-hook 'before-save-hook 'gofmt-before-save)
+    (setq-local tab-width 2))
+  (add-hook 'before-save-hook 'gofmt-before-save))
 
 (use-package go-ts-mode
   :straight (:type built-in)
   :config
+  (setq go-ts-mode-indent-offset 2)
   ;; Copied from
   ;; https://github.com/Homebrew/brew/blob/c2ed3327c605c3e738359c9807b8f4cd6fec09eb/Cellar/emacs-plus%4029/29.3/share/emacs/29.3/lisp/progmodes/go-ts-mode.el#L115-L206
   ;;
@@ -357,16 +354,12 @@ method, get the containing class."
       :override t
       '((ERROR) @font-lock-warning-face))))
 
-(setq go-ts-mode-indent-offset 2)
-
 (use-package go-imenu
   :straight t
   :hook (go-mode . go-imenu-setup))
 
 ;; (use-package flymake-go
 ;;   :straight t)
-
-(require 'gherkin-mode)
 
 (use-package ruby-mode
   ;; My language of choice for professional work.
@@ -383,7 +376,30 @@ method, get the containing class."
   :config
   (defun jf/ruby-mode-configurator ()
     (eldoc-mode t)
-    (setq-local fill-column 80)))
+    (setq-local fill-column 80))
+  (defun jf/require-debugger ()
+    "Determine the correct debugger based on the Gemfile."
+    (let ((gemfile-lock
+            (f-join (projectile-project-root) "Gemfile.lock")))
+      (if-let* ((f-exists? gemfile-lock)
+                 (debuggers
+                   (s-split "\n"
+                     (shell-command-to-string
+                       (concat
+                         "rg \"^ +(byebug|debugger|pry-byebug|debug) \" "
+                         gemfile-lock
+                         " -r '$1' --only-matching | uniq")))))
+        (cond
+          ((member "byebug" debuggers)
+            "require 'byebug'; byebug")
+          ((member "debug" debuggers)
+            "require 'debug'; binding.break")
+          ((member "debugger" debuggers)
+            "require 'debugger'; debugger")
+          ((member "pry-byebug" debuggers)
+            "require 'pry-byebug'; binding.pry")
+          (t "require 'debug'; binding.break"))
+        "require 'debug'; binding.break"))))
 
 (use-package python
   :straight (:type built-in)
@@ -394,14 +410,12 @@ method, get the containing class."
     (eldoc-mode t)
     (python-docstring-mode t)
     (setq-default python-indent-offset 4)
-    (setq-local fill-column 80)))
-
-(defun jf/python-ts-mode-configurator ()
-  (define-key python-ts-mode-map
-    (kbd "M-.") #'xref-find-definitions)
-  (jf/python-mode-configurator))
-
-(add-hook 'python-ts-mode-hook #'jf/python-ts-mode-configurator)
+    (setq-local fill-column 80))
+  (defun jf/python-ts-mode-configurator ()
+    (define-key python-ts-mode-map
+      (kbd "M-.") #'xref-find-definitions)
+    (jf/python-mode-configurator))
+  (add-hook 'python-ts-mode-hook #'jf/python-ts-mode-configurator))
 
 (use-package flymake-ruff
   :straight t)
@@ -435,10 +449,6 @@ method, get the containing class."
       '(lambda ()
          (venv-projectile-auto-workon)
          (projectile-find-file))))
-
-;; An odd little creature, hide all comment lines.  Sometimes this can
-;; be a useful tool for viewing implementation details.
-(require 'hide-comnt)
 
 (use-package json-mode
   ;; The web's data structure of choice is JSON.
@@ -537,30 +547,6 @@ method, get the containing class."
   :mode (("\\.plantuml\\'" . plantuml-mode))
   :mode (("\\.puml\\'" . plantuml-mode))
   :straight t)
-
-(defun jf/require-debugger ()
-  "Determine the correct debugger based on the Gemfile."
-  (let ((gemfile-lock
-          (f-join (projectile-project-root) "Gemfile.lock")))
-    (if-let* ((f-exists? gemfile-lock)
-               (debuggers
-                 (s-split "\n"
-                   (shell-command-to-string
-                     (concat
-                       "rg \"^ +(byebug|debugger|pry-byebug|debug) \" "
-                       gemfile-lock
-                       " -r '$1' --only-matching | uniq")))))
-      (cond
-        ((member "byebug" debuggers)
-          "require 'byebug'; byebug")
-        ((member "debug" debuggers)
-          "require 'debug'; binding.break")
-        ((member "debugger" debuggers)
-          "require 'debugger'; debugger")
-        ((member "pry-byebug" debuggers)
-          "require 'pry-byebug'; binding.pry")
-        (t "require 'debug'; binding.break"))
-      "require 'debug'; binding.break")))
 
 (use-package rspec-mode
   ;; I write most of my Ruby tests using rspec.  This tool helps manage
@@ -714,24 +700,6 @@ method, get the containing class."
              ("C-c y y" . jf/ruby-mode/yank-yardoc)))
   :hook ((ruby-mode ruby-ts-mode) . yard-mode))
 
-;; I didn't know about `add-log-current-defun-function' until a blog
-;; reader reached out.  Now, I'm making a general function for different
-;; modes.
-(defun jf/yank-current-scoped-function-name ()
-  "Echo and kill the current scoped function name.
-
-See `add-log-current-defun-function'."
-  (interactive)
-  (if-let ((text (funcall add-log-current-defun-function)))
-    (progn
-      (message "%s" text)
-      (kill-new (substring-no-properties text)))
-    (user-error "Warning: Point not on function")))
-(bind-key "C-c y f"
-  #'jf/yank-current-scoped-function-name prog-mode-map)
-(bind-key "C-c y f"
-  #'jf/yank-current-scoped-function-name emacs-lisp-mode-map)
-
 (use-package devdocs
   ;; Download and install documents from https://devdocs.io/ Useful for
   ;; having local inline docs.  Perhaps not always in the format that I
@@ -757,7 +725,86 @@ See `add-log-current-defun-function'."
 (use-package prog-mode
   :straight (:type built-in)
   :hook (prog-mode . jf/prog-mode-configurator)
-  :preface
+  :config
+  ;; I didn't know about `add-log-current-defun-function' until a blog
+  ;; reader reached out.  Now, I'm making a general function for different
+  ;; modes.
+  (defun jf/yank-current-scoped-function-name ()
+    "Echo and kill the current scoped function name.
+
+See `add-log-current-defun-function'."
+    (interactive)
+    (if-let ((text (funcall add-log-current-defun-function)))
+      (progn
+        (message "%s" text)
+        (kill-new (substring-no-properties text)))
+      (user-error "Warning: Point not on function")))
+  (bind-key "C-c y f"
+    #'jf/yank-current-scoped-function-name prog-mode-map)
+  (bind-key "C-c y f"
+    #'jf/yank-current-scoped-function-name emacs-lisp-mode-map)
+
+  (defvar jf/comment-header-regexp/major-modes-alist
+    '((emacs-lisp-mode . "^;;;+$")
+       (ruby-mode . "^[[:space:]]*##+$")
+       (ruby-ts-mode . "^[[:space:]]*##+$"))
+    "AList of major modes and their comment headers.")
+
+  (defun jf/comment-header-forward ()
+    "Move to previous line that starts a comment block.
+
+See `jf/comment-header-regexp/major-modes-alis'."
+    (interactive)
+    (let ((regexp
+            (alist-get major-mode
+              jf/comment-header-regexp/major-modes-alist)))
+      (when (string-match-p
+              regexp
+              (buffer-substring-no-properties
+                (line-beginning-position)
+                (line-end-position)))
+        (forward-line))
+      (condition-case err
+        (progn
+          (search-forward-regexp regexp)
+          (beginning-of-line)
+          (recenter scroll-margin t)
+          (pulsar-pulse-line))
+        (error (goto-char (point-max))))))
+
+  (defun jf/comment-header-backward ()
+    "Move to previous line that starts a comment block.
+ See `jf/comment-header-regexp/major-modes-alis'."
+    (interactive)
+    (let ((regexp
+            (alist-get major-mode
+              jf/comment-header-regexp/major-modes-alist)))
+      (when (string-match-p
+              regexp
+              (buffer-substring-no-properties
+                (line-beginning-position)
+                (line-end-position)))
+        (previous-line)
+        (recenter scroll-margin t)
+        (pulsar-pulse-line))
+      (condition-case err
+        (progn
+          (search-backward-regexp regexp)
+          (beginning-of-line)
+          (recenter scroll-margin t)
+          (pulsar-pulse-line))
+        (error (goto-char (point-min))))))
+
+  (dolist (el jf/comment-header-regexp/major-modes-alist)
+    (let ((jf-map (intern (format "%s-map" (car el)))))
+      ;; The treesitter mode maps don't seem to exist at this point
+      (unless (s-contains? "-ts-" (format "%s" (car el)))
+        (progn
+          (define-key (symbol-value jf-map)
+            (kbd "s-ESC") #'jf/comment-header-backward)
+          (define-key (symbol-value jf-map)
+            (kbd "C-s-]") #'jf/comment-header-forward)))))
+
   (defun jf/prog-mode-configurator ()
     "Do the configuration of all the things."
     ;; I'll type my own parenthesis thank you very much.
@@ -784,122 +831,67 @@ See `add-log-current-defun-function'."
   (copilot-idle-delay 1.5)
   :ensure t)
 
-(defvar jf/comment-header-regexp/major-modes-alist
-  '((emacs-lisp-mode . "^;;;+$")
-     (ruby-mode . "^[[:space:]]*##+$")
-     (ruby-ts-mode . "^[[:space:]]*##+$"))
-  "AList of major modes and their comment headers.")
+(use-package ruby-ts-mode
+  :straight (:type built-in)
+  :config
+  (defun jf/ruby-ts-mode-configurator ()
+    "Configure the `treesit' provided `ruby-ts-mode'."
+    ;; I encountered some loading issues where ruby-ts-mode was not
+    ;; available during my understanding of the use-package life-cycle.
+    (cond ((string-match "_spec.rb$" buffer-file-name)
+            (rspec-mode 1)))
+    (setq-local add-log-current-defun-function
+      #'jf/treesit/yank-qualified-method-fname)
+    (define-key ruby-ts-mode-map (kbd "C-M-h")
+      #'jf/treesit/function-select)
+    (define-key ruby-ts-mode-map (kbd "M-.")
+      #'xref-find-definitions)
+    (define-key ruby-ts-mode-map (kbd "s-.")
+      #'rspec-toggle-spec-and-target)
+    (define-key ruby-ts-mode-map
+      (kbd "C-c y f") #'jf/yank-current-scoped-function-name)
+    (define-key ruby-ts-mode-map
+      (kbd "C-c y y") #'jf/ruby-mode/yank-yardoc)
+    (define-key ruby-ts-mode-map
+      (kbd "s-ESC") #'jf/comment-header-backward)
+    (define-key ruby-ts-mode-map
+      (kbd "C-s-]") #'jf/comment-header-forward)
+    (define-key ruby-ts-mode-map
+      (kbd "C-c w r") #'jf/treesit/wrap-rubocop)
+    (define-key ruby-ts-mode-map
+      (kbd "M-{") #'ruby-beginning-of-block)
+    (define-key ruby-ts-mode-map
+      (kbd "M-}") #'ruby-end-of-block))
+  :hook (ruby-ts-mode . jf/ruby-ts-mode-configurator))
 
-(defun jf/commend-header-forward ()
-  "Move to previous line that starts a comment block.
-
-See `jf/comment-header-regexp/major-modes-alis'."
-  (interactive)
-  (let ((regexp
-          (alist-get major-mode
-            jf/comment-header-regexp/major-modes-alist)))
-    (when (string-match-p
-            regexp
-            (buffer-substring-no-properties
-              (line-beginning-position)
-              (line-end-position)))
-      (forward-line))
-    (condition-case err
-      (progn
-        (search-forward-regexp regexp)
-        (beginning-of-line)
-        (recenter scroll-margin t)
-        (pulsar-pulse-line))
-      (error (goto-char (point-max))))))
-
-(defun jf/comment-header-backward ()
-  "Move to previous line that starts a comment block.
- See `jf/comment-header-regexp/major-modes-alis'."
-  (interactive)
-  (let ((regexp
-          (alist-get major-mode
-            jf/comment-header-regexp/major-modes-alist)))
-  (when (string-match-p
-          regexp
-          (buffer-substring-no-properties
-            (line-beginning-position)
-            (line-end-position)))
-    (previous-line)
-    (recenter scroll-margin t)
-    (pulsar-pulse-line))
-  (condition-case err
-    (progn
-      (search-backward-regexp regexp)
-      (beginning-of-line)
-      (recenter scroll-margin t)
-      (pulsar-pulse-line))
-    (error (goto-char (point-min))))))
-
-(dolist (el jf/comment-header-regexp/major-modes-alist)
-  (let ((jf-map (intern (format "%s-map" (car el)))))
-    ;; The treesitter mode maps don't seem to exist at this point
-    (unless (s-contains? "-ts-" (format "%s" (car el)))
-      (progn
-        (define-key (symbol-value jf-map)
-          (kbd "s-ESC") #'jf/comment-header-backward)
-        (define-key (symbol-value jf-map)
-          (kbd "C-s-]") #'jf/commend-header-forward)))))
-
-(defun jf/ruby-ts-mode-configurator ()
-  "Configure the `treesit' provided `ruby-ts-mode'."
-  ;; I encountered some loading issues where ruby-ts-mode was not
-  ;; available during my understanding of the use-package life-cycle.
-  (cond ((string-match "_spec.rb$" buffer-file-name)
-          (rspec-mode 1)))
-  (setq-local add-log-current-defun-function
-    #'jf/treesit/yank-qualified-method-fname)
-  (define-key ruby-ts-mode-map (kbd "C-M-h")
-    #'jf/treesit/function-select)
-  (define-key ruby-ts-mode-map (kbd "M-.")
-    #'xref-find-definitions)
-  (define-key ruby-ts-mode-map (kbd "s-.")
-    #'rspec-toggle-spec-and-target)
-  (define-key ruby-ts-mode-map
-    (kbd "C-c y f") #'jf/yank-current-scoped-function-name)
-  (define-key ruby-ts-mode-map
-    (kbd "C-c y y") #'jf/ruby-mode/yank-yardoc)
-  (define-key ruby-ts-mode-map
-    (kbd "s-ESC") #'jf/comment-header-backward)
-  (define-key ruby-ts-mode-map
-    (kbd "C-s-]") #'jf/commend-header-forward)
-  (define-key ruby-ts-mode-map
-    (kbd "C-c w r") #'jf/treesit/wrap-rubocop)
-  (define-key ruby-ts-mode-map
-    (kbd "M-{") #'ruby-beginning-of-block)
-  (define-key ruby-ts-mode-map
-    (kbd "M-}") #'ruby-end-of-block))
-(add-hook 'ruby-ts-mode-hook #'jf/ruby-ts-mode-configurator)
-
-;; From
-;; https://emacs.dyerdwelling.family/emacs/20230414111409-emacs--indexing-emacs-init/
-;;
-;; Creating some outline modes.  Which has me thinking about an outline
-;; mode for my agenda file.
-(defun jf/emacs-lisp-mode-configurator ()
-  (setq imenu-sort-function 'imenu--sort-by-name)
-  (setq imenu-generic-expression
-    '((nil "^;;[[:space:]]+-> \\(.*\\)$" 1)
-       ("Variables"
-         "^([[:space:]]*\\(cl-\\)?defvar[[:space:]]+\\([^ ]*\\)$" 2)
-       ("Variables"
-         "^([[:space:]]*\\(cl-\\)?defconst[[:space:]]+\\([^ ]*\\)$" 2)
-       ("Variables"
-         "^([[:space:]]*\\(cl-\\)?defcustom[[:space:]]+\\([^ ]*\\)$" 2)
-       ("Functions"
-         "^([[:space:]]*\\(cl-\\)?defun[[:space:]]+\\([^(]+\\)" 2)
-       ("Macros"
-         "^([[:space:]]*\\(cl-\\)?defmacro[[:space:]]+\\([^(]+\\)" 2)
-       ("Types"
-         "^([[:space:]]*\\(cl-\\)?defstruct[[:space:]]+\\([^(]+\\)" 2)
-       ("Packages"
-         "^.*([[:space:]]*use-package[[:space:]]+\\([[:word:]-]+\\)" 1)))
-  (imenu-add-menubar-index))
-(add-hook 'emacs-lisp-mode-hook #'jf/emacs-lisp-mode-configurator)
+(use-package emacs
+  :straight (:type built-in)
+  :config
+  ;; From
+  ;; https://emacs.dyerdwelling.family/emacs/20230414111409-emacs--indexing-emacs-init/
+  ;;
+  ;; Creating some outline modes.  Which has me thinking about an outline
+  ;; mode for my agenda file.
+  (defun jf/emacs-lisp-mode-configurator ()
+    (setq imenu-sort-function 'imenu--sort-by-name)
+    (setq imenu-generic-expression
+      '((nil "^;;[[:space:]]+-> \\(.*\\)$" 1)
+         ("Variables"
+           "^([[:space:]]*\\(cl-\\)?defvar[[:space:]]+\\([^ ]*\\)$" 2)
+         ("Variables"
+           "^([[:space:]]*\\(cl-\\)?defconst[[:space:]]+\\([^ ]*\\)$" 2)
+         ("Variables"
+           "^([[:space:]]*\\(cl-\\)?defcustom[[:space:]]+\\([^ ]*\\)$" 2)
+         ("Functions"
+           "^([[:space:]]*\\(cl-\\)?defun[[:space:]]+\\([^(]+\\)" 2)
+         ("Macros"
+           "^([[:space:]]*\\(cl-\\)?defmacro[[:space:]]+\\([^(]+\\)" 2)
+         ("Types"
+           "^([[:space:]]*\\(cl-\\)?defstruct[[:space:]]+\\([^(]+\\)" 2)
+         ("Packages"
+           "^.*([[:space:]]*use-package[[:space:]]+\\([[:word:]-]+\\)" 1)))
+    (imenu-add-menubar-index))
+  :hook (emacs-lisp-mode . jf/emacs-lisp-mode-configurator))
 
 (use-package annotate
   :straight t
@@ -916,6 +908,12 @@ See `jf/comment-header-regexp/major-modes-alis'."
     (define-key map (kbd "C-s-a ]") #'annotate-goto-next-annotation)
     (define-key map (kbd "C-s-a [") #'annotate-goto-previous-annotation)
     map))
+
+;; An odd little creature, hide all comment lines.  Sometimes this can
+;; be a useful tool for viewing implementation details.
+(require 'hide-comnt)
+(require 'jf-lsp)
+(require 'gherkin-mode)
 
 (load "jf-rubocop-cops.el")
 

@@ -76,7 +76,6 @@
   "Given the ELEMENT adjust the 'PROGRESS' property.
 
 Using the 'PROGRESS' and 'RANK' to calculate the incrementation."
-  (message "%S" element)
   (if-let* ((progress
               (org-entry-get element "PROGRESS"))
              (rank
@@ -87,7 +86,8 @@ Using the 'PROGRESS' and 'RANK' to calculate the incrementation."
                  jf/gaming/ticks-by-rank nil nil #'string=)))
     (jf/gaming/clock-track-incremement track ticks)
     (user-error "Element: %S; Progress: %S; Rank: %S"
-      element progress rank)))
+      (org-element-property :raw-value element)
+      progress rank)))
 
 (defun jf/gaming/clock-track-incremement (track ticks)
   "Return a TRACK incremented by a number of TICKS."
