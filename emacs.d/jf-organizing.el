@@ -49,21 +49,15 @@
   (setq magit-repository-directories jf/git-project-paths))
 
 (use-package bookmark+
+  ;; https://www.emacswiki.org/emacs/BookmarkPlus
+  ;;
+  ;; Enhancements to the built-in Emacs bookmarking feature.
   :straight t
   :demand t
   :config
-  ;; (defun ii/bmkp-autoname-bookmark-function (position)
-  ;;   (let* ((prj (ii/project-current-short-name))
-  ;;          (prj-label (if (not (null prj)) (format "[%s] " prj))))
-  ;;     (format "👀 %s%s (%d)"
-  ;;             prj-label
-  ;;             (if (buffer-file-name)
-  ;;                 (abbreviate-file-name (buffer-file-name))
-  ;;               (buffer-name))
-  ;;             (abs position))))
-  ;; (customize-set-variable 'bmkp-autoname-format "^👀 .*$")
-  ;; (customize-set-value 'bmkp-autoname-bookmark-function
-  ;;                      #'ii/bmkp-autoname-bookmark-function)
+  ;; Definitely want uniform windowing behavior.
+  (define-key bookmark-bmenu-mode-map (kbd "M-o") #'ace-window)
+
   ;; when this is not set to `nil' explicitly, auto-save bookmarks
   ;; gets itself into an infinite loop attempting to autosave and
   ;; write the custom value to custom-file.el.  this happens only when
@@ -76,30 +70,22 @@
   (customize-set-value 'bmkp-last-as-first-bookmark-file nil)
   (global-set-key (kbd "H-1") #'bookmark-bmenu-list)
 
-  (add-to-list 'bmkp-default-handlers-for-file-types
-    '("^https?:" . browse-url))
-
   ;; auto-set bookmarks.
-  (add-hook 'prog-mode-hook #'bmkp-automatic-bookmark-mode)
-  (add-hook 'js-base-mode-hook #'bmkp-automatic-bookmark-mode)
-  (setq bmkp-automatic-bookmark-mode-delay 30)
+  (setq bmkp-automatic-bookmark-mode-delay 30))
 
-  ;; (set-face-attribute 'bmkp-url nil
-  ;;                     :foreground (nord-color "frost-3"))
-  ;; (set-face-attribute 'bmkp-bookmark-list nil
-  ;;                     :inherit 'default
-  ;;                     :background 'unspecified
-  ;;                     :foreground (nord-color "frost-1"))
-  ;; (set-face-attribute 'bmkp-t-mark nil
-  ;;                     :foreground (nord-color "frost-0"))
-  ;; (set-face-attribute 'bmkp-heading nil
-  ;;                     :height 1.2
-  ;;                     :foreground (nord-color "snow-storm-0"))
-  ;; (set-face-attribute 'bmkp-local-directory nil
-  ;;                     :inherit 'default
-  ;;                     :background 'unspecified
-  ;;                     :foreground (nord-color "aurora-2"))
-  )
+(use-package org-bookmark-heading
+  ;; Emacs bookmark support for Org-mode.
+  ;;
+  ;; Without this package, the default bookmarking for an `org-mode'
+  ;; file is to use a regular expression (which might include things
+  ;; like TODO state).  This approach is precarious.  With this package
+  ;; we now store a bookmark to an `org-mode' file as the filename and
+  ;; the UUID.  This does not quite solve the precarity in regards to
+  ;; `denote' and it's filename convention.
+  ;;
+  ;; As indicated in the configuration, this is a drop-in no additional
+  ;; configuration package.  Super sweet!
+  :straight t)
 
 (provide 'jf-organizing)
 ;;; jf-organizing.el ends here

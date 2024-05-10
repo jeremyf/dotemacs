@@ -83,12 +83,11 @@
   ;; Todo, can I get this section into a function so I can duplicate it in the jf/menu--tor?
   [["Jump to"
      ("j a" jf/jump-to/agenda-local)
-     ("j c" "Capture Backlog" jf/jump-to/code-backlog)
+     ;; ("j c" "Capture Backlog" jf/jump-to/code-backlog)
      ("j d" "Denote File" jf/jump_to_corresponding_denote_file :if-derived markdown-mode)
      ("j g" "Global Mark" consult-global-mark)
      ("j h" "Hugo File" jf/jump_to_corresponding_hugo_file :if-derived org-mode)
      ("j m" "Mark" consult-mark)
-     ;; ("j p" "Jump in Pull requests" jf/org-mode/open-all-unresolved-pull-requests)
      ("j r" "Jump to Git Related" consult-git-related-find-file)
      ("j l" "Jump to Magit Project Lists" magit-list-repositories)
      ;; ("j s" "Jump to Shortdoc" shortdoc-display-group)
@@ -99,8 +98,6 @@
       ("s" "Search note content…" consult-notes-search-in-all-notes)
       ("S" "Search note filename…" consult-notes)
       ("C-t" "Start a timer…" tmr-with-description)
-      ("t" "Todo for project…" magit-todos-list)
-      ("T" "Mastodon Toot…" mastodon-toot)
       ("u" jf/org-mode/agenda-files-update)]
     ["Denote"
       ("d a" jf/project/add-project-path :if jf/denote?)
@@ -127,21 +124,8 @@
       ("g s" "Safari" jf/menu--org-capture-safari)
       ("g w" "Eww" jf/capture/denote/from/eww-data :if-derived eww-mode)
       ]
-    ["Mark"
-      ("M s" "Safari" jf/menu--bookmark-safari)]])
-
-;; (use-package file-info
-;;   ;; Show the metadata of the current buffer's file; and then copy those values.
-;;   ;; The package also appears highly extensible.
-;;   :straight (:host github :repo "artawower/file-info.el")
-;;   :bind ("C-x f" . file-info-show)
-;;   :config
-;;   (setq hydra-hint-display-type 'posframe)
-;;   (setq hydra-posframe-show-params `(:poshandler posframe-poshandler-frame-center
-;; 						 :internal-border-width 2
-;; 						 :internal-border-color "#61AFEF"
-;; 						 :left-fringe 16
-;; 						 :right-fringe 16)))
+    ["Bookmark"
+      ("B s" "Safari" jf/menu--bookmark-safari)]])
 
 (provide 'jf-menus)
 ;;; jf-menus.el ends here

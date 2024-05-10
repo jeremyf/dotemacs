@@ -60,12 +60,14 @@
   :bind ("C-s-f" . #'forge-dispatch)
   :straight (:host github :repo "magit/forge"))
 
-;; A super-fast overlay of forge notifications (something which I
-;; haven't previously used).
-;;
-;;
 (use-package gh-notify
+  ;; A super-fast overlay of forge notifications (something which I
+  ;; haven't previously used).
   :straight t
+  :bind (:map gh-notify-mode-map
+          ;; C-c C-c is more and more the "do it" command.  So let's
+          ;; "Make it so."
+          ("C-c C-c" . gh-notify-forge-refresh))
   :config
   (setq gh-notify-exclude-repo-limit
     '("samvera-labs/geomash"
@@ -105,21 +107,12 @@
      "🚧: work in progress (WIP)"
      "🗡: stab in the dark"
      "🤖: continuous integration (CI) changes")
-  ;; The following list was pulled from http://udacity.github.io/git-styleguide/
-  ;;
-  ;; '("feat: A new feature"
-  ;;    "fix: A bug fix"
-  ;;    "docs: Changes to documentation"
-  ;;    "style: Formatting, missing semi colons, etc; no code change"
-  ;;    "refactor: Refactoring production code"
-  ;;    "test: Adding tests, refactoring test; no production code change"
-  ;;    "chore: Updating build tasks, package manager configs, etc; no production code change")
   "Team 💜 Violet 💜 's commit message guidelines on <2023-05-12 Fri>.")
 
 (use-package git-commit
   :straight t
   :hook ((git-commit-mode . jf/git-commit-mode-setup))
-  :bind (:map git-commit-mode (("TAB" .  #'completion-at-point)))
+  :bind (:map git-commit-mode-map (("TAB" .  #'completion-at-point)))
   :preface
   (defun jf/git-commit-mode-setup ()
     ;; Specify config capf
