@@ -91,6 +91,21 @@
                     'message-mode)))
        (propertize " Narrow " 'face 'mode-line-highlight))))
 
+(defvar jf/mode-line-format/vterm-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map [mode-line down-mouse-1] #'vterm-copy-mode)
+    map)
+  "Keymap to display on `vterm' copy indicator.")
+
+(defvar-local jf/mode-line-format/vterm
+  '(:eval
+     (when (derived-mode-p 'vterm-mode)
+       (propertize
+         (concat " " (if vterm-copy-mode "©" "O") " ")
+         'face 'mode-line-highlight
+         'local-map jf/mode-line-format/vterm-map
+         'help-echo "mouse-1:vterm-copy-mode"))))
+
 (defvar-local jf/mode-line-format/misc-info
   '(:eval
      (when (mode-line-window-selected-p)
@@ -173,6 +188,7 @@
                       jf/mode-line-format/narrow
                       jf/mode-line-format/project
                       jf/mode-line-format/vc-branch
+                      jf/mode-line-format/vterm
                       ))
   (put construct 'risky-local-variable t))
 
@@ -187,6 +203,7 @@
 
 (setq-default mode-line-format
   '("%e" " "
+     jf/mode-line-format/vterm
      jf/mode-line-format/kbd-macro
      jf/mode-line-format/narrow
      jf/mode-line-format/buffer-name-and-status "  "
