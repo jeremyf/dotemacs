@@ -10,10 +10,7 @@
 
 ;;; Code
 
-(use-package mastodon
-  :straight (:host github :repo "jeremyf/mastodon.el")
-  :config (setq mastodon-instance-url "https://dice.camp"
-                          mastodon-active-user "takeonrules"))
+
 
 (provide 'jf-communicating)
 ;;; jf-communicating.el ends here

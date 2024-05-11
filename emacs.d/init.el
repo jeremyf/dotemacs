@@ -87,12 +87,22 @@
  ;; Ensuring I have an autosave directory.
 (make-directory "~/.emacs.d/autosaves/" t)
 
-;; Track recent
-(recentf-mode 1)
+(use-package recentf
+  :straight (:type built-in)
+  :config
+  (setq recentf-max-menu-items 50
+    recentf-max-saved-items 200)
+  ;; Track recent
+  (recentf-mode 1)
+  ;; Quietly save the recent file list every 10 minutes.
+  (run-at-time nil 600 (lambda ()
+                         (let ((save-silently t))
+                           (recentf-save-list)))))
 
-;; Quietly save the recent file list every 10 minutes.
-(run-at-time nil 600 (lambda () (let ((save-silently t)) (recentf-save-list))))
-(global-auto-revert-mode)
+(use-package autorevert
+  :straight (:type built-in)
+  :config
+  (global-auto-revert-mode))
 
 (setq-default fill-column 80)
 ;; Doing a bit of configuration of my cursors
@@ -124,9 +134,6 @@
 
   ;; Automatically delete excess backups
   delete-old-versions t
-
-  ;; https://www.reddit.com/r/emacs/comments/102y0n4/weekly_tips_tricks_c_thread/
-  dired-dwim-target t
 
   echo-key-strokes 0.2
 
@@ -162,10 +169,6 @@
   ;; Increase read size per process
   read-process-output-max (* 6 512 1024)
 
-  recentf-max-menu-items 50
-
-  recentf-max-saved-items 200
-
   require-final-newline t
 
   ;; Make regular Isearch interpret empty space as regular expression
@@ -191,11 +194,33 @@
 
   ;; Recommendation from https://protesilaos.com/emacs/modus-themes
   x-underline-at-descent-line t
-
-  ;; Exposing one additional modifier key.
-  ns-right-command-modifier 'hyper
-  ns-right-alternate-modifier 'meta
   line-move-visual t)
+
+(use-package emacs
+  :straight (:type built-in)
+  :config
+  ;; The following function facilitates a best of both worlds.  By
+  ;; default, I want Option to be Meta (e.g. \"M-\") in Emacs.
+  ;; However, I can toggle that setting.  That way if I need an umlaut
+  ;; (e.g., \"¨\"), I can use MacOS’s native functions to type \"⌥\" +
+  ;; \"u\".
+  ;;
+  ;; I like having MacOS’s native Option (e.g. =⌥=) modifier
+  ;; available.  But using that default in Emacs would be a
+  ;; significant hinderance.
+  (defun jf/toggle-osx-alternate-modifier ()
+    "Toggle native OS-X Option modifier setting.
+
+    See `ns-alternate-modifier'."
+    (interactive)
+    (if ns-alternate-modifier
+      (progn (setq ns-alternate-modifier nil)
+        (message "Enabling OS X native Option modifier"))
+      (progn (setq ns-alternate-modifier 'meta)
+        (message "Disabling OX X native Option modifier (e.g. Option as Meta)"))))
+  ;; Exposing one additional modifier key.
+  (setq ns-right-command-modifier 'hyper
+    ns-right-alternate-modifier 'meta))
 
 (use-package ediff
   :straight (:type built-in)
@@ -244,6 +269,10 @@
   :custom (dired-listing-switches "-laGhpX")
   (dired-use-ls-dired t)
   :config
+  ;; When two dired buffers are open and you mark then rename a file, it
+  ;; assume's you're moving the file from the one buffer to the other.
+  ;; Very useful.
+  (setq dired-dwim-target t)
   (with-eval-after-load 'dired
     ;; Bind dired-x-find-file.
     (setq dired-x-hands-off-my-keys nil)
@@ -386,7 +415,190 @@
   ;; useful for feeding a macro.
   :straight t)
 
-(require 'jf-modeline)
+(use-package vc-git
+  :straight (:type built-in))
+
+(use-package keycast
+  :straight t
+  :init
+  (setq keycast-mode-line-insert-after
+    'jf/mode-line-format/buffer-name-and-status)
+  (setq keycast-mode-line-remove-tail-elements nil)
+  (setq keycast-mode-line-window-predicate 'mode-line-window-selected-p)
+  (setq keycast-mode-line-format "%2s%k%2s(%c%R)"))
+
+(use-package emacs
+  :straight (:type built-in)
+  :preface
+
+  (defvar-local jf/mode-line-format/kbd-macro
+    '(:eval
+       (when (and (mode-line-window-selected-p) defining-kbd-macro)
+         (propertize " KMacro " 'face 'mode-line-highlight))))
+
+  (defvar-local jf/mode-line-format/buffer-name-and-status
+    '(:eval
+       (let ((name (buffer-name)))
+         (propertize
+           (if buffer-read-only
+             ;; TODO: <2024-03-09 Sat> Create mouse clickability to review
+             ;; filename
+             (format " %s %s " (char-to-string #xE0A2) name)
+             name)
+           'face
+           (if (mode-line-window-selected-p)
+             'mode-line-buffer-id
+             'mode-line-inactive)))))
+
+  (defun jf/mode-line-format/major-mode-indicator ()
+    "Return appropriate propertized mode line indicator for the major mode."
+    (let ((indicator (cond
+                       ((derived-mode-p 'text-mode) "§")
+                       ((derived-mode-p 'prog-mode) "λ")
+                       ((derived-mode-p 'comint-mode) ">_")
+                       (t "◦"))))
+      (propertize indicator
+        'face
+        (if (mode-line-window-selected-p)
+          'jf/mode-line-format/face-shadow
+          'mode-line-inactive))))
+
+  (defun jf/mode-line-format/major-mode-name ()
+    (propertize (capitalize (string-replace "-mode" "" (symbol-name major-mode)))
+      'face (if (mode-line-window-selected-p) 'mode-line 'mode-line-inactive)))
+
+  (defvar-local jf/mode-line-format/major-mode
+    '(:eval
+       (concat
+         (jf/mode-line-format/major-mode-indicator)
+         " "
+         (jf/mode-line-format/major-mode-name))))
+
+  (defvar-local jf/mode-line-format/narrow
+    '(:eval
+       (when (and (mode-line-window-selected-p)
+               (buffer-narrowed-p)
+               (not (derived-mode-p
+                      'Info-mode
+                      'help-mode
+                      'special-mode
+                      'message-mode)))
+         (propertize " Narrow " 'face 'mode-line-highlight))))
+
+  (defvar jf/mode-line-format/vterm-map
+    (let ((map (make-sparse-keymap)))
+      (define-key map [mode-line down-mouse-1] #'vterm-copy-mode)
+      map)
+    "Keymap to display on `vterm' copy indicator.")
+
+  (defvar-local jf/mode-line-format/vterm
+    '(:eval
+       (when (derived-mode-p 'vterm-mode)
+         (propertize
+           (concat " " (if vterm-copy-mode "©" "O") " ")
+           'face 'mode-line-highlight
+           'local-map jf/mode-line-format/vterm-map
+           'help-echo "mouse-1:vterm-copy-mode"))))
+
+  (defvar-local jf/mode-line-format/misc-info
+    '(:eval
+       (when (mode-line-window-selected-p)
+         mode-line-misc-info)))
+
+  (with-eval-after-load 'eglot
+    (setq mode-line-misc-info
+      (delete '(eglot--managed-mode
+                 (" [" eglot--mode-line-format "] "))
+        mode-line-misc-info)))
+
+  (defvar-local jf/mode-line-format/eglot
+    `(:eval
+       (when (and (featurep 'eglot) (mode-line-window-selected-p))
+         '(eglot--managed-mode eglot--mode-line-format))))
+
+  (defvar-local jf/mode-line-format/vc-branch
+    '(:eval
+       (when-let* (((mode-line-window-selected-p))
+                    (file (if (equal major-mode 'dired-mode)
+                            default-directory
+                            (buffer-file-name)))
+                    (backend (or (vc-backend file) 'git))
+                    (branch (jf/mode-line-format/vc-branch-name file backend)))
+         (jf/mode-line-format/vc-details file branch))))
+
+  (defface jf/mode-line-format/face-shadow
+    '((t :foreground "#d0ffe0" :inherit shadow))
+    "A face for symbols in the `mode-line'.")
+
+  (defun jf/mode-line-format/vc-details (file branch)
+    "Return the FILE and BRANCH."
+    (propertize
+      (concat
+        ;; 
+        (propertize "" ;; (char-to-string #xE0A0)
+          'face
+          'jf/mode-line-format/face-shadow)
+        " "
+        branch)
+      'local-map jf/mode-line-format/map-vc
+      'help-echo "mouse-1: magit-status"))
+
+  (defvar jf/mode-line-format/map-vc
+    (let ((map (make-sparse-keymap)))
+      (define-key map [mode-line down-mouse-1] #'magit-status)
+      map)
+    "Keymap to display on version control indicator.")
+
+  (defun jf/mode-line-format/vc-branch-name (file backend)
+    "Return VC branch name for FILE with BACKEND."
+    (when-let ((rev (vc-working-revision file backend))
+                (branch (or (vc-git--symbolic-ref file)
+                          (substring rev 0 7))))
+      branch))
+
+  (defvar-local jf/mode-line-format/flymake
+    '(:eval
+       (when (and flymake--state
+               (mode-line-window-selected-p))
+         flymake-mode-line-format)))
+
+  (defvar-local jf/mode-line-format/project
+    '(:eval
+       (when (projectile-project-p)
+         (propertize
+           (concat " " (project-name (project-current)))
+           'face
+           (if (mode-line-window-selected-p)
+             'jf/mode-line-format/face-shadow
+             'mode-line-inactive)))))
+
+  (dolist (construct '(
+                        jf/mode-line-format/buffer-name-and-status
+                        jf/mode-line-format/eglot
+                        jf/mode-line-format/flymake
+                        jf/mode-line-format/kbd-macro
+                        jf/mode-line-format/major-mode
+                        jf/mode-line-format/misc-info
+                        jf/mode-line-format/narrow
+                        jf/mode-line-format/project
+                        jf/mode-line-format/vc-branch
+                        jf/mode-line-format/vterm
+                        ))
+    (put construct 'risky-local-variable t))
+
+  (setq-default mode-line-format
+    '("%e" " "
+       jf/mode-line-format/vterm
+       jf/mode-line-format/kbd-macro
+       jf/mode-line-format/narrow
+       jf/mode-line-format/buffer-name-and-status "  "
+       jf/mode-line-format/major-mode "  "
+       jf/mode-line-format/project "  "
+       jf/mode-line-format/vc-branch "  "
+       jf/mode-line-format/flymake "  "
+       jf/mode-line-format/eglot "  "
+       ;; jf/mode-line-format/misc-info
+       )))
 
 (use-package ace-window
   ;; Quick navigation from window to window.
@@ -680,7 +892,332 @@ When given PREFIX use `eww-browse-url'."
           (forward-char 1))
         (t ad-do-it)))))
 
-(require 'jf-windows)
+(use-package window
+  :preface (require 'prot-window)
+  ;; Wrangle up how windows and buffers display.
+  :straight (:type built-in)
+  :bind (("s-q" . #'jf/bury-or-unbury-buffer)
+          ("C-x 2" . #'jf/window/split-and-follow-below)
+          ("C-x 3" . #'jf/window/split-and-follow-right)
+          ("s-\\" . #'jf/nav-toggle-split-direction))
+  :config
+  (advice-add #'kill-buffer-and-window :after #'balance-windows)
+  (defun jf/nav-toggle-split-direction ()
+    "Toggle window split from vertical to horizontal.
+This work the other way around as well.
+Credit: https://github.com/olivertaylor/dotfiles/blob/master/emacs/init.el"
+    (interactive)
+    (if (> (length (window-list)) 2)
+      (error "Can't toggle with more than 2 windows")
+      (let ((was-full-height (window-full-height-p)))
+        (delete-other-windows)
+        (if was-full-height
+          (split-window-vertically)
+          (split-window-horizontally))
+        (save-selected-window
+          (other-window 1)
+          (switch-to-buffer (other-buffer))))))
+
+  (defun jf/window/split-and-follow-below ()
+    "Split the selected window in two with the new window below.
+
+This uses `split-window-below' but follows with the cursor."
+    (interactive)
+    (split-window-below)
+    (balance-windows)
+    (other-window 1))
+  (defun jf/window/split-and-follow-right ()
+    "Split the selected window in two with the new window to the right.
+
+This uses `split-window-right' but follows with the cursor."
+    (interactive)
+    (split-window-right)
+    (balance-windows)
+    (other-window 1))
+  (defun jf/body-function/rspec-compilation (window)
+    "Select the WINDOW and move to `end-of-buffer'."
+    (select-window window)
+    (end-of-buffer))
+  (setq display-buffer-alist
+    `(;; no window
+       ("\\`\\*Async Shell Command\\*\\'"
+         (display-buffer-no-window))
+       ("\\`\\*\\(Warnings\\|Compile-Log\\|Org Links\\)\\*\\'"
+         (display-buffer-no-window)
+         (allow-no-window . t))
+       ;; bottom side window
+       ("\\*Org \\(Select\\|Note\\)\\*" ; the `org-capture' key selection and `org-add-log-note'
+         (display-buffer-in-side-window)
+         (dedicated . t)
+         (side . bottom)
+         (slot . 0)
+         (window-parameters . ((mode-line-format . (" %b")))))
+       ;; bottom buffer (NOT side window)
+       ((or . ((derived-mode . flymake-diagnostics-buffer-mode)
+                (derived-mode . flymake-project-diagnostics-mode)
+                (derived-mode . messages-buffer-mode)
+                (derived-mode . backtrace-mode)))
+         (display-buffer-reuse-mode-window display-buffer-at-bottom)
+         (window-height . 0.3)
+         (dedicated . t)
+         (preserve-size . (t . t)))
+       ("\\*Embark Actions\\*"
+         (display-buffer-reuse-mode-window display-buffer-below-selected)
+         (window-height . fit-window-to-buffer)
+         (window-parameters . ((no-other-window . t)
+                                (mode-line-format . (" %b")))))
+       ("\\*\\(Output\\|Register Preview\\).*"
+         (display-buffer-reuse-mode-window display-buffer-at-bottom))
+       ;; below current window
+       ("\\(\\*Capture\\*\\|CAPTURE-.*\\)"
+         (display-buffer-reuse-mode-window display-buffer-below-selected))
+       ("\\*\\vc-\\(incoming\\|outgoing\\|git : \\).*"
+         (display-buffer-reuse-mode-window display-buffer-below-selected)
+         (window-height . 0.1)
+         (dedicated . t)
+         (preserve-size . (t . t)))
+       ("\\*rspec-compilation\\*"
+         (display-buffer-reuse-mode-window display-buffer-below-selected)
+         (body-function . jf/body-function/rspec-compilation))
+       ((derived-mode . reb-mode) ; M-x re-builder
+         (display-buffer-reuse-mode-window display-buffer-below-selected)
+         (window-height . 4) ; note this is literal lines, not relative
+         (dedicated . t)
+         (preserve-size . (t . t)))
+       ((or . ((derived-mode . occur-mode)
+                (derived-mode . grep-mode)
+                (derived-mode . rg-mode)
+                (derived-mode . Buffer-menu-mode)
+                (derived-mode . log-view-mode)
+                (derived-mode . help-mode) ; See the hooks for `visual-line-mode'
+                "\\*\\(|Buffer List\\|Occur\\|vc-change-log\\).*"))
+         (prot-window-display-buffer-below-or-pop)
+         (dedicated . t)
+         (body-function . prot-window-select-fit-size))
+       ("\\*\\(Calendar\\|Bookmark Annotation\\|ert\\).*"
+         (display-buffer-reuse-mode-window display-buffer-below-selected)
+         (dedicated . t)
+         (window-height . fit-window-to-buffer))
+       ;; NOTE 2022-09-10: The following is for `ispell-word', though
+       ;; it only works because I override `ispell-display-buffer'
+       ;; with `prot-spell-ispell-display-buffer' and change the
+       ;; value of `ispell-choices-buffer'.
+       ("\\*ispell-top-choices\\*.*"
+         (display-buffer-reuse-mode-window display-buffer-below-selected)
+         (window-height . fit-window-to-buffer))
+       ;; same window
+       ;; NOTE 2023-02-17: `man' does not fully obey the
+       ;; `display-buffer-alist'.  It works for new frames and for
+       ;; `display-buffer-below-selected', but otherwise is
+       ;; unpredictable.  See `Man-notify-method'.
+       ((or . ((derived-mode . Man-mode)
+                (derived-mode . woman-mode)
+                "\\*\\(Man\\|woman\\).*"))
+         (display-buffer-same-window))))
+  (setq confirm-kill-emacs #'yes-or-no-p)
+  :config
+  ;; For some reason, the C-x 5 0 keybindings don't set in my brain.
+  (defun jf/bury-or-unbury-buffer (&optional prefix)
+    "Without PREFIX `bury-buffer' a buffer.
+
+With one universal PREFIX, `unbury-buffer'.
+With two universal PREFIX `delete-frame'.
+With three or more universal PREFIX `save-buffers-kill-emacs'."
+    (interactive "p")
+    (cond
+      ((eq prefix nil)
+        (if buffer-read-only (kill-current-buffer) (bury-buffer)))
+      ((>= prefix 64)
+        (progn
+          (let ((save-silently t)) (recentf-save-list))
+          (save-buffers-kill-emacs t)))
+      ((>= prefix 16)
+        (delete-frame))
+      ((>= prefix 4)
+        (unbury-buffer))
+      (t
+        (if buffer-read-only (kill-current-buffer) (bury-buffer))))))
+
+(use-package font-lock
+  :straight (:type built-in)
+  :config
+  ;; Show tabs as they are tricky little creatures
+  (defface jf/tabs-face
+    '((default :inherit font-lock-misc-punctuation-face))
+    "Help me see tabs; they are tricky creatures.")
+  (defface jf/bom-face
+    '((default :inherit font-lock-misc-punctuation-face))
+    "Help me see BOM characters \"﻿\"; they are tricky!")
+
+  (add-hook 'prog-mode-hook
+    (lambda ()
+      (unless (member major-mode '(go-mode go-ts-mode))
+        (font-lock-add-keywords nil '(("\t" . 'jf/tabs-face)))
+        (font-lock-add-keywords nil '(("﻿" . 'jf/bom-face))))))
+  (add-hook 'text-mode-hook
+    (lambda ()
+      (font-lock-add-keywords nil '(("\t" . 'jf/tabs-face)))
+      (font-lock-add-keywords nil '(("﻿" . 'jf/bom-face))))))
+
+(use-package ef-themes
+  :straight t
+  :init
+  (defvar jf/themes-plist '()
+    "The named themes by pallette.")
+  :config
+  (setq ef-themes-headings ; read the manual's entry or the doc string
+    '((0 . (bold 1.4))
+       (1 . (variable-pitch bold 1.7))
+       (2 . (overline semibold 1.5))
+       (3 . (monochrome overline 1.4 background))
+       (4 . (overline 1.3))
+       (5 . (rainbow 1.2))
+       (6 . (rainbow 1.15))
+       (t . (rainbow 1.1))))
+  ;; When these are non-nil, the mode line uses the proportional font
+  (setq ef-themes-mixed-fonts t
+    ef-themes-variable-pitch-ui t)
+
+  (defun jf/theme-custom-faces ()
+    "Set the various custom faces for both `treesit' and `tree-sitter'."
+    (ef-themes-with-colors
+      (setq hl-todo-keyword-faces
+        `(("HOLD" . ,yellow)
+           ("TODO" . ,red)
+           ("BLOCKED" . ,yellow)
+           ("NEXT" . ,blue)
+           ("THEM" . ,magenta)
+           ("PROG" . ,cyan-warmer)
+           ("OKAY" . ,green-warmer)
+           ("DONT" . ,yellow-warmer)
+           ("FAIL" . ,red-warmer)
+           ("BUG" . ,red-warmer)
+           ("DONE" . ,green)
+           ("NOTE" . ,blue-warmer)
+           ("KLUDGE" . ,cyan)
+           ("HACK" . ,cyan)
+           ("TEMP" . ,red)
+           ("FIXME" . ,red-warmer)
+           ("XXX+" . ,red-warmer)
+           ("REVIEW" . ,red)
+           ("DEPRECATED" . ,yellow)))
+      (custom-set-faces
+        `(denote-faces-link
+           ((,c (:inherit link
+                  :box (:line-width (1 . 1)
+                         :color ,border
+                         :style released-button)))))
+        `(ef-themes-fixed-pitch
+           ((,c (:family "IntoneMono Nerd Font Mono"))))
+        `(olivetti-fringe
+           ((,c (:inherit fringe :background ,bg-dim))))
+        `(jf/bom-face
+           ((,c (:width ultra-expanded
+                  :box (:line-width (2 . 2)
+                         :color ,underline-err
+                         :style released-button)))))
+        `(jf/mode-line-format/face-shadow
+           ((,c :foreground ,fg-mode-line)))
+        `(jf/tabs-face
+           ((,c :underline (:style wave :color ,bg-blue-intense))))
+        `(jf/org-faces-date
+           ((,c :underline nil :foreground ,cyan-faint)))
+        `(jf/org-faces-epigraph
+           ((,c :underline nil :slant oblique :foreground ,fg-alt)))
+        `(jf/org-faces-abbr
+           ((,c :underline t :slant oblique :foreground ,fg-dim)))
+        `(org-list-dt
+           ((,c :bold t :slant italic :foreground ,fg-alt)))
+        `(font-lock-misc-punctuation-face
+           ((,c :foreground ,green-warmer)))
+        `(elixir-ts-comment-doc-identifier
+           ((,c :foreground ,comment)))
+        `(elixir-ts-comment-doc-attribute
+           ((,c :foreground ,comment)))
+        ;; `(mode-line
+        ;;    ((,c :foreground ,cyan :background ,bg-cyan-subtle)))
+        `(org-block
+           ;; ((,c :background ,bg-yellow-subtle)))
+           ((,c :background ,bg-added-faint)))
+        `(org-block-begin-line
+           ((,c :background ,bg-added-refine)))
+        `(org-block-end-line
+           ((,c :background ,bg-added-refine)))
+        `(org-modern-priority
+           ((,c :foreground ,fg-term-red-bright
+              :box (:color ,fg-term-red-bright :line-width (-1 . -1)))))
+        `(fill-column-indicator
+           ((,c :width ultra-condensed
+              :background ,bg-dim
+              :foreground ,bg-dim)))
+        `(font-lock-regexp-face
+           ((,c :foreground ,red))))))
+  (setq jf/themes-plist '(:dark ef-bio :light ef-cyprus)))
+
+(use-package custom
+  :straight (:type built-in)
+  :preface
+  (mapc #'disable-theme custom-enabled-themes)
+  :config
+  ;; In organizing the packages, I discovred that themes is part of the
+  ;; `custom' package.
+  (defun jf/emacs-theme-by-osx-appearance ()
+    "Function to load named theme."
+    (load-theme
+      (plist-get jf/themes-plist (jf/current-macos-interface-style))))
+
+  ;; Theming hooks to further customize colors
+  (defvar after-enable-theme-hook nil
+    "Normal hook run after enabling a theme.")
+
+  (defun run-after-enable-theme-hook (&rest _args)
+    "Run `after-enable-theme-hook'."
+    (run-hooks 'after-enable-theme-hook))
+
+  (advice-add 'enable-theme :after #'run-after-enable-theme-hook)
+
+  (add-hook 'after-enable-theme-hook #'jf/theme-custom-faces)
+
+  (defun jf/current-macos-interface-style ()
+    (if (equal "Dark"
+          (substring
+            (shell-command-to-string
+              "defaults read -g AppleInterfaceStyle") 0 4))
+      :dark :light))
+
+  (defun jf/dark ()
+    "Toggle system-wide Dark or Light setting."
+    (interactive)
+    (shell-command
+      (concat "osascript -e 'tell application \"System Events\" "
+        "to tell appearance preferences "
+        "to set dark mode to not dark mode'")
+    (jf/emacs-theme-by-osx-appearance)))
+  (jf/emacs-theme-by-osx-appearance))
+
+(use-package tab-bar
+  ;; I've been stepping away from multiple tabs, however as I further
+  ;; explored.  I need to think of these tabs as contained frames.  They
+  ;; can save window configuration.
+  :straight (:type built-in)
+  :bind ("C-c t t" . #'tab-bar-mode)
+  :hook (tab-bar-mode . jf/tab-bar-mode-hook)
+  :config
+  (defun jf/tab-bar-mode-hook ()
+    "Expose key binding for switching tabs."
+    (define-key global-map
+      (kbd "C-c t n")
+      #'tab-bar-new-tab
+      (not tab-bar-mode))
+    (define-key global-map
+      (kbd "C-c t k")
+      #'tab-bar-close-tab
+      (not tab-bar-mode))
+    (define-key global-map
+      (kbd "C-c t s")
+      #'tab-bar-switch-to-tab
+      ;; Remove the binding when we're NOT in tab-bar-mode.
+      (not tab-bar-mode))))
 
 (use-package xref
   :straight t
@@ -841,22 +1378,35 @@ When given PREFIX use `eww-browse-url'."
        (left . 0))))
 
 (require 'jf-utility)
+
+(use-package ws-butler
+  ;; Keep white space tidy.
+  :straight t
+  :hook (prog-mode . ws-butler-mode))
+
+(use-package fill-sentences-correctly
+  ;; `fill-sentences-correctly-mode' ensures that `fill-paragraph'
+  ;; (e.g. M-q) preserves two spaces.
+  :straight (fill-sentences-correctly
+       :host github
+       :repo "duckwork/fill-sentences-correctly.el")
+  :config (fill-sentences-correctly-mode))
+
+(use-package tomelr
+  ;; Emacs-Lisp Library for converting S-expressions to TOML.  I'll
+  ;; likely be using this as I move my Hugo front-matter from YAML to
+  ;; TOML, as per the changes described by `ox-hugo'.
+  :straight (tomelr :host github :repo "kaushalmodi/tomelr"))
+
 (require 'jf-org-mode)
 
 (use-package abbrev
-  ;; The =abbrev= package is simple and powerful, providing an auto-correct
-  ;; that I configure.  No more “teh” in my text.
+  ;; The =abbrev= package is simple and powerful, providing an
+  ;; auto-correct that I configure.  No more “teh” in my text.
   :straight (:type built-in)
   :custom (abbrev-file-name (file-truename
                               "~/git/dotemacs/emacs.d/abbrev_defs"))
   :hook (text-mode . abbrev-mode))
-
-;; https://github.com/ChanderG/lam
-;;
-;; Create a buffer specific `abbrev'
-(use-package lam
-  :straight (:host github :repo "ChanderG/lam")
-  :bind ("C-x l" . #'lam/control))
 
 (use-package emacs
   :bind ("C-M-i" . completion-at-point)
@@ -1634,19 +2184,412 @@ literal then add a fuzzy search)."
 
 (require 'jf-coding)
 (require 'jf-organizing)
-(require 'jf-framing)
+
+(use-package edit-indirect
+  ;; A nice package for editing regions in separate buffers.  It doesn't appear
+  ;; to get the mode guess right.  I haven't used this as much as
+  ;; `narrow-region'.  Perhaps it can go?
+  :straight t)
+
+(use-package logos
+  ;; A `narrow-region' extension that moves towards providing a
+  ;; presentation-type experience.
+  :straight t
+  :bind (:map logos-focus-mode-map
+          ("M-]" . #'logos-forward-page-dwim)
+          ("s-]" . #'logos-forward-page-dwim)
+          ("M-[" . #'logos-backward-page-dwim)
+          ("s-[" . #'logos-backward-page-dwim))
+  :config
+  (let ((map global-map))
+    (define-key map [remap narrow-to-region] #'logos-narrow-dwim)
+    (define-key map [remap forward-page] #'logos-forward-page-dwim)
+    (define-key map [remap backward-page] #'logos-backward-page-dwim))
+  ;; (let ((map logos-focus-mode-map))
+  ;;   (define-key map [remap next-line] #'logos-forward-page-dwim)
+  ;;   (define-key map [remap previous-line] #'logos-backward-page-dwim))
+  (setq logos-outlines-are-pages t)
+  (setq-default logos-hide-cursor t
+    logos-hide-mode-line t
+    logos-hide-buffer-boundaries t
+    logos-hide-fringe t
+    logos-variable-pitch t
+    logos-buffer-read-only t
+    logos-scroll-lock nil
+    logos-olivetti t
+    logos-outline-regexp-alist
+    `((emacs-lisp-mode . "^;;;+ ")
+       (org-mode . "^\\*+ +")
+       (markdown-mode . "^\\#+ +")))
+  (defun logos--reveal-entry ()
+    "Reveal Org or Outline entry."
+    (cond
+      ((and (eq major-mode 'org-mode)
+         (org-at-heading-p))
+        (org-show-subtree))
+      ((or (eq major-mode 'outline-mode)
+         (bound-and-true-p outline-minor-mode))
+        (outline-show-subtree))))
+  :init
+  (add-hook 'logos-page-motion-hook #'logos--reveal-entry))
+
+(use-package "nov.el"
+  ;; A package to help in reading epubs.
+  :straight t
+  :init (use-package esxml :straight t)
+  :config
+  (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
+  :custom (nov-text-width 80))
+
+(use-package so-long
+  ;; Switch to `so-long' when the file gets too long for normal processing.
+  :straight t
+  :bind
+  (:map so-long-mode-map
+    ("C-s" . isearch-forward)
+    ("C-r" . isearch-backward))
+  :config (global-so-long-mode 1))
+
+;;;
+;; A package to "narrow" focus; providing a visually appealing interface
+(use-package olivetti
+  :straight t
+  :hook (olivetti-mode-on . jf/olivetti-mode-on-hook)
+  (olivetti-mode-off . jf/olivetti-mode-off-hook)
+  :config
+  ;; I'm typically aiming for 80 character fill-column.
+  (setq olivetti-body-width 80)
+  (setq olivetti-minimum-body-width 80)
+  (setq olivetti-style 'fancy)
+  (setq olivetti-recall-visual-line-mode-entry-state t)
+  :config
+  (defun jf/olivetti-mode-on-hook ()
+    "Remove some visual chatter."
+    (setq-local original-flymake-fringe-indicator-position
+      flymake-fringe-indicator-position)
+    (setq-local original-vi-tilde-fringe-mode
+      vi-tilde-fringe-mode)
+    (setq-local original-display-fill-column-indicator-mode
+      display-fill-column-indicator-mode)
+    (setq-local original-git-gutter-mode
+      git-gutter-mode)
+    (setq-local original-display-line-numbers-mode
+      display-line-numbers-mode)
+    (setq-local original-org-modern-block-fringe
+      org-modern-block-fringe)
+    ;; The of org-modern blocks is not quite right with olivetti.
+    (setq-local org-modern-block-fringe nil)
+    (setq-local flymake-fringe-indicator-position nil)
+    ;; By restarting org-modern-mode, I hide the expansive fringe; thus
+    ;; preserving the "beauty" of Olivetti
+    (when (eq major-mode 'org-mode)
+      (org-modern-mode 1))
+    (vi-tilde-fringe-mode -1)
+    (display-line-numbers-mode -1)
+    (display-fill-column-indicator-mode -1)
+    (git-gutter-mode -1))
+  (defun jf/olivetti-mode-off-hook ()
+    "Restore some visual chatter."
+    (setq-local flymake-fringe-indicator-position
+      original-flymake-fringe-indicator-position)
+    (when (eq major-mode 'org-mode)
+      (org-modern-mode 1))
+    (vi-tilde-fringe-mode
+      original-vi-tilde-fringe-mode)
+    (display-fill-column-indicator-mode
+      original-display-fill-column-indicator-mode)
+    (display-line-numbers-mode
+      original-display-line-numbers-mode)
+    (git-gutter-mode
+      original-git-gutter-mode)
+    (setq-local org-modern-block-fringe
+      original-org-modern-block-fringe))
+  (defun jf/olivetti-mode (&rest args)
+    ;; I want to turn off org-modern-mode as it's drawing of the
+    ;; overlays conflicts with Olivetti.  We'll turn it on later.
+    (when (eq major-mode 'org-mode)
+      (org-modern-mode -1)))
+  (advice-add 'olivetti-mode :before #'jf/olivetti-mode))
+
+;;; Presentation mode leveraging logos
+
+(defvar jf/minor-mode/presenter-map
+  (let ((map (make-sparse-keymap)))
+    (define-key map (kbd "C-n") #'next-line)
+    (define-key map (kbd "C-p") #'previous-line)
+    (dolist (key `("M-]" "s-]"))
+      (define-key map (kbd key) 'logos-forward-page-dwim))
+    (dolist (key `("M-[" "s-["))
+      (define-key map (kbd key) 'logos-backward-page-dwim))
+    map))
+
+(define-minor-mode jf/minor-mode/presenter
+  "Enter a `logos' and `olivetti' mode for showing things."
+  :init-value nil
+  :global nil
+  :keymap jf/minor-mode/presenter-map
+  :lighter " presenter")
+
+(defcustom jf/minor-mode/presenter-on-hook
+  (lambda ()
+    (let ((logos-hide-cursor nil)
+           (logos-buffer-read-only nil)
+           (org-hide-emphasis-markers t))
+      (call-interactively 'logos-narrow-dwim)
+      (olivetti-mode t)
+      (keycast-mode-line-mode t)
+      (display-line-numbers-mode -1)
+      (when (fboundp 'fontaine-set-preset) (fontaine-set-preset 'presenting))
+      (when (fboundp 'vi-tilde-fringe-mode) (vi-tilde-fringe-mode -1))
+      (when (fboundp 'git-gutter-mode) (git-gutter-mode -1))
+      (when (fboundp 'centaur-tabs-local-mode) (centaur-tabs-local-mode -1))))
+  "Hook when `jf/minor-mode/presenter' activated."
+  :type 'hook)
+
+(defcustom jf/minor-mode/presenter-off-hook
+  (lambda ()
+    (call-interactively 'widen)
+    (olivetti-mode -1)
+    (keycast-mode-line-mode -1)
+    ;; (setq-local  org-hide-emphasis-markers nil)
+    (display-line-numbers-mode t)
+    (when (fboundp 'fontaine-set-preset) (fontaine-set-preset 'default))
+    (when (fboundp 'vi-tilde-fringe-mode) (vi-tilde-fringe-mode t))
+    (when (fboundp 'git-gutter-mode) (git-gutter-mode t))
+    (when (fboundp 'centaur-tabs-local-mode) (centaur-tabs-local-mode t)))
+  "Hook when `jf/minor-mode/presenter' deactivated."
+  :type 'hook)
+
 (require 'jf-utility)
-(require 'jf-communicating)
-(require 'jf-reading)
+
+(use-package mastodon
+  :straight (:host github :repo "jeremyf/mastodon.el")
+  :config (setq mastodon-instance-url "https://dice.camp"
+            mastodon-active-user "takeonrules"))
+
+(use-package doc-view
+  ;; A package for improving the in Emacs viewing experience of PDFs.
+  :straight (doc-view :type built-in)
+  :bind (:map doc-view-mode-map
+              ("C-c g" . doc-view-goto-page)))
+
+(use-package elfeed
+  ;; An Emacs RSS reader.  I’ve used Google Reader, Feedly, Inoreader, and
+  ;; Newsboat.  I wrote about
+  ;; https://takeonrules.com/2020/04/12/switching-from-inoreader-to-newsboat-for-rss-reader/,
+  ;; and the principles apply for Elfeed.
+  :straight t
+  :after org
+  :preface
+  (defun jf/elfeed-show-entry-switch(buffer)
+    (switch-to-buffer buffer)
+    (setq-local shr-inhibit-images t)
+    (olivetti-mode 1)
+    (text-scale-set 2)
+    (elfeed-show-refresh))
+  :custom
+  (elfeed-curl-timeout 90)
+  (elfeed-db-directory "~/Documents/.elfeed")
+  :config
+  (setq elfeed-show-entry-switch #'jf/elfeed-show-entry-switch)
+  (setq-default elfeed-search-filter "@2-days-ago +unread ")
+  :bind ((:map elfeed-search-mode-map
+           ("q" . jf/elfeed-save-db-and-bury)))
+  :config
+  (defun jf/elfeed-save-db-and-bury ()
+    "Wrapper to save the elfeed db to disk before burying buffer."
+    ;;write to disk when quiting
+    (interactive)
+    (elfeed-db-save)
+    (quit-window))
+
+  (defun jf/elfeed-load-db-and-open ()
+    "Load the elfeed db from disk before opening."
+    (interactive)
+    (elfeed)
+    (elfeed-update)
+    (elfeed-db-load)
+    (elfeed-search-update--force))
+  (defalias 'rss 'jf/elfeed-load-db-and-open)
+
+  ;; From https://karthinks.com/blog/lazy-elfeed/
+  (defun elfeed-search-show-entry-pre (&optional lines)
+    "Return a function that will scroll n LINES in `elfeed' search results.
+
+It will display entries without switching to them."
+    (lambda (times)
+      (interactive "p")
+      (forward-line (* times (or lines 0)))
+      (recenter)
+      (call-interactively #'elfeed-search-show-entry)
+      (select-window (previous-window))
+      (unless elfeed-search-remain-on-entry (forward-line -1))))
+  (eval-after-load 'elfeed-search
+    '(define-key elfeed-search-mode-map (kbd "n")
+       (elfeed-search-show-entry-pre +1)))
+  (eval-after-load 'elfeed-search
+    '(define-key elfeed-search-mode-map (kbd "p")
+       (elfeed-search-show-entry-pre -1)))
+  (eval-after-load 'elfeed-search
+    '(define-key elfeed-search-mode-map (kbd "M-RET")
+       (elfeed-search-show-entry-pre))))
+;; End https://karthinks.com/blog/lazy-elfeed/
+
+(use-package elfeed-org
+  ;; Maintaining my RSS subscriptions in `org-mode' format.
+  :straight t
+  :after elfeed
+  :config (elfeed-org)
+  (defun jf/export-public-elfeed-opml ()
+    "Export public OPML file."
+    (let ((opml-body (cl-loop for org-file in '("~/git/org/denote/indices/public-elfeed.org")
+                       concat
+                       (with-temp-buffer
+                         (insert-file-contents
+                           (expand-file-name org-file org-directory))
+                         (rmh-elfeed-org-convert-org-to-opml
+                           (current-buffer))))))
+      (with-current-buffer (find-file-noselect "~/git/takeonrules.source/static/blogroll.xml")
+        (erase-buffer)
+        (insert "<?xml version=\"1.0\"?>\n")
+        (insert "<?xml-stylesheet type=\"text/xsl\" href=\"/blogroll.xsl\"?>\n")
+        (insert "<opml version=\"1.0\">\n")
+        (insert "  <head>\n")
+        (insert "    <title>Take on Rules Public Blogroll</title>\n")
+        (insert "  </head>\n")
+        (insert "  <body>\n")
+        (insert opml-body)
+        (insert "  </body>\n")
+        (insert "</opml>\n")
+        (save-buffer))))
+  (setq rmh-elfeed-org-files nil)
+  (dolist (file '("~/git/org/denote/indices/public-elfeed.org"
+                   "~/git/org/denote/indices/private-elfeed.org"))
+    (when (f-exists? file)
+      (add-to-list 'rmh-elfeed-org-files file))))
+
+(use-package eww
+  ;; A plain text browser.  Use this to see just how bad much of the web has
+  ;; become.
+  :straight t
+  :custom (eww-auto-rename-buffer 'title)
+  :config
+  (setq shr-cookie-policy nil)
+  (defun shr-tag-dfn (dom)
+    (shr-fontize-dom dom 'italic))
+
+  (defun shr-tag-cite (dom)
+    (shr-fontize-dom dom 'italic))
+
+  (defun shr-tag-q (dom)
+    (shr-insert (car shr-around-q-tag))
+    (shr-generic dom)
+    (shr-insert (cdr shr-around-q-tag)))
+
+  (defcustom shr-around-q-tag '("“" . "”")
+    "The before and after quotes.  `car' is inserted before the Q-tag and `cdr' is inserted after the Q-tag.
+
+Alternative suggestions are: - '(\"\\\"“\" . \"\\\"\")"
+    :type (cons 'string 'string))
+
+  (defface shr-small
+    '((t :height 0.8))
+    "Face for <small> elements.")
+
+  ;; Drawing inspiration from shr-tag-h1
+  (defun shr-tag-small (dom)
+    (shr-fontize-dom dom (when shr-use-fonts 'shr-small)))
+
+  (defface shr-time
+    '((t :inherit underline :underline (:style wave)))
+    "Face for <time> elements.")
+
+  ;; Drawing inspiration from shr-tag-abbr
+  (defun shr-tag-time (dom)
+    (when-let* ((datetime (or
+         (dom-attr dom 'title)
+         (dom-attr dom 'datetime)))
+    (start (point)))
+      (shr-generic dom)
+      (shr-add-font start (point) 'shr-time)
+      (add-text-properties
+       start (point)
+       (list
+  'help-echo datetime
+         'mouse-face 'highlight))))
+
+  ;; EWW lacks a style for article
+  (defun shr-tag-article (dom)
+    (shr-ensure-paragraph)
+    (shr-generic dom)
+    (shr-ensure-paragraph))
+
+  ;; EWW lacks a style for section; This is quite provisional
+  (defun shr-tag-section (dom)
+    (shr-ensure-paragraph)
+    (shr-generic dom)
+    (shr-ensure-paragraph))
+
+  (setq browse-url-browser-function 'browse-url-default-macosx-browser)
+  (defun jf/reader-visual ()
+    ;; A little bit of RSS beautification.
+    "A method to turn on visual line mode and adjust text scale."
+    (require 'olivetti)
+    (olivetti-mode 1)
+    (text-scale-set 2))
+  :bind (:map eww-mode-map ("U" . eww-up-url))
+  :bind (("C-s-o" . browse-url-at-point))
+  :hook ((eww-mode . jf/reader-visual)))
+
+(use-package stem-reading-mode
+  ;; A package that emboldens word stems, helping read a bit faster.
+  :straight t
+  :custom (stem-reading-overlay t))
+
 (require 'jf-versioning)
 (require 'jf-quick-help)
 (require 'jf-gaming)
 (require 'jf-blogging)
 (require 'jf-project)
 (require 'jf-menus)
-(require 'jf-capf-hacking)
-(require 'jf-experiments)
-(require 'git-related)
+
+(use-package qrencode
+  ;; https://github.com/ruediger/qrencode-el/
+  ;;
+  ;; Generate an plain text QRCode (or PNG but really why not use those
+  ;; UTF characters)
+  :straight t)
+
+(use-package pdf-tools
+  :pin manual ;; manually update
+  :straight t
+  :defer t
+  :ensure t
+  :config (pdf-tools-install)
+   ;; open pdfs scaled to fit page
+  (setq-default pdf-view-display-size 'fit-page)
+   ;; automatically annotate highlights
+  (setq pdf-annot-activate-created-annotations t)
+  ;; use normal isearch
+  (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward))
+
+(use-package org-noter
+  :straight t
+  :config (setq org-noter-doc-split-percentage '(0.67 . 0.33))
+  (org-noter-enable-update-renames)
+  (setq org-noter-notes-search-path '())
+  (dolist (path '("~/Library/CloudStorage/ProtonDrive-jeremy@jeremyfriesen.com/"
+                   "~/Documents/"))
+    (when (f-dir-p path)
+      ;; Add element to end of list.
+      (add-to-list 'org-noter-notes-search-path path t)))
+  (setq org-noter-default-notes-file-names
+    '("Notes.org")))
+
+(use-package avy-embark-collect
+  :after (avy embark)
+  :straight t)
+
 (require 'dig-my-grave)
 
 (load "~/git/dotemacs/emacs.d/random-tables-data.el")
@@ -1700,6 +2643,128 @@ literal then add a fuzzy search)."
       (org-insert-tilde-language . ruby)
       (org-insert-tilde-language . emacs-lisp)
       (encoding . utf-8))))
+
+(use-package paragraphs
+  :straight t
+  :bind (("M-[" . #'backward-paragraph)
+          ("s-[" . #'backward-paragraph)
+          ("M-]" . #'forward-paragraph)
+          ("s-]" . #'forward-paragraph)))
+
+(use-package transient
+  :straight (:type built-in)
+  :config
+  (transient-define-suffix jf/jump-to/agenda-local ()
+    "Jump to local agenda"
+    :description "Agenda (Local)"
+    (interactive)
+    (find-file jf/agenda-filename/local))
+
+  (transient-define-suffix jf/shr/toggle-images ()
+    "Toggle showing or hiding images"
+    :description (lambda ()
+                   (format "Show SHR Images (%s)"
+                     (if shr-inhibit-images " " "*")))
+    (interactive)
+    (setq shr-inhibit-images (not shr-inhibit-images)))
+
+  (transient-define-suffix jf/jump-to/code-backlog ()
+    "Jump to coding backlog"
+    :description "Capture Backlog"
+    (interactive)
+    (find-file jf/org-mode/capture/filename))
+
+  (transient-define-suffix jf/org-mode/add-description (description)
+    "Add Description to `org-mode'"
+    :description "Add Description…"
+    (interactive (list (read-string "Description: ")))
+    (when (jf/org-mode/blog-entry?)
+      (save-excursion
+        (goto-char (point-min))
+        (re-search-forward "^$")
+        (insert "\n#+DESCRIPTION: " description))))
+
+  (transient-define-suffix jf/org-mode/add-session-report (date game location)
+    "Add session report metadata (DATE, GAME, and LOCATION) to current buffer."
+    :description "Add Session…"
+    (interactive (list
+                   (org-read-date
+                     nil nil nil "Session Date")
+                   (completing-read
+                     "Game: " (jf/tor-game-list))
+                   (completing-read
+                     "Location: " jf/tor-session-report-location)))
+    (when (jf/org-mode/blog-entry?)
+      (save-excursion
+        (goto-char (point-min))
+        (re-search-forward "^$")
+        (insert "\n#+HUGO_CUSTOM_FRONT_MATTER: :sessionReport "
+          "'((date . \"" date "\") (game . \"" game "\") "
+          "(location . \"" location "\"))"))))
+
+  (defun jf/org-mode/blog-entry? (&optional buffer)
+    (when-let* ((buffer (or buffer (current-buffer)))
+                 (file (buffer-file-name buffer)))
+      (and (denote-file-is-note-p file)
+        (string-match-p "\\/blog-posts\\/" file))))
+
+  (transient-define-suffix jf/enable-indent-for-tab-command ()
+    :description "Enable `indent-for-tab-command'"
+    (interactive)
+    (keymap-global-set "TAB" #'indent-for-tab-command))
+  (transient-define-prefix jf/menu ()
+    "A context specific \"mega\" menu."
+    ;; Todo, can I get this section into a function so I can duplicate
+    ;; it in the jf/menu--tor?
+    [["Jump to"
+       ("j a" jf/jump-to/agenda-local)
+       ;; ("j c" "Capture Backlog" jf/jump-to/code-backlog)
+       ("j d" "Denote File" jf/jump_to_corresponding_denote_file :if-derived markdown-mode)
+       ("j g" "Global Mark" consult-global-mark)
+       ("j h" "Hugo File" jf/jump_to_corresponding_hugo_file :if-derived org-mode)
+       ("j m" "Mark" consult-mark)
+       ("j r" "Jump to Git Related" consult-git-related-find-file)
+       ("j l" "Jump to Magit Project Lists" magit-list-repositories)
+       ;; ("j s" "Jump to Shortdoc" shortdoc-display-group)
+       ;; ("j v" jf/jump-to/violet-board)
+       ]
+      ["Tasks"
+        ("n" "Github Notifications…" gh-notify)
+        ("s" "Search note content…" consult-notes-search-in-all-notes)
+        ("S" "Search note filename…" consult-notes)
+        ("C-t" "Start a timer…" tmr-with-description)
+        ("u" jf/org-mode/agenda-files-update)]
+      ["Denote"
+        ("d a" jf/project/add-project-path :if jf/denote?)
+        ("d c" jf/denote-org-capture/filename-set)
+        ("d p" jf/project/convert-document-to-project :if jf/denote?)
+        ]
+      ["Blogging"
+        ("b d" jf/org-mode/add-description :if jf/org-mode/blog-entry?)
+        ("b r" jf/org-mode/add-session-report :if jf/org-mode/blog-entry?)
+        ("b s" "Add Series…" jf/org-mode/add-series-to-file :if jf/org-mode/blog-entry?)
+        ("b x" "Export to TakeOnRules…" jf/export-org-to-tor :if jf/org-mode/blog-entry?)]]
+    [["Modes"
+       ;; I could write functions for these, but this is concise enough
+       ("m t" "Typopunct ( )" typopunct-mode :if-nil typopunct-mode)
+       ("m t" "Typopunct (*)" typopunct-mode :if-non-nil typopunct-mode)
+       ("m o" "MacOS Native Option ( )" jf/toggle-osx-alternate-modifier :if-non-nil ns-alternate-modifier)
+       ("m o" "MacOS Native Option (*)" jf/toggle-osx-alternate-modifier :if-nil ns-alternate-modifier)
+       ("m i" jf/shr/toggle-images)
+       ("TAB" jf/enable-indent-for-tab-command)
+       ]
+      ["Grab Refs"
+        ("g e" "Elfeed" jf/capture/denote/from/elfeed-show-entry :if-derived elfeed-show-mode)
+        ("g f" "Firefox" jf/menu--org-capture-firefox)
+        ("g s" "Safari" jf/menu--org-capture-safari)
+        ("g w" "Eww" jf/capture/denote/from/eww-data :if-derived eww-mode)
+        ]
+      ["Bookmark"
+        ("B s" "Safari" jf/menu--bookmark-safari)]])
+
+  ;; this suffix provides a dynamic description of the current host I want to use
+  ;; for my blog.  And the prefix’s function toggles the host.
+  :bind ("s-1" . #'jf/menu))
 
 (provide 'init)
   ;;; init.el ends here

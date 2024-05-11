@@ -10,22 +10,6 @@
 
 ;;; Code:
 
-;; The following function facilitates a best of both worlds.  By default, I
-;; want Option to be Meta (e.g. \"M-\") in Emacs.  However, I can toggle that
-;; setting.  That way if I need an umlaut (e.g., \"¨\"), I can use MacOS’s
-;; native functions to type \"⌥\" + \"u\".
-;;
-;; I like having MacOS’s native Option (e.g. =⌥=) modifier available.  But
-;; using that default in Emacs would be a significant hinderance.
-(defun jf/toggle-osx-alternate-modifier ()
-  "Toggle native OS-X Option modifier setting (e.g. `ns-alternate-modifier')."
-  (interactive)
-  (if ns-alternate-modifier
-    (progn (setq ns-alternate-modifier nil)
-      (message "Enabling OS X native Option modifier"))
-    (progn (setq ns-alternate-modifier 'meta)
-      (message "Disabling OX X native Option modifier (e.g. Option as Meta)"))))
-
 ;; I try to get quick feedback when writing emacs-lisp; the
 ;; `jf/eval-region-dwim' binds a mnemonic key sequence to an extend
 ;; `eval-region'.
