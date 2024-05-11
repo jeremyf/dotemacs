@@ -2454,35 +2454,33 @@ literal then add a fuzzy search)."
               ("C-c g" . doc-view-goto-page)))
 
 (use-package elfeed
-  ;; An Emacs RSS reader.  I’ve used Google Reader, Feedly, Inoreader, and
-  ;; Newsboat.  I wrote about
+  ;; An Emacs RSS reader.  I’ve used Google Reader, Feedly, Inoreader,
+  ;; and Newsboat.  I wrote about
   ;; https://takeonrules.com/2020/04/12/switching-from-inoreader-to-newsboat-for-rss-reader/,
   ;; and the principles apply for Elfeed.
   :straight t
-  :after org
-  :preface
+  ;; Without this, I was not seeing `rss' command.
+  :demand 3
+  :custom
+  (elfeed-curl-timeout 90)
+  (elfeed-db-directory "~/Documents/.elfeed")
+  :bind ((:map elfeed-search-mode-map
+           ("q" . jf/elfeed-save-db-and-bury)))
+  :config
+  (setq elfeed-show-entry-switch #'jf/elfeed-show-entry-switch)
+  (setq-default elfeed-search-filter "@2-days-ago +unread ")
   (defun jf/elfeed-show-entry-switch(buffer)
     (switch-to-buffer buffer)
     (setq-local shr-inhibit-images t)
     (olivetti-mode 1)
     (text-scale-set 2)
     (elfeed-show-refresh))
-  :custom
-  (elfeed-curl-timeout 90)
-  (elfeed-db-directory "~/Documents/.elfeed")
-  :config
-  (setq elfeed-show-entry-switch #'jf/elfeed-show-entry-switch)
-  (setq-default elfeed-search-filter "@2-days-ago +unread ")
-  :bind ((:map elfeed-search-mode-map
-           ("q" . jf/elfeed-save-db-and-bury)))
-  :config
   (defun jf/elfeed-save-db-and-bury ()
     "Wrapper to save the elfeed db to disk before burying buffer."
     ;;write to disk when quiting
     (interactive)
     (elfeed-db-save)
     (quit-window))
-
   (defun jf/elfeed-load-db-and-open ()
     "Load the elfeed db from disk before opening."
     (interactive)
