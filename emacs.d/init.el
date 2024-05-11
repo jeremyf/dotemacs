@@ -21,7 +21,8 @@
 ;; they do.
 (defvar bootstrap-version nil)
 (let ((bootstrap-file
-        (expand-file-name "straight/repos/straight.el/bootstrap.el" user-emacs-directory))
+        (expand-file-name "straight/repos/straight.el/bootstrap.el"
+          user-emacs-directory))
        (bootstrap-version 6))
   (unless (file-exists-p bootstrap-file)
     (with-current-buffer
@@ -60,20 +61,21 @@
       ;; Using Emacs.app/Contents/MacOS/bin since it was compiled with
       ;; ./configure --prefix="$PWD/nextstep/Emacs.app/Contents/MacOS"
       (add-to-list 'exec-path (concat invocation-directory "bin") t)
-      (setenv "LIBRARY_PATH" (concat (getenv "LIBRARY_PATH")
-                               (when (getenv "LIBRARY_PATH")
-                                 ":")
-                               ;; This is where Homebrew puts gcc libraries.
-                               (car (file-expand-wildcards
-                                      "/opt/homebrew/lib/gcc/*"))))
+      (setenv "LIBRARY_PATH"
+        (concat (getenv "LIBRARY_PATH")
+          (when (getenv "LIBRARY_PATH")
+            ":")
+          ;; This is where Homebrew puts gcc libraries.
+          (car (file-expand-wildcards
+                 "/opt/homebrew/lib/gcc/*"))))
       ;; Only set after LIBRARY_PATH can find gcc libraries.
       (setq comp-deferred-compilation t))
     (message "Native comp is *not* available")))
 
-;; These are some general configurations that I’ve slowly accumulated.  There’s
-;; inline documentation in most cases.  There might be little bits worth
-;; teasing out but for the most part, you can move along and reference this
-;; later.
+;; These are some general configurations that I’ve slowly accumulated.
+;; There’s inline documentation in most cases.  There might be little
+;; bits worth teasing out but for the most part, you can move along and
+;; reference this later.
 (setq user-full-name "Jeremy Friesen"
   user-mail-address "jeremy@jeremyfriesen.com")
 
@@ -127,8 +129,8 @@
   ;; Don't create lock files.  It's only me on this maching.
   create-lockfiles nil
 
-  ;; Instead of delete being gone forever, throw it in the trashbin which I must
-  ;; take out
+  ;; Instead of delete being gone forever, throw it in the trashbin
+  ;; which I must take out
   delete-by-moving-to-trash t
 
   ;; Automatically delete excess backups
@@ -220,7 +222,7 @@
       (progn (setq ns-alternate-modifier nil)
         (message "Enabling OS X native Option modifier"))
       (progn (setq ns-alternate-modifier 'meta)
-        (message "Disabling OX X native Option modifier (e.g. Option as Meta)"))))
+        (message "Disabling OX X native Option modifier"))))
   ;; Exposing one additional modifier key.
   (setq ns-right-command-modifier 'hyper
     ns-right-alternate-modifier 'meta))
@@ -244,7 +246,8 @@
 (add-to-list 'initial-frame-alist '(fullscreen . maximized))
 
 (tool-bar-mode -1) ;; Hide the icons of the Emacs toolbar
-(scroll-bar-mode -1) ;; Hide the scroll bar. Let's be clear, I don't use it.
+ ;; Hide the scroll bar. Let's be clear, I don't use it.
+(scroll-bar-mode -1)
 (defalias 'yes-or-no-p 'y-or-n-p) ;; Always "y" or "n" for yes/no
 
 (prefer-coding-system 'utf-8)
@@ -252,9 +255,9 @@
 (set-terminal-coding-system 'utf-8)
 (set-keyboard-coding-system 'utf-8)
 
-;; And I’m going to disable a few key bindings.  These were always messing me
-;; up a bit.  Also enable a few that I find helpful.  (I’ll enable a lot more
-;; later).
+;; And I’m going to disable a few key bindings.  These were always
+;; messing me up a bit.  Also enable a few that I find helpful.  (I’ll
+;; enable a lot more later).
 (unbind-key "C-z") ;; `suspend-frame'
 (unbind-key "C-c o") ;; was bound to open a file externally
 (unbind-key "C-x C-c") ;; was `save-buffers-kill-terminal'
@@ -306,48 +309,50 @@
   (push "/opt/homebrew/share/info" Info-directory-list))
 
 (use-package expand-region
-  ;; A simple package that does two related things really well; expands and
-  ;; contracts the current region.  I use this all the time.
+  ;; A simple package that does two related things really well; expands
+  ;; and contracts the current region.  I use this all the time.
   ;;
-  ;; In writing, with the cursor at point, when I expand it selects the word.
-  ;; The next expand the sentence, then paragraph, then page.  In programming it
-  ;; leverages sexp.
+  ;; In writing, with the cursor at point, when I expand it selects the
+  ;; word.  The next expand the sentence, then paragraph, then page.  In
+  ;; programming it leverages sexp.
   :straight (:host github :repo "jeremyf/expand-region.el")
   :bind (("C-=" . er/expand-region)
           ("C-+" . er/contract-region)))
 
 (use-package display-fill-column-indicator
-  ;; It's nice to have a gentle reminder showing me the recommended column width
-  ;; for the current buffer.
+  ;; It's nice to have a gentle reminder showing me the recommended
+  ;; column width for the current buffer.
   :straight (:type built-in)
   :hook (prog-mode . display-fill-column-indicator-mode))
 
 (use-package kind-icon
-  ;; This packages helps provide additional icons for functions and variables in
-  ;; the completion candidates.
+  ;; This packages helps provide additional icons for functions and
+  ;; variables in the completion candidates.
   :straight t
   :after corfu
   :custom
   (kind-icon-use-icons t)
-  (kind-icon-default-face 'corfu-default) ; Have background color be the same as
-                                        ; `corfu' face background
-  (kind-icon-blend-background nil)  ; Use midpoint color between foreground and
-                                        ; background colors ("blended")?
+  ;; Have background color be the same as `corfu' face background
+  (kind-icon-default-face 'corfu-default)
+  ;; Use midpoint color between foreground and background colors
+  ;; ("blended")?
+  (kind-icon-blend-background nil)
   (kind-icon-blend-frac 0.08)
-  ;; directory that defaults to the `user-emacs-directory'. Here, I change that
-  ;; directory to a location appropriate to `no-littering' conventions, a
-  ;; package which moves directories of other packages to sane locations.
-  ;; (svg-lib-icons-dir (no-littering-expand-var-file-name "svg-lib/cache/")) ;
-  ;; Change cache dir
+  ;; directory that defaults to the `user-emacs-directory'. Here, I
+  ;; change that directory to a location appropriate to `no-littering'
+  ;; conventions, a package which moves directories of other packages to
+  ;; sane locations.  (svg-lib-icons-dir
+  ;; (no-littering-expand-var-file-name "svg-lib/cache/")) ; Change
+  ;; cache dir
   :config
   ;; Enable-Recursive-Minibuffers `kind-icon'
   (add-to-list 'corfu-margin-formatters #'kind-icon-margin-formatter))
 
 (use-package lin
-  ;;  “LIN locally remaps the hl-line face to a style that is optimal for major
-  ;;  modes where line selection is the primary mode of interaction.”  In
-  ;;  otherwords, ~lin.el~ improves the highlighted line behavior for the
-  ;;  competing contexts.
+  ;;  “LIN locally remaps the hl-line face to a style that is optimal
+  ;;  for major modes where line selection is the primary mode of
+  ;;  interaction.”  In otherwords, ~lin.el~ improves the highlighted
+  ;;  line behavior for the competing contexts.
   :straight (lin :host gitlab :repo "protesilaos/lin")
   :init (global-hl-line-mode)
   :config (lin-global-mode 1)
@@ -372,7 +377,7 @@
   (defun jf/pulse (&optional parg)
     "Pulse the current line.
 
-  If PARG (given as universal prefix), pulse between `point' and `mark'."
+  When PARG pulse between `point' and `mark'."
     (interactive "P")
     (if (car parg)
       (pulsar--pulse nil nil (point) (mark))
@@ -380,9 +385,10 @@
   :bind (("C-c C-l" . jf/pulse)))
 
 (use-package rainbow-mode
-  ;; When I toggle on Rainbow mode, it colorizes the text that is color names
-  ;; and hex declarations (e.g. "#0000ff" ).  Most useful when working with CSS,
-  ;; but sometimes non-CSS files have those declarations as well.
+  ;; When I toggle on Rainbow mode, it colorizes the text that is color
+  ;; names and hex declarations (e.g. "#0000ff" ).  Most useful when
+  ;; working with CSS, but sometimes non-CSS files have those
+  ;; declarations as well.
   :straight t)
 
 (use-package rainbow-delimiters
@@ -391,31 +397,32 @@
   :hook ((prog-mode) . rainbow-delimiters-mode))
 
 (use-package recursion-indicator
-  ;; I vascilate between yes and no; but invariably find myself stuck in a
-  ;; recursed buffer.
+  ;; I vascilate between yes and no; but invariably find myself stuck in
+  ;; a recursed buffer.
   :straight t
   :config
   (setq enable-recursive-minibuffers t)
   (recursion-indicator-mode))
 
 (use-package vi-tilde-fringe
-  ;; Show tilde (e.g. ~\~~) on empty trailing lines.  This is a feature ported
-  ;; from https://en.wikipedia.org/wiki/Vi
+  ;; Show tilde (e.g. ~\~~) on empty trailing lines.  This is a feature
+  ;; ported from https://en.wikipedia.org/wiki/Vi
   :straight t
   :config (global-vi-tilde-fringe-mode))
 
 (use-package whole-line-or-region
-  ;; From the package commentary, “This minor mode allows functions to operate
-  ;; on the current line if they would normally operate on a region and region
-  ;; is currently undefined.”  I’ve used this for awhile and believe it’s not
-  ;; baked into my assumptions regarding how I navigate Emacs.
+  ;; From the package commentary, “This minor mode allows functions to
+  ;; operate on the current line if they would normally operate on a
+  ;; region and region is currently undefined.”  I’ve used this for
+  ;; awhile and believe it’s not baked into my assumptions regarding how
+  ;; I navigate Emacs.
   :straight t
   :config (whole-line-or-region-global-mode))
 
 (use-package keycast
   ;; When I turn on `keycast-mode-line' each key press will echo in the
-  ;; mode-line.  There are other options for logging which could be conceptually
-  ;; useful for feeding a macro.
+  ;; mode-line.  There are other options for logging which could be
+  ;; conceptually useful for feeding a macro.
   :straight t)
 
 (use-package vc-git
@@ -444,8 +451,6 @@
        (let ((name (buffer-name)))
          (propertize
            (if buffer-read-only
-             ;; TODO: <2024-03-09 Sat> Create mouse clickability to review
-             ;; filename
              (format " %s %s " (char-to-string #xE0A2) name)
              name)
            'face
@@ -454,7 +459,7 @@
              'mode-line-inactive)))))
 
   (defun jf/mode-line-format/major-mode-indicator ()
-    "Return appropriate propertized mode line indicator for the major mode."
+    "Return propertized mode line indicator for the major mode."
     (let ((indicator (cond
                        ((derived-mode-p 'text-mode) "§")
                        ((derived-mode-p 'prog-mode) "λ")
@@ -467,8 +472,10 @@
           'mode-line-inactive))))
 
   (defun jf/mode-line-format/major-mode-name ()
-    (propertize (capitalize (string-replace "-mode" "" (symbol-name major-mode)))
-      'face (if (mode-line-window-selected-p) 'mode-line 'mode-line-inactive)))
+    (propertize (capitalize
+                  (string-replace "-mode" "" (symbol-name major-mode)))
+      'face (if (mode-line-window-selected-p)
+              'mode-line 'mode-line-inactive)))
 
   (defvar-local jf/mode-line-format/major-mode
     '(:eval
@@ -489,7 +496,7 @@
          (propertize " Narrow " 'face 'mode-line-highlight))))
 
   (defvar jf/mode-line-format/vterm-map
-    (let ((map (make-sparse-keymap)))
+q    (let ((map (make-sparse-keymap)))
       (define-key map [mode-line down-mouse-1] #'vterm-copy-mode)
       map)
     "Keymap to display on `vterm' copy indicator.")
@@ -522,11 +529,15 @@
   (defvar-local jf/mode-line-format/vc-branch
     '(:eval
        (when-let* (((mode-line-window-selected-p))
-                    (file (if (equal major-mode 'dired-mode)
-                            default-directory
-                            (buffer-file-name)))
-                    (backend (or (vc-backend file) 'git))
-                    (branch (jf/mode-line-format/vc-branch-name file backend)))
+                    (file
+                      (if (equal major-mode 'dired-mode)
+                        default-directory
+                        (buffer-file-name)))
+                    (backend
+                      (or (vc-backend file) 'git))
+                    (branch
+                      (jf/mode-line-format/vc-branch-name
+                        file backend)))
          (jf/mode-line-format/vc-details file branch))))
 
   (defface jf/mode-line-format/face-shadow
@@ -611,8 +622,8 @@
           ("M-o" . ace-window)))
 
 (use-package avy
-  ;; Pick a letter, avy finds all words with that at the beginning of it.  Narrow
-  ;; results from there.
+  ;; Pick a letter, avy finds all words with that at the beginning of
+  ;; it.  Narrow results from there.
   :bind (("C-j" . avy-goto-char-timer))
   :straight t
   :config
@@ -669,9 +680,10 @@
     t))
 
 (use-package browse-at-remote
-  ;; Because I sometimes want to jump to the source code.  And in looking at
-  ;; this I learned about vc-annotate; a better blame than what I've had before.
-  ;; `bar-browse' is faster than `browse-at-remote'.
+  ;; Because I sometimes want to jump to the source code.  And in
+  ;; looking at this I learned about vc-annotate; a better blame than
+  ;; what I've had before.  `bar-browse' is faster than
+  ;; `browse-at-remote'.
   :straight t
   :bind
   ;; Note this is in the same prefix space as `link-hint'
@@ -691,8 +703,9 @@
 
 (use-package link-hint
   ;; I use this more and more and more.  Invoking `link-hint-open-link'
-  ;; highlights the visible URLs, providing quick keys to then open those URLs.
-  ;; If there's only one candidate, the function opens that URL.
+  ;; highlights the visible URLs, providing quick keys to then open
+  ;; those URLs.  If there's only one candidate, the function opens that
+  ;; URL.
   :straight t
   :bind
   ;; Note this is in the same prefix space as `browse-at-remote'
@@ -710,13 +723,13 @@ When given PREFIX use `eww-browse-url'."
 
 
 (use-package fontaine
-  ;; A narrow focus package for naming font configurations and then selecting
-  ;; them.
+  ;; A narrow focus package for naming font configurations and then
+  ;; selecting them.
   :straight t
   :config
   (setq fontaine-presets
-    ;; I'm naming the presets as "actions"; the mindset that I'm using when
-    ;; wanting that font.
+    ;; I'm naming the presets as "actions"; the mindset that I'm using
+    ;; when wanting that font.
     '((smallest
         :default-height 100)
        (smaller
@@ -767,40 +780,20 @@ When given PREFIX use `eww-browse-url'."
 
 (use-package all-the-icons
   ;; It's nice to see icons as a quick visual helper.
-  :straight t
-  ;; :config
-  ;; (cl-defmacro jf/all-the-icons--with(&key name)
-  ;;   "A macro to provide functions for icon names."
-  ;;   (let ((defun-fn (intern (concat "jf/all-the-icons--with-" name)))
-  ;;          (icon-fn (intern (concat "all-the-icons-" name)))
-  ;;          (docstring (concat
-  ;;                       "Displays an ICON from `all-the-icons-" name "'.")))
-  ;;     `(defun ,defun-fn (icon str &optional height v-adjust)
-  ;;        ,docstring
-  ;;        (s-concat (,icon-fn
-  ;;                    icon
-  ;;                    :v-adjust (or v-adjust 0)
-  ;;                    :height (or height 1))
-  ;;          " " str))))
-  ;; (jf/all-the-icons--with :name "faicon")
-  ;; (jf/all-the-icons--with :name "material")
-  ;; (jf/all-the-icons--with :name "octicon")
-  ;; (jf/all-the-icons--with :name "alltheicon")
-  )
+  :straight t)
 
 (use-package all-the-icons-dired
-  ;; Incorporates file icons with file listings of dired.  /Note/: On 2021-04-11
-  ;; I was getting the following error with this package: "*ERROR*: Symbol's
-  ;; value as variable is void: file"
+  ;; Incorporates file icons with file listings of dired.  /Note/: On
+  ;; 2021-04-11 I was getting the following error with this package:
+  ;; "*ERROR*: Symbol's value as variable is void: file"
   :straight t
   :after all-the-icons
   :hook (dired-mode . all-the-icons-dired-mode))
 
-;;;; Typography
 (use-package typopunct
-  ;; A package that provides some automatic replacement of strings of keys.  For
-  ;; example in text-mode, when I type three periods (e.g. “.”) typopunct
-  ;; replaces that with an ellipsis (e.g. “…”)
+  ;; A package that provides some automatic replacement of strings of
+  ;; keys.  For example in text-mode, when I type three periods
+  ;; (e.g. “.”) typopunct replaces that with an ellipsis (e.g. “…”)
   :straight t
   :custom (typopunct-buffer-language 'english)
   :config
@@ -879,17 +872,24 @@ When given PREFIX use `eww-browse-url'."
                      (typopunct-closing-quotation-mark lang))))
       (cond
         (mark-active
-          (let ((skeleton-end-newline nil)
-                 (singleo (typopunct-opening-single-quotation-mark lang))
-                 (singleq (typopunct-closing-single-quotation-mark lang)))
+          (let ((skeleton-end-newline
+                  nil)
+                 (singleo
+                   (typopunct-opening-single-quotation-mark lang))
+                 (singleq
+                   (typopunct-closing-single-quotation-mark lang)))
             (if (> (point) (mark))
               (exchange-point-and-mark))
             (save-excursion
-              (while (re-search-forward (regexp-quote (string omark)) (mark) t)
-                (replace-match (regexp-quote (string singleo)) nil nil)))
+              (while (re-search-forward
+                       (regexp-quote (string omark)) (mark) t)
+                (replace-match
+                  (regexp-quote (string singleo)) nil nil)))
             (save-excursion
-              (while (re-search-forward (regexp-quote (string qmark)) (mark) t)
-                (replace-match (regexp-quote (string singleq)) nil nil)))
+              (while (re-search-forward
+                       (regexp-quote (string qmark)) (mark) t)
+                (replace-match
+                  (regexp-quote (string singleq)) nil nil)))
             (skeleton-insert (list nil omark '_ qmark) -1)))
         ((looking-at (regexp-opt (list (string omark) (string qmark))))
           (forward-char 1))
@@ -949,7 +949,8 @@ This uses `split-window-right' but follows with the cursor."
          (display-buffer-no-window)
          (allow-no-window . t))
        ;; bottom side window
-       ("\\*Org \\(Select\\|Note\\)\\*" ; the `org-capture' key selection and `org-add-log-note'
+       ;; the `org-capture' key selection and `org-add-log-note'
+       ("\\*Org \\(Select\\|Note\\)\\*"
          (display-buffer-in-side-window)
          (dedicated . t)
          (side . bottom)
@@ -973,7 +974,8 @@ This uses `split-window-right' but follows with the cursor."
          (display-buffer-reuse-mode-window display-buffer-at-bottom))
        ;; below current window
        ("\\(\\*Capture\\*\\|CAPTURE-.*\\)"
-         (display-buffer-reuse-mode-window display-buffer-below-selected))
+         (display-buffer-reuse-mode-window
+           display-buffer-below-selected))
        ("\\*\\vc-\\(incoming\\|outgoing\\|git : \\).*"
          (display-buffer-reuse-mode-window display-buffer-below-selected)
          (window-height . 0.1)
@@ -992,13 +994,14 @@ This uses `split-window-right' but follows with the cursor."
                 (derived-mode . rg-mode)
                 (derived-mode . Buffer-menu-mode)
                 (derived-mode . log-view-mode)
-                (derived-mode . help-mode) ; See the hooks for `visual-line-mode'
+                (derived-mode . help-mode)
                 "\\*\\(|Buffer List\\|Occur\\|vc-change-log\\).*"))
          (prot-window-display-buffer-below-or-pop)
          (dedicated . t)
          (body-function . prot-window-select-fit-size))
        ("\\*\\(Calendar\\|Bookmark Annotation\\|ert\\).*"
-         (display-buffer-reuse-mode-window display-buffer-below-selected)
+         (display-buffer-reuse-mode-window
+           display-buffer-below-selected)
          (dedicated . t)
          (window-height . fit-window-to-buffer))
        ;; NOTE 2022-09-10: The following is for `ispell-word', though
@@ -1006,7 +1009,8 @@ This uses `split-window-right' but follows with the cursor."
        ;; with `prot-spell-ispell-display-buffer' and change the
        ;; value of `ispell-choices-buffer'.
        ("\\*ispell-top-choices\\*.*"
-         (display-buffer-reuse-mode-window display-buffer-below-selected)
+         (display-buffer-reuse-mode-window
+           display-buffer-below-selected)
          (window-height . fit-window-to-buffer))
        ;; same window
        ;; NOTE 2023-02-17: `man' does not fully obey the
@@ -1246,13 +1250,15 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
       #'tmr-sound-play
       #'jf/tmr-notification-notify))
   (tmr-timer-finished-functions
-    (list #'tmr-print-message-for-completed-timer #'tmr-sound-play #'jf/tmr-notification-notify) nil nil "Customized with use-package tmr")
+    (list #'tmr-print-message-for-completed-timer
+      #'tmr-sound-play #'jf/tmr-notification-notify)
+    nil nil "Customized with use-package tmr")
   :straight (:host github :type git
               :repo "protesilaos/tmr"))
 
 (use-package transient
-  ;; A package for creating turbo-charged menus.  It is the backbone for the
-  ;; menu-like dispatch of `magit' functionality.
+  ;; A package for creating turbo-charged menus.  It is the backbone for
+  ;; the menu-like dispatch of `magit' functionality.
   :straight t)
 
 (use-package ts
@@ -1281,11 +1287,11 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   :straight t)
 
 (use-package wgrep
-  ;; “Edit a grep buffer and apply those changes to the file buffer.”  In other
-  ;; words, after “searching” for something, sending the results to a buffer
-  ;; (via `embark-export' or such thing), you can edit that search results
-  ;; buffer and propogate the changes to the locations of the elements that
-  ;; matched the search.
+  ;; “Edit a grep buffer and apply those changes to the file buffer.”
+  ;; In other words, after “searching” for something, sending the
+  ;; results to a buffer (via `embark-export' or such thing), you can
+  ;; edit that search results buffer and propogate the changes to the
+  ;; locations of the elements that matched the search.
   ;;
   ;;   1.  Call `consult-ripgrep' (via ~C-c f~) to search for something.
   ;;   2.  Call `embark-export' (via ~C-s-e~) to export to a grep buffer.
@@ -1307,7 +1313,8 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   :custom (rg-keymap-prefix (kbd "C-c f"))
   :config (rg-enable-menu)
   ;; https://github.com/dajva/rg.el/issues/142 Give focus to *rg* buffer.
-  (add-to-list 'rg-finish-functions (lambda (buffer _) (pop-to-buffer buffer)))
+  (add-to-list 'rg-finish-functions
+    (lambda (buffer _) (pop-to-buffer buffer)))
 
   ;; Override the baseline rg-project to include files
   (rg-define-search rg-project
@@ -1356,7 +1363,46 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
           ("<C-s-return>" . crux-smart-open-line-above)
           ("C-s-k" . crux-kill-line-backwards)
           ("<s-backspace>" . crux-kill-line-backwards)
-          ("<f9>" . crux-kill-other-buffers)))
+          ("C-M-d" . jf/duplicate-current-line-or-lines-of-region)
+          ("C-c d" . jf/duplicate-current-line-or-lines-of-region)
+          ("<f12>" . jf/create-scratch-buffer))
+  :config
+  (cl-defun jf/create-scratch-buffer (&optional arg)
+    "Create `scratch' buffer; create `denote' scratch when ARG given."
+    ;; A simple wrapper around scratch, that helps name it and sets the
+    ;; major mode to `org-mode'.
+    (interactive "P")
+    (if (car arg)
+      (jf/denote/create-scratch (format-time-string "%Y-%m-%d Scratch"))
+      (progn
+        (crux-create-scratch-buffer)
+        (rename-buffer (concat "*scratch* at "
+                         (format-time-string "%Y-%m-%d %H:%M")))
+        (org-mode))))
+  (defun jf/duplicate-current-line-or-lines-of-region (arg)
+    "Duplicate current line region ARG times."
+    ;; Sometimes I just want to duplicate an area without copy and
+    ;; paste.  This helps that process.  It’s not as smart as TextMate’s
+    ;; equivalent function, but it’s close enough.
+    (interactive "p")
+    (if (use-region-p)
+      (progn
+        (when (> (point) (mark))
+          (exchange-point-and-mark))
+        (beginning-of-line)
+        (exchange-point-and-mark)
+        (end-of-line)
+        (goto-char (+ (point) 1))
+        (exchange-point-and-mark)
+        (let* ((end (mark))
+                (beg (point))
+                (region
+                  (buffer-substring-no-properties beg end)))
+          (dotimes (_i arg)
+            (goto-char end)
+            (insert region)
+            (setq end (point)))))
+      (crux-duplicate-current-line-or-region arg))))
 
 (use-package math-at-point
   ;; Sometimes you just want to do math
@@ -1412,17 +1458,22 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   :hook (text-mode . abbrev-mode))
 
 (use-package emacs
-  :bind ("C-M-i" . completion-at-point)
-  ("TAB" . indent-for-tab-command)
+  :bind (("C-M-i" . completion-at-point)
+          ("TAB" . indent-for-tab-command)
+          ("C-w" . jf/delete-region-or-backward-word)
+          ("M-DEL" . jf/delete-region-or-backward-word)
+          ("C-M-<backspace>" . backward-kill-paragraph))
   :custom
   (global-display-line-numbers-mode t)
   (column-number-mode t)
   (global-display-fill-column-indicator-mode t)
   (delete-selection-mode t)
-  (auto-save-file-name-transforms '((".*" "~/.emacs.d/autosaves/\\1" t)))
+  (auto-save-file-name-transforms
+    '((".*" "~/.emacs.d/autosaves/\\1" t)))
   :init
-  ;; Emacs 28: Hide commands in M-x which do not apply to the current mode.
-  ;; Corfu commands are hidden, since they are not supposed to be used via M-x.
+  ;; Emacs 28: Hide commands in M-x which do not apply to the current
+  ;; mode.  Corfu commands are hidden, since they are not supposed to be
+  ;; used via M-x.
   (setq read-extended-command-predicate
     #'command-completion-default-include-p)
   ;; TAB cycle if there are only few candidates
@@ -1446,7 +1497,39 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   ;; Do not allow the cursor in the minibuffer prompt
   (setq minibuffer-prompt-properties
     '(read-only t cursor-intangible t face minibuffer-prompt))
-  (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode))
+  (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
+  :config
+  (defun jf/auto-create-missing-dirs ()
+    "Ensure that we create directories along the new path."
+    ;; Ensure that we create the directories along the path of a new
+    ;; file I’m creating.  See
+    ;; https://emacsredux.com/blog/2022/06/12/auto-create-missing-directories/
+    (let ((target-dir (file-name-directory buffer-file-name)))
+      (unless (file-exists-p target-dir)
+        (make-directory target-dir t))))
+
+  (add-to-list 'find-file-not-found-functions
+    #'jf/auto-create-missing-dirs)
+
+  (defun jf/filename/tilde-based (filename)
+    "Return ~/ relative FILENAME."
+    (string-replace (getenv "HOME") "~"
+      (if (consp filename) (cadr filename) filename)))
+  (defun jf/delete-region-or-backward-word (&optional arg)
+    "Delete region or delete backwards the ARG number of words."
+    (interactive "p")
+    (if (region-active-p)
+      (delete-region (region-beginning) (region-end))
+      (jf/delete-word (- arg))))
+
+  (defun jf/delete-word (arg)
+    "Delete characters forward until encountering the end of a word.
+
+    With ARG, do this that many times."
+    (interactive "p")
+    (if (use-region-p)
+      (delete-region (region-beginning) (region-end))
+      (delete-region (point) (progn (forward-word arg) (point))))))
 
 (use-package embark
   ;; The "missing" context menu; a bit like the right-click but more.
@@ -1468,8 +1551,8 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
     embark-become-indicator embark-action-indicator))
 
 (use-package consult
-  ;; Extensions for the numerous `completing-read' functions.  Highly extensible
-  ;; and customizable.
+  ;; Extensions for the numerous `completing-read' functions.  Highly
+  ;; extensible and customizable.
   :straight t
   ;; Replace bindings. Lazily loaded due by `use-package'.
   :bind (;; C-c bindings (mode-specific-map)
@@ -1520,7 +1603,8 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
           ;; Customizations that map to ivy
           ("C-c r" . consult-recent-file)
           ;; ("C-c o" . consult-file-externally)
-          ("C-s" . consult-line) ;; I've long favored Swiper mapped to c-s
+          ;; I've long favored Swiper mapped to c-s
+          ("C-s" . consult-line)
           ;; Isearch integration
           ("M-s e" . consult-isearch-history)
           :map isearch-mode-map
@@ -1533,39 +1617,39 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   ;; Use Consult to select xref locations with preview
   (setq xref-show-xrefs-function #'consult-xref
     xref-show-definitions-function #'consult-xref)
-  ;; Optionally configure the register formatting. This improves the register
-  ;; preview for `consult-register', `consult-register-load',
+  ;; Optionally configure the register formatting. This improves the
+  ;; register preview for `consult-register', `consult-register-load',
   ;; `consult-register-store' and the Emacs built-ins.
   (setq register-preview-delay 0.5
     register-preview-function #'consult-register-format)
-  ;; Optionally tweak the register preview window.
-  ;; This adds thin lines, sorting and hides the mode line of the window.
+  ;; Optionally tweak the register preview window.  This adds thin
+  ;; lines, sorting and hides the mode line of the window.
   (advice-add #'register-preview :override #'consult-register-window)
   :custom
   (consult-narrow-key "<")
   ;; Updating the default to include "--smart-case"
   ;; Leveraging ripgrep-all https://github.com/phiresky/ripgrep-all
   (consult-ripgrep-command
-    (concat "rg --null --hidden --line-buffered --color=ansi --max-columns=1000 "
+    (concat "rg --null --hidden --line-buffered --color=ansi "
+      "--max-columns=1000 --follow "
       "--smart-case --no-heading --line-number --no-ignore-vcs "
-      "--follow "
-      "--glob !vendor/ --glob !coverage/ --glob !**/tmp/ --glob !**/log/ "
+      "--glob !vendor/ --glob !coverage/ --glob !**/tmp/ "
       "--glob !public/ --glob !node_modules/ --glob !.git/ --glob !doc/ "
-      "--glob !.yardoc/ --glob !.byebug_history "
+      "--glob !.yardoc/ --glob !.byebug_history --glob !**/log/ "
       " . -e ARG OPTS"))
   (consult-ripgrep-args
-    (concat "rg --null --hidden --line-buffered --color=never --max-columns=1000 "
+    (concat "rg --null --hidden --line-buffered --color=never "
+      "--max-columns=1000 --follow"
       "--path-separator / --no-ignore-vcs --smart-case --no-heading "
-      "--follow "
-      "--glob !vendor/ --glob !coverage/ --glob !**/tmp/ --glob !**/log/ "
+      "--glob !vendor/ --glob !coverage/ --glob !**/tmp/ "
       "--glob !public/ --glob !node_modules/ --glob !.git/ --glob !doc/ "
-      "--glob !.yardoc/ --glob !.byebug_history "
+      "--glob !.yardoc/ --glob !.byebug_history  --glob !**/log/ "
       "--line-number "))
   ;; Configure other variables and modes in the :config section,
   ;; after lazily loading the package.
   :preface
   (defun jf/consult-imenu (prefix)
-    "Call `consult-imenu' or when PREFIX is given call `consult-imenu-multi'."
+    "Call `consult-imenu' or `consult-imenu-multi' when PREFIX given."
     (interactive "P")
     (if (car prefix)
       (consult-imenu-multi)
@@ -1594,7 +1678,8 @@ With a PREFIX jump to the agenda without starting the clock."
   (consult-customize
     consult-line consult-ripgrep consult-find
     :initial (when (use-region-p)
-               (buffer-substring-no-properties (region-beginning) (region-end))))
+               (buffer-substring-no-properties
+                 (region-beginning) (region-end))))
   (autoload 'projectile-project-root "projectile")
   (setq consult-project-root-function #'projectile-project-root)
 
@@ -1620,8 +1705,8 @@ With a PREFIX jump to the agenda without starting the clock."
                   (?m "Method" font-lock-function-name-face))))))
 
 (use-package embark-consult
-  ;; I use ~embark.el~ and ~consult.el~, let’s add a little bit more connective
-  ;;  tissue.
+  ;; I use ~embark.el~ and ~consult.el~, let’s add a little bit more
+  ;;  connective tissue.
   :straight t
   :after (embark consult)
   :demand t ; only necessary if you have the hook below
@@ -1631,10 +1716,10 @@ With a PREFIX jump to the agenda without starting the clock."
   (embark-collect-mode . consult-preview-at-point-mode))
 
 (use-package consult-dir
-  ;; This package helps ease traveling across directories by providing directory
-  ;; candidates related to current buffers, bookmarks, and projects.  Further,
-  ;; like other ~consult.el~ functions, you can use narrowing keys.  See
-  ;; https://github.com/karthink/consult-dir.
+  ;; This package helps ease traveling across directories by providing
+  ;; directory candidates related to current buffers, bookmarks, and
+  ;; projects.  Further, like other ~consult.el~ functions, you can use
+  ;; narrowing keys.  See https://github.com/karthink/consult-dir.
   :straight t
   :after (consult)
   :bind (("C-x C-d" . consult-dir)
@@ -1643,11 +1728,12 @@ With a PREFIX jump to the agenda without starting the clock."
           ("C-x C-j" . consult-dir-jump-file)))
 
 (use-package consult-projectile
-  ;; package provides a function I use everyday: ~M-x consult-projectile~.  When
-  ;; I invoke ~consult-projectile~, I have the file completion for the current
-  ;; project.  I can also type =b= + =SPACE= to narrow my initial search to open
-  ;; buffers in the project.  Or =p= + =space= to narrow to other projects; and
-  ;; then select a file within that project.
+  ;; package provides a function I use everyday: ~M-x
+  ;; consult-projectile~.  When I invoke ~consult-projectile~, I have
+  ;; the file completion for the current project.  I can also type =b= +
+  ;; =SPACE= to narrow my initial search to open buffers in the project.
+  ;; Or =p= + =space= to narrow to other projects; and then select a
+  ;; file within that project.
   :commands (consult-projectile)
   :bind (("C-x 4 p" . consult-projectile-find-file-other-window)
           ("M-s r" . consult-ripgrep)
@@ -1660,8 +1746,8 @@ With a PREFIX jump to the agenda without starting the clock."
 
 
   :config
-  ;; I want recent files as well as project files as well as recent project
-  ;; files...Hence the override fb
+  ;; I want recent files as well as project files as well as recent
+  ;; project files...Hence the override fb
   (setq jf/consult--source-recent-file consult--source-recent-file)
   (plist-put jf/consult--source-recent-file :narrow ?R)
   (plist-put jf/consult--source-recent-file :name "Recent File")
@@ -1687,24 +1773,27 @@ With a PREFIX jump to the agenda without starting the clock."
   (defun consult-find-file-with-preview (prompt &optional dir default mustmatch initial pred)
     (interactive)
     (let ((default-directory (or dir default-directory)))
-      (consult--read #'read-file-name-internal :state (consult--file-preview)
+      (consult--read #'read-file-name-internal
+        :state (consult--file-preview)
         :prompt prompt
         :initial initial
         :require-match mustmatch
         :predicate pred)))
   :bind
-  ;;; This overwrite `ns-open-file-using-panel'; the operating system's "Finder"
+  ;;; This overwrite `ns-open-file-using-panel'; the operating system's
+  ;;; "Finder"
   ;; ("C-c o" . consult-projectile)
-  ;;; I have long had Cmd+t mapped to opening project files; however, I'm
-  ;;; noticing the way I'm typing this and it is feeling wrong.  So now I won't
-  ;;; have that way open.
+  ;;; I have long had Cmd+t mapped to opening project files; however,
+  ;;; I'm noticing the way I'm typing this and it is feeling wrong.  So
+  ;;; now I won't have that way open.
   ("s-t" . consult-projectile)
   ("s-p" . consult-projectile)
   ("H-t" . consult-projectile)
   ("H-p" . consult-projectile))
 
 (use-package corfu
-  ;; Completion overlay; a narrower intreface than the more verbose company.
+  ;; Completion overlay; a narrower intreface than the more verbose
+  ;; company.
   :straight t
   ;; Optionally use TAB for cycling, default is `corfu-complete'.
   :bind (:map corfu-map
@@ -1717,23 +1806,23 @@ With a PREFIX jump to the agenda without starting the clock."
           ("S-TAB" . corfu-previous)
           ([backtab] . corfu-previous))
   :custom
-  ;; Works with `indent-for-tab-command'. Make sure tab doesn't indent when you
-  ;; want to perform completion
+  ;; Works with `indent-for-tab-command'. Make sure tab doesn't indent
+  ;; when you want to perform completion
   (tab-always-indent 'complete)
   (completion-cycle-threshold nil)      ; Always show candidates in menu
   (corfu-auto nil)
   (corfu-auto-prefix 2)
   (corfu-auto-delay 0.25)
   ;; (corfu-min-width 80)
-  ;; (corfu-max-width corfu-min-width)     ; Always have the same width
+  ;; (corfu-max-width corfu-min-width) ; Always have the same width
   (corfu-count 14)
   (corfu-scroll-margin 4)
   (corfu-cycle nil)
-  ;; (corfu-echo-documentation nil)        ; Already use corfu-doc
-  (corfu-separator ?\s)                 ; Necessary for use with orderless
+  ;; (corfu-echo-documentation nil)  ; Already use corfu-doc
+  (corfu-separator ?\s)              ; Necessary for use with orderless
   (corfu-quit-no-match 'separator)
-  (corfu-preview-current 'insert)       ; Preview current candidate?
-  (corfu-preselect-first t)             ; Preselect first candidate?
+  (corfu-preview-current 'insert)    ; Preview current candidate?
+  (corfu-preselect-first t)          ; Preselect first candidate?
   :preface
   (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster)
   (defun corfu-move-to-minibuffer ()
@@ -1741,7 +1830,8 @@ With a PREFIX jump to the agenda without starting the clock."
 Useful if you want a more robust view into the recommend candidates."
     (interactive)
     (let (completion-cycle-threshold completion-cycling)
-      (apply #'consult-completion-in-region completion-in-region--data)))
+      (apply #'consult-completion-in-region
+        completion-in-region--data)))
   (defun corfu-enable-always-in-minibuffer ()
   "Enable Corfu in the minibuffer if Vertico/Mct are not active."
   (unless (or (bound-and-true-p mct--active)
@@ -1752,7 +1842,8 @@ Useful if you want a more robust view into the recommend candidates."
                 corfu-popupinfo-delay nil)
     (corfu-mode 1)))
   :config
-  (add-hook 'minibuffer-setup-hook #'corfu-enable-always-in-minibuffer 1)
+  (add-hook 'minibuffer-setup-hook
+    #'corfu-enable-always-in-minibuffer 1)
   :init
   ;; (corfu-indexed-mode)
   ;; Recommended: Enable Corfu globally.
@@ -1771,8 +1862,8 @@ Useful if you want a more robust view into the recommend candidates."
   (corfu-popupinfo-mode))
 
 (use-package cape
-  ;; Completion at point functions, with the amazing `cape-capf-super' for
-  ;; granular configuration of specific mode completion behavior.
+  ;; Completion at point functions, with the amazing `cape-capf-super'
+  ;; for granular configuration of specific mode completion behavior.
   :straight t
   :init
   (add-to-list 'completion-at-point-functions #'cape-dabbrev)
@@ -1810,13 +1901,13 @@ Useful if you want a more robust view into the recommend candidates."
   ;; Help me lookup definitions and details.
   :init
   (use-package transient :straight t)
-  ;; I'm going to talk about this later, but I'm adding this to the menu, so I
-  ;; may as well state the dependency.
+  ;; I'm going to talk about this later, but I'm adding this to the
+  ;; menu, so I may as well state the dependency.
   (use-package embark :straight t)
   :straight t
   :config
   (transient-define-prefix jf/helpful-menu ()
-    "Return a `transient' compliant list to apply to different transients."
+    "Return a `transient' list to apply to different transients."
     ["Help"
       ""
       ("Q" "Kill Helpful Buffers" helpful-kill-buffers)
@@ -1826,7 +1917,9 @@ Useful if you want a more robust view into the recommend candidates."
       ("d" "Definition" sdcv-search)
       ("D" "Docs" devdocs-lookup)
       ("f" "Function (interactive)" helpful-callable)
+
       ("F" "Function (all)" helpful-function)
+      ("i" "Info" info)
       ("k" "Key" helpful-key)
       ("l" "Library" find-library)
       ("m" "Macro" helpful-macro)
@@ -1838,62 +1931,66 @@ Useful if you want a more robust view into the recommend candidates."
   ("C-s-h" . jf/helpful-menu))
 
 (use-package hippie-exp
-  ;; A composable expansion tool that I find compliments `corfu' in that it
-  ;; looks in a different manner for completions.
+  ;; A composable expansion tool that I find compliments `corfu' in that
+  ;; it looks in a different manner for completions.
   ;;
-  ;; TODO: Perhaps I should spend a bit time investigating removing `hippie-exp'
-  ;; in favor of `corfu' and `cape' behavior.  Definitely spend a bit of time exploring
-  ;; this option.
+  ;; TODO: Perhaps I should spend a bit time investigating removing
+  ;; `hippie-exp' in favor of `corfu' and `cape' behavior.  Definitely
+  ;; spend a bit of time exploring this option.
   :straight t
   :config
-  (setq hippie-expand-try-functions-list '(try-expand-dabbrev-visible
-                                            try-expand-dabbrev
-                                            try-expand-dabbrev-all-buffers
-                                            try-expand-dabbrev-from-kill
-                                            try-complete-file-name
-                                            try-complete-file-name-partially
-                                            try-expand-all-abbrevs
-                                            try-expand-list
-                                            try-expand-line
-                                            try-complete-lisp-symbol-partially
-                                            try-complete-lisp-symbol))
+  (setq hippie-expand-try-functions-list
+    '(try-expand-dabbrev-visible
+       try-expand-dabbrev
+       try-expand-dabbrev-all-buffers
+       try-expand-dabbrev-from-kill
+       try-complete-file-name
+       try-complete-file-name-partially
+       try-expand-all-abbrevs
+       try-expand-list
+       try-expand-line
+       try-complete-lisp-symbol-partially
+       try-complete-lisp-symbol))
   :bind (("M-SPC" . hippie-expand))
   :init (global-set-key [remap dabbrev-expand] 'hippie-expand))
 
 (use-package marginalia
-  ;; Given that my blog has lots of "writing in the margins" this is the package
-  ;; for me.
+  ;; Given that my blog has lots of "writing in the margins" this is the
+  ;; package for me.
   ;;
-  ;; It provides annotations for completions; in particular I rely on showing
-  ;; the docstring of `M-x' results.
+  ;; It provides annotations for completions; in particular I rely on
+  ;; showing the docstring of `M-x' results.
   :straight t
-  :config (setq marginalia-max-relative-age 0) ;; Set absolute value
+  :config (setq marginalia-max-relative-age 0)
   ;; /Note:/ The declaration of `marginalia-mode' must be in the :init
-  ;; section.This ensures that it is enabled right away.  It also forces the
-  ;; loading of the package.
+  ;; section.This ensures that it is enabled right away.  It also forces
+  ;; the loading of the package.
   :init (marginalia-mode))
 
 (use-package orderless
-  ;; The https://github.com/minad/orderless package provides completion tooling
-  ;; for non-strict word order.  I spent considerable time reading through the
-  ;; https://github.com/minad/consult/wiki
+  ;; The https://github.com/minad/orderless package provides completion
+  ;; tooling for non-strict word order.  I spent considerable time
+  ;; reading through the https://github.com/minad/consult/wiki
   ;;
-  ;; As configured the orderless completion recognizes the following “switches”:
+  ;; As configured the orderless completion recognizes the following
+  ;; “switches”:
   ;;
-  ;; - Flex (~\~~) :: Just start typing characters and you’ll get matches that
-  ;;   have those characters
+  ;; - Flex (~\~~) :: Just start typing characters and you’ll get
+  ;;   matches that have those characters
   ;; - File Extension (~\.ext~) :: Match files with this extension.
   ;; - Regexp ~^.$~ :: Use some regular expression syntax
   ;;   - ~^~ matching beginning
   ;;   - ~.~ any ol’ character
   ;;   - ~$~ matching ending
-  ;; - Initialism (~`~) :: In ~M-x~ when I typed ~`pl~ the ~previous-line~
-  ;;   function was a top match.  The initialism switch “explodes” the
-  ;;   characters and says match methods who’s words start with those
-  ;;   characters.
+  ;; - Initialism (~`~) :: In ~M-x~ when I typed ~`pl~ the
+  ;;   ~previous-line~ function was a top match.  The initialism switch
+  ;;   “explodes” the characters and says match methods who’s words
+  ;;   start with those characters.
   ;; - Not Literal ~!~ :: Exclude candidates that match the literal
-  ;;   (e.g. ~!previous~ won’t show ~previous-line~ in the ~M-x~ completion).
-  ;; - Literal ~=~ :: No “fuzzy buziness”, just match exactly what I typed.
+  ;;   (e.g. ~!previous~ won’t show ~previous-line~ in the ~M-x~
+  ;;   completion).
+  ;; - Literal ~=~ :: No “fuzzy buziness”, just match exactly what I
+  ;; - typed.
   ;;
   ;; There is another case (e.g. ~%~ character fold) that I don’t yet
   ;; understand.
@@ -1907,8 +2004,8 @@ Useful if you want a more robust view into the recommend candidates."
        (?~ . orderless-flex)))
   (defun +orderless-dispatch (pattern index _total)
     (cond
-      ;; Ensure that $ works with Consult commands, which add disambiguation
-      ;; suffixes
+      ;; Ensure that $ works with Consult commands, which add
+      ;; disambiguation suffixes
       ((string-suffix-p "$" pattern)
         `(orderless-regexp . ,(concat (substring pattern 0 -1)
                                 "[\x100000-\x10FFFD]*$")))
@@ -1934,41 +2031,44 @@ Useful if you want a more robust view into the recommend candidates."
     (orderless-matching-styles '(orderless-initialism
                                   orderless-literal
                                   orderless-regexp)))
-  ;; Certain dynamic completion tables (completion-table-dynamic) do not work
-  ;; properly with orderless. One can add basic as a fallback.  Basic will only
-  ;; be used when orderless fails, which happens only for these special tables.
+  ;; Certain dynamic completion tables (completion-table-dynamic) do not
+  ;; work properly with orderless. One can add basic as a fallback.
+  ;; Basic will only be used when orderless fails, which happens only
+  ;; for these special tables.
   (setq completion-styles '(orderless basic)
     completion-category-defaults nil
-          ;;; Enable partial-completion for files.
-          ;;; Either give orderless precedence or partial-completion.
-          ;;; Note that completion-category-overrides is not really an override,
+          ;;; Enable partial-completion for files.  Either give
+          ;;; orderless precedence or partial-completion.  Note that
+          ;;; completion-category-overrides is not really an override,
           ;;; but rather prepended to the default completion-styles.
     ;; completion-category-overrides '((file (styles orderless
     ;; partial-completion))) ;; orderless is tried first
-    completion-category-overrides '((file
-                                      (styles partial-completion))
-                                     ;; enable initialism by default for symbols
-                                     (command
-                                       (styles +orderless-with-initialism))
-                                     (variable
-                                       (styles +orderless-with-initialism))
-                                     (symbol
-                                       (styles +orderless-with-initialism))
-                                     (eglot
-                                       (styles orderless)))
+    completion-category-overrides
+    '((file
+        (styles partial-completion))
+       ;; enable initialism by default for symbols
+       (command
+         (styles +orderless-with-initialism))
+       (variable
+         (styles +orderless-with-initialism))
+       (symbol
+         (styles +orderless-with-initialism))
+       (eglot
+         (styles orderless)))
     orderless-component-separator #'orderless-escapable-split-on-space
     orderless-style-dispatchers '(+orderless-dispatch)))
 
 (use-package org-mac-link
   ;; Similar to `grab-mac-link' but a bit specific to `org-mode'.
-  :straight (org-mac-link :type git :host github :repo "jeremyf/org-mac-link")
+  :straight (org-mac-link :type git
+              :host github :repo "jeremyf/org-mac-link")
   :bind (:map org-mode-map (("C-c g" . org-mac-grab-link))))
 
 (use-package tempel
   ;; For awhile, I'd used yasnippets; themselves inspired by my beloved
-  ;; TextMate.  However, I've found `tempel' to be both more than adequate and
-  ;; has a narrower implementation foot-print, cleaving closer to emacs-lisp;
-  ;; thus likely easing it's maintenance burden.
+  ;; TextMate.  However, I've found `tempel' to be both more than
+  ;; adequate and has a narrower implementation foot-print, cleaving
+  ;; closer to emacs-lisp; thus likely easing it's maintenance burden.
   :straight (tempel :host github :repo "minad/tempel")
   :custom (tempel-path "~/git/dotemacs/templates")
   :config (global-tempel-abbrev-mode)
@@ -1979,7 +2079,10 @@ Useful if you want a more robust view into the recommend candidates."
   :preface
   (cl-defun jf/org-macro-value-list (macro-name &key (dir org-directory))
     "List the unique inner text of all uses of MACRO-NAME in given DIR."
-    (let ((path (if current-prefix-arg dir (or (buffer-file-name (current-buffer)) dir))))
+    (let ((path
+            (if current-prefix-arg
+              dir
+              (or (buffer-file-name (current-buffer)) dir))))
       (s-split
         "\n"
         (s-trim
@@ -1993,12 +2096,12 @@ Useful if you want a more robust view into the recommend candidates."
               " | sort | uniq"))))))
   ;; Setup completion at point
   (defun tempel-setup-capf ()
-    ;; Add the Tempel Capf to `completion-at-point-functions'. `tempel-expand'
-    ;; only triggers on exact matches. Alternatively use `tempel-complete' if
-    ;; you want to see all matches, but then Tempel will probably trigger too
-    ;; often when you don't expect it.
-    ;; NOTE: We add `tempel-expand' *before* the main programming mode Capf,
-    ;; such that it will be tried first.
+    ;; Add the Tempel Capf to
+    ;; `completion-at-point-functions'. `tempel-expand' only triggers on
+    ;; exact matches. Alternatively use `tempel-complete' if you want to
+    ;; see all matches, but then Tempel will probably trigger too often
+    ;; when you don't expect it.  NOTE: We add `tempel-expand' *before*
+    ;; the main programming mode Capf, such that it will be tried first.
     (setq-local completion-at-point-functions
       (cons #'tempel-expand
         completion-at-point-functions)))
@@ -2018,18 +2121,18 @@ Useful if you want a more robust view into the recommend candidates."
   (tempel-key "H-m k" macro-keyboard org-mode-map))
 
 (use-package vertico
-  ;; Another one of minad's packages which improves my day to day experience.  I
-  ;; find the user experience wonderful when pairing vertical candidate
-  ;; selection with `marginalia' and then having the `vertico-indexed-mode'
-  ;; option for quick numerical selection.
+  ;; Another one of minad's packages which improves my day to day
+  ;; experience.  I find the user experience wonderful when pairing
+  ;; vertical candidate selection with `marginalia' and then having the
+  ;; `vertico-indexed-mode' option for quick numerical selection.
   :straight (:type git :host github :repo "minad/vertico")
   :bind (:map vertico-map
           (("<tab>" . #'vertico-insert)
             ("<escape>" . #'minibuffer-keyboard-quit)
             ("M-p" . #'previous-history-element)
             ("M-n" . #'next-history-element)
-            ;; I've been using more groupings, and being able to move through
-            ;; those is nice.
+            ;; I've been using more groupings, and being able to move
+            ;; through those is nice.
             ("C-M-n" . #'vertico-next-group)
             ("C-M-p" . #'vertico-previous-group)
             ("C-SPC" . #'jf/vertico-restrict-to-matches)))
@@ -2072,19 +2175,18 @@ literal then add a fuzzy search)."
     nil
     jf/silence-loading-log)
   (keymap-global-set "M-r" #'vertico-repeat)
-  ;; When I type ~/ in the `find-file' selector, then it will clear the existing
-  ;; path and go to ~/
-  ;; From Prot's video presentation
+  ;; When I type ~/ in the `find-file' selector, then it will clear the
+  ;; existing path and go to ~/ From Prot's video presentation
   (add-hook 'rfn-eshadow-update-overlay-hook #'vertico-directory-tidy)
   (add-hook 'minibuffer-setup-hook #'vertico-repeat-save))
 
 (use-package which-key
-  ;; This package helps me begin typing a key sequence and seeing what options
-  ;; are available to complete the sequence.
+  ;; This package helps me begin typing a key sequence and seeing what
+  ;; options are available to complete the sequence.
   ;;
-  ;; For example, I type "C-c", wait a moment and get a menu that shows me what
-  ;; key bindings start with "C-c"; and then I can type the following key and
-  ;; execute that command.
+  ;; For example, I type "C-c", wait a moment and get a menu that shows
+  ;; me what key bindings start with "C-c"; and then I can type the
+  ;; following key and execute that command.
   :straight t
   :custom
   (which-key-side-window-max-width 0.5)
@@ -2104,7 +2206,7 @@ literal then add a fuzzy search)."
   :straight t
   :config
   (defun --set-emoji-font (frame)
-    "Adjust the font settings of FRAME so Emacs can display emoji properly."
+    "Adjust font settings of FRAME so Emacs can display emoji properly."
     (if (eq system-type 'darwin)
   ;; For NS/Cocoa
   (set-fontset-font t
@@ -2120,15 +2222,16 @@ literal then add a fuzzy search)."
       'prepend)))
   ;; For when Emacs is started in GUI mode:
   (--set-emoji-font nil)
-  ;; Hook for when a frame is created with emacsclient
-  ;; see https://www.gnu.org/software/emacs/manual/html_node/elisp/Creating-Frames.html
+  ;; Hook for when a frame is created with emacsclient see
+  ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Creating-Frames.html
   (add-hook 'after-make-frame-functions '--set-emoji-font))
 
 (use-package sdcv-mode
   ;; This follows from
   ;; http://mbork.pl/2017-01-14_I'm_now_using_the_right_dictionary
   ;;
-  ;; Namely I want to use a more inspiring dictionary for the poetry and prose.
+  ;; Namely I want to use a more inspiring dictionary for the poetry and
+  ;; prose.
   :straight (sdcv-mode :type git :host github :repo "gucong/emacs-sdcv")
   :bind ("C-c C-'" . sdcv-search))
 
@@ -2139,10 +2242,10 @@ literal then add a fuzzy search)."
   :config (unicode-fonts-setup))
 
 (use-package unfill
-  ;; Provides the reverse of ~fill-paragraph~, and a toggle fill and unfill.  In
-  ;; fact, the unfill/fill function of Emacs was the first editor function I saw
-  ;; (shown to me by a friend in 2005) that had me strongly consider Emacs. Alas
-  ;; I was not prepared for Emacs.
+  ;; Provides the reverse of ~fill-paragraph~, and a toggle fill and
+  ;; unfill.  In fact, the unfill/fill function of Emacs was the first
+  ;; editor function I saw (shown to me by a friend in 2005) that had me
+  ;; strongly consider Emacs. Alas I was not prepared for Emacs.
   :bind ("M-q" . unfill-toggle)
   :straight t)
 
@@ -2158,9 +2261,9 @@ literal then add a fuzzy search)."
          ([C-s-up] . move-text-up)))
 
 (use-package titlecase
-  ;; The rules of “titlecase” are confounding.  The ~titlecase.el~ package
-  ;; provides numerous ways to cast a string to “titlecase.”  I chose wikipedia
-  ;; style as a quasi-opinionated compromise.
+  ;; The rules of “titlecase” are confounding.  The ~titlecase.el~
+  ;; package provides numerous ways to cast a string to “titlecase.”  I
+  ;; chose wikipedia style as a quasi-opinionated compromise.
   :straight (titlecase :host github :repo "duckwork/titlecase.el")
   :custom (titlecase-style 'wikipedia))
 
@@ -2176,8 +2279,8 @@ literal then add a fuzzy search)."
   :straight t)
 
 (use-package iedit
-  ;; Type \"C-;\" to select current symbol and all matches; Then edit at multiple
-  ;; points.
+  ;; Type \"C-;\" to select current symbol and all matches; Then edit at
+  ;; multiple points.
   :straight t)
 
 (use-package ispell
@@ -2197,8 +2300,6 @@ literal then add a fuzzy search)."
   ;; Convenient organization and commands for projects.
   :straight t
   :custom (projectile-project-search-path '("~/git/"))
-  ;; (projectile-git-fd-args "-H -0 -E hyrax-webapp -E .git -tf --strip-cwd-prefix -c never")
-  ;; (projectile-git-submodule-command "")
   :bind ("s-." . projectile-toggle-between-implementation-and-test)
   :config
   (projectile-mode 1)
@@ -2266,8 +2367,8 @@ literal then add a fuzzy search)."
   :straight t)
 
 (use-package edit-indirect
-  ;; A nice package for editing regions in separate buffers.  It doesn't appear
-  ;; to get the mode guess right.  I haven't used this as much as
+  ;; A nice package for editing regions in separate buffers.  It doesn't
+  ;; appear to get the mode guess right.  I haven't used this as much as
   ;; `narrow-region'.  Perhaps it can go?
   :straight t)
 
@@ -2285,9 +2386,6 @@ literal then add a fuzzy search)."
     (define-key map [remap narrow-to-region] #'logos-narrow-dwim)
     (define-key map [remap forward-page] #'logos-forward-page-dwim)
     (define-key map [remap backward-page] #'logos-backward-page-dwim))
-  ;; (let ((map logos-focus-mode-map))
-  ;;   (define-key map [remap next-line] #'logos-forward-page-dwim)
-  ;;   (define-key map [remap previous-line] #'logos-backward-page-dwim))
   (setq logos-outlines-are-pages t)
   (setq-default logos-hide-cursor t
     logos-hide-mode-line t
@@ -2322,7 +2420,8 @@ literal then add a fuzzy search)."
   :custom (nov-text-width 80))
 
 (use-package so-long
-  ;; Switch to `so-long' when the file gets too long for normal processing.
+  ;; Switch to `so-long' when the file gets too long for normal
+  ;; processing.
   :straight t
   :bind
   (:map so-long-mode-map
@@ -2330,9 +2429,9 @@ literal then add a fuzzy search)."
     ("C-r" . isearch-backward))
   :config (global-so-long-mode 1))
 
-;;;
-;; A package to "narrow" focus; providing a visually appealing interface
 (use-package olivetti
+  ;; A package to "narrow" focus; providing a visually appealing
+  ;; interface
   :straight t
   :hook (olivetti-mode-on . jf/olivetti-mode-on-hook)
   (olivetti-mode-off . jf/olivetti-mode-off-hook)
@@ -2419,10 +2518,14 @@ literal then add a fuzzy search)."
       (olivetti-mode t)
       (keycast-mode-line-mode t)
       (display-line-numbers-mode -1)
-      (when (fboundp 'fontaine-set-preset) (fontaine-set-preset 'presenting))
-      (when (fboundp 'vi-tilde-fringe-mode) (vi-tilde-fringe-mode -1))
-      (when (fboundp 'git-gutter-mode) (git-gutter-mode -1))
-      (when (fboundp 'centaur-tabs-local-mode) (centaur-tabs-local-mode -1))))
+      (when (fboundp 'fontaine-set-preset)
+        (fontaine-set-preset 'presenting))
+      (when (fboundp 'vi-tilde-fringe-mode)
+        (vi-tilde-fringe-mode -1))
+      (when (fboundp 'git-gutter-mode)
+        (git-gutter-mode -1))
+      (when (fboundp 'centaur-tabs-local-mode)
+        (centaur-tabs-local-mode -1))))
   "Hook when `jf/minor-mode/presenter' activated."
   :type 'hook)
 
@@ -2433,10 +2536,14 @@ literal then add a fuzzy search)."
     (keycast-mode-line-mode -1)
     ;; (setq-local  org-hide-emphasis-markers nil)
     (display-line-numbers-mode t)
-    (when (fboundp 'fontaine-set-preset) (fontaine-set-preset 'default))
-    (when (fboundp 'vi-tilde-fringe-mode) (vi-tilde-fringe-mode t))
-    (when (fboundp 'git-gutter-mode) (git-gutter-mode t))
-    (when (fboundp 'centaur-tabs-local-mode) (centaur-tabs-local-mode t)))
+    (when (fboundp 'fontaine-set-preset)
+      (fontaine-set-preset 'default))
+    (when (fboundp 'vi-tilde-fringe-mode)
+      (vi-tilde-fringe-mode t))
+    (when (fboundp 'git-gutter-mode)
+      (git-gutter-mode t))
+    (when (fboundp 'centaur-tabs-local-mode)
+      (centaur-tabs-local-mode t)))
   "Hook when `jf/minor-mode/presenter' deactivated."
   :type 'hook)
 
@@ -2492,7 +2599,7 @@ literal then add a fuzzy search)."
 
   ;; From https://karthinks.com/blog/lazy-elfeed/
   (defun elfeed-search-show-entry-pre (&optional lines)
-    "Return a function that will scroll n LINES in `elfeed' search results.
+    "Return a function that scrolls n LINES in `elfeed' search results.
 
 It will display entries without switching to them."
     (lambda (times)
@@ -2520,14 +2627,16 @@ It will display entries without switching to them."
   :config (elfeed-org)
   (defun jf/export-public-elfeed-opml ()
     "Export public OPML file."
-    (let ((opml-body (cl-loop for org-file in '("~/git/org/denote/indices/public-elfeed.org")
-                       concat
-                       (with-temp-buffer
-                         (insert-file-contents
-                           (expand-file-name org-file org-directory))
-                         (rmh-elfeed-org-convert-org-to-opml
-                           (current-buffer))))))
-      (with-current-buffer (find-file-noselect "~/git/takeonrules.source/static/blogroll.xml")
+    (let ((opml-body
+            (cl-loop for org-file in '("~/git/org/denote/indices/public-elfeed.org")
+              concat
+              (with-temp-buffer
+                (insert-file-contents
+                  (expand-file-name org-file org-directory))
+                (rmh-elfeed-org-convert-org-to-opml
+                  (current-buffer))))))
+      (with-current-buffer
+        (find-file-noselect "~/git/takeonrules.source/static/blogroll.xml")
         (erase-buffer)
         (insert "<?xml version=\"1.0\"?>\n")
         (insert "<?xml-stylesheet type=\"text/xsl\" href=\"/blogroll.xsl\"?>\n")
@@ -2547,8 +2656,8 @@ It will display entries without switching to them."
       (add-to-list 'rmh-elfeed-org-files file))))
 
 (use-package eww
-  ;; A plain text browser.  Use this to see just how bad much of the web has
-  ;; become.
+  ;; A plain text browser.  Use this to see just how bad much of the web
+  ;; has become.
   :straight t
   :custom (eww-auto-rename-buffer 'title)
   :config
@@ -2565,7 +2674,9 @@ It will display entries without switching to them."
     (shr-insert (cdr shr-around-q-tag)))
 
   (defcustom shr-around-q-tag '("“" . "”")
-    "The before and after quotes.  `car' is inserted before the Q-tag and `cdr' is inserted after the Q-tag.
+    "The before and after quotes.
+
+`car' is inserted before the Q-tag and `cdr' is inserted after the Q-tag.
 
 Alternative suggestions are: - '(\"\\\"“\" . \"\\\"\")"
     :type (cons 'string 'string))
@@ -2656,8 +2767,9 @@ Alternative suggestions are: - '(\"\\\"“\" . \"\\\"\")"
   :config (setq org-noter-doc-split-percentage '(0.67 . 0.33))
   (org-noter-enable-update-renames)
   (setq org-noter-notes-search-path '())
-  (dolist (path '("~/Library/CloudStorage/ProtonDrive-jeremy@jeremyfriesen.com/"
-                   "~/Documents/"))
+  (dolist (path
+            '("~/Library/CloudStorage/ProtonDrive-jeremy@jeremyfriesen.com/"
+               "~/Documents/"))
     (when (f-dir-p path)
       ;; Add element to end of list.
       (add-to-list 'org-noter-notes-search-path path t)))
@@ -2711,13 +2823,13 @@ Alternative suggestions are: - '(\"\\\"“\" . \"\\\"\")"
 
 (setq safe-local-variable-values
   '((eval
-      ;; setq-local org-export-with-properties
-      ;; '("PRONOUNS" "ALIGNMENT" "BACKGROUND" "DEMEANOR" "ANCESTRY" "KEEPSAKE" "LOCATIONS" "FACTIONS" "ARCHETYPE" "SESSION_DATE" "START_LOCATION"  "CAMPAIGN_START_DATE" "CAMPAIGN_END_DATE" "END_LOCATION")
-      (projectile-git-fd-args . "-H -0 -E hyrax-webapp -E .git -tf --strip-cwd-prefix -c never")
+      (projectile-git-fd-args .
+        "-H -0 -E hyrax-webapp -E .git -tf --strip-cwd-prefix -c never")
       (projectile-git-submodule-command . "")
       (jf/tor-minor-mode . 1)
       (projectile-require-project-root)
-      (projectile-git-command . "git ls-files -zco --exclude-from=.projectile.gitignore")
+      (projectile-git-command .
+        "git ls-files -zco --exclude-from=.projectile.gitignore")
       (org-insert-tilde-language . ruby)
       (org-insert-tilde-language . emacs-lisp)
       (encoding . utf-8))))
@@ -2756,7 +2868,7 @@ Alternative suggestions are: - '(\"\\\"“\" . \"\\\"\")"
         (insert "\n#+DESCRIPTION: " description))))
 
   (transient-define-suffix jf/org-mode/add-session-report (date game location)
-    "Add session report metadata (DATE, GAME, and LOCATION) to current buffer."
+    "Add metadata (DATE, GAME, and LOCATION) to current buffer."
     :description "Add Session…"
     (interactive (list
                    (org-read-date
@@ -2790,9 +2902,11 @@ Alternative suggestions are: - '(\"\\\"“\" . \"\\\"\")"
     [["Jump to"
        ("j a" jf/jump-to/agenda-local)
        ;; ("j c" "Capture Backlog" jf/jump-to/code-backlog)
-       ("j d" "Denote File" jf/jump_to_corresponding_denote_file :if-derived markdown-mode)
+       ("j d" "Denote File" jf/jump_to_corresponding_denote_file
+         :if-derived markdown-mode)
        ("j g" "Global Mark" consult-global-mark)
-       ("j h" "Hugo File" jf/jump_to_corresponding_hugo_file :if-derived org-mode)
+       ("j h" "Hugo File" jf/jump_to_corresponding_hugo_file
+         :if-derived org-mode)
        ("j m" "Mark" consult-mark)
        ("j r" "Jump to Git Related" consult-git-related-find-file)
        ("j l" "Jump to Magit Project Lists" magit-list-repositories)
@@ -2811,30 +2925,41 @@ Alternative suggestions are: - '(\"\\\"“\" . \"\\\"\")"
         ("d p" jf/project/convert-document-to-project :if jf/denote?)
         ]
       ["Blogging"
-        ("b d" jf/org-mode/add-description :if jf/org-mode/blog-entry?)
-        ("b r" jf/org-mode/add-session-report :if jf/org-mode/blog-entry?)
-        ("b s" "Add Series…" jf/org-mode/add-series-to-file :if jf/org-mode/blog-entry?)
-        ("b x" "Export to TakeOnRules…" jf/export-org-to-tor :if jf/org-mode/blog-entry?)]]
+        ("b d" jf/org-mode/add-description
+          :if jf/org-mode/blog-entry?)
+        ("b r" jf/org-mode/add-session-report
+          :if jf/org-mode/blog-entry?)
+        ("b s" "Add Series…" jf/org-mode/add-series-to-file
+          :if jf/org-mode/blog-entry?)
+        ("b x" "Export to TakeOnRules…" jf/export-org-to-tor
+          :if jf/org-mode/blog-entry?)]]
     [["Modes"
        ;; I could write functions for these, but this is concise enough
-       ("m t" "Typopunct ( )" typopunct-mode :if-nil typopunct-mode)
-       ("m t" "Typopunct (*)" typopunct-mode :if-non-nil typopunct-mode)
-       ("m o" "MacOS Native Option ( )" jf/toggle-osx-alternate-modifier :if-non-nil ns-alternate-modifier)
-       ("m o" "MacOS Native Option (*)" jf/toggle-osx-alternate-modifier :if-nil ns-alternate-modifier)
+       ("m t" "Typopunct ( )" typopunct-mode
+         :if-nil typopunct-mode)
+       ("m t" "Typopunct (*)" typopunct-mode
+         :if-non-nil typopunct-mode)
+       ("m o" "MacOS Native Option ( )" jf/toggle-osx-alternate-modifier
+         :if-non-nil ns-alternate-modifier)
+       ("m o" "MacOS Native Option (*)" jf/toggle-osx-alternate-modifier
+         :if-nil ns-alternate-modifier)
        ("m i" jf/shr/toggle-images)
        ("TAB" jf/enable-indent-for-tab-command)
        ]
       ["Grab Refs"
-        ("g e" "Elfeed" jf/capture/denote/from/elfeed-show-entry :if-derived elfeed-show-mode)
+        ("g e" "Elfeed" jf/capture/denote/from/elfeed-show-entry
+          :if-derived elfeed-show-mode)
         ("g f" "Firefox" jf/menu--org-capture-firefox)
         ("g s" "Safari" jf/menu--org-capture-safari)
-        ("g w" "Eww" jf/capture/denote/from/eww-data :if-derived eww-mode)
+        ("g w" "Eww" jf/capture/denote/from/eww-data
+          :if-derived eww-mode)
         ]
       ["Bookmark"
         ("B s" "Safari" jf/menu--bookmark-safari)]])
 
-  ;; this suffix provides a dynamic description of the current host I want to use
-  ;; for my blog.  And the prefix’s function toggles the host.
+  ;; this suffix provides a dynamic description of the current host I
+  ;; want to use for my blog.  And the prefix’s function toggles the
+  ;; host.
   :bind ("s-1" . #'jf/menu))
 
 (provide 'init)
