@@ -202,8 +202,37 @@
   :bind (("M-[" . #'backward-paragraph)
           ("s-[" . #'backward-paragraph)
           ("M-]" . #'forward-paragraph)
-          ("s-]" . #'forward-paragraph))
+          ("s-]" . #'forward-paragraph)
+          ("C-k" . #'jf/kill-line-or-region)
+          ("C-c n" . #'jf/yank-file-name-to-clipboard) ;; Deprecated
+          ("C-c y n" . #'jf/yank-file-name-to-clipboard))
+  :bind (:map emacs-lisp-mode-map
+          ("C-c C-c" . 'jf/eval-region-dwim))
   :config
+  (defun jf/eval-region-dwim ()
+    "When region is active, evaluate it and kill the mark.
+
+Else, evaluate the whole buffer."
+    ;; I try to get quick feedback when writing emacs-lisp; the
+    ;; `jf/eval-region-dwim' binds a mnemonic key sequence to an extend
+    ;; `eval-region'.
+    (interactive)
+    (if (not (region-active-p))
+      (progn
+        (message "Evaluating buffer...")
+        (eval-buffer))
+      (progn
+        (message "Evaluating region...")
+        (eval-region (region-beginning) (region-end)))
+      (setq-local deactivate-mark t)))
+
+  (defun jf/kill-line-or-region (&optional arg)
+    "Kill the selected region otherwise kill the ARG number of lines."
+    (interactive "P")
+    (if (use-region-p)
+      (kill-region (region-beginning) (region-end))
+      (kill-line arg)))
+
   ;; The following function facilitates a best of both worlds.  By
   ;; default, I want Option to be Meta (e.g. \"M-\") in Emacs.
   ;; However, I can toggle that setting.  That way if I need an umlaut
@@ -225,7 +254,78 @@
         (message "Disabling OX X native Option modifier"))))
   ;; Exposing one additional modifier key.
   (setq ns-right-command-modifier 'hyper
-    ns-right-alternate-modifier 'meta))
+    ns-right-alternate-modifier 'meta)
+  (defun jf/yank-file-name-to-clipboard (arg)
+    "Nab, I mean copy, the current buffer file name to the clipboard.
+
+  When you pass one universal prefix ARG, nab the project
+  relative filename.  When you pass two or more prompt for
+  different aspects of a file."
+    ;; https://blog.sumtypeofway.com/posts/emacs-config.html
+    (interactive "P")
+    (let* ((prefix (car arg))
+            (raw-filename
+              (if (equal major-mode 'dired-mode)
+                default-directory
+                (buffer-file-name)))
+            (filename
+              (cond
+                ((not prefix)
+                  raw-filename)
+                ((= prefix 4)
+                  (concat "./"
+                    (file-relative-name
+                      raw-filename (projectile-project-root))))
+                ((>= prefix 16)
+                  (let ((options
+                          '(("Filename, Basename" .
+                              (lambda (f) (file-name-nondirectory f)))
+                             ("Filename, Project Relative" .
+                               (lambda (f)
+                                 (concat "./"
+                                   (file-relative-name f
+                                     (projectile-project-root)))))
+                             ("Filename, Full" .
+                               (lambda (f) (f)))
+                             ("Dirname" .
+                               (lambda (f) (file-name-directory f)))
+                             ("Dirname, Project Relative" .
+                               (lambda (f)
+                                 (concat "./"
+                                   (file-relative-name
+                                     (file-name-directory f)
+                                     (projectile-project-root))))))))
+                    (funcall
+                      (alist-get
+                        (completing-read "Option: " options nil t)
+                        options nil nil #'string=)
+                      raw-filename))))))
+      (when filename
+        (kill-new filename)
+        (message
+          "Copied buffer file name '%s' to the clipboard."
+          filename)))))
+
+(use-package sort
+  :straight (:type built-in)
+  :config
+  (defun jf/sort-unique-lines (reverse beg end
+                                &optional adjacent
+                                keep-blanks
+                                interactive)
+    "Sort lines and delete duplicates.
+
+  By default the sort is lexigraphically ascending.  To sort as
+  descending set REVERSE to non-nil.  Specify BEG and END for the
+  bounds of sorting.  By default, this is the selected region.
+
+  I've included ADJACENT, KEEP-BLANKS, and INTERACTIVE so I can
+  echo the method signature of `sort-lines' and
+  `delete-duplicate-lines'"
+    (interactive "P\nr")
+    (sort-lines reverse beg end)
+    (delete-duplicate-lines
+      beg end reverse adjacent keep-blanks interactive)))
 
 (use-package ediff
   :straight (:type built-in)
@@ -496,7 +596,7 @@
          (propertize " Narrow " 'face 'mode-line-highlight))))
 
   (defvar jf/mode-line-format/vterm-map
-q    (let ((map (make-sparse-keymap)))
+    (let ((map (make-sparse-keymap)))
       (define-key map [mode-line down-mouse-1] #'vterm-copy-mode)
       map)
     "Keymap to display on `vterm' copy indicator.")
@@ -1425,8 +1525,6 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
        (height . 0.5)
        (top . 0)
        (left . 0))))
-
-(require 'jf-utility)
 
 (use-package ws-butler
   ;; Keep white space tidy.

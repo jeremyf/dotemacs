@@ -146,8 +146,10 @@ first matching link."
   ;; to have that work better by default.
   ;;
   ;; (org-mode . org-indent-mode)
-  :bind ("C-c C-j" . jf/project/jump-to-task)
-  ("C-c C-x C-j" . org-clock-goto)
+  :bind (("C-c C-j" . jf/project/jump-to-task)
+          ("C-c C-x C-j" . org-clock-goto)
+           ("s-5" . jf/org-insert-immediate-active-timestamp)
+          )
   :bind (:map org-mode-map (("C-c j" . org-goto)
                              ("C-c C-j" . jf/project/jump-to-task)
                              ("C-x n t" . jf/org-mode/narrow-to-date)
@@ -220,6 +222,20 @@ File.open('%s', 'w') { |f| $stdout = f; pp results }")
                           "CANCELED(c@/!)"
                           "DONE(d!)")))
 
+  (defun jf/org-insert-immediate-active-timestamp (arg)
+    "Insert an active date for today.
+
+  One universal ARG prompts for date
+  Two universal ARG inserts timestamp.
+  then insertes active date."
+    ;; Insert an active timestamp, with a few options.
+    (interactive "P")
+    (let ((prefix (car arg)))
+      (cond
+        ((not prefix)  (org-insert-time-stamp nil nil nil))
+        ((= prefix 4) (org-insert-time-stamp (org-read-date nil t nil "Date")
+                        nil nil))
+        ((>= prefix 16)  (org-insert-time-stamp nil t nil)))))
   (transient-define-suffix jf/denote-org-capture/filename-set ()
     "Work with `jf/denote-org-capture/filename'"
     :description '(lambda ()
