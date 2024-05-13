@@ -1298,8 +1298,8 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
     (shell-command
       (concat "osascript -e 'tell application \"System Events\" "
         "to tell appearance preferences "
-        "to set dark mode to not dark mode'")
-    (jf/emacs-theme-by-osx-appearance)))
+        "to set dark mode to not dark mode'"))
+    (jf/emacs-theme-by-osx-appearance))
   (jf/emacs-theme-by-osx-appearance))
 
 (use-package tab-bar
