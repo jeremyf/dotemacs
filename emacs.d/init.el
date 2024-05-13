@@ -209,6 +209,10 @@
   :bind (:map emacs-lisp-mode-map
           ("C-c C-c" . 'jf/eval-region-dwim))
   :config
+  (defun jf/alist-prompt (prompt collection &rest args)
+    (let ((string (completing-read prompt collection args)))
+      (cons string (alist-get string collection nil nil #'string=))))
+
   (defun jf/eval-region-dwim ()
     "When region is active, evaluate it and kill the mark.
 
@@ -1066,7 +1070,8 @@ This uses `split-window-right' but follows with the cursor."
          (dedicated . t)
          (preserve-size . (t . t)))
        ("\\*Embark Actions\\*"
-         (display-buffer-reuse-mode-window display-buffer-below-selected)
+         (display-buffer-reuse-mode-window
+           display-buffer-below-selected)
          (window-height . fit-window-to-buffer)
          (window-parameters . ((no-other-window . t)
                                 (mode-line-format . (" %b")))))
@@ -1077,15 +1082,18 @@ This uses `split-window-right' but follows with the cursor."
          (display-buffer-reuse-mode-window
            display-buffer-below-selected))
        ("\\*\\vc-\\(incoming\\|outgoing\\|git : \\).*"
-         (display-buffer-reuse-mode-window display-buffer-below-selected)
+         (display-buffer-reuse-mode-window
+           display-buffer-below-selected)
          (window-height . 0.1)
          (dedicated . t)
          (preserve-size . (t . t)))
        ("\\*rspec-compilation\\*"
-         (display-buffer-reuse-mode-window display-buffer-below-selected)
+         (display-buffer-reuse-mode-window
+           display-buffer-below-selected)
          (body-function . jf/body-function/rspec-compilation))
        ((derived-mode . reb-mode) ; M-x re-builder
-         (display-buffer-reuse-mode-window display-buffer-below-selected)
+         (display-buffer-reuse-mode-window
+           display-buffer-below-selected)
          (window-height . 4) ; note this is literal lines, not relative
          (dedicated . t)
          (preserve-size . (t . t)))
@@ -1335,7 +1343,8 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
 (use-package tmr
   ;; A timer package.
   ;;
-  ;; My dbus install is not behaving so I'm cheating with a bit of AppleScript
+  ;; My dbus install is not behaving so I'm cheating with a bit of
+  ;; AppleScript
   :preface
   (defun jf/tmr-notification-notify (timer)
     "Dispatch a notification for TIMER."
@@ -1829,25 +1838,107 @@ first matching link."
         ((>= prefix 16)
           (org-insert-time-stamp nil t nil)))))
 
-  (transient-define-suffix jf/denote-org-capture/filename-set ()
-    "Work with `jf/denote-org-capture/filename'"
-    :description
-    '(lambda ()
-       (concat
-         "Denote Capture Filename: "
-         (propertize
-           (format "%s"
-             (and denote-last-path
-               (file-exists-p denote-last-path)
-               (denote-retrieve-filename-title denote-last-path)))
-           'face 'transient-argument)))
-    (interactive)
-    (if denote-last-path
-      (setq denote-last-path nil)
-      (let ((fname
-              (buffer-file-name (current-buffer))))
-        (setq denote-last-path
-          (and (denote-file-is-note-p  fname) fname)))))
+  (defun jf/org-mode/agenda-files ()
+    "Return a list of note files containing 'agenda' tag.
+
+Uses the fd command (see https://github.com/sharkdp/fd)
+
+We want files to have the 'projects' `denote' keyword."
+    (let ((projects
+            (mapcar (lambda (el) (cdr el)) (jf/project/list-projects))))
+      ;; (dolist (file (jf/journal/list-current-journals))
+      ;;   (setq projects (cons file projects)))
+      ;; (when (file-exists-p jf/agenda-filename/scientist)
+      ;;   (setq projects (cons jf/agenda-filename/scientist projects)))
+      (when (file-exists-p jf/agenda-filename/local)
+        (setq projects (cons jf/agenda-filename/local projects)))
+      projects))
+
+;; (defun jf/journal/list-current-journals ()
+;;   "Return the last 14 daily journal entries."
+;;   (split-string-and-unquote
+;;     (shell-command-to-string
+;;       (concat
+;;         "fd _journal --absolute-path "
+;;         denote-journal-extras-directory " | sort | tail -14"))
+;;   "\n"))
+
+  (defun jf/org-mode/capture/project-task/find ()
+    "Find the project file and position to the selected task."
+    (let* ((project
+             (completing-read "Project: " (jf/project/list-projects)))
+            (filename
+              (cdar (jf/project/list-projects :project project)))
+            (name-and-task
+              (jf/alist-prompt
+                (format "Task for %s: " project)
+                (jf/org-mode/existing-tasks filename)))
+            (task-name
+              (car name-and-task)))
+      ;; Defer finding this file as long as possible.
+      (find-file filename)
+
+      (if-let ((task (cdr name-and-task)))
+        ;; I like having the most recent writing close to the headline;
+        ;; showing a reverse order.  This also allows me to have
+        ;; sub-headings within a task and not insert content and clocks
+        ;; there.  (if-let ((drawer (car (org-element-map task 'drawer
+        ;; #'identity)))) (goto-char (org-element-property :contents-end
+        ;; drawer)) (goto-char (org-element-property :contents-begin
+        ;; task)))
+        (let* ((name-and-subtask
+                 (jf/alist-prompt
+                   (format "Sub-Task for %s: " task-name)
+                   (jf/org-mode/existing-sub-tasks :task task)))
+                (subtask-name
+                  (car name-and-subtask)))
+          (if-let ((subtask (cdr name-and-subtask)))
+            (goto-char (org-element-property :contents-end subtask))
+            (if current-prefix-arg
+              ;; We don't want to edit this thing
+              (goto-char (org-element-property :begin task))
+              (progn
+                (goto-char (org-element-property :contents-end task))
+                (insert "** " subtask-name "\n\n")))))
+        (progn
+          (goto-char (point-max))
+          ;; Yes make this a top-level element.  It is easy to demote and
+          ;; move around.
+          (insert "* TODO " task-name " :tasks:\n\n")))))
+
+  (defun jf/org-mode/existing-tasks (&optional filename)
+    "Return an alist of existing tasks in given FILENAME.
+
+Each member's `car' is title and `cdr' is `org-mode' element.
+
+Members of the sequence either have a tag 'tasks' or are in a todo state."
+    (with-current-buffer (or (and filename (find-file-noselect filename))
+                           (current-buffer))
+      (mapcar (lambda (headline)
+                (cons (org-element-property :title headline) headline))
+        (org-element-map
+          (org-element-parse-buffer 'headline)
+          'headline
+          (lambda (headline)
+            (and
+              (or (eq (org-element-property :todo-type headline) 'todo)
+                (member "tasks" (org-element-property :tags headline)))
+              headline))))))
+
+  (cl-defun jf/org-mode/existing-sub-tasks (&key task)
+    "Return an alist of existing sub-tasks for the given TASK element.
+
+Each member's `car' is title and `cdr' is `org-mode' element."
+    (let ((subtask-level (+ 1 (org-element-property :level task))))
+      (mapcar (lambda (headline)
+                (cons (org-element-property :title headline) headline))
+        (org-element-map
+          task
+          'headline
+          (lambda (headline)
+            (and
+              (eq (org-element-property :level headline) subtask-level)
+              headline))))))
 
   (defun jf/org-mode/configurator ()
     (add-hook 'org-mode-hook
@@ -3135,7 +3226,9 @@ With a PREFIX jump to the agenda without starting the clock."
        consult--source-modified-buffer))
 
 
-  (defun consult-find-file-with-preview (prompt &optional dir default mustmatch initial pred)
+  (defun consult-find-file-with-preview (prompt
+                                          &optional dir default
+                                          mustmatch initial pred)
     (interactive)
     (let ((default-directory (or dir default-directory)))
       (consult--read #'read-file-name-internal
@@ -3521,7 +3614,8 @@ literal then add a fuzzy search)."
            cursor-intangible t
            rear-nonsticky t))))
   :config
-  (define-key vertico-map (kbd "C-SPC") #'jf/vertico-restrict-to-matches)
+  (define-key vertico-map (kbd "C-SPC")
+    #'jf/vertico-restrict-to-matches)
   (vertico-mode 1)
   (setq read-file-name-completion-ignore-case t
     read-buffer-completion-ignore-case t
@@ -3652,6 +3746,16 @@ literal then add a fuzzy search)."
           "}.gsub(/-(\\w)/) { |m| m[1].upcase }'"))
       "\n"))
   :config
+  (cl-defun jf/denote? (&key (buffer (current-buffer)))
+    "Return non-nil when BUFFER is for `denote'."
+    (when-let* ((file (buffer-file-name buffer)))
+      (denote-file-is-note-p file)))
+  (defun jf/blog-entry? (&optional buffer)
+    "Return non-nil when BUFFER is a blog post."
+    (when-let* ((buffer (or buffer (current-buffer)))
+                 (file (buffer-file-name buffer)))
+      (and (denote-file-is-note-p file)
+        (string-match-p "\\/blog-posts\\/" file))))
   (require 'denote-org-extras)
   ;; (setq denote-journal-extras-title-format 'day-date-month-year)
   (setq denote-infer-keywords t)
@@ -4482,9 +4586,12 @@ When USE_HUGO_SHORTCODE is given use glossary based exporting."
              (s-starts-with? "https://takeonrules.com/" url))
             (if (s-contains? "/series/" url)
               (format "{{< linkToSeries \"%s\" >}}"
-                (nth 4 (s-split "/" "https://takeonrules.com/series/one-two-three/")))
+                (nth 4
+                  (s-split "/"
+                    "https://takeonrules.com/series/one-two-three/")))
               (format "{{< linkToPath \"%s\" >}}"
-                (s-trim (s-replace "https://takeonrules.com/" "/" url)))))
+                (s-trim
+                  (s-replace "https://takeonrules.com/" "/" url)))))
           ((eq format 'html)
             (format "<a href=\"%s\">%s</a>" url desc))
           ((eq format 'md) (format "[%s](%s)" desc url))
@@ -4629,17 +4736,18 @@ The DOM could be as sanitized by `org-web-tools--sanitized-dom'."
   (cl-defun jf/org-mode/add-series-to-file (&key file series drop-tags all)
     "Add SERIES to FILE.
 
-Optionally DROP-TAGS, as there may have been a TAG associated with the series."
+Optionally DROP-TAGS, as there may have been a TAG associated
+with the series."
     (interactive)
     (with-current-buffer (if file
                            (find-file-noselect file)
                            (current-buffer))
-      (when (or current-prefix-arg all (jf/org-mode/blog-entry?))
+      (when (or current-prefix-arg all (jf/blog-entry?))
         (let ((series
                 (or series
                   (completing-read "Series: "
                     (jf/tor-series-list) nil t))))
-          (unless (and (jf/org-mode/blog-entry?)
+          (unless (and (jf/blog-entry?)
                     (s-contains? "#+HUGO_CUSTOM_FRONT_MATTER: :series "
                       (buffer-substring-no-properties
                         (point-min) (point-max))))
@@ -4662,7 +4770,26 @@ Optionally DROP-TAGS, as there may have been a TAG associated with the series."
                               dir id keywords title extension series)))
             (denote-rename-file-and-buffer file new-name)
             (denote-update-dired-buffers))))))
-  )
+
+  (transient-define-suffix jf/denote-org-capture/filename-set ()
+    "Work with `jf/denote-org-capture/filename'"
+    :description
+    '(lambda ()
+       (concat
+         "Denote Capture Filename: "
+         (propertize
+           (format "%s"
+             (and denote-last-path
+               (file-exists-p denote-last-path)
+               (denote-retrieve-filename-title denote-last-path)))
+           'face 'transient-argument)))
+    (interactive)
+    (if denote-last-path
+      (setq denote-last-path nil)
+      (let ((fname
+              (buffer-file-name (current-buffer))))
+        (setq denote-last-path
+          (and (denote-file-is-note-p  fname) fname))))))
 
 (use-package consult-notes
   ;;Let’s add another way at looking up files.  I appreciate the ability
@@ -4772,7 +4899,985 @@ Optionally DROP-TAGS, as there may have been a TAG associated with the series."
   :config
   (setq-default ispell-program-name "aspell"))
 
-(require 'jf-coding)
+(use-package crdt
+  ;; For remote code sharing/pairing
+  :straight t)
+
+(use-package code-review
+  ;; Shall we review code via Magit?  I believe the answer must be yes.
+  :after magit
+  :straight (code-review
+             :type git
+             :host github
+             :repo "phelrine/code-review"
+              :branch "fix/closql-update")
+  :bind (:map forge-pullreq-mode-map
+          (("C-c r" . #'code-review-forge-pr-at-point)))
+  :config
+  (add-hook 'code-review-mode-hook #'emojify-mode)
+  (setq code-review-fill-column 80))
+
+(use-package treesit
+  :straight (:type built-in)
+  :init
+  (setq treesit-font-lock-level 4)
+  :preface
+  (defun jf/treesit/function-select ()
+    "Select the current function at point."
+    (interactive)
+    (if-let ((func (treesit-defun-at-point)))
+      (progn
+        (goto-char (treesit-node-start func))
+        (call-interactively #'set-mark-command)
+        (goto-char (treesit-node-end func)))
+      (user-error "No function to select")))
+
+  (defun jf/treesit/wrap-rubocop (&optional given-cops)
+    "Wrap the current ruby region by disabling/enabling the GIVEN-COPS."
+    (interactive)
+    (if (derived-mode-p 'ruby-ts-mode 'ruby-mode)
+      (if-let ((region (jf/treesit/derive-region-for-rubocop)))
+        (let ((cops
+                (or given-cops
+                  (completing-read-multiple "Cops to Disable: "
+                    jf/rubocop/list-all-cops nil t))))
+          (save-excursion
+            (goto-char (cdr region))
+            (call-interactively #'crux-move-beginning-of-line)
+            (let ((indentation (s-repeat (current-column) " ")))
+              (goto-char (cdr region))
+              (insert "\n"
+                (s-join "\n"
+                  (mapcar
+                    (lambda (cop)
+                      (concat indentation "# rubocop:enable " cop))
+                    cops)))
+              (goto-char (car region))
+              (beginning-of-line)
+              (insert
+                (s-join "\n"
+                  (mapcar
+                    (lambda (cop)
+                      (concat indentation "# rubocop:disable " cop))
+                    cops))
+                "\n"))))
+        (user-error "Not a region nor a function"))
+      (user-error "%s is not derived from a ruby mode" major-mode)))
+
+  (defun jf/treesit/derive-region-for-rubocop ()
+    "Return `cons' of begin and end positions of region."
+    (cond
+      ;; When given, first honor the explicit region
+      ((use-region-p)
+        (cons (region-beginning) (region-end)))
+      ;; Then honor the current function
+      ((treesit-defun-at-point)
+        (cons (treesit-node-start (treesit-defun-at-point))
+          (treesit-node-end (treesit-defun-at-point))))
+      ;; Then fallback to attempting to find the containing
+      ;; class/module.
+      (t
+        (when-let ((node
+                     (treesit-parent-until
+                       (treesit-node-at (point))
+                       (lambda (n) (member (treesit-node-type n)
+                                     '("class" "module"))))))
+          (cons (treesit-node-start node) (treesit-node-end node))))))
+
+  ;; This function, tested against Ruby, will return the module space
+  ;; qualified method name (e.g. Hello::World#method_name).
+  (cl-defun jf/treesit/yank-qualified-method-fname ()
+    "Return the fully qualified name of method at point.  If not on a
+method, get the containing class."
+    (if-let ((func (treesit-defun-at-point)))
+      ;; Instance method or class method?
+      (let* ((method_type
+               (if (string= "method"
+                     (treesit-node-type func))
+                 "#" "."))
+              (method_name
+                (treesit-node-text
+                  (car (treesit-filter-child
+                         func
+                         (lambda (node)
+                           (string= "identifier"
+                             (treesit-node-type node)))))))
+              (module_space
+                (s-join "::" (jf/treesit/module_space func))))
+        (if current-prefix-arg
+          module_space
+          (concat module_space method_type method_name)))
+      (let ((current-node (treesit-node-at (point))))
+        (s-join "::" (jf/treesit/module_space current-node)))))
+
+  ;; Handles the following Ruby code:
+  ;;
+  ;;   module A::B
+  ;;     module C
+  ;;     end
+  ;;     C::D = Struct.new do
+  ;;       def call
+  ;;       end
+  ;;     end
+  ;;   end
+  ;; Special thanks to https://eshelyaron.com/posts/2023-04-01-take-on-recursion.html
+  (defun jf/treesit/module_space (node &optional acc)
+    (if-let ((parent
+               (treesit-parent-until
+                 node
+                 (lambda (n) (member (treesit-node-type n)
+                               '("class" "module" "assignment")))))
+              (parent_name
+                (treesit-node-text
+                  (car
+                    (treesit-filter-child
+                      parent
+                      (lambda (n)
+                        (member (treesit-node-type n)
+                          '("constant" "scope_resolution"))))))))
+      (jf/treesit/module_space parent (cons parent_name acc))
+      acc)))
+
+(use-package treesit-auto
+  :straight (:host github :repo "renzmann/treesit-auto")
+  :config (setq treesit-auto-install 'prompt)
+  (global-treesit-auto-mode))
+
+(use-package scopeline
+  ;; Show the scope info of methods, blocks, if/case statements.  This
+  ;; is done via an overlay for "blocks" that are more than 5 (default)
+  ;; lines
+  :straight (:host github :repo "jeremyf/scopeline.el")
+  ;; The original scopeline prefix was creating line height issues for
+  ;; my font of choice.  Namely adding just a bit more spacing for the
+  ;; scopeline overlay, thus making line heights inconsistent.
+  :config (setq scopeline-overlay-prefix "  ~ ")
+  :hook ((ruby-mode ruby-ts-mode) . scopeline-mode))
+
+;;;; Other packages and their configurations
+(use-package bundler
+  ;; For Ruby package management
+  :straight (bundler
+              :type git
+              :host github
+              :repo "endofunky/bundler.el"))
+
+(use-package csv-mode
+  :straight t
+  ;; By default I want to show the separator character.
+  :custom (csv-invisibility-default nil)
+  ;; Always enter CSV mode in align mode; makes it easier to read.
+  :hook (csv-mode . csv-align-mode))
+
+(use-package docker
+  ;; https://github.com/Silex/docker.el
+  ;; A reality of modern development is that things happen in Docker.
+  :straight t)
+
+(use-package dockerfile-mode
+  ;; Given that I interact with docker files, I should have some syntax
+  ;; awareness.
+  :straight t)
+
+(use-package editorconfig
+  ;; “EditorConfig helps maintain consistent coding styles for multiple
+  ;; developers working on the same project across various editors and
+  ;; IDEs.”  See https://editorconfig.org/#overview for more details.
+  :straight t
+  :config
+  (editorconfig-mode 1))
+
+(use-package heex-ts-mode
+  :straight t)
+
+(use-package mix
+  :straight t
+  :config
+  (keymap-set mix-minor-mode-map "C-c e"
+    #'mix-minor-mode-command-map)
+  (keymap-set mix-minor-mode-map "C-c d"
+    #'jf/duplicate-current-line-or-lines-of-region)
+  (add-hook 'elixir-ts-mode-hook 'mix-minor-mode))
+
+(use-package elixir-ts-mode
+  :after heex-ts-mode
+  :straight t)
+
+;; (use-package flymake-elixir
+;;   :straight t
+;;   :config
+;;   (add-hook 'elixir-ts-mode-hook 'flymake-elixir-load))
+
+(use-package emacs
+  :hook (emacs-lisp-mode . jf/emacs-lisp-mode-hook)
+  :preface
+  (defun jf/emacs-lisp-mode-hook ()
+    ;; 72 is what I've found works best on exporting to my blog.
+    (setq-local fill-column 72)))
+
+;; I don't use this package (I think...):
+;; (use-package emmet-mode
+;;   :straight t
+;;   :bind (("C-c C-e" . emmet-expand-yas ))
+;;   :hook ((sgml-mode . emmet-mode)
+;;          (html-mode . emmet-mode)
+;;          (css-mode . emmet-mode)))
+
+(use-package go-mode
+  :straight t
+  :hook ((go-mode go-ts-mode) . jf/go-mode)
+  :config
+  ;; See https://pkg.go.dev/golang.org/x/tools/cmd/goimports
+  (setq gofmt-command "goimports")
+  (defun jf/go-mode ()
+    (setq-local tab-width 2))
+  (add-hook 'before-save-hook 'gofmt-before-save))
+
+(use-package go-ts-mode
+  :straight (:type built-in)
+  :config
+  (setq go-ts-mode-indent-offset 2)
+  ;; Copied from
+  ;; https://github.com/Homebrew/brew/blob/c2ed3327c605c3e738359c9807b8f4cd6fec09eb/Cellar/emacs-plus%4029/29.3/share/emacs/29.3/lisp/progmodes/go-ts-mode.el#L115-L206
+  ;;
+  ;; Modifications made to remove parse error.
+  (setq go-ts-mode--font-lock-settings
+    (treesit-font-lock-rules
+      :language 'go
+      :feature 'bracket
+      '((["(" ")" "[" "]" "{" "}"]) @font-lock-bracket-face)
+
+      :language 'go
+      :feature 'comment
+      '((comment) @font-lock-comment-face)
+
+      :language 'go
+      :feature 'constant
+      `([(false) (nil) (true)] @font-lock-constant-face
+         ,@(when (go-ts-mode--iota-query-supported-p)
+             '((iota) @font-lock-constant-face))
+         (const_declaration
+           (const_spec name: (identifier) @font-lock-constant-face)))
+
+      :language 'go
+      :feature 'delimiter
+      '((["," "." ";" ":"]) @font-lock-delimiter-face)
+
+      :language 'go
+      :feature 'definition
+      '((function_declaration
+          name: (identifier) @font-lock-function-name-face)
+         (method_declaration
+           name: (field_identifier) @font-lock-function-name-face)
+         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+         ;;; method_spec is, as of 2024-05-01 and Emacs v29.3, something
+         ;;; that breaks with the installed tree-sitter language.
+         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+         ;; (method_spec
+         ;;  name: (field_identifier) @font-lock-function-name-face)
+         (field_declaration
+           name: (field_identifier) @font-lock-property-name-face)
+         (parameter_declaration
+           name: (identifier) @font-lock-variable-name-face)
+         (short_var_declaration
+           left: (expression_list
+                   (identifier) @font-lock-variable-name-face
+                   ("," (identifier) @font-lock-variable-name-face)*))
+         (var_spec name: (identifier) @font-lock-variable-name-face
+           ("," name: (identifier) @font-lock-variable-name-face)*))
+
+      :language 'go
+      :feature 'function
+      '((call_expression
+          function: (identifier) @font-lock-function-call-face)
+         (call_expression
+           function: (selector_expression
+                       field: (field_identifier)
+                       @font-lock-function-call-face)))
+
+      :language 'go
+      :feature 'keyword
+      `([,@go-ts-mode--keywords] @font-lock-keyword-face)
+
+      :language 'go
+      :feature 'label
+      '((label_name) @font-lock-constant-face)
+
+      :language 'go
+      :feature 'number
+      '([(float_literal)
+          (imaginary_literal)
+          (int_literal)] @font-lock-number-face)
+
+      :language 'go
+      :feature 'string
+      '([(interpreted_string_literal)
+          (raw_string_literal)
+          (rune_literal)] @font-lock-string-face)
+
+      :language 'go
+      :feature 'type
+      '([(package_identifier) (type_identifier)] @font-lock-type-face)
+
+      :language 'go
+      :feature 'property
+      '((selector_expression field: (field_identifier)
+          @font-lock-property-use-face)
+         (keyed_element (_ (identifier) @font-lock-property-use-face)))
+
+      :language 'go
+      :feature 'variable
+      '((identifier) @font-lock-variable-use-face)
+
+      :language 'go
+      :feature 'escape-sequence
+      :override t
+      '((escape_sequence) @font-lock-escape-face)
+
+      :language 'go
+      :feature 'error
+      :override t
+      '((ERROR) @font-lock-warning-face))))
+
+(use-package go-imenu
+  :straight t
+  :hook (go-mode . go-imenu-setup))
+
+;; (use-package flymake-go
+;;   :straight t)
+
+(use-package ruby-mode
+  ;; My language of choice for professional work.
+  :straight (:type built-in)
+  :custom (ruby-flymake-use-rubocop-if-available nil)
+  :bind
+  (:map ruby-mode-map
+    (("C-M-h" . jf/treesit/function-select)
+      ("C-c y f" . jf/treesit/yank-qualified-method-fname)
+      ("C-c w r" . jf/treesit/wrap-rubocop)
+      ("M-{" . ruby-beginning-of-block)
+      ("M-}" . ruby-end-of-block)))
+  :hook ((ruby-mode ruby-ts-mode) . #'jf/ruby-mode-configurator)
+  :config
+  (defun jf/ruby-mode-configurator ()
+    (eldoc-mode t)
+    (setq-local fill-column 80))
+  (defun jf/require-debugger ()
+    "Determine the correct debugger based on the Gemfile."
+    (let ((gemfile-lock
+            (f-join (projectile-project-root) "Gemfile.lock")))
+      (if-let* ((f-exists? gemfile-lock)
+                 (debuggers
+                   (s-split "\n"
+                     (shell-command-to-string
+                       (concat
+                         "rg \"^ +(byebug|debugger|pry-byebug|debug) \" "
+                         gemfile-lock
+                         " -r '$1' --only-matching | uniq")))))
+        (cond
+          ((member "byebug" debuggers)
+            "require 'byebug'; byebug")
+          ((member "debug" debuggers)
+            "require 'debug'; binding.break")
+          ((member "debugger" debuggers)
+            "require 'debugger'; debugger")
+          ((member "pry-byebug" debuggers)
+            "require 'pry-byebug'; binding.pry")
+          (t "require 'debug'; binding.break"))
+        "require 'debug'; binding.break"))))
+
+(use-package python
+  :straight (:type built-in)
+  :hook (python-mode . jf/python-mode-configurator)
+  :bind (:map python-mode-map ("M-." . xref-find-definitions))
+  :config
+  (defun jf/python-mode-configurator ()
+    (eldoc-mode t)
+    (python-docstring-mode t)
+    (setq-default python-indent-offset 4)
+    (setq-local fill-column 80))
+  (defun jf/python-ts-mode-configurator ()
+    (define-key python-ts-mode-map
+      (kbd "M-.") #'xref-find-definitions)
+    (jf/python-mode-configurator))
+  (add-hook 'python-ts-mode-hook #'jf/python-ts-mode-configurator))
+
+(use-package flymake-ruff
+  :straight t)
+  ;; :hook (eglot-managed-mode . flymake-ruff-load))
+
+(use-package python-docstring
+  :straight t)
+
+(use-package pydoc-info
+  :straight t
+  :config
+  (dolist (python '(python-mode python-ts-mode))
+    (info-lookup-add-help
+      :mode python
+      :parse-rule 'pydoc-info-python-symbol-at-point
+      :doc-spec
+      '(("(python)Index" pydoc-info-lookup-transform-entry)
+         ("(sphinx)Index" pydoc-info-lookup-transform-entry)))))
+
+(use-package virtualenvwrapper
+  :straight t
+  :config
+  ;; if you want interactive shell support
+  (venv-initialize-interactive-shells)
+  ;; if you want eshell support note that setting `venv-location` is not
+  ;; necessary if you use the default location (`~/.virtualenvs`), or if
+  ;; the the environment variable `WORKON_HOME` points to the right
+  ;; place
+  (venv-initialize-eshell)
+  (setq projectile-switch-project-action
+      '(lambda ()
+         (venv-projectile-auto-workon)
+         (projectile-find-file))))
+
+(use-package json-mode
+  ;; The web's data structure of choice is JSON.
+  :straight t)
+
+(use-package json-reformat
+  ;; Because JSON can be quite ugly, I want something to help tidy it
+  ;; up.
+  :straight t
+  :after json-mode
+  :init (setq json-reformat:indent-width 2))
+
+(use-package hl-todo
+  :straight t
+  :config (global-hl-todo-mode))
+
+;;
+;; https://github.com/alphapapa/magit-todos.git
+(use-package magit-todos
+  :config (magit-todos-mode)
+  :commands (magit-todos-list)
+  :custom (magit-todos-exclude-globs '(".git/" "public/"))
+  (magit-todos-insert-after
+    '(bottom) nil nil
+    "Changed by setter of obsolete option `magit-todos-insert-at'")
+  :straight (:host github :repo "alphapapa/magit-todos"))
+
+(use-package lua-mode
+  ;; For working with https://www.hammerspoon.org/
+  :straight t)
+
+(use-package markdown-mode
+  :straight t
+  :bind (:map markdown-mode-map ("C-c C-j" . jf/project/jump-to-task))
+  :hook (((markdown-mode markdown-ts-mode) . turn-on-visual-line-mode))
+  :mode (("README\\.md\\'" . gfm-mode)
+          ("\\.md\\'" . markdown-mode)
+          ("\\.markdown\\'" . markdown-mode))
+  :preface
+  (defun jf/markdown-toc (&optional depth)
+    "Extract DEPTH of headings from the current Markdown buffer.
+   The generated and indented TOC will be inserted at point."
+    (interactive "P")
+    (let ((max-depth (or depth 3)) toc-list)
+      (save-excursion
+        (goto-char (point-min))
+        (while (re-search-forward "^\\(##+\\)\\s-+\\(.*\\)" nil t)
+          (let* ((level
+                   (length (match-string 1)))
+                  (heading-text
+                    (match-string 2))
+                  (heading-id
+                    (downcase (replace-regexp-in-string
+                                "[[:space:]]+" "-" heading-text))))
+            (when (<= level max-depth)
+              (push (cons level
+                      (cons heading-text heading-id))
+                toc-list)))))
+      (setq toc-list (reverse toc-list))
+      (dolist (item toc-list)
+        (let* ((level
+                 (car item))
+                (heading-text
+                  (cadr item))
+                (heading-id
+                  (cddr item))
+                (indentation
+                  (make-string (- (* 2 (1- level)) 2) ?\ ))
+                (line
+                  (format "- [%s](#%s)\n" heading-text heading-id)))
+          (setq markdown-toc
+            (concat markdown-toc (concat indentation line)))))
+      (insert markdown-toc)))
+  :init
+  (setq markdown-command
+    ;; In the early days of Apple Silicon, Pandoc was only available
+    ;; through an odd installation.  As those early days have passed,
+    ;; Pandoc is now available in a native form for Apple Silicon.
+    (if (file-exists-p "/opt/homebrew/bin/pandoc")
+      "/opt/homebrew/bin/pandoc"
+      "/usr/local/bin/pandoc"))
+  (font-lock-add-keywords 'markdown-mode
+    '(("{{[^}]+}}" . 'font-lock-function-name-face))))
+
+(use-package plantuml-mode
+  ;; A mode for working with PlantUML.  See https://plantuml.com
+  ;;
+  ;;
+  :config (setq plantuml-executable-path (concat
+                                           (getenv "HB_PATH")
+                                           "/bin/plantuml")
+            plantuml-default-exec-mode 'executable
+            org-plantuml-executable-path (concat
+                                           (getenv "HB_PATH")
+                                           "/bin/plantuml")
+            org-plantuml-exec-mode 'executable)
+  :mode (("\\.plantuml\\'" . plantuml-mode))
+  :mode (("\\.puml\\'" . plantuml-mode))
+  :straight t)
+
+(use-package rspec-mode
+  ;; I write most of my Ruby tests using rspec.  This tool helps manage
+  ;; that process.
+  :straight t
+  ;; Ensure that we’re loading ruby-mode before we do any rspec loading.
+  :after ruby-mode
+  :custom
+  (rspec-docker-container "web")
+  (rspec-use-spring-when-possible t)
+  (rspec-use-docker-when-possible t)
+  (rspec-docker-cwd "./")
+  (rspec-docker-command "docker compose exec")
+    :hook ((dired-mode . rspec-dired-mode)
+          (rspec-mode . jf/rspec-mode-hook))
+  ;; Dear reader, make sure that you can jump from spec and definition.
+  ;; And in Ruby land when you have lib/my_file.rb, the corresponding
+  ;; spec should be in spec/my_file_spec.rb; and when you have
+  ;; app/models/my_file.rb, the spec should be in
+  ;; spec/models/my_file_spec.rb
+  :bind (:map rspec-mode-map
+          (("s-." .
+             'rspec-toggle-spec-and-target)
+            ("C-c y r" .
+              'jf/yank-bundle-exec-rspec-to-clipboard)))
+  :bind (:map ruby-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
+  :preface
+  (defun jf/rspec-mode-hook ()
+    (setq imenu-generic-expression
+      '(("Method" "^\\s *def\\s +\\([^\(\n; ]+\\)" 1)
+         ("Describe" "^\\( *\\(its?\\|specify\\|example\\|describe\\|context\\|feature\\|scenario\\) +.+\\)" 1))))
+  (defun jf/yank-bundle-exec-rspec-to-clipboard ()
+    "Grab a ready to run rspec command."
+    (interactive)
+    (let* ((filename
+             (file-relative-name (buffer-file-name)
+               (projectile-project-root)))
+            (text
+              (format "bundle exec rspec %s:%s"
+                filename (line-number-at-pos))))
+      (kill-new text)
+      (message "Killed: %s" text)
+      text))
+  (defun jf/rspec-spring-p ()
+    "Check the project for spring as part of the Gemfile.lock."
+    (let ((gemfile-lock
+            (f-join (projectile-project-root) "Gemfile.lock")))
+      (and (f-exists? gemfile-lock)
+        (s-present?
+          (shell-command-to-string
+            (concat "rg \"^ +spring-commands-rspec \" "
+              gemfile-lock))))))
+  ;; Out of the box, for my typical docker ecosystem, the
+  ;; `rspec-spring-p' function does not work.  So I'm overriding the
+  ;; default behavior to match my ecosystem.
+  (advice-add #'rspec-spring-p :override #'jf/rspec-spring-p))
+
+(use-package ruby-interpolation
+  ;; Nice and simple package for string interpolation.
+  :straight t
+  :hook (ruby-mode . ruby-interpolation-mode))
+
+(use-package sql-indent
+  ;; SQL, oh how I love thee and wish I worked more with thee.
+  :straight t
+  :hook (sql-mode . sqlind-minor-mode))
+
+(use-package string-inflection
+  ;; A quick way to change case and separators for words.
+  :straight t)
+
+(use-package typescript-mode
+  ;; I have this for the work I once did a few years ago.  I am happiest
+  ;; when I'm not working in Javascript.
+  :straight t)
+
+(use-package vterm
+  ;; A terminal in Emacs.
+  :straight t)
+
+(use-package web-mode
+  ;; Help consistently edit web documents of SGML markup dialetcs.
+  :straight t
+  :config (setq web-mode-markup-indent-offset 2
+            web-mode-css-indent-offset 2
+            web-mode-code-indent-offset 2)
+  :init
+  (add-to-list 'auto-mode-alist '("\\.html?\\'" . web-mode))
+  (add-to-list 'auto-mode-alist '("\\.erb\\'" . web-mode))
+  (add-to-list `auto-mode-alist '("\\.svg\\'" . xml-mode)))
+
+(use-package xml-format
+  ;; Encountering unformatted XML is jarring; this package helps format
+  ;; it for human legibility.
+  :straight t
+  :after nxml-mode)
+
+(use-package yaml-mode
+  ;; Oh yaml, I once thought you better than XML.  Now, you are
+  ;; ubiquitous and a bit imprecise.  Still better than JSON; which
+  ;; doesn't allow for comments.
+  :straight t)
+
+;; (use-package combobulate
+;;   :straight (:host github :repo "mickeynp/combobulate")
+;;   :hook ((json-ts-mode . combobulate-mode)
+;;           (html-ts-mode . combobulate-mode)
+;;           (yaml-ts-mode . combobulate-mode)))
+
+(use-package yard-mode
+  ;; My prefered Ruby documentation syntax
+  :straight t
+  :preface
+  ;; This is not working as I had tested; it's very dependent on the
+  ;; little details.  I think I may want to revisit to just work on the
+  ;; current line.
+  (defun jf/ruby-mode/yank-yardoc ()
+    "Add parameter yarddoc stubs for the current method."
+    (interactive)
+    (save-excursion
+      (when-let* ((func (treesit-defun-at-point))
+                   (method_parameters_text
+                     (treesit-node-text
+                       (car
+                         (treesit-filter-child
+                           func
+                           (lambda (node)
+                             (string= "method_parameters"
+                               (treesit-node-type node))))))))
+        (goto-char (treesit-node-start func))
+        ;; Grab the parameter names.
+        (let* ((identifiers (mapcar (lambda (token)
+                                      (replace-regexp-in-string
+                                        "[^a-z|_]" ""
+                                        (car (s-split " "
+                                               (s-trim token)))))
+                              (s-split "," method_parameters_text)))
+                (indentation (s-repeat (current-column) " ")))
+          (previous-line)
+          (end-of-line)
+          (insert
+            (concat "\n" indentation "##\n")
+            (s-join "\n" (mapcar
+                           (lambda (param)
+                             (concat indentation "# @param "
+                               param
+                               " [Object]"))
+                           identifiers)))))))
+  :bind* (:map ruby-mode-map
+           (("C-c y f" . jf/yank-current-scoped-function-name)
+             ("C-c y y" . jf/ruby-mode/yank-yardoc)))
+  :hook ((ruby-mode ruby-ts-mode) . yard-mode))
+
+(use-package devdocs
+  ;; Download and install documents from https://devdocs.io/ Useful for
+  ;; having local inline docs.  Perhaps not always in the format that I
+  ;; want, but can't have everything.
+  :straight t
+  :commands (devdocs-install))
+
+;; An alternate to devdocs.  Facilitates downloading HTML files and
+;; index.
+(use-package dash-docs
+  :straight t)
+
+;;; Commented out as work machine does not like codeberg.org git URLs
+;;
+;; (use-packaqge consult-dash
+;;   :straight t)
+
+(use-package flymake
+  :straight t
+  ;; Don't be so hasty in syntax checking.
+  :custom (flymake-no-changes-timeout 2))
+
+(use-package prog-mode
+  :straight (:type built-in)
+  :hook (prog-mode . jf/prog-mode-configurator)
+  :config
+  ;; I didn't know about `add-log-current-defun-function' until a blog
+  ;; reader reached out.  Now, I'm making a general function for
+  ;; different modes.
+  (defun jf/yank-current-scoped-function-name ()
+    "Echo and kill the current scoped function name.
+
+See `add-log-current-defun-function'."
+    (interactive)
+    (if-let ((text (funcall add-log-current-defun-function)))
+      (progn
+        (message "%s" text)
+        (kill-new (substring-no-properties text)))
+      (user-error "Warning: Point not on function")))
+  (bind-key "C-c y f"
+    #'jf/yank-current-scoped-function-name prog-mode-map)
+  (bind-key "C-c y f"
+    #'jf/yank-current-scoped-function-name emacs-lisp-mode-map)
+
+  (defvar jf/comment-header-regexp/major-modes-alist
+    '((emacs-lisp-mode . "^;;;+$")
+       (ruby-mode . "^[[:space:]]*##+$")
+       (ruby-ts-mode . "^[[:space:]]*##+$"))
+    "AList of major modes and their comment headers.")
+
+  (defun jf/comment-header-forward ()
+    "Move to previous line that starts a comment block.
+
+See `jf/comment-header-regexp/major-modes-alis'."
+    (interactive)
+    (let ((regexp
+            (alist-get major-mode
+              jf/comment-header-regexp/major-modes-alist)))
+      (when (string-match-p
+              regexp
+              (buffer-substring-no-properties
+                (line-beginning-position)
+                (line-end-position)))
+        (forward-line))
+      (condition-case err
+        (progn
+          (search-forward-regexp regexp)
+          (beginning-of-line)
+          (recenter scroll-margin t)
+          (pulsar-pulse-line))
+        (error (goto-char (point-max))))))
+
+  (defun jf/comment-header-backward ()
+    "Move to previous line that starts a comment block.
+ See `jf/comment-header-regexp/major-modes-alis'."
+    (interactive)
+    (let ((regexp
+            (alist-get major-mode
+              jf/comment-header-regexp/major-modes-alist)))
+      (when (string-match-p
+              regexp
+              (buffer-substring-no-properties
+                (line-beginning-position)
+                (line-end-position)))
+        (previous-line)
+        (recenter scroll-margin t)
+        (pulsar-pulse-line))
+      (condition-case err
+        (progn
+          (search-backward-regexp regexp)
+          (beginning-of-line)
+          (recenter scroll-margin t)
+          (pulsar-pulse-line))
+        (error (goto-char (point-min))))))
+
+  (dolist (el jf/comment-header-regexp/major-modes-alist)
+    (let ((jf-map (intern (format "%s-map" (car el)))))
+      ;; The treesitter mode maps don't seem to exist at this point
+      (unless (s-contains? "-ts-" (format "%s" (car el)))
+        (progn
+          (define-key (symbol-value jf-map)
+            (kbd "s-ESC") #'jf/comment-header-backward)
+          (define-key (symbol-value jf-map)
+            (kbd "C-s-]") #'jf/comment-header-forward)))))
+
+  (defun jf/prog-mode-configurator ()
+    "Do the configuration of all the things."
+    ;; I'll type my own parenthesis thank you very much.
+    ;; (electric-pair-mode)
+    (flymake-mode 1)
+    (setq truncate-lines t)
+    (which-function-mode)))
+
+(use-package copilot
+  ;; I want to explore this a bit, but by default want it "off" and to
+  ;; be as unobtrusive.
+  :straight (:host github
+              :repo "zerolfx/copilot.el"
+              :files ("dist" "*.el"))
+  :bind (:map copilot-mode-map
+          (("C-c 0 <return>" . copilot-accept-completion)
+            ("C-c 0 <down>" .  copilot-next-completion)
+            ("C-c 0 <up>" . copilot-previous-completion)
+            ("C-c 0 DEL" . copilot-clear-overlay)
+            ("C-c 0 TAB" . copilot-panel-complete)
+            ("C-c 0 ESC" . copilot-mode)))
+  :bind ("C-c 0 ESC" . copilot-mode)
+  :custom
+  ;; Copilot...never give me code comment recommendations.
+  (copilot-disable-predicates '(er--point-is-in-comment-p))
+  (copilot-idle-delay 1.5)
+  :ensure t)
+
+(use-package ruby-ts-mode
+  :straight (:type built-in)
+  :config
+  (defun jf/ruby-ts-mode-configurator ()
+    "Configure the `treesit' provided `ruby-ts-mode'."
+    ;; I encountered some loading issues where ruby-ts-mode was not
+    ;; available during my understanding of the use-package life-cycle.
+    (cond ((string-match "_spec.rb$" buffer-file-name)
+            (rspec-mode 1)))
+    (setq-local add-log-current-defun-function
+      #'jf/treesit/yank-qualified-method-fname)
+    (define-key ruby-ts-mode-map (kbd "C-M-h")
+      #'jf/treesit/function-select)
+    (define-key ruby-ts-mode-map (kbd "M-.")
+      #'xref-find-definitions)
+    (define-key ruby-ts-mode-map (kbd "s-.")
+      #'rspec-toggle-spec-and-target)
+    (define-key ruby-ts-mode-map
+      (kbd "C-c y f") #'jf/yank-current-scoped-function-name)
+    (define-key ruby-ts-mode-map
+      (kbd "C-c y y") #'jf/ruby-mode/yank-yardoc)
+    (define-key ruby-ts-mode-map
+      (kbd "s-ESC") #'jf/comment-header-backward)
+    (define-key ruby-ts-mode-map
+      (kbd "C-s-]") #'jf/comment-header-forward)
+    (define-key ruby-ts-mode-map
+      (kbd "C-c w r") #'jf/treesit/wrap-rubocop)
+    (define-key ruby-ts-mode-map
+      (kbd "M-{") #'ruby-beginning-of-block)
+    (define-key ruby-ts-mode-map
+      (kbd "M-}") #'ruby-end-of-block))
+  :hook (ruby-ts-mode . jf/ruby-ts-mode-configurator))
+
+(use-package emacs
+  :straight (:type built-in)
+  :config
+  ;; From
+  ;; https://emacs.dyerdwelling.family/emacs/20230414111409-emacs--indexing-emacs-init/
+  ;;
+  ;; Creating some outline modes.  Which has me thinking about an
+  ;; outline mode for my agenda file.
+  (defun jf/emacs-lisp-mode-configurator ()
+    (setq imenu-sort-function 'imenu--sort-by-name)
+    (setq imenu-generic-expression
+      '((nil "^;;[[:space:]]+-> \\(.*\\)$" 1)
+         ("Variables"
+           "^([[:space:]]*\\(cl-\\)?defvar[[:space:]]+\\([^ ]*\\)$" 2)
+         ("Variables"
+           "^([[:space:]]*\\(cl-\\)?defconst[[:space:]]+\\([^ ]*\\)$" 2)
+         ("Variables"
+           "^([[:space:]]*\\(cl-\\)?defcustom[[:space:]]+\\([^ ]*\\)$" 2)
+         ("Functions"
+           "^([[:space:]]*\\(cl-\\)?defun[[:space:]]+\\([^(]+\\)" 2)
+         ("Macros"
+           "^([[:space:]]*\\(cl-\\)?defmacro[[:space:]]+\\([^(]+\\)" 2)
+         ("Types"
+           "^([[:space:]]*\\(cl-\\)?defstruct[[:space:]]+\\([^(]+\\)" 2)
+         ("Packages"
+           "^.*([[:space:]]*use-package[[:space:]]+\\([[:word:]-]+\\)" 1)))
+    (imenu-add-menubar-index))
+  :hook (emacs-lisp-mode . jf/emacs-lisp-mode-configurator))
+
+;; An odd little creature, hide all comment lines.  Sometimes this can
+;; be a useful tool for viewing implementation details.
+(require 'hide-comnt)
+
+(if t
+  (progn
+    (use-package eglot
+      :straight t
+      ;; :straight (:type built-in) The Language Server Protocol (LSP)
+      ;; is a game changer; having access to that tooling is very much a
+      ;; nice to have.
+      :hook ((
+               yaml-mode yaml-ts-mode
+               angular-mode angular-ts-mode ;; npm install -g @angular/language-service@next typescript @angular/language-server
+               css-mode css-ts-mode
+               elixir-ts-mode
+               go-mode go-ts-mode ;; https://github.com/golang/tools/tree/master/gopls
+               html-mode html-ts-mode
+               js-mode js-ts-mode
+               json-mode json-ts-mode
+               python-mode python-ts-mode
+               ruby-mode ruby-ts-mode
+               scss-mode scss-ts-mode
+               typescript-ts-mode typescript-mode ;; https://github.com/typescript-language-server/typescript-language-server
+               )
+              . eglot-ensure)
+      :config
+      ;; https://github.com/elixir-lsp/elixir-ls?tab=readme-ov-file
+      (add-to-list 'eglot-server-programs
+        '(elixir-ts-mode "~/elixir-ls/v0.20.0/language_server.sh"))
+      ;; https://github.com/emacs-lsp/lsp-mode/wiki/Install-Angular-Language-server
+      ;; with modifications for homebrew
+      (add-to-list 'eglot-servier-programs
+        '(angular-mode
+           "node /opt/homebrew/lib/node_modules/@angular/language-server --ngProbeLocations /opt/homebrew/lib/node_modules --tsProbeLocations /opt/homebrew/lib/node_modules --stdio"))
+      (add-to-list 'eglot-servier-programs
+        '(angular-ts-mode
+           "node /opt/homebrew/lib/node_modules/@angular/language-server --ngProbeLocations /opt/homebrew/lib/node_modules --tsProbeLocations /opt/homebrew/lib/node_modules --stdio"))
+      :hook ((eglot-managed-mode . jf/eglot-capf)))
+
+
+    ;; See https://elixir-lsp.github.io/elixir-ls/getting-started/emacs/
+
+    (use-package eglot-booster
+      :straight (:host github :repo "jdtsmith/eglot-booster")
+      :after eglot
+      :config	(eglot-booster-mode)
+      (advice-add 'eglot-completion-at-point
+        :around #'cape-wrap-buster)
+      (defun jf/eglot-capf ()
+      "Ensure `eglot-completion-at-point' preceeds everything."
+      ;; I don't want `eglot-completion-at-point' to trample my other
+      ;; completion options.
+      ;;
+      ;; https://stackoverflow.com/questions/72601990/how-to-show-suggestions-for-yasnippets-when-using-eglot
+      (setq-local completion-at-point-functions
+        (list (cape-capf-super
+                #'eglot-completion-at-point
+                #'tempel-expand
+                #'cape-file
+                #'cape-keyword)))))
+
+    (use-package eldoc
+      ;; Helps with rendering documentation
+      ;; https://www.masteringemacs.org/article/seamlessly-merge-multiple-documentation-sources-eldoc
+      :config
+      (setq eldoc-documentation-strategy
+        ;; 'eldoc-documentation-enthusiast))
+        'eldoc-documentation-compose-eagerly)
+      (add-to-list 'display-buffer-alist
+        '("^\\*eldoc"
+           (display-buffer-reuse-mode-window
+             display-buffer-below-selected)
+           (dedicated . t)
+           (body-function . prot-window-select-fit-size)))
+      :straight t))
+  (progn
+    (use-package lsp-mode
+      :straight t
+      :hook ((elixir-ts-mode . lsp)
+              (angular-ts-mode . lsp)
+              (ruby-ts-mode . lsp)
+              (python-ts-mode . lsp)
+              (go-ts-mode . lsp)
+              (lsp-mode . lsp-enable-which-key-integration))
+      :commands lsp)
+
+    (use-package lsp-ui
+      :straight t
+      :commands lsp-ui-mode)
+
+    (use-package dap-mode
+      :straight t)))
+
+(require 'gherkin-mode)
+
+(load "jf-rubocop-cops.el")
 
 (use-package project
   ;; I'm unclear why I have this and projectile declared/required.
@@ -5160,7 +6265,8 @@ It will display entries without switching to them."
   (defcustom shr-around-q-tag '("“" . "”")
     "The before and after quotes.
 
-`car' is inserted before the Q-tag and `cdr' is inserted after the Q-tag.
+`car' is inserted before the Q-tag and `cdr' is inserted after
+the Q-tag.
 
 Alternative suggestions are: - '(\"\\\"“\" . \"\\\"\")"
     :type (cons 'string 'string))
@@ -5223,8 +6329,6 @@ Alternative suggestions are: - '(\"\\\"“\" . \"\\\"\")"
 (require 'jf-quick-help)
 (require 'jf-gaming)
 (require 'jf-blogging)
-(require 'jf-project)
-(require 'jf-menus)
 
 (use-package qrencode
   ;; https://github.com/ruediger/qrencode-el/
@@ -5291,7 +6395,7 @@ Alternative suggestions are: - '(\"\\\"“\" . \"\\\"\")"
       ad-do-it))
 
   (defun server-visit-hook-custom-find ()
-    "Arrange to visit the files from a client call in separate windows."
+    "Arrange to visit the files from client call in separate windows."
     (if (zerop server-visit-files-custom-find:buffer-count)
       (progn
         (delete-other-windows)
@@ -5317,6 +6421,175 @@ Alternative suggestions are: - '(\"\\\"“\" . \"\\\"\")"
       (org-insert-tilde-language . ruby)
       (org-insert-tilde-language . emacs-lisp)
       (encoding . utf-8))))
+
+(use-package org
+  ;; For projects and all
+  :straight (:type built-in)
+  :config
+  (cl-defun jf/project/jump-to/notes (&key project)
+    "Jump to the given PROJECT's notes file.
+
+Determine the PROJECT by querying `jf/project/list-projects'."
+    (interactive)
+    (let* ((project (or (s-presence project)
+                      (jf/project/find-dwim)))
+            (filename (cdar (jf/project/list-projects :project project))))
+      (find-file filename)))
+
+  ;; I work on several different projects each day; helping folks get
+  ;; unstuck.  I also need to track and record my time.
+  (bind-key "C-c C-j" 'jf/project/jump-to-task)
+  (cl-defun jf/project/jump-to-task (&optional prefix)
+    "Jump to task.
+
+With one PREFIX go to place where we would jump on capture."
+    (interactive "p")
+    (require 'org-capture)
+    (require 'pulsar)
+    (cond
+      ;; ((>= prefix 16)
+      ;;   (if-let ((filename (f-join denote-journal-extras-directory "20240131T000000--time-reporting.org")))
+      ;;     (progn
+      ;;       (org-link-open-as-file (concat filename "::*Timeblock") nil)
+      ;;       (org-next-visible-heading 1)
+      ;;       (search-forward "#+BEGIN:")
+      ;;       (org-dblock-update))
+      ;;     (org-capture-goto-target "t")))
+      ((>= prefix 4)
+        (org-capture-goto-target "t"))
+      (t (progn
+           (call-interactively #'set-mark-command)
+           (if (when (and (fboundp 'org-clocking-p) (org-clocking-p)) t)
+             (progn
+               (org-clock-goto)
+               (goto-char (org-element-property
+                            :contents-begin (org-element-at-point))))
+             ;; Jump to where we would put a project were we to capture
+             ;; it.
+             (org-capture-goto-target "t")))))
+    (pulsar-pulse-line))
+
+  (bind-key "s-2" 'jf/project/jump-to/project-work-space)
+  (defun jf/project/jump-to/project-work-space (project)
+    "Prompt for PROJECT then workspace and open that workspace."
+    (interactive (list (jf/project/find-dwim)))
+    (let*
+      ;; Get the project's file name
+      ((filename
+         (cdar (jf/project/list-projects :project project)))
+        (paths-cons-list
+          (jf/project/project-paths-for filename))
+        (path-name
+          (completing-read (format "Links for %s: " project)
+            paths-cons-list nil t))
+        (path
+          (alist-get path-name paths-cons-list nil nil #'string=)))
+      (cond
+        ((s-starts-with? "http" path)
+          (eww-browse-with-external-browser path))
+        ((f-dir-p path)
+          (dired path))
+        ((f-file-p path)
+          (if (string= "pdf" (f-ext path))
+            (shell-command (concat "open " path))
+            (find-file path)))
+        ;; Try the path as an org-link (e.g. path ==
+        ;; "denote:20230328T093100")
+        (t (when-let* ((type-target (s-split ":" path))
+                        ;; There's a registered handler for the protocol
+                        ;; (e.g. "denote")
+                        (follow-func (org-link-get-parameter
+                                       (car type-target) :follow)))
+             (funcall follow-func (cadr type-target))
+             ;; We tried...and don't know how to handle this.
+             (progn
+               (message "WARNING: Project %s missing path name \"%s\" (with path %s)"
+                 project path-name path)
+               (jf/project/jump-to/notes :project project)))))))
+
+  (defun jf/project/project-paths-for (filename)
+    "Find the project paths for the given FILENAME.
+
+Added in cases where we want to inject the actual file."
+    (with-current-buffer (find-file-noselect filename)
+      (let ((paths
+              (cl-maplist #'read
+                (cdar (org-collect-keywords '("PROJECT_PATHS"))))))
+        (setq paths (cons (cons "Notes" filename) paths)))))
+
+;;;; Support Functions
+  (cl-defun jf/project/list-projects (&key (project ".+")
+                                       (directory org-directory))
+    "Return a list of `cons' that match the given PROJECT.
+
+The `car' of the `cons' is the project (e.g. \"Take on Rules\").
+The `cdr' is the fully qualified path to that projects notes file.
+
+The DIRECTORY defaults to `org-directory' but you can specify
+otherwise."
+    (mapcar (lambda (line)
+              (let* ((slugs (s-split ":" line))
+                      (proj (s-trim (car (cdr slugs))))
+                      (filename (s-trim (car slugs))))
+                (cons proj filename)))
+      (split-string-and-unquote
+        (shell-command-to-string
+          (concat
+            "rg \"^#\\+PROJECT_NAME: +(" project ") *$\" " directory
+            " --follow --only-matching --no-ignore-vcs --with-filename "
+            "-r '$1' | tr '\n' '@'"))
+        "@")))
+
+  (cl-defun jf/project/get-project-from/project-source-code (&key (directory org-directory))
+    "Return the current \"noted\" project name.
+
+Return nil if the current buffer is not part of a noted project.
+
+Noted projects would be found within the given DIRECTORY."
+    (when-let ((project_path_to_code_truename (cdr (project-current))))
+      (let ((project_path_to_code (jf/filename/tilde-based
+                                    project_path_to_code_truename)))
+        ;; How to handle multiple projects?  Prompt to pick one
+        (let ((filename (s-trim (shell-command-to-string
+                                  (concat
+                                    "rg \"^#\\+PROJECT_PATHS: .*"
+                                    project_path_to_code " *\\\"\" "
+                                    directory " --files-with-matches "
+                                    " --no-ignore-vcs --ignore-case")))))
+          (unless (string-equal "" filename)
+            (with-current-buffer (find-file-noselect
+                                   (file-truename filename))
+              (jf/project/get-project-from/current-buffer-is-project)))))))
+
+  (defun jf/project/get-project-from/current-clock ()
+    "Return the current clocked project's name or nil."
+    ;; This is a naive implementation that assumes a :task: has the clock.
+    ;; A :task:'s immediate ancestor is a :projects:.
+    (when-let ((m (and
+                    ;; If this isn't set, we ain't clocking.
+                    (fboundp 'org-clocking-p)
+                    (org-clocking-p)
+                    org-clock-marker)))
+      (with-current-buffer (marker-buffer m)
+        (goto-char m)
+        (jf/project/get-project-from/current-buffer-is-project))))
+
+  (defun jf/project/get-project-from/current-buffer-is-project ()
+    "Return the PROJECT_NAME keyword of current buffer."
+    (cadar (org-collect-keywords (list "PROJECT_NAME"))))
+
+  (defun jf/project/find-dwim ()
+    "Find the current project based on context.
+
+When the `current-prefix-arg' is set always prompt for the project."
+    ;; `jf/project/get-project-from/current-agenda-buffer'
+    (or
+      (and (not current-prefix-arg)
+        (or
+          (jf/project/get-project-from/current-buffer-is-project)
+          (jf/project/get-project-from/current-clock)
+          (jf/project/get-project-from/project-source-code)))
+      (completing-read "Project: " (jf/project/list-projects)))))
 
 (use-package transient
   :straight (:type built-in)
@@ -5345,7 +6618,7 @@ Alternative suggestions are: - '(\"\\\"“\" . \"\\\"\")"
     "Add Description to `org-mode'"
     :description "Add Description…"
     (interactive (list (read-string "Description: ")))
-    (when (jf/org-mode/blog-entry?)
+    (when (jf/blog-entry?)
       (save-excursion
         (goto-char (point-min))
         (re-search-forward "^$")
@@ -5361,7 +6634,7 @@ Alternative suggestions are: - '(\"\\\"“\" . \"\\\"\")"
                      "Game: " (jf/tor-game-list))
                    (completing-read
                      "Location: " jf/tor-session-report-location)))
-    (when (jf/org-mode/blog-entry?)
+    (when (jf/blog-entry?)
       (save-excursion
         (goto-char (point-min))
         (re-search-forward "^$")
@@ -5369,16 +6642,71 @@ Alternative suggestions are: - '(\"\\\"“\" . \"\\\"\")"
           "'((date . \"" date "\") (game . \"" game "\") "
           "(location . \"" location "\"))"))))
 
-  (defun jf/org-mode/blog-entry? (&optional buffer)
-    (when-let* ((buffer (or buffer (current-buffer)))
-                 (file (buffer-file-name buffer)))
-      (and (denote-file-is-note-p file)
-        (string-match-p "\\/blog-posts\\/" file))))
+  (transient-define-suffix jf/org-mode/agenda-files-update (&rest _)
+    "Update the value of `org-agenda-files'."
+    :description "Update agenda files…"
+    (interactive)
+    (message "Updating `org-agenda-files'")
+    (setq org-agenda-files (jf/org-mode/agenda-files)))
+  (add-hook 'after-init-hook #'jf/org-mode/agenda-files-update)
 
   (transient-define-suffix jf/enable-indent-for-tab-command ()
     :description "Enable `indent-for-tab-command'"
     (interactive)
     (keymap-global-set "TAB" #'indent-for-tab-command))
+
+  (transient-define-suffix jf/project/convert-document-to-project (&optional buffer)
+    "Conditionally convert the current BUFFER to a project.
+
+This encodes the logic for creating a project."
+    :description "Convert to project…"
+    (interactive)
+    (let ((buffer (or buffer (current-buffer))))
+      (with-current-buffer buffer
+        (if-let* ((file
+                    (buffer-file-name buffer))
+                   (_proceed
+                     (and
+                       (denote-file-is-note-p file)
+                       (derived-mode-p 'org-mode)
+                       (not (jf/project/get-project-from/current-buffer-is-project))))
+                   (existing-title
+                     (org-get-title))
+                   (file-type
+                     (denote-filetype-heuristics file)))
+          (let ((keywords
+                  (denote-retrieve-keywords-value file file-type)))
+            ;; The 5th line is after the `denote' file metadata
+            (goto-line 5)
+            (insert "\n#+PROJECT_NAME: " existing-title
+              "\n#+CATEGORY: " existing-title)
+            (setq keywords (cons "projects" keywords))
+            (denote-rewrite-keywords file keywords file-type)
+            (call-interactively #'denote-rename-file-using-front-matter))
+          (user-error "Unable to convert buffer to project")))))
+
+  (transient-define-suffix jf/project/add-project-path (label path)
+    "Add a PROJECT_PATH `org-mode' keyword to buffer.
+
+This encodes the logic for creating a project."
+    :description "Add project path…"
+    (interactive (list
+                   (read-string "Label: ")
+                   (read-string "Path: ")))
+    (save-excursion
+      (goto-char (point-min))
+      (let ((case-fold-search t))
+        (if (or
+              (re-search-forward "^#\\+PROJECT_PATHS:" nil t)
+              (re-search-forward "^#\\+PROJECT_NAME:" nil t))
+          (end-of-line)
+          (progn (goto-line 6) (re-search-forward "^$" nil t)))
+        (insert
+          "\n#+PROJECT_PATHS: (\""
+          (s-trim label) "\" . \""
+          (s-trim path)
+          "\")"))))
+
   (transient-define-prefix jf/menu ()
     "A context specific \"mega\" menu."
     ;; Todo, can I get this section into a function so I can duplicate
@@ -5410,13 +6738,13 @@ Alternative suggestions are: - '(\"\\\"“\" . \"\\\"\")"
         ]
       ["Blogging"
         ("b d" jf/org-mode/add-description
-          :if jf/org-mode/blog-entry?)
+          :if jf/blog-entry?)
         ("b r" jf/org-mode/add-session-report
-          :if jf/org-mode/blog-entry?)
+          :if jf/blog-entry?)
         ("b s" "Add Series…" jf/org-mode/add-series-to-file
-          :if jf/org-mode/blog-entry?)
+          :if jf/blog-entry?)
         ("b x" "Export to TakeOnRules…" jf/export-org-to-tor
-          :if jf/org-mode/blog-entry?)]]
+          :if jf/blog-entry?)]]
     [["Modes"
        ;; I could write functions for these, but this is concise enough
        ("m t" "Typopunct ( )" typopunct-mode
@@ -5440,7 +6768,6 @@ Alternative suggestions are: - '(\"\\\"“\" . \"\\\"\")"
         ]
       ["Bookmark"
         ("B s" "Safari" jf/menu--bookmark-safari)]])
-
   ;; this suffix provides a dynamic description of the current host I
   ;; want to use for my blog.  And the prefix’s function toggles the
   ;; host.

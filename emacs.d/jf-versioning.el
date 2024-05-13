@@ -54,7 +54,10 @@
           ("C-x g d" . magit-dispatch))
   :hook ((with-editor-post-finish . #'magit-status)))
 
-(setq auth-sources (list "~/.authinfo.pgp" "~/.authinfo"))
+(use-package auth-source
+  :straight (:type built-in)
+  :config
+  (setq auth-sources (list "~/.authinfo.pgp" "~/.authinfo")))
 
 (use-package forge
   :bind ("C-s-f" . #'forge-dispatch)
@@ -89,54 +92,54 @@
        "harvard-lts/CURIOSity"
        "WGBH-MLA/ams")))
 
-(defvar jf/version-control/valid-commit-title-prefixes
-  '("🎁: feature (A new feature)"
-     "🐛: bug fix (A bug fix)"
-     "📚: docs (Changes to documentation)"
-     "💄: style (Formatting, missing semi colons, etc; no code change)"
-     "♻️: refactor (Refactoring production code)"
-     "☑️: tests (Adding tests, refactoring test; no production code change)"
-     "🧹: chore (Updating build tasks, package manager configs, etc; no production code change)"
-     "🛠: build"
-     "💸: minting a new version"
-     "🔄: revert"
-     "🦄: spike (Indicates research task; usually creates more tickets)"
-     "☄️: epic (Enumeration of lots of other issues/tasks)"
-     "⚙️: config changes"
-     "🎬: initial commit or setup of project/component"
-     "🚧: work in progress (WIP)"
-     "🗡: stab in the dark"
-     "🤖: continuous integration (CI) changes")
-  "Team 💜 Violet 💜 's commit message guidelines on <2023-05-12 Fri>.")
-
 (use-package git-commit
   :straight t
   :hook ((git-commit-mode . jf/git-commit-mode-setup))
-  :bind (:map git-commit-mode-map (("TAB" .  #'completion-at-point)))
-  :preface
+  :bind (:map git-commit-mode-map
+          (("TAB" .  #'completion-at-point)))
+  :bind ("s-7" . #'jf/insert-task-type-at-point)
+  :config
   (defun jf/git-commit-mode-setup ()
     ;; Specify config capf
     (setq fill-column git-commit-fill-column)
     (setq-local completion-at-point-functions
-                  (cons #'jf/version-control/issue-capf
-                          (cons #'jf/version-control/project-capf
-                            completion-at-point-functions)))
+      (cons #'jf/version-control/issue-capf
+        (cons #'jf/version-control/project-capf
+          completion-at-point-functions)))
     (goto-char (point-min))
     (beginning-of-line-text)
     (when (looking-at-p "^$")
-      (jf/insert-task-type-at-point :at (point-min)))))
+      (jf/insert-task-type-at-point :at (point-min))))
 
-(keymap-global-set "s-7" #'jf/insert-task-type-at-point)
-(cl-defun jf/insert-task-type-at-point (&key (splitter ":") (padding " ") (at nil))
-  "Select and insert task type.
+  (defvar jf/version-control/valid-commit-title-prefixes
+    '("🎁: feature (A new feature)"
+       "🐛: bug fix (A bug fix)"
+       "📚: docs (Changes to documentation)"
+       "💄: style (Formatting, missing semi colons, etc; no code change)"
+       "♻️: refactor (Refactoring production code)"
+       "☑️: tests (Adding tests, refactoring test; no production code change)"
+       "🧹: chore (Updating build tasks, package manager configs, etc; no production code change)"
+       "🛠: build"
+       "💸: minting a new version"
+       "🔄: revert"
+       "🦄: spike (Indicates research task; usually creates more tickets)"
+       "☄️: epic (Enumeration of lots of other issues/tasks)"
+       "⚙️: config changes"
+       "🎬: initial commit or setup of project/component"
+       "🚧: work in progress (WIP)"
+       "🗡: stab in the dark"
+       "🤖: continuous integration (CI) changes")
+    "Team 💜 Violet 💜 's commit message guidelines on <2023-05-12 Fri>.")
+  (cl-defun jf/insert-task-type-at-point (&key (splitter ":") (padding " ") (at nil))
+    "Select and insert task type.
 
 Split result on SPLITTER and insert result plus PADDING.  When
 provided AT, insert character there."
-  (interactive)
-  (let ((commit-type (completing-read "Commit title prefix: "
-                       jf/version-control/valid-commit-title-prefixes nil t)))
-    (when at (goto-char at))
-    (insert (car (s-split splitter commit-type)) padding)))
+    (interactive)
+    (let ((commit-type (completing-read "Commit title prefix: "
+                         jf/version-control/valid-commit-title-prefixes nil t)))
+      (when at (goto-char at))
+      (insert (car (s-split splitter commit-type)) padding))))
 
 ;; COMMENTED OUT FOR FUTURE REFERENCE
 ;; (transient-define-prefix jf/magit-aux-commands ()
