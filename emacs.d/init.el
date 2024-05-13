@@ -3695,17 +3695,18 @@ literal then add a fuzzy search)."
           "  m[0].upcase + m[1..-1] "
           "}.gsub(/-(\\w)/) { |m| m[1].upcase }'"))
       "\n"))
-  :config
-  (cl-defun jf/denote? (&key (buffer (current-buffer)))
-    "Return non-nil when BUFFER is for `denote'."
-    (when-let* ((file (buffer-file-name buffer)))
-      (denote-file-is-note-p file)))
+  :preface
   (defun jf/blog-entry? (&optional buffer)
     "Return non-nil when BUFFER is a blog post."
     (when-let* ((buffer (or buffer (current-buffer)))
                  (file (buffer-file-name buffer)))
       (and (denote-file-is-note-p file)
         (string-match-p "\\/blog-posts\\/" file))))
+  :config
+  (cl-defun jf/denote? (&key (buffer (current-buffer)))
+    "Return non-nil when BUFFER is for `denote'."
+    (when-let* ((file (buffer-file-name buffer)))
+      (denote-file-is-note-p file)))
   (require 'denote-org-extras)
   ;; (setq denote-journal-extras-title-format 'day-date-month-year)
   (setq denote-infer-keywords t)
@@ -5867,8 +5868,6 @@ See `jf/comment-header-regexp/major-modes-alis'."
   ;; bookmark file so this isn't a problem but it really does seem
   ;; like a bmkp bug.
   (customize-set-value 'bmkp-last-as-first-bookmark-file nil)
-  (global-set-key (kbd "H-1") #'bookmark-bmenu-list)
-
   ;; auto-set bookmarks.
   (setq bmkp-automatic-bookmark-mode-delay 30))
 
@@ -7495,6 +7494,7 @@ This encodes the logic for creating a project."
           :if-derived eww-mode)
         ]
       ["Bookmark"
+        ("B B" "Bookmarks" bookmark-bmenu-list)
         ("B s" "Safari" jf/menu--bookmark-safari)]])
   ;; this suffix provides a dynamic description of the current host I
   ;; want to use for my blog.  And the prefix’s function toggles the
