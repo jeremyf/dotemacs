@@ -2708,13 +2708,9 @@ HEADLINE does not exist, write it at the end of the file."
       "\n#+END_${block-type}"))
 
   (defvar jf/org-mode/capture/template/while-clocking
-    (concat "\n:PROPERTIES:"
-      "\n:CAPTURED_AT: ${captured-at}"
-      "\n:REMOTE_URL: [[${remote-url}][${function-name}]]"
-      "\n:LOCAL_FILE: [[file:${file-name}::${line-number}]]"
-      "\n:FUNCTION_NAME: ${function-name}"
-      "\n:END:\n"
-      "\n#+BEGIN_${block-type} ${block-mode}"
+    (concat "Reviewing [[${remote-url}][${function-name}]] "
+      "(see [[file:${file-name}::${line-number}][local ${function-name}])"
+      "\n\n#+BEGIN_${block-type} ${block-mode}"
       "\n${block-text}"
       "\n#+END_${block-type}"))
 
@@ -6772,6 +6768,42 @@ This encodes the logic for creating a project."
   ;; want to use for my blog.  And the prefix’s function toggles the
   ;; host.
   :bind ("s-1" . #'jf/menu))
+
+;;; Morpho
+;; (let ((ip4g-dir
+;;        (expand-file-name "~/git/morpho-utils/emacs")))
+;;   (when (file-directory-p ip4g-dir)
+;;     (progn
+;;       (use-package hydra
+;;         ;; Much of Morpho's code leverages the `hydra' package.  Of late
+;;         ;; I've been favoring `transient' but that's a refactor that I
+;;         ;; need not champion.
+;;         :straight t)
+;;       (use-package detached
+;;         ;; Run detached shell commands that can keep running even after
+;;         ;; I quit emacs.
+;;         :straight t
+;;         :preface
+;;         ;; We need the 'dtach' command installed for the detached
+;;         ;; package to work.
+;;         ;;
+;;         ;; '$ brew install dtach'
+;;         (unless (= 0 (shell-command "which dtach"))
+;;           (async-shell-command "brew install dtach"))
+;;         :init (detached-init))
+;;       (unless (= 0 (shell-command "which openstack"))
+;;         (async-shell-command "brew install openstackclient"))
+;;       (unless (= 0 (shell-command "which autossh"))
+;;         (async-shell-command "brew install autossh"))
+
+;;       ;; Need to set these before I require the ip4g package
+;;       (setq ip4g/project-root (expand-file-name "git" (getenv "HOME")))
+;;       (setq morpho-project-root ip4g/project-root)
+;;       (setq ip4g/gcloud-path "/opt/homebrew/share/google-cloud-sdk/bin")
+;;       (add-to-list 'load-path ip4g-dir)
+;;       (require 'ip4g)
+;;       (global-set-key (kbd "H-m c") #'ip4g/current-pcloud)
+;;       (global-set-key (kbd "H-m i") #'ip4g/hydra/body))))
 
 (provide 'init)
   ;;; init.el ends here
