@@ -10,7 +10,6 @@
 
 ;;;; Dependencies
 (require 'jf-quick-help)
-(require 'jf-org-mode)
 
 ;;;; General
 

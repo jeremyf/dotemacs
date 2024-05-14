@@ -51,8 +51,6 @@
 (require 's)
 (require 'f)
 (require 'pulsar)
-(require 'jf-org-mode)
-
 ;;;; Interactive Commands
 
 

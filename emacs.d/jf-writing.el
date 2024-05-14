@@ -10,9 +10,6 @@
 
 ;;; Code:
 
-(require 'jf-org-mode)
-(require 'jf-denote)
-
 
 (provide 'jf-writing)
 ;;; jf-writing.el ends here

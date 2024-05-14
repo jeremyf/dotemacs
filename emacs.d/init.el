@@ -2,12 +2,19 @@
 ;;
 ;;  Emacs configuration for Jeremy Friesen
 ;;
-  ;;; Commentary:
+;;; Commentary:
 ;;
-;;  This is my journey into Emacs.  Let's see where we go!
+;;  This is my journey into Emacs.  Let's see where we go!  I have tried
+;;  `org-mode' literate configuration, separate conceptual files, and am
+;;  now creating a singular unholy init file of all the things.  I have
+;;  made efforts to associate the functions/variables with their
+;;  corresponding packages; either built-in or from places such as
+;;  melpa.
 ;;
-  ;;; CODE:
+;;; Code:
 (add-to-list 'load-path "~/git/dotemacs/emacs.d")
+
+;; Let's just shunt those custom files into oblivion.
 (setq custom-file (make-temp-file "emacs-custom-"))
 (load custom-file :noerror)
 
@@ -37,8 +44,8 @@
 (straight-use-package 'use-package)
 (setq use-package-always-ensure t)
 
-;; *Gcmh* does garbage collection (GC) when the user is idle.
 (use-package gcmh
+  ;; *Gcmh* does garbage collection (GC) when the user is idle.
   :straight t
   :init
   (setq gcmh-idle-delay 5
@@ -49,156 +56,12 @@
       (unless (frame-focus-state)
         (garbage-collect)))))
 
-(use-package exec-path-from-shell
-  ;; https://xenodium.com/trying-out-gccemacs-on-macos/
-  :straight t
-  :config
-  (exec-path-from-shell-initialize)
-  (if (and (fboundp 'native-comp-available-p)
-        (native-comp-available-p))
-    (progn
-      (message "Native comp is available")
-      ;; Using Emacs.app/Contents/MacOS/bin since it was compiled with
-      ;; ./configure --prefix="$PWD/nextstep/Emacs.app/Contents/MacOS"
-      (add-to-list 'exec-path (concat invocation-directory "bin") t)
-      (setenv "LIBRARY_PATH"
-        (concat (getenv "LIBRARY_PATH")
-          (when (getenv "LIBRARY_PATH")
-            ":")
-          ;; This is where Homebrew puts gcc libraries.
-          (car (file-expand-wildcards
-                 "/opt/homebrew/lib/gcc/*"))))
-      ;; Only set after LIBRARY_PATH can find gcc libraries.
-      (setq comp-deferred-compilation t))
-    (message "Native comp is *not* available")))
-
-;; These are some general configurations that I’ve slowly accumulated.
-;; There’s inline documentation in most cases.  There might be little
-;; bits worth teasing out but for the most part, you can move along and
-;; reference this later.
-(setq user-full-name "Jeremy Friesen"
-  user-mail-address "jeremy@jeremyfriesen.com")
-
-(defconst jf/silence-loading-log t
-  "When t log to stdout load messages from this configuration.
-
-     In a previous iteration, I loaded lots of separate '*.el' files.
-     This flag allowed me to more easily troubleshoot those load
-     attempts.")
- ;; Ensuring I have an autosave directory.
-(make-directory "~/.emacs.d/autosaves/" t)
-
-(use-package recentf
-  :straight (:type built-in)
-  :config
-  (setq recentf-max-menu-items 50
-    recentf-max-saved-items 200)
-  ;; Track recent
-  (recentf-mode 1)
-  ;; Quietly save the recent file list every 10 minutes.
-  (run-at-time nil 600 (lambda ()
-                         (let ((save-silently t))
-                           (recentf-save-list)))))
-
-(use-package autorevert
-  :straight (:type built-in)
-  :config
-  (global-auto-revert-mode))
-
-(setq-default fill-column 80)
-;; Doing a bit of configuration of my cursors
-(setq-default cursor-type 'bar)
-(blink-cursor-mode t)
-
-(when (executable-find "rg")
-  (setq grep-program "rg"))
-
-(setq
-  ;; Don't delink hardlinks
-  backup-by-copying t
-
-  backup-directory-alist '((".*" . "~/.emacs.d/backups/"))
-
-  bookmark-default-file "~/emacs-bookmarks.el"
-
-  bookmark-save-flag 1
-
-  ;; I may as well trust themes.
-  custom-safe-themes t
-
-  ;; Don't create lock files.  It's only me on this maching.
-  create-lockfiles nil
-
-  ;; Instead of delete being gone forever, throw it in the trashbin
-  ;; which I must take out
-  delete-by-moving-to-trash t
-
-  ;; Automatically delete excess backups
-  delete-old-versions t
-
-  echo-key-strokes 0.2
-
-  global-mark-ring-max 32
-
-  help-window-select t
-
-  ;; Show index and count of search results
-  isearch-lazy-count t
-  lazy-count-prefix-format "(%s/%s) "
-
-  ;; Slow down the UI being updated to improve performance
-  idle-update-delay 0.5
-
-  ;; Ensure tabs are expanded, not inserted
-  indent-tabs-mode nil
-
-  ;; Don't include the  emacs "start" window
-  inhibit-startup-screen t
-
-  ;; how many of the newest versions to keep
-  kept-new-versions 20
-
-  ;; and how many of the old
-  kept-old-versions 5
-
-  ;; Set a generous kill ring size.
-  kill-ring-max 120
-
-  ;; Favor new bit code
-  load-prefer-newer t
-
-  ;; Increase read size per process
-  read-process-output-max (* 6 512 1024)
-
-  require-final-newline t
-
-  ;; Make regular Isearch interpret empty space as regular expression
-  ;; search-whitespace-regexp ".*?"
-
-  ;; Type C-u C-SPC to pop the mark, then C-SPC to pop again.
-  ;; Without this variable, it's C-u C-SPC everytime
-  set-mark-command-repeat-pop t
-
-  show-trailing-whitespace t
-
-  ;; https://www.masteringemacs.org/article/demystifying-emacs-window-manager
-  switch-to-buffer-obey-display-actions t
-
-  ;; https://github.com/maryrosecook/emacs/blob/6ef574e27f33f08a81b26970b5fb9b4c9c1f9eff/init.el#L745
-  ;; make emacs only add vertical split panes
-  ;; split-height-threshold 99999999999999999
-  ;; Follow symlinks instead of prompting.
-  vc-follow-symlinks t
-
-  ;; Use version numbers on backups
-  version-control t
-
-  ;; Recommendation from https://protesilaos.com/emacs/modus-themes
-  x-underline-at-descent-line t
-  line-move-visual t)
-
 (use-package emacs
   :straight (:type built-in)
+  :init
+  ;; Ensuring I have an autosave directory.  On a few rare occassions
+  ;; this has saved me from lost "work".
+  (make-directory "~/.emacs.d/autosaves/" t)
   :bind (("M-[" . #'backward-paragraph)
           ("s-[" . #'backward-paragraph)
           ("M-]" . #'forward-paragraph)
@@ -209,6 +72,103 @@
   :bind (:map emacs-lisp-mode-map
           ("C-c C-c" . 'jf/eval-region-dwim))
   :config
+  (setq-default fill-column 80)
+  ;; Doing a bit of configuration of my cursors
+  (setq-default cursor-type 'bar)
+
+  (blink-cursor-mode t)
+
+  (setq
+    ;; Don't delink hardlinks
+    backup-by-copying t
+
+    backup-directory-alist '((".*" . "~/.emacs.d/backups/"))
+
+    bookmark-default-file "~/emacs-bookmarks.el"
+
+    bookmark-save-flag 1
+
+    ;; I may as well trust themes.
+    custom-safe-themes t
+
+    ;; Don't create lock files.  It's only me on this maching.
+    create-lockfiles nil
+
+    ;; Instead of delete being gone forever, throw it in the trashbin
+    ;; which I must take out
+    delete-by-moving-to-trash t
+
+    ;; Automatically delete excess backups
+    delete-old-versions t
+
+    echo-key-strokes 0.2
+
+    global-mark-ring-max 32
+
+    help-window-select t
+
+    ;; Show index and count of search results
+    isearch-lazy-count t
+    lazy-count-prefix-format "(%s/%s) "
+
+    ;; Slow down the UI being updated to improve performance
+    idle-update-delay 0.5
+
+    ;; Ensure tabs are expanded, not inserted
+    indent-tabs-mode nil
+
+    ;; Don't include the  emacs "start" window
+    inhibit-startup-screen t
+
+    ;; how many of the newest versions to keep
+    kept-new-versions 20
+
+    ;; and how many of the old
+    kept-old-versions 5
+
+    ;; Set a generous kill ring size.
+    kill-ring-max 120
+
+    ;; Favor new bit code
+    load-prefer-newer t
+
+    ;; Increase read size per process
+    read-process-output-max (* 6 512 1024)
+
+    require-final-newline t
+
+    ;; Make regular Isearch interpret empty space as regular expression
+    ;; search-whitespace-regexp ".*?"
+
+    ;; Type C-u C-SPC to pop the mark, then C-SPC to pop again.
+    ;; Without this variable, it's C-u C-SPC everytime
+    set-mark-command-repeat-pop t
+
+    show-trailing-whitespace t
+
+    ;; https://www.masteringemacs.org/article/demystifying-emacs-window-manager
+    switch-to-buffer-obey-display-actions t
+
+    ;; https://github.com/maryrosecook/emacs/blob/6ef574e27f33f08a81b26970b5fb9b4c9c1f9eff/init.el#L745
+    ;; make emacs only add vertical split panes
+    ;; split-height-threshold 99999999999999999
+    ;; Follow symlinks instead of prompting.
+    vc-follow-symlinks t
+
+    ;; Use version numbers on backups
+    version-control t
+
+    ;; Recommendation from https://protesilaos.com/emacs/modus-themes
+    x-underline-at-descent-line t
+    line-move-visual t)
+
+  ;; These are some general configurations that I’ve slowly accumulated.
+  ;; There’s inline documentation in most cases.  There might be little
+  ;; bits worth teasing out but for the most part, you can move along and
+  ;; reference this later.
+  (setq user-full-name "Jeremy Friesen"
+    user-mail-address "jeremy@jeremyfriesen.com")
+
   (defun jf/alist-prompt (prompt collection &rest args)
     (let ((string (completing-read prompt collection args)))
       (cons string (alist-get string collection nil nil #'string=))))
@@ -309,6 +269,52 @@ Else, evaluate the whole buffer."
         (message
           "Copied buffer file name '%s' to the clipboard."
           filename)))))
+
+(use-package exec-path-from-shell
+  ;; https://xenodium.com/trying-out-gccemacs-on-macos/
+  :straight t
+  :config
+  (exec-path-from-shell-initialize)
+  (if (and (fboundp 'native-comp-available-p)
+        (native-comp-available-p))
+    (progn
+      (message "Native comp is available")
+      ;; Using Emacs.app/Contents/MacOS/bin since it was compiled with
+      ;; ./configure --prefix="$PWD/nextstep/Emacs.app/Contents/MacOS"
+      (add-to-list 'exec-path (concat invocation-directory "bin") t)
+      (setenv "LIBRARY_PATH"
+        (concat (getenv "LIBRARY_PATH")
+          (when (getenv "LIBRARY_PATH")
+            ":")
+          ;; This is where Homebrew puts gcc libraries.
+          (car (file-expand-wildcards
+                 "/opt/homebrew/lib/gcc/*"))))
+      ;; Only set after LIBRARY_PATH can find gcc libraries.
+      (setq comp-deferred-compilation t))
+    (message "Native comp is *not* available")))
+
+(use-package recentf
+  :straight (:type built-in)
+  :config
+  (setq recentf-max-menu-items 50
+    recentf-max-saved-items 200)
+  ;; Track recent
+  (recentf-mode 1)
+  ;; Quietly save the recent file list every 10 minutes.
+  (run-at-time nil 600 (lambda ()
+                         (let ((save-silently t))
+                           (recentf-save-list)))))
+
+(use-package autorevert
+  :straight (:type built-in)
+  :config
+  (global-auto-revert-mode))
+
+(use-package grep
+  :straight (:type built-in)
+  :config
+  (when (executable-find "rg")
+    (setq grep-program "rg")))
 
 (use-package sort
   :straight (:type built-in)
@@ -875,8 +881,6 @@ When given PREFIX use `eww-browse-url'."
          :italic-slant italic
          :line-spacing nil)))
   (fontaine-set-preset 'default))
-
-;;;; Icons
 
 (use-package nerd-icons
   :straight t
@@ -2071,8 +2075,12 @@ holding contextual information."
   (advice-add #'org-latex-property-drawer
     :override #'jf/org-latex-property-drawer)
 
-  (defun jf/org-latex-format-basic-headline-function
-    (_todo _todo-type _priority text _tags _info)
+  (defun jf/org-latex-format-basic-headline-function (_todo
+                                                       _todo-type
+                                                       _priority
+                                                       text
+                                                       _tags
+                                                       _info)
     "Only render the TEXT of the headlin.
 See `org-latex-format-headline-function' for details."
     text)
@@ -2265,13 +2273,13 @@ The function takes has one parameter: an `org-mode' element.")
   ;; When I jump to a new task for the day, I want to position that task
   ;; within the prompted project.  Inspiration from
   ;; https://gist.github.com/webbj74/0ab881ed0ce61153a82e.
-  (cl-defun jf/org-mode/agenda-find-project-node
-    (&key
-      (tag "projects")
-      (project (jf/org-mode/agenda-project-prompt))
-      ;; The `file+olp+datetree` directive creates a headline like
-      ;; “2022-09-03 Saturday”.
-      (within_headline (format-time-string "%Y-%m-%d %A")))
+  (cl-defun jf/org-mode/agenda-find-project-node (
+                                                   &key
+                                                   (tag "projects")
+                                                   (project (jf/org-mode/agenda-project-prompt))
+                                                   ;; The `file+olp+datetree` directive creates a headline like
+                                                   ;; “2022-09-03 Saturday”.
+                                                   (within_headline (format-time-string "%Y-%m-%d %A")))
     "Position `point' at the end of the given PROJECT WITHIN_HEADLINE.
 
 And use the given TAG."
@@ -2454,8 +2462,6 @@ Assumes that I'm on a :projects: headline.
       (kill-new tasks)
       (message output)))
 
-;;; Extra Org Mode Export Function(s)
-
   ;; Org Mode has built-in capabilities for exporting to HTML (and other
   ;; languages).  The following function does just a bit more.  It
   ;; converts the org region to HTML and sends it to the clipboard as an
@@ -2612,8 +2618,10 @@ Assumes that I'm on a :projects: headline.
 
   ;; If the example doesn't exist, create the example in the file
 
-  (cl-defun jf/org-mode/capture/prompt-for-example
-    (&optional given-mode &key (tag "example"))
+  (cl-defun jf/org-mode/capture/prompt-for-example (&optional
+                                                     given-mode
+                                                     &key
+                                                     (tag "example"))
     "Prompt for the GIVEN-MODE example with given TAG."
     (let* ((mode (or given-mode (completing-read "Example:"
                                   '("Existing" "New" "Stored")))))
@@ -2660,11 +2668,10 @@ Assumes that I'm on a :projects: headline.
     nil
     "A cached value to help quickly capture items.")
 
-  (cl-defun jf/org-mode/capture/set-position-file
-    (&key
-      (headline (jf/org-mode/capture/prompt-for-example))
-      (tag "code")
-      (depth 3))
+  (cl-defun jf/org-mode/capture/set-position-file (&key
+                                                    (headline (jf/org-mode/capture/prompt-for-example))
+                                                    (tag "code")
+                                                    (depth 3))
     "Position `point' at the end of HEADLINE.
 
 The HEADLINE must have the given TAG and be at the given DEPTH
@@ -3303,16 +3310,10 @@ Useful if you want a more robust view into the recommend candidates."
   ;; Recommended: Enable Corfu globally.
   ;; This is recommended since dabbrev can be used globally (M-/).
   (global-corfu-mode)
-  (load "~/.emacs.d/straight/build/corfu/corfu-indexed.el"
-    nil
-    jf/silence-loading-log)
+  (load "~/.emacs.d/straight/build/corfu/corfu-indexed.el" nil t)
   (corfu-indexed-mode)
-  (load "~/.emacs.d/straight/build/corfu/corfu-info.el"
-    nil
-    jf/silence-loading-log)
-  (load "~/.emacs.d/straight/build/corfu/corfu-popupinfo.el"
-    nil
-    jf/silence-loading-log)
+  (load "~/.emacs.d/straight/build/corfu/corfu-info.el" nil t)
+  (load "~/.emacs.d/straight/build/corfu/corfu-popupinfo.el" nil t)
   (corfu-popupinfo-mode))
 
 (use-package cape
@@ -3619,16 +3620,10 @@ literal then add a fuzzy search)."
   (setq vertico-cycle t)
   :init
   ;; Type "C-3 return" and select the 3rd candidate in the list.
-  (load "~/.emacs.d/straight/build/vertico/vertico-indexed.el"
-    nil
-    jf/silence-loading-log)
+  (load "~/.emacs.d/straight/build/vertico/vertico-indexed.el" nil t)
   (vertico-indexed-mode)
-  (load "~/.emacs.d/straight/build/vertico/vertico-directory.el"
-    nil
-    jf/silence-loading-log)
-  (load "~/.emacs.d/straight/build/vertico/vertico-repeat.el"
-    nil
-    jf/silence-loading-log)
+  (load "~/.emacs.d/straight/build/vertico/vertico-directory.el" nil t)
+  (load "~/.emacs.d/straight/build/vertico/vertico-repeat.el" nil t)
   (keymap-global-set "M-r" #'vertico-repeat)
   ;; When I type ~/ in the `find-file' selector, then it will clear the
   ;; existing path and go to ~/ From Prot's video presentation
@@ -3965,9 +3960,6 @@ When no FILE is provided use `buffer-file-name'.
       new-file))
 
 
-;;;; Note taking configurations
-
-
   (cl-defun jf/denote/org-property-from-id (&key identifier property)
     ;; This function helps me retrieve Org-Mode properties from the
     ;; given Denote ID.
@@ -4038,8 +4030,6 @@ This function is the plural version of
                          refs))
                      (lax-plist-get kw-plist "SAME_AS"))))))))
 
-;;;;; `denote' file finding functions
-
   (defun jf/denote/link-or-create (target &optional id-only)
     "Use `denote-link' on TARGET file, creating it if necessary.
 
@@ -4097,7 +4087,6 @@ See `denote-file-prompt'"
             "git ls-files -zco --exclude-from=.projectile.gitignore"))
       (consult-projectile--file (denote-directory))))
 
-;;;;; Note taking Domains
   (cl-defmacro jf/denote/create-functions-for (&key domain
                                                 key (create-fn nil))
     "A macro to CREATE-FN for the given DOMAIN.
@@ -4184,7 +4173,6 @@ See `denote-file-prompt'"
     (find-file filename))
   (bind-key "H-d f B" #'jf/denote/find-file--blog-posts-draft)
 
-;;;;;; Scratch
   (defun jf/denote/create-scratch (title)
     "Create a scratch note with TITLE."
     (interactive (list (read-string
@@ -4201,17 +4189,12 @@ See `denote-file-prompt'"
     :create-fn #'jf/denote/create-scratch
     :key ?s)
 
-;;;;;; Scientist
   (jf/denote/create-functions-for :domain "work"
     :key ?w)
 
   (jf/denote/create-functions-for :domain "private"
     :key ?v)
 
-  ;; (jf/denote/create-functions-for :domain "journal"
-  ;;   :key ?j)
-
-;;;;;; Epigraphs
   (cl-defun jf/denote/create-epigraph (&key
                                         (body
                                           (read-from-minibuffer
@@ -4264,12 +4247,10 @@ Default the note’s title to the first NTH-WORDS of the BODY."
     :key ?e
     :create-fn 'jf/denote/create-epigraph)
 
-;;;;;; Glossary Entries
-  (cl-defun jf/denote/create-glossary-entry
-    (&key
-      (title (read-from-minibuffer "Name the Entry: "))
-      (is-a-game (yes-or-no-p "Is this a game?"))
-      (abbr (read-from-minibuffer "Abbreviation (empty to skip): ")))
+  (cl-defun jf/denote/create-glossary-entry (&key
+                                              (title (read-from-minibuffer "Name the Entry: "))
+                                              (is-a-game (yes-or-no-p "Is this a game?"))
+                                              (abbr (read-from-minibuffer "Abbreviation (empty to skip): ")))
     "Create a `denote' entry for the given TITLE and ABBR.
 
     And if this IS-A-GAME then amend accordingly.
@@ -4360,7 +4341,6 @@ Consider different logic if IS-A-SERIES."
     :key ?i
     :create-fn 'jf/denote/create-indices-entry)
 
-;;;;; `org-link-parameters'
   (cl-defun jf/org-link-complete-link-for (parg &key
                                             scheme filter subdirectory)
     "Prompt for `denote' with filename FILTER in the given SUBDIRECTORY.
@@ -4649,7 +4629,6 @@ When USE_HUGO_SHORTCODE is given use glossary based exporting."
             (user-error "Current element is of type %s; it must be one of the following: %s" type types)))
         (user-error "Current element must be of type 'link; it is %S" (car element)))))
 
-;;;;; Capturing functions for applications
   (defun jf/menu--org-capture-firefox ()
     "Create an `denote' entry from Firefox page."
     (interactive)
@@ -5050,7 +5029,6 @@ method, get the containing class."
   :config (setq scopeline-overlay-prefix "  ~ ")
   :hook ((ruby-mode ruby-ts-mode) . scopeline-mode))
 
-;;;; Other packages and their configurations
 (use-package bundler
   ;; For Ruby package management
   :straight (bundler
@@ -5594,8 +5572,6 @@ method, get the containing class."
 (use-package dash-docs
   :straight t)
 
-;;; Commented out as work machine does not like codeberg.org git URLs
-;;
 ;; (use-packaqge consult-dash
 ;;   :straight t)
 
@@ -5761,17 +5737,17 @@ See `jf/comment-header-regexp/major-modes-alis'."
     (setq imenu-generic-expression
       '((nil "^;;[[:space:]]+-> \\(.*\\)$" 1)
          ("Variables"
-           "^([[:space:]]*\\(cl-\\)?defvar[[:space:]]+\\([^ ]*\\)$" 2)
+           "^[[:space:]]*([[:space:]]*\\(cl-\\)?defvar[[:space:]]+\\([^ ]*\\)$" 2)
          ("Variables"
-           "^([[:space:]]*\\(cl-\\)?defconst[[:space:]]+\\([^ ]*\\)$" 2)
+           "^[[:space:]]*([[:space:]]*\\(cl-\\)?defconst[[:space:]]+\\([^ ]*\\)$" 2)
          ("Variables"
-           "^([[:space:]]*\\(cl-\\)?defcustom[[:space:]]+\\([^ ]*\\)$" 2)
+           "^[[:space:]]*([[:space:]]*\\(cl-\\)?defcustom[[:space:]]+\\([^ ]*\\)$" 2)
          ("Functions"
-           "^([[:space:]]*\\(cl-\\)?defun[[:space:]]+\\([^(]+\\)" 2)
+           "^[[:space:]]*([[:space:]]*\\(cl-\\)?defun[[:space:]]+\\([^(]+\\)" 2)
          ("Macros"
-           "^([[:space:]]*\\(cl-\\)?defmacro[[:space:]]+\\([^(]+\\)" 2)
+           "^[[:space:]]*([[:space:]]*\\(cl-\\)?defmacro[[:space:]]+\\([^(]+\\)" 2)
          ("Types"
-           "^([[:space:]]*\\(cl-\\)?defstruct[[:space:]]+\\([^(]+\\)" 2)
+           "^[[:space:]]*([[:space:]]*\\(cl-\\)?defstruct[[:space:]]+\\([^(]+\\)" 2)
          ("Packages"
            "^.*([[:space:]]*use-package[[:space:]]+\\([[:word:]-]+\\)" 1)))
     (imenu-add-menubar-index))
@@ -6075,8 +6051,6 @@ See `jf/comment-header-regexp/major-modes-alis'."
       (org-modern-mode -1)))
   (advice-add 'olivetti-mode :before #'jf/olivetti-mode))
 
-;;; Presentation mode leveraging logos
-
 (defvar jf/minor-mode/presenter-map
   (let ((map (make-sparse-keymap)))
     (define-key map (kbd "C-n") #'next-line)
@@ -6368,8 +6342,6 @@ Alternative suggestions are: - '(\"\\\"“\" . \"\\\"\")"
 
 (load "~/git/dotemacs/emacs.d/random-tables-data.el")
 
-(load (concat user-emacs-directory "hide-comnt.el") :noerror)
-
 (use-package server
   :straight (:type built-in)
   :hook (server-visit . server-visit-hook-custom-find)
@@ -6513,7 +6485,6 @@ Added in cases where we want to inject the actual file."
                 (cdar (org-collect-keywords '("PROJECT_PATHS"))))))
         (setq paths (cons (cons "Notes" filename) paths)))))
 
-;;;; Support Functions
   (cl-defun jf/project/list-projects (&key (project ".+")
                                        (directory org-directory))
     "Return a list of `cons' that match the given PROJECT.

@@ -13,7 +13,5 @@
 
 ;;;; Other packages and their configurations
 
-(require 'jf-org-mode)
-
 (provide 'jf-completing)
 ;;; jf-completing.el ends here
