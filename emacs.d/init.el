@@ -7448,7 +7448,7 @@ This encodes the logic for creating a project."
        ("j h" "Hugo File" jf/jump_to_corresponding_hugo_file
          :if-derived org-mode)
        ("j m" "Mark" consult-mark)
-       ("j r" "Jump to Git Related" consult-git-related-find-file)
+       ;; ("j r" "Jump to Git Related" consult-git-related-find-file)
        ("j l" "Jump to Magit Project Lists" magit-list-repositories)
        ;; ("j s" "Jump to Shortdoc" shortdoc-display-group)
        ;; ("j v" jf/jump-to/violet-board)
