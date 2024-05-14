@@ -411,7 +411,6 @@ Else, evaluate the whole buffer."
   jf/tor-hostname-default-local
   "What is the current hostname for serving TakeOnRules content.")
 
-;; https://www.reddit.com/r/emacs/comments/112t0uo/comment/ja41lso/?utm_source=share&utm_medium=web2x&context=3
 (use-package info
   :straight (:type built-in)
   :config
@@ -5324,9 +5323,11 @@ method, get the containing class."
   :straight t
   :config (global-hl-todo-mode))
 
-;;
-;; https://github.com/alphapapa/magit-todos.git
+
 (use-package magit-todos
+  ;; Package that adds a `magit' section highlighting todos in the
+  ;; current repository; and even highlighting what todos were added in
+  ;; the branch but not in main.
   :config (magit-todos-mode)
   :commands (magit-todos-list)
   :custom (magit-todos-exclude-globs '(".git/" "public/"))
@@ -5394,8 +5395,6 @@ method, get the containing class."
 
 (use-package plantuml-mode
   ;; A mode for working with PlantUML.  See https://plantuml.com
-  ;;
-  ;;
   :config (setq plantuml-executable-path (concat
                                            (getenv "HB_PATH")
                                            "/bin/plantuml")
@@ -5567,9 +5566,9 @@ method, get the containing class."
   :straight t
   :commands (devdocs-install))
 
-;; An alternate to devdocs.  Facilitates downloading HTML files and
-;; index.
 (use-package dash-docs
+  ;; An alternate to devdocs.  Facilitates downloading HTML files and
+  ;; index.
   :straight t)
 
 ;; (use-packaqge consult-dash
