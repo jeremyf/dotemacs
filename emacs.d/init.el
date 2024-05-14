@@ -2229,46 +2229,6 @@ function is ever added to that hook."
             "+LEVEL=4+projects" 'agenda))
         #'string<)))
 
-  (cl-defun jf/org-mode/headlines-with-property (&key property title)
-    "Find all headlines with PROPERTY.
-
-When you provide a TITLE limit the headlines to those titles that match.
-
-Hopefully only one of them."
-    (with-current-buffer (current-buffer)
-      (org-element-map
-        (org-element-parse-buffer)
-        '(keyword node-property headline)
-        (lambda (element)
-          (and
-            (org-element-type-p element 'headline)
-            (not (s-blank? (org-entry-get element property)))
-            (if title
-              (string= (org-element-property :raw-value element) title)
-              t)
-            (org-element-property :title element))))))
-
-  (defvar jf/org-mode/headline-property-adjusters
-    nil
-    "An alist of property and function.
-
-The function takes has one parameter: an `org-mode' element.")
-
-  (defun jf/org-mode/increment-progress (&optional element)
-    "Increment 'PROGRESS' property for `org-mode' ELEMENT."
-    (interactive)
-    (save-excursion
-      (when-let*
-        ((candidates
-           (jf/org-mode/headlines-with-property :property "PROGRESS"))
-          (element
-            (or element
-              (completing-read "Progress Tracks: "
-                candidates nil t)))
-          (new-rank
-            (jf/org-mode/increment-progress-for-element element)))
-        (org-entry-put element "PROGRESS" new-rank))))
-
   ;; When I jump to a new task for the day, I want to position that task
   ;; within the prompted project.  Inspiration from
   ;; https://gist.github.com/webbj74/0ab881ed0ce61153a82e.
@@ -6105,8 +6065,6 @@ See `jf/comment-header-regexp/major-modes-alis'."
   "Hook when `jf/minor-mode/presenter' deactivated."
   :type 'hook)
 
-(require 'jf-utility)
-
 (use-package mastodon
   :straight (:host github :repo "jeremyf/mastodon.el")
   :config (setq mastodon-instance-url "https://dice.camp"
@@ -6525,8 +6483,8 @@ provided AT, insert character there."
   :config
   (global-undo-tree-mode +1))
 
-(require 'jf-quick-help)
-(require 'jf-gaming)
+(require 'org-charsheet)
+
 (with-eval-after-load 'org
   (use-package ox
     :straight (:type built-in))

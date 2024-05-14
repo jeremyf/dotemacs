@@ -9,6 +9,9 @@ This is my Emacs configuration repository.  It pairs with my [[https://github.co
 For those curious, I wrote [[https://takeonrules.com/2020/10/18/why-i-chose-emacs-as-my-new-text-editor/][Why I Chose Emacs as My New Text Editor // Take on Rules]].
 
 * The Structure
+:PROPERTIES:
+:ID:       45A067AA-0193-4D6E-A77F-8E02B088DCBC
+:END:
 
 Below is the top-level directory:
 
@@ -33,6 +36,9 @@ The files and directories:
 - templates :: Templates for the [[https://github.com/minad/tempel][Emacs tempel package]].
 
 * The emacs.d Directory
+:PROPERTIES:
+:ID:       F12B8506-CA7F-4BC7-92DA-077C96AD2B80
+:END:
 
 There are two “primary” files to consider in =./emacs.d=:
 
@@ -40,41 +46,26 @@ There are two “primary” files to consider in =./emacs.d=:
 - early-init.el :: The file evaluated early on when Emacs launches.
 
 ** Digging Further into emacs.d
+:PROPERTIES:
+:ID:       9E740E8A-2098-41A5-B20F-72E1321AA97E
+:END:
 
 The =init.el= file requires the various files in my =emacs.d= directory.  As of <2022-11-19 Sat> I shifted from Literate configuration to a Emacs Lisp configuration.  I appreciate being able to jump to the definition and edit directly; something that wasn’t immediately obvious with Literate configuration.
 
 Organizing concepts is an interesting challenge, as packages interact in a multi-dimensional manner.  Each of my =jf-<concept>.el= has a rudimentary commentary.
 
 - [[file:emacs.d/abbrev_defs][abbrev_defs]] :: Common typos auto-corrected
-- [[file:emacs.d/custom.el][custom.el]] :: Customizations file
 - [[file:emacs.d/early-init.el][early-init.el]] :: The preamble for starting Emacs
 - [[file:emacs.d/hide-comnt.el][hide-comnt.el]] :: A silly little mode to hide comments
-- [[file:emacs.d/init.el][init.el]] :: The guts of Emacs initialization
-- [[file:emacs.d/jf-blogging.el][jf-blogging.el]] :: Functions that I use for blogging, this houses deprecated methods.
-- [[file:emacs.d/jf-coding.el][jf-coding.el]] :: Specific functions to help coding
-- [[file:emacs.d/jf-communicating.el][jf-communicating.el]] :: Configuration for running Mastodon in my Emacs
-- [[file:emacs.d/jf-completing.el][jf-completing.el]] :: Functions that help completing read
-- [[file:emacs.d/jf-denote.el][jf-denote.el]] :: My configuration and extension of the Denote package
-- [[file:emacs.d/jf-fonts-and-iconography.el][jf-fonts-and-iconography.el]] :: the look and feel of the words I type
-- [[file:emacs.d/jf-formatting.el][jf-formatting.el]] ::
-- [[file:emacs.d/jf-framing.el][jf-framing.el]] ::
-- [[file:emacs.d/jf-gaming.el][jf-gaming.el]] ::
-- [[file:emacs.d/jf-illuminating.el][jf-illuminating.el]] ::
-- [[file:emacs.d/jf-launching.el][jf-launching.el]] ::
-- [[file:emacs.d/jf-menus.el][jf-menus.el]] ::
-- [[file:emacs.d/jf-minor-mode-maker.el][jf-minor-mode-maker.el]] ::
-- [[file:emacs.d/jf-navigating.el][jf-navigating.el]] ::
-- [[file:emacs.d/jf-org-mode.el][jf-org-mode.el]] :: Beloved OrgMode \ Along my path we meet and \ Now walk together
-- [[file:emacs.d/jf-organizing.el][jf-organizing.el]] ::
-- [[file:emacs.d/jf-project.el][jf-project.el]] :: Connective tissue for projects
-- [[file:emacs.d/jf-quick-help.el][jf-quick-help.el]] ::
-- [[file:emacs.d/jf-reading.el][jf-reading.el]] ::
-- [[file:emacs.d/jf-utility.el][jf-utility.el]] ::
-- [[file:emacs.d/jf-versioning.el][jf-versioning.el]] ::
-- [[file:emacs.d/jf-windows.el][jf-windows.el]] ::
-- [[file:emacs.d/jf-writing.el][jf-writing.el]] :: General writing functions
+- [[file:emacs.d/init.el][init.el]] :: Most everything of or related to my Emacs configuration.
+- [[file:emacs.d/dig-my-grave.el][dig-my-grave.el] :: An `org-mode` package that extends the triple back tick by providing a prompt for block context.
+- [[file:emacs.d/org-charsheet.el][org-charsheet.el]] :: A work-in-progress package for managing Org Headline metadata (with a focus on table top role-playing games).
+
 
 ** Keybinding Prefixes
+:PROPERTIES:
+:ID:       EADA236A-4612-42D2-B5A7-7F73408C2AB8
+:END:
 
 On <2023-10-20 Fri> I began refactoring some keybindings.  There were functions that got “prime” key chords but were not things I’d frequently use.  As such, I’m taking a two-fold approach:
 
