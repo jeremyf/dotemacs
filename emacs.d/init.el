@@ -5885,27 +5885,15 @@ See `jf/comment-header-regexp/major-modes-alis'."
   :bind ("s-." . projectile-toggle-between-implementation-and-test)
   :config
   (projectile-mode 1)
-  (defun jf/projectile-reset-known-projects ()
-    "Reset known projects to `projectile-project-search-path'."
-    (interactive)
-    (require 's)
-    (dolist (proj projectile-known-projects)
-      (dolist (search-path projectile-project-search-path)
-        (unless (s-starts-with? search-path proj)
-          (projectile-remove-known-project proj)))))
-
   ;; The default relevant `magit-list-repositories'
   ;; The following command shows all "project" directories
   (defvar jf/git-project-paths
     (mapcar (lambda (el) (cons el 1)) projectile-known-projects)
     "An alist of project directories.")
 
-  (dolist (path
-            (s-split "\n"
-              (s-trim
-                (shell-command-to-string "ls ~/git/org/denote/"))))
+  (dolist (dir (f-directories "~/git/org/denote/"))
     (add-to-list 'jf/git-project-paths
-      (cons (concat "~/git/org/denote" path) 1)))
+      (cons dir 1)))
 
   (setq magit-repository-directories jf/git-project-paths))
 
@@ -6726,14 +6714,19 @@ Take on Rules using the \"blockquote\" special block."
     (cl-defun jf/blog-post/tootify ()
       "Create a toot from the current buffer."
       (interactive)
-      (if (jf/org-mode/blog-entry?)
-        (let* ((metadata (jf/org-keywords-as-plist :keywords-regexp "\\(ROAM_REFS\\|DESCRIPTION\\)"))
-                (url (lax-plist-get metadata "ROAM_REFS"))
-                (description (lax-plist-get metadata "DESCRIPTION")))
+      (if (jf/blog-entry?)
+        (let* ((metadata
+                 (jf/org-keywords-as-plist
+                   :keywords-regexp "\\(ROAM_REFS\\|DESCRIPTION\\)"))
+                (url
+                  (lax-plist-get metadata "ROAM_REFS"))
+                (description
+                  (lax-plist-get metadata "DESCRIPTION")))
           (call-interactively #'mastodon-toot)
           (end-of-buffer)
-          (insert (s-join "\n\n" (flatten-list (list description url)))))
-        (user-error "Current buffer is not a blog post.")))
+          (insert (s-join "\n\n"
+                    (flatten-list (list description url)))))
+        (user-error "Current buffer is not a blog post")))
 
     (cl-defun jf/jump_to_corresponding_hugo_file (&key (buffer (current-buffer)))
       "Find the TakeOnRules.com url in the BUFFER and jump to corresponding Hugo file."
