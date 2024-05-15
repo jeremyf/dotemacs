@@ -4218,8 +4218,7 @@ Default the note’s title to the first NTH-WORDS of the BODY."
     NOTE: At present there is no consideration for uniqueness."
     (interactive)
     (let* ((key
-             (downcase (denote-sluggify-title
-                         (if (s-present? abbr) abbr title))))
+             (downcase (denote-sluggify-title title)))
             (template (concat "#+GLOSSARY_KEY: " key "\n"
                         (when (s-present? abbr)
                           (concat "#+ABBR: " abbr "\n"))
@@ -7501,41 +7500,27 @@ This encodes the logic for creating a project."
   ;; host.
   :bind ("s-1" . #'jf/menu))
 
-;;; Morpho
-;; (let ((ip4g-dir
-;;        (expand-file-name "~/git/morpho-utils/emacs")))
-;;   (when (file-directory-p ip4g-dir)
-;;     (progn
-;;       (use-package hydra
-;;         ;; Much of Morpho's code leverages the `hydra' package.  Of late
-;;         ;; I've been favoring `transient' but that's a refactor that I
-;;         ;; need not champion.
-;;         :straight t)
-;;       (use-package detached
-;;         ;; Run detached shell commands that can keep running even after
-;;         ;; I quit emacs.
-;;         :straight t
-;;         :preface
-;;         ;; We need the 'dtach' command installed for the detached
-;;         ;; package to work.
-;;         ;;
-;;         ;; '$ brew install dtach'
-;;         (unless (= 0 (shell-command "which dtach"))
-;;           (async-shell-command "brew install dtach"))
-;;         :init (detached-init))
-;;       (unless (= 0 (shell-command "which openstack"))
-;;         (async-shell-command "brew install openstackclient"))
-;;       (unless (= 0 (shell-command "which autossh"))
-;;         (async-shell-command "brew install autossh"))
 
-;;       ;; Need to set these before I require the ip4g package
-;;       (setq ip4g/project-root (expand-file-name "git" (getenv "HOME")))
-;;       (setq morpho-project-root ip4g/project-root)
-;;       (setq ip4g/gcloud-path "/opt/homebrew/share/google-cloud-sdk/bin")
-;;       (add-to-list 'load-path ip4g-dir)
-;;       (require 'ip4g)
-;;       (global-set-key (kbd "H-m c") #'ip4g/current-pcloud)
-;;       (global-set-key (kbd "H-m i") #'ip4g/hydra/body))))
+(use-package detached
+  ;; Run detached shell commands that can keep running even after
+  ;; I quit emacs.
+  :straight t
+  :preface
+  ;; We need the 'dtach' command installed for the detached
+  ;; package to work.
+  ;;
+  ;; '$ brew install dtach'
+  (unless (executable-find "which dtach")
+    (async-shell-command "brew install dtach")))
+
+
+(let ((ip4g-dir
+       (expand-file-name "~/git/morpho-utils/emacs")))
+  (when (file-directory-p ip4g-dir)
+    (unless (executable-find "which openstack")
+      (async-shell-command "brew install openstackclient"))
+    (unless (executable-find "which autossh")
+      (async-shell-command "brew install autossh"))))
 
 (provide 'init)
   ;;; init.el ends here
