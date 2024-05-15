@@ -783,7 +783,9 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
             (car (list-utils-dupes (-list dice))))
   :fetcher (lambda (data &rest rest)
              (when-let ((index (car rest)))
-               (concat " with unexpected “" (nth (- index 1) data) "” event")))
+               (concat " with unexpected “"
+                 (nth (- (if (listp index) (car index) index) 1) data)
+                 "” event")))
   :data '("Very negative" "Negative" "Negative but…" "Positive but…" "Positive" "Very Positive"))
 
 ;;; OSE
