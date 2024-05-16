@@ -2675,7 +2675,7 @@ HEADLINE does not exist, write it at the end of the file."
 
   (defvar jf/org-mode/capture/template/while-clocking
     (concat "Reviewing [[${remote-url}][${function-name}]] "
-      "(see [[file:${file-name}::${line-number}][local ${function-name}])"
+      "(see [[file:${file-name}::${line-number}][local ${function-name}]])"
       "\n\n#+BEGIN_${block-type} ${block-mode}"
       "\n${block-text}"
       "\n#+END_${block-type}"))
@@ -2765,7 +2765,11 @@ The return value is a list of `cons' with the `car' values of:
                 "\n#+end_blockquote\n%?"))))
         ((string= "file" type)
           (save-excursion
-            (org-link-open-as-file path nil)
+            ;; When capturing an HTML file, when the second parameter
+            ;; was nil, the `org-link-open-as-file' would launch an
+            ;; external web browser.  Not desired behvaior for a content
+            ;; capture.
+            (org-link-open-as-file path t)
             (s-format jf/org-mode/capture/template/while-clocking
               'aget
               (jf/org-mode/capture/get-field-values content))))
