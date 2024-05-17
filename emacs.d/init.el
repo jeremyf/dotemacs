@@ -849,6 +849,11 @@ The ARGS are the rest of the ARGS passed to the ADVISED-FUNCTION."
                      (string-match
 		                   "^https://github.com/\\([^/]+\\)/\\([^/]+\\)/[^/]+/[^/]+/\\([^#]+\\)\\(#L\\([0-9]+\\)\\)?"
 		                   url)))
+          ;; Due to my present file structure I have some repositories
+          ;; in ~/git/ and others in ~/git/sub-dir
+          ;;
+          ;; In most every case, the Github org and repo match the
+          ;; remote URL.
           (let ((filename-without-org
 		              (format "~/git/%s/%s"
 			              (match-string 2 url)
@@ -6392,6 +6397,7 @@ Alternative suggestions are: - '(\"\\\"“\" . \"\\\"\")"
        "scientist-softserv/iiif_print"
        "scientist-softserv/palni-palci"
        "scientist-softserv/palni_palci_knapsack"
+       "scientist-softserv/space_stone-serverless"
        "scientist-softserv/utk-hyku"
        "harvard-lts/CURIOSity"
        "WGBH-MLA/ams")))
