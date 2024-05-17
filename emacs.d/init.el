@@ -828,8 +828,60 @@ When given PREFIX use `eww-browse-url'."
     (interactive "P")
     (let ((browse-url-browser-function
             (if prefix #'eww-browse-url browse-url-browser-function)))
-      (link-hint-open-link))))
+      (link-hint-open-link)))
 
+  (defun jf/link-hint--apply (advised-function func &rest args)
+    "Hijack opening `org-mode' URLs by attempting to open local file.
+
+The ADVISED-FUNCTION is the original `link-hint--apply'.
+
+The FUNC is the dispatched function for handling the link
+type (e.g. `link-hint--open-org-link').
+
+The ARGS are the rest of the ARGS passed to the ADVISED-FUNCTION."
+    (if (and
+          (eq 'link-hint--open-org-link func)
+          (eq :open (caddr args)))
+      (progn
+        (if-let* ((url
+                    (car args))
+                   (_match
+                     (string-match
+		                   "^https://github.com/\\([^/]+\\)/\\([^/]+\\)/[^/]+/[^/]+/\\([^#]+\\)\\(#L\\([0-9]+\\)\\)?"
+		                   url)))
+          (let ((filename-without-org
+		              (format "~/git/%s/%s"
+			              (match-string 2 url)
+                    (match-string 3 url)))
+                 (filename-with-org
+		               (format "~/git/%s/%s/%s"
+			               (match-string 1 url)
+                     (match-string 2 url)
+                     (match-string 3 url)))
+                 (line-number
+                   (match-string 5 url)))
+            (cond
+              ((f-exists? filename-without-org)
+                (progn
+                  (find-file filename-without-org)
+                  (when line-number
+                    (goto-char (point-min))
+                    (forward-line
+                      (1- (string-to-number line-number))))))
+              ((f-exists? filename-with-org)
+                (progn
+                  (find-file filename-with-org)
+                  (when line-number
+                    (goto-char (point-min))
+                    (forward-line
+                      (1- (string-to-number line-number))))))
+              (t (funcall func args))))
+
+          (funcall func args)))
+      (apply advised-function func args)))
+
+  (advice-add 'link-hint--apply
+	  :around #'jf/link-hint--apply))
 
 (use-package fontaine
   ;; A narrow focus package for naming font configurations and then
@@ -2675,7 +2727,6 @@ HEADLINE does not exist, write it at the end of the file."
 
   (defvar jf/org-mode/capture/template/while-clocking
     (concat "Reviewing [[${remote-url}][${function-name}]] "
-      "(see [[file:${file-name}::${line-number}][local ${function-name}]])"
       "\n\n#+BEGIN_${block-type} ${block-mode}"
       "\n${block-text}"
       "\n#+END_${block-type}"))
@@ -5823,7 +5874,9 @@ See `jf/comment-header-regexp/major-modes-alis'."
 (use-package projectile
   ;; Convenient organization and commands for projects.
   :straight t
-  :custom (projectile-project-search-path '("~/git/"))
+  :custom
+  (projectile-project-search-path
+    '("~/git/" "~/git/converge-cloud"))
   :bind ("s-." . projectile-toggle-between-implementation-and-test)
   :config
   (projectile-mode 1)
@@ -7505,26 +7558,25 @@ This encodes the logic for creating a project."
   :bind ("s-1" . #'jf/menu))
 
 
-(use-package detached
-  ;; Run detached shell commands that can keep running even after
-  ;; I quit emacs.
-  :straight t
-  :preface
-  ;; We need the 'dtach' command installed for the detached
-  ;; package to work.
-  ;;
-  ;; '$ brew install dtach'
-  (unless (executable-find "which dtach")
-    (async-shell-command "brew install dtach")))
+;; (use-package detached
+;;   ;; Run detached shell commands that can keep running even after
+;;   ;; I quit emacs.
+;;   ;;
+;;   ;; We will need the 'dtach' command installed for the detached
+;;   ;; package to work.
+;;   ;;
+;;   ;; '$ brew install dtach'
+;;   :straight t
+;;   (unless (executable-find "dtach")
+;;     (async-shell-command "brew install dtach")))
 
-
-(let ((ip4g-dir
-       (expand-file-name "~/git/morpho-utils/emacs")))
-  (when (file-directory-p ip4g-dir)
-    (unless (executable-find "which openstack")
-      (async-shell-command "brew install openstackclient"))
-    (unless (executable-find "which autossh")
-      (async-shell-command "brew install autossh"))))
+;; (let ((ip4g-dir
+;;        (expand-file-name "~/git/morpho-utils/emacs")))
+;;   (when (file-directory-p ip4g-dir)
+;;     (unless (executable-find "openstack")
+;;       (async-shell-command "brew install openstackclient"))
+;;     (unless (executable-find "autossh")
+;;       (async-shell-command "brew install autossh"))))
 
 (provide 'init)
   ;;; init.el ends here
