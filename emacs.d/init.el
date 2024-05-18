@@ -399,18 +399,6 @@ Else, evaluate the whole buffer."
   (file-truename "~/git/takeonrules.source")
   "The home directory of TakeOnRules.com Hugo repository.")
 
-(defconst jf/tor-hostname-default-local
-  "http://localhost:1313"
-  "The scheme, host name, and port for serving up a local TakeOnRules.com.")
-
-(defconst jf/tor-hostname-default-remote
-  "https://takeonrules.com"
-  "The scheme and host name for TakeOnRules.com.")
-
-(defvar jf/tor-hostname-current
-  jf/tor-hostname-default-local
-  "What is the current hostname for serving TakeOnRules content.")
-
 (use-package info
   :straight (:type built-in)
   :config
