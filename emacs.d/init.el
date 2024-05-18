@@ -165,8 +165,8 @@
 
   ;; These are some general configurations that I’ve slowly accumulated.
   ;; There’s inline documentation in most cases.  There might be little
-  ;; bits worth teasing out but for the most part, you can move along and
-  ;; reference this later.
+  ;; bits worth teasing out but for the most part, you can move along
+  ;; and reference this later.
   (setq user-full-name "Jeremy Friesen"
     user-mail-address "jeremy@jeremyfriesen.com")
 
@@ -1320,10 +1320,6 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
         `(org-modern-priority
            ((,c :foreground ,fg-term-red-bright
               :box (:color ,fg-term-red-bright :line-width (-1 . -1)))))
-        `(fill-column-indicator
-           ((,c :width ultra-condensed
-              :background ,bg-dim
-              :foreground ,bg-dim)))
         `(font-lock-regexp-face
            ((,c :foreground ,red))))))
   (setq jf/themes-plist '(:dark ef-bio :light ef-cyprus)))
@@ -1462,7 +1458,8 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   ;; locations of the elements that matched the search.
   ;;
   ;;   1.  Call `consult-ripgrep' (via ~C-c f~) to search for something.
-  ;;   2.  Call `embark-export' (via ~C-s-e~) to export to a grep buffer.
+  ;;   2.  Call `embark-export' (via ~C-s-e~) to export to a grep
+  ;;       buffer.
   ;;   3.  Call `wgrep-change-to-wgrep-mode' (via ~e~ or ~C-c C-p~)
   ;;   4.  Edit the grep buffer as you would anywhere else.
   ;;   5.  Save (via ~C-x C-s~) or Cancel (via ~C-c C-k~).
@@ -1480,7 +1477,8 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   :after (wgrep)
   :custom (rg-keymap-prefix (kbd "C-c f"))
   :config (rg-enable-menu)
-  ;; https://github.com/dajva/rg.el/issues/142 Give focus to *rg* buffer.
+  ;; https://github.com/dajva/rg.el/issues/142 Give focus to *rg*
+  ;; buffer.
   (add-to-list 'rg-finish-functions
     (lambda (buffer _) (pop-to-buffer buffer)))
 
@@ -1970,8 +1968,8 @@ We want files to have the 'projects' `denote' keyword."
                 (insert "** " subtask-name "\n\n")))))
         (progn
           (goto-char (point-max))
-          ;; Yes make this a top-level element.  It is easy to demote and
-          ;; move around.
+          ;; Yes make this a top-level element.  It is easy to demote
+          ;; and move around.
           (insert "* TODO " task-name " :tasks:\n\n")))))
 
   (defun jf/org-mode/existing-tasks (&optional filename)
@@ -1979,8 +1977,10 @@ We want files to have the 'projects' `denote' keyword."
 
 Each member's `car' is title and `cdr' is `org-mode' element.
 
-Members of the sequence either have a tag 'tasks' or are in a todo state."
-    (with-current-buffer (or (and filename (find-file-noselect filename))
+Members of the sequence either have a tag 'tasks' or are in a
+todo state."
+    (with-current-buffer (or (and filename
+                               (find-file-noselect filename))
                            (current-buffer))
       (mapcar (lambda (headline)
                 (cons (org-element-property :title headline) headline))
@@ -2033,7 +2033,7 @@ Each member's `car' is title and `cdr' is `org-mode' element."
 
   ;; https://stackoverflow.com/questions/13340616/assign-ids-to-every-entry-in-org-mode
   (defun jf/org-add-ids-to-headlines-in-file ()
-    "Conditionally add ID properties to all file's headlines without an ID."
+    "Add ID properties to all file's headlines without an ID."
     (interactive)
     (org-map-entries 'org-id-get-create))
 
@@ -2139,7 +2139,8 @@ CHANNEL is ignored."
 CONTENTS holds the contents of the drawer.  INFO is a plist
 holding contextual information."
     (and (org-string-nw-p contents)
-      (format "\\begin{description}\n%s\\end{description}\n\\vspace{5mm}"
+      (format
+        "\\begin{description}\n%s\\end{description}\n\\vspace{5mm}"
         contents)))
 
   (advice-add #'org-latex-property-drawer
@@ -2498,14 +2499,14 @@ Assumes that I'm on a :projects: headline.
   ;; RTF datatype.
   ;;
   ;; Why is that nice?  As an RTF datatype, the paste receiver better
-  ;; handles the HTML (e.g., I can more readily paste into an Email and it
-  ;; pastes as expected).
+  ;; handles the HTML (e.g., I can more readily paste into an Email and
+  ;; it pastes as expected).
   ;;
   ;; See
   ;; https://kitchingroup.cheme.cmu.edu/blog/2016/06/16/Copy-formatted-org-mode-text-from-Emacs-to-other-applications/
-  ;; for more details.  One addition I made was to add the ~-inputencoding
-  ;; UTF-8~ switch.  Without it, I would end up with some weird characters
-  ;; from odd smartquote handling.
+  ;; for more details.  One addition I made was to add the
+  ;; ~-inputencoding UTF-8~ switch.  Without it, I would end up with
+  ;; some weird characters from odd smartquote handling.
   (defun jf/org-mode/delete-link ()
     "Remove the link part of `org-mode' keeping only description."
     (interactive)
@@ -2553,7 +2554,8 @@ Assumes that I'm on a :projects: headline.
                 (plist-get day-project-task :project))
               (from-task
                 (plist-get day-project-task :task)))
-        ;; Narrowing the region to perform quicker queries on the element
+        ;; Narrowing the region to perform quicker queries on the
+        ;; element
         (narrow-to-region (org-element-property :begin from-task)
           (org-element-property :end from-task))
 
@@ -2592,7 +2594,8 @@ Assumes that I'm on a :projects: headline.
               (s-join ":" (org-element-property :tags from-task))
               content)
             "d"))
-        ;; Now that we've added the content, let's tidy up the from-task.
+        ;; Now that we've added the content, let's tidy up the
+        ;; from-task.
         (goto-char (org-element-property :contents-begin from-task))
         ;; Prompt for the todo state of the original task.
         (call-interactively 'org-todo))))
@@ -3141,7 +3144,8 @@ to Backlog."
       "--max-columns=1000 --follow "
       "--smart-case --no-heading --line-number --no-ignore-vcs "
       "--glob !vendor/ --glob !coverage/ --glob !**/tmp/ "
-      "--glob !public/ --glob !node_modules/ --glob !.git/ --glob !doc/ "
+      "--glob !public/ --glob !node_modules/ --glob !.git/ "
+      "--glob !doc/ "
       "--glob !.yardoc/ --glob !.byebug_history --glob !**/log/ "
       " . -e ARG OPTS"))
   (consult-ripgrep-args
@@ -3149,7 +3153,8 @@ to Backlog."
       "--max-columns=1000 --follow"
       "--path-separator / --no-ignore-vcs --smart-case --no-heading "
       "--glob !vendor/ --glob !coverage/ --glob !**/tmp/ "
-      "--glob !public/ --glob !node_modules/ --glob !.git/ --glob !doc/ "
+      "--glob !public/ --glob !node_modules/ --glob !.git/ "
+      "--glob !doc/ "
       "--glob !.yardoc/ --glob !.byebug_history  --glob !**/log/ "
       "--line-number "))
   ;; Configure other variables and modes in the :config section,
@@ -3350,8 +3355,8 @@ Useful if you want a more robust view into the recommend candidates."
     (unless (or (bound-and-true-p mct--active)
               (bound-and-true-p vertico--input)
               (eq (current-local-map) read-passwd-map))
-      ;; (setq-local corfu-auto nil) ;; Enable/disable auto completion
-      (setq-local corfu-echo-delay nil ;; Disable automatic echo and popup
+      ;; Disable automatic echo and popup
+      (setq-local corfu-echo-delay nil
         corfu-popupinfo-delay nil)
       (corfu-mode 1)))
   :config
@@ -3584,7 +3589,8 @@ Useful if you want a more robust view into the recommend candidates."
   :bind (:map tempel-map (([backtab] . tempel-previous)
                            ("TAB" . tempel-next)))
   :preface
-  (cl-defun jf/org-macro-value-list (macro-name &key (dir org-directory))
+  (cl-defun jf/org-macro-value-list (macro-name
+                                      &key (dir org-directory))
     "List the unique inner text of all uses of MACRO-NAME in given DIR."
     (let ((path
             (if current-prefix-arg
@@ -4073,7 +4079,9 @@ This function is the plural version of
         (with-current-buffer (find-file-noselect filename)
           (let ((kw-plist
                   (jf/org-keywords-as-plist
-                    :keywords-regexp "\\(TITLE\\|GLOSSARY_KEY\\|OFFER\\|ROAM_REFS\\|SAME_AS\\)")))
+                    :keywords-regexp
+                    (concat "\\(TITLE\\|GLOSSARY_KEY\\|OFFER"
+                      "\\|ROAM_REFS\\|SAME_AS\\)"))))
             (list
               :title (lax-plist-get kw-plist "TITLE")
               :key (lax-plist-get kw-plist "GLOSSARY_KEY")
@@ -4103,7 +4111,8 @@ ID-ONLY link without title."
           (denote--link-get-description target)
           id-only)
         )
-      (denote--command-with-title-history #'denote-link-after-creating)))
+      (denote--command-with-title-history
+        #'denote-link-after-creating)))
 
   (defun jf/denote/file-prompt (&optional files-matching-regexp)
     "Prompt for a file based on subdirectories.
@@ -4687,8 +4696,11 @@ When USE_HUGO_SHORTCODE is given use glossary based exporting."
                              ((string= "denote" new-type)
                                "TITLE")))))
                 (progn
-                  (replace-regexp-in-region "\\[\\[\\([^:]+\\):\\([0-9A-Z]+\\)\\]\\[\\([^]]+\\)\\]\\]"
-                    (format "[[%s:%s][%s]]" new-type denote-id  new-text)
+                  (replace-regexp-in-region
+                    (concat "\\[\\[\\([^:]+\\):\\([0-9A-Z]+\\)"
+                      "\\]\\[\\([^]]+\\)\\]\\]")
+                    (format "[[%s:%s][%s]]"
+                      new-type denote-id new-text)
                     (org-element-property :begin element)
                     (org-element-property :end element))
                   (org-link-descriptive-ensure))
@@ -4779,7 +4791,8 @@ The DOM could be as sanitized by `org-web-tools--sanitized-dom'."
       (yank)
       (save-buffer)))
 
-  (cl-defun jf/org-mode/add-series-to-file (&key file series drop-tags all)
+  (cl-defun jf/org-mode/add-series-to-file (&key
+                                             file series drop-tags all)
     "Add SERIES to FILE.
 
 Optionally DROP-TAGS, as there may have been a TAG associated
@@ -5326,8 +5339,8 @@ method, get the containing class."
                    (s-split "\n"
                      (shell-command-to-string
                        (concat
-                         "rg \"^ +(byebug|debugger|pry-byebug|debug) \" "
-                         gemfile-lock
+                         "rg \"^ +(byebug|debugger|pry-byebug|debug) \""
+                         " " gemfile-lock
                          " -r '$1' --only-matching | uniq")))))
         (cond
           ((member "byebug" debuggers)
@@ -6614,15 +6627,16 @@ provided AT, insert character there."
     :straight t
     :after ox
     :custom
-    ;; - blockquote :: for chunks of text that I attribute to other folks.
-    ;; - marginnote :: a "dangling" note that is only partially part of the
-    ;;                 conversation.
+    ;; - blockquote :: for chunks of text that I attribute to other
+    ;;   folks.
+    ;; - marginnote :: a "dangling" note that is only partially part of
+    ;;                 the conversation.
     ;; - poem :: because poetic spacing is critical.
-    ;; - inline_comments :: a concession that I need different comments based on
-    ;;                      context; and that marginalia may be too much in some
-    ;;                      cases.
-    ;; - update :: I write updates for my blog posts; corrections or additions
-    ;;             based on new information.
+    ;; - inline_comments :: a concession that I need different comments
+    ;;                      based on context; and that marginalia may be
+    ;;                      too much in some cases.
+    ;; - update :: I write updates for my blog posts; corrections or
+    ;;             additions based on new information.
     (org-hugo-paired-shortcodes "blockquote marginnote poem inlinecomment update")
     (hugo-use-code-for-kbd t)
     :config
@@ -6630,10 +6644,10 @@ provided AT, insert character there."
     (advice-add #'org-md-example-block :override #'org-blackfriday-src-block)
 
 
-    ;; These functions work too aggressively.  The types of lists (ordered,
-    ;; definition, and unordered) are co-mingled.  This co-mingling means that I'm
-    ;; not getting the behavior I want.  So I'll proceed with the default ox-hugo
-    ;; behavior.
+    ;; These functions work too aggressively.  The types of lists
+    ;; (ordered, definition, and unordered) are co-mingled.  This
+    ;; co-mingling means that I'm not getting the behavior I want.  So
+    ;; I'll proceed with the default ox-hugo behavior.
     ;;
     ;; (advice-add #'org-blackfriday-plain-list :override #'org-html-plain-list '((name . "wrapper")))
     ;; (advice-add #'org-blackfriday-item :override #'org-html-item '((name . "wrapper")))
@@ -6643,7 +6657,8 @@ provided AT, insert character there."
       "Transcode a FOOTNOTE-REFERENCE element from Org to Hugo sidenote shortcode.
 CONTENTS is nil.  INFO is a plist holding contextual information."
       (let* ((element
-               (car (org-export-get-footnote-definition footnote-reference info)))
+               (car (org-export-get-footnote-definition
+                      footnote-reference info)))
               (beg
                 (org-element-property :contents-begin element))
               (end
@@ -6682,7 +6697,8 @@ Take on Rules using the \"blockquote\" special block."
         (progn
           (org-element-put-property quote-block :type "blockquote")
           (org-hugo-special-block quote-block contents info))
-        ;; The original md quote block method; probably a better way to do this.
+        ;; The original md quote block method; probably a better way to
+        ;; do this.
         (replace-regexp-in-string
           "^" "> "
           (replace-regexp-in-string "\n\\'" "" contents))))
@@ -6695,7 +6711,7 @@ Take on Rules using the \"blockquote\" special block."
       "The path to the file that has inline org macros.")
 
     (defvar jf/exporting-org-to-tor nil
-      "Not nil while performing the export of org file to Take on Rules.")
+      "Not nil while performing export of org file to Take on Rules.")
 
     (cl-defun jf/export-org-to-tor (&key (buffer (current-buffer)))
       "Export current org BUFFER for TakeOnRules post."
@@ -6811,7 +6827,7 @@ Take on Rules using the \"blockquote\" special block."
         (user-error "Current buffer is not a blog post")))
 
     (cl-defun jf/jump_to_corresponding_hugo_file (&key (buffer (current-buffer)))
-      "Find the TakeOnRules.com url in the BUFFER and jump to corresponding Hugo file."
+      "Find the TakeOnRules.com url in BUFFER and jump to Hugo file."
       (interactive)
       (with-current-buffer buffer
         (save-excursion
@@ -6864,8 +6880,10 @@ If UNSAFE is non-nil, assume point is on headline."
         (org-back-to-heading))
       (cl-loop for element = (org-element-at-point)
         for pos = (pcase element
-                    (`(headline . ,_) (org-element-property :contents-begin element))
-                    (`(,(or 'planning 'property-drawer 'node-property 'keyword 'drawer) . ,_) (org-element-property :end element)))
+                    (`(headline . ,_)
+                      (org-element-property :contents-begin element))
+                    (`(,(or 'planning 'property-drawer 'node-property 'keyword 'drawer) . ,_)
+                      (org-element-property :end element)))
         while pos
         do (goto-char pos)))
 
@@ -6968,8 +6986,9 @@ If UNSAFE is non-nil, assume point is on headline."
                   "- title: " title
                   "\n  key: " key))))
 
-    ;; Note: I needed to use `fboundp' because if I invoked this functions
-    ;; before other consult functions I got a method void error.
+    ;; Note: I needed to use `fboundp' because if I invoked this
+    ;; functions before other consult functions I got a method void
+    ;; error.
     (cl-defun jf/find-file-via-matching (&key prompt matching in (switch "--files-with-matches"))
       "PROMPT for files IN the directory with MATCHING content with given SWITCH.
 
@@ -6997,31 +7016,39 @@ If `consult--read' is defined, use that.  Otherwise fallback to
 
     (defun jf/tor-tags-list ()
       "Return a list of tags from TakeOnRules.com."
-      (jf/tor-list-by-key-from-filename :key "tag" :filename "data/glossary.yml"))
+      (jf/tor-list-by-key-from-filename
+        :key "tag" :filename "data/glossary.yml"))
 
     (defun jf/tor-epigraph-list ()
       "Return a list of epigraph keys from TakeOnRules.com."
-      (jf/tor-list-by-key-from-filename :key "key" :filename "data/epigraphs.yml"))
+      (jf/tor-list-by-key-from-filename
+        :key "key" :filename "data/epigraphs.yml"))
 
     (defun jf/tor-game-list ()
       "Return a list of games from TakeOnRules.com."
-      (jf/tor-list-by-key-from-filename :key "game" :filename "data/glossary.yml"))
+      (jf/tor-list-by-key-from-filename
+        :key "game" :filename "data/glossary.yml"))
 
     (defun jf/tor-glossary-title-list ()
       "Return a list of titles from TakeOnRules.com."
-      (jf/tor-list-by-key-from-filename :key "title" :filename "data/glossary.yml"))
+      (jf/tor-list-by-key-from-filename
+        :key "title" :filename "data/glossary.yml"))
 
     (defun jf/tor-glossary-key-list ()
       "Return a list of keys from TakeOnRules.com glossary."
-      (jf/tor-list-by-key-from-filename :key "key" :filename "data/glossary.yml"))
+      (jf/tor-list-by-key-from-filename
+        :key "key" :filename "data/glossary.yml"))
 
     (defun jf/tor-series-list ()
       "Return a list of series from TakeOnRules.com."
-      (jf/tor-list-by-key-from-filename :key "key" :filename "data/series.yml"))
+      (jf/tor-list-by-key-from-filename
+        :key "key" :filename "data/series.yml"))
 
     (defun jf/tor-licenses-list ()
       "Return a list of available licenses for TakeOnRules.com."
-      (jf/tor-list-by-key-from-filename :key "Key" :filename "data/licenses.yml"))
+      (jf/tor-list-by-key-from-filename
+        :key "Key" :filename "data/licenses.yml"))
+
     (cl-defun jf/tor-list-by-key-from-filename (&key
                                                  key
                                                  filename
@@ -7032,19 +7059,20 @@ If `consult--read' is defined, use that.  Otherwise fallback to
           (concat
             "rg \"^[- ] " key ": .*$\" "
             (f-join directory filename)
-            " --only-matching --no-filename | sed 's/^[ -] " key ": //' | sort | tr '\n' '@'"))
+            " --only-matching --no-filename | sed 's/^[ -] " key
+            ": //' | sort | tr '\n' '@'"))
         "@"))
 
     (cl-defun jf/list-filenames-with-file-text (&key matching in)
-      "Build a list of filenames MATCHING the pattern IN the given directory."
+      "Build list of filenames MATCHING pattern IN the given directory."
       (let ((default-directory
               (f-join jf/tor-home-directory in)))
         (split-string-and-unquote
           (shell-command-to-string
             (concat
               "rg \""
-              matching "\" --only-matching --files-with-matches --sortr modified"
-              "| tr '\n' '@'"))
+              matching "\" --only-matching --files-with-matches"
+              " --sortr modified | tr '\n' '@'"))
           "@")))
 
     (cl-defun jf/list-full-filenames-with-file-text (&key matching in (switch "--files-with-matches"))
@@ -7053,13 +7081,14 @@ If `consult--read' is defined, use that.  Otherwise fallback to
         (shell-command-to-string
           (concat
             "rg \""
-            matching "\" " in " --only-matching " switch " --sortr modified"
-            "| tr '\n' '@'"))
+            matching "\" " in " --only-matching " switch
+            " --sortr modified | tr '\n' '@'"))
         "@"))
 
     (defun jf/tor-page-relative-pathname-list ()
       "Return a list of pages for TakeOnRules.com."
-      (jf/list-filenames-with-file-text :matching "^title: " :in "content"))
+      (jf/list-filenames-with-file-tex
+        :matching "^title: " :in "content"))
 
     (defun jf/tor-asset-relative-pathname-list ()
       "Return a list of image filenames for TakeOnRules.com."
@@ -7069,7 +7098,7 @@ If `consult--read' is defined, use that.  Otherwise fallback to
           (shell-command-to-string "ls"))))
 
     (defun jf/matches-in-buffer (regexp &optional buffer)
-      "Return a list of matches of REGEXP in BUFFER or the current buffer if not given."
+      "Return list of REGEXP matches in BUFFER or the current buffer."
       (let ((matches))
         (save-match-data
           (save-excursion
@@ -7098,7 +7127,8 @@ Add the blog post to the given SERIES with the given KEYWORDS."
       (interactive)
       ;; Guard against running this on non- `jf/lore24-filename'.
       (unless (string=
-                (jf/filename/tilde-based (buffer-file-name (current-buffer)))
+                (jf/filename/tilde-based
+                  (buffer-file-name (current-buffer)))
                 jf/lore24-filename)
         (user-error "You must be in %S" jf/lore24-filename))
       ;; Now that we know we're on the right buffer...
@@ -7151,24 +7181,29 @@ Add the blog post to the given SERIES with the given KEYWORDS."
       (let* ((table-filename
                (f-join jf/tor-home-directory "data/list_of_all_tables.yml"))
               (path (s-trim (shell-command-to-string
-                              (concat "rg \"^- table_number:\\s" table-number "$\" -A4 "
+                              (concat "rg \"^- table_number:\\s"
+                                table-number "$\" -A4 "
                                 table-filename
-                                " | rg \"^ +path: +\\\"([^\\\"]+)\\\"\" -r '$1' "
-                                "--only-matching")))))
+                                " | rg \"^ +path: +\\\"([^\\\"]+)\\\"\""
+                                " -r '$1' --only-matching")))))
         (s-trim (shell-command-to-string
-                  (concat "rg \"^#\\+ROAM_REFS: .*(https://takeonrules.com"
-                    path ")\" -r '$1' --files-with-matches " org-directory)))))
+                  (concat
+                    "rg \"^#\\+ROAM_REFS: .*(https://takeonrules.com"
+                    path ")\" -r '$1' --files-with-matches "
+                    org-directory)))))
 
     (defun jf/list-blog-tables (&optional table-number)
-      "Return a list of blog tables of the form \"TABLE-NUMBER: CAPTION\"."
+      "Return list of blog tables with form \"TABLE-NUMBER: CAPTION\"."
       (let* ((table-filename
-               (f-join jf/tor-home-directory "data/list_of_all_tables.yml"))
+               (f-join jf/tor-home-directory
+                 "data/list_of_all_tables.yml"))
               (match (or table-number "\\d+")))
         (s-split
           "\n"
           (s-trim
             (shell-command-to-string
-              (concat "rg \"^- table_number: (" match ")\\n\\s+caption: (.*)\""
+              (concat "rg \"^- table_number: ("
+                match ")\\n\\s+caption: (.*)\""
                 " --multiline --replace '$1: $2' --only-matching "
                 table-filename))))))
 
@@ -7189,7 +7224,8 @@ Add the blog post to the given SERIES with the given KEYWORDS."
                     (s-split ":"
                       (car (jf/list-blog-tables table-number)))))))
              (link
-               (format "https://takeonrules.com/tables/%s" table-number)))
+               (format "https://takeonrules.com/tables/%s"
+                 table-number)))
         (pcase format
           ((or 'html '11ty)
             (if jf/exporting-org-to-tor
@@ -7450,8 +7486,8 @@ Noted projects would be found within the given DIRECTORY."
 
   (defun jf/project/get-project-from/current-clock ()
     "Return the current clocked project's name or nil."
-    ;; This is a naive implementation that assumes a :task: has the clock.
-    ;; A :task:'s immediate ancestor is a :projects:.
+    ;; This is a naive implementation that assumes a :task: has the
+    ;; clock.  A :task:'s immediate ancestor is a :projects:.
     (when-let ((m (and
                     ;; If this isn't set, we ain't clocking.
                     (fboundp 'org-clocking-p)
