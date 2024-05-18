@@ -11,6 +11,17 @@
 ;;  corresponding packages; either built-in or from places such as
 ;;  melpa.
 ;;
+;;  How is this mess organized?  I have favored the `use-package' macro
+;;  to fit most of the configuration within the `use-package' sexp.
+;;  This has meant using several built-in packages.  In this way, the
+;;  organization does have some logical meaning.  And as I get more
+;;  familiar with those built-in packages, I can begin to explore their
+;;  configurability.
+;;
+;;  This organization does mean that I'm declaring a function within the
+;;  `use-package' macro that might depend on other packages.  Perhaps
+;;  overtime I'll refactor accordingly.
+;;
 ;;; Code:
 (add-to-list 'load-path "~/git/dotemacs/emacs.d")
 
@@ -45,12 +56,15 @@
 (straight-use-package 'use-package)
 (setq use-package-always-ensure t)
 
+;; When you open Emacs, grab all the space on the screen
+(add-to-list 'initial-frame-alist '(fullscreen . maximized))
+
 (use-package gcmh
   ;; *Gcmh* does garbage collection (GC) when the user is idle.
   :straight t
   :init
   (setq gcmh-idle-delay 5
-    gcmh-high-cons-threshold (* 16 1024 1024))  ; 16mb
+    gcmh-high-cons-threshold (* 32 1024 1024))  ; 32mb
   :config (gcmh-mode)
   (add-function :after after-focus-change-function
     (defun jf/garbage-collect-maybe ()
@@ -60,34 +74,66 @@
 (use-package emacs
   :straight (:type built-in)
   :init
+  ;; And I’m going to disable a few key bindings.  These were always
+  ;; messing me up a bit.  Also enable a few that I find helpful.  (I’ll
+  ;; enable a lot more later).
+  (unbind-key "C-z") ;; `suspend-frame'
+  (unbind-key "s-o") ;; `ns-open-file-using-panel'
+  (unbind-key "C-x C-c") ;; `save-buffers-kill-terminal'
+
+  ;; Hide the icons of the Emacs toolbar
+  (tool-bar-mode -1)
+
+  ;; I don't click on the scrollbar but am appreciative of the visual
+  ;; indicator of relative position in the buffer.
+  (scroll-bar-mode 1)
+
   ;; Ensuring I have an autosave directory.  On a few rare occassions
   ;; this has saved me from lost "work".
   (make-directory "~/.emacs.d/autosaves/" t)
   :bind (("M-[" . #'backward-paragraph)
           ("s-[" . #'backward-paragraph)
+          ("H-s". #'save-buffer)
           ("M-]" . #'forward-paragraph)
           ("s-]" . #'forward-paragraph)
           ("C-k" . #'jf/kill-line-or-region)
           ("C-c n" . #'jf/yank-file-name-to-clipboard) ;; Deprecated
-          ("C-c y n" . #'jf/yank-file-name-to-clipboard))
+          ("C-c y n" . #'jf/yank-file-name-to-clipboard)
+          ("M-<delete>" . #'kill-word)
+          ("s-<down>" . #'end-of-buffer)
+          ("s-<up>" . #'beginning-of-buffer)
+          ("s-q" . #'save-buffers-kill-terminal)
+          ("s-w" . #'kill-current-buffer)
+          ("C-x C-b" . #'ibuffer)
+          ("M-RET" . #'newline-and-indent))
   :bind (:map emacs-lisp-mode-map
           ("C-c C-c" . 'jf/eval-region-dwim))
   :config
-  (setq-default fill-column 80)
-  ;; Doing a bit of configuration of my cursors
-  (setq-default cursor-type 'bar)
+  ;; Allow "y" or "n" to stand in for yes/no prompts
+  (defalias 'yes-or-no-p 'y-or-n-p)
 
+  (prefer-coding-system 'utf-8)
+  (set-default-coding-systems 'utf-8)
+  (set-terminal-coding-system 'utf-8)
+  (set-keyboard-coding-system 'utf-8)
+
+  ;; With 80 columns, I can always have two windows side-by-side.
+  (setq-default fill-column 80)
+
+  ;; Doing a bit of configuration of my cursors.  The blinking provides
+  ;; the queue and on 2024-05-18, I thought I'd give a try with the
+  ;; hollow box.  Why?  It feels more retro.
+  (setq-default cursor-type 'hollow)
   (blink-cursor-mode t)
 
   (setq
     ;; Don't delink hardlinks
     backup-by-copying t
 
+    ;; On a few occassions, perhaps once every three months, I dive into
+    ;; my backups to find something that 1) wasn't under version control
+    ;; and 2) somehow got altered.
     backup-directory-alist '((".*" . "~/.emacs.d/backups/"))
-
-    bookmark-default-file "~/emacs-bookmarks.el"
-
-    bookmark-save-flag 1
 
     ;; I may as well trust themes.
     custom-safe-themes t
@@ -272,6 +318,12 @@ Else, evaluate the whole buffer."
           "Copied buffer file name '%s' to the clipboard."
           filename)))))
 
+(use-package subword
+  :straight (:type built-in)
+  :config
+  ;; With subword-mode, HelloWorld is two words for navigation.
+  (global-subword-mode))
+
 (use-package exec-path-from-shell
   ;; https://xenodium.com/trying-out-gccemacs-on-macos/
   :straight t
@@ -348,39 +400,6 @@ Else, evaluate the whole buffer."
   (setq ediff-show-clashes-only t)
   (setq ediff-split-window-function 'split-window-horizontally)
   (setq ediff-window-setup-function 'ediff-setup-windows-plain))
-
-(bind-key "H-s" 'save-buffer)
-
-;; With subword-mode, HelloWorld is two words for navigation.
-(global-subword-mode)
-
-;; When you open Emacs, grab all the space on the screen
-(add-to-list 'initial-frame-alist '(fullscreen . maximized))
-
-(tool-bar-mode -1) ;; Hide the icons of the Emacs toolbar
-;; Hide the scroll bar. Let's be clear, I don't use it.
-(scroll-bar-mode -1)
-(defalias 'yes-or-no-p 'y-or-n-p) ;; Always "y" or "n" for yes/no
-
-(prefer-coding-system 'utf-8)
-(set-default-coding-systems 'utf-8)
-(set-terminal-coding-system 'utf-8)
-(set-keyboard-coding-system 'utf-8)
-
-;; And I’m going to disable a few key bindings.  These were always
-;; messing me up a bit.  Also enable a few that I find helpful.  (I’ll
-;; enable a lot more later).
-(unbind-key "C-z") ;; `suspend-frame'
-(unbind-key "C-c o") ;; was bound to open a file externally
-(unbind-key "C-x C-c") ;; was `save-buffers-kill-terminal'
-
-(keymap-global-set "M-<delete>" 'kill-word)
-(keymap-global-set "s-<down>" 'end-of-buffer)
-(keymap-global-set "s-<up>" 'beginning-of-buffer)
-(keymap-global-set "s-q" 'save-buffers-kill-terminal)
-(keymap-global-set "s-w" 'kill-current-buffer)
-(keymap-global-set "C-x C-b" 'ibuffer)
-(keymap-global-set "M-RET" 'newline-and-indent)
 
 (use-package dired
   :straight (:type built-in)
@@ -720,9 +739,9 @@ Else, evaluate the whole buffer."
 (use-package ace-window
   ;; Quick navigation from window to window.
   :straight t
-  :custom (aw-keys '(?a ?s ?d ?f ?g ?h ?j ?k ?l))
-  :bind (("C-x o" . ace-window)
-          ("M-o" . ace-window)))
+  :custom (aw-keys '(?a ?s ?d ?f ?g ?j ?h ?k ?l))
+  :bind (("M-o" . ace-window) ;; deprecated
+          ("s-o" . ace-window)))
 
 (use-package avy
   ;; Pick a letter, avy finds all words with that at the beginning of
@@ -1365,29 +1384,6 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
     (jf/emacs-theme-by-osx-appearance))
   (jf/emacs-theme-by-osx-appearance))
 
-(use-package tab-bar
-  ;; I've been stepping away from multiple tabs, however as I further
-  ;; explored.  I need to think of these tabs as contained frames.  They
-  ;; can save window configuration.
-  :straight (:type built-in)
-  :bind ("C-c t t" . #'tab-bar-mode)
-  :hook (tab-bar-mode . jf/tab-bar-mode-hook)
-  :config
-  (defun jf/tab-bar-mode-hook ()
-    "Expose key binding for switching tabs."
-    (define-key global-map
-      (kbd "C-c t n")
-      #'tab-bar-new-tab
-      (not tab-bar-mode))
-    (define-key global-map
-      (kbd "C-c t k")
-      #'tab-bar-close-tab
-      (not tab-bar-mode))
-    (define-key global-map
-      (kbd "C-c t s")
-      #'tab-bar-switch-to-tab
-      ;; Remove the binding when we're NOT in tab-bar-mode.
-      (not tab-bar-mode))))
 
 (use-package xref
   :straight t
@@ -2624,7 +2620,7 @@ Assumes that I'm on a :projects: headline.
               (progn (message "Found %s" element) element))
             ((> level element-level)
               (user-error
-                "Selected element %s is higher level."
+                "Selected element %s is higher level"
                 element-level))
             ((< level element-level)
               (progn
@@ -3088,7 +3084,7 @@ to Backlog."
           ("M-g e" . consult-compile-error)
           ("M-g g" . consult-goto-line)
           ("H-o" . consult-org-agenda)
-          ("M-g M-o" . consult-org-agenda)
+          ("M-g s-o" . consult-org-agenda)
           ("M-g M-g" . consult-goto-line)
           ("s-l" . consult-goto-line)
           ("C-l" . consult-goto-line)
@@ -5982,9 +5978,18 @@ See `jf/comment-header-regexp/major-modes-alis'."
   ;; Enhancements to the built-in Emacs bookmarking feature.
   :straight t
   :demand t
+  :init
+  (use-package bookmark
+    :straight (:type built-in)
+    :config
+    ;; On each machine I use, I have different bookmarks, yet they all
+    ;; point to the same location.
+    (setq bookmark-default-file "~/emacs-bookmarks.el")
+
+    ;; Save the `bookmark-file' each time I modify a bookmark.
+    (setq bookmark-save-flag 1))
   :config
-  ;; Definitely want uniform windowing behavior.
-  (define-key bookmark-bmenu-mode-map (kbd "M-o") #'ace-window)
+  ;; (define-key bookmark-bmenu-mode-map (kbd "s-o") #'ace-window)
 
   ;; when this is not set to `nil' explicitly, auto-save bookmarks
   ;; gets itself into an infinite loop attempting to autosave and
@@ -5998,6 +6003,42 @@ See `jf/comment-header-regexp/major-modes-alis'."
   (customize-set-value 'bmkp-last-as-first-bookmark-file nil)
   ;; auto-set bookmarks.
   (setq bmkp-automatic-bookmark-mode-delay 30))
+
+(use-package activities
+  ;; https://takeonrules.com/2024/05/18/a-quiet-morning-of-practice-to-address-an-observed-personal-computering-workflow-snag/
+  ;;
+  ;; https://github.com/alphapapa/activities.el
+  ;;
+  ;; On <2024-05-17 Fri> while working to orient to a code-base, I was
+  ;; reviewing several different files.  I found it helpful to have
+  ;; those files open in a specific window configuration.
+  ;;
+  ;; I did this exploration in between a pairing session in which a
+  ;; colleague stepped away to work on something and then came back.
+  ;; When she came back, I needed to set down my windwo configuration
+  ;; and work on the same code from a different perspective.
+  ;;
+  ;; It turns out "saving" that activity would have been useful; as I
+  ;; could then come back to that window state and resume that work.
+  ;;
+  ;; The `activities' package provides that capability.
+  :straight t
+  :init
+  (activities-mode)
+  (activities-tabs-mode)
+  :bind
+  (("H-a n" . activities-new)
+    ("H-a d" . activities-define)
+    ("H-a D" . activities-discard)
+    ("H-a a" . activities-resume)
+    ("H-a z" . activities-suspend)
+    ("H-a k" . activities-kill)
+    ("H-a RET" . #'tab-bar-switch-to-tab)
+    ("H-a S" . activities-save-all)
+    ("H-a s" . activities-switch)
+    ("H-a b" . activities-switch-buffer)
+    ("H-a g" . activities-revert)
+    ("H-a l" . activities-list)))
 
 (use-package org-bookmark-heading
   ;; Emacs bookmark support for Org-mode.
@@ -6017,7 +6058,36 @@ See `jf/comment-header-regexp/major-modes-alis'."
   ;; A nice package for editing regions in separate buffers.  It doesn't
   ;; appear to get the mode guess right.  I haven't used this as much as
   ;; `narrow-region'.  Perhaps it can go?
-  :straight t)
+  :straight t
+  :bind ("C-x n e" . #'jf/edit-indirect-region-or-function)
+  :config
+  (defun jf/edit-indirect-region-or-function ()
+    "Create indirect buffer to edit current region or function."
+    (interactive)
+    (if (use-region-p)
+      (edit-indirect-region (region-beginning) (region-end))
+      (cond
+        ;; As of <2024-05-18 Sat> emacs-lisp does not work with treesit.
+        ((or (derived-mode-p 'emacs-lisp-mode)
+           (derived-mode-p 'text-mode))
+          (let ((beg nil)
+                 (end nil))
+            (save-excursion
+              (if (derived-mode-p 'emacs-lisp-mode)
+                  (mark-defun)
+                (mark-paragraph))
+              (setq beg (point))
+              (setq end (mark)))
+            (edit-indirect-region beg end t)))
+        ((derived-mode-p 'prog-mode)
+          (if-let (func (treesit-defun-at-point))
+            (edit-indirect-region
+              (treesit-node-start func)
+              (treesit-node-end func))
+            (user-error "Cannot indirect edit; "
+              "Select region or be within a function")))
+        (t (user-error "Unable to indirect edit current context"))))))
+
 
 (use-package logos
   ;; A `narrow-region' extension that moves towards providing a
@@ -6084,7 +6154,7 @@ See `jf/comment-header-regexp/major-modes-alis'."
   :hook (olivetti-mode-on . jf/olivetti-mode-on-hook)
   (olivetti-mode-off . jf/olivetti-mode-off-hook)
   :config
-  ;; I'm typically aiming for 80 character fill-column.
+  ;; I'm typically aiming for 80 character `fill-column'.
   (setq olivetti-body-width 80)
   (setq olivetti-minimum-body-width 80)
   (setq olivetti-style 'fancy)
@@ -6138,64 +6208,71 @@ See `jf/comment-header-regexp/major-modes-alis'."
       (org-modern-mode -1)))
   (advice-add 'olivetti-mode :before #'jf/olivetti-mode))
 
-(defvar jf/minor-mode/presenter-map
-  (let ((map
-          (make-sparse-keymap)))
-    (define-key map (kbd "C-n") #'next-line)
-    (define-key map (kbd "C-p") #'previous-line)
-    (dolist (key `("M-]" "s-]"))
-      (define-key map (kbd key) 'logos-forward-page-dwim))
-    (dolist (key `("M-[" "s-["))
-      (define-key map (kbd key) 'logos-backward-page-dwim))
-    map))
+(use-package easy-mmode
+  ;; The built in package for crafting minor-modes.  I know their
+  ;; utility, and continue to consider how I might apply them as an
+  ;; overlay to existing modes.  I do have my one minor mode
+  ;; `jf/minor-mode/presenter'.
+  :straight (:type built-in)
+  :config
+  (defvar jf/minor-mode/presenter-map
+    (let ((map
+            (make-sparse-keymap)))
+      (define-key map (kbd "C-n") #'next-line)
+      (define-key map (kbd "C-p") #'previous-line)
+      (dolist (key `("M-]" "s-]"))
+        (define-key map (kbd key) 'logos-forward-page-dwim))
+      (dolist (key `("M-[" "s-["))
+        (define-key map (kbd key) 'logos-backward-page-dwim))
+      map))
 
-(define-minor-mode jf/minor-mode/presenter
-  "Enter a `logos' and `olivetti' mode for showing things."
-  :init-value nil
-  :global nil
-  :keymap jf/minor-mode/presenter-map
-  :lighter " presenter")
+  (define-minor-mode jf/minor-mode/presenter
+    "Enter a `logos' and `olivetti' mode for showing things."
+    :init-value nil
+    :global nil
+    :keymap jf/minor-mode/presenter-map
+    :lighter " presenter")
 
-(defcustom jf/minor-mode/presenter-on-hook
-  (lambda ()
-    (let ((logos-hide-cursor
-            nil)
-           (logos-buffer-read-only
-             nil)
-           (org-hide-emphasis-markers
-             t))
-      (call-interactively 'logos-narrow-dwim)
-      (olivetti-mode t)
-      (keycast-mode-line-mode t)
-      (display-line-numbers-mode -1)
+  (defcustom jf/minor-mode/presenter-on-hook
+    (lambda ()
+      (let ((logos-hide-cursor
+              nil)
+             (logos-buffer-read-only
+               nil)
+             (org-hide-emphasis-markers
+               t))
+        (call-interactively 'logos-narrow-dwim)
+        (olivetti-mode t)
+        (keycast-mode-line-mode t)
+        (display-line-numbers-mode -1)
+        (when (fboundp 'fontaine-set-preset)
+          (fontaine-set-preset 'presenting))
+        (when (fboundp 'vi-tilde-fringe-mode)
+          (vi-tilde-fringe-mode -1))
+        (when (fboundp 'git-gutter-mode)
+          (git-gutter-mode -1))
+        (when (fboundp 'centaur-tabs-local-mode)
+          (centaur-tabs-local-mode -1))))
+    "Hook when `jf/minor-mode/presenter' activated."
+    :type 'hook)
+
+  (defcustom jf/minor-mode/presenter-off-hook
+    (lambda ()
+      (call-interactively 'widen)
+      (olivetti-mode -1)
+      (keycast-mode-line-mode -1)
+      ;; (setq-local  org-hide-emphasis-markers nil)
+      (display-line-numbers-mode t)
       (when (fboundp 'fontaine-set-preset)
-        (fontaine-set-preset 'presenting))
+        (fontaine-set-preset 'default))
       (when (fboundp 'vi-tilde-fringe-mode)
-        (vi-tilde-fringe-mode -1))
+        (vi-tilde-fringe-mode t))
       (when (fboundp 'git-gutter-mode)
-        (git-gutter-mode -1))
+        (git-gutter-mode t))
       (when (fboundp 'centaur-tabs-local-mode)
-        (centaur-tabs-local-mode -1))))
-  "Hook when `jf/minor-mode/presenter' activated."
-  :type 'hook)
-
-(defcustom jf/minor-mode/presenter-off-hook
-  (lambda ()
-    (call-interactively 'widen)
-    (olivetti-mode -1)
-    (keycast-mode-line-mode -1)
-    ;; (setq-local  org-hide-emphasis-markers nil)
-    (display-line-numbers-mode t)
-    (when (fboundp 'fontaine-set-preset)
-      (fontaine-set-preset 'default))
-    (when (fboundp 'vi-tilde-fringe-mode)
-      (vi-tilde-fringe-mode t))
-    (when (fboundp 'git-gutter-mode)
-      (git-gutter-mode t))
-    (when (fboundp 'centaur-tabs-local-mode)
-      (centaur-tabs-local-mode t)))
-  "Hook when `jf/minor-mode/presenter' deactivated."
-  :type 'hook)
+        (centaur-tabs-local-mode t)))
+    "Hook when `jf/minor-mode/presenter' deactivated."
+    :type 'hook))
 
 (use-package mastodon
   :straight (:host github :repo "jeremyf/mastodon.el")
@@ -6617,8 +6694,6 @@ provided AT, insert character there."
     (mkdir "~/.emacs.d/undo-tree/"))
   :config
   (global-undo-tree-mode +1))
-
-(require 'org-charsheet)
 
 (with-eval-after-load 'org
   (use-package ox
@@ -7514,7 +7589,10 @@ When the `current-prefix-arg' is set always prompt for the project."
           (jf/project/get-project-from/project-source-code)))
       (completing-read "Project: " (jf/project/list-projects)))))
 
+(require 'org-charsheet)
+
 (use-package transient
+  ;; Declaration for personal menu
   :straight (:type built-in)
   :config
   (transient-define-suffix jf/jump-to/agenda-local ()
@@ -7722,4 +7800,4 @@ This encodes the logic for creating a project."
 ;;       (async-shell-command "brew install autossh"))))
 
 (provide 'init)
-  ;;; init.el ends here
+;;; init.el ends here
