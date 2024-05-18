@@ -19,7 +19,8 @@
 (load custom-file :noerror)
 
 ;; https://www.reddit.com/r/emacs/comments/mtb05k/emacs_init_time_decreased_65_after_i_realized_the/
-(setq straight-check-for-modifications '(check-on-save find-when-checking))
+(setq straight-check-for-modifications
+  '(check-on-save find-when-checking))
 
 ;; This preamble is part of straight-use-package My understanding, in
 ;; reading straight documentation is that it has better load
@@ -227,7 +228,8 @@ Else, evaluate the whole buffer."
   different aspects of a file."
     ;; https://blog.sumtypeofway.com/posts/emacs-config.html
     (interactive "P")
-    (let* ((prefix (car arg))
+    (let* ((prefix
+             (car arg))
             (raw-filename
               (if (equal major-mode 'dired-mode)
                 default-directory
@@ -356,7 +358,7 @@ Else, evaluate the whole buffer."
 (add-to-list 'initial-frame-alist '(fullscreen . maximized))
 
 (tool-bar-mode -1) ;; Hide the icons of the Emacs toolbar
- ;; Hide the scroll bar. Let's be clear, I don't use it.
+;; Hide the scroll bar. Let's be clear, I don't use it.
 (scroll-bar-mode -1)
 (defalias 'yes-or-no-p 'y-or-n-p) ;; Always "y" or "n" for yes/no
 
@@ -545,7 +547,8 @@ Else, evaluate the whole buffer."
 
   (defvar-local jf/mode-line-format/buffer-name-and-status
     '(:eval
-       (let ((name (buffer-name)))
+       (let ((name
+               (buffer-name)))
          (propertize
            (if buffer-read-only
              (format " %s %s " (char-to-string #xE0A2) name)
@@ -557,11 +560,12 @@ Else, evaluate the whole buffer."
 
   (defun jf/mode-line-format/major-mode-indicator ()
     "Return propertized mode line indicator for the major mode."
-    (let ((indicator (cond
-                       ((derived-mode-p 'text-mode) "§")
-                       ((derived-mode-p 'prog-mode) "λ")
-                       ((derived-mode-p 'comint-mode) ">_")
-                       (t "◦"))))
+    (let ((indicator
+            (cond
+              ((derived-mode-p 'text-mode) "§")
+              ((derived-mode-p 'prog-mode) "λ")
+              ((derived-mode-p 'comint-mode) ">_")
+              (t "◦"))))
       (propertize indicator
         'face
         (if (mode-line-window-selected-p)
@@ -593,7 +597,8 @@ Else, evaluate the whole buffer."
          (propertize " Narrow " 'face 'mode-line-highlight))))
 
   (defvar jf/mode-line-format/vterm-map
-    (let ((map (make-sparse-keymap)))
+    (let ((map
+            (make-sparse-keymap)))
       (define-key map [mode-line down-mouse-1] #'vterm-copy-mode)
       map)
     "Keymap to display on `vterm' copy indicator.")
@@ -655,7 +660,8 @@ Else, evaluate the whole buffer."
       'help-echo "mouse-1: magit-status"))
 
   (defvar jf/mode-line-format/map-vc
-    (let ((map (make-sparse-keymap)))
+    (let ((map
+            (make-sparse-keymap)))
       (define-key map [mode-line down-mouse-1] #'magit-status)
       map)
     "Keymap to display on version control indicator.")
@@ -835,20 +841,24 @@ The ARGS are the rest of the ARGS passed to the ADVISED-FUNCTION."
                     (car args))
                    (_match
                      (string-match
-		                   "^https://github.com/\\([^/]+\\)/\\([^/]+\\)/[^/]+/[^/]+/\\([^#]+\\)\\(#L\\([0-9]+\\)\\)?"
-		                   url)))
+                       (concat "^https://github.com/"
+                         "\\([^/]+\\)/\\([^/]+\\)" ;; org/repo
+                         "/[^/]+/[^/]+/" ;; blob/sha
+                         "\\([^#]+\\)" ;; path to fil
+                         "\\(#L\\([0-9]+\\)\\)?") ;; line number
+                       url)))
           ;; Due to my present file structure I have some repositories
           ;; in ~/git/ and others in ~/git/sub-dir
           ;;
           ;; In most every case, the Github org and repo match the
           ;; remote URL.
           (let ((filename-without-org
-		              (format "~/git/%s/%s"
-			              (match-string 2 url)
+                  (format "~/git/%s/%s"
+                    (match-string 2 url)
                     (match-string 3 url)))
                  (filename-with-org
-		               (format "~/git/%s/%s/%s"
-			               (match-string 1 url)
+                   (format "~/git/%s/%s/%s"
+                     (match-string 1 url)
                      (match-string 2 url)
                      (match-string 3 url)))
                  (line-number
@@ -874,7 +884,7 @@ The ARGS are the rest of the ARGS passed to the ADVISED-FUNCTION."
       (apply advised-function func args)))
 
   (advice-add 'link-hint--apply
-	  :around #'jf/link-hint--apply))
+    :around #'jf/link-hint--apply))
 
 (use-package fontaine
   ;; A narrow focus package for naming font configurations and then
@@ -1064,7 +1074,8 @@ Credit: https://github.com/olivertaylor/dotfiles/blob/master/emacs/init.el"
     (interactive)
     (if (> (length (window-list)) 2)
       (error "Can't toggle with more than 2 windows")
-      (let ((was-full-height (window-full-height-p)))
+      (let ((was-full-height
+              (window-full-height-p)))
         (delete-other-windows)
         (if was-full-height
           (split-window-vertically)
@@ -1551,8 +1562,10 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
         (end-of-line)
         (goto-char (+ (point) 1))
         (exchange-point-and-mark)
-        (let* ((end (mark))
-                (beg (point))
+        (let* ((end
+                 (mark))
+                (beg
+                  (point))
                 (region
                   (buffer-substring-no-properties beg end)))
           (dotimes (_i arg)
@@ -1592,8 +1605,8 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   ;; `fill-sentences-correctly-mode' ensures that `fill-paragraph'
   ;; (e.g. M-q) preserves two spaces.
   :straight (fill-sentences-correctly
-       :host github
-       :repo "duckwork/fill-sentences-correctly.el")
+              :host github
+              :repo "duckwork/fill-sentences-correctly.el")
   :config (fill-sentences-correctly-mode))
 
 (use-package tomelr
@@ -1766,7 +1779,8 @@ File.open('%s', 'w') { |f| $stdout = f; pp results }")
       ;; We want the symbol so that links such performing completion on
       ;; "org-mode" will look for links with the text of org-mode and
       ;; then replace the text "org-mode" with the returned link.
-      (let ((bounds (bounds-of-thing-at-point 'symbol)))
+      (let ((bounds
+              (bounds-of-thing-at-point 'symbol)))
         (list (car bounds) (cdr bounds)
           ;; Call without parameters, getting a links (filtered by CAPF
           ;; magic)
@@ -1776,7 +1790,8 @@ File.open('%s', 'w') { |f| $stdout = f; pp results }")
             ;; We want the properties of that link.  In the case of one
             ;; match, the provided text will have the 'link property.
             ;; However if the
-            (let ((link (car (jf/org-links-with-text text))))
+            (let ((link
+                    (car (jf/org-links-with-text text))))
               (delete-char (- (length text)))
               (insert
                 "[[" (get-text-property 0 'link link) "]"
@@ -1804,7 +1819,8 @@ And 3 shall be the magic number."
         (jf/org-macros)
         :exit-function
         (lambda (text _status)
-          (let ((macro (car (jf/org-macros text))))
+          (let ((macro
+                  (car (jf/org-macros text))))
             (delete-char (- (length text)))
             (insert macro)))
         ;; Proceed with the next completion function if the returned
@@ -1813,7 +1829,8 @@ And 3 shall be the magic number."
         :exclusive 'no)))
 
   (defun jf/org-macros (&optional given-macro)
-    (let ((macros (jf/regexp-matches-for-text "{{{[^{}]+}}}")))
+    (let ((macros
+            (jf/regexp-matches-for-text "{{{[^{}]+}}}")))
       (if given-macro
         (when (member given-macro macros) (list given-macro))
         macros)))
@@ -1822,10 +1839,12 @@ And 3 shall be the magic number."
     "Get a list of all REGEXP matches in the STRING."
     (save-match-data
       (seq-uniq
-        (let ((string (or string (buffer-string)))
+        (let ((string
+                (or string (buffer-string)))
                (pos 0) matches)
           (while (string-match regexp string pos)
-            (let ((text (match-string 0 string)))
+            (let ((text
+                    (match-string 0 string)))
               (set-text-properties 0 (length text) nil text)
               (push text matches))
             (setq pos (match-end 0)))
@@ -1876,7 +1895,8 @@ first matching link."
   then insertes active date."
     ;; Insert an active timestamp, with a few options.
     (interactive "P")
-    (let ((prefix (car arg)))
+    (let ((prefix
+            (car arg)))
       (cond
         ((not prefix)
           (org-insert-time-stamp nil nil nil))
@@ -1902,14 +1922,14 @@ We want files to have the 'projects' `denote' keyword."
         (setq projects (cons jf/agenda-filename/local projects)))
       projects))
 
-;; (defun jf/journal/list-current-journals ()
-;;   "Return the last 14 daily journal entries."
-;;   (split-string-and-unquote
-;;     (shell-command-to-string
-;;       (concat
-;;         "fd _journal --absolute-path "
-;;         denote-journal-extras-directory " | sort | tail -14"))
-;;   "\n"))
+  ;; (defun jf/journal/list-current-journals ()
+  ;;   "Return the last 14 daily journal entries."
+  ;;   (split-string-and-unquote
+  ;;     (shell-command-to-string
+  ;;       (concat
+  ;;         "fd _journal --absolute-path "
+  ;;         denote-journal-extras-directory " | sort | tail -14"))
+  ;;   "\n"))
 
   (defun jf/org-mode/capture/project-task/find ()
     "Find the project file and position to the selected task."
@@ -1977,7 +1997,8 @@ Members of the sequence either have a tag 'tasks' or are in a todo state."
     "Return an alist of existing sub-tasks for the given TASK element.
 
 Each member's `car' is title and `cdr' is `org-mode' element."
-    (let ((subtask-level (+ 1 (org-element-property :level task))))
+    (let ((subtask-level
+            (+ 1 (org-element-property :level task))))
       (mapcar (lambda (headline)
                 (cons (org-element-property :title headline) headline))
         (org-element-map
@@ -2006,7 +2027,8 @@ Each member's `car' is title and `cdr' is `org-mode' element."
     "An org-capture conformant function for capturing to a blog-post."
     (if denote-last-path
       denote-org-capture-specifiers
-      (let ((denote-directory (f-join denote-directory "blog-posts")))
+      (let ((denote-directory
+              (f-join denote-directory "blog-posts")))
         (denote-org-capture))))
 
   ;; https://stackoverflow.com/questions/13340616/assign-ids-to-every-entry-in-org-mode
@@ -2082,7 +2104,8 @@ on the needs/constraints of the locality.")
       keyword))
 
   (defun jf/project-as-link ()
-    (let ((link jf/link-to-project))
+    (let ((link
+            jf/link-to-project))
       (setq jf/link-to-project nil)
       link))
 
@@ -2096,9 +2119,12 @@ on the needs/constraints of the locality.")
     "Convert DATA to appropriate markup for given BACK-END.
 
 CHANNEL is ignored."
-    (let* ((field-value (s-split ":" data))
-            (term (s-titleize (s-replace "_" " " (car field-value))))
-            (value (s-trim (cadr field-value))))
+    (let* ((field-value
+             (s-split ":" data))
+            (term
+              (s-titleize (s-replace "_" " " (car field-value))))
+            (value
+              (s-trim (cadr field-value))))
       (if (s-blank? value)
         ""
         (cond
@@ -2170,7 +2196,7 @@ function is ever added to that hook."
     (use-package ox
       :straight (ox :type built-in))
     (add-to-list 'org-export-filter-options-functions
-    #'jf/org-export-change-options)
+      #'jf/org-export-change-options)
    ;;; Org Export and Composition Functionality
     (setq org-export-global-macros (list))
 
@@ -2483,7 +2509,8 @@ Assumes that I'm on a :projects: headline.
   (defun jf/org-mode/delete-link ()
     "Remove the link part of `org-mode' keeping only description."
     (interactive)
-    (let ((elem (org-element-context)))
+    (let ((elem
+            (org-element-context)))
       (when (eq (car elem) 'link)
         (let* ((content-begin
                  (org-element-property :contents-begin elem))
@@ -2494,8 +2521,9 @@ Assumes that I'm on a :projects: headline.
                 (link-end
                   (org-element-property :end elem)))
           (when (and content-begin content-end)
-            (let ((content (buffer-substring-no-properties
-                             content-begin content-end)))
+            (let ((content
+                    (buffer-substring-no-properties
+                      content-begin content-end)))
               (delete-region link-begin link-end)
               (insert (concat content " "))))))))
   ;; ;; I have left the following for posterity.  It's something that
@@ -2571,7 +2599,8 @@ Assumes that I'm on a :projects: headline.
 
   (defun jf/org-agenda/timesheet/get-day-and-project-and-task-at-point ()
     "Return a plist of :day, :project, and :task for element at point."
-    (let* ((task (jf/org-agenda-headline-for-level :level 5))
+    (let* ((task
+             (jf/org-agenda-headline-for-level :level 5))
             (project (progn
                        (org-up-heading-safe)
                        (org-element-at-point)))
@@ -2582,9 +2611,11 @@ Assumes that I'm on a :projects: headline.
 
   (cl-defun jf/org-agenda-headline-for-level (&key (level 5))
     "Find the `org-mode' ancestor headline with LEVEL."
-    (let ((element (org-element-at-point)))
+    (let ((element
+            (org-element-at-point)))
       (if (eq 'headline (org-element-type element))
-        (let ((element-level (org-element-property :level element)))
+        (let ((element-level
+                (org-element-property :level element)))
           (cond
             ((= level element-level)
               (progn (message "Found %s" element) element))
@@ -2615,9 +2646,12 @@ Assumes that I'm on a :projects: headline.
   (defun jf/org-link-to-headline ()
     "Insert an internal link to a headline."
     (interactive)
-    (let* ((headlines (jf/org-get-headlines))
-            (choice (completing-read "Headings: " headlines nil t))
-            (desc (read-string "Description: " choice)))
+    (let* ((headlines
+             (jf/org-get-headlines))
+            (choice
+              (completing-read "Headings: " headlines nil t))
+            (desc
+              (read-string "Description: " choice)))
       (org-insert-link buffer-file-name (concat "*" choice) desc)))
 
   ;; If the example doesn't exist, create the example in the file
@@ -2627,14 +2661,16 @@ Assumes that I'm on a :projects: headline.
                                                      &key
                                                      (tag "example"))
     "Prompt for the GIVEN-MODE example with given TAG."
-    (let* ((mode (or given-mode (completing-read "Example:"
-                                  '("Existing" "New" "Stored")))))
+    (let* ((mode
+             (or given-mode (completing-read "Example:"
+                              '("Existing" "New" "Stored")))))
       (cond
         ((string= mode "New")
-          (let ((example (read-string "New Example Name: "
-                           nil
-                           nil
-                           (format-time-string "%Y-%m-%d %H:%M:%S"))))
+          (let ((example
+                  (read-string "New Example Name: "
+                    nil
+                    nil
+                    (format-time-string "%Y-%m-%d %H:%M:%S"))))
             (with-current-buffer (find-file-noselect
                                    jf/org-mode/capture/filename)
               (jf/org-mode/capture/set-position-file :headline nil
@@ -2779,8 +2815,10 @@ The return value is a list of `cons' with the `car' values of:
         ;; The 'eww-mode never fires :(
         ((eq 'eww-mode major-mode)
           (save-excursion
-            (let* ((url (plist-get eww-data :url))
-                    (title (plist-get eww-data :title)))
+            (let* ((url
+                     (plist-get eww-data :url))
+                    (title
+                      (plist-get eww-data :title)))
               (concat "#+attr_shortcode:"
                 (when title (concat " :cite " title))
                 (when url (concat " :cite_url " url))
@@ -2850,8 +2888,10 @@ to Backlog."
     ;;
     ;; - org-capture-key (default "c")
     ;; - template jf/org-mode/capture/template/default
-    (let ((params (jf/org-mode/capture/parameters prefix))
-           (block-text (buffer-substring-no-properties start end)))
+    (let ((params
+            (jf/org-mode/capture/parameters prefix))
+           (block-text
+             (buffer-substring-no-properties start end)))
       (org-capture-string
         (s-format (plist-get params :template)
           'aget
@@ -2970,7 +3010,8 @@ to Backlog."
     ;; Ensure that we create the directories along the path of a new
     ;; file I’m creating.  See
     ;; https://emacsredux.com/blog/2022/06/12/auto-create-missing-directories/
-    (let ((target-dir (file-name-directory buffer-file-name)))
+    (let ((target-dir
+            (file-name-directory buffer-file-name)))
       (unless (file-exists-p target-dir)
         (make-directory target-dir t))))
 
@@ -3125,7 +3166,8 @@ to Backlog."
 
 With a PREFIX jump to the agenda without starting the clock."
     (interactive "P")
-    (let ((the-match (or match "TODO=\"STARTED\"|TODO=\"TODO\"")))
+    (let ((the-match
+            (or match "TODO=\"STARTED\"|TODO=\"TODO\"")))
       (if prefix
         (consult-org-agenda the-match)
         (save-window-excursion
@@ -3134,8 +3176,10 @@ With a PREFIX jump to the agenda without starting the clock."
   (defun jf/consult-buffer-kill ()
     "In `consult-buffer' kill the current candidate"
     (interactive)
-    (let ((marker (string #x200002)) ;; probably some internal detail :(
-           (candidate (vertico--candidate)))
+    (let ((marker
+            (string #x200002)) ;; probably some internal detail :(
+           (candidate
+             (vertico--candidate)))
       (when (s-ends-with? marker candidate)
         (kill-buffer (s-replace marker "" candidate))
         (vertico-next))))
@@ -3240,7 +3284,8 @@ With a PREFIX jump to the agenda without starting the clock."
                                           &optional dir default
                                           mustmatch initial pred)
     (interactive)
-    (let ((default-directory (or dir default-directory)))
+    (let ((default-directory
+            (or dir default-directory)))
       (consult--read #'read-file-name-internal
         :state (consult--file-preview)
         :prompt prompt
@@ -3301,14 +3346,14 @@ Useful if you want a more robust view into the recommend candidates."
       (apply #'consult-completion-in-region
         completion-in-region--data)))
   (defun corfu-enable-always-in-minibuffer ()
-  "Enable Corfu in the minibuffer if Vertico/Mct are not active."
-  (unless (or (bound-and-true-p mct--active)
+    "Enable Corfu in the minibuffer if Vertico/Mct are not active."
+    (unless (or (bound-and-true-p mct--active)
               (bound-and-true-p vertico--input)
               (eq (current-local-map) read-passwd-map))
-    ;; (setq-local corfu-auto nil) ;; Enable/disable auto completion
-    (setq-local corfu-echo-delay nil ;; Disable automatic echo and popup
-                corfu-popupinfo-delay nil)
-    (corfu-mode 1)))
+      ;; (setq-local corfu-auto nil) ;; Enable/disable auto completion
+      (setq-local corfu-echo-delay nil ;; Disable automatic echo and popup
+        corfu-popupinfo-delay nil)
+      (corfu-mode 1)))
   :config
   (add-hook 'minibuffer-setup-hook
     #'corfu-enable-always-in-minibuffer 1)
@@ -3537,7 +3582,7 @@ Useful if you want a more robust view into the recommend candidates."
   :bind (("M-+" . tempel-complete) ;; Alternative tempel-expand
           ("M-*" . tempel-insert))
   :bind (:map tempel-map (([backtab] . tempel-previous)
-        ("TAB" . tempel-next)))
+                           ("TAB" . tempel-next)))
   :preface
   (cl-defun jf/org-macro-value-list (macro-name &key (dir org-directory))
     "List the unique inner text of all uses of MACRO-NAME in given DIR."
@@ -3609,7 +3654,8 @@ prompt and allows further narrowing.
 Useful when you want to mix selector semantics (e.g. start with a
 literal then add a fuzzy search)."
     (interactive)
-    (let ((inhibit-read-only t))
+    (let ((inhibit-read-only
+            t))
       (goto-char (point-max))
       (insert " ")
       (add-text-properties (minibuffer-prompt-end) (point-max)
@@ -3879,7 +3925,8 @@ and use one of the extensions implied by `denote-file-type'."
     "Sort current directory using `denote-sort-dired'."
     (interactive)
     (if (eq major-mode 'dired-mode)
-      (let ((denote-directory default-directory))
+      (let ((denote-directory
+              default-directory))
         (call-interactively #'denote-sort-dired)
         (user-error "Current buffer not dired-mode"))))
 
@@ -3934,7 +3981,8 @@ When no FILE is provided use `buffer-file-name'.
               (if (equal keywords :none)
                 '()
                 (or keywords
-                  (let ((kws (denote-extract-keywords-from-path file)))
+                  (let ((kws
+                          (denote-extract-keywords-from-path file)))
                     (completing-read-multiple "Keywords: "
                       (delete-dups (append kws (denote-keywords)))
                       nil nil (when kws
@@ -4049,7 +4097,8 @@ ID-ONLY link without title."
     (interactive (list (jf/denote/file-prompt)
                    current-prefix-arg))
     (if (and target (file-exists-p target))
-      (let ((type (denote-filetype-heuristics target)))
+      (let ((type
+              (denote-filetype-heuristics target)))
         (denote-link target type
           (denote--link-get-description target)
           id-only)
@@ -4220,7 +4269,8 @@ See `denote-file-prompt'"
 
 Default the note’s title to the first NTH-WORDS of the BODY."
     (interactive)
-    (let* ((body-as-list (s-split-words body))
+    (let* ((body-as-list
+             (s-split-words body))
             (title (s-join " " (if (> (length body-as-list) nth-words)
                                  (cl-subseq body-as-list 0 nth-words)
                                  body-as-list)))
@@ -4329,7 +4379,8 @@ Default the note’s title to the first NTH-WORDS of the BODY."
 
 Consider different logic if IS-A-SERIES."
     (interactive)
-    (let* ((keywords (list))
+    (let* ((keywords
+             (list))
             (template (concat (when (s-present? is-a-series)
                                 "#+HIGHLIGHT: true\n"))))
       (when (s-present? is-a-series)
@@ -4356,10 +4407,11 @@ Consider different logic if IS-A-SERIES."
     an `denote' identifier.
 
 PARG is part of the method signature for `org-link-parameters'."
-    (let* ((denote-directory (if subdirectory
-                               (f-join (denote-directory)
-                                 (concat subdirectory "/"))
-                               (denote-directory)))
+    (let* ((denote-directory
+             (if subdirectory
+               (f-join (denote-directory)
+                 (concat subdirectory "/"))
+               (denote-directory)))
             (file (funcall project-read-file-name-function
                     "Select note: "
                     (denote-all-files)
@@ -4385,10 +4437,10 @@ PARG is part of the method signature for `org-link-parameters'."
     DESCRIPTION.  PROTOCOL is ignored."
     (let* ((keyword-alist
              (jf/denote/org-keywords-from-id
-                            :identifier link
-                            :keywords (list "TITLE"
-                                        keyword
-                                        "GLOSSARY_KEY")))
+               :identifier link
+               :keywords (list "TITLE"
+                           keyword
+                           "GLOSSARY_KEY")))
             (title
               (car (alist-get "TITLE" keyword-alist nil nil #'string=)))
             (keyword-value
@@ -4502,12 +4554,14 @@ PARG is for a conformant method signature."
 
   (cl-defun jf/epigraph-text-for (&key identifier)
     "Return the epigraph text for `denote' IDENTIFIER."
-    (let ((filename (denote-get-path-by-id identifier)))
+    (let ((filename
+            (denote-get-path-by-id identifier)))
       (with-current-buffer (find-file-noselect filename)
-        (let ((text (s-join "\n\n" (org-element-map
-                                     (org-element-parse-buffer)
-                                     'paragraph
-                                     (lambda (p) (caddr p))))))
+        (let ((text
+                (s-join "\n\n" (org-element-map
+                                 (org-element-parse-buffer)
+                                 'paragraph
+                                 (lambda (p) (caddr p))))))
           (if (cadar (org-collect-keywords '("POEM")))
             (format "<pre class=\"poem\">\n%s\n</pre>" text)
             (format "%s" text))))))
@@ -4594,8 +4648,10 @@ When USE_HUGO_SHORTCODE is given use glossary based exporting."
   (defun jf/associate-blog-post-url-with-identifier (url identifier)
     "Associate given URL with the `denote' IDENTIFIER."
     (message "Associating URL: %s with IDENTIFIER: %s." identifier url)
-    (let* ((filename (denote-get-path-by-id identifier))
-            (buffer (find-file-noselect filename)))
+    (let* ((filename
+             (denote-get-path-by-id identifier))
+            (buffer
+              (find-file-noselect filename)))
       (with-current-buffer buffer
         (jf/export-org-to-tor--global-buffer-prop-ensure
           :key "ROAM_REFS"
@@ -4606,11 +4662,15 @@ When USE_HUGO_SHORTCODE is given use glossary based exporting."
   (defun jf/org-mode/convert-link-type (&optional element)
     "Replace the given `org-mode' ELEMENT's link type and text."
     (interactive)
-    (let* ((types '("abbr" "abbr-plural" "denote"))
-            (element (or element (org-element-context))))
+    (let* ((types
+             '("abbr" "abbr-plural" "denote"))
+            (element
+              (or element (org-element-context))))
       (if (eq 'link (car element))
-        (let ((type (org-element-property :type (org-element-context)))
-               (denote-id (plist-get (cadr element) :path)))
+        (let ((type
+                (org-element-property :type (org-element-context)))
+               (denote-id
+                 (plist-get (cadr element) :path)))
           (if (member type types)
             (when-let ((new-type
                          (completing-read "New link type: "
@@ -4663,10 +4723,12 @@ When USE_HUGO_SHORTCODE is given use glossary based exporting."
     "Create `bookmark+' for current Safari page."
     (interactive)
     (require 'grab-mac-link)
-    (let* ((url-and-title (grab-mac-link-safari-1))
-            (title (read-string
-                     (concat "URL: " (car url-and-title) "\nTitle: ")
-                     (cadr url-and-title))))
+    (let* ((url-and-title
+             (grab-mac-link-safari-1))
+            (title
+              (read-string
+                (concat "URL: " (car url-and-title) "\nTitle: ")
+                (cadr url-and-title))))
       (bmkp-url-target-set (car url-and-title) nil title)))
 
   ;; I'd love to avoid re-fetching the content.
@@ -4705,8 +4767,10 @@ The DOM could be as sanitized by `org-web-tools--sanitized-dom'."
   (defun jf/denote/archive-timesheet-month ()
     "Cut the month agenda and create a `denote' note."
     (interactive)
-    (let* ((headline (jf/org-agenda-headline-for-level :level 2))
-            (title (org-element-property :title headline)))
+    (let* ((headline
+             (jf/org-agenda-headline-for-level :level 2))
+            (title
+              (org-element-property :title headline)))
       (org-cut-subtree)
       (denote (concat title " Time Sheet")
         '("timesheet" "scientist")
@@ -4738,18 +4802,25 @@ with the series."
               (re-search-forward "^$")
               (insert "\n#+HUGO_CUSTOM_FRONT_MATTER: :series " series)
               (save-buffer)))
-          (let* ((file (buffer-file-name))
-                  (id (denote-retrieve-filename-identifier file))
-                  (file-type 'org)
-                  (title (denote-retrieve-title-value file file-type))
+          (let* ((file
+                   (buffer-file-name))
+                  (id
+                    (denote-retrieve-filename-identifier file))
+                  (file-type
+                    'org)
+                  (title
+                    (denote-retrieve-title-value file file-type))
                   (keywords
                     (seq-difference
                       (denote-retrieve-keywords-value file file-type)
                       (flatten-list drop-tags)))
-                  (extension (denote-get-file-extension file))
-                  (dir (file-name-directory file))
-                  (new-name (denote-format-file-name
-                              dir id keywords title extension series)))
+                  (extension
+                    (denote-get-file-extension file))
+                  (dir
+                    (file-name-directory file))
+                  (new-name
+                    (denote-format-file-name
+                      dir id keywords title extension series)))
             (denote-rename-file-and-buffer file new-name)
             (denote-update-dired-buffers))))))
 
@@ -4801,18 +4872,18 @@ with the series."
   (defun --set-emoji-font (frame)
     "Adjust font settings of FRAME so Emacs can display emoji properly."
     (if (eq system-type 'darwin)
-  ;; For NS/Cocoa
-  (set-fontset-font t
+      ;; For NS/Cocoa
+      (set-fontset-font t
         'symbol
         (font-spec :family "Apple Color Emoji")
         frame
         'prepend)
       ;; For Linux
       (set-fontset-font t
-      'symbol
-      (font-spec :family "Symbola")
-      frame
-      'prepend)))
+        'symbol
+        (font-spec :family "Symbola")
+        frame
+        'prepend)))
   ;; For when Emacs is started in GUI mode:
   (--set-emoji-font nil)
   ;; Hook for when a frame is created with emacsclient see
@@ -4851,7 +4922,7 @@ with the series."
   ;; A simple package ability to move lines up and down.
   :straight t
   :bind (([C-s-down] . move-text-down)
-         ([C-s-up] . move-text-up)))
+          ([C-s-up] . move-text-up)))
 
 (use-package titlecase
   ;; The rules of “titlecase” are confounding.  The ~titlecase.el~
@@ -4864,11 +4935,11 @@ with the series."
   ;; Allow Emacs to work with multiple cursors.  See
   ;; https://melpa.org/#/multiple-cursors
   :bind (("C-M-SPC" . set-rectangular-region-anchor)
-         ("C->" . mc/mark-next-like-this)
-         ("C-<" . mc/mark-previous-like-this)
-         ("C-s-<mouse-1>" . mc/add-cursor-on-click)
-         ("C-c C->" . mc/mark-all-like-this)
-         ("C-c C-SPC" . mc/edit-lines)) ;; CTRL+CMD+c
+          ("C->" . mc/mark-next-like-this)
+          ("C-<" . mc/mark-previous-like-this)
+          ("C-s-<mouse-1>" . mc/add-cursor-on-click)
+          ("C-c C->" . mc/mark-all-like-this)
+          ("C-c C-SPC" . mc/edit-lines)) ;; CTRL+CMD+c
   :straight t)
 
 (use-package iedit
@@ -4889,9 +4960,9 @@ with the series."
   ;; Shall we review code via Magit?  I believe the answer must be yes.
   :after magit
   :straight (code-review
-             :type git
-             :host github
-             :repo "phelrine/code-review"
+              :type git
+              :host github
+              :repo "phelrine/code-review"
               :branch "fix/closql-update")
   :bind (:map forge-pullreq-mode-map
           (("C-c r" . #'code-review-forge-pr-at-point)))
@@ -4918,7 +4989,8 @@ with the series."
     "Wrap the current ruby region by disabling/enabling the GIVEN-COPS."
     (interactive)
     (if (derived-mode-p 'ruby-ts-mode 'ruby-mode)
-      (if-let ((region (jf/treesit/derive-region-for-rubocop)))
+      (if-let ((region
+                 (jf/treesit/derive-region-for-rubocop)))
         (let ((cops
                 (or given-cops
                   (completing-read-multiple "Cops to Disable: "
@@ -4926,7 +4998,8 @@ with the series."
           (save-excursion
             (goto-char (cdr region))
             (call-interactively #'crux-move-beginning-of-line)
-            (let ((indentation (s-repeat (current-column) " ")))
+            (let ((indentation
+                    (s-repeat (current-column) " ")))
               (goto-char (cdr region))
               (insert "\n"
                 (s-join "\n"
@@ -4989,7 +5062,8 @@ method, get the containing class."
         (if current-prefix-arg
           module_space
           (concat module_space method_type method_name)))
-      (let ((current-node (treesit-node-at (point))))
+      (let ((current-node
+              (treesit-node-at (point))))
         (s-join "::" (jf/treesit/module_space current-node)))))
 
   ;; Handles the following Ruby code:
@@ -5285,7 +5359,7 @@ method, get the containing class."
 
 (use-package flymake-ruff
   :straight t)
-  ;; :hook (eglot-managed-mode . flymake-ruff-load))
+;; :hook (eglot-managed-mode . flymake-ruff-load))
 
 (use-package python-docstring
   :straight t)
@@ -5312,9 +5386,9 @@ method, get the containing class."
   ;; place
   (venv-initialize-eshell)
   (setq projectile-switch-project-action
-      '(lambda ()
-         (venv-projectile-auto-workon)
-         (projectile-find-file))))
+    '(lambda ()
+       (venv-projectile-auto-workon)
+       (projectile-find-file))))
 
 (use-package json-mode
   ;; The web's data structure of choice is JSON.
@@ -5427,7 +5501,7 @@ method, get the containing class."
   (rspec-use-docker-when-possible t)
   (rspec-docker-cwd "./")
   (rspec-docker-command "docker compose exec")
-    :hook ((dired-mode . rspec-dired-mode)
+  :hook ((dired-mode . rspec-dired-mode)
           (rspec-mode . jf/rspec-mode-hook))
   ;; Dear reader, make sure that you can jump from spec and definition.
   ;; And in Ruby land when you have lib/my_file.rb, the corresponding
@@ -5545,13 +5619,15 @@ method, get the containing class."
                                (treesit-node-type node))))))))
         (goto-char (treesit-node-start func))
         ;; Grab the parameter names.
-        (let* ((identifiers (mapcar (lambda (token)
-                                      (replace-regexp-in-string
-                                        "[^a-z|_]" ""
-                                        (car (s-split " "
-                                               (s-trim token)))))
-                              (s-split "," method_parameters_text)))
-                (indentation (s-repeat (current-column) " ")))
+        (let* ((identifiers
+                 (mapcar (lambda (token)
+                           (replace-regexp-in-string
+                             "[^a-z|_]" ""
+                             (car (s-split " "
+                                    (s-trim token)))))
+                   (s-split "," method_parameters_text)))
+                (indentation
+                  (s-repeat (current-column) " ")))
           (previous-line)
           (end-of-line)
           (insert
@@ -5599,7 +5675,8 @@ method, get the containing class."
 
 See `add-log-current-defun-function'."
     (interactive)
-    (if-let ((text (funcall add-log-current-defun-function)))
+    (if-let ((text
+               (funcall add-log-current-defun-function)))
       (progn
         (message "%s" text)
         (kill-new (substring-no-properties text)))
@@ -5661,7 +5738,8 @@ See `jf/comment-header-regexp/major-modes-alis'."
         (error (goto-char (point-min))))))
 
   (dolist (el jf/comment-header-regexp/major-modes-alist)
-    (let ((jf-map (intern (format "%s-map" (car el)))))
+    (let ((jf-map
+            (intern (format "%s-map" (car el)))))
       ;; The treesitter mode maps don't seem to exist at this point
       (unless (s-contains? "-ts-" (format "%s" (car el)))
         (progn
@@ -5810,17 +5888,17 @@ See `jf/comment-header-regexp/major-modes-alis'."
       (advice-add 'eglot-completion-at-point
         :around #'cape-wrap-buster)
       (defun jf/eglot-capf ()
-      "Ensure `eglot-completion-at-point' preceeds everything."
-      ;; I don't want `eglot-completion-at-point' to trample my other
-      ;; completion options.
-      ;;
-      ;; https://stackoverflow.com/questions/72601990/how-to-show-suggestions-for-yasnippets-when-using-eglot
-      (setq-local completion-at-point-functions
-        (list (cape-capf-super
-                #'eglot-completion-at-point
-                #'tempel-expand
-                #'cape-file
-                #'cape-keyword)))))
+        "Ensure `eglot-completion-at-point' preceeds everything."
+        ;; I don't want `eglot-completion-at-point' to trample my other
+        ;; completion options.
+        ;;
+        ;; https://stackoverflow.com/questions/72601990/how-to-show-suggestions-for-yasnippets-when-using-eglot
+        (setq-local completion-at-point-functions
+          (list (cape-capf-super
+                  #'eglot-completion-at-point
+                  #'tempel-expand
+                  #'cape-file
+                  #'cape-keyword)))))
 
     (use-package eldoc
       ;; Helps with rendering documentation
@@ -5938,7 +6016,8 @@ See `jf/comment-header-regexp/major-modes-alis'."
           ("M-[" . #'logos-backward-page-dwim)
           ("s-[" . #'logos-backward-page-dwim))
   :config
-  (let ((map global-map))
+  (let ((map
+          global-map))
     (define-key map [remap narrow-to-region] #'logos-narrow-dwim)
     (define-key map [remap forward-page] #'logos-forward-page-dwim)
     (define-key map [remap backward-page] #'logos-backward-page-dwim))
@@ -6047,7 +6126,8 @@ See `jf/comment-header-regexp/major-modes-alis'."
   (advice-add 'olivetti-mode :before #'jf/olivetti-mode))
 
 (defvar jf/minor-mode/presenter-map
-  (let ((map (make-sparse-keymap)))
+  (let ((map
+          (make-sparse-keymap)))
     (define-key map (kbd "C-n") #'next-line)
     (define-key map (kbd "C-p") #'previous-line)
     (dolist (key `("M-]" "s-]"))
@@ -6065,9 +6145,12 @@ See `jf/comment-header-regexp/major-modes-alis'."
 
 (defcustom jf/minor-mode/presenter-on-hook
   (lambda ()
-    (let ((logos-hide-cursor nil)
-           (logos-buffer-read-only nil)
-           (org-hide-emphasis-markers t))
+    (let ((logos-hide-cursor
+            nil)
+           (logos-buffer-read-only
+             nil)
+           (org-hide-emphasis-markers
+             t))
       (call-interactively 'logos-narrow-dwim)
       (olivetti-mode t)
       (keycast-mode-line-mode t)
@@ -6110,7 +6193,7 @@ See `jf/comment-header-regexp/major-modes-alis'."
   ;; A package for improving the in Emacs viewing experience of PDFs.
   :straight (doc-view :type built-in)
   :bind (:map doc-view-mode-map
-              ("C-c g" . doc-view-goto-page)))
+          ("C-c g" . doc-view-goto-page)))
 
 (use-package elfeed
   ;; An Emacs RSS reader.  I’ve used Google Reader, Feedly, Inoreader,
@@ -6248,17 +6331,19 @@ Alternative suggestions are: - '(\"\\\"“\" . \"\\\"\")"
 
   ;; Drawing inspiration from shr-tag-abbr
   (defun shr-tag-time (dom)
-    (when-let* ((datetime (or
-         (dom-attr dom 'title)
-         (dom-attr dom 'datetime)))
-    (start (point)))
+    (when-let* ((datetime
+                  (or
+                    (dom-attr dom 'title)
+                    (dom-attr dom 'datetime)))
+                 (start
+                   (point)))
       (shr-generic dom)
       (shr-add-font start (point) 'shr-time)
       (add-text-properties
-       start (point)
-       (list
-  'help-echo datetime
-         'mouse-face 'highlight))))
+        start (point)
+        (list
+          'help-echo datetime
+          'mouse-face 'highlight))))
 
   ;; EWW lacks a style for article
   (defun shr-tag-article (dom)
@@ -6557,15 +6642,18 @@ provided AT, insert character there."
     (defun jf/org-hugo-sidenote (footnote-reference _contents info)
       "Transcode a FOOTNOTE-REFERENCE element from Org to Hugo sidenote shortcode.
 CONTENTS is nil.  INFO is a plist holding contextual information."
-      (let* ((element (car (org-export-get-footnote-definition footnote-reference info)))
-              (beg (org-element-property :contents-begin element))
-              (end (org-element-property :contents-end element))
-              (content (s-trim
-                         (org-export-string-as
-                           (buffer-substring-no-properties beg end)
-                           'md t '(:with-toc nil)))))
+      (let* ((element
+               (car (org-export-get-footnote-definition footnote-reference info)))
+              (beg
+                (org-element-property :contents-begin element))
+              (end
+                (org-element-property :contents-end element))
+              (content
+                (s-trim
+                  (org-export-string-as
+                    (buffer-substring-no-properties beg end)
+                    'md t '(:with-toc nil)))))
         (format "{{< sidenote >}}%s{{< /sidenote >}}" content)))
-
 
     (advice-add #'org-blackfriday-footnote-reference
       :override #'jf/org-hugo-sidenote
@@ -6616,21 +6704,27 @@ Take on Rules using the \"blockquote\" special block."
       (setq jf/exporting-org-to-tor t)
       (with-current-buffer buffer
         (save-excursion
-          (let* ((export-global-plist (jf/org-keywords-as-plist))
-                  (section (jf/export-org-to-tor--global-buffer-prop-ensure
-                             :key "HUGO_SECTION"
-                             :plist export-global-plist
-                             :default (format-time-string "posts/%Y")))
-                  (base_dir (jf/export-org-to-tor--global-buffer-prop-ensure
-                              :key "HUGO_BASE_DIR"
-                              :plist export-global-plist
-                              :default "~/git/takeonrules.source"))
-                  (format (jf/export-org-to-tor--global-buffer-prop-ensure
-                            :key "HUGO_FRONT_MATTER_FORMAT"
-                            :plist export-global-plist
-                            :default "yaml"))
-                  (title (lax-plist-get export-global-plist "TITLE"))
-                  (identifier (lax-plist-get export-global-plist "IDENTIFIER")))
+          (let* ((export-global-plist
+                   (jf/org-keywords-as-plist))
+                  (section
+                    (jf/export-org-to-tor--global-buffer-prop-ensure
+                      :key "HUGO_SECTION"
+                      :plist export-global-plist
+                      :default (format-time-string "posts/%Y")))
+                  (base_dir
+                    (jf/export-org-to-tor--global-buffer-prop-ensure
+                      :key "HUGO_BASE_DIR"
+                      :plist export-global-plist
+                      :default "~/git/takeonrules.source"))
+                  (format
+                    (jf/export-org-to-tor--global-buffer-prop-ensure
+                      :key "HUGO_FRONT_MATTER_FORMAT"
+                      :plist export-global-plist
+                      :default "yaml"))
+                  (title
+                    (lax-plist-get export-global-plist "TITLE"))
+                  (identifier
+                    (lax-plist-get export-global-plist "IDENTIFIER")))
             (save-buffer)
             (jf/export-org-to-tor--inject-additional-front-matter
               :title title
@@ -6740,7 +6834,8 @@ Take on Rules using the \"blockquote\" special block."
 
     (defun jf/org-mode-get-keyword-key-value (kwd)
       "Map KWD to list."
-      (let ((data (cadr kwd)))
+      (let ((data
+              (cadr kwd)))
         (list (plist-get data :key)
           (plist-get data :value))))
 
@@ -6798,7 +6893,8 @@ If UNSAFE is non-nil, assume point is on headline."
         (progn
           (kill-buffer buffer-name)
           (message (concat "Stopping Hugo in \"" buffer-name "\" buffer…")))
-        (let* ((default-directory directory))
+        (let* ((default-directory
+                 directory))
           (start-process "hugo-server" buffer-name "hugo" "server" "-D")
           (message (concat "Starting Hugo in \"" buffer-name "\" buffer…")))))
 
@@ -6823,21 +6919,27 @@ If UNSAFE is non-nil, assume point is on headline."
       (cond
         ;; Blog post
         ((string-match jf/tor-hugo-regexp-for-post-path url)
-          (let* ((slug (match-string-no-properties 1 url))
-                  (filename (car
-                              (jf/list-filenames-with-file-text
-                                :matching (concat "^slug: " slug "$")
-                                :in "content"))))
-            (find-file (f-join jf/tor-home-directory "content" filename))))
+          (let* ((slug
+                   (match-string-no-properties 1 url))
+                  (filename
+                    (car
+                      (jf/list-filenames-with-file-text
+                        :matching (concat "^slug: " slug "$")
+                        :in "content"))))
+            (find-file
+              (f-join jf/tor-home-directory "content" filename))))
         ;; Pages
         ((string-match jf/tor-hugo-regexp-for-pages-path url)
-          (let* ((permalink (match-string-no-properties 1 url))
-                  (filename (car
-                              (jf/list-filenames-with-file-text
-                                :matching (concat "^permalink: ['\\\"]?/?"
-                                            permalink "/?['\\\"]?$")
-                                :in "content"))))
-            (find-file (f-join jf/tor-home-directory "content" filename))))
+          (let* ((permalink
+                   (match-string-no-properties 1 url))
+                  (filename
+                    (car
+                      (jf/list-filenames-with-file-text
+                        :matching (concat "^permalink: ['\\\"]?/?"
+                                    permalink "/?['\\\"]?$")
+                        :in "content"))))
+            (find-file
+              (f-join jf/tor-home-directory "content" filename))))
         ;; No match found
         (t (message "Unable to find post for \"%s\"" url))))
 
@@ -6845,8 +6947,9 @@ If UNSAFE is non-nil, assume point is on headline."
       "Find TakeOnRules glossary and begin entering a changelog entry."
       (interactive)
       (find-file (f-join jf/tor-home-directory "data" "changelog.yml"))
-      ;; The changelog is structured in date descending order.  The first
-      ;; line is the YAML preamble indicating a data object (e.g. "---")
+      ;; The changelog is structured in date descending order.  The
+      ;; first line is the YAML preamble indicating a data object
+      ;; (e.g. "---")
       (goto-char (point-min))
       (end-of-line)
       (insert (concat "\n- date: "
@@ -6857,7 +6960,8 @@ If UNSAFE is non-nil, assume point is on headline."
       "Find TakeOnRules series and add an entry with TITLE."
       (interactive "sSeries Entry's Title: ")
       (find-file (f-join jf/tor-home-directory "data" "series.yml"))
-      (let ((key (downcase (s-dashed-words title))))
+      (let ((key
+              (downcase (s-dashed-words title))))
         (goto-char (point-max))
         (insert (concat
                   (if (looking-at-p "^$") "" "\n")
@@ -6933,7 +7037,8 @@ If `consult--read' is defined, use that.  Otherwise fallback to
 
     (cl-defun jf/list-filenames-with-file-text (&key matching in)
       "Build a list of filenames MATCHING the pattern IN the given directory."
-      (let ((default-directory (f-join jf/tor-home-directory in)))
+      (let ((default-directory
+              (f-join jf/tor-home-directory in)))
         (split-string-and-unquote
           (shell-command-to-string
             (concat
@@ -6958,7 +7063,8 @@ If `consult--read' is defined, use that.  Otherwise fallback to
 
     (defun jf/tor-asset-relative-pathname-list ()
       "Return a list of image filenames for TakeOnRules.com."
-      (let ((default-directory (f-join jf/tor-home-directory "assets" "images")))
+      (let ((default-directory
+              (f-join jf/tor-home-directory "assets" "images")))
         (split-string-and-unquote
           (shell-command-to-string "ls"))))
 
@@ -7116,9 +7222,9 @@ Add the blog post to the given SERIES with the given KEYWORDS."
   :defer t
   :ensure t
   :config (pdf-tools-install)
-   ;; open pdfs scaled to fit page
+  ;; open pdfs scaled to fit page
   (setq-default pdf-view-display-size 'fit-page)
-   ;; automatically annotate highlights
+  ;; automatically annotate highlights
   (setq pdf-annot-activate-created-annotations t)
   ;; use normal isearch
   (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward))
@@ -7155,14 +7261,16 @@ Add the blog post to the given SERIES with the given KEYWORDS."
 
   ;; Connective Tissue and oddity functions:
   (defvar server-visit-files-custom-find:buffer-count
-  "A counter for assisting with opening multiple files via a single
+    nil
+    "A counter for assisting with opening multiple files via a single
     client call.")
 
   (defadvice server-visit-files
     (around server-visit-files-custom-find
       activate compile)
     "Maintain a counter of visited files from a single client call."
-    (let ((server-visit-files-custom-find:buffer-count 0))
+    (let ((server-visit-files-custom-find:buffer-count
+            0))
       ad-do-it))
 
   (defun server-visit-hook-custom-find ()
@@ -7171,8 +7279,10 @@ Add the blog post to the given SERIES with the given KEYWORDS."
       (progn
         (delete-other-windows)
         (switch-to-buffer (current-buffer)))
-      (let ((buffer (current-buffer))
-             (window (split-window-sensibly)))
+      (let ((buffer
+              (current-buffer))
+             (window
+               (split-window-sensibly)))
         (switch-to-buffer buffer)
         (balance-windows)))
     (setq server-visit-files-custom-find:buffer-count
@@ -7202,9 +7312,11 @@ Add the blog post to the given SERIES with the given KEYWORDS."
 
 Determine the PROJECT by querying `jf/project/list-projects'."
     (interactive)
-    (let* ((project (or (s-presence project)
-                      (jf/project/find-dwim)))
-            (filename (cdar (jf/project/list-projects :project project))))
+    (let* ((project
+             (or (s-presence project)
+               (jf/project/find-dwim)))
+            (filename
+              (cdar (jf/project/list-projects :project project))))
       (find-file filename)))
 
   ;; I work on several different projects each day; helping folks get
@@ -7298,9 +7410,12 @@ The `cdr' is the fully qualified path to that projects notes file.
 The DIRECTORY defaults to `org-directory' but you can specify
 otherwise."
     (mapcar (lambda (line)
-              (let* ((slugs (s-split ":" line))
-                      (proj (s-trim (car (cdr slugs))))
-                      (filename (s-trim (car slugs))))
+              (let* ((slugs
+                       (s-split ":" line))
+                      (proj
+                        (s-trim (car (cdr slugs))))
+                      (filename
+                        (s-trim (car slugs))))
                 (cons proj filename)))
       (split-string-and-unquote
         (shell-command-to-string
@@ -7317,15 +7432,17 @@ Return nil if the current buffer is not part of a noted project.
 
 Noted projects would be found within the given DIRECTORY."
     (when-let ((project_path_to_code_truename (cdr (project-current))))
-      (let ((project_path_to_code (jf/filename/tilde-based
-                                    project_path_to_code_truename)))
+      (let ((project_path_to_code
+              (jf/filename/tilde-based
+                project_path_to_code_truename)))
         ;; How to handle multiple projects?  Prompt to pick one
-        (let ((filename (s-trim (shell-command-to-string
-                                  (concat
-                                    "rg \"^#\\+PROJECT_PATHS: .*"
-                                    project_path_to_code " *\\\"\" "
-                                    directory " --files-with-matches "
-                                    " --no-ignore-vcs --ignore-case")))))
+        (let ((filename
+                (s-trim (shell-command-to-string
+                          (concat
+                            "rg \"^#\\+PROJECT_PATHS: .*"
+                            project_path_to_code " *\\\"\" "
+                            directory " --files-with-matches "
+                            " --no-ignore-vcs --ignore-case")))))
           (unless (string-equal "" filename)
             (with-current-buffer (find-file-noselect
                                    (file-truename filename))
@@ -7431,7 +7548,8 @@ When the `current-prefix-arg' is set always prompt for the project."
 This encodes the logic for creating a project."
     :description "Convert to project…"
     (interactive)
-    (let ((buffer (or buffer (current-buffer))))
+    (let ((buffer
+            (or buffer (current-buffer))))
       (with-current-buffer buffer
         (if-let* ((file
                     (buffer-file-name buffer))
@@ -7452,7 +7570,8 @@ This encodes the logic for creating a project."
               "\n#+CATEGORY: " existing-title)
             (setq keywords (cons "projects" keywords))
             (denote-rewrite-keywords file keywords file-type)
-            (call-interactively #'denote-rename-file-using-front-matter))
+            (call-interactively
+              #'denote-rename-file-using-front-matter))
           (user-error "Unable to convert buffer to project")))))
 
   (transient-define-suffix jf/project/add-project-path (label path)
@@ -7465,7 +7584,8 @@ This encodes the logic for creating a project."
                    (read-string "Path: ")))
     (save-excursion
       (goto-char (point-min))
-      (let ((case-fold-search t))
+      (let ((case-fold-search
+              t))
         (if (or
               (re-search-forward "^#\\+PROJECT_PATHS:" nil t)
               (re-search-forward "^#\\+PROJECT_NAME:" nil t))
