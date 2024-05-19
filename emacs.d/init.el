@@ -5966,7 +5966,8 @@ See `jf/comment-header-regexp/major-modes-alis'."
 
 (require 'gherkin-mode)
 
-(load "jf-rubocop-cops.el")
+;; I'm not working in Ruby much these days, so into the comment dustbin.
+;; (load "jf-rubocop-cops.el")
 
 (use-package project
   ;; I'm unclear why I have this and projectile declared/required.
