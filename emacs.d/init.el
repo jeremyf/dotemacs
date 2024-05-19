@@ -7373,6 +7373,7 @@ Add the blog post to the given SERIES with the given KEYWORDS."
   :straight t)
 
 (use-package pdf-tools
+  ;; I appreciate having a good PDF reading experience within Emacs.
   :straight t
   :defer t
   :config
