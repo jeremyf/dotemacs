@@ -7476,6 +7476,136 @@ Add the blog post to the given SERIES with the given KEYWORDS."
   ;; For projects and all
   :straight (:type built-in)
   :config
+  (defun jf/org-mode/buffer-headline-tags ()
+    "Return a list of `org-mode' tags excluding filetags.
+
+  In the present implementation, I'm relying on `denote'
+  conventions.  However, by creating a function I'm hiding the
+  implementation details on how I get that."
+    (let* ((all-tags
+             (org-get-buffer-tags))
+            (file-level-tags
+              (denote-extract-keywords-from-path (buffer-file-name))))
+      ;; Given that I want inherited tags and the filetags are
+      ;; considered to be on all headlines, I want to remove those tags.
+      (cl-reduce (lambda (mem el)
+                   (if (member
+                         (substring-no-properties (car el))
+                         file-level-tags)
+                     mem
+                     (add-to-list 'mem el)))
+        all-tags :initial-value '())))
+
+  (defun jf/org-mode/summarize-tags (&optional tags)
+    "Create `org-mode' buffer that summaraizes the headlines for TAGS.
+
+This reducing function \"promotes\" the property drawer elements
+to list elements while providing the same functionality of an
+`org-mode' buffer.
+
+Some of this could be accomplished with column/table declarations
+but the headlines and content might not fit so well in the
+buffer."
+    (interactive (list
+                   (completing-read-multiple
+                     "Tags: "
+                     (jf/org-mode/buffer-headline-tags) nil t)))
+
+    (require 's)
+    ;; With the given tags map the headlines and their properties.
+    (let* ((prop-names-to-skip
+             ;; This is a list of headline properties that I really
+             ;; don't want to report.  I suspect some may be buffer
+             ;; specific.  But for now, this should be adequate.
+             ;;
+             ;; Perhaps in later iterations we'll prompt for additional
+             ;; ones to ignore.
+             '("ID" "ALLTAGS" "FILE" "PRIORITY" "ITEM" "TIMESTAMP"
+                "TIMESTAMP_IA" "CATEGORY" "TAGS"
+                "BLOCKED" "TODO" "CLOSED"))
+            (text-chunks
+              ;; In using `org-map-entries' I can access inherited tags,
+              ;; which I find structurally useful
+              (org-map-entries
+                ;; Yes this could be its own function but for now, we'll
+                ;; leave it at that.
+                (lambda ()
+                  (let* ((h (org-element-at-point))
+                          ;; Rebuild a terse header: depth, todo, title
+                          ;; only
+                          (header-text
+                            (format
+                              "%s%s %s\n"
+                              (s-repeat
+                                (org-element-property :level h) "*")
+                              (if-let ((todo
+                                         (org-element-property
+                                           :todo-keyword h)))
+                                (format " %s" todo)
+                                "")
+                              (org-element-property :title h)))
+
+                          ;; Only select relevant properties, converting
+                          ;; those properties into a list of strings.
+                          (properties-text
+                            (cl-reduce
+                              (lambda (mem prop-value)
+                                (if (member (car prop-value)
+                                      prop-names-to-skip)
+                                  mem
+                                  (add-to-list 'mem
+                                    (format "- %s :: %s"
+                                      (car prop-value)
+                                      (cdr prop-value))
+                                    t)))
+                              (org-entry-properties h)
+                              :initial-value nil)))
+
+                    ;; If we have properties we want to render, we'll
+                    ;; have one format.
+                    (if properties-text
+                      (format "%s\n%s\n" header-text
+                        (s-join "\n" properties-text))
+                      header-text)))
+                (s-join "|" tags)
+                'file 'comment))
+            ;; Let's have only one of these
+            (buffer-name "*Org Mode Tag Summary*")
+            (display-buffer-mark-dedicated t))
+
+      ;; We've run this command again, so let's destroy what we had
+      ;; and start anew.
+      (when (get-buffer buffer-name) (kill-buffer buffer-name))
+      (get-buffer-create buffer-name)
+      (with-current-buffer buffer-name
+        ;; Minimize the chatter of the mode-line
+        (let ((mode-line
+                (concat
+                  (propertize (format "%s Tags: #%s"
+                                ;; Show a lock icon
+                                (char-to-string #xE0A2)
+                                (s-join " #" tags))
+                    'face 'mode-line-buffer-id)
+                  "  "
+                  (propertize
+                    "C-c C-k to exit"
+                    'face 'jf/mode-line-format/face-shadow))))
+          ;; This came from `org-mode' so let's continue to keep it that
+          ;; way.
+          (org-mode)
+          (insert (s-join "\n" text-chunks))
+          ;; Let's not have the illusion that we're allowing ourselves
+          ;; to edit this text
+          (read-only-mode)
+          (pop-to-buffer buffer-name
+            `((display-buffer-in-side-window)
+               (side . right)
+               (window-width 72)
+               (window-parameters
+                 (tab-line-format . none)
+                 (mode-line-format . ,mode-line)
+                 (no-delete-other-windows . t))))))))
+
   (cl-defun jf/project/jump-to/notes (&key project)
     "Jump to the given PROJECT's notes file.
 
