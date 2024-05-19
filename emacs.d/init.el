@@ -7913,13 +7913,13 @@ This encodes the logic for creating a project."
         ("d p" jf/project/convert-document-to-project :if jf/denote?)
         ]
       ["Blogging"
-        ("b d" jf/org-mode/add-description
+        ("B d" jf/org-mode/add-description
           :if jf/blog-entry?)
-        ("b r" jf/org-mode/add-session-report
+        ("B r" jf/org-mode/add-session-report
           :if jf/blog-entry?)
-        ("b s" "Add Series…" jf/org-mode/add-series-to-file
+        ("B s" "Add Series…" jf/org-mode/add-series-to-file
           :if jf/blog-entry?)
-        ("b x" "Export to TakeOnRules…" jf/export-org-to-tor
+        ("B x" "Export to TakeOnRules…" jf/export-org-to-tor
           :if jf/blog-entry?)]]
     [["Modes"
        ;; I could write functions for these, but this is concise enough
@@ -7946,8 +7946,8 @@ This encodes the logic for creating a project."
           :if-derived eww-mode)
         ]
       ["Bookmark"
-        ("B B" "Bookmarks" bookmark-bmenu-list)
-        ("B s" "Safari" jf/menu--bookmark-safari)]])
+        ("b b" "Bookmarks" bookmark-bmenu-list)
+        ("b s" "Safari" jf/menu--bookmark-safari)]])
   :bind ("s-1" . #'jf/menu))
 
 
