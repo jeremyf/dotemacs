@@ -7482,6 +7482,9 @@ Add the blog post to the given SERIES with the given KEYWORDS."
   In the present implementation, I'm relying on `denote'
   conventions.  However, by creating a function I'm hiding the
   implementation details on how I get that."
+
+    ;; This is here to indicate the dependency
+    (require 'denote)
     (let* ((all-tags
              (org-get-buffer-tags))
             (file-level-tags
