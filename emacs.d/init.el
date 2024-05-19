@@ -13,10 +13,9 @@
 ;;
 ;;  How is this mess organized?  I have favored the `use-package' macro
 ;;  to fit most of the configuration within the `use-package' sexp.
-;;  This has meant using several built-in packages.  In this way, the
-;;  organization does have some logical meaning.  And as I get more
-;;  familiar with those built-in packages, I can begin to explore their
-;;  configurability.
+;;  This has meant using several built-in packages, which provides some
+;;  organizational meanting.  And as I get more familiar with those
+;;  built-in packages, I can begin to explore their configurability.
 ;;
 ;;  This organization does mean that I'm declaring a function within the
 ;;  `use-package' macro that might depend on other packages.  Perhaps
@@ -63,8 +62,9 @@
   ;; *Gcmh* does garbage collection (GC) when the user is idle.
   :straight t
   :init
-  (setq gcmh-idle-delay 5
-    gcmh-high-cons-threshold (* 32 1024 1024))  ; 32mb
+  (setq
+    gcmh-low-cons-threshold (* 1024 1024)
+    gcmh-high-cons-threshold (* 1024 1024 1024))
   :config (gcmh-mode)
   (add-function :after after-focus-change-function
     (defun jf/garbage-collect-maybe ()
@@ -72,6 +72,7 @@
         (garbage-collect)))))
 
 (use-package emacs
+  ;; Setting baseline behavior for Emacs.
   :straight (:type built-in)
   :init
   ;; And I’m going to disable a few key bindings.  These were always
@@ -137,7 +138,7 @@
     ;; I may as well trust themes.
     custom-safe-themes t
 
-    ;; Don't create lock files.  It's only me on this maching.
+    ;; Don't create lock files.  It's only me on this machine...I hope.
     create-lockfiles nil
 
     ;; Instead of delete being gone forever, throw it in the trashbin
@@ -146,8 +147,6 @@
 
     ;; Automatically delete excess backups
     delete-old-versions t
-
-    echo-key-strokes 0.2
 
     global-mark-ring-max 32
 
@@ -173,7 +172,7 @@
     kept-old-versions 5
 
     ;; Set a generous kill ring size.
-    kill-ring-max 120
+    kill-ring-max 128
 
     ;; Favor new bit code
     load-prefer-newer t
@@ -262,9 +261,13 @@ Else, evaluate the whole buffer."
         (message "Enabling OS X native Option modifier"))
       (progn (setq ns-alternate-modifier 'meta)
         (message "Disabling OX X native Option modifier"))))
-  ;; Exposing one additional modifier key.
+
+  ;; Exposing one additional modifier key.  This opens up a significant
+  ;; set of keys and no one (by default) binds to 'H-' while many bind
+  ;; to 'C-c' or other 'C-' keys, leaving conflicts.
   (setq ns-right-command-modifier 'hyper
     ns-right-alternate-modifier 'meta)
+
   (defun jf/yank-file-name-to-clipboard (arg)
     "Nab, I mean copy, the current buffer file name to the clipboard.
 
@@ -318,9 +321,9 @@ Else, evaluate the whole buffer."
           filename)))))
 
 (use-package subword
+  ;; With subword-mode, HelloWorld is two words for navigation.
   :straight (:type built-in)
   :config
-  ;; With subword-mode, HelloWorld is two words for navigation.
   (global-subword-mode))
 
 (use-package exec-path-from-shell
@@ -347,10 +350,14 @@ Else, evaluate the whole buffer."
     (message "Native comp is *not* available")))
 
 (use-package recentf
+  ;; The probability of me needing to open a file I "recently" opened is
+  ;; high.  Providing a list of those files for easy searching helps me
+  ;; navigate tasks that I'm working on over the course of a week or
+  ;; more.
   :straight (:type built-in)
   :config
   (setq recentf-max-menu-items 50
-    recentf-max-saved-items 200)
+    recentf-max-saved-items 256)
   ;; Track recent
   (recentf-mode 1)
   ;; Quietly save the recent file list every 10 minutes.
@@ -364,13 +371,16 @@ Else, evaluate the whole buffer."
   (global-auto-revert-mode))
 
 (use-package grep
+  ;; The most important switch is moving from 'grep' to 'ripgrep', a
+  ;; fast near drop-in replacement for 'grep'; most notable on large
+  ;; directories.
   :straight (:type built-in)
   :config
   (when (executable-find "rg")
     (setq grep-program "rg")))
 
 (use-package sort
-  ;; Extended mostly as a place to define `jf/sort-unique-lines'.
+  ;; "Opened" as a place to define `jf/sort-unique-lines'.
   :straight (:type built-in)
   :config
   (defun jf/sort-unique-lines (reverse beg end
@@ -421,10 +431,6 @@ Else, evaluate the whole buffer."
     (setq dired-x-hands-off-my-keys nil)
     (require 'dired-x))
   :hook (dired-mode . dired-hide-details-mode))
-
-(defconst jf/tor-home-directory
-  (file-truename "~/git/takeonrules.source")
-  "The home directory of TakeOnRules.com Hugo repository.")
 
 (use-package info
   ;; A lot of offline documentation resides in the venerable `info'
@@ -708,7 +714,7 @@ Else, evaluate the whole buffer."
 
   (defvar-local jf/mode-line-format/project
     '(:eval
-       (when (projectile-project-p)
+       (when (and (fboundp 'projectile-project-p) (projectile-project-p))
          (propertize
            (concat " " (project-name (project-current)))
            'face
@@ -6733,6 +6739,9 @@ provided AT, insert character there."
       "blockquote marginnote poem inlinecomment update")
     (hugo-use-code-for-kbd t)
     :config
+    (defconst jf/tor-home-directory
+      (file-truename "~/git/takeonrules.source")
+      "The home directory of TakeOnRules.com Hugo repository.")
     ;; I want to have backticks instead of indentations; The backticks
     ;; also
     (advice-add #'org-md-example-block
@@ -7375,8 +7384,11 @@ Add the blog post to the given SERIES with the given KEYWORDS."
 (use-package pdf-tools
   ;; I appreciate having a good PDF reading experience within Emacs.
   :straight t
-  :defer t
   :config
+  ;; For some reason when I call `embark-dwim' on `pdf-loader-install'
+  ;; It resets my theme and puts me at the beginning of this file.
+  ;;
+  ;; Also when I attempt to describ
   (pdf-loader-install)
   ;; open pdfs scaled to fit page
   (setq-default pdf-view-display-size 'fit-page)
