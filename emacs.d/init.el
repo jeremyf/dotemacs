@@ -63,8 +63,9 @@
   :straight t
   :init
   (setq
+    gcmh-idle-delay 5
     gcmh-low-cons-threshold (* 1024 1024)
-    gcmh-high-cons-threshold (* 1024 1024 1024))
+    gcmh-high-cons-threshold (* 16 1024 1024))
   :config (gcmh-mode)
   (add-function :after after-focus-change-function
     (defun jf/garbage-collect-maybe ()
@@ -527,14 +528,17 @@ Else, evaluate the whole buffer."
 (use-package rainbow-delimiters
   ;; A quick and useful visual queue for paranthesis.
   :straight t
-  :hook ((prog-mode) . rainbow-delimiters-mode))
+  :hook (prog-mode-hook . rainbow-delimiters-mode))
 
 (use-package recursion-indicator
   ;; I vascilate between yes and no; but invariably find myself stuck in
   ;; a recursed buffer.
   :straight t
-  :config
+  :demand t
+  :init
   (setq enable-recursive-minibuffers t)
+  :config
+  ;; TODO Problem with this function and helpful
   (recursion-indicator-mode))
 
 (use-package vi-tilde-fringe
@@ -5902,7 +5906,7 @@ See `jf/comment-header-regexp/major-modes-alis'."
         '(elixir-ts-mode "~/elixir-ls/v0.20.0/language_server.sh"))
       ;; https://github.com/emacs-lsp/lsp-mode/wiki/Install-Angular-Language-server
       ;; with modifications for homebrew
-      (add-to-list 'eglot-servier-programs
+      (add-to-list 'eglot-server-programs
         '(angular-mode
            "node /opt/homebrew/lib/node_modules/@angular/language-server --ngProbeLocations /opt/homebrew/lib/node_modules --tsProbeLocations /opt/homebrew/lib/node_modules --stdio"))
       (add-to-list 'eglot-servier-programs
@@ -7500,7 +7504,7 @@ Add the blog post to the given SERIES with the given KEYWORDS."
         all-tags :initial-value '())))
 
   (defun jf/org-mode/summarize-tags (&optional tags)
-    "Create `org-mode' buffer that summaraizes the headlines for TAGS.
+    "Create `org-mode' buffer that summarizes the headlines for TAGS.
 
 This reducing function \"promotes\" the property drawer elements
 to list elements while providing the same functionality of an
@@ -7544,9 +7548,14 @@ buffer."
                               (if-let ((todo
                                          (org-element-property
                                            :todo-keyword h)))
-                                (format " %s" todo)
-                                "")
-                              (org-element-property :title h)))
+                                (format " %s" todo) "")
+                              ;; Turn the headline into a link to the
+                              ;; document.
+                              (format "%s [[file:%s::*%s][%s]]"
+                                (org-element-property :title h)
+                                (buffer-file-name)
+                                (org-element-property :raw-value h)
+                                "link")))
 
                           ;; Only select relevant properties, converting
                           ;; those properties into a list of strings.
@@ -7555,6 +7564,9 @@ buffer."
                               (lambda (mem prop-value)
                                 (if (member (car prop-value)
                                       prop-names-to-skip)
+                                  ;; For awhile I was forgetting to
+                                  ;; always return the mem; which would
+                                  ;; clobber my results.
                                   mem
                                   (add-to-list 'mem
                                     (format "- %s :: %s"
