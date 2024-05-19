@@ -565,6 +565,7 @@ Else, evaluate the whole buffer."
 
 (use-package emacs
   :straight (:type built-in)
+  :after (projectile)
   :preface
   (defvar-local jf/mode-line-format/kbd-macro
     '(:eval
@@ -7372,11 +7373,10 @@ Add the blog post to the given SERIES with the given KEYWORDS."
   :straight t)
 
 (use-package pdf-tools
-  :pin manual ;; manually update
   :straight t
   :defer t
-  :ensure t
-  :config (pdf-tools-install)
+  :config
+  (pdf-loader-install)
   ;; open pdfs scaled to fit page
   (setq-default pdf-view-display-size 'fit-page)
   ;; automatically annotate highlights
