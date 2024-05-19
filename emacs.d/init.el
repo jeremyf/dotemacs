@@ -6868,7 +6868,7 @@ Take on Rules using the \"blockquote\" special block."
         (insert
           (format
             (concat "\n#+HUGO_CUSTOM_FRONT_MATTER: :sessionReport "
-              "'((date . \"%s\") (game . \"%s\") (location . \"%s\"))"
+              "'((date . \"%s\") (game . \"%s\") (location . \"%s\"))")
             (plist-get kw-plist "SESSION_REPORT_DATE")
             (plist-get kw-plist "SESSION_REPORT_GAME")
             (plist-get kw-plist "SESSION_REPORT_LOCATION")))))
@@ -7362,7 +7362,7 @@ Add the blog post to the given SERIES with the given KEYWORDS."
       "table"
       :complete #'jf/org/link-table-complete
       :export #'jf/org/link-table-export
-      :follow #'jf/org/link-table-follow))))
+      :follow #'jf/org/link-table-follow)))
 
 (use-package qrencode
   ;; https://github.com/ruediger/qrencode-el/
