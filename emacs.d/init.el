@@ -84,9 +84,8 @@
   ;; Hide the icons of the Emacs toolbar
   (tool-bar-mode -1)
 
-  ;; I don't click on the scrollbar but am appreciative of the visual
-  ;; indicator of relative position in the buffer.
-  (scroll-bar-mode 1)
+  ;; I don't click on the scrollbar and can live without it.
+  (scroll-bar-mode -1)
 
   ;; Ensuring I have an autosave directory.  On a few rare occassions
   ;; this has saved me from lost "work".
@@ -371,6 +370,7 @@ Else, evaluate the whole buffer."
     (setq grep-program "rg")))
 
 (use-package sort
+  ;; Extended mostly as a place to define `jf/sort-unique-lines'.
   :straight (:type built-in)
   :config
   (defun jf/sort-unique-lines (reverse beg end
@@ -392,6 +392,8 @@ Else, evaluate the whole buffer."
       beg end reverse adjacent keep-blanks interactive)))
 
 (use-package ediff
+  ;; I haven't used `ediff' much, but it's a good option for reviewing
+  ;; file deltas.
   :straight (:type built-in)
   :config
   (setq ediff-keep-variants nil)
@@ -402,6 +404,10 @@ Else, evaluate the whole buffer."
   (setq ediff-window-setup-function 'ediff-setup-windows-plain))
 
 (use-package dired
+  ;; Oh `dired', you are a super powered directory editor.  For years I
+  ;; avoided interacting with you, but overtime I've practiced and find
+  ;; your utility great.  Never conflate a file with a buffer and
+  ;; instead consider the power of what a buffer can do.
   :straight (:type built-in)
   :custom (dired-listing-switches "-laGhpX")
   (dired-use-ls-dired t)
@@ -421,6 +427,9 @@ Else, evaluate the whole buffer."
   "The home directory of TakeOnRules.com Hugo repository.")
 
 (use-package info
+  ;; A lot of offline documentation resides in the venerable `info'
+  ;; format.  This allows me to access the info docs that are part of
+  ;; brew installed packages.
   :straight (:type built-in)
   :config
   (info-initialize)
@@ -543,10 +552,9 @@ Else, evaluate the whole buffer."
   ;; conceptually useful for feeding a macro.
   :straight t)
 
-(use-package vc-git
-  :straight (:type built-in))
-
 (use-package keycast
+  ;; It can be helpful when pairing or presenting to have a log of your
+  ;; key cominations.
   :straight t
   :init
   (setq keycast-mode-line-insert-after
@@ -558,7 +566,6 @@ Else, evaluate the whole buffer."
 (use-package emacs
   :straight (:type built-in)
   :preface
-
   (defvar-local jf/mode-line-format/kbd-macro
     '(:eval
        (when (and (mode-line-window-selected-p) defining-kbd-macro)
@@ -801,19 +808,6 @@ Else, evaluate the whole buffer."
         (cdr (ring-ref avy-ring 0))))
     t))
 
-(use-package browse-at-remote
-  ;; Because I sometimes want to jump to the source code.  And in
-  ;; looking at this I learned about vc-annotate; a better blame than
-  ;; what I've had before.  `bar-browse' is faster than
-  ;; `browse-at-remote'.
-  :straight t
-  :bind
-  ;; Note this is in the same prefix space as `link-hint'
-  ("C-c l r" . browse-at-remote)
-  ("C-c l a" . vc-annotate)
-  ("C-c l n" . jf/project/jump-to/notes)
-  ("C-c l t" . git-timemachine))
-
 (use-package imenu-list
   ;; Show an outline summary of the current buffer.
   :custom (imenu-list-focus-after-activation t)
@@ -904,6 +898,20 @@ The ARGS are the rest of the ARGS passed to the ADVISED-FUNCTION."
 
   (advice-add 'link-hint--apply
     :around #'jf/link-hint--apply))
+
+(use-package browse-at-remote
+  ;; Because I sometimes want to jump to the source code.  And in
+  ;; looking at this I learned about vc-annotate; a better blame than
+  ;; what I've had before.  `bar-browse' is faster than
+  ;; `browse-at-remote'.
+  :straight t
+  :after (link-hint)
+  :bind
+  ;; Note this is in the same prefix space as `link-hint'
+  ("C-c l r" . browse-at-remote)
+  ("C-c l a" . vc-annotate)
+  ("C-c l n" . jf/project/jump-to/notes)
+  ("C-c l t" . git-timemachine))
 
 (use-package fontaine
   ;; A narrow focus package for naming font configurations and then
@@ -1384,9 +1392,10 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
     (jf/emacs-theme-by-osx-appearance))
   (jf/emacs-theme-by-osx-appearance))
 
-
 (use-package xref
-  :straight t
+  ;; Cross-referencing commands.  I suspect there's a lot more that I
+  ;; could use to improve my usage.
+  :straight (:type built-in)
   :custom
   (xref-file-name-display 'project-relative)
   (xref-search-program 'ripgrep))
@@ -1610,6 +1619,9 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   :straight (tomelr :host github :repo "kaushalmodi/tomelr"))
 
 (use-package htmlize
+  ;; This package helps me convert an inline `org-mode' buffer to RTF
+  ;; and paste into other contexts (Google Docs for example) without
+  ;; worrying about an explicit export and copy.
   :straight t
   :bind ("C-M-s-c" . jf/formatted-copy-org-to-html)
   :config
@@ -1667,9 +1679,17 @@ future copy)."
               "end tell")))))))
 
 (use-package org
+  ;; Begin Org Mode (all it's glory)
+  ;;
+  ;; - Time tracking
+  ;; - Note taking
+  ;; - Exporting notes to different formats
+  ;; - Capturing information
+  ;; - Mixing code and prose to generate technical documentation
+  ;;
+  ;; And I'm sure much more
   :preface
   (require 'cl-lib)
-  ;; Begin Org Mode (all it's glory)
   :straight (org :type git :host github :repo "emacsmirror/org")
   :hook (org-mode . jf/org-mode/configurator)
   :bind (("C-c C-j" . jf/project/jump-to-task)
@@ -2950,6 +2970,8 @@ to Backlog."
          :empty-lines-after 1))))
 
 (use-package org-web-tools
+  ;; A package that I can pull down a web page and store its content as
+  ;; an `org-mode' file.
   :straight t
   :config
   (setq org-web-tools-pandoc-sleep-time 1.5))
@@ -3193,7 +3215,6 @@ With a PREFIX jump to the agenda without starting the clock."
                  (region-beginning) (region-end))))
   (autoload 'projectile-project-root "projectile")
   (setq consult-project-root-function #'projectile-project-root)
-
   (require 'consult-imenu)
   (dolist (python '(python-mode python-ts-mode))
     (add-to-list 'consult-imenu-config
@@ -3254,8 +3275,6 @@ With a PREFIX jump to the agenda without starting the clock."
               :host gitlab
               :repo "OlMon/consult-projectile"
               :branch "master")
-
-
   :config
   ;; I want recent files as well as project files as well as recent
   ;; project files...Hence the override fb
@@ -3425,7 +3444,6 @@ Useful if you want a more robust view into the recommend candidates."
       ("d" "Definition" sdcv-search)
       ("D" "Docs" devdocs-lookup)
       ("f" "Function (interactive)" helpful-callable)
-
       ("F" "Function (all)" helpful-function)
       ("i" "Info" info)
       ("k" "Key" helpful-key)
@@ -3568,8 +3586,11 @@ Useful if you want a more robust view into the recommend candidates."
 
 (use-package org-mac-link
   ;; Similar to `grab-mac-link' but a bit specific to `org-mode'.
+  ;;
+  ;; I often use this when reading while writing blog posts.
+  :after (grab-mac-link)
   :straight (org-mac-link :type git
-              :host github :repo "jeremyf/org-mac-link")
+              :host gitlab :repo "aimebertrand/org-mac-link")
   :bind (:map org-mode-map (("C-c g" . org-mac-grab-link))))
 
 (use-package tempel
@@ -5179,14 +5200,6 @@ method, get the containing class."
     ;; 72 is what I've found works best on exporting to my blog.
     (setq-local fill-column 72)))
 
-;; I don't use this package (I think...):
-;; (use-package emmet-mode
-;;   :straight t
-;;   :bind (("C-c C-e" . emmet-expand-yas ))
-;;   :hook ((sgml-mode . emmet-mode)
-;;          (html-mode . emmet-mode)
-;;          (css-mode . emmet-mode)))
-
 (use-package go-mode
   :straight t
   :hook ((go-mode go-ts-mode) . jf/go-mode)
@@ -5204,7 +5217,8 @@ method, get the containing class."
   ;; Copied from
   ;; https://github.com/Homebrew/brew/blob/c2ed3327c605c3e738359c9807b8f4cd6fec09eb/Cellar/emacs-plus%4029/29.3/share/emacs/29.3/lisp/progmodes/go-ts-mode.el#L115-L206
   ;;
-  ;; Modifications made to remove parse error.
+  ;; Modifications made to remove parse error.  Someday I'll get rid of
+  ;; this.
   (setq go-ts-mode--font-lock-settings
     (treesit-font-lock-rules
       :language 'go
@@ -5851,6 +5865,8 @@ See `jf/comment-header-regexp/major-modes-alis'."
 ;; be a useful tool for viewing implementation details.
 (require 'hide-comnt)
 
+;; I've been exploring either `lsp-mode' or `eglot' and thusfar prefer
+;; the lightweight nature of `eglot'.
 (if t
   (progn
     (use-package eglot
@@ -6576,21 +6592,21 @@ Alternative suggestions are: - '(\"\\\"“\" . \"\\\"\")"
     '("🎁: feature (A new feature)"
        "🐛: bug fix (A bug fix)"
        "📚: docs (Changes to documentation)"
-       "💄: style (Formatting, missing semi colons, etc; no code change)"
-       "♻️: refactor (Refactoring production code)"
-       "☑️: tests (Adding tests, refactoring test; no production code change)"
-       "🧹: chore (Updating build tasks, package manager configs, etc; no production code change)"
+       "💄: style (Format, missing semi colons, etc; no code change)"
+       "♻️: refactor (Refactor production code)"
+       "☑️: tests (Add tests, refactor test; no prod code change)"
+       "🧹: chore (Update build tasks, package manager configs, etc;)"
        "🛠: build"
        "💸: minting a new version"
        "🔄: revert"
-       "🦄: spike (Indicates research task; usually creates more tickets)"
+       "🦄: spike (Research task; usually creates more tickets)"
        "☄️: epic (Enumeration of lots of other issues/tasks)"
        "⚙️: config changes"
        "🎬: initial commit or setup of project/component"
        "🚧: work in progress (WIP)"
        "🗡: stab in the dark"
        "🤖: continuous integration (CI) changes")
-    "Team 💜 Violet 💜 's commit message guidelines on <2023-05-12 Fri>.")
+    "Team 💜 Violet 💜 's commit message guidelines on 2023-05-12.")
   (cl-defun jf/insert-task-type-at-point (&key
                                            (splitter ":")
                                            (padding " ") (at nil))
@@ -6712,20 +6728,24 @@ provided AT, insert character there."
     ;;                      too much in some cases.
     ;; - update :: I write updates for my blog posts; corrections or
     ;;             additions based on new information.
-    (org-hugo-paired-shortcodes "blockquote marginnote poem inlinecomment update")
+    (org-hugo-paired-shortcodes
+      "blockquote marginnote poem inlinecomment update")
     (hugo-use-code-for-kbd t)
     :config
-    ;; I want to have backticks instead of indentations;  The backticks also
-    (advice-add #'org-md-example-block :override #'org-blackfriday-src-block)
-
+    ;; I want to have backticks instead of indentations; The backticks
+    ;; also
+    (advice-add #'org-md-example-block
+      :override #'org-blackfriday-src-block)
 
     ;; These functions work too aggressively.  The types of lists
     ;; (ordered, definition, and unordered) are co-mingled.  This
     ;; co-mingling means that I'm not getting the behavior I want.  So
     ;; I'll proceed with the default ox-hugo behavior.
     ;;
-    ;; (advice-add #'org-blackfriday-plain-list :override #'org-html-plain-list '((name . "wrapper")))
-    ;; (advice-add #'org-blackfriday-item :override #'org-html-item '((name . "wrapper")))
+    ;; (advice-add #'org-blackfriday-plain-list
+    ;;   :override #'org-html-plain-list '((name . "wrapper")))
+    ;; (advice-add #'org-blackfriday-item
+    ;;   :override #'org-html-item '((name . "wrapper")))
 
     ;; Convert footnote to sidenote for HTML export
     (defun jf/org-hugo-sidenote (footnote-reference _contents info)
@@ -6836,7 +6856,8 @@ Take on Rules using the \"blockquote\" special block."
       (insert (concat
                 "\n#+HUGO_SLUG: " (denote-sluggify-title title)
                 ;; 2022-02-26 07:46:15.000000000 -04:00
-                "\n#+HUGO_PUBLISHDATE: " (format-time-string "%Y-%m-%d %H:%M:%S %z")
+                "\n#+HUGO_PUBLISHDATE: "
+                (format-time-string "%Y-%m-%d %H:%M:%S %z")
                 "\n#+HUGO_TYPE: post"
                 "\n#+HUGO_LAYOUT: post"
                 "\n#+HUGO_DRAFT: true"
@@ -6846,13 +6867,16 @@ Take on Rules using the \"blockquote\" special block."
                              :keywords-regexp "\\(SESSION_REPORT_DATE\\|SESSION_REPORT_LOCATION\\|SESSION_REPORT_GAME\\)")))
         (insert
           (format
-            "\n#+HUGO_CUSTOM_FRONT_MATTER: :sessionReport '((date . \"%s\") (game . \"%s\") (location . \"%s\"))"
+            (concat "\n#+HUGO_CUSTOM_FRONT_MATTER: :sessionReport "
+              "'((date . \"%s\") (game . \"%s\") (location . \"%s\"))"
             (plist-get kw-plist "SESSION_REPORT_DATE")
             (plist-get kw-plist "SESSION_REPORT_GAME")
             (plist-get kw-plist "SESSION_REPORT_LOCATION")))))
 
     (cl-defun jf/export-org-to-tor--global-buffer-prop-ensure (&key key plist (default nil))
-      "Ensure the current buffer has the given KEY in the global PLIST, if not set the DEFAULT or prompt for it."
+      "Ensure current buffer has given KEY in global PLIST.
+
+If not set  DEFAULT or prompt for it."
       (let ((value (plist-get plist key #'string=)))
         (if value value
           (jf/export-org-to-tor--global-buffer-prop-set
@@ -6860,13 +6884,17 @@ Take on Rules using the \"blockquote\" special block."
             :value (or default (read-from-minibuffer (format "%s: " key)))))))
 
     (cl-defun jf/export-org-to-tor--global-buffer-prop-set (&key key value)
-      "Set the global property named KEY to the VALUE for the current buffer."
+      "Set global property named KEY to VALUE for current buffer."
       (goto-char (point-min))
       (forward-line 4)
       (insert (format "\n#+%s: %s" (upcase key) value)))
 
     (defvar jf/tor-session-report-location
-      '("around the table" "via Zoom" "via Discord and Roll20" "via Discord" "in my living room")
+      '("around the table"
+         "via Zoom"
+         "via Discord and Roll20"
+         "via Discord"
+         "in my living room")
       "TakeOnRules session report locations.")
 
     (cl-defun jf/org-keywords-as-plist (&key (keywords-regexp "\\(IDENTIFIER\\|FILETAGS\\|HUGO_FRONT_MATTER_FORMAT\\|HUGO_SECTION\\|HUGO_BASE_DIR\\|TITLE\\|SUBTITLE\\)"))
@@ -6882,7 +6910,9 @@ Take on Rules using the \"blockquote\" special block."
         (org-element-parse-buffer)
         'keyword
         (lambda (el)
-          (when (string-match property (org-element-property :key el)) el))))
+          (when (string-match property
+                  (org-element-property :key el))
+            el))))
 
     (cl-defun jf/blog-post/tootify ()
       "Create a toot from the current buffer."
@@ -6908,18 +6938,22 @@ Take on Rules using the \"blockquote\" special block."
         (save-excursion
           (goto-char (point-min))
           (save-match-data
-            (if (re-search-forward "^\\#\\+ROAM_REFS:.+\\(https?://takeonrules\.com[^ \n]*\\)" nil t)
+            (if (re-search-forward
+                  (concat "^\\#\\+ROAM_REFS:.+"
+                    "\\(https?://takeonrules\.com[^ \n]*\\)" nil t))\]=
+
               (jf/tor-find-hugo-file-by-url (match-string 1))
               (message "Unable to find Take on Rules URL in buffer."))))))
 
     (cl-defun jf/jump_to_corresponding_denote_file (&key (buffer (current-buffer)))
-      "Find the org_id in the BUFFER and jump to corresponding `denote' file."
+      "Find org_id in BUFFER and jump to corresponding `denote' file."
       (interactive)
       (with-current-buffer buffer
         (save-excursion
           (goto-char (point-min))
           (save-match-data
-            (if (re-search-forward "^org_id: \\([[:digit:]]+T[[:digit:]]+\\)$" nil t)
+            (if (re-search-forward
+                  "^org_id: \\([[:digit:]]+T[[:digit:]]+\\)$" nil t)
               (find-file (denote-get-path-by-id (match-string 1)))
               (message "Unable to find Denote ID in buffer."))))))
 
@@ -6932,8 +6966,10 @@ Take on Rules using the \"blockquote\" special block."
 
     (cl-defun jf/org-mode-extract-body-and-properties (node-id)
       "Extract quotable body and properties from NODE-ID."
-      (with-current-buffer (find-file-noselect (org-id-find-id-file node-id))
-        (list :properties (org-element-map (org-element-parse-buffer 'object)
+      (with-current-buffer (find-file-noselect
+                             (org-id-find-id-file node-id))
+        (list :properties (org-element-map
+                            (org-element-parse-buffer 'object)
                             '(keyword node-property)
                             #'jf/org-mode-get-keyword-key-value)
           :body (jf/org-mode-extract-body-from-current-buffer))))
@@ -6957,7 +6993,9 @@ If UNSAFE is non-nil, assume point is on headline."
         for pos = (pcase element
                     (`(headline . ,_)
                       (org-element-property :contents-begin element))
-                    (`(,(or 'planning 'property-drawer 'node-property 'keyword 'drawer) . ,_)
+                    (`(,(or 'planning 'property-drawer
+                          'node-property 'keyword 'drawer)
+                        . ,_)
                       (org-element-property :end element)))
         while pos
         do (goto-char pos)))
@@ -6985,11 +7023,14 @@ If UNSAFE is non-nil, assume point is on headline."
       (if (get-buffer buffer-name)
         (progn
           (kill-buffer buffer-name)
-          (message (concat "Stopping Hugo in \"" buffer-name "\" buffer…")))
+          (message
+            (concat "Stopping Hugo in \"" buffer-name "\" buffer…")))
         (let* ((default-directory
                  directory))
-          (start-process "hugo-server" buffer-name "hugo" "server" "-D")
-          (message (concat "Starting Hugo in \"" buffer-name "\" buffer…")))))
+          (start-process
+            "hugo-server" buffer-name "hugo" "server" "-D")
+          (message
+            (concat "Starting Hugo in \"" buffer-name "\" buffer…")))))
 
     (defvar jf/tor-hostname-regexp
       "^https?://takeonrules\.com"
@@ -7065,7 +7106,7 @@ If UNSAFE is non-nil, assume point is on headline."
     ;; functions before other consult functions I got a method void
     ;; error.
     (cl-defun jf/find-file-via-matching (&key prompt matching in (switch "--files-with-matches"))
-      "PROMPT for files IN the directory with MATCHING content with given SWITCH.
+      "PROMPT for files IN directory with MATCHING content for SWITCH.
 
 If `consult--read' is defined, use that.  Otherwise fallback to
 `completing-read'."
@@ -7128,7 +7169,7 @@ If `consult--read' is defined, use that.  Otherwise fallback to
                                                  key
                                                  filename
                                                  (directory jf/tor-home-directory))
-      "Build a list of entries of the KEY from the FILENAME in DIRECTORY."
+      "Build list of entries of the KEY from the FILENAME in DIRECTORY."
       (split-string-and-unquote
         (shell-command-to-string
           (concat
@@ -7151,7 +7192,7 @@ If `consult--read' is defined, use that.  Otherwise fallback to
           "@")))
 
     (cl-defun jf/list-full-filenames-with-file-text (&key matching in (switch "--files-with-matches"))
-      "List of filenames MATCHING with SWITCH the pattern IN the given directory."
+      "List filenames MATCHING with SWITCH pattern IN the directory."
       (split-string-and-unquote
         (shell-command-to-string
           (concat
@@ -7219,7 +7260,8 @@ Add the blog post to the given SERIES with the given KEYWORDS."
                 (s-trim (shell-command-to-string
                           (concat
                             "cd ~/git/org/denote/blog-posts; "
-                            "find *--lore24-entry-* | sort | tail -1"))))
+                            "find *--lore24-entry-* | sort | "
+                            "tail -1"))))
 
               ;; From the last blog post, derive the next index value.
               (next-index (format "%03d"
@@ -7237,12 +7279,13 @@ Add the blog post to the given SERIES with the given KEYWORDS."
 
               ;; The body of the blog post; by default I leverage
               ;; `org-transclusion'.
-              (template (format
-                          (concat "#+HUGO_CUSTOM_FRONT_MATTER: :series %s"
-                            "\n\n#+TRANSCLUDE: [[id:%s]] :only-contents "
-                            ":exclude-elements \"drawer keyword headline\"")
-                          series
-                          node-id))
+              (template
+                (format
+                  (concat "#+HUGO_CUSTOM_FRONT_MATTER: :series %s"
+                    "\n\n#+TRANSCLUDE: [[id:%s]] :only-contents "
+                    ":exclude-elements \"drawer keyword headline\"")
+                  series
+                  node-id))
               ;; This will be a blog post.
               (directory (f-join (denote-directory) "blog-posts"))
 
@@ -7254,7 +7297,8 @@ Add the blog post to the given SERIES with the given KEYWORDS."
 
     (defun jf/path-to-table-number (table-number)
       (let* ((table-filename
-               (f-join jf/tor-home-directory "data/list_of_all_tables.yml"))
+               (f-join jf/tor-home-directory
+                 "data/list_of_all_tables.yml"))
               (path (s-trim (shell-command-to-string
                               (concat "rg \"^- table_number:\\s"
                                 table-number "$\" -A4 "
@@ -7318,7 +7362,7 @@ Add the blog post to the given SERIES with the given KEYWORDS."
       "table"
       :complete #'jf/org/link-table-complete
       :export #'jf/org/link-table-export
-      :follow #'jf/org/link-table-follow)))
+      :follow #'jf/org/link-table-follow))))
 
 (use-package qrencode
   ;; https://github.com/ruediger/qrencode-el/
@@ -7497,7 +7541,9 @@ With one PREFIX go to place where we would jump on capture."
              (funcall follow-func (cadr type-target))
              ;; We tried...and don't know how to handle this.
              (progn
-               (message "WARNING: Project %s missing path name \"%s\" (with path %s)"
+               (message
+                 (concat "WARNING: Project %s missing path name "
+                   "\"%s\" (with path %s)")
                  project path-name path)
                (jf/project/jump-to/notes :project project)))))))
 
@@ -7536,7 +7582,7 @@ otherwise."
             "-r '$1' | tr '\n' '@'"))
         "@")))
 
-  (cl-defun jf/project/get-project-from/project-source-code (&key (directory org-directory))
+  (cl-defun jf/project/get-project/project-source-code (&key (directory org-directory))
     "Return the current \"noted\" project name.
 
 Return nil if the current buffer is not part of a noted project.
@@ -7557,9 +7603,9 @@ Noted projects would be found within the given DIRECTORY."
           (unless (string-equal "" filename)
             (with-current-buffer (find-file-noselect
                                    (file-truename filename))
-              (jf/project/get-project-from/current-buffer-is-project)))))))
+              (jf/project/get-project/current-buffer)))))))
 
-  (defun jf/project/get-project-from/current-clock ()
+  (defun jf/project/get-project/current-clock ()
     "Return the current clocked project's name or nil."
     ;; This is a naive implementation that assumes a :task: has the
     ;; clock.  A :task:'s immediate ancestor is a :projects:.
@@ -7570,9 +7616,9 @@ Noted projects would be found within the given DIRECTORY."
                     org-clock-marker)))
       (with-current-buffer (marker-buffer m)
         (goto-char m)
-        (jf/project/get-project-from/current-buffer-is-project))))
+        (jf/project/get-project/current-buffer))))
 
-  (defun jf/project/get-project-from/current-buffer-is-project ()
+  (defun jf/project/get-project/current-buffer ()
     "Return the PROJECT_NAME keyword of current buffer."
     (cadar (org-collect-keywords (list "PROJECT_NAME"))))
 
@@ -7580,13 +7626,13 @@ Noted projects would be found within the given DIRECTORY."
     "Find the current project based on context.
 
 When the `current-prefix-arg' is set always prompt for the project."
-    ;; `jf/project/get-project-from/current-agenda-buffer'
+    ;; `jf/project/get-project/current-agenda-buffer'
     (or
       (and (not current-prefix-arg)
         (or
-          (jf/project/get-project-from/current-buffer-is-project)
-          (jf/project/get-project-from/current-clock)
-          (jf/project/get-project-from/project-source-code)))
+          (jf/project/get-project/current-buffer)
+          (jf/project/get-project/current-clock)
+          (jf/project/get-project/project-source-code)))
       (completing-read "Project: " (jf/project/list-projects)))))
 
 (require 'org-charsheet)
@@ -7643,6 +7689,9 @@ When the `current-prefix-arg' is set always prompt for the project."
           "'((date . \"" date "\") (game . \"" game "\") "
           "(location . \"" location "\"))"))))
 
+  ;; My agenda files are a bit dynamic.  At one point I was using daily
+  ;; journals and kept the latest 14 in my agenda files.  I don't that
+  ;; now but I do add "projects" (see `jf/project/add-project-path').
   (transient-define-suffix jf/org-mode/agenda-files-update (&rest _)
     "Update the value of `org-agenda-files'."
     :description "Update agenda files…"
@@ -7671,7 +7720,7 @@ This encodes the logic for creating a project."
                      (and
                        (denote-file-is-note-p file)
                        (derived-mode-p 'org-mode)
-                       (not (jf/project/get-project-from/current-buffer-is-project))))
+                       (not (jf/project/get-project/current-buffer))))
                    (existing-title
                      (org-get-title))
                    (file-type
@@ -7760,6 +7809,9 @@ This encodes the logic for creating a project."
        ("m o" "MacOS Native Option (*)" jf/toggle-osx-alternate-modifier
          :if-nil ns-alternate-modifier)
        ("m i" jf/shr/toggle-images)
+       ;; I find that in all of my shuffling that sometimes the TAB for
+       ;; command gets lost.  This is my "Yup that happens and here's
+       ;; how to make that unhappen."
        ("TAB" jf/enable-indent-for-tab-command)
        ]
       ["Grab Refs"
@@ -7773,9 +7825,6 @@ This encodes the logic for creating a project."
       ["Bookmark"
         ("B B" "Bookmarks" bookmark-bmenu-list)
         ("B s" "Safari" jf/menu--bookmark-safari)]])
-  ;; this suffix provides a dynamic description of the current host I
-  ;; want to use for my blog.  And the prefix’s function toggles the
-  ;; host.
   :bind ("s-1" . #'jf/menu))
 
 
