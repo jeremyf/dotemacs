@@ -1439,7 +1439,9 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
 (use-package transient
   ;; A package for creating turbo-charged menus.  It is the backbone for
   ;; the menu-like dispatch of `magit' functionality.
-  :straight t)
+  :straight t
+  ;; This exposes the --sign switch for git commit
+  :config (setq transient-default-level 5))
 
 (use-package ts
   ;; Timestamp library (not typescript)
