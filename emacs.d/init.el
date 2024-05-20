@@ -6536,11 +6536,11 @@ Alternative suggestions are: - '(\"\\\"“\" . \"\\\"\")"
   (setq magit-bury-buffer-function
     #'magit-restore-window-configuration)
   (remove-hook 'magit-status-sections-hook 'magit-insert-tags-header)
+  :hook ((with-editor-post-finish . #'magit-status))
   :bind (("C-c m" . magit-status)
           ("C-x g m" . magit-status)
           ("C-x g f" . magit-file-dispatch)
-          ("C-x g d" . magit-dispatch))
-  :hook ((with-editor-post-finish . #'magit-status)))
+          ("C-x g d" . magit-dispatch)))
 
 (use-package auth-source
   :straight (:type built-in)
@@ -6581,57 +6581,19 @@ Alternative suggestions are: - '(\"\\\"“\" . \"\\\"\")"
        "harvard-lts/CURIOSity"
        "WGBH-MLA/ams")))
 
-(use-package git-commit
-  :straight t
-  :hook ((git-commit-mode . jf/git-commit-mode-setup))
-  :bind (:map git-commit-mode-map
-          (("TAB" .  #'completion-at-point)))
-  :bind ("s-7" . #'jf/insert-task-type-at-point)
+(use-package structured-commit
+  :straight (:type git :host github
+              :repo "bunnylushington/structured-commit")
+  :hook (git-commit-setup . structured-commit/write-message)
   :config
-  (defun jf/git-commit-mode-setup ()
-    ;; Specify config capf
-    (setq fill-column git-commit-fill-column)
-    (setq-local completion-at-point-functions
-      (cons #'jf/version-control/issue-capf
-        (cons #'jf/version-control/project-capf
-          completion-at-point-functions)))
-    (goto-char (point-min))
-    (beginning-of-line-text)
-    (when (looking-at-p "^$")
-      (jf/insert-task-type-at-point :at (point-min))))
+  (advice-add #'structured-commit/project
+    :override #'jf/structured-commit/project)
+  (defun jf/structured-commit/project ()
+    "Return root directory base name for project.
 
-  (defvar jf/version-control/valid-commit-title-prefixes
-    '("🎁: feature (A new feature)"
-       "🐛: bug fix (A bug fix)"
-       "📚: docs (Changes to documentation)"
-       "💄: style (Format, missing semi colons, etc; no code change)"
-       "♻️: refactor (Refactor production code)"
-       "☑️: tests (Add tests, refactor test; no prod code change)"
-       "🧹: chore (Update build tasks, package manager configs, etc;)"
-       "🛠: build"
-       "💸: minting a new version"
-       "🔄: revert"
-       "🦄: spike (Research task; usually creates more tickets)"
-       "☄️: epic (Enumeration of lots of other issues/tasks)"
-       "⚙️: config changes"
-       "🎬: initial commit or setup of project/component"
-       "🚧: work in progress (WIP)"
-       "🗡: stab in the dark"
-       "🤖: continuous integration (CI) changes")
-    "Team 💜 Violet 💜 's commit message guidelines on 2023-05-12.")
-  (cl-defun jf/insert-task-type-at-point (&key
-                                           (splitter ":")
-                                           (padding " ") (at nil))
-    "Select and insert task type.
-
-Split result on SPLITTER and insert result plus PADDING.  When
-provided AT, insert character there."
-    (interactive)
-    (let ((commit-type
-            (completing-read "Commit title prefix: "
-              jf/version-control/valid-commit-title-prefixes nil t)))
-      (when at (goto-char at))
-      (insert (car (s-split splitter commit-type)) padding))))
+The `magit-gitdir' is the project's .git directory."
+    (require 'f)
+    (file-name-base (f-dirname (magit-gitdir)))))
 
 ;; COMMENTED OUT FOR FUTURE REFERENCE
 ;; (transient-define-prefix jf/magit-aux-commands ()
