@@ -5903,6 +5903,18 @@ See `jf/comment-header-regexp/major-modes-alis'."
                )
               . eglot-ensure)
       :config
+      (defun jf/eglot-capf ()
+        "Ensure `eglot-completion-at-point' preceeds everything."
+        ;; I don't want `eglot-completion-at-point' to trample my other
+        ;; completion options.
+        ;;
+        ;; https://stackoverflow.com/questions/72601990/how-to-show-suggestions-for-yasnippets-when-using-eglot
+        (setq-local completion-at-point-functions
+          (list (cape-capf-super
+                  #'eglot-completion-at-point
+                  #'tempel-expand
+                  #'cape-file
+                  #'cape-keyword))))
       ;; https://github.com/elixir-lsp/elixir-ls?tab=readme-ov-file
       (add-to-list 'eglot-server-programs
         '(elixir-ts-mode "~/elixir-ls/v0.20.0/language_server.sh"))
@@ -5924,19 +5936,7 @@ See `jf/comment-header-regexp/major-modes-alis'."
       :after eglot
       :config	(eglot-booster-mode)
       (advice-add 'eglot-completion-at-point
-        :around #'cape-wrap-buster)
-      (defun jf/eglot-capf ()
-        "Ensure `eglot-completion-at-point' preceeds everything."
-        ;; I don't want `eglot-completion-at-point' to trample my other
-        ;; completion options.
-        ;;
-        ;; https://stackoverflow.com/questions/72601990/how-to-show-suggestions-for-yasnippets-when-using-eglot
-        (setq-local completion-at-point-functions
-          (list (cape-capf-super
-                  #'eglot-completion-at-point
-                  #'tempel-expand
-                  #'cape-file
-                  #'cape-keyword)))))
+        :around #'cape-wrap-buster))
 
     (use-package eldoc
       ;; Helps with rendering documentation
