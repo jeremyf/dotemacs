@@ -7524,21 +7524,22 @@ buffer."
                           ;; Only select relevant properties, converting
                           ;; those properties into a list of strings.
                           (properties-text
-                            (cl-reduce
-                              (lambda (mem prop-value)
-                                (if (member (car prop-value)
-                                      prop-names-to-skip)
-                                  ;; For awhile I was forgetting to
-                                  ;; always return the mem; which would
-                                  ;; clobber my results.
-                                  mem
-                                  (add-to-list 'mem
-                                    (format "- %s :: %s"
-                                      (car prop-value)
-                                      (cdr prop-value))
-                                    t)))
-                              (org-entry-properties h)
-                              :initial-value nil)))
+                            (seq-sort #'string<
+                              (cl-reduce
+                                (lambda (mem prop-value)
+                                  (if (member (car prop-value)
+                                        prop-names-to-skip)
+                                    ;; For awhile I was forgetting to
+                                    ;; always return the mem; which would
+                                    ;; clobber my results.
+                                    mem
+                                    (add-to-list 'mem
+                                      (format "- %s :: %s"
+                                        (car prop-value)
+                                        (cdr prop-value))
+                                      t)))
+                                (org-entry-properties h)
+                                :initial-value nil))))
 
                     ;; If we have properties we want to render, we'll
                     ;; have one format.
@@ -7560,7 +7561,7 @@ buffer."
         ;; Minimize the chatter of the mode-line
         (let ((mode-line
                 (concat
-                  (propertize (format "%s Tags: #%s"
+                  (propertize (format " %s Tags: #%s"
                                 ;; Show a lock icon
                                 (char-to-string #xE0A2)
                                 (s-join " #" tags))
@@ -7573,6 +7574,7 @@ buffer."
           ;; way.
           (org-mode)
           (insert (s-join "\n" text-chunks))
+          (goto-char (min-point))
           ;; Let's not have the illusion that we're allowing ourselves
           ;; to edit this text
           (read-only-mode)
