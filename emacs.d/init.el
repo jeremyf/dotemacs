@@ -1360,7 +1360,9 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
               :box (:color ,fg-term-red-bright :line-width (-1 . -1)))))
         `(font-lock-regexp-face
            ((,c :foreground ,red))))))
-  (setq jf/themes-plist '(:dark ef-bio :light ef-cyprus)))
+  ;; I had '(:light ef-cyprus) but the differentiation between function
+  ;; and comment was not adequate
+  (setq jf/themes-plist '(:dark ef-bio :light ef-elea-light)))
 
 (use-package custom
   :straight (:type built-in)
@@ -1750,10 +1752,20 @@ File.open('%s', 'w') { |f| $stdout = f; pp results }")
   ;;
   ;; Note, I did change from pdflatex to lualatex as the LaTeX class I'm
   ;; often using are only available in Lua processing.
+  ;;
+  ;; See https://orgmode.org/worg/org-tutorials/org-latex-export.html#sec-12-3 for why 3
   (setq org-latex-pdf-process
     '("lualatex -shell-escape -interaction nonstopmode -output-directory %o %f"
+       "lualatex -shell-escape -interaction nonstopmode -output-directory %o %f"
        "lualatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
+  (setq org-latex-src-block-backend 'minted)
   (setq org-latex-compiler "lualatex")
+  (setq org-latex-custom-lang-environments
+    '((emacs-lisp "common-lispcode")))
+  (setq org-latex-minted-options
+    '(("frame" "lines")
+       ("fontsize" "\\footnotesize")
+       ("linenos" "")))
   (setq org-confirm-babel-evaluate #'jf/org-confirm-babel-evaluate
     org-fontify-quote-and-verse-blocks t
     ;; I'd prefer to use the executable, but that doe not appear to be
@@ -5084,7 +5096,7 @@ with the series."
 
   ;; This function, tested against Ruby, will return the module space
   ;; qualified method name (e.g. Hello::World#method_name).
-  (cl-defun jf/treesit/yank-qualified-method-fname ()
+  (defun jf/treesit/yank-qualified-method-fname ()
     "Return the fully qualified name of method at point.  If not on a
 method, get the containing class."
     (if-let ((func (treesit-defun-at-point)))
@@ -5627,6 +5639,19 @@ method, get the containing class."
   ;; doesn't allow for comments.
   :straight t)
 
+(use-package yaml-pro
+  :hook (yaml-ts-mode . jf/yaml-mode-configurator)
+  :bind (:map yaml-ts-mode-map
+          ("C-c y f" . yaml-pro-copy-node-path-at-point))
+  :config
+  (defun jf/yaml-mode-configurator ()
+    ;; (which-function-mode)
+    (setq-local add-log-current-defun-function
+      #'jf/yaml-node-path-at-point))
+  (defun jf/yaml-node-path-at-point ()
+    (yaml-pro-ts--imenu-node-label (treesit-node-at (point) 'yaml)))
+  :straight t)
+
 ;; (use-package combobulate
 ;;   :straight (:host github :repo "mickeynp/combobulate")
 ;;   :hook ((json-ts-mode . combobulate-mode)
@@ -5790,7 +5815,8 @@ See `jf/comment-header-regexp/major-modes-alis'."
     ;; (electric-pair-mode)
     (flymake-mode 1)
     (setq truncate-lines t)
-    (which-function-mode)))
+    ;; (which-function-mode)
+    ))
 
 (use-package copilot
   ;; I want to explore this a bit, but by default want it "off" and to
