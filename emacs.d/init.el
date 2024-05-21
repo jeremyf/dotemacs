@@ -7600,7 +7600,7 @@ buffer."
           ;; way.
           (org-mode)
           (insert (s-join "\n" text-chunks))
-          (goto-char (min-point))
+          (goto-char (point-min))
           ;; Let's not have the illusion that we're allowing ourselves
           ;; to edit this text
           (read-only-mode)
