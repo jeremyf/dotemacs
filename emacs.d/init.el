@@ -86,9 +86,6 @@
   ;; Hide the icons of the Emacs toolbar
   (tool-bar-mode -1)
 
-  ;; I don't click on the scrollbar and can live without it.
-  (scroll-bar-mode -1)
-
   ;; Ensuring I have an autosave directory.  On a few rare occassions
   ;; this has saved me from lost "work".
   (make-directory "~/.emacs.d/autosaves/" t)
@@ -5475,44 +5472,10 @@ method, get the containing class."
   :bind (:map markdown-mode-map ("C-c C-j" . jf/project/jump-to-task))
   :hook (((markdown-mode markdown-ts-mode) . turn-on-visual-line-mode))
   :mode (("README\\.md\\'" . gfm-mode)
-          ("\\.md\\'" . markdown-mode)
-          ("\\.markdown\\'" . markdown-mode))
-  :preface
-  (defun jf/markdown-toc (&optional depth)
-    "Extract DEPTH of headings from the current Markdown buffer.
-   The generated and indented TOC will be inserted at point."
-    (interactive "P")
-    (let ((max-depth (or depth 3)) toc-list)
-      (save-excursion
-        (goto-char (point-min))
-        (while (re-search-forward "^\\(##+\\)\\s-+\\(.*\\)" nil t)
-          (let* ((level
-                   (length (match-string 1)))
-                  (heading-text
-                    (match-string 2))
-                  (heading-id
-                    (downcase (replace-regexp-in-string
-                                "[[:space:]]+" "-" heading-text))))
-            (when (<= level max-depth)
-              (push (cons level
-                      (cons heading-text heading-id))
-                toc-list)))))
-      (setq toc-list (reverse toc-list))
-      (dolist (item toc-list)
-        (let* ((level
-                 (car item))
-                (heading-text
-                  (cadr item))
-                (heading-id
-                  (cddr item))
-                (indentation
-                  (make-string (- (* 2 (1- level)) 2) ?\ ))
-                (line
-                  (format "- [%s](#%s)\n" heading-text heading-id)))
-          (setq markdown-toc
-            (concat markdown-toc (concat indentation line)))))
-      (insert markdown-toc)))
-  :init
+          ("\\.md\\'" . gfm-mode)
+          ("\\.markdown\\'" . gfm-mode))
+  :config
+  (setq markdown-hide-urls t)
   (setq markdown-command
     ;; In the early days of Apple Silicon, Pandoc was only available
     ;; through an odd installation.  As those early days have passed,
@@ -5522,6 +5485,42 @@ method, get the containing class."
       "/usr/local/bin/pandoc"))
   (font-lock-add-keywords 'markdown-mode
     '(("{{[^}]+}}" . 'font-lock-function-name-face))))
+
+(defun jf/markdown-toc (&optional depth)
+  "Extract DEPTH of headings from the current Markdown buffer.
+
+The generated and indented TOC will be inserted at point."
+  (interactive "P")
+  (let ((max-depth (or depth 3)) toc-list)
+    (save-excursion
+      (goto-char (point-min))
+      (while (re-search-forward "^\\(##+\\)\\s-+\\(.*\\)" nil t)
+        (let* ((level
+                 (length (match-string 1)))
+                (heading-text
+                  (match-string 2))
+                (heading-id
+                  (downcase (replace-regexp-in-string
+                              "[[:space:]]+" "-" heading-text))))
+          (when (<= level max-depth)
+            (push (cons level
+                    (cons heading-text heading-id))
+              toc-list)))))
+    (setq toc-list (reverse toc-list))
+    (dolist (item toc-list)
+      (let* ((level
+               (car item))
+              (heading-text
+                (cadr item))
+              (heading-id
+                (cddr item))
+              (indentation
+                (make-string (- (* 2 (1- level)) 2) ?\ ))
+              (line
+                (format "- [%s](#%s)\n" heading-text heading-id)))
+        (setq markdown-toc
+          (concat markdown-toc (concat indentation line)))))
+    (insert markdown-toc)))
 
 (use-package plantuml-mode
   ;; A mode for working with PlantUML.  See https://plantuml.com
@@ -5921,7 +5920,7 @@ See `jf/comment-header-regexp/major-modes-alis'."
                go-mode go-ts-mode ;; https://github.com/golang/tools/tree/master/gopls
                html-mode html-ts-mode
                js-mode js-ts-mode
-               json-mode json-ts-mode
+               json-mode json-ts-mode ;; npm install -g vscode-json-languageserver
                python-mode python-ts-mode
                ruby-mode ruby-ts-mode
                scss-mode scss-ts-mode
