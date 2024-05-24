@@ -1507,6 +1507,10 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   ;; Prompt for file types
   (rg-define-search rg-project-prompt-for-files
     :dir project
+    :files (concat
+             "`rg \"^// Code generated .* DO NOT EDIT\\.$\" "
+             project
+             " --files-without-matches --glob \\!vendor`")
     :menu ("Search" "P" "Project prompt file type"))
 
   (when (f-dir-p "~/git/dotemacs/")
@@ -7508,6 +7512,7 @@ buffer."
                      (jf/org-mode/buffer-headline-tags) nil t)))
 
     (require 's)
+    (message "🪓 %S" org-tags-exclude-from-inheritance)
     ;; With the given tags map the headlines and their properties.
     (let* ((prop-names-to-skip
              ;; This is a list of headline properties that I really
@@ -7543,7 +7548,10 @@ buffer."
                               (format "%s [[file:%s::*%s][%s]]"
                                 (org-element-property :title h)
                                 (buffer-file-name)
-                                (org-element-property :raw-value h)
+                                ;; Strip out the progress cookie
+                                (replace-regexp-in-string
+                                  "\\[[^\]]*\\] +" ""
+                                  (org-element-property :title h))
                                 "link")))
 
                           ;; Only select relevant properties, converting
@@ -7555,8 +7563,8 @@ buffer."
                                   (if (member (car prop-value)
                                         prop-names-to-skip)
                                     ;; For awhile I was forgetting to
-                                    ;; always return the mem; which would
-                                    ;; clobber my results.
+                                    ;; always return the mem; which
+                                    ;; would clobber my results.
                                     mem
                                     (add-to-list 'mem
                                       (format "- %s :: %s"
