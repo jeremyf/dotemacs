@@ -503,7 +503,6 @@ Else, evaluate the whole buffer."
   (pulsar-global-mode 1)
   (setq pulsar-face 'pulsar-magenta
     pulsar-delay 0.05)
-  (setq ring-bell-function 'jf/pulse)
   :preface
   (defun jf/pulse (&optional parg)
     "Pulse the current line.
@@ -514,6 +513,9 @@ Else, evaluate the whole buffer."
       (pulsar--pulse nil nil (point) (mark))
       (pulsar-pulse-line)))
   :bind (("C-c C-l" . jf/pulse)))
+
+;; Silence that bell by pulsing the line instead
+(setq ring-bell-function 'jf/pulse)
 
 (use-package rainbow-mode
   ;; When I toggle on Rainbow mode, it colorizes the text that is color
@@ -1268,6 +1270,8 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
       (font-lock-add-keywords nil '(("\t" . 'jf/tabs-face)))
       (font-lock-add-keywords nil '(("﻿" . 'jf/bom-face))))))
 
+(mapc #'disable-theme custom-enabled-themes)
+
 (use-package ef-themes
   :straight t
   :init
@@ -1363,14 +1367,12 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
 
 (use-package custom
   :straight (:type built-in)
-  :preface
-  (mapc #'disable-theme custom-enabled-themes)
   :config
   ;; In organizing the packages, I discovred that themes is part of the
   ;; `custom' package.
   (defun jf/emacs-theme-by-osx-appearance ()
     "Function to load named theme."
-    (load-theme
+    (ef-themes-select
       (plist-get jf/themes-plist (jf/current-macos-interface-style))))
 
   ;; Theming hooks to further customize colors
