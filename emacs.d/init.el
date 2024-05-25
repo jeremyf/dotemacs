@@ -2312,11 +2312,13 @@ function is ever added to that hook."
     (use-package org-modern
       :straight (:host github :repo "minad/org-modern")
       :custom
-      ((org-modern-star '("◉" "○" "◈" "◇" "•"))
+      (org-modern-replace-stars
+        '("➊" "➋" "➌" "➍" "➎" "➏" "➐" "➑" "➒" "•"))
+      (org-modern-star 'replace)
         ;; Showing the depth of stars helps with the speed keys
         ;; as well as gives a clearer indicator of the depth of
         ;; the outline.
-        (org-modern-hide-stars nil))
+        (org-modern-hide-stars nil)
       :config (global-org-modern-mode))
 
     ;; For automatically showing the invisible parts of org-mode.
