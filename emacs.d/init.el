@@ -1761,15 +1761,22 @@ File.open('%s', 'w') { |f| $stdout = f; pp results }")
     '("lualatex -shell-escape -interaction nonstopmode -output-directory %o %f"
        "lualatex -shell-escape -interaction nonstopmode -output-directory %o %f"
        "lualatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
-  (setq org-latex-src-block-backend 'minted)
-  (setq org-latex-compiler "lualatex")
-  (setq org-latex-custom-lang-environments
-    '((emacs-lisp "common-lispcode")))
-  (setq org-latex-minted-options
-    '(("frame" "lines")
-       ("fontsize" "\\footnotesize")
-       ("linenos" "")))
-  (setq org-confirm-babel-evaluate #'jf/org-confirm-babel-evaluate
+
+  ;; The 'minted backend provides souce code highlighting.
+  (setq
+    org-latex-src-block-backend 'minted
+    org-latex-compiler "lualatex"
+    org-latex-custom-lang-environments
+    '((emacs-lisp "common-lispcode"))
+    org-latex-minted-options '(("frame" "lines")
+                                ("fontsize" "\\footnotesize")
+                                ("linenos" "")))
+
+  (setq
+    org-auto-align-tags nil
+    org-tags-column nil
+
+    org-confirm-babel-evaluate #'jf/org-confirm-babel-evaluate
     org-fontify-quote-and-verse-blocks t
     ;; I'd prefer to use the executable, but that doe not appear to be
     ;; the implementation of org-babel.
