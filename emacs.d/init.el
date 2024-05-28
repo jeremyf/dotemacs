@@ -889,14 +889,14 @@ The ARGS are the rest of the ARGS passed to the ADVISED-FUNCTION."
             (cond
               ((f-exists? filename-without-org)
                 (progn
-                  (find-file filename-without-org)
+                  (find-file-other-window filename-without-org)
                   (when line-number
                     (goto-char (point-min))
                     (forward-line
                       (1- (string-to-number line-number))))))
               ((f-exists? filename-with-org)
                 (progn
-                  (find-file filename-with-org)
+                  (find-file-other-window filename-with-org)
                   (when line-number
                     (goto-char (point-min))
                     (forward-line
