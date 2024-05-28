@@ -1532,6 +1532,23 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   (add-to-list 'rg-required-command-line-flags "--follow")
   :straight t)
 
+(rg-define-search rg-project-not-generated
+  "Search only within files that are not generated."
+  :files (rg-get-not-generated-file-names)
+  :dir project
+  :menu ("Search" "n" "Not Generated"))
+
+(defun rg-get-not-generated-file-names ()
+  "Create a custom type glob for files that were not generated."
+  (format "{%s}"
+    (s-join ","
+      (s-split "\n"
+        (s-trim (shell-command-to-string
+                  (concat
+                    "rg -e \"^// Code generated .*DO NOT EDIT\\.$\" . "
+                    "--files-without-match  | sed 's|\\./||'")))))))
+
+
 (use-package visual-regexp
   ;; I haven't used much search and replace but the visual queues are
   ;; useful.  And I learned about ,\ in this play.  ,\(upcase \1) will
