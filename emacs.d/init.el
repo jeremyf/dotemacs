@@ -424,6 +424,7 @@ Else, evaluate the whole buffer."
   ;; assume's you're moving the file from the one buffer to the other.
   ;; Very useful.
   (setq dired-dwim-target t)
+  (setq dired-vc-rename-file t)
   (with-eval-after-load 'dired
     ;; Bind dired-x-find-file.
     (setq dired-x-hands-off-my-keys nil)
@@ -7551,7 +7552,6 @@ buffer."
                      (jf/org-mode/buffer-headline-tags) nil t)))
 
     (require 's)
-    (message "🪓 %S" org-tags-exclude-from-inheritance)
     ;; With the given tags map the headlines and their properties.
     (let* ((prop-names-to-skip
              ;; This is a list of headline properties that I really
@@ -7619,7 +7619,9 @@ buffer."
                       (format "%s\n%s\n" header-text
                         (s-join "\n" properties-text))
                       header-text)))
-                (s-join "|" tags)
+                ;; Omit done
+                (format "+TODO<>\"DONE\"+%s"
+                  (s-join "|" tags))
                 'file 'comment))
             ;; Let's have only one of these
             (buffer-name "*Org Mode Tag Summary*")
