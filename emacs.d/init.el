@@ -1534,19 +1534,19 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
 
 (rg-define-search rg-project-not-generated
   "Search only within files that are not generated."
-  :files (rg-get-not-generated-file-names)
+  :files (jf/rg-get-not-generated-file-names)
   :dir project
   :menu ("Search" "n" "Not Generated"))
 
-(defun rg-get-not-generated-file-names ()
+(defun jf/rg-get-not-generated-file-names ()
   "Create a custom type glob for files that were not generated."
   (format "{%s}"
-    (s-join ","
-      (s-split "\n"
-        (s-trim (shell-command-to-string
-                  (concat
-                    "rg -e \"^// Code generated .*DO NOT EDIT\\.$\" . "
-                    "--files-without-match  | sed 's|\\./||'")))))))
+    (string-trim
+      (shell-command-to-string
+        (concat
+          "rg -e \"^// Code generated .*DO NOT EDIT\\.$\" . "
+          "--files-without-match --glob=\\!vendor | tr '\\n' '\\,' "
+          " | sed 's|,$||' | sed 's|\\./||g'" )))))
 
 
 (use-package visual-regexp
@@ -6627,6 +6627,7 @@ Alternative suggestions are: - '(\"\\\"“\" . \"\\\"\")"
        "samvera-labs/hyku_knapsack"
        "samvera/bulkrax"
        "samvera/hyku"
+       "samvera/hyku-next"
        "samvera/valkyrie"
        "scientist-softserv/actions"
        "scientist-softserv/adventist-dl"
