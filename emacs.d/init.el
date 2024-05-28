@@ -1278,6 +1278,9 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   (defvar jf/themes-plist '()
     "The named themes by pallette.")
   :config
+  (setq ef-themes-common-palette-overrides
+      '((bg-region bg-green-intense)
+        (fg-region fg-main)))
   (setq ef-themes-headings ; read the manual's entry or the doc string
     '((0 . (bold 1.4))
        (1 . (variable-pitch bold 1.7))
