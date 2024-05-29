@@ -5505,12 +5505,14 @@ method, get the containing class."
 (use-package markdown-mode
   :straight t
   :bind (:map markdown-mode-map ("C-c C-j" . jf/project/jump-to-task))
-  :hook (((markdown-mode markdown-ts-mode) . turn-on-visual-line-mode))
+  :hook (((markdown-mode markdown-ts-mode) . jf/markdown-mode-configurator))
   :mode (("README\\.md\\'" . gfm-mode)
           ("\\.md\\'" . gfm-mode)
           ("\\.markdown\\'" . gfm-mode))
   :config
-  (setq markdown-hide-urls t)
+  (defun jf/markdown-mode-configurator ()
+    (setq-local markdown-hide-urls t)
+    (visual-line-mode 1))
   (setq markdown-command
     ;; In the early days of Apple Silicon, Pandoc was only available
     ;; through an odd installation.  As those early days have passed,
@@ -5626,6 +5628,11 @@ The generated and indented TOC will be inserted at point."
   ;; `rspec-spring-p' function does not work.  So I'm overriding the
   ;; default behavior to match my ecosystem.
   (advice-add #'rspec-spring-p :override #'jf/rspec-spring-p))
+
+(use-package dotenv-mode
+  :straight t
+  :config
+  (add-to-list 'auto-mode-alist '("\\.env\\..*\\'" . dotenv-mode)))
 
 (use-package ruby-interpolation
   ;; Nice and simple package for string interpolation.
