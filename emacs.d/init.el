@@ -6652,10 +6652,24 @@ Alternative suggestions are: - '(\"\\\"“\" . \"\\\"\")"
        "harvard-lts/CURIOSity"
        "WGBH-MLA/ams")))
 
+(use-package git-commit
+  :straight t
+  :hook ((git-commit-mode . jf/git-commit-mode-configurator))
+  :bind (:map git-commit-mode-map
+          (("TAB" .  #'completion-at-point)))
+  :bind ("s-7" . #'jf/insert-task-type-at-point)
+  :config
+  (defun jf/git-commit-mode-configurator ()
+    "Prepare all of the commit buffer structure"
+    (setq fill-column git-commit-fill-column)
+    (goto-char (point-min))
+    (beginning-of-line-text)
+    (when (looking-at-p "^$")
+      (structured-commit/write-message))))
+
 (use-package structured-commit
   :straight (:type git :host github
               :repo "bunnylushington/structured-commit")
-  :hook (git-commit-setup . structured-commit/write-message)
   :config
   (advice-add #'structured-commit/project
     :override #'jf/structured-commit/project)
