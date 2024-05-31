@@ -7467,6 +7467,8 @@ Add the blog post to the given SERIES with the given KEYWORDS."
 (require 'dig-my-grave)
 
 (load "~/git/dotemacs/emacs.d/random-tables-data.el")
+(use-package insert-random
+  :straight t)
 
 (use-package server
   :straight (:type built-in)
