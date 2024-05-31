@@ -121,7 +121,7 @@
   ;; Doing a bit of configuration of my cursors.  The blinking provides
   ;; the queue and on 2024-05-18, I thought I'd give a try with the
   ;; hollow box.  Why?  It feels more retro.
-  (setq-default cursor-type 'hollow)
+  (setq-default cursor-type 'bar)
   (blink-cursor-mode t)
 
   (setq
@@ -213,6 +213,9 @@
     user-mail-address "jeremy@jeremyfriesen.com")
 
   (defun jf/alist-prompt (prompt collection &rest args)
+    "PROMPT from an alist COLLECTION returning a `cons'.
+
+This is a simple wrapper around the `completing-read' function."
     (let ((string (completing-read prompt collection args)))
       (cons string (alist-get string collection nil nil #'string=))))
 
@@ -377,15 +380,11 @@ Else, evaluate the whole buffer."
   (when (executable-find "rg")
     (setq grep-program "rg")))
 
-(use-package sort
-  ;; "Opened" as a place to define `jf/sort-unique-lines'.
-  :straight (:type built-in)
-  :config
-  (defun jf/sort-unique-lines (reverse beg end
-                                &optional adjacent
-                                keep-blanks
-                                interactive)
-    "Sort lines and delete duplicates.
+(defun jf/sort-unique-lines (reverse beg end
+                              &optional adjacent
+                              keep-blanks
+                              interactive)
+  "Sort lines and delete duplicates.
 
   By default the sort is lexigraphically ascending.  To sort as
   descending set REVERSE to non-nil.  Specify BEG and END for the
@@ -394,10 +393,10 @@ Else, evaluate the whole buffer."
   I've included ADJACENT, KEEP-BLANKS, and INTERACTIVE so I can
   echo the method signature of `sort-lines' and
   `delete-duplicate-lines'"
-    (interactive "P\nr")
-    (sort-lines reverse beg end)
-    (delete-duplicate-lines
-      beg end reverse adjacent keep-blanks interactive)))
+  (interactive "P\nr")
+  (sort-lines reverse beg end)
+  (delete-duplicate-lines
+    beg end reverse adjacent keep-blanks interactive))
 
 (use-package ediff
   ;; I haven't used `ediff' much, but it's a good option for reviewing
@@ -504,16 +503,16 @@ Else, evaluate the whole buffer."
   (pulsar-global-mode 1)
   (setq pulsar-face 'pulsar-magenta
     pulsar-delay 0.05)
-  :preface
-  (defun jf/pulse (&optional parg)
-    "Pulse the current line.
+  :bind (("C-c C-l" . jf/pulse)))
+
+(defun jf/pulse (&optional parg)
+  "Pulse the current line.
 
   When PARG pulse between `point' and `mark'."
-    (interactive "P")
-    (if (car parg)
-      (pulsar--pulse nil nil (point) (mark))
-      (pulsar-pulse-line)))
-  :bind (("C-c C-l" . jf/pulse)))
+  (interactive "P")
+  (if (car parg)
+    (pulsar--pulse nil nil (point) (mark))
+    (pulsar-pulse-line)))
 
 ;; Silence that bell by pulsing the line instead
 (setq ring-bell-function 'jf/pulse)
@@ -538,7 +537,6 @@ Else, evaluate the whole buffer."
   :init
   (setq enable-recursive-minibuffers t)
   :config
-  ;; TODO Problem with this function and helpful
   (recursion-indicator-mode))
 
 (use-package vi-tilde-fringe
@@ -555,12 +553,6 @@ Else, evaluate the whole buffer."
   ;; I navigate Emacs.
   :straight t
   :config (whole-line-or-region-global-mode))
-
-(use-package keycast
-  ;; When I turn on `keycast-mode-line' each key press will echo in the
-  ;; mode-line.  There are other options for logging which could be
-  ;; conceptually useful for feeding a macro.
-  :straight t)
 
 (use-package keycast
   ;; It can be helpful when pairing or presenting to have a log of your
@@ -6811,7 +6803,7 @@ The `magit-gitdir' is the project's .git directory."
 
     ;; Convert footnote to sidenote for HTML export
     (defun jf/org-hugo-sidenote (footnote-reference _contents info)
-      "Transcode a FOOTNOTE-REFERENCE element from Org to Hugo sidenote shortcode.
+      "Transcode FOOTNOTE-REFERENCE element to Hugo sidenote shortcode.
 CONTENTS is nil.  INFO is a plist holding contextual information."
       (let* ((element
                (car (org-export-get-footnote-definition
@@ -6943,7 +6935,8 @@ If not set  DEFAULT or prompt for it."
         (if value value
           (jf/export-org-to-tor--global-buffer-prop-set
             :key key
-            :value (or default (read-from-minibuffer (format "%s: " key)))))))
+            :value (or default
+                     (read-from-minibuffer (format "%s: " key)))))))
 
     (cl-defun jf/export-org-to-tor--global-buffer-prop-set (&key key value)
       "Set global property named KEY to VALUE for current buffer."
@@ -7167,7 +7160,8 @@ If UNSAFE is non-nil, assume point is on headline."
     ;; Note: I needed to use `fboundp' because if I invoked this
     ;; functions before other consult functions I got a method void
     ;; error.
-    (cl-defun jf/find-file-via-matching (&key prompt matching in (switch "--files-with-matches"))
+    (cl-defun jf/find-file-via-matching (&key prompt matching in
+                                          (switch "--files-with-matches"))
       "PROMPT for files IN directory with MATCHING content for SWITCH.
 
 If `consult--read' is defined, use that.  Otherwise fallback to
@@ -7253,7 +7247,8 @@ If `consult--read' is defined, use that.  Otherwise fallback to
               " --sortr modified | tr '\n' '@'"))
           "@")))
 
-    (cl-defun jf/list-full-filenames-with-file-text (&key matching in (switch "--files-with-matches"))
+    (cl-defun jf/list-full-filenames-with-file-text (&key matching in
+                                                      (switch "--files-with-matches"))
       "List filenames MATCHING with SWITCH pattern IN the directory."
       (split-string-and-unquote
         (shell-command-to-string
@@ -7297,7 +7292,8 @@ If `consult--read' is defined, use that.  Otherwise fallback to
       (kill-new (jf/tor-convert-text-to-slug
                   (replace-regexp-in-string "^#+ +" "" heading))))
 
-    (cl-defun jf/create-lore-24-blog-entry (&key (series "in-the-shadows-of-mont-brun")
+    (cl-defun jf/create-lore-24-blog-entry (&key
+                                             (series "in-the-shadows-of-mont-brun")
                                              (keywords '("lore24" "rpgs")))
       "Create #Lore24 entry from current node.
 
@@ -7633,7 +7629,9 @@ buffer."
                       (format "%s\n%s\n" header-text
                         (s-join "\n" properties-text))
                       header-text)))
-                ;; Omit done
+
+                ;; Select headlines matching any of the tags and that
+                ;; are not "DONE".
                 (format "+TODO<>\"DONE\"+%s"
                   (s-join "|" tags))
                 'file 'comment))
@@ -7641,7 +7639,7 @@ buffer."
             (buffer-name "*Org Mode Tag Summary*")
             (display-buffer-mark-dedicated t))
 
-      ;; We've run this command again, so let's destroy what we had
+      ;; When we've run this command again, so let's destroy what we had
       ;; and start anew.
       (when (get-buffer buffer-name) (kill-buffer buffer-name))
       (get-buffer-create buffer-name)
