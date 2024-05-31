@@ -1529,6 +1529,7 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   "Search only within files that are not generated."
   :files (jf/rg-get-not-generated-file-names)
   :dir project
+  :flags '("--glob=\"\\!vendor/\"")
   :menu ("Search" "n" "Not Generated"))
 
 (defun jf/rg-get-not-generated-file-names ()
