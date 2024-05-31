@@ -14,7 +14,7 @@
 ;;  How is this mess organized?  I have favored the `use-package' macro
 ;;  to fit most of the configuration within the `use-package' sexp.
 ;;  This has meant using several built-in packages, which provides some
-;;  organizational meanting.  And as I get more familiar with those
+;;  organizational meaning.  And as I get more familiar with those
 ;;  built-in packages, I can begin to explore their configurability.
 ;;
 ;;  This organization does mean that I'm declaring a function within the
@@ -5033,6 +5033,27 @@ with the series."
   :config
   (setq-default ispell-program-name "aspell"))
 
+(use-package jinx
+  ;; `brew install enchant`
+  :straight t
+  :bind ("M-$" . #'jink-correct)
+  :hook (emacs-startup . #'global-jinx-mode)
+  :config
+  (add-to-list 'jinx-exclude-faces '(prog-mode font-lock-string-face))
+  ;; From https://github.com/minad/jinx/wiki
+  (defun jinx--add-to-abbrev (overlay word)
+    "Add abbreviation to `global-abbrev-table'.
+The misspelled word is taken from OVERLAY.  WORD is the corrected word."
+    (let ((abbrev (buffer-substring-no-properties
+                    (overlay-start overlay)
+                    (overlay-end overlay))))
+      (message "Abbrev: %s -> %s" abbrev word)
+      (define-abbrev global-abbrev-table abbrev word)))
+
+
+  (advice-add 'jinx--correct-replace :before #'jinx--add-to-abbrev))
+
+
 (use-package crdt
   ;; For remote code sharing/pairing
   :straight t)
@@ -5185,9 +5206,9 @@ method, get the containing class."
   ;; is done via an overlay for "blocks" that are more than 5 (default)
   ;; lines
   :straight (:host github :repo "jeremyf/scopeline.el")
-  ;; The original scopeline prefix was creating line height issues for
+  ;; The original `scopeline' prefix was creating line height issues for
   ;; my font of choice.  Namely adding just a bit more spacing for the
-  ;; scopeline overlay, thus making line heights inconsistent.
+  ;; `scopeline' overlay, thus making line heights inconsistent.
   :config (setq scopeline-overlay-prefix "  ~ ")
   :hook ((ruby-mode ruby-ts-mode) . scopeline-mode))
 
