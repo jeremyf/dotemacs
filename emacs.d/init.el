@@ -641,6 +641,13 @@ Else, evaluate the whole buffer."
            'local-map jf/mode-line-format/vterm-map
            'help-echo "mouse-1:vterm-copy-mode"))))
 
+  (defvar-local jf/mode-line-format/which-function
+    '(:eval
+       (when which-function-mode
+         (propertize
+           (concat " ⨍ := " (which-function))
+           'face 'mode-line-emphasis))))
+
   (defvar-local jf/mode-line-format/misc-info
     '(:eval
        (when (mode-line-window-selected-p)
@@ -729,6 +736,7 @@ Else, evaluate the whole buffer."
                         jf/mode-line-format/project
                         jf/mode-line-format/vc-branch
                         jf/mode-line-format/vterm
+                        jf/mode-line-format/which-function
                         ))
     (put construct 'risky-local-variable t))
 
@@ -737,12 +745,13 @@ Else, evaluate the whole buffer."
        jf/mode-line-format/vterm
        jf/mode-line-format/kbd-macro
        jf/mode-line-format/narrow
-       jf/mode-line-format/buffer-name-and-status "  "
-       jf/mode-line-format/major-mode "  "
-       jf/mode-line-format/project "  "
-       jf/mode-line-format/vc-branch "  "
-       jf/mode-line-format/flymake "  "
-       jf/mode-line-format/eglot "  "
+       jf/mode-line-format/buffer-name-and-status " "
+       jf/mode-line-format/major-mode " "
+       jf/mode-line-format/project " "
+       jf/mode-line-format/vc-branch " "
+       jf/mode-line-format/flymake " "
+       jf/mode-line-format/eglot
+       jf/mode-line-format/which-function
        ;; jf/mode-line-format/misc-info
        )))
 
