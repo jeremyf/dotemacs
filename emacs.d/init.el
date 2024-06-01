@@ -641,12 +641,29 @@ Else, evaluate the whole buffer."
            'local-map jf/mode-line-format/vterm-map
            'help-echo "mouse-1:vterm-copy-mode"))))
 
+  (defvar jf/mode-line-format/which-function-map
+    (let ((map
+            (make-sparse-keymap)))
+      (define-key map [mode-line mouse-1]
+        #'jf/yank-current-scoped-function-name)
+      (define-key map [mode-line M-mouse-1]
+        #'mark-defun)
+      map))
+
   (defvar-local jf/mode-line-format/which-function
     '(:eval
-       (when which-function-mode
-         (propertize
-           (concat " ⨍ := " (which-function))
-           'face 'mode-line-emphasis))))
+       (when (and which-function-mode (mode-line-window-selected-p))
+         (when-let ((func (which-function)))
+           (propertize
+             (concat " ⨍ := " func)
+             'face
+             'mode-line-emphasis
+             'local-map
+             jf/mode-line-format/which-function-map
+             'help-echo
+             (concat
+               "mouse-1:    #'jf/yank-current-scoped-function-name\n"
+               "M-mouse-1:  #'mark-defun (C-M-h)"))))))
 
   (defvar-local jf/mode-line-format/misc-info
     '(:eval
@@ -5880,7 +5897,7 @@ See `jf/comment-header-regexp/major-modes-alis'."
     ;; (electric-pair-mode)
     (flymake-mode 1)
     (setq truncate-lines t)
-    ;; (which-function-mode)
+    (which-function-mode)
     ))
 
 (use-package copilot
