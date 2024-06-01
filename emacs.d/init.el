@@ -5054,16 +5054,10 @@ with the series."
   ;; multiple points.
   :straight t)
 
-(use-package ispell
-  :straight (:type built-in)
-  :config
-  (setq-default ispell-program-name "aspell"))
-
 (use-package jinx
   ;; `brew install enchant`
   :straight t
-  :bind ("M-$" . #'jink-correct)
-  :hook (emacs-startup . #'global-jinx-mode)
+  :bind ("M-$" . #'jinx-correct)
   :config
   (add-to-list 'jinx-exclude-faces '(prog-mode font-lock-string-face))
   ;; From https://github.com/minad/jinx/wiki
