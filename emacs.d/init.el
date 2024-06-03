@@ -6695,15 +6695,12 @@ Alternative suggestions are: - '(\"\\\"“\" . \"\\\"\")"
   :config
   (defun jf/git-commit-mode-configurator ()
     "Prepare all of the commit buffer structure"
-    (setq fill-column git-commit-fill-column)
-    (goto-char (point-min))
-    (beginning-of-line-text)
-    (when (looking-at-p "^$")
-      (structured-commit/write-message))))
+    (setq fill-column git-commit-fill-column)))
 
 (use-package structured-commit
   :straight (:type git :host github
               :repo "bunnylushington/structured-commit")
+  :hook (git-commit-setup . structured-commit/write-message)
   :config
   (advice-add #'structured-commit/project
     :override #'jf/structured-commit/project)
@@ -7565,7 +7562,7 @@ Add the blog post to the given SERIES with the given KEYWORDS."
 
 (use-package org
   ;; For projects and all
-  :straight (:type built-in)
+  :straight (org :source org-elpa)
   :config
   (defun jf/org-mode/buffer-headline-tags ()
     "Return a list of `org-mode' tags excluding filetags.
