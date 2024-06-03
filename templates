@@ -58,7 +58,7 @@ markdown-mode markdown-ts-mode
 ;;;; org-mode
 org-mode
 
-(eg "([[abbr:20230824T082549][e.g.]] " q ")")
+(eg "([[abbr:20230824T082549][e.g.]], " q ")")
 (aka "([[abbr:20221009T115519][a.k.a.]] " q ")")
 (dnd "[[abbr:20221009T115753][D&D]] " q )
 (rpg "[[abbr:20221009T115226][RPG]] " q)
