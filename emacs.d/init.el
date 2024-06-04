@@ -6697,6 +6697,14 @@ Alternative suggestions are: - '(\"\\\"“\" . \"\\\"\")"
     "Prepare all of the commit buffer structure"
     (setq fill-column git-commit-fill-column)))
 
+(add-to-list 'treesit-language-source-alist
+             '(gitcommit . ("https://github.com/gbprod/tree-sitter-gitcommit")))
+
+(use-package git-commit-ts-mode
+  :straight (git-commit-ts-mode :host github
+                              :repo "danilshvalov/git-commit-ts-mode")
+  :mode "\\COMMIT_EDITMSG\\'")
+
 (use-package structured-commit
   :straight (:type git :host github
               :repo "bunnylushington/structured-commit")
