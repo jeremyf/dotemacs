@@ -7576,7 +7576,7 @@ Add the blog post to the given SERIES with the given KEYWORDS."
 
 (use-package org
   ;; For projects and all
-  :straight (org :source org-elpa)
+  :straight (org :type git :host github :repo "emacsmirror/org")
   :config
   (defun jf/org-mode/buffer-headline-tags ()
     "Return a list of `org-mode' tags excluding filetags.
