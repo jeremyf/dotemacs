@@ -5276,6 +5276,11 @@ method, get the containing class."
     ;; 72 is what I've found works best on exporting to my blog.
     (setq-local fill-column 72)))
 
+(use-package flymake-go-staticcheck
+  ;; Adding a linter to go files, leveraging the staticcheck binary.
+  ;; See: https://github.com/dominikh/go-tools/tree/master/cmd/staticcheck
+  :straight t)
+
 (use-package go-mode
   :straight t
   :hook ((go-mode go-ts-mode) . jf/go-mode)
@@ -6005,7 +6010,13 @@ See `jf/comment-header-regexp/major-modes-alis'."
                   #'eglot-completion-at-point
                   #'tempel-expand
                   #'cape-file
-                  #'cape-keyword))))
+                  #'cape-keyword)))
+        ;; I could configure `eglot-stay-out-of' to skip fly-make; or I
+        ;; could simply check here if I'm in `go-ts-mode' and if so
+        ;; enable the linting `flymake-go-staticcheck-enable'
+        (when (and (derived-mode-p 'go-ts-mode)
+                (fboundp 'flymake-go-staticcheck-enable))
+          (flymake-go-staticcheck-enable)))
       ;; https://github.com/elixir-lsp/elixir-ls?tab=readme-ov-file
       (add-to-list 'eglot-server-programs
         '(elixir-ts-mode "~/elixir-ls/v0.20.0/language_server.sh"))
@@ -6017,7 +6028,7 @@ See `jf/comment-header-regexp/major-modes-alis'."
       (add-to-list 'eglot-servier-programs
         '(angular-ts-mode
            "node /opt/homebrew/lib/node_modules/@angular/language-server --ngProbeLocations /opt/homebrew/lib/node_modules --tsProbeLocations /opt/homebrew/lib/node_modules --stdio"))
-      :hook ((eglot-managed-mode . jf/eglot-capf)))
+      :hook ((eglot-managed-mode . jf/eglot-managed-mode)))
 
 
     ;; See https://elixir-lsp.github.io/elixir-ls/getting-started/emacs/
