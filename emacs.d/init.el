@@ -3179,7 +3179,7 @@ to Backlog."
           ;; ("M-s G" . consult-git-grep)
           ;;
           ;; I keep this around because orderless search is great
-          ("M-s r" . consult-ripgrep)
+          ("M-s r r" . consult-ripgrep)
           ;; ("C-c f" . consult-ripgrep)
           ;; ("M-s l" . consult-line)
           ("M-s M-s" . consult-line-multi)
@@ -5993,8 +5993,8 @@ See `jf/comment-header-regexp/major-modes-alis'."
               . eglot-ensure)
       :config
       (defun jf/eglot-organize-imports () (interactive)
-	      (eglot-code-actions nil nil "source.organizeImports" t))
-      (defun jf/eglot-capf ()
+        (eglot-code-actions nil nil "source.organizeImports" t))
+      (defun jf/eglot-managed-mode ()
         "Ensure `eglot-completion-at-point' preceeds everything."
         ;; I don't want `eglot-completion-at-point' to trample my other
         ;; completion options.
@@ -7559,7 +7559,7 @@ Add the blog post to the given SERIES with the given KEYWORDS."
 
 (use-package org
   ;; For projects and all
-  :straight (org :type git :host github :repo "emacsmirror/org")
+  :straight (org :source org-elpa)
   :config
   (defun jf/org-mode/buffer-headline-tags ()
     "Return a list of `org-mode' tags excluding filetags.
