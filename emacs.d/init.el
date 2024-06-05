@@ -1156,10 +1156,6 @@ This uses `split-window-right' but follows with the cursor."
     (split-window-right)
     (balance-windows)
     (other-window 1))
-  (defun jf/body-function/rspec-compilation (window)
-    "Select the WINDOW and move to `end-of-buffer'."
-    (select-window window)
-    (end-of-buffer))
   (setq display-buffer-alist
     `(;; no window
        ("\\`\\*Async Shell Command\\*\\'"
@@ -1204,8 +1200,7 @@ This uses `split-window-right' but follows with the cursor."
          (preserve-size . (t . t)))
        ("\\*rspec-compilation\\*"
          (display-buffer-reuse-mode-window
-           display-buffer-below-selected)
-         (body-function . jf/body-function/rspec-compilation))
+           display-buffer-below-selected))
        ((derived-mode . reb-mode) ; M-x re-builder
          (display-buffer-reuse-mode-window
            display-buffer-below-selected)
