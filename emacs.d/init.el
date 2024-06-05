@@ -5301,8 +5301,10 @@ method, get the containing class."
   ;; See https://pkg.go.dev/golang.org/x/tools/cmd/goimports
   (setq gofmt-command "goimports")
   (defun jf/go-mode ()
-    (setq-local tab-width 2))
-  (add-hook 'before-save-hook 'gofmt-before-save))
+    (add-hook 'before-save-hook 'jf/eglot-organize-imports nil t)
+    (add-hook 'before-save-hook 'eglot-format-buffer nil t)
+    (add-hook 'before-save-hook 'gofmt-before-save nil t)
+    (setq-local tab-width 2)))
 
 (use-package go-ts-mode
   :straight (:type built-in)
@@ -6007,6 +6009,8 @@ See `jf/comment-header-regexp/major-modes-alis'."
                )
               . eglot-ensure)
       :config
+      (defun jf/eglot-organize-imports () (interactive)
+	      (eglot-code-actions nil nil "source.organizeImports" t))
       (defun jf/eglot-capf ()
         "Ensure `eglot-completion-at-point' preceeds everything."
         ;; I don't want `eglot-completion-at-point' to trample my other
