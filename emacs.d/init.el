@@ -6690,19 +6690,11 @@ Alternative suggestions are: - '(\"\\\"“\" . \"\\\"\")"
   :hook ((git-commit-mode . jf/git-commit-mode-configurator))
   :bind (:map git-commit-mode-map
           (("TAB" .  #'completion-at-point)))
-  :bind ("s-7" . #'jf/insert-task-type-at-point)
+  :bind ("s-7" . #'structured-commit/write-message)
   :config
   (defun jf/git-commit-mode-configurator ()
     "Prepare all of the commit buffer structure"
     (setq fill-column git-commit-fill-column)))
-
-(add-to-list 'treesit-language-source-alist
-             '(gitcommit . ("https://github.com/gbprod/tree-sitter-gitcommit")))
-
-(use-package git-commit-ts-mode
-  :straight (git-commit-ts-mode :host github
-                              :repo "danilshvalov/git-commit-ts-mode")
-  :mode "\\COMMIT_EDITMSG\\'")
 
 (use-package structured-commit
   :straight (:type git :host github
