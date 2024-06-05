@@ -1531,10 +1531,6 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   ;; Prompt for file types
   (rg-define-search rg-project-prompt-for-files
     :dir project
-    :files (concat
-             "`rg \"^// Code generated .* DO NOT EDIT\\.$\" "
-             project
-             " --files-without-matches --glob \\!vendor`")
     :menu ("Search" "P" "Project prompt file type"))
 
   (when (f-dir-p "~/git/dotemacs/")
@@ -1548,7 +1544,7 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   ;; I want to ensure that I'm following symlinks.  This is important
   ;; for my Personal Knowledge Management file structure and ensuring
   ;; that private and public concepts don't bleed across machines.
-  (add-to-list 'rg-required-command-line-flags "--follow")
+  (add-to-list 'rg-required-command-line-flags "--follow ")
   :straight t)
 
 (rg-define-search rg-project-not-generated
@@ -3240,17 +3236,15 @@ to Backlog."
       "--smart-case --no-heading --line-number --no-ignore-vcs "
       "--glob !vendor/ --glob !coverage/ --glob !**/tmp/ "
       "--glob !public/ --glob !node_modules/ --glob !.git/ "
-      "--glob !doc/ "
-      "--glob !.yardoc/ --glob !.byebug_history --glob !**/log/ "
+      "--glob !doc/ --glob !vendor/  --glob !**/log/ "
       " . -e ARG OPTS"))
   (consult-ripgrep-args
     (concat "rg --null --hidden --line-buffered --color=never "
-      "--max-columns=1000 --follow"
+      "--max-columns=1000 --follow "
       "--path-separator / --no-ignore-vcs --smart-case --no-heading "
       "--glob !vendor/ --glob !coverage/ --glob !**/tmp/ "
       "--glob !public/ --glob !node_modules/ --glob !.git/ "
-      "--glob !doc/ "
-      "--glob !.yardoc/ --glob !.byebug_history  --glob !**/log/ "
+      "--glob !doc/ --glob !vendor/ --glob !**/log/ "
       "--line-number "))
   ;; Configure other variables and modes in the :config section,
   ;; after lazily loading the package.
@@ -3344,15 +3338,23 @@ With a PREFIX jump to the agenda without starting the clock."
   ;; Or =p= + =space= to narrow to other projects; and then select a
   ;; file within that project.
   :commands (consult-projectile)
-  :bind (("C-x 4 p" . consult-projectile-find-file-other-window)
-          ("M-s r" . consult-ripgrep)
-          ("M-s f" . projectile-ripgrep))
+  :bind (("M-s r r" . consult-ripgrep)
+          ("M-s r n" . jf/consult-ripgrep-no-generated))
   :straight (consult-projectile
               :type git
               :host gitlab
               :repo "OlMon/consult-projectile"
               :branch "master")
   :config
+  (defun jf/consult-ripgrep-no-generated ()
+    "As `consult-ripgrep' but omit generated files."
+    (interactive)
+    (let ((default-directory (projectile-project-root)))
+      (let ((consult-rigrep-args
+              (concat "rg -e \"^// Code generated .*DO NOT EDIT\\.$\" "
+                ". --files-without-match --glob=\\!vendor | "
+                "xargs " consult-ripgrep-args)))
+        (call-interactively #'consult-ripgrep))))
   ;; I want recent files as well as project files as well as recent
   ;; project files...Hence the override fb
   (setq jf/consult--source-recent-file consult--source-recent-file)
