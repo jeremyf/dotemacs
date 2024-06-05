@@ -1547,24 +1547,6 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   (add-to-list 'rg-required-command-line-flags "--follow ")
   :straight t)
 
-(rg-define-search rg-project-not-generated
-  "Search only within files that are not generated."
-  :files (jf/rg-get-not-generated-file-names)
-  :dir project
-  :flags '("--glob=\"\\!vendor/\"")
-  :menu ("Search" "n" "Not Generated"))
-
-(defun jf/rg-get-not-generated-file-names ()
-  "Create a custom type glob for files that were not generated."
-  (format "{%s}"
-    (string-trim
-      (shell-command-to-string
-        (concat
-          "rg -e \"^// Code generated .*DO NOT EDIT\\.$\" . "
-          "--files-without-match --glob=\\!vendor | tr '\\n' '\\,' "
-          " | sed 's|,$||' | sed 's|\\./||g'" )))))
-
-
 (use-package visual-regexp
   ;; I haven't used much search and replace but the visual queues are
   ;; useful.  And I learned about ,\ in this play.  ,\(upcase \1) will
@@ -5568,6 +5550,7 @@ method, get the containing class."
 The generated and indented TOC will be inserted at point."
   (interactive "P")
   (let ((max-depth (or depth 3)) toc-list)
+    (setq-local markdown-toc nil)
     (save-excursion
       (goto-char (point-min))
       (while (re-search-forward "^\\(##+\\)\\s-+\\(.*\\)" nil t)
@@ -5594,7 +5577,7 @@ The generated and indented TOC will be inserted at point."
                 (make-string (- (* 2 (1- level)) 2) ?\ ))
               (line
                 (format "- [%s](#%s)\n" heading-text heading-id)))
-        (setq markdown-toc
+        (setq-local markdown-toc
           (concat markdown-toc (concat indentation line)))))
     (insert markdown-toc)))
 
