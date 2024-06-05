@@ -3881,10 +3881,6 @@ literal then add a fuzzy search)."
       (and (denote-file-is-note-p file)
         (string-match-p "\\/blog-posts\\/" file))))
   :config
-  (cl-defun jf/denote? (&key (buffer (current-buffer)))
-    "Return non-nil when BUFFER is for `denote'."
-    (when-let* ((file (buffer-file-name buffer)))
-      (denote-file-is-note-p file)))
   (require 'denote-org-extras)
   ;; (setq denote-journal-extras-title-format 'day-date-month-year)
   (setq denote-infer-keywords t)
@@ -4935,6 +4931,12 @@ with the series."
         (setq denote-last-path
           (and (denote-file-is-note-p  fname) fname))))))
 
+(cl-defun jf/denote? (&key (buffer (current-buffer)))
+  "Return non-nil when BUFFER is for `denote'."
+  (require 'denote)
+  (when-let* ((file (buffer-file-name buffer)))
+    (denote-file-is-note-p file)))
+
 (use-package consult-notes
   ;;Let’s add another way at looking up files.  I appreciate the ability
   ;;to search all files and start with a character (e.g. =b=) followed
@@ -5288,7 +5290,6 @@ method, get the containing class."
   ;; See https://pkg.go.dev/golang.org/x/tools/cmd/goimports
   (setq gofmt-command "goimports")
   (defun jf/go-mode ()
-    (add-hook 'before-save-hook 'jf/eglot-organize-imports nil t)
     (add-hook 'before-save-hook 'eglot-format-buffer nil t)
     (add-hook 'before-save-hook 'gofmt-before-save nil t)
     (setq-local tab-width 2)))
@@ -5997,8 +5998,6 @@ See `jf/comment-header-regexp/major-modes-alis'."
                )
               . eglot-ensure)
       :config
-      (defun jf/eglot-organize-imports () (interactive)
-        (eglot-code-actions nil nil "source.organizeImports" t))
       (defun jf/eglot-managed-mode ()
         "Ensure `eglot-completion-at-point' preceeds everything."
         ;; I don't want `eglot-completion-at-point' to trample my other
