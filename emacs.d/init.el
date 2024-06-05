@@ -1744,7 +1744,7 @@ future copy)."
   ;; And I'm sure much more
   :preface
   (require 'cl-lib)
-  :straight (org :type git :host github :repo "emacsmirror/org")
+  :straight (org :source org-elpa)
   :hook (org-mode . jf/org-mode/configurator)
   :bind (("C-c C-j" . jf/project/jump-to-task)
           ("C-c C-x C-j" . org-clock-goto)
