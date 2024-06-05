@@ -5279,19 +5279,15 @@ method, get the containing class."
   :straight t)
 
 (use-package go-mode
-  :straight t
-  :hook ((go-mode go-ts-mode) . jf/go-mode)
-  :config
-  ;; See https://pkg.go.dev/golang.org/x/tools/cmd/goimports
-  (setq gofmt-command "goimports")
-  (defun jf/go-mode ()
-    (add-hook 'before-save-hook 'eglot-format-buffer nil t)
-    (add-hook 'before-save-hook 'gofmt-before-save nil t)
-    (setq-local tab-width 2)))
+  :straight t)
 
 (use-package go-ts-mode
   :straight (:type built-in)
+  :hook (go-ts-mode . jf/go-mode)
   :config
+  (defun jf/go-mode ()
+    (add-hook 'before-save-hook #'eglot-format-buffer -10 t)
+    (setq-local tab-width 2))
   (setq go-ts-mode-indent-offset 2)
   ;; Copied from
   ;; https://github.com/Homebrew/brew/blob/c2ed3327c605c3e738359c9807b8f4cd6fec09eb/Cellar/emacs-plus%4029/29.3/share/emacs/29.3/lisp/progmodes/go-ts-mode.el#L115-L206
@@ -5399,9 +5395,6 @@ method, get the containing class."
 (use-package go-imenu
   :straight t
   :hook (go-mode . go-imenu-setup))
-
-;; (use-package flymake-go
-;;   :straight t)
 
 (use-package ruby-mode
   ;; My language of choice for professional work.
@@ -5935,39 +5928,6 @@ See `jf/comment-header-regexp/major-modes-alis'."
       (kbd "M-}") #'ruby-end-of-block))
   :hook (ruby-ts-mode . jf/ruby-ts-mode-configurator))
 
-(use-package emacs
-  :straight (:type built-in)
-  :config
-  ;; From
-  ;; https://emacs.dyerdwelling.family/emacs/20230414111409-emacs--indexing-emacs-init/
-  ;;
-  ;; Creating some outline modes.  Which has me thinking about an
-  ;; outline mode for my agenda file.
-  (defun jf/emacs-lisp-mode-configurator ()
-    (setq imenu-sort-function 'imenu--sort-by-name)
-    (setq imenu-generic-expression
-      '((nil "^;;[[:space:]]+-> \\(.*\\)$" 1)
-         ("Variables"
-           "^[[:space:]]*([[:space:]]*\\(cl-\\)?defvar[[:space:]]+\\([^ ]*\\)$" 2)
-         ("Variables"
-           "^[[:space:]]*([[:space:]]*\\(cl-\\)?defconst[[:space:]]+\\([^ ]*\\)$" 2)
-         ("Variables"
-           "^[[:space:]]*([[:space:]]*\\(cl-\\)?defcustom[[:space:]]+\\([^ ]*\\)$" 2)
-         ("Functions"
-           "^[[:space:]]*([[:space:]]*\\(cl-\\)?defun[[:space:]]+\\([^(]+\\)" 2)
-         ("Macros"
-           "^[[:space:]]*([[:space:]]*\\(cl-\\)?defmacro[[:space:]]+\\([^(]+\\)" 2)
-         ("Types"
-           "^[[:space:]]*([[:space:]]*\\(cl-\\)?defstruct[[:space:]]+\\([^(]+\\)" 2)
-         ("Packages"
-           "^.*([[:space:]]*use-package[[:space:]]+\\([[:word:]-]+\\)" 1)))
-    (imenu-add-menubar-index))
-  :hook (emacs-lisp-mode . jf/emacs-lisp-mode-configurator))
-
-;; An odd little creature, hide all comment lines.  Sometimes this can
-;; be a useful tool for viewing implementation details.
-(require 'hide-comnt)
-
 ;; I've been exploring either `lsp-mode' or `eglot' and thusfar prefer
 ;; the lightweight nature of `eglot'.
 (if t
@@ -6002,15 +5962,15 @@ See `jf/comment-header-regexp/major-modes-alis'."
         (setq-local completion-at-point-functions
           (list (cape-capf-super
                   #'eglot-completion-at-point
-                  #'tempel-expand
-                  #'cape-file
-                  #'cape-keyword)))
+                  #'tempel-expand)))
         ;; I could configure `eglot-stay-out-of' to skip fly-make; or I
         ;; could simply check here if I'm in `go-ts-mode' and if so
         ;; enable the linting `flymake-go-staticcheck-enable'
         (when (and (derived-mode-p 'go-ts-mode)
                 (fboundp 'flymake-go-staticcheck-enable))
-          (flymake-go-staticcheck-enable)))
+          (progn
+            (flymake-go-staticcheck-enable)
+            (flymake-start))))
       ;; https://github.com/elixir-lsp/elixir-ls?tab=readme-ov-file
       (add-to-list 'eglot-server-programs
         '(elixir-ts-mode "~/elixir-ls/v0.20.0/language_server.sh"))
@@ -6024,6 +5984,16 @@ See `jf/comment-header-regexp/major-modes-alis'."
            "node /opt/homebrew/lib/node_modules/@angular/language-server --ngProbeLocations /opt/homebrew/lib/node_modules --tsProbeLocations /opt/homebrew/lib/node_modules --stdio"))
       :hook ((eglot-managed-mode . jf/eglot-managed-mode)))
 
+    (add-hook 'go-ts-mode-hook 'flymake-mode 8)
+    ;; (add-hook 'go-ts-mode-hook 'flymake-show-buffer-diagnostics 9)
+    (add-hook 'go-ts-mode-hook 'eglot-ensure 10)
+
+    ;; Optional: install eglot-format-buffer as a save hook.
+    ;; The depth of -10 places this before eglot's willSave notification,
+    ;; so that that notification reports the actual contents that will be saved.
+    (defun eglot-format-buffer-on-save ()
+      )
+    (add-hook 'go-ts-mode-hook #'eglot-format-buffer-on-save)
 
     ;; See https://elixir-lsp.github.io/elixir-ls/getting-started/emacs/
 
@@ -6065,6 +6035,39 @@ See `jf/comment-header-regexp/major-modes-alis'."
 
     (use-package dap-mode
       :straight t)))
+
+(use-package emacs
+  :straight (:type built-in)
+  :config
+  ;; From
+  ;; https://emacs.dyerdwelling.family/emacs/20230414111409-emacs--indexing-emacs-init/
+  ;;
+  ;; Creating some outline modes.  Which has me thinking about an
+  ;; outline mode for my agenda file.
+  (defun jf/emacs-lisp-mode-configurator ()
+    (setq imenu-sort-function 'imenu--sort-by-name)
+    (setq imenu-generic-expression
+      '((nil "^;;[[:space:]]+-> \\(.*\\)$" 1)
+         ("Variables"
+           "^[[:space:]]*([[:space:]]*\\(cl-\\)?defvar[[:space:]]+\\([^ ]*\\)$" 2)
+         ("Variables"
+           "^[[:space:]]*([[:space:]]*\\(cl-\\)?defconst[[:space:]]+\\([^ ]*\\)$" 2)
+         ("Variables"
+           "^[[:space:]]*([[:space:]]*\\(cl-\\)?defcustom[[:space:]]+\\([^ ]*\\)$" 2)
+         ("Functions"
+           "^[[:space:]]*([[:space:]]*\\(cl-\\)?defun[[:space:]]+\\([^(]+\\)" 2)
+         ("Macros"
+           "^[[:space:]]*([[:space:]]*\\(cl-\\)?defmacro[[:space:]]+\\([^(]+\\)" 2)
+         ("Types"
+           "^[[:space:]]*([[:space:]]*\\(cl-\\)?defstruct[[:space:]]+\\([^(]+\\)" 2)
+         ("Packages"
+           "^.*([[:space:]]*use-package[[:space:]]+\\([[:word:]-]+\\)" 1)))
+    (imenu-add-menubar-index))
+  :hook (emacs-lisp-mode . jf/emacs-lisp-mode-configurator))
+
+;; An odd little creature, hide all comment lines.  Sometimes this can
+;; be a useful tool for viewing implementation details.
+(require 'hide-comnt)
 
 (require 'gherkin-mode)
 
