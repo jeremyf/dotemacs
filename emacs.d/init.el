@@ -6753,7 +6753,7 @@ Alternative suggestions are: - '(\"\\\"“\" . \"\\\"\")"
     (goto-char (point-min))
     (beginning-of-line-text)
     (when (looking-at-p "^$")
-      (structured-commit/write-message :at (point-min)))))
+      (structured-commit/write-message))))
 
 (use-package structured-commit
   :straight (:type git :host github
