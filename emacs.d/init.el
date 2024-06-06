@@ -5284,9 +5284,50 @@ method, get the containing class."
 (use-package go-ts-mode
   :straight (:type built-in)
   :hook (go-ts-mode . jf/go-mode)
+  :bind (:map go-ts-mode-map (("s-." . 'jf/go/toggle-test-impl)))
   :config
+  (defun jf/go/toggle-test-impl ()
+    "As `projectile-toggle-between-implementation-and-test'."
+    (interactive)
+    (if (s-ends-with? "_test.go" (buffer-file-name))
+      (projectile-toggle-between-implementation-and-test)
+      (find-file (format "%s_test.go" (file-name-base (buffer-file-name))))))
+  (defun go-format ()
+    "Formats the current buffer according to the goimports tool."
+    (interactive)
+    (let ((tmpfile (make-temp-file "gofmt" nil ".go"))
+           (patchbuf (get-buffer-create "*Gofmt patch*"))
+           (errbuf (get-buffer-create "*Gofmt Errors*"))
+           (coding-system-for-read 'utf-8)
+           (coding-system-for-write 'utf-8))
+
+      (with-current-buffer errbuf
+        (setq buffer-read-only nil)
+        (erase-buffer))
+      (with-current-buffer patchbuf
+        (erase-buffer))
+
+      (write-region nil nil tmpfile)
+
+      ;; We're using errbuf for the mixed stdout and stderr output. This
+      ;; is not an issue because gofmt -w does not produce any stdout
+      ;; output in case of success.
+      (if (zerop (call-process "goimports" nil errbuf nil "-w" tmpfile))
+        (if (zerop (call-process-region (point-min) (point-max) "diff" nil patchbuf nil "-n" "-" tmpfile))
+          (progn
+            (kill-buffer errbuf)
+            (message "Buffer is already gofmted"))
+          (go--apply-rcs-patch patchbuf)
+          (kill-buffer errbuf)
+          (message "Applied gofmt"))
+        (message "Could not apply gofmt. Check errors for details")
+        (gofmt--process-errors (buffer-file-name) tmpfile errbuf))
+
+      (kill-buffer patchbuf)
+      (delete-file tmpfile)))
   (defun jf/go-mode ()
     (add-hook 'before-save-hook #'eglot-format-buffer -10 t)
+    (add-hook 'before-save-hook #'go-format -15 t)
     (setq-local tab-width 2))
   (setq go-ts-mode-indent-offset 2)
   ;; Copied from
@@ -6088,6 +6129,11 @@ See `jf/comment-header-regexp/major-modes-alis'."
     '("~/git/" "~/git/converge-cloud"))
   :bind ("s-." . projectile-toggle-between-implementation-and-test)
   :config
+  (setq projectile-create-missing-test-files t)
+  (setq projectile-git-command
+    "git ls-files -zco --exclude-standard -- ':!vendor/' ':!pkg/'")
+  (setq projectile-git-fd-args
+    "-H -0 -E .git -tf --strip-cwd-prefix -c never -E vendor/ -E pkg/")
   (projectile-mode 1)
   ;; The default relevant `magit-list-repositories'
   ;; The following command shows all "project" directories
@@ -6099,7 +6145,18 @@ See `jf/comment-header-regexp/major-modes-alis'."
     (add-to-list 'jf/git-project-paths
       (cons dir 1)))
 
-  (setq magit-repository-directories jf/git-project-paths))
+  (setq magit-repository-directories jf/git-project-paths)
+  (projectile-register-project-type 'go
+  '("go.mod")
+  :project-file "go.mod"
+  :test-suffix "_test"
+  :related-files-fn #'jf/projectile/go-related-files)
+
+(defun jf/projectile/go-related-files (path)
+  (when (string-match "\\.go$" path)
+    (if (s-ends-with? "_test.go" path)
+      (list :impl (replace-regexp-in-string "_test\\.go$" ".go" path))
+      (list :test (replace-regexp-in-string "\\.go$" "_test.go" path))))))
 
 (use-package bookmark+
   ;; https://www.emacswiki.org/emacs/BookmarkPlus
@@ -6692,12 +6749,15 @@ Alternative suggestions are: - '(\"\\\"“\" . \"\\\"\")"
   :config
   (defun jf/git-commit-mode-configurator ()
     "Prepare all of the commit buffer structure"
-    (setq fill-column git-commit-fill-column)))
+    (setq fill-column git-commit-fill-column)
+    (goto-char (point-min))
+    (beginning-of-line-text)
+    (when (looking-at-p "^$")
+      (structured-commit/write-message :at (point-min)))))
 
 (use-package structured-commit
   :straight (:type git :host github
-              :repo "bunnylushington/structured-commit")
-  :hook (git-commit-setup . structured-commit/write-message)
+              :repo "jeremyf/structured-commit")
   :config
   (advice-add #'structured-commit/project
     :override #'jf/structured-commit/project)
@@ -7547,7 +7607,7 @@ Add the blog post to the given SERIES with the given KEYWORDS."
 (setq safe-local-variable-values
   '((eval
       (projectile-git-fd-args .
-        "-H -0 -E hyrax-webapp -E .git -tf --strip-cwd-prefix -c never")
+        "-H -0 -E vendor -E .git -tf --strip-cwd-prefix -c never")
       (projectile-git-submodule-command . "")
       (jf/tor-minor-mode . 1)
       (projectile-require-project-root)
