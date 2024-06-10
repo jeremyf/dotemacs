@@ -5351,9 +5351,9 @@ method, get the containing class."
       (kill-buffer patchbuf)
       (delete-file tmpfile)))
   (defun jf/go-mode ()
+    (setq-local tab-width 2)
     (add-hook 'before-save-hook #'eglot-format-buffer -10 t)
-    (add-hook 'before-save-hook #'go-format -15 t)
-    (setq-local tab-width 2))
+    (add-hook 'before-save-hook #'go-format -15 t))
   (setq go-ts-mode-indent-offset 2)
   ;; Copied from
   ;; https://github.com/Homebrew/brew/blob/c2ed3327c605c3e738359c9807b8f4cd6fec09eb/Cellar/emacs-plus%4029/29.3/share/emacs/29.3/lisp/progmodes/go-ts-mode.el#L115-L206
@@ -6039,7 +6039,9 @@ See `jf/comment-header-regexp/major-modes-alis'."
             (flymake-start))))
       ;; https://github.com/elixir-lsp/elixir-ls?tab=readme-ov-file
       (add-to-list 'eglot-server-programs
-        '(elixir-ts-mode "~/elixir-ls/v0.20.0/language_server.sh"))
+        ;; By personal convention I'm having the most up to date version
+        ;; added to the v0 directory
+        '(elixir-ts-mode "~/elixir-ls/v0/language_server.sh"))
       ;; https://github.com/emacs-lsp/lsp-mode/wiki/Install-Angular-Language-server
       ;; with modifications for homebrew
       (add-to-list 'eglot-server-programs
@@ -6053,6 +6055,7 @@ See `jf/comment-header-regexp/major-modes-alis'."
     (add-hook 'go-ts-mode-hook 'flymake-mode 8)
     ;; (add-hook 'go-ts-mode-hook 'flymake-show-buffer-diagnostics 9)
     (add-hook 'go-ts-mode-hook 'eglot-ensure 10)
+    (add-hook 'elixir-ts-mode-hook 'eglot-ensure 10)
 
     ;; Optional: install eglot-format-buffer as a save hook.
     ;; The depth of -10 places this before eglot's willSave notification,
@@ -6158,7 +6161,7 @@ See `jf/comment-header-regexp/major-modes-alis'."
   (setq projectile-git-command
     "git ls-files -zco --exclude-standard -- ':!vendor/' ':!pkg/'")
   (setq projectile-git-fd-args
-    "-H -0 -E .git -tf --strip-cwd-prefix -c never -E vendor/ -E pkg/")
+    "-H -0 -tf --strip-cwd-prefix -c never -E pkg/ -E docs/ -E .git")
   (projectile-mode 1)
   ;; The default relevant `magit-list-repositories'
   ;; The following command shows all "project" directories
@@ -7586,7 +7589,9 @@ Add the blog post to the given SERIES with the given KEYWORDS."
 
 (require 'dig-my-grave)
 
-(load "~/git/dotemacs/emacs.d/random-tables-data.el")
+(if (f-file-p "~/git/dotemacs/emacs.d/random-tables-data.el")
+  (load "~/git/dotemacs/emacs.d/random-tables-data.el"))
+
 (use-package insert-random
   :straight t)
 
@@ -8194,6 +8199,28 @@ This encodes the logic for creating a project."
 ;;       (async-shell-command "brew install openstackclient"))
 ;;     (unless (executable-find "autossh")
 ;;       (async-shell-command "brew install autossh"))))
+
+(dir-locals-set-class-variables
+     'go-lang
+     '((nil . ((projectile-git-fd-args .
+     "-H -0 -tf --strip-cwd-prefix -c never -E vendor/ -E pkg/ -E docs/ -E .git")))))
+
+(dir-locals-set-directory-class
+  "~/git/converge-cloud/marketplace-provider" 'go-lang)
+
+(dir-locals-set-directory-class
+  "~/git/converge-cloud/morpho-account-service" 'go-lang)
+
+(dir-locals-set-directory-class
+  "~/git/converge-cloud/morpho-service-broker" 'go-lang)
+
+;; (custom-set-variables
+;;  ;; custom-set-variables was added by Custom.
+;;  ;; If you edit it by hand, you could mess it up, so be careful.
+;;  ;; Your init file should contain only one such instance.
+;;  ;; If there is more than one, they won't work right.
+;;  '(safe-local-variable-values
+;;    '((projectile-git-fd-args . "-H -0 -tf --strip-cwd-prefix -c never -E vendor/ -E pkg/ -E docs/ -E .git"))))
 
 (provide 'init)
 ;;; init.el ends here

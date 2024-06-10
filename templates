@@ -106,6 +106,10 @@ text-mode
 
 ;; (banner comment-start (make-string (length title) ?=) n comment-start (p "Title: " title) n comment-start (make-string (length title) ?=))
 
+go-ts-mode go-mode
+
+(db "runtime.Breakpoint()" n)
+
 ;;;; web-mode
 web-mode
 (bb "<% byebug %>" n)
