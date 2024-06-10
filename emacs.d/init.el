@@ -2257,7 +2257,6 @@ function is ever added to that hook."
         (org-table-recalculate-buffer-tables)
         (org-dblock-update '(4)))))
 
-  (with-eval-after-load 'org
     (use-package ox
       :straight (ox :type built-in))
     (add-to-list 'org-export-filter-options-functions
@@ -3166,6 +3165,7 @@ to Backlog."
           ("C-x C-SPC" . consult-global-mark)
           ("M-i" . jf/consult-imenu)
           ("M-g i" . consult-imenu)
+          ("M-g x" . jf/consult-recent-xref)
           ("M-g I" . consult-imenu-multi)
           ;; M-s bindings (search-map)
           ("M-s f" . consult-find)
@@ -3283,6 +3283,30 @@ With a PREFIX jump to the agenda without starting the clock."
                   (?e "Example" font-lock-doc-face)
                   (?M "Module" font-lock-type-face)
                   (?m "Method" font-lock-function-name-face))))))
+
+(defvar consult--xref-history nil)
+
+(setq xref-marker-ring-length 32)
+
+(defun jf/consult-recent-xref (&optional markers)
+  "Jump to a marker in MARKERS list (defaults to `xref--history'.
+
+The command supports preview of the currently selected marker position.
+The symbol at point is added to the future history."
+  (interactive)
+  (consult--read
+    (consult--global-mark-candidates
+      (or markers (flatten-list xref--history)))
+    :prompt "Go to Xref: "
+    :annotate (consult--line-prefix)
+    :category 'consult-location
+    :sort nil
+    :require-match t
+    :lookup #'consult--lookup-location
+    :history '(:input consult--xref-history)
+    :add-history (thing-at-point 'symbol)
+    :state (consult--jump-state)))
+
 
 (use-package embark-consult
   ;; I use ~embark.el~ and ~consult.el~, let’s add a little bit more
@@ -4925,6 +4949,7 @@ with the series."
               (buffer-file-name (current-buffer))))
         (setq denote-last-path
           (and (denote-file-is-note-p  fname) fname))))))
+(require 'denote)
 
 (cl-defun jf/denote? (&key (buffer (current-buffer)))
   "Return non-nil when BUFFER is for `denote'."
@@ -8136,6 +8161,19 @@ This encodes the logic for creating a project."
         ("b s" "Safari" jf/menu--bookmark-safari)]])
   :bind ("s-1" . #'jf/menu))
 
+
+(with-eval-after-load 'org
+  (use-package edraw-org
+    :straight (edraw-org :host github :repo "misohena/el-easydraw")
+    :config (edraw-org-setup-default))
+
+;; When using the org-export-in-background option (when using the
+;; asynchronous export function), the following settings are
+;; required. This is because Emacs started in a separate process does
+;; not load org.el but only ox.el.
+(with-eval-after-load "ox"
+  (require 'edraw-org)
+  (edraw-org-setup-exporter))
 
 ;; (use-package detached
 ;;   ;; Run detached shell commands that can keep running even after
