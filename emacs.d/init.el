@@ -2257,6 +2257,7 @@ function is ever added to that hook."
         (org-table-recalculate-buffer-tables)
         (org-dblock-update '(4)))))
 
+  (with-eval-after-load 'org
     (use-package ox
       :straight (ox :type built-in))
     (add-to-list 'org-export-filter-options-functions
@@ -7589,7 +7590,7 @@ Add the blog post to the given SERIES with the given KEYWORDS."
 
 (require 'dig-my-grave)
 
-(if (f-file-p "~/git/dotemacs/emacs.d/random-tables-data.el")
+(when (f-file-p "~/git/dotemacs/emacs.d/random-tables-data.el")
   (load "~/git/dotemacs/emacs.d/random-tables-data.el"))
 
 (use-package insert-random
@@ -8170,7 +8171,7 @@ This encodes the logic for creating a project."
 (with-eval-after-load 'org
   (use-package edraw-org
     :straight (edraw-org :host github :repo "misohena/el-easydraw")
-    :config (edraw-org-setup-default))
+    :config (edraw-org-setup-default)))
 
 ;; When using the org-export-in-background option (when using the
 ;; asynchronous export function), the following settings are

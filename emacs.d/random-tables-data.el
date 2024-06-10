@@ -2,6 +2,7 @@
   (require 'random-table "~/git/random-table.el/random-table.el")
   (use-package random-table
     :straight (:host github :repo "jeremyf/random-table.el")))
+
 (setq random-table/reporter #'random-table/reporter/as-insert)
 
 (keymap-global-set "H-r" #'random-table/roll)
