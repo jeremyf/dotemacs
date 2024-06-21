@@ -928,6 +928,24 @@ The ARGS are the rest of the ARGS passed to the ADVISED-FUNCTION."
   (advice-add 'link-hint--apply
     :around #'jf/link-hint--apply))
 
+;; Allow for opening the URLs provided in eldoc.  This is rough and
+;; minimal error handling.
+(link-hint-define-type 'eldoc-url
+  :next #'link-hint--next-eldoc-url
+  :at-point-p #'link-hint--shr-url-at-point-p
+  :open #'browse-url
+  :copy #'kill-new)
+
+(defun link-hint--next-eldoc-url (bound)
+  "Get position of next `help-echo' property at or after BOUND."
+  (link-hint--next-property 'help-echo bound))
+
+(defun link-hint--shr-url-at-point-p ()
+  "Get URL of current property."
+  (get-char-property (point) 'help-echo))
+
+(push 'link-hint-eldoc-url link-hint-types)
+
 (use-package browse-at-remote
   ;; Because I sometimes want to jump to the source code.  And in
   ;; looking at this I learned about vc-annotate; a better blame than
