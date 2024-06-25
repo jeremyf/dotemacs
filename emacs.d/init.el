@@ -6038,6 +6038,156 @@ See `jf/comment-header-regexp/major-modes-alis'."
                )
               . eglot-ensure)
       :config
+      ;; Cribbed from:
+      ;; https://codeberg.org/mekeor/init/src/commit/11e3d86aa18090a5e3a6f0d29373c24373f29aaf/init.el#L666-L811
+      ;;
+      ;; References:
+      ;; https://github.com/golang/tools/blob/master/gopls/doc/settings.md
+      (setf (plist-get eglot-workspace-configuration :gopls)
+        '(;; :allExperiments ;; bool false
+
+           ;; BUILD
+
+           ;; :buildFlags                 ;; []string                 []
+           ;; :env                        ;; map[string]string        {}
+           ;; :directoryFilters           ;; []string                 ["-**/node_modules"]
+           ;; :templateExtensions         ;; []string                 []
+           ;; :memoryMode                 ;; "DegradeClosed"|"Normal" "Normal"
+           ;; :expandWorkspaceToModule    ;; bool                     true
+           ;; :allowModfileModifications  ;; bool                     false
+           ;; :allowImplicitNetworkAccess ;; bool                     false
+           ;; :standaloneTags             ;; []string                 ["ignore"]
+
+           ;; FORMATTING
+
+           ;; :local   ;; string ""
+           :gofumpt t ;; bool   false
+
+           ;; UI
+
+           ;; :codelenses (
+           ;; :gc_details         ;; bool false
+           ;; :generate           ;; bool true
+           ;; :regenerate_cgo     ;; bool true
+           ;; :run_govulncheck    ;; bool undocumented
+           ;; :test               ;; bool undocumented
+           ;; :tidy               ;; bool true
+           ;; :upgrade_dependency ;; bool true
+           ;; :vendor             ;; bool true
+           ;; )
+
+           ;; :semanticTokens   ;; bool false
+           ;; :noSemanticString ;; bool false
+           ;; :noSemanticNumber ;; bool false
+
+           ;; COMPLETION
+
+           ;; :usePlaceholders                ;; bool                                      false
+           ;; :completionBudget               ;; time.Duration                             "100ms"
+           ;; :matcher                        ;; "CaseInsensitive"|"CaseSensitive"|"Fuzzy" "Fuzzy"
+           ;; :experimentalPostfixCompletions ;; bool                                      true
+           ;; :completeFunctionCalls          ;; bool                                      true
+
+           ;; DIAGNOSTIC
+
+           :analyses
+           (
+             ;; :appends              ;; bool true
+             ;; :asmdecl              ;; bool true
+             ;; :assign               ;; bool true
+             ;; :atomic               ;; bool true
+             ;; :atomicalign          ;; bool true
+             ;; :bools                ;; bool true
+             ;; :buildtag             ;; bool true
+             ;; :cgocall              ;; bool true
+             ;; :composites           ;; bool true
+             ;; :copylocks            ;; bool true
+             ;; :deepequalerrors      ;; bool true
+             ;; :defers               ;; bool true
+             ;; :deprecated           ;; bool true
+             ;; :directive            ;; bool true
+             ;; :embed                ;; bool true
+             ;; :errorsas             ;; bool true
+             ;; :fieldalignment       ;; bool false
+             ;; :fillreturns          ;; bool true
+             ;; :fillstruct           ;; bool true
+             ;; :httpresponse         ;; bool true
+             ;; :ifaceassert          ;; bool true
+             ;; :infertypeargs        ;; bool true
+             ;; :loopclosure          ;; bool true
+             ;; :lostcancel           ;; bool true
+             ;; :nilfunc              ;; bool true
+             ;; :nilness              ;; bool true
+             ;; :nonewvars            ;; bool true
+             ;; :noresultvalues       ;; bool true
+             ;; :printf               ;; bool true
+             :shadow t                ;; bool false
+             ;; :shift                ;; bool true
+             ;; :simplifycompositelit ;; bool true
+             ;; :simplifyrange        ;; bool true
+             ;; :simplifyslice        ;; bool true
+             ;; :slog                 ;; bool true
+             ;; :sortslice            ;; bool true
+             ;; :stdmethods           ;; bool true
+             ;; :stringintconv        ;; bool true
+             ;; :structtag            ;; bool true
+             ;; :stubmethods          ;; bool true
+             ;; :testinggoroutine     ;; bool true
+             ;; :tests                ;; bool true
+             ;; :timeformat           ;; bool true
+             ;; :undeclaredname       ;; bool true
+             ;; :unmarshal            ;; bool true
+             ;; :unreachable          ;; bool true
+             ;; :unsafeptr            ;; bool true
+             :unusedparams t          ;; bool false
+             ;; :unusedresult         ;; bool true
+             :unusedvariable t        ;; bool false
+             :unusedwrite t           ;; bool false
+             :useany t                ;; bool false
+             )
+
+           :staticcheck t ;; bool            false
+
+           ;; :annotations (
+           ;; :bounds ;; bool true
+           ;; :escape ;; bool true
+           ;; :inline ;; bool true
+           ;; :nil    ;; bool true
+           ;; )
+
+           ;; :vulncheck                 ;; "Imports"|"Off" "Off"
+           ;; :diagnosticsDelay          ;; time.Duration   "1s"
+           ;; :diagnosticsTrigger        ;; "Edit"|"Save"   "Edit"
+           ;; :analysisProgressReporting ;; bool            true
+
+           ;; DOCUMENTATION
+
+           ;; :hoverKind    ;; "FullDocumentation"|"NoDocumentation"|"SingleLine"|"Structured"|"SynopsisDocumentation" "FullDocumentation"
+           ;; :linkTarget   ;; "godoc.org"|"pkg.go.dev"|string                                                         "pkg.go.dev"
+           :linksInHover :json-false ;; bool                                                                           true
+
+           ;; INLAY HINTS
+
+           :hints
+           (
+             :assignVariableTypes    t           ;; bool false
+             :compositeLiteralFields t           ;; bool false
+             :compositeLiteralTypes  t           ;; bool false
+             :constantValues         t           ;; bool false
+             :functionTypeParameters t           ;; bool false
+             :parameterNames         :json-false ;; bool false
+             :rangeVariableTypes     t           ;; bool false
+             )
+
+           ;; NAVIGATION
+
+           ;; :importShortcut ;; "Both"|"Definition"|"Link"                            "Both"
+           ;; :symbolMatcher  ;; "CaseInsensitive"|"CaseSensitive"|"FastFuzzy"|"Fuzzy" "FastFuzzy"
+           ;; :symbolStyle    ;; "Dynamic"|"Full"|"Package"                            "Dynamic"
+           ;; :symbolScope    ;; "all"|"workspace"                                     "all"
+           ;; :verboseOutput  ;; bool                                                  false
+           ;; :newDiff        ;; "both"|"old"|"new"                                    "both"
+           ))
       (defun jf/eglot-managed-mode ()
         "Ensure `eglot-completion-at-point' preceeds everything."
         ;; I don't want `eglot-completion-at-point' to trample my other
