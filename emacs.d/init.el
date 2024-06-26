@@ -932,17 +932,19 @@ The ARGS are the rest of the ARGS passed to the ADVISED-FUNCTION."
 ;; minimal error handling.
 (link-hint-define-type 'eldoc-url
   :next #'link-hint--next-eldoc-url
-  :at-point-p #'link-hint--shr-url-at-point-p
+  :at-point-p #'link-hint--eldoc-url-at-point-p
   :open #'browse-url
   :copy #'kill-new)
 
 (defun link-hint--next-eldoc-url (bound)
-  "Get position of next `help-echo' property at or after BOUND."
-  (link-hint--next-property 'help-echo bound))
+  "Get position of next `face' at or after BOUND."
+  (link-hint--next-property-with-value 'face 'markdown-link-face bound))
 
-(defun link-hint--shr-url-at-point-p ()
-  "Get URL of current property."
-  (get-char-property (point) 'help-echo))
+(defun link-hint--eldoc-url-at-point-p ()
+  "Return the name of the eldoc link at the point or nil."
+  (when (eq (get-text-property (point) 'face)
+          'markdown-link-face)
+    (get-text-property (point) 'help-echo)))
 
 (push 'link-hint-eldoc-url link-hint-types)
 
