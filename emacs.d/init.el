@@ -938,10 +938,15 @@ The ARGS are the rest of the ARGS passed to the ADVISED-FUNCTION."
 
 (defun link-hint--next-eldoc-url (bound)
   "Get position of next `face' at or after BOUND."
+  ;; While we're interested in the 'help-echo value, we need to see if
+  ;; we can't solely work from that.  Instead we need to check if we
+  ;; have a link face.
   (link-hint--next-property-with-value 'face 'markdown-link-face bound))
 
 (defun link-hint--eldoc-url-at-point-p ()
   "Return the name of the eldoc link at the point or nil."
+  ;; Mirroring `link-hint--next-eldoc-url' logic, when we have a link
+  ;; face look to the help-echo for the URL.
   (when (eq (get-text-property (point) 'face)
           'markdown-link-face)
     (get-text-property (point) 'help-echo)))
