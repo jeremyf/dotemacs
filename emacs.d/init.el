@@ -1371,6 +1371,12 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
                   :box (:line-width (2 . 2)
                          :color ,underline-err
                          :style released-button)))))
+        `(go-test--standard-face
+           ((,c :foreground ,info :background ,bg-info)))
+        `(go-test--ok-face
+           ((,c :foreground ,info)))
+        `(go-test--error-face
+           ((,c :foreground ,err)))
         `(jf/mode-line-format/face-shadow
            ((,c :foreground ,fg-mode-line)))
         `(jf/tabs-face
@@ -5483,6 +5489,13 @@ method, get the containing class."
       :feature 'error
       :override t
       '((ERROR) @font-lock-warning-face))))
+
+(use-package gotest
+  :straight t
+  :bind (:map go-ts-mode-map
+          ("C-c t t" . go-test-current-test)
+          ("C-c t f" . go-test-current-file)
+          ("C-c t p" . go-test-current-project)))
 
 (use-package go-imenu
   :straight t
