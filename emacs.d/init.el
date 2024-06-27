@@ -3832,6 +3832,7 @@ literal then add a fuzzy search)."
   (which-key-max-description-length nil)
   (which-key-show-docstrings t)
   (which-key-add-column-padding 2)
+  (which-key-separator " :: ")
   (which-key-max-display-columns 2)
   :config
   (which-key-mode)
