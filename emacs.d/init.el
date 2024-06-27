@@ -6351,7 +6351,7 @@ See `jf/comment-header-regexp/major-modes-alis'."
   (setq projectile-git-command
     "git ls-files -zco --exclude-standard -- ':!vendor/' ':!pkg/'")
   (setq projectile-git-fd-args
-    "-H -0 -tf --strip-cwd-prefix -c never -E pkg/ -E docs/ -E .git")
+    "-H -0 -tf --strip-cwd-prefix -c never -E vendor/ -E pkg/ -E docs/ -E .git")
   (projectile-mode 1)
   ;; The default relevant `magit-list-repositories'
   ;; The following command shows all "project" directories
@@ -7824,19 +7824,6 @@ Add the blog post to the given SERIES with the given KEYWORDS."
 
 (add-hook 'after-init-hook #'jf/enable-indent-for-tab-command)
 
-(setq safe-local-variable-values
-  '((eval
-      (projectile-git-fd-args .
-        "-H -0 -E vendor -E .git -tf --strip-cwd-prefix -c never")
-      (projectile-git-submodule-command . "")
-      (jf/tor-minor-mode . 1)
-      (projectile-require-project-root)
-      (projectile-git-command .
-        "git ls-files -zco --exclude-from=.projectile.gitignore")
-      (org-insert-tilde-language . ruby)
-      (org-insert-tilde-language . emacs-lisp)
-      (encoding . utf-8))))
-
 (use-package org
   ;; For projects and all
   :straight (org :source org-elpa)
@@ -8404,13 +8391,17 @@ This encodes the logic for creating a project."
 (dir-locals-set-directory-class
   "~/git/converge-cloud/morpho-service-broker" 'go-lang)
 
-;; (custom-set-variables
-;;  ;; custom-set-variables was added by Custom.
-;;  ;; If you edit it by hand, you could mess it up, so be careful.
-;;  ;; Your init file should contain only one such instance.
-;;  ;; If there is more than one, they won't work right.
-;;  '(safe-local-variable-values
-;;    '((projectile-git-fd-args . "-H -0 -tf --strip-cwd-prefix -c never -E vendor/ -E pkg/ -E docs/ -E .git"))))
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(safe-local-variable-values
+    '((projectile-git-fd-args .
+        "-H -0 -tf --strip-cwd-prefix -c never -E vendor/ -E pkg/ -E docs/ -E .git")
+       (projectile-git-command .
+         "git ls-files -zco --exclude-from=.projectile.gitignore")
+       )))
 
 (provide 'init)
 ;;; init.el ends here
