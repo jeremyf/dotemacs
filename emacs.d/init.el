@@ -4840,6 +4840,12 @@ When USE_HUGO_SHORTCODE is given use glossary based exporting."
     (require 'grab-mac-link)
     (jf/denote/capture-reference :url (car (grab-mac-link-firefox-1))))
 
+  (defun jf/menu--org-capture-chrome ()
+    "Create an `denote' entry from Chrome page."
+    (interactive)
+    (require 'grab-mac-link)
+    (jf/denote/capture-reference :url (car (grab-mac-link-chrome-1))))
+
   (defun jf/menu--org-capture-safari ()
     "Create an `denote' entry from Safari page."
     (interactive)
@@ -4863,6 +4869,18 @@ When USE_HUGO_SHORTCODE is given use glossary based exporting."
     (require 'grab-mac-link)
     (let* ((url-and-title
              (grab-mac-link-safari-1))
+            (title
+              (read-string
+                (concat "URL: " (car url-and-title) "\nTitle: ")
+                (cadr url-and-title))))
+      (bmkp-url-target-set (car url-and-title) nil title)))
+
+  (defun jf/menu--bookmark-chrome ()
+    "Create `bookmark+' for current Chrome page."
+    (interactive)
+    (require 'grab-mac-link)
+    (let* ((url-and-title
+             (grab-mac-link-chrome-1))
             (title
               (read-string
                 (concat "URL: " (car url-and-title) "\nTitle: ")
@@ -5341,7 +5359,7 @@ method, get the containing class."
 
 (use-package go-ts-mode
   :straight (:type built-in)
-  :hook (go-ts-mode . jf/go-mode)
+  :hook (go-ts-mode . jf/go-ts-mode-configurator)
   :bind (:map go-ts-mode-map (("s-." . 'jf/go/toggle-test-impl)))
   :config
   (defun jf/go/toggle-test-impl ()
@@ -5383,10 +5401,6 @@ method, get the containing class."
 
       (kill-buffer patchbuf)
       (delete-file tmpfile)))
-  (defun jf/go-mode ()
-    (setq-local tab-width 2)
-    (add-hook 'before-save-hook #'eglot-format-buffer -10 t)
-    (add-hook 'before-save-hook #'go-format -15 t))
   (setq go-ts-mode-indent-offset 2)
   ;; Copied from
   ;; https://github.com/Homebrew/brew/blob/c2ed3327c605c3e738359c9807b8f4cd6fec09eb/Cellar/emacs-plus%4029/29.3/share/emacs/29.3/lisp/progmodes/go-ts-mode.el#L115-L206
@@ -5493,10 +5507,40 @@ method, get the containing class."
 
 (use-package gotest
   :straight t
-  :bind (:map go-ts-mode-map
-          ("C-c t t" . go-test-current-test)
-          ("C-c t f" . go-test-current-file)
-          ("C-c t p" . go-test-current-project)))
+  :config
+  (setq-default go-test-args "-count 1"))
+
+(defun jf/go-ts-mode-configurator ()
+  (setq-local tab-width 2)
+  (if (s-ends-with? "_test.go" (buffer-file-name))
+    (jf/minor-mode/go-ts-test-mode)
+    (jf/minor-mode/go-ts-implementation-mode))
+  (add-hook 'before-save-hook #'eglot-format-buffer -10 t)
+  (add-hook 'before-save-hook #'go-format -15 t))
+
+(defvar jf/minor-mode/go-ts-test-mode-map
+  (let ((map
+          (make-sparse-keymap)))
+    (define-key map (kbd "C-c ,") #'go-test-current-file)
+    map))
+
+(defvar jf/minor-mode/go-ts-implementation-mode-map
+  (let ((map
+          (make-sparse-keymap)))
+    (define-key map (kbd "C-c ,") #'go-test-current-project)
+    map))
+
+(define-minor-mode jf/minor-mode/go-ts-test-mode
+  "A minor mode to augment test files in `go-ts-mode'."
+  :init-value nil
+  :global nil
+  :keymap jf/minor-mode/go-ts-test-mode-map)
+
+(define-minor-mode jf/minor-mode/go-ts-implementation-mode
+  "A minor mode to augment implementation files in `go-ts-mode'."
+  :init-value nil
+  :global nil
+  :keymap jf/minor-mode/go-ts-implementation-mode-map)
 
 (use-package go-imenu
   :straight t
@@ -8333,6 +8377,7 @@ This encodes the logic for creating a project."
       ["Grab Refs"
         ("g e" "Elfeed" jf/capture/denote/from/elfeed-show-entry
           :if-derived elfeed-show-mode)
+        ("g c" "Chrome" jf/menu--org-capture-chrome)
         ("g f" "Firefox" jf/menu--org-capture-firefox)
         ("g s" "Safari" jf/menu--org-capture-safari)
         ("g w" "Eww" jf/capture/denote/from/eww-data
@@ -8340,7 +8385,9 @@ This encodes the logic for creating a project."
         ]
       ["Bookmark"
         ("b b" "Bookmarks" bookmark-bmenu-list)
-        ("b s" "Safari" jf/menu--bookmark-safari)]])
+        ("b c" "Chrome" jf/menu--bookmark-chrome)
+        ("b s" "Safari" jf/menu--bookmark-safari)
+        ]])
   :bind ("s-1" . #'jf/menu))
 
 
