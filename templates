@@ -109,8 +109,9 @@ text-mode
 go-ts-mode go-mode
 
 (db "runtime.Breakpoint()" n)
-(newtest  "package " p n n "import(" n "  \"testing\"" n "  \"github.com/stretchr/testify/assert\"" n ")" n n "func Test" p "(t *testing.T) {" n q n "  assert.Nil(t, nil)}")
-
+(tnew  "package " p n n "import(" n "  \"testing\"" n "  \"github.com/stretchr/testify/assert\"" n ")" n n "func Test" p "(t *testing.T) {" n q n "  assert.Nil(t, nil)" n "}")
+(tfunc "func Test" p "(t *testing.T) {" n > q n "}")
+(trun  "t.Run(\"" p "\", func(t *testing.T) {" n > q n "})")
 
 ;;;; web-mode
 web-mode
