@@ -5508,7 +5508,7 @@ method, get the containing class."
 (use-package gotest
   :straight t
   :config
-  (setq-default go-test-args "-count 1"))
+  (setq-default go-test-args "-count 1 -v"))
 
 (defun jf/go-ts-mode-configurator ()
   (setq-local tab-width 2)
