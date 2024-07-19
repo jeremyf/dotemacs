@@ -6092,6 +6092,9 @@ See `jf/comment-header-regexp/major-modes-alis'."
 ;; the lightweight nature of `eglot'.
 (use-package eglot
   :straight t
+  :bind (:map eglot-mode-map
+          ("C-h /" . flymake-show-buffer-diagnostics)
+          ("M-m" . eglot-rename))
   ;; :straight (:type built-in) The Language Server Protocol (LSP)
   ;; is a game changer; having access to that tooling is very much a
   ;; nice to have.
@@ -6110,7 +6113,6 @@ See `jf/comment-header-regexp/major-modes-alis'."
            typescript-ts-mode typescript-mode ;; https://github.com/typescript-language-server/typescript-language-server
            )
           . eglot-ensure)
-  :bind (:map eglot-mode-map ("M-m" . eglot-rename))
   :config
   ;; Cribbed from:
   ;; https://codeberg.org/mekeor/init/src/commit/11e3d86aa18090a5e3a6f0d29373c24373f29aaf/init.el#L666-L811
@@ -6230,7 +6232,7 @@ See `jf/comment-header-regexp/major-modes-alis'."
        ;; )
 
        ;; :vulncheck                 ;; "Imports"|"Off" "Off"
-       ;; :diagnosticsDelay          ;; time.Duration   "1s"
+       :diagnosticsDelay "250ms"     ;; time.Duration   "1s"
        ;; :diagnosticsTrigger        ;; "Edit"|"Save"   "Edit"
        ;; :analysisProgressReporting ;; bool            true
 
