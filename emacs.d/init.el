@@ -102,7 +102,7 @@
           ("s-<up>" . #'beginning-of-buffer)
           ("s-q" . #'save-buffers-kill-terminal)
           ("s-w" . #'kill-current-buffer)
-          ("C-x C-b" . #'ibuffer)
+          ("s-i" . #'ibuffer)
           ("M-RET" . #'newline-and-indent))
   :bind (:map emacs-lisp-mode-map
           ("C-c C-c" . 'jf/eval-region-dwim))
@@ -5273,6 +5273,9 @@ method, get the containing class."
       (jf/treesit/module_space parent (cons parent_name acc))
       acc)))
 
+(use-package cognitive-complexity
+  :straight (:host github :repo "abougouffa/cognitive-complexity"))
+
 (use-package treesit-auto
   :straight (:host github :repo "renzmann/treesit-auto")
   :config (setq treesit-auto-install 'prompt)
@@ -5521,13 +5524,13 @@ method, get the containing class."
 (defvar jf/minor-mode/go-ts-test-mode-map
   (let ((map
           (make-sparse-keymap)))
-    (define-key map (kbd "C-c ,") #'go-test-current-file)
+    (define-key map (kbd "C-c C-c") #'go-test-current-file)
     map))
 
 (defvar jf/minor-mode/go-ts-implementation-mode-map
   (let ((map
           (make-sparse-keymap)))
-    (define-key map (kbd "C-c ,") #'go-test-current-project)
+    (define-key map (kbd "C-c C-c") #'go-test-current-project)
     map))
 
 (define-minor-mode jf/minor-mode/go-ts-test-mode
@@ -6080,264 +6083,245 @@ See `jf/comment-header-regexp/major-modes-alis'."
 
 ;; I've been exploring either `lsp-mode' or `eglot' and thusfar prefer
 ;; the lightweight nature of `eglot'.
-(if t
-  (progn
-    (use-package eglot
-      :straight t
-      ;; :straight (:type built-in) The Language Server Protocol (LSP)
-      ;; is a game changer; having access to that tooling is very much a
-      ;; nice to have.
-      :hook ((
-               yaml-mode yaml-ts-mode
-               angular-mode angular-ts-mode ;; npm install -g @angular/language-service@next typescript @angular/language-server
-               css-mode css-ts-mode
-               elixir-ts-mode
-               go-mode go-ts-mode ;; https://github.com/golang/tools/tree/master/gopls
-               html-mode html-ts-mode
-               js-mode js-ts-mode
-               json-mode json-ts-mode ;; npm install -g vscode-json-languageserver
-               python-mode python-ts-mode
-               ruby-mode ruby-ts-mode
-               scss-mode scss-ts-mode
-               typescript-ts-mode typescript-mode ;; https://github.com/typescript-language-server/typescript-language-server
-               )
-              . eglot-ensure)
-      :config
-      ;; Cribbed from:
-      ;; https://codeberg.org/mekeor/init/src/commit/11e3d86aa18090a5e3a6f0d29373c24373f29aaf/init.el#L666-L811
-      ;;
-      ;; References:
-      ;; https://github.com/golang/tools/blob/master/gopls/doc/settings.md
-      (setf (plist-get eglot-workspace-configuration :gopls)
-        '(;; :allExperiments ;; bool false
+(use-package eglot
+  :straight t
+  ;; :straight (:type built-in) The Language Server Protocol (LSP)
+  ;; is a game changer; having access to that tooling is very much a
+  ;; nice to have.
+  :hook ((
+           yaml-mode yaml-ts-mode
+           angular-mode angular-ts-mode ;; npm install -g @angular/language-service@next typescript @angular/language-server
+           css-mode css-ts-mode
+           elixir-ts-mode
+           go-mode go-ts-mode ;; https://github.com/golang/tools/tree/master/gopls
+           html-mode html-ts-mode
+           js-mode js-ts-mode
+           json-mode json-ts-mode ;; npm install -g vscode-json-languageserver
+           python-mode python-ts-mode
+           ruby-mode ruby-ts-mode
+           scss-mode scss-ts-mode
+           typescript-ts-mode typescript-mode ;; https://github.com/typescript-language-server/typescript-language-server
+           )
+          . eglot-ensure)
+  :bind (:map eglot-mode-map ("M-m" . eglot-rename))
+  :config
+  ;; Cribbed from:
+  ;; https://codeberg.org/mekeor/init/src/commit/11e3d86aa18090a5e3a6f0d29373c24373f29aaf/init.el#L666-L811
+  ;;
+  ;; References:
+  ;; https://github.com/golang/tools/blob/master/gopls/doc/settings.md
+  (setf (plist-get eglot-workspace-configuration :gopls)
+    '(;; :allExperiments ;; bool false
 
-           ;; BUILD
+       ;; BUILD
 
-           ;; :buildFlags                 ;; []string                 []
-           ;; :env                        ;; map[string]string        {}
-           ;; :directoryFilters           ;; []string                 ["-**/node_modules"]
-           ;; :templateExtensions         ;; []string                 []
-           ;; :memoryMode                 ;; "DegradeClosed"|"Normal" "Normal"
-           ;; :expandWorkspaceToModule    ;; bool                     true
-           ;; :allowModfileModifications  ;; bool                     false
-           ;; :allowImplicitNetworkAccess ;; bool                     false
-           ;; :standaloneTags             ;; []string                 ["ignore"]
+       ;; :buildFlags                 ;; []string                 []
+       ;; :env                        ;; map[string]string        {}
+       ;; :directoryFilters           ;; []string                 ["-**/node_modules"]
+       ;; :templateExtensions         ;; []string                 []
+       ;; :memoryMode                 ;; "DegradeClosed"|"Normal" "Normal"
+       ;; :expandWorkspaceToModule    ;; bool                     true
+       ;; :allowModfileModifications  ;; bool                     false
+       ;; :allowImplicitNetworkAccess ;; bool                     false
+       ;; :standaloneTags             ;; []string                 ["ignore"]
 
-           ;; FORMATTING
+       ;; FORMATTING
 
-           ;; :local   ;; string ""
-           :gofumpt t ;; bool   false
+       ;; :local   ;; string ""
+       :gofumpt t ;; bool   false
 
-           ;; UI
+       ;; UI
 
-           ;; :codelenses (
-           ;; :gc_details         ;; bool false
-           ;; :generate           ;; bool true
-           ;; :regenerate_cgo     ;; bool true
-           ;; :run_govulncheck    ;; bool undocumented
-           ;; :test               ;; bool undocumented
-           ;; :tidy               ;; bool true
-           ;; :upgrade_dependency ;; bool true
-           ;; :vendor             ;; bool true
-           ;; )
+       ;; :codelenses (
+       ;; :gc_details         ;; bool false
+       ;; :generate           ;; bool true
+       ;; :regenerate_cgo     ;; bool true
+       ;; :run_govulncheck    ;; bool undocumented
+       ;; :test               ;; bool undocumented
+       ;; :tidy               ;; bool true
+       ;; :upgrade_dependency ;; bool true
+       ;; :vendor             ;; bool true
+       ;; )
 
-           ;; :semanticTokens   ;; bool false
-           ;; :noSemanticString ;; bool false
-           ;; :noSemanticNumber ;; bool false
+       ;; :semanticTokens   ;; bool false
+       ;; :noSemanticString ;; bool false
+       ;; :noSemanticNumber ;; bool false
 
-           ;; COMPLETION
+       ;; COMPLETION
 
-           ;; :usePlaceholders                ;; bool                                      false
-           ;; :completionBudget               ;; time.Duration                             "100ms"
-           ;; :matcher                        ;; "CaseInsensitive"|"CaseSensitive"|"Fuzzy" "Fuzzy"
-           ;; :experimentalPostfixCompletions ;; bool                                      true
-           ;; :completeFunctionCalls          ;; bool                                      true
+       ;; :usePlaceholders                ;; bool                                      false
+       ;; :completionBudget               ;; time.Duration                             "100ms"
+       ;; :matcher                        ;; "CaseInsensitive"|"CaseSensitive"|"Fuzzy" "Fuzzy"
+       ;; :experimentalPostfixCompletions ;; bool                                      true
+       ;; :completeFunctionCalls          ;; bool                                      true
 
-           ;; DIAGNOSTIC
+       ;; DIAGNOSTIC
 
-           :analyses
-           (
-             ;; :appends              ;; bool true
-             ;; :asmdecl              ;; bool true
-             ;; :assign               ;; bool true
-             ;; :atomic               ;; bool true
-             ;; :atomicalign          ;; bool true
-             ;; :bools                ;; bool true
-             ;; :buildtag             ;; bool true
-             ;; :cgocall              ;; bool true
-             ;; :composites           ;; bool true
-             ;; :copylocks            ;; bool true
-             ;; :deepequalerrors      ;; bool true
-             ;; :defers               ;; bool true
-             ;; :deprecated           ;; bool true
-             ;; :directive            ;; bool true
-             ;; :embed                ;; bool true
-             ;; :errorsas             ;; bool true
-             ;; :fieldalignment       ;; bool false
-             ;; :fillreturns          ;; bool true
-             ;; :fillstruct           ;; bool true
-             ;; :httpresponse         ;; bool true
-             ;; :ifaceassert          ;; bool true
-             ;; :infertypeargs        ;; bool true
-             ;; :loopclosure          ;; bool true
-             ;; :lostcancel           ;; bool true
-             ;; :nilfunc              ;; bool true
-             ;; :nilness              ;; bool true
-             ;; :nonewvars            ;; bool true
-             ;; :noresultvalues       ;; bool true
-             ;; :printf               ;; bool true
-             :shadow t                ;; bool false
-             ;; :shift                ;; bool true
-             ;; :simplifycompositelit ;; bool true
-             ;; :simplifyrange        ;; bool true
-             ;; :simplifyslice        ;; bool true
-             ;; :slog                 ;; bool true
-             ;; :sortslice            ;; bool true
-             ;; :stdmethods           ;; bool true
-             ;; :stringintconv        ;; bool true
-             ;; :structtag            ;; bool true
-             ;; :stubmethods          ;; bool true
-             ;; :testinggoroutine     ;; bool true
-             ;; :tests                ;; bool true
-             ;; :timeformat           ;; bool true
-             ;; :undeclaredname       ;; bool true
-             ;; :unmarshal            ;; bool true
-             ;; :unreachable          ;; bool true
-             ;; :unsafeptr            ;; bool true
-             :unusedparams t          ;; bool false
-             ;; :unusedresult         ;; bool true
-             :unusedvariable t        ;; bool false
-             :unusedwrite t           ;; bool false
-             :useany t                ;; bool false
-             )
+       :analyses
+       (
+         ;; :appends              ;; bool true
+         ;; :asmdecl              ;; bool true
+         ;; :assign               ;; bool true
+         ;; :atomic               ;; bool true
+         ;; :atomicalign          ;; bool true
+         ;; :bools                ;; bool true
+         ;; :buildtag             ;; bool true
+         ;; :cgocall              ;; bool true
+         ;; :composites           ;; bool true
+         ;; :copylocks            ;; bool true
+         ;; :deepequalerrors      ;; bool true
+         ;; :defers               ;; bool true
+         ;; :deprecated           ;; bool true
+         ;; :directive            ;; bool true
+         ;; :embed                ;; bool true
+         ;; :errorsas             ;; bool true
+         ;; :fieldalignment       ;; bool false
+         ;; :fillreturns          ;; bool true
+         ;; :fillstruct           ;; bool true
+         ;; :httpresponse         ;; bool true
+         ;; :ifaceassert          ;; bool true
+         ;; :infertypeargs        ;; bool true
+         ;; :loopclosure          ;; bool true
+         ;; :lostcancel           ;; bool true
+         ;; :nilfunc              ;; bool true
+         ;; :nilness              ;; bool true
+         ;; :nonewvars            ;; bool true
+         ;; :noresultvalues       ;; bool true
+         ;; :printf               ;; bool true
+         :shadow t                ;; bool false
+         ;; :shift                ;; bool true
+         ;; :simplifycompositelit ;; bool true
+         ;; :simplifyrange        ;; bool true
+         ;; :simplifyslice        ;; bool true
+         ;; :slog                 ;; bool true
+         ;; :sortslice            ;; bool true
+         ;; :stdmethods           ;; bool true
+         ;; :stringintconv        ;; bool true
+         ;; :structtag            ;; bool true
+         ;; :stubmethods          ;; bool true
+         ;; :testinggoroutine     ;; bool true
+         ;; :tests                ;; bool true
+         ;; :timeformat           ;; bool true
+         ;; :undeclaredname       ;; bool true
+         ;; :unmarshal            ;; bool true
+         ;; :unreachable          ;; bool true
+         ;; :unsafeptr            ;; bool true
+         :unusedparams t          ;; bool false
+         ;; :unusedresult         ;; bool true
+         :unusedvariable t        ;; bool false
+         :unusedwrite t           ;; bool false
+         :useany t                ;; bool false
+         )
 
-           :staticcheck t ;; bool            false
+       :staticcheck t ;; bool            false
 
-           ;; :annotations (
-           ;; :bounds ;; bool true
-           ;; :escape ;; bool true
-           ;; :inline ;; bool true
-           ;; :nil    ;; bool true
-           ;; )
+       ;; :annotations (
+       ;; :bounds ;; bool true
+       ;; :escape ;; bool true
+       ;; :inline ;; bool true
+       ;; :nil    ;; bool true
+       ;; )
 
-           ;; :vulncheck                 ;; "Imports"|"Off" "Off"
-           ;; :diagnosticsDelay          ;; time.Duration   "1s"
-           ;; :diagnosticsTrigger        ;; "Edit"|"Save"   "Edit"
-           ;; :analysisProgressReporting ;; bool            true
+       ;; :vulncheck                 ;; "Imports"|"Off" "Off"
+       ;; :diagnosticsDelay          ;; time.Duration   "1s"
+       ;; :diagnosticsTrigger        ;; "Edit"|"Save"   "Edit"
+       ;; :analysisProgressReporting ;; bool            true
 
-           ;; DOCUMENTATION
+       ;; DOCUMENTATION
 
-           ;; :hoverKind    ;; "FullDocumentation"|"NoDocumentation"|"SingleLine"|"Structured"|"SynopsisDocumentation" "FullDocumentation"
-           ;; :linkTarget   ;; "godoc.org"|"pkg.go.dev"|string                                                         "pkg.go.dev"
-           :linksInHover :json-false ;; bool                                                                           true
+       ;; :hoverKind    ;; "FullDocumentation"|"NoDocumentation"|"SingleLine"|"Structured"|"SynopsisDocumentation" "FullDocumentation"
+       ;; :linkTarget   ;; "godoc.org"|"pkg.go.dev"|string                                                         "pkg.go.dev"
+       :linksInHover :json-false ;; bool                                                                           true
 
-           ;; INLAY HINTS
+       ;; INLAY HINTS
 
-           :hints
-           (
-             :assignVariableTypes    t           ;; bool false
-             :compositeLiteralFields t           ;; bool false
-             :compositeLiteralTypes  t           ;; bool false
-             :constantValues         t           ;; bool false
-             :functionTypeParameters t           ;; bool false
-             :parameterNames         :json-false ;; bool false
-             :rangeVariableTypes     t           ;; bool false
-             )
+       :hints
+       (
+         :assignVariableTypes    t           ;; bool false
+         :compositeLiteralFields t           ;; bool false
+         :compositeLiteralTypes  t           ;; bool false
+         :constantValues         t           ;; bool false
+         :functionTypeParameters t           ;; bool false
+         :parameterNames         :json-false ;; bool false
+         :rangeVariableTypes     t           ;; bool false
+         )
 
-           ;; NAVIGATION
+       ;; NAVIGATION
 
-           ;; :importShortcut ;; "Both"|"Definition"|"Link"                            "Both"
-           ;; :symbolMatcher  ;; "CaseInsensitive"|"CaseSensitive"|"FastFuzzy"|"Fuzzy" "FastFuzzy"
-           ;; :symbolStyle    ;; "Dynamic"|"Full"|"Package"                            "Dynamic"
-           ;; :symbolScope    ;; "all"|"workspace"                                     "all"
-           ;; :verboseOutput  ;; bool                                                  false
-           ;; :newDiff        ;; "both"|"old"|"new"                                    "both"
-           ))
-      (defun jf/eglot-managed-mode ()
-        "Ensure `eglot-completion-at-point' preceeds everything."
-        ;; I don't want `eglot-completion-at-point' to trample my other
-        ;; completion options.
-        ;;
-        ;; https://stackoverflow.com/questions/72601990/how-to-show-suggestions-for-yasnippets-when-using-eglot
-        (setq-local completion-at-point-functions
-          (list (cape-capf-super
-                  #'eglot-completion-at-point
-                  #'tempel-expand)))
-        ;; I could configure `eglot-stay-out-of' to skip fly-make; or I
-        ;; could simply check here if I'm in `go-ts-mode' and if so
-        ;; enable the linting `flymake-go-staticcheck-enable'
-        (when (and (derived-mode-p 'go-ts-mode)
-                (fboundp 'flymake-go-staticcheck-enable))
-          (progn
-            (flymake-go-staticcheck-enable)
-            (flymake-start))))
-      ;; https://github.com/elixir-lsp/elixir-ls?tab=readme-ov-file
-      (add-to-list 'eglot-server-programs
-        ;; By personal convention I'm having the most up to date version
-        ;; added to the v0 directory
-        '(elixir-ts-mode "~/elixir-ls/v0/language_server.sh"))
-      ;; https://github.com/emacs-lsp/lsp-mode/wiki/Install-Angular-Language-server
-      ;; with modifications for homebrew
-      (add-to-list 'eglot-server-programs
-        '(angular-mode
-           "node /opt/homebrew/lib/node_modules/@angular/language-server --ngProbeLocations /opt/homebrew/lib/node_modules --tsProbeLocations /opt/homebrew/lib/node_modules --stdio"))
-      (add-to-list 'eglot-servier-programs
-        '(angular-ts-mode
-           "node /opt/homebrew/lib/node_modules/@angular/language-server --ngProbeLocations /opt/homebrew/lib/node_modules --tsProbeLocations /opt/homebrew/lib/node_modules --stdio"))
-      :hook ((eglot-managed-mode . jf/eglot-managed-mode)))
+       ;; :importShortcut ;; "Both"|"Definition"|"Link"                            "Both"
+       ;; :symbolMatcher  ;; "CaseInsensitive"|"CaseSensitive"|"FastFuzzy"|"Fuzzy" "FastFuzzy"
+       ;; :symbolStyle    ;; "Dynamic"|"Full"|"Package"                            "Dynamic"
+       ;; :symbolScope    ;; "all"|"workspace"                                     "all"
+       ;; :verboseOutput  ;; bool                                                  false
+       ;; :newDiff        ;; "both"|"old"|"new"                                    "both"
+       ))
+  (defun jf/eglot-managed-mode ()
+    "Ensure `eglot-completion-at-point' preceeds everything."
+    ;; I don't want `eglot-completion-at-point' to trample my other
+    ;; completion options.
+    ;;
+    ;; https://stackoverflow.com/questions/72601990/how-to-show-suggestions-for-yasnippets-when-using-eglot
+    (setq-local completion-at-point-functions
+      (list (cape-capf-super
+              #'eglot-completion-at-point
+              #'tempel-expand)))
+    ;; I could configure `eglot-stay-out-of' to skip fly-make; or I
+    ;; could simply check here if I'm in `go-ts-mode' and if so
+    ;; enable the linting `flymake-go-staticcheck-enable'
+    (when (and (derived-mode-p 'go-ts-mode)
+            (fboundp 'flymake-go-staticcheck-enable))
+      (progn
+        (flymake-go-staticcheck-enable)
+        (flymake-start))))
+  ;; https://github.com/elixir-lsp/elixir-ls?tab=readme-ov-file
+  (add-to-list 'eglot-server-programs
+    ;; By personal convention I'm having the most up to date version
+    ;; added to the v0 directory
+    '(elixir-ts-mode "~/elixir-ls/v0/language_server.sh"))
+  ;; https://github.com/emacs-lsp/lsp-mode/wiki/Install-Angular-Language-server
+  ;; with modifications for homebrew
+  (add-to-list 'eglot-server-programs
+    '(angular-mode
+       "node /opt/homebrew/lib/node_modules/@angular/language-server --ngProbeLocations /opt/homebrew/lib/node_modules --tsProbeLocations /opt/homebrew/lib/node_modules --stdio"))
+  (add-to-list 'eglot-servier-programs
+    '(angular-ts-mode
+       "node /opt/homebrew/lib/node_modules/@angular/language-server --ngProbeLocations /opt/homebrew/lib/node_modules --tsProbeLocations /opt/homebrew/lib/node_modules --stdio"))
+  :hook ((eglot-managed-mode . jf/eglot-managed-mode)))
 
-    (add-hook 'go-ts-mode-hook 'flymake-mode 8)
-    ;; (add-hook 'go-ts-mode-hook 'flymake-show-buffer-diagnostics 9)
-    (add-hook 'go-ts-mode-hook 'eglot-ensure 10)
-    (add-hook 'elixir-ts-mode-hook 'eglot-ensure 10)
+(add-hook 'go-ts-mode-hook 'flymake-mode 8)
+;; (add-hook 'go-ts-mode-hook 'flymake-show-buffer-diagnostics 9)
+(add-hook 'go-ts-mode-hook 'eglot-ensure 10)
+(add-hook 'elixir-ts-mode-hook 'eglot-ensure 10)
 
-    ;; Optional: install eglot-format-buffer as a save hook.
-    ;; The depth of -10 places this before eglot's willSave notification,
-    ;; so that that notification reports the actual contents that will be saved.
-    (defun eglot-format-buffer-on-save ()
-      )
-    (add-hook 'go-ts-mode-hook #'eglot-format-buffer-on-save)
+;; Optional: install eglot-format-buffer as a save hook.
+;; The depth of -10 places this before eglot's willSave notification,
+;; so that that notification reports the actual contents that will be saved.
+;; (defun eglot-format-buffer-on-save ())
+;; (add-hook 'go-ts-mode-hook #'eglot-format-buffer-on-save)
 
-    ;; See https://elixir-lsp.github.io/elixir-ls/getting-started/emacs/
+;; See https://elixir-lsp.github.io/elixir-ls/getting-started/emacs/
 
-    (use-package eglot-booster
-      :straight (:host github :repo "jdtsmith/eglot-booster")
-      :after eglot
-      :config	(eglot-booster-mode)
-      (advice-add 'eglot-completion-at-point
-        :around #'cape-wrap-buster))
+(use-package eglot-booster
+  :straight (:host github :repo "jdtsmith/eglot-booster")
+  :after eglot
+  :config	(eglot-booster-mode)
+  (advice-add 'eglot-completion-at-point
+    :around #'cape-wrap-buster))
 
-    (use-package eldoc
-      ;; Helps with rendering documentation
-      ;; https://www.masteringemacs.org/article/seamlessly-merge-multiple-documentation-sources-eldoc
-      :config
-      (setq eldoc-documentation-strategy
-        ;; 'eldoc-documentation-enthusiast))
-        'eldoc-documentation-compose-eagerly)
-      (add-to-list 'display-buffer-alist
-        '("^\\*eldoc"
-           (display-buffer-reuse-mode-window
-             display-buffer-below-selected)
-           (dedicated . t)
-           (body-function . prot-window-select-fit-size)))
-      :straight t))
-  (progn
-    (use-package lsp-mode
-      :straight t
-      :hook ((elixir-ts-mode . lsp)
-              (angular-ts-mode . lsp)
-              (ruby-ts-mode . lsp)
-              (python-ts-mode . lsp)
-              (go-ts-mode . lsp)
-              (lsp-mode . lsp-enable-which-key-integration))
-      :commands lsp)
-
-    (use-package lsp-ui
-      :straight t
-      :commands lsp-ui-mode)
-
-    (use-package dap-mode
-      :straight t)))
+(use-package eldoc
+  ;; Helps with rendering documentation
+  ;; https://www.masteringemacs.org/article/seamlessly-merge-multiple-documentation-sources-eldoc
+  :config
+  (setq eldoc-documentation-strategy
+    ;; 'eldoc-documentation-enthusiast))
+    'eldoc-documentation-compose-eagerly)
+  (add-to-list 'display-buffer-alist
+    '("^\\*eldoc"
+       (display-buffer-reuse-mode-window
+         display-buffer-below-selected)
+       (dedicated . t)
+       (body-function . prot-window-select-fit-size)))
+  :straight t)
 
 (use-package emacs
   :straight (:type built-in)
