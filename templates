@@ -89,7 +89,17 @@ org-mode
   " :mode " (p (completing-read "Mode: " '(inline paragraph marginnote sidenote section fallback) nil t) mode)
     n "#+begin_update"
     n q
-    n "#+end_update" n)
+  n "#+end_update" n)
+
+(verb_block
+  (p (completing-read "Method: " '("get" "post" "put") nil t) method t)
+  (p (read-string "URL: ") url t)
+  (p (completing-read "Content-Type: " '("text/html" "text/plain" "application/json" "application/xml") nil t) type t)
+  "#+begin_src verb :wrap src ob-verb-response" n
+  > method  " " url n
+  > "Content-Type: " type "; charset=utf-8" n
+  > q
+  "#+end_src")
 
 ;;;;; Consider "The One Ring" minor mode to inject these.
 (rune "{{{rune(" (completing-read "Rune: " jf/gaming/runes) ")}}}")

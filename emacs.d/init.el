@@ -2136,6 +2136,7 @@ Each member's `car' is title and `cdr' is `org-mode' element."
     (append org-babel-load-languages
       '((emacs-lisp . t)
          (shell . t)
+         (verb . t)
          (plantuml . t)
          (ruby . t))))
   (add-to-list 'org-structure-template-alist '("m" . "marginnote"))
@@ -3050,6 +3051,11 @@ to Backlog."
          :empty-lines-before 1
          :empty-lines-after 1))))
 
+(use-package verb
+  ;; https://github.com/federicotdn/verb
+  :after org
+  :straight t)
+
 (use-package org-web-tools
   ;; A package that I can pull down a web page and store its content as
   ;; an `org-mode' file.
@@ -3757,6 +3763,7 @@ Useful if you want a more robust view into the recommend candidates."
   ;; Hyper Macro!
   (tempel-key "H-m d" tsomb-date org-mode-map)
   (tempel-key "H-m u" update_block org-mode-map)
+  (tempel-key "H-m v" verb_block org-mode-map)
   (tempel-key "H-m c" macro-cite org-mode-map)
   (tempel-key "H-m i" macro-idiomatic org-mode-map)
   (tempel-key "H-m m" macro-mechanic org-mode-map)
@@ -6971,6 +6978,7 @@ Alternative suggestions are: - '(\"\\\"“\" . \"\\\"\")"
        "samvera/hyku"
        "samvera/hyku-next"
        "samvera/valkyrie"
+       "samvera/avalon-next"
        "scientist-softserv/actions"
        "scientist-softserv/adventist-dl"
        "scientist-softserv/adventist_knapsack"

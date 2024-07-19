@@ -43,7 +43,8 @@
      ("Elixir" . "#+begin_src elixir-ts\n#+end_src")
      ("Plant UML (puml)" . "#+begin_src plantuml\n@startuml\n!theme amiga\n\n@enduml\n#+end_src")
      ("Ruby" . "#+begin_src ruby\n#+end_src")
-     ("Update" . tempel-insert-update_block))
+     ("Update" . tempel-insert-update_block)
+     ("Verb" . tempel-insert-verb_block))
 
   "A list of `cons' cells used for `dig-my-grave' `completing-read'.
 The `car' as the label and `cdr' as the value that we'll insert.")
