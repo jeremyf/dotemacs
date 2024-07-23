@@ -120,6 +120,7 @@ go-ts-mode go-mode
 
 (db "runtime.Breakpoint()" n)
 (tnew  "package " p "_test" n n "import(" n "  \"testing\"" n "  \"github.com/stretchr/testify/assert\"" n ")" n n "func Test" p "(t *testing.T) {" n q n "  assert.Nil(t, nil)" n "}")
+(thelper "func helper" p "(t *testing.T) {" n > "t.Helper()" n > q n "}")
 (tfunc "func Test" p "(t *testing.T) {" n > q n "}")
 (trun  "t.Run(\"" p "\", func(t *testing.T) {" n > q n "})")
 (ttable "test_cases := struct {" n > p n "}{" n > "{" p "}" n "}" n n "for _, test_case := range test_cases {" n > q n "}")
