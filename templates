@@ -124,6 +124,17 @@ go-ts-mode go-mode
 (tfunc "func Test" p "(t *testing.T) {" n > q n "}")
 (trun  "t.Run(\"" p "\", func(t *testing.T) {" n > q n "})")
 (ttable "test_cases := struct {" n > p n "}{" n > "{" p "}" n "}" n n "for _, test_case := range test_cases {" n > q n "}")
+(options "type " (p "Options for: " struct) "Option interface {"
+  n> "Apply(*" struct ")" n
+  "}"
+  n n"type with" (p "With: " with) " struct {}"
+  n n "func (w with" with ") Apply(o *" struct ") {"
+  n> "// Make it so!"
+  n> q
+  n "}"
+  n n "func With" with "() " struct "Option {"
+  n> "return with" with "{}"
+  n "}")
 
 ;;;; web-mode
 web-mode
