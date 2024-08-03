@@ -28,6 +28,48 @@
 
 ;;;; Tables
 
+(random-table/register :name "The One Ring > Lore > Action"
+  :data '("⏿ Abandon" "⏿ Attack" "⏿ Betray" "⏿ Corrupt" "⏿ Defeat" "⏿ Weaken"
+           "Aid" "Arrive" "Await" "Breach" "Break" "Capture"
+           "Change" "Chase" "Command" "Control" "Create" "Defy"
+           "Demand" "Discover" "Disguise" "Endure" "Escape" "Evade"
+           "Explore" "Find" "Focus" "Gather" "Guard" "Guide"
+           "Hide" "Hinder" "Hoard" "Hold" "Hunt" "Journey"
+           "Lead" "Learn" "Leave" "Lose" "Mourn" "Move"
+           "Persist" "Preserve" "Prevent" "Refuse" "Reject" "Remove"
+           "Replenish" "Restore" "Scheme" "Search" "Seize" "Share"
+           "Slay" "Steal" "Summon" "Surrender" "Surround" "Threaten"
+           "Transform" "Trap" "Trick" "Uncover" "Uphold" "Withstand"
+           "ᚠ Believe" "ᚠ Bolster" "ᚠ Defend" "ᚠ Forgive" "ᚠ Resist" "ᚠ Strengthen"))
+
+(random-table/register :name "The One Ring > Lore > Aspect"
+  :data '("⏿ Corrupted" "⏿ Cruel" "⏿ Deceptive" "⏿ Fell" "⏿ Ruined" "⏿ Treacherous"
+           "Active" "Ancient" "Bold" "Bright" "Broken" "Cheerless"
+           "Cold" "Concealed" "Dangerous" "Dark" "Dead" "Defended"
+           "Desolate" "Destroyed" "Dreadful" "Empty" "Evil" "Faded"
+           "Far-reaching" "Fierce" "Foreboding" "Forgotten" "Fragile" "Ghastly"
+           "Gloomy" "Growing" "Hidden" "Ill-fated" "Impenetrable" "Inspiring"
+           "Isolated" "Lofty" "Lost" "Menacing" "Mighty" "Mysterious"
+           "Noble" "Obstructed" "Old" "Ominous" "Open" "Peaceful"
+           "Restored" "Sheltered" "Silent" "Simple" "Small" "Sombre"
+           "Stony" "Stout" "Stricken" "Stubborn" "Twisted" "Unnatural"
+           "Veiled" "Vigorous" "Weary" "Wild" "Wretched" "Young"
+           "ᚠ Flourishing" "ᚠ Beautiful" "ᚠ Good" "ᚠ Kind" "ᚠ Gentle" "ᚠ Wondrous"))
+
+(random-table/register :name "The One Ring > Lore > Focus"
+  :data '("⏿ Curse" "⏿ Despair" "⏿ Enemy" "⏿ Fear" "⏿ Shadow" "⏿ War"
+           "Battle" "Border" "Burden" "Council" "Court" "Creature"
+           "Darkness" "Death" "Defence" "Depths" "Doubt" "Dreams"
+           "Fate" "Fire" "Folk" "Followers" "Greed" "Haven"
+           "History" "Honour" "Journey" "Kindred" "Knowledge" "Land"
+           "Leader" "Legend" "Life" "Light" "Luck" "Memory"
+           "Message" "Might" "Nature" "Pain" "Path" "Patron"
+           "Peril" "Plan" "Power" "Prophecy" "Quest" "Refuge"
+           "Riddle" "Ruins" "Rumour" "Secret" "Skill" "Song"
+           "Story" "Strength" "Time" "Tool" "Treasure" "Trust"
+           "Truth" "Vengeance" "Wealth" "Weapon" "Wilds" "Wish"
+           "ᚠ Courage" "ᚠ Duty" "ᚠ Fellowship" "ᚠ Hope" "ᚠ Love" "ᚠ Peace"))
+
 ;;;;; Core Rules
 
 (defconst jf/gaming/the-one-ring/feat-die
@@ -212,47 +254,6 @@
       "You face a test which is contrary to your nature or abilities"
       "An ally becomes a hindrance or liability"))))
 
-(defconst jf/gaming/the-one-ring/strider-mode/lore-table
-  '(
-    :action ("⏿ Abandon" "⏿ Attack" "⏿ Betray" "⏿ Corrupt" "⏿ Defeat" "⏿ Weaken" ;; Eye of Sauron
-             "Aid" "Arrive" "Await" "Breach" "Break" "Capture" ;; 1
-             "Change" "Chase" "Command" "Control" "Create" "Defy" ;; 2
-             "Demand" "Discover" "Disguise" "Endure" "Escape" "Evade" ;; 3
-             "Explore" "Find" "Focus" "Gather" "Guard" "Guide" ;; 4
-             "Hide" "Hinder" "Hoard" "Hold" "Hunt" "Journey" ;; 5
-             "Lead" "Learn" "Leave" "Lose" "Mourn" "Move" ;; 6
-             "Persist" "Preserve" "Prevent" "Refuse" "Reject" "Remove" ;; 7
-             "Replenish" "Restore" "Scheme" "Search" "Seize" "Share" ;; 8
-             "Slay" "Steal" "Summon" "Surrender" "Surround" "Threaten" ;; 9
-             "Transform" "Trap" "Trick" "Uncover" "Uphold" "Withstand" ;; 10
-             "ᚠ Believe" "ᚠ Bolster" "ᚠ Defend" "ᚠ Forgive" "ᚠ Resist" "ᚠ Strengthen") ;; Rune of Gandalf
-    :aspect ("⏿ Corrupted" "⏿ Cruel" "⏿ Deceptive" "⏿ Fell" "⏿ Ruined" "⏿ Treacherous" ;; Eye of Sauron
-             "Active" "Ancient" "Bold" "Bright" "Broken" "Cheerless" ;; 1
-             "Cold" "Concealed" "Dangerous" "Dark" "Dead" "Defended" ;; 2
-             "Desolate" "Destroyed" "Dreadful" "Empty" "Evil" "Faded" ;; 3
-             "Far-reaching" "Fierce" "Foreboding" "Forgotten" "Fragile" "Ghastly" ;; 4
-             "Gloomy" "Growing" "Hidden" "Ill-fated" "Impenetrable" "Inspiring" ;; 5
-             "Isolated" "Lofty" "Lost" "Menacing" "Mighty" "Mysterious" ;; 6
-             "Noble" "Obstructed" "Old" "Ominous" "Open" "Peaceful" ;; 7
-             "Restored" "Sheltered" "Silent" "Simple" "Small" "Sombre" ;; 8
-             "Stony" "Stout" "Stricken" "Stubborn" "Twisted" "Unnatural" ;; 9
-             "Veiled" "Vigorous" "Weary" "Wild" "Wretched" "Young" ;; 10
-             "ᚠ Flourishing" "ᚠ Beautiful" "ᚠ Good" "ᚠ Kind" "ᚠ Gentle" "ᚠ Wondrous") ;; Rune of Gandalf
-    :focus ("⏿ Curse" "⏿ Despair" "⏿ Enemy" "⏿ Fear" "⏿ Shadow" "⏿ War" ;; Eye of Sauron
-            "Battle" "Border" "Burden" "Council" "Court" "Creature" ;; 1
-            "Darkness" "Death" "Defence" "Depths" "Doubt" "Dreams" ;; 2
-            "Fate" "Fire" "Folk" "Followers" "Greed" "Haven" ;; 3
-            "History" "Honour" "Journey" "Kindred" "Knowledge" "Land" ;; 4
-            "Leader" "Legend" "Life" "Light" "Luck" "Memory" ;; 5
-            "Message" "Might" "Nature" "Pain" "Path" "Patron" ;; 6
-            "Peril" "Plan" "Power" "Prophecy" "Quest" "Refuge" ;; 7
-            "Riddle" "Ruins" "Rumour" "Secret" "Skill" "Song" ;; 8
-            "Story" "Strength" "Time" "Tool" "Treasure" "Trust" ;; 9
-            "Truth" "Vengeance" "Wealth" "Weapon" "Wilds" "Wish" ;; 10
-            "ᚠ Courage" "ᚠ Duty" "ᚠ Fellowship" "ᚠ Hope" "ᚠ Love" "ᚠ Peace") ;; Rune of Gandalf
-    )
-  "From Strider Mode p11-12")
-
 (defconst jf/gaming/the-one-ring/strider-mode/revelation-episode-table
   '("Internal strife or an external threat puts your Safe Haven in peril"
     "Unexpected danger arises on the path ahead, forcing you to seek a new route"
@@ -341,19 +342,6 @@
                              nil
                              #'string=))))
 
-(cl-defun jf/gaming/the-one-ring/roll/lore-table
-    (question
-     &key
-     (lore-table jf/gaming/the-one-ring/strider-mode/lore-table))
-  "Return the response from asking the lore table the given QUESTION."
-  (interactive (list
-                (read-string "Open-ended Question: ")))
-  (concat "{{{i(Lore Table)}}}:\n"
-          "\n"
-          "- Question :: “" question "”\n"
-          "- Action :: " (jf/roll-on-table (plist-get lore-table :action)) "\n"
-          "- Aspect :: " (jf/roll-on-table (plist-get lore-table :aspect)) "\n"
-          "- Focus :: " (jf/roll-on-table (plist-get lore-table :focus)) "\n"))
 
 (cl-defun jf/gaming/the-one-ring/roll/skill-check (dice
                                                    favorability
@@ -437,10 +425,10 @@
 
 ;;;; Session Tracking
 (defvar jf/gaming/the-one-ring/strider-mode/character-sheet-filename
-  (file-truename "~/git/org/denote/melange/20221128T203953--duinhir-tailwind__rpgs_the-one-ring.org"))
+  (file-truename "~/git/org/denote/melange/20221128T203953--duinhir-tailwind__TheOneRing_rpgs.org"))
 
 (defvar jf/gaming/the-one-ring/strider-mode/campaign-index-filename
-  (file-truename "~/git/org/denote/indices/20221129T091857--the-travels-of-duinhir-tailwind__rpgs_the-one-ring.org"))
+  (file-truename "~/git/org/denote/indices/20221129T091857--the-travels-of-duinhir-tailwind__rpgs_projects.org"))
 
 (cl-defun jf/sidebar--build (&key
                              buffer-name
@@ -569,13 +557,11 @@ to READ_ONLY."
     ("j c" "Character Sheet"
      (lambda ()
        (interactive)
-       (jf/gaming/the-one-ring/strider-mode/pop-open-filename
-        :filename jf/gaming/the-one-ring/strider-mode/character-sheet-filename)))
+       (find-file-other-window jf/gaming/the-one-ring/strider-mode/character-sheet-filename)))
     ("j i" "Index of Campaign"
      (lambda ()
        (interactive)
-       (jf/gaming/the-one-ring/strider-mode/pop-open-filename
-        :filename jf/gaming/the-one-ring/strider-mode/campaign-index-filename)))
+       (find-file-other-window jf/gaming/the-one-ring/strider-mode/campaign-index-filename)))
     ("j x" jf/gaming/the-one-ring/strider-mode/experience-milestones)
     ]])
 

@@ -2929,51 +2929,6 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "{HRE > Random Encounter > Urban} and {HRE > Random Encounter > Urban}"
            "{HRE > Random Encounter > Urban} and {HRE > Random Encounter > Urban}"))
 
-(random-table/register :name "The One Ring > Lore"
-  :data '("- Action :: {The One Ring > Lore > Action}\n- Aspect :: {The One Ring > Lore > Aspect}\n- Focus :: {The One Ring > Lore > Focus}"))
-
-(random-table/register :name "The One Ring > Lore > Action"
-  :data '("⏿ Abandon" "⏿ Attack" "⏿ Betray" "⏿ Corrupt" "⏿ Defeat" "⏿ Weaken"
-           "Aid" "Arrive" "Await" "Breach" "Break" "Capture"
-           "Change" "Chase" "Command" "Control" "Create" "Defy"
-           "Demand" "Discover" "Disguise" "Endure" "Escape" "Evade"
-           "Explore" "Find" "Focus" "Gather" "Guard" "Guide"
-           "Hide" "Hinder" "Hoard" "Hold" "Hunt" "Journey"
-           "Lead" "Learn" "Leave" "Lose" "Mourn" "Move"
-           "Persist" "Preserve" "Prevent" "Refuse" "Reject" "Remove"
-           "Replenish" "Restore" "Scheme" "Search" "Seize" "Share"
-           "Slay" "Steal" "Summon" "Surrender" "Surround" "Threaten"
-           "Transform" "Trap" "Trick" "Uncover" "Uphold" "Withstand"
-           "ᚠ Believe" "ᚠ Bolster" "ᚠ Defend" "ᚠ Forgive" "ᚠ Resist" "ᚠ Strengthen"))
-
-(random-table/register :name "The One Ring > Lore > Aspect"
-  :data '("⏿ Corrupted" "⏿ Cruel" "⏿ Deceptive" "⏿ Fell" "⏿ Ruined" "⏿ Treacherous"
-           "Active" "Ancient" "Bold" "Bright" "Broken" "Cheerless"
-           "Cold" "Concealed" "Dangerous" "Dark" "Dead" "Defended"
-           "Desolate" "Destroyed" "Dreadful" "Empty" "Evil" "Faded"
-           "Far-reaching" "Fierce" "Foreboding" "Forgotten" "Fragile" "Ghastly"
-           "Gloomy" "Growing" "Hidden" "Ill-fated" "Impenetrable" "Inspiring"
-           "Isolated" "Lofty" "Lost" "Menacing" "Mighty" "Mysterious"
-           "Noble" "Obstructed" "Old" "Ominous" "Open" "Peaceful"
-           "Restored" "Sheltered" "Silent" "Simple" "Small" "Sombre"
-           "Stony" "Stout" "Stricken" "Stubborn" "Twisted" "Unnatural"
-           "Veiled" "Vigorous" "Weary" "Wild" "Wretched" "Young"
-           "ᚠ Flourishing" "ᚠ Beautiful" "ᚠ Good" "ᚠ Kind" "ᚠ Gentle" "ᚠ Wondrous"))
-
-(random-table/register :name "The One Ring > Lore > Focus"
-  :data '("⏿ Curse" "⏿ Despair" "⏿ Enemy" "⏿ Fear" "⏿ Shadow" "⏿ War"
-           "Battle" "Border" "Burden" "Council" "Court" "Creature"
-           "Darkness" "Death" "Defence" "Depths" "Doubt" "Dreams"
-           "Fate" "Fire" "Folk" "Followers" "Greed" "Haven"
-           "History" "Honour" "Journey" "Kindred" "Knowledge" "Land"
-           "Leader" "Legend" "Life" "Light" "Luck" "Memory"
-           "Message" "Might" "Nature" "Pain" "Path" "Patron"
-           "Peril" "Plan" "Power" "Prophecy" "Quest" "Refuge"
-           "Riddle" "Ruins" "Rumour" "Secret" "Skill" "Song"
-           "Story" "Strength" "Time" "Tool" "Treasure" "Trust"
-           "Truth" "Vengeance" "Wealth" "Weapon" "Wilds" "Wish"
-           "ᚠ Courage" "ᚠ Duty" "ᚠ Fellowship" "ᚠ Hope" "ᚠ Love" "ᚠ Peace"))
-
 (random-table/register :name "Errant > Alignment"
   :roller "2d6"
   :data '((2 . "C3") (3 . "C2") (4 . "C1")

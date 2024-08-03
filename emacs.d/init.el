@@ -4882,6 +4882,18 @@ When USE_HUGO_SHORTCODE is given use glossary based exporting."
                 (cadr url-and-title))))
       (bmkp-url-target-set (car url-and-title) nil title)))
 
+  (defun jf/menu--bookmark-firefox ()
+    "Create `bookmark+' for current Firefox page."
+    (interactive)
+    (require 'grab-mac-link)
+    (let* ((url-and-title
+             (grab-mac-link-firefox-1))
+            (title
+              (read-string
+                (concat "URL: " (car url-and-title) "\nTitle: ")
+                (cadr url-and-title))))
+      (bmkp-url-target-set (car url-and-title) nil title)))
+
   (defun jf/menu--bookmark-chrome ()
     "Create `bookmark+' for current Chrome page."
     (interactive)
@@ -6106,7 +6118,7 @@ See `jf/comment-header-regexp/major-modes-alis'."
            go-mode go-ts-mode ;; https://github.com/golang/tools/tree/master/gopls
            html-mode html-ts-mode
            js-mode js-ts-mode
-           json-mode json-ts-mode ;; npm install -g vscode-json-languageserver
+           json-mode json-ts-mode ;; npm i -g vscode-langservers-extracted
            python-mode python-ts-mode
            ruby-mode ruby-ts-mode
            scss-mode scss-ts-mode
@@ -8380,6 +8392,7 @@ This encodes the logic for creating a project."
       ["Bookmark"
         ("b b" "Bookmarks" bookmark-bmenu-list)
         ("b c" "Chrome" jf/menu--bookmark-chrome)
+        ("b f" "Firefox" jf/menu--bookmark-firefox)
         ("b s" "Safari" jf/menu--bookmark-safari)
         ]])
   :bind ("s-1" . #'jf/menu))

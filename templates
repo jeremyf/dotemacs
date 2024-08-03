@@ -101,10 +101,6 @@ org-mode
   > q
   "#+end_src")
 
-;;;;; Consider "The One Ring" minor mode to inject these.
-(rune "{{{rune(" (completing-read "Rune: " jf/gaming/runes) ")}}}")
-(asl "As {{{i(Loremaster)}}}, ")
-
 ;;;; text-mode
 text-mode
 

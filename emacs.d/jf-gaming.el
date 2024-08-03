@@ -13,11 +13,11 @@
 
 ;;;; General
 
-(defconst jf/gaming/runes
+(defconst (jf/gaming/runes
   '(("ᚠ" . "Gandalf Rune for the One Ring") ;; (Runic Letter Fehu Feoh Fe F) Gandalf rune
     ("Շ" . "Success Icon for the One Ring") ;; (Armenian Capital Letter Sha) Success Icon
     ("⏿" . "Eye of Sauron for the One Ring") ;; (Observer Eye Symbol) Sauron symbol
-    ))
+    )))
 ;;;; Burning Wheel Code
 ;; (jf/minor-mode-maker :title "Burning Wheel Gold"
 ;;          ;; Being a programmer and someone who plays table top
