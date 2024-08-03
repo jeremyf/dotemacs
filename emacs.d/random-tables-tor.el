@@ -95,15 +95,33 @@
            "Exploring a Ruin" "Setting up Camp" "Eating a Meal"
            "Recovering from Battle" "In a Bout of Madness" "Resting Peacfully"))
 
+;; Assumption is that we're not interested
+(defconst random-table/roller/one-ring-favourability
+  '(("Favoured" . (lambda () (max (random 12) (random 12))))
+    ("Neutral" . (lambda () (random 12)))
+    ("Ill-Favoured" . (lambda () (min (random 12) (random 12)))))
+  "Favourability options and associated roller
+
+The Eye is 0
+Gandalf is 11")
+
+(defun random-table/roller/one-ring-event (&optional table)
+  (funcall (random-table/completing-read/alist
+             "Favourability: "
+             random-table/roller/one-ring-favourability
+             nil
+             t)))
+
 (random-table/register :name "The One Ring > Event"
+  :roller #'random-table/roller/one-ring-event
   ;; TODO Add a favorability selector
-  :data '((1 . "Terrible Misfortune: {The One Ring > Event > Terrible Misfortune}\n\t- Consequence :: If the roll fails, the target is Wounded.\n\t- Fatigue :: 3")
-           (2 . "Despair: {The One Ring > Event > Despair}\n\t- Consequence :: If the roll fails, gain 2 Shadow points (Dread).\n\t- Fatigue :: 2")
-           ((3 . 4) . "Ill Choices: {The One Ring > Event > Ill Choices}\n\t- Consequence :: If the roll fails, gain 1 Shadow point (Dread).\n\t- Fatigue :: 2")
-           ((5 . 8) . "Mishap: {The One Ring > Event > Mishap}\n\t- Consequence :: If the roll fails, add 1 day to the length of the journey, and gain 1 additional Fatigue.\n\t- Fatigue :: 2")
-           ((9 . 10) . "Short Cut: {The One Ring > Event > Short Cut}\n\t- Consequence :: If the roll succeeds, reduce the length of the journey by 1 day.\n\t- Fatigue :: 1")
-           (11 . "Chance Meeting: {The One Ring > Event > Chance Meeting}\n\t- Consequence :: If the roll succeeds, no Fatigue is gained, and you may envision a favourable encounter.\n\t- Fatigue :: 1")
-           (12 . "Joyful Sight: {The One Ring > Event > Joyful Sight}\n\t- Consequence :: If the roll succeeds, regain 1 Hope.\n\t- Fatigue :: 0")))
+  :data '((0 . "Terrible Misfortune: {The One Ring > Event > Terrible Misfortune}\n\t- Consequence :: If the roll fails, the target is Wounded.\n\t- Fatigue :: 3")
+           (1 . "Despair: {The One Ring > Event > Despair}\n\t- Consequence :: If the roll fails, gain 2 Shadow points (Dread).\n\t- Fatigue :: 2")
+           ((2 . 3) . "Ill Choices: {The One Ring > Event > Ill Choices}\n\t- Consequence :: If the roll fails, gain 1 Shadow point (Dread).\n\t- Fatigue :: 2")
+           ((4 . 7) . "Mishap: {The One Ring > Event > Mishap}\n\t- Consequence :: If the roll fails, add 1 day to the length of the journey, and gain 1 additional Fatigue.\n\t- Fatigue :: 2")
+           ((8 . 9) . "Short Cut: {The One Ring > Event > Short Cut}\n\t- Consequence :: If the roll succeeds, reduce the length of the journey by 1 day.\n\t- Fatigue :: 1")
+           (10 . "Chance Meeting: {The One Ring > Event > Chance Meeting}\n\t- Consequence :: If the roll succeeds, no Fatigue is gained, and you may envision a favourable encounter.\n\t- Fatigue :: 1")
+           (11 . "Joyful Sight: {The One Ring > Event > Joyful Sight}\n\t- Consequence :: If the roll succeeds, regain 1 Hope.\n\t- Fatigue :: 0")))
 
 (random-table/register :name "The One Ring > Event > Terrible Misfortune"
   :private t
