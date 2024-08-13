@@ -1,6 +1,4 @@
-;;; init.el --- Summary:  ;;; -*- lexical-binding: t; -*-
-;;
-;;  Emacs configuration for Jeremy Friesen
+;;; init.el --- Emacs configuration for Jeremy Friesen -*- lexical-binding: t; -*-
 ;;
 ;;; Commentary:
 ;;
@@ -4853,15 +4851,13 @@ When USE_HUGO_SHORTCODE is given use glossary based exporting."
                                "PLURAL_ABBR")
                              ((string= "denote" new-type)
                                "TITLE")))))
-                (progn
-                  (replace-regexp-in-region
-                    (concat "\\[\\[\\([^:]+\\):\\([0-9A-Z]+\\)"
-                      "\\]\\[\\([^]]+\\)\\]\\]")
-                    (format "[[%s:%s][%s]]"
-                      new-type denote-id new-text)
-                    (org-element-property :begin element)
-                    (org-element-property :end element))
-                  (org-link-descriptive-ensure))
+                (replace-regexp-in-region
+                  (concat "\\[\\[\\([^:]+\\):\\([0-9A-Z]+\\)"
+                    "\\]\\[\\([^]]+\\)\\]\\]")
+                  (format "[[%s:%s][%s]]"
+                    new-type denote-id new-text)
+                  (org-element-property :begin element)
+                  (org-element-property :end element))
                 (user-error "Expected denote-id %s to have a %s acceptable property" denote-id new-type)))
             (user-error "Current element is of type %s; it must be one of the following: %s" type types)))
         (user-error "Current element must be of type 'link; it is %S" (car element)))))
