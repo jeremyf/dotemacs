@@ -58,6 +58,15 @@ markdown-mode markdown-ts-mode
 ;;;; org-mode
 org-mode
 
+
+(beamer
+  n "#+OPTIONS: H:2 num:t"
+  n "#+BEAMER_THEME: Madrid"
+  n "#+LATEX_CLASS: beamer"
+  n "#+TOC: headlines [currentsection]"
+  n "#+STARTUP: beamer"
+  n "#+latex_header: \\AtBeginSection[]{\\begin{frame}<beamer>\\frametitle{Topic}\\tableofcontents[currentsection]\\end{frame}}" n)
+
 (eg "([[abbr:20230824T082549][e.g.]], " q ")")
 (aka "([[abbr:20221009T115519][a.k.a.]] " q ")")
 (dnd "[[abbr:20221009T115753][D&D]] " q )
