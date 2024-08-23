@@ -342,50 +342,92 @@
                              nil
                              #'string=))))
 
+(defvar jf/gaming/the-one-ring/skills
+  '("Athletics" "Awareness" "Awe" "Axe"
+     "Battle" "Bow" "Courtesy" "Craft"
+     "Explore" "Healing" "Hunting" "Insight"
+     "Lore" "Persuade" "Riddle" "Scan"
+     "Song" "Spear" "Stealth" "Sword"
+     "Travel")
+  "The skills of “The One Ring”")
 
-(cl-defun jf/gaming/the-one-ring/roll/skill-check (dice
-                                                   favorability
+(cl-defun jf/gaming/the-one-ring/roll/skill-check(skill
+                                                   tn
+                                                   favourability
+                                                   dice
                                                    &key
                                                    (is_weary
-                                                    jf/gaming/the-one-ring/character-is-weary))
-  "Return the verbose results of rolling the DICE with the given FAVORABILITY for the feat die."
-  (interactive (list
-                (read-number "Number of D6s: ")
-                (completing-read "Favourability: "
-                                 jf/gaming/the-one-ring/feat-die-favourability)))
-  (let* ((feat-die (jf/gaming/the-one-ring/roll/feat-die favorability))
-         (success-dice (jf/gaming/the-one-ring/roll/success-dice :dice dice :is_weary is_weary))
-         (weary_message (if is_weary " with Weary condition" ""))
-         (prefix (format "%s %sd6%s [Feat: %s  Success: %s]"
-                         favorability
-                         dice
-                         weary_message
-                         feat-die
-                         (plist-get success-dice :rolls))))
-    (cond
-     ((numberp feat-die)
-      (format "%s: %s %sՇ "
-              prefix
-              (+ feat-die (plist-get success-dice :total))
-              (plist-get success-dice :sixes)))
-     ((string= "⏿" feat-die)
-      (format "%s: %s %s %sՇ"
-              prefix
-              feat-die
-              (plist-get success-dice :total)
-              (plist-get success-dice :sixes)))
-     ((string= "ᚠ" feat-die)
-      (format "%s: %s %sՇ"
-              prefix
-              feat-die
-              (plist-get success-dice :sixes))))))
+                                                     jf/gaming/the-one-ring/character-is-weary)
+                                                   (is_miserable
+                                                     jf/gaming/the-one-ring/character-is-miserable))
+  "Roll DICE for SKILL check against TN with feat die FAVOURABILITY.
 
-(defun jf/gaming/the-one-ring/roll/solo-event-table (favorability)
+Examples:
+
+Success (Skill: Battle; TN: 12; Roll: 13; Favourability: Neutral; Feat Dice: 8; Success Dice: 2d6 {2 3})
+
+Success 2Շ (Skill: Battle; TN: 12; Roll: 20; Favourability: Neutral; Feat Dice: 8; Success Dice: 2d6 {6 6})
+
+Failure (Skill: Battle; TN: 12; Roll: 11 Favourability: Neutral; Feat Dice: 6; Success Dice: 2d6 {2 3})
+
+Failure ⏿ (Skill: Battle; TN: 12; Roll: 5 Favourability: Neutral; Feat Dice: ⏿; Success Dice: 2d6 {2 3})
+
+Success ᚠ  (Skill: Battle; TN: 12; Roll: ᚠ Favourability: Neutral; Feat Dice: ᚠ; Success Dice: 2d6 {2 3})
+
+Success ᚠ (Skill: Battle; TN: 12; Roll: ᚠ Favourability: Neutral; Feat Dice: ᚠ; Weary: true; Success Dice: 2d6 {2 3})"
+  (interactive (list
+                 (completing-read "Skill: "
+                   jf/gaming/the-one-ring/skills
+                   nil
+                   t)
+                 (read-number "Target Number (TN): ")
+                 (completing-read "Favourability: "
+                   jf/gaming/the-one-ring/feat-die-favourability)
+                 (read-number "Number of D6s: ")))
+  (let* ((feat-die (jf/gaming/the-one-ring/roll/feat-die favourability))
+          (success-dice (jf/gaming/the-one-ring/roll/success-dice :dice dice :is_weary is_weary))
+          (tengwars (plist-get success-dice :sixes))
+          (tengwar_msg (when (> tengwars 0) (format " %sՇ" tengwars)))
+          (result_and_roll
+            (cond
+              ((numberp feat-die)
+                (let ((roll (+ feat-die (plist-get success-dice :total))))
+                  (cons
+                    (if (>=  roll tn)
+                      (concat "Success" tengwar_msg)
+                      "Failure")
+                    roll)))
+              ((string= "⏿" feat-die)
+                (if is_miserable
+                  (cons "Failure ⏿" "⏿")
+                  (let ((roll (plist-get success-dice :total)))
+                    (cons
+                      (if (>= roll tn)
+                        (concat "Success ⏿" tengwar_msg)
+                        "Failure ⏿")
+                      roll))))
+              ((string= "ᚠ" feat-die)
+                (cons
+                  (concat "Success ᚠ" tengwar_msg)
+                  "ᚠ")))))
+    (format "%s {Skill: %s, TN: %s, Roll: %s, Favourability: %s, Feat Dice: %s, Success Dice: %sd6 (%s)%s%s}"
+      (car result_and_roll)
+      skill
+      tn
+      (cdr result_and_roll)
+      favourability
+      feat-die dice
+      (plist-get success-dice :rolls)
+      (if is_weary " Weary: true;" "")
+      (if is_miserable " Miserable: true;" ""))))
+
+
+(defun jf/gaming/the-one-ring/roll/solo-event-table (favourability)
   "Return the results of rolling on the solo event table with the given FAVORABILITY."
   (interactive (list (completing-read "Favourability: "
                                       jf/gaming/the-one-ring/feat-die-favourability)))
   (let* ((subtable-name (jf/gaming/the-one-ring/roll/favorability-with-table
-                         :favorability favorability
+                         :favorability favourability
                          :table (plist-get jf/gaming/the-one-ring/strider-mode/event-table :table)))
          (details (plist-get jf/gaming/the-one-ring/strider-mode/event-table :details))
          (subtable (plist-get details subtable-name))

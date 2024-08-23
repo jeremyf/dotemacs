@@ -7,7 +7,7 @@
 
 (random-table/register :name "The One Ring > Lore"
   :data '("{The One Ring > Lore @label}{The One Ring > Lore @options}")
-  :label '(read-string "Question: ")
+  :label '(read-string "Open-ended Question: ")
   :options '(("Action" . "- Action :: {The One Ring > Lore Table > Action}")
               ("Aspect" . "- Aspect :: {The One Ring > Lore Table > Aspect}")
               ("Feature" . "- Feature :: {The One Ring > Lore Table > Feature}")
@@ -179,3 +179,22 @@ Gandalf is 11")
     "Abundant foraging\n\t- Task :: HUNTING to replenish your rations"
     "Ancient monument\n\t- Task :: AWARENESS to recognize its significance"
     "Peaceful sanctuary\n\t- Task :: Noteworthy Encounter"))
+
+(random-table/register :name "The One Ring > Chamber"
+  :data '("- Chamber Type :: {The One Ring > Chamber > Type}\n- Condition :: {The One Ring > Chamber > Condition}\n- Appearance :: {The One Ring > Chamber > Appearance}\n- Challenge :: {The One Ring > Chamber > Challenge}"))
+
+(random-table/register :name "The One Ring > Chamber > Challenge"
+  :private t
+  :data '("Combat" "None (Desolation)" "Athletics" "Battle" "Enhearten" "Healing" "Hunting" "Lore" "Riddle" "Stealth" "None (Foreshadowing)" "Token of Hope"))
+
+(random-table/register :name "The One Ring > Chamber > Appearance"
+  :private t
+  :data '("Shunned" "Unfinished" "Austere" "Ancient" "Simple" "Heroic" "Homely" "Richly Decorated" "Elven" "Fortified" "Natural" "Enchanted"))
+
+(random-table/register :name "The One Ring > Chamber > Condition"
+  :private t
+  :data '("Held by foes" "Blocked" "Suspiciously Intact" "Flooded" "Utterly ruined" "Goblin-gnnawed" "Shattered by earthquake" "Burnt" "Despoiled" "Ruined by the passag eof time" "Mostly intact" "A safe place to rest"))
+
+(random-table/register :name "The One Ring > Chamber > Type"
+  :private t
+  :data '("Orc-nest" "Utility" "Storeroom" "Small Dwelling" "Stairs" "[Well/Watercourse]" "[Guard Post/Armoury]" "Forge" "Workshop" "Large Dwelling" "Civic Building" "Great Hall"))
