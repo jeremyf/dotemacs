@@ -53,6 +53,13 @@
 (straight-use-package 'use-package)
 (setq use-package-always-ensure t)
 
+;; See https://github.com/radian-software/straight.el/issues/1146
+(use-package straight
+  :custom
+  ;; add project and flymake to the pseudo-packages variable so straight.el doesn't download a separate version than what eglot downloads.
+  (straight-built-in-pseudo-packages '(emacs nadvice python image-mode project flymake))
+  (straight-use-package-by-default t))
+
 ;; When you open Emacs, grab all the space on the screen
 (add-to-list 'initial-frame-alist '(fullscreen . maximized))
 
@@ -3151,7 +3158,6 @@ to Backlog."
   (("C-." . embark-act)       ;; pick some comfortable binding
     ("M-." . embark-dwim)
     ("C-s-e" . embark-export)
-    ("H-e" . embark-export)
     ("C-h b" . embark-bindings))
   :init
   ;; Optionally replace the key help with a completing-read interface
@@ -3911,8 +3917,7 @@ literal then add a fuzzy search)."
               denote-file-prompt
               denote--title-prompt
               denote-get-path-by-id)
-  :bind ("H-l" . 'jf/denote/link-or-create)
-  ("H-i" . 'jf/denote/link-or-create)
+  :bind ("H-i" . 'jf/denote/link-or-create)
   :hook (dired-mode . denote-dired-mode)
   (org-mode . denote-rename-buffer-mode)
   :init
@@ -6126,8 +6131,9 @@ See `jf/comment-header-regexp/major-modes-alis'."
 (use-package eglot
   :straight t
   :bind (:map eglot-mode-map
-          ("C-h /" . flymake-show-buffer-diagnostics)
-          ("M-m" . eglot-rename))
+          ("H-e f" . flymake-show-buffer-diagnostics)
+          ("H-e r" . eglot-reconnect)
+          ("H-e m" . eglot-rename))
   ;; :straight (:type built-in) The Language Server Protocol (LSP)
   ;; is a game changer; having access to that tooling is very much a
   ;; nice to have.
@@ -7850,8 +7856,10 @@ Add the blog post to the given SERIES with the given KEYWORDS."
 
 (require 'dig-my-grave)
 
-(when (f-file-p "~/git/dotemacs/emacs.d/random-tables-data.el")
-  (load "~/git/dotemacs/emacs.d/random-tables-data.el"))
+(when (f-file-p "~/git/random-table.el/random-table.el")
+  (progn
+    (require "~/git/random-table.el/random-table.el")
+    (load "~/git/dotemacs/emacs.d/random-tables-data.el")))
 
 (use-package insert-random
   :straight t)

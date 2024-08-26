@@ -1,8 +1,3 @@
-(if (f-file?  "~/git/random-table.el/random-table.el")
-  (require 'random-table "~/git/random-table.el/random-table.el")
-  (use-package random-table
-    :straight (:host github :repo "jeremyf/random-table.el")))
-
 (setq random-table/reporter #'random-table/reporter/as-insert)
 
 (keymap-global-set "H-r" #'random-table/roll)
@@ -3120,11 +3115,11 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
 (random-table/register :name "Mausritter > Physical Detail"
   :private t
   :data '("Scarred body" "Groomed fur" "Corpulent body" "Dreadlocks" "Skeletal body" "Dyed fur"
-  "Willowy body" "Shaved fur" "Tiny body" "Frizzy fur" "Massive body" "Silky fur"
-  "War paint" "Night black eyes" "Foreign clothes" "Eye patch" "Elegant clothes" "Blood red eyes"
-  "Patched clothes" "Wise eyes" "Fashionable clothes" "Sharp eyes" "Unwashed clothes" "Luminous eyes"
-  "Missing ear" "Cropped tail" "Lumpy face" "Whip-like tail" "Beautiful face" "Tufted tail"
-  "Round face" "Stubby tail" "Delicate face" "Prehensile tail" "Elongated face" "Curly tail"))
+           "Willowy body" "Shaved fur" "Tiny body" "Frizzy fur" "Massive body" "Silky fur"
+           "War paint" "Night black eyes" "Foreign clothes" "Eye patch" "Elegant clothes" "Blood red eyes"
+           "Patched clothes" "Wise eyes" "Fashionable clothes" "Sharp eyes" "Unwashed clothes" "Luminous eyes"
+           "Missing ear" "Cropped tail" "Lumpy face" "Whip-like tail" "Beautiful face" "Tufted tail"
+           "Round face" "Stubby tail" "Delicate face" "Prehensile tail" "Elongated face" "Curly tail"))
 
 (random-table/register :name "Mausritter > Weather > Spring"
   :roller "2d6"

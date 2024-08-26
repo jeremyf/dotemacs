@@ -130,10 +130,10 @@ go-ts-mode go-mode
 (trun  "t.Run(\"" p "\", func(t *testing.T) {" n > q n "})")
 (ttable "test_cases := struct {" n > p n "}{" n > "{" p "}" n "}" n n "for _, test_case := range test_cases {" n > q n "}")
 (options "type " (p "Options for: " optInterface) "Option interface {"
-  n> "Apply(*" optInterface ")" n
+  n> "apply(*" optInterface ")" n
   "}"
   n n"type with" (p "With: " withOpt) " struct {}"
-  n n "func (w with" withOpt ") Apply(o *" optInterface ") {"
+  n n "func (w with" withOpt ") apply(o *" optInterface ") {"
   n> "// Make it so!"
   n> q
   n "}"
