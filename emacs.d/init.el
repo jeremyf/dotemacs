@@ -7386,8 +7386,8 @@ If not set  DEFAULT or prompt for it."
           (save-match-data
             (if (re-search-forward
                   (concat "^\\#\\+ROAM_REFS:.+"
-                    "\\(https?://takeonrules\.com[^ \n]*\\)" nil t))\]=
-
+                    "\\(https?://takeonrules\.com[^ \n]*\\)")
+                  nil t)
               (jf/tor-find-hugo-file-by-url (match-string 1))
               (message "Unable to find Take on Rules URL in buffer."))))))
 
