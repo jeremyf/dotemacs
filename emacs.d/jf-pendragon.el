@@ -162,6 +162,96 @@
            "Doucette (custard and bone marrow pie)" "Roast eagle" "Roast bream served in a dariole (pastry mold)" "Turnips baked with cheese"
            "Hippocras" "Mushroom tarts" "Wafers" "Whole dry spices “to aid in digestion”"))
 
+;; Starting Squire
+;; Most often Age 14
+;; Squire Skill: Age + 1 + first modifier
+;; Knightly Skills: Age - 11 + second modifier
+;; - these are Awareness, Battle, Courtesy, Horsemanship, First Aid, Lance, Hunting, Sword
+;; Passion: Loyalty(Lord) 15
+;; Each Winter Phase test all skills separately
+(random-table/register :name "Pendragon > Book of the Entourage > New Squire"
+  :data '(((1 . 5) . "Son of an Esquire (-2/-1)")
+           ((6 . 10) . "Younger son (4th or more) of a vassal knight (-1/0)")
+           ((11 . 15) . "2nd son (“spare”) of a vassal knight (0/0)")
+           ((16 . 20) . "Heir of a vassal knight (0/0)")))
+
+;; Wife: aged 14+1d6
+;; The following skills start at 5:
+;; - Stewardship, Chirurgery, First Aid, Courtesy, Industry, Intrigue, Flirting, Fashion, Dancing
+;; Chirurgery, First and and Courtesy increase by 1 per years 16 through 20.
+;; Passion Love (Family) 15
+;;
+;; Ladies improve Industry + two skills chosen by the player:
+;; 1d6+(Age-10) to a max of 15.  These increase as play progresses.
+;; Stewardship increases by father's status
+;; (("Commoner" . -7)
+;;   ("Esquire" . -2 )
+;;   ("Household Knight". 0)
+;;   ("Vassal Knight". 0)
+;;   ("Estate Holder or Baron". +3)
+;;   ("Officer". +1)
+;;   ("Holy Man". -3)
+;;   ("Foot Soldier". -5))
+
+;; (random-table/register :name "Pendragon > Book of the Entourage > Wife and Dowry"
+;;   :data
+;;   '("Daughter of a wealthy esquire. Dowry: £{2d6+8} treasure."
+;;      "Younger daughter of a vassal knight. Dowry: £{1d6} treasure."
+;;      "Eldest daughter of a vassal knight or younger daughter of a rich vassal knight. Dowry: £{1d6+6} treasure."
+;;      "Eldest daughter of a rich vassal knight or younger daughter of an estate holder. Dowry: £{2d6+1} treasure."
+;;      "Eldest daughter of a rich vassal knight or younger daughter of an estate holder. Dowry: £{2d6+2} treasure."
+;;      "Widow of a vassal knight. Dowry: £{2d6} treasure. Widow's Portion: £3.5 land"
+;;      "Eldest daughter of an estate holder. Dowry: £{1d6 * 5 + 35} treasure."
+;;      "Co-heiress (1 of 4) of a vassal knight. Dowry: £{2d6} treasure, £{1d2+1} land."
+;;      "Widow of a rich vassal knight. Dowry: £{4d6} treasure. Widow's Portion: £{1d3+4} land."
+;;      "Co-heiress (1 of 3) of a vassal knight. Dowry: £{3d6} treasure, £{1d2+2} land."
+;;      "Eldest daughter of an estate holder. Dowry: £{5d6+60} treasure."
+;;      "Eldest daughter of an estate holder. Dowry: £{5d6+85} treasure."
+;;      "Widow of a rich vassal knight. Dowry: £{6d6} treasure. Widow's Portion: £{1d6+7} land."
+;;      "Co-heiress (1 of 2) of a vassal knight. Dowry: £{3d6+5} treasure, £{1d3+3} land."
+;;      "Widow of a rich vassal knight. Dowry: £{3d20+3} treasure. Widow's Portion: £{1d3+12} land."
+;;      "Widow of an estate holder. Dowry: £{5d20+5} treasure. Widow's Portion: £{1d10+19} land."
+
+
+;; TODO: Let's map this into the random-table, now that I have the
+;; algorithm.
+(defun rpgs/pendragon/roll (rank modifier roll)
+  "Given RANK + MODIFIER and ROLL, determine success.
+
+Return `cons' with `car' that is the result and `crd' the details
+as a `plist' with properties of :roll :rank :modifier :critical_excess."
+  (interactive (list
+                 (read-number "Rank: ")
+                 (read-number "Modifier: " 0)
+                 (+ 1 (random 20))))
+  (let* ((critical_excess nil)
+          (modified_rank
+           (+ rank modifier))
+          (modified_roll
+            (+ roll modifier))
+          (result
+            (if (>= modified_rank 20)
+              (let ((overage (- modified_rank 20)))
+                (if (>= (+ roll overage) 20)
+                  (progn
+                    (format "Critical (+%s)" (- (+ roll overage) 20))
+                    (setq critical_excess (- (+ roll overage) 20)))
+                  (format "Success" modified_roll)))
+              (cond
+                ((= 20 roll)
+                  "Fumble")
+                ((> roll modified_rank)
+                  "Failure")
+                ((= roll modified_rank)
+                  "Critical")
+                (t (format "Success" roll))))))
+    (cons (format "%s" result)
+      (list
+        :roll roll
+        :rank rank
+        :modifier modifier
+        :critical_excess critical_excess))))
+
 (defconst rpgs/pendragon/traits
   '("Chaste" "Energetic" "Forgiving" "Generous" "Honest" "Just" "Merciful" "Modest" "Prudent"
      "Spiritual" "Temperate" "Trusting" "Valorous" "Lazy" "Vengeful" "Selfish" "Deceitful"
