@@ -3713,7 +3713,7 @@ Useful if you want a more robust view into the recommend candidates."
   :after (grab-mac-link)
   :straight (org-mac-link :type git
               :host gitlab :repo "aimebertrand/org-mac-link")
-  :bind (:map org-mode-map (("C-c g" . org-mac-grab-link))))
+  :bind (:map org-mode-map (("C-c g" . org-mac-link-get-link))))
 
 (use-package tempel
   ;; For awhile, I'd used yasnippets; themselves inspired by my beloved
@@ -5383,9 +5383,6 @@ method, get the containing class."
 
 (use-package elixir-ts-mode
   :after heex-ts-mode
-  :straight t)
-
-(use-package erlang
   :straight t)
 
 ;; (use-package flymake-elixir
