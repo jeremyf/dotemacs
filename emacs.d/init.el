@@ -7878,11 +7878,6 @@ Add the blog post to the given SERIES with the given KEYWORDS."
 
 (require 'dig-my-grave)
 
-(when (f-file-p "~/git/random-table.el/random-table.el")
-  (progn
-    (require "~/git/random-table.el/random-table.el")
-    (load "~/git/dotemacs/emacs.d/random-tables-data.el")))
-
 (use-package insert-random
   :straight t)
 
@@ -8448,6 +8443,10 @@ This encodes the logic for creating a project."
         ]])
   :bind ("s-1" . #'jf/menu))
 
+(when (f-file-p "~/git/random-table.el/random-table.el")
+  (progn
+    (load "~/git/random-table.el/random-table.el")
+    (load "~/git/dotemacs/emacs.d/random-tables-data.el")))
 
 (with-eval-after-load 'org
   (use-package edraw-org
