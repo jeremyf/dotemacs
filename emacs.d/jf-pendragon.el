@@ -12,8 +12,6 @@
            ((4 . 5) "Natural causes")
            (6 . "Unknown cause, just never came home")))
 
-
-
 (random-table/register :name "Pendragon > Book of Sires > Bride's Homeland"
   :data '(((1 . 2) . "Same county homeland as groom's family")
            ((3 . 4) . "Same region as groom's family")
@@ -393,3 +391,157 @@ as a `plist' with properties of :roll :rank :modifier :critical_excess."
            "Champion" "Herald" "Chevalier" "Suzerain"
            "High {Pendragon > Named Knight > Employer Type (d19)}"
            "Low {Pendragon > Named Knight > Employer Type (d19)}"))
+
+(random-table/register :name "Pendragon > Book of Uther > Courtly Event"
+  :data '(
+           ((1 . 2) . "Someone has disappeared from among {Pendragon > Book of Uther > Courtly Event > Who is Missing}")
+           (3 . "Someone is picking a fight outside of the hall with {Pendragon > Book of Uther > Courtly Event > Who is Missing}")
+           ((4 . 5) . "Someone is speaking ill of {Pendragon > Book of Uther > Courtly Event > Hostility}")
+           (6 . "Someone is threatening a {Pendragon > Book of Uther > Courtly Event > Hostility}")
+           (7 . "Someone is enraged about not getting to see {Pendragon > Book of Uther > Courtly Event > Hostility}")
+           (8 . "Money is passing hands between people who out not to have money: {Pendragon > Book of Uther > Courtly Event > Impropriety}")
+           (9 . "Someone appears to be stealing: {Pendragon > Book of Uther > Courtly Event > Impropriety}")
+           (10 . "A stranger is suspiciously lurking around: {Pendragon > Book of Uther > Courtly Event > Unknown Person}")
+           (11 . "An unknown person demands entry to court among the nobles: {Pendragon > Book of Uther > Courtly Event > Unknown Person}")
+           (12 . "A stranger who asks others to get something from a courtier: {Pendragon > Book of Uther > Courtly Event > Unknown Person}")
+           (13 . "An officer has been beaten, and cannot remember by whom: {Pendragon > Book of Uther > Courtly Event > Mysteries}")
+           (14 . "A guard has collapsed at his post: {Pendragon > Book of Uther > Courtly Event > Mysteries}")
+           (15 . "A woman tries to get a seat at court: {Pendragon > Book of Uther > Courtly Event > Woman Troubles > Who}")
+           (16 . "Someone is having sex indiscreetly: {Pendragon > Book of Uther > Courtly Event > Woman Troubles > Who} {Pendragon > Book of Uther > Courtly Event > Woman Troubles > What}")
+           (17 . "A woman makes a pass at a Player-knight: {Pendragon > Book of Uther > Courtly Event > Woman Troubles > Who} {Pendragon > Book of Uther > Courtly Event > Woman Troubles > What}")
+           ((18 . 20) . "There are rumors swirling around one of the Player-knights or someone close: {Pendragon > Book of Uther > Courtly Event > Whispering Campaign}")))
+
+
+(random-table/register :name "Pendragon > Book of Uther > Courtly Event > Who is Missing"
+  :private t
+  :data '(
+           (1 . "Foreign emissaries")
+           (2 . "The king’s officers")
+           ((3 . 4) . "The king’s kitchen")
+           ((5 . 6) . "The King’s Guard or garrison")
+           ((7 . 8) . "The king’s hall staff")
+           ((9 . 10) . "The king’s knights")
+           (11 . "A group of visiting merchanges")
+           (12 . "The officers of the Player-knight’s lord")
+           ((13 . 14) . "A Player-knight’s kitchen")
+           ((15 . 16) . "The guardsmen of the garrison of one of the the Player-knight’s lord")
+           ((17 . 18) . "The hall staff of one of the Player-knights")
+           ((19 . 20) . "The kniwhgts of the Player-knights’ lord")))
+
+(random-table/register :name "Pendragon > Book of Uther > Courtly Event > Hostility"
+  :private t
+  :data '(
+           (1 . "A foreign emissary")
+           (2 . "A royal officer")
+           ((3 . 4) . "A royal knight")
+           ((5 . 6) . "A member of the King’s Guard")
+           ((7 . 8) . "A visiting knight")
+           ((9 . 10) . "A visiting lord")
+           (11 . "A knight from the Player-knight’s household")
+           (12 . "An officer of the Player-knight’s lord")
+           (13 . "A servant from a Player-knight’s kitchen")
+           (14 . "A monk")
+           ((15 . 16) . "A royal servant")
+           ((17 . 18) . "One of the Player-knights’s squires")
+           (19 . "A visiting merchant")
+           ((19 . 20) . "A wealthy commoner")))
+
+(random-table/register :name "Pendragon > Book of Uther > Courtly Event > Impropriety"
+  :private t
+  :data '(
+           ((1 . 5) . "A bribe")
+           ((6 . 10) . "A gambling payoff officer")
+           ((11 . 15) . "Friends helping each other out")
+           ((16 . 20) . "Misinterpretation. Victims become enemies of the Player-knights")))
+
+(random-table/register :name "Pendragon > Book of Uther > Courtly Event > Unknown Person"
+  :private t
+  :data '(
+           "An assassin"
+           "A Saxon spy; Gamemaster names his homeland"
+           "A Caledonian spy; Gamemaster names his homeland"
+           "A Cambrian spy; Gamemaster names his homeland"
+           "A spy from Malahaut"
+           "An angry clergyman preparing a curse"
+           "A messenger with a message for only the king"
+           "An angry enemy of the king"
+           "An angry enemy of the lord of the Player-knights"
+           "An angry enemy of a Player-knight"
+           "An angry enemy of a royal knight"
+           "A spy"
+           "An entertainer looking for work"
+           "An esquire seeking employment"
+           "A freelance knight seeking employment"
+           "A spy for another lord"
+           "A foreign spy"
+           "A revenge-seeking monk"
+           "A phantom, which disappears after being discovered"))
+
+(random-table/register :name "Pendragon > Book of Uther > Courtly Event > Mysteries"
+  :private t
+  :data '(((1 . 2) . "First Aid is needed; if successful, roll again")
+          ((3 . 4) . "The Player-knights are accused of doing it")
+          ((5 . 7) . "Evidence reveals it was an enemy of the king")
+          ((8 . 12) . "He dies, which implicates the Player-knights")
+          ((13 . 15) . "The knights are attacked by the same foe while rendering aid")
+          ((16 . 18) . "The victim wakes and begs the Player-knights to hide him")
+          ((19 . 20) . "The victim is embarrassed and refuses any more help, or even an explanation")))
+
+(random-table/register :name "Pendragon > Book of Uther > Courtly Event > Woman Troubles > Who"
+  :private t
+  :data '(
+          (1 . "One of the Player-knights’ wives")
+          (2 . "One of the king’s concubines")
+          (3 . "One of the royal officers’s wives")
+          (4 . "One of King Uther’s vassals’ wives")
+          (5 . "An unmarried maiden-in-waiting")
+          (6 . "The daughter of a vassal knight who has been bragging about her purity")
+          (7 . "The wife of a court officer")
+          (8 . "A nun")
+          (9 . "A spell-concocting old woman")
+          (10 . "A life-sucking succubus")
+          (11 . "A foreign lady visiting court")
+          ((12 . 13) . "A lady one of the Player-knights has been courting, or desiring")
+          ((14 . 15) . "An ambitious commoner wanting to better herself")
+          ((16 . 17) . "A scheming serving wench")
+          ((18 . 20) . "An innocent serving wench")))
+
+(random-table/register :name "Pendragon > Book of Uther > Courtly Event > Woman Troubles > What"
+  :private t
+  :data '(
+           (1 . "Silent embarrassment")
+           ((2 . 3) . "Embarrassment—with demands the affair be kept secret")
+           ((4 . 5) . "Shame—with a demand to keep silent about this or she will kill herself.  Roll again for her lover’s reaction")
+           ((6 . 7) . "Denial")
+           (8 . "Accusation of rape; he denies it")
+           ((9 . 10) . "The accusation that the man seduced her while she is drunk; he denies it")
+           (11 . "The accusation that the woman seduced him while he is drunk; she denise it")
+           (12 . "To discard the man and try to seduce a Player-knight; her lover goes away quickly")
+           ((13 . 14) . "Anger, threatening to ruin whoever reports it")
+           ((15 . 16) . "Flight")
+           (17 . "Laughter…")
+           (18 . "Embarassment, beg the knight to keep silent")
+           (19 . "An offer to pay money to keep this secret")
+           (20 . "A threat to harm or kill the witness")))
+
+(random-table/register :name "Pendragon > Book of Uther > Courtly Event > Whispering Campaign"
+  :private t
+  :data '(
+           ((1 . 3) . "Is having an affair with {Pendragon > Book of Uther > Courtly Event > Woman Troubles > Who}")
+           (4 . "Is an upstart with boundless ambition")
+           (5 . "Is a braggart who doesn't deserve his status")
+           (6 . "Is craven")
+           (7 . "Is an oath-breaker")
+           (8 . "Is really a base-born bastard")
+           (9 . "Is really a noble-born bastard")
+           (10 . "Is a lousy lover")
+           (11 . "Is committing {Pendragon > Book of Uther > Courtly Event > Impropriety}")
+           (12 . "Is a liar")
+           (13 . "Is a drunk")
+           (14 . "Is a thief")
+           (15 . "Has been speaking ill of {Pendragon > Book of Uther > Courtly Event > Hostility}")
+           (16 . "Has been meeting with {Pendragon > Book of Uther > Courtly Event > Unknown Person }")
+           (17 . "Has been talking rebellion or treason")
+           (18 . "Has renounced Christ")
+           (19 . "Has a bastard child no one knows about")
+           (20 . "Has an unnatural desire or appetite")))
