@@ -1344,6 +1344,7 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
       (setq hl-todo-keyword-faces
         `(("HOLD" . ,yellow)
            ("TODO" . ,red)
+           ("QUESTION" .,yellow)
            ("BLOCKED" . ,yellow)
            ("NEXT" . ,blue)
            ("THEM" . ,magenta)
