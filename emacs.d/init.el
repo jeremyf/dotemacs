@@ -5750,7 +5750,7 @@ method, get the containing class."
   ;; the branch but not in main.
   :config (magit-todos-mode)
   :commands (magit-todos-list)
-  :custom (magit-todos-exclude-globs '(".git/" "public/"))
+  :custom (magit-todos-exclude-globs '(".git/" "public/" "vendor/"))
   (magit-todos-insert-after
     '(bottom) nil nil
     "Changed by setter of obsolete option `magit-todos-insert-at'")
