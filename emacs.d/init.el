@@ -3339,7 +3339,37 @@ With a PREFIX jump to the agenda without starting the clock."
                   (?C "Constant" font-lock-constant-face)
                   (?e "Example" font-lock-doc-face)
                   (?M "Module" font-lock-type-face)
-                  (?m "Method" font-lock-function-name-face))))))
+                  (?m "Method" font-lock-function-name-face)))))
+  (dolist (go '(go-ts-mode go-mode))
+    (add-to-list 'consult-imenu-config
+      `(,go
+         :toplevel "Function"
+         :types ((?f "Function" font-lock-function-name-face)
+                  (?m "Method" font-lock-function-name-face)
+                  (?s "Struct" font-local-type-face)
+                  (?i "Interface" font-local-type-face)
+                  (?r "t.Run" font-lock-doc-face)
+                  (?t "Type" font-local-type-face)
+                  (?a "Alias" font-local-type-face))))))
+
+(defun go-ts-mode--testing-run-node-p (node)
+  "Return t when NODE is a testing.T.Run declaration."
+  (and
+    (string-equal "call_expression" (treesit-node-type node))
+    (when-let* ((fnNode (treesit-node-child-by-field-name node "function"))
+                 (operand (treesit-node-child-by-field-name fnNode "operand"))
+                 (field (treesit-node-child-by-field-name fnNode "field")))
+      (and
+        (string= (treesit-node-type operand) "identifier")
+        (string= (treesit-node-text operand) "t")
+        (string= (treesit-node-type field) "field_identifier")
+        (string= (treesit-node-text field) "Run")))))
+
+(defun go-ts-mode--testing-run-name (node)
+  "Get imenu t.Run node name."
+  (let* ((args (treesit-node-child-by-field-name node "arguments")))
+    (format "%s" (treesit-node-text (car (treesit-node-children args "argument_list"))))))
+
 
 (defvar consult--xref-history nil)
 
@@ -5574,11 +5604,15 @@ method, get the containing class."
   (setq-default go-test-args "-count 1 -v"))
 
 (defun jf/go-ts-mode-configurator ()
+  (add-to-list
+   'treesit-simple-imenu-settings
+    `("t.Run" "\\`call_expression\\'" go-ts-mode--testing-run-node-p go-ts-mode--testing-run-name))
   (setq-local tab-width 2)
+  (setq-local eglot-stay-out-of '(imenu))
   (if (s-ends-with? "_test.go" (buffer-file-name))
     (jf/minor-mode/go-ts-test-mode)
     (jf/minor-mode/go-ts-implementation-mode))
-  (add-hook 'before-save-hook #'eglot-format-buffer -10 t)
+  ;; (add-hook 'before-save-hook #'eglot-format-buffer -10 t)
   (add-hook 'before-save-hook #'go-format -15 t))
 
 (defvar jf/minor-mode/go-ts-test-mode-map
@@ -5604,10 +5638,6 @@ method, get the containing class."
   :init-value nil
   :global nil
   :keymap jf/minor-mode/go-ts-implementation-mode-map)
-
-(use-package go-imenu
-  :straight t
-  :hook (go-mode . go-imenu-setup))
 
 (use-package ruby-mode
   ;; My language of choice for professional work.
