@@ -2335,7 +2335,21 @@ function is ever added to that hook."
       '("linkToSeries" . "@@hugo:{{< linkToSeries \"@@$1@@hugo:\" >}}@@"))
     (add-to-list 'org-latex-classes
       '("jf/article"
-         "\\documentclass[11pt,a4paper]{article}"
+         "\\documentclass[11pt,letter]{article}
+\\usepackage[letter]{anysize}
+\\usepackage{minted}
+\\usemintedstyle{emacs}"
+         ("\\section{%s}" . "\\section{%s}")
+         ("\\subsection{%s}" . "\\subsection{%s}")
+         ("\\subsubsection{%s}" . "\\subsubsection{%s}")
+         ("\\paragraph{%s}" . "\\paragraph{%s}")
+         ("\\subparagraph{%s}" . "\\subparagraph{%s}")))
+    (add-to-list 'org-latex-classes
+      '("jf/landscape"
+         "\\documentclass[11pt,letter,landscape]{article}
+\\usepackage{minted}
+\\usepackage[letter]{anysize}
+\\usemintedstyle{emacs}"
          ("\\section{%s}" . "\\section{%s}")
          ("\\subsection{%s}" . "\\subsection{%s}")
          ("\\subsubsection{%s}" . "\\subsubsection{%s}")
