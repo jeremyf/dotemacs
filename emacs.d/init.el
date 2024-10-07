@@ -6177,6 +6177,8 @@ See `jf/comment-header-regexp/major-modes-alis'."
   :straight t
   :bind (:map eglot-mode-map
           ("H-e h" . flymake-show-buffer-diagnostics)
+          ("H-e n" . flymake-goto-next-error)
+          ("H-e p" . flymake-goto-prev-error)
           ("H-e r" . eglot-reconnect)
           ("H-e m" . eglot-rename))
   ;; :straight (:type built-in) The Language Server Protocol (LSP)
@@ -8533,6 +8535,9 @@ This encodes the logic for creating a project."
 
 (dir-locals-set-directory-class
   "~/git/converge-cloud/marketplace-provider" 'go-lang)
+
+(dir-locals-set-directory-class
+  "~/git/converge-cloud/concierge" 'go-lang)
 
 (dir-locals-set-directory-class
   "~/git/converge-cloud/morpho-account-service" 'go-lang)
