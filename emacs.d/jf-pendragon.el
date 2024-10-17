@@ -1,3 +1,4 @@
+
 (if (f-file?  "~/git/random-table.el/random-table.el")
   (require 'random-table "~/git/random-table.el/random-table.el")
   (use-package random-table
@@ -139,7 +140,13 @@
            (18 . "A pair of silver plates £2")
            ((19 . 20) . "A silver goblet £2")))
 
+(random-table/register :name "Pendragon > Book of Feasts > Courses"
+  :data `(,(concat "\n  - First Course :: {Pendragon > Book of Feasts > First Course}"
+            "\n  - Second Course :: {Pendragon > Book of Feasts > Second Course}"
+            "\n  - Third Course :: {Pendragon > Book of Feasts > Third Course}")))
+
 (random-table/register :name "Pendragon > Book of Feasts > First Course"
+  :private t
   :data '("Meat with mustard" "Ale and cheese quiche" "Swan neck pudding" "Beef marrow fritters"
            "Eels in thick spicy puree" "Roast baby swan" "Fat capon" "Roast heron"
            "Roast pheasant" "Loach in cold green sauce" "Fruit tarts" "Cold meat slicese in ginger sauce"
@@ -147,6 +154,7 @@
            "Roasted salmon in wine sauce" "Almond omelet" "Cod tails" "Pastries (plum, quince, and apple)"))
 
 (random-table/register :name "Pendragon > Book of Feasts > Second Course"
+  :private t
   :data '("Artichokes stuffed with blueberry rice" "Broth with bacon and peas" "Meat tiles" "Roasted seal"
            "Honey-glazed roast chicken rolled with mustard and pine nuts" "Heraldic emblem in meat jelly" "stuffed boar" "Peacock (redressed in its feathers before service)"
            "Astrological temperament herb cakes and cheses" "Capon pastries and chips" "Roasted crane" "Roasted coney"
@@ -154,6 +162,7 @@
            "Beaver tails" "Cockentrice (pigs head on chicken body)" "Lampreys in hot sauce" "Fruit and salmon pie"))
 
 (random-table/register :name "Pendragon > Book of Feasts > Third Course"
+  :private t
   :data '("Herb fritters" "Roasted chicken and pheasant wings" "A selection of cheeses" "Quinces stewed in wine"
            "Roasted pigeon" "Elderberry divination cakes" "Roast larks" "Venison in frumenty"
            "White poultry meat stewed in wine" "Almond cakes served on roundels" "Glazed eggs" "Imported or baked fruits"
@@ -254,6 +263,9 @@ as a `plist' with properties of :roll :rank :modifier :critical_excess."
   '("Chaste" "Energetic" "Forgiving" "Generous" "Honest" "Just" "Merciful" "Modest" "Prudent"
      "Spiritual" "Temperate" "Trusting" "Valorous" "Lazy" "Vengeful" "Selfish" "Deceitful"
      "Arbitrary" "Cruel" "Proud" "Reckless" "Worldly" "Indulgent" "Suspicious" "Cowardly"))
+
+(random-table/register :name "Pendragon > Random Trait"
+  :data rpgs/pendragon/traits)
 
 (random-table/register :name "Pendragon > Name > Irish > Female"
   :data '("Aibhlinn" "Aileen" "Beibhinn" "Bevan" "Blaithnaid" "Brigid" "Cait" "Cron" "Derbail" "Dunlaith" "Eithrie" "Finnguala" "Flann" "Gormlaith" "Grainne" "Lassar" "Mor" "Orlaith" "Sadb" "Siobhan" "Sinead" "Sorcha" "Una"))
@@ -545,3 +557,72 @@ as a `plist' with properties of :roll :rank :modifier :critical_excess."
            (18 . "Has renounced Christ")
            (19 . "Has a bastard child no one knows about")
            (20 . "Has an unnatural desire or appetite")))
+
+(random-table/register :name "Pendragon > Winter Phase > Family Events"
+  :data '(((1 . 2) . "Death in family")
+           ((3 . 7) . "Marriage in family")
+           ((8 . 12) . "Birth in family")
+           ((13 . 15) . "Family member is missing or lost")
+           ((16 . 18) . "No event")
+           ((19 . 20) . "Scandalous rumor: {Pendragon > Scandalous Rumors}")))
+
+(random-table/register :name "Pendragon > Winter Phase > Scandalous Rumors"
+  :data '((1 . "Insulted a lord")
+           ((2 . 3) . "Cheated at a tournament")
+           (4 . "Impoverished, badly in debt")
+           ((5 . 7) . "Adulterer")
+           (8 . "Kidnapper")
+           ((9 . 10) . "Horse-thief")
+           ((11 . 16) . "Illicit love affair")
+           (17 . "Murderer")
+           (18 . "Heretic")
+           (19 . "Necromancer")
+           (20 . "{Pendragon > Scandalous Rumors (1d19)}…and its proven true!")))
+
+(random-table/register :name "Pendragon > Winter Phase > Family Member"
+  :data '(((1 . 3) . "Father")
+           ((4 . 6) . "Mother")
+           ((7 . 10) . "Brother")
+           ((11 . 14) . "Sister")
+           (15 . "Uncle")
+           (16 . "Aunt")
+           (17 . "Grandfather")
+           (18 . "Grandmother")
+           ((19 . 20) . "Cousin")))
+
+(random-table/register :name "Pendragon > House Rule > Random Christian Trait"
+  :roller "d20"
+  :data '(
+           (1 . "[Energetic/Lazy]")
+           (2 . "[Generous/Selfish]")
+           (3 . "[Honest/Deceitful]")
+           (4 . "[Just/Arbitrary]")
+           (5 . "[Prudent/Reckless]")
+           (6 . "[Trusting/Suspicious]")
+           (7 . "[Valorous/Cowardly]")
+           ((8 . 9) . "{Pendragon > House Rule > Random Christian Trait > Opposing}")
+           ((10 . 20) . "{Pendragon > House Rule > Random Christian Trait > Religious}")))
+(random-table/register :name "Pendragon > House Rule > Random Christian Trait > Opposing"
+  :private t
+  :data '("Lustful" "Vengeful" "Cruel" "Proud" "Worldly" "Indulgent"))
+(random-table/register :name "Pendragon > House Rule > Random Christian Trait > Religious"
+  :private t
+  :data '("Chaste" "Forgiving" "Merciful" "Modest" "Spiritual" "Temperate"))
+
+(random-table/register :name "Pendragon > House Rule > Random Pagan Trait"
+  :roller "d20"
+  :data '((1 . "[Forgiving/Vengeful]")
+           (2 . "[Just/Arbitrary]")
+           (3 . "[Merciful/Cruel]")
+           (4 . "[Prudent/Reckless]")
+           (5 . "[Trusting/Suspicious]")
+           (6 . "[Valorous/Cowardly]")
+           (7 . "[Temperate/Indulgent]")
+           ((8 . 9) . "{Pendragon > House Rule > Random Pagan Trait > Opposing}")
+           ((10 . 20) . "{Pendragon > House Rule > Random Pagan Trait > Religious}")))
+(random-table/register :name "Pendragon > House Rule > Random Pagan Trait > Opposing"
+  :private t
+  :data '("Lazy" "Selfish" "Deceitful" "Chaste" "Modest" "Worldly"))
+(random-table/register :name "Pendragon > House Rule > Random Pagan Trait > Religious"
+  :private t
+  :data '("Energetic" "Generous" "Honest" "Lustful" "Proud" "Spiritual"))

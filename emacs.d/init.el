@@ -2159,6 +2159,7 @@ Each member's `car' is title and `cdr' is `org-mode' element."
   ;; Make TAB act as if it were issued from the buffer of the
   ;; languages's major mode.
   :custom (org-src-tab-acts-natively t)
+  (org-latex-tables-booktabs t)
   (org-clock-clocktable-default-properties
     '(:maxlevel 5 :link t :tags t))
   :bind (:map org-mode-map
@@ -2245,6 +2246,19 @@ holding contextual information."
         "\\begin{description}\n%s\\end{description}\n\\vspace{5mm}"
         contents)))
 
+  (advice-add #'org-latex-special-block
+    :around #'jf/org-latex-special-block)
+
+  (defun jf/org-latex-special-block (orig-fun &rest args)
+    "Transcode a SPECIAL-BLOCK element from Org to LaTeX.
+CONTENTS holds the contents of the block.  INFO is a plist
+holding contextual information."
+    (let ((type (org-element-property :type (car args))))
+      (if (string= "marginnote" (downcase type))
+        (let ((contents (cadr args)))
+          (format "\n\\marginnote{%s}\n" contents))
+        (apply orig-fun args))))
+
   (advice-add #'org-latex-property-drawer
     :override #'jf/org-latex-property-drawer)
 
@@ -2320,11 +2334,11 @@ function is ever added to that hook."
     (add-to-list 'org-export-global-macros
       '("abbr-plural" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" abbr=\"t\" plural=\"t\" >}}@@"))
     (add-to-list 'org-export-global-macros
-      '("i" . "@@html:<i class=\"dfn\">@@$1@@html:</i>@@"))
+      '("i" . "@@latex:\\emph{@@@@html:<i class=\"dfn\">@@$1@@html:</i>@@@@latex:}@@"))
     (add-to-list 'org-export-global-macros
-      '("mechanic" . "@@html:<i class=\"mechanic\">@@$1@@html:</i>@@"))
+      '("mechanic" . "@@latex:\\emph{@@@@html:<i class=\"mechanic\">@@$1@@html:</i>@@@@latex:}@@"))
     (add-to-list 'org-export-global-macros
-      '("m" . "@@html:<i class=\"mechanic\">@@$1@@html:</i>@@"))
+      '("m" . "@@latex:\\emph{@@@@html:<i class=\"mechanic\">@@$1@@html:</i>@@@@latex:}@@"))
     (add-to-list 'org-export-global-macros
       '("newline" . "@@latex:\\@@ @@html:<br />@@"))
     (add-to-list 'org-export-global-macros
@@ -2338,7 +2352,10 @@ function is ever added to that hook."
          "\\documentclass[11pt,letter]{article}
 \\usepackage[letter]{anysize}
 \\usepackage{minted}
-\\usemintedstyle{emacs}"
+\\usepackage{array, booktabs, caption}
+\\usemintedstyle{emacs}
+\\usepackage[colorlinks = true,
+        urlcolor  = blue]{hyperref}"
          ("\\section{%s}" . "\\section{%s}")
          ("\\subsection{%s}" . "\\subsection{%s}")
          ("\\subsubsection{%s}" . "\\subsubsection{%s}")
@@ -2347,14 +2364,49 @@ function is ever added to that hook."
     (add-to-list 'org-latex-classes
       '("jf/landscape"
          "\\documentclass[11pt,letter,landscape]{article}
-\\usepackage{minted}
 \\usepackage[letter]{anysize}
+\\usepackage{minted}
+\\usepackage{array, booktabs, caption}
 \\usemintedstyle{emacs}"
          ("\\section{%s}" . "\\section{%s}")
          ("\\subsection{%s}" . "\\subsection{%s}")
          ("\\subsubsection{%s}" . "\\subsubsection{%s}")
          ("\\paragraph{%s}" . "\\paragraph{%s}")
          ("\\subparagraph{%s}" . "\\subparagraph{%s}")))
+    (add-to-list 'org-latex-classes
+      '("tuftebook"
+         "\\documentclass[notoc,sfsidenotes]{tufte-book}
+\\usepackage{array, booktabs, caption}
+\\hypersetup{pdftex,colorlinks=true,allcolors=blue}
+\\usepackage{hypcap}
+\\usepackage{color}
+\\usepackage{amssymb}
+\\usepackage{gensymb}
+\\usepackage{nicefrac}
+\\usepackage{units}"
+         ("\\section{%s}" . "\\section*{%s}")
+         ("\\subsection{%s}" . "\\subsection*{%s}")
+         ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+         ("\\paragraph{%s}" . "\\paragraph*{%s}")
+         ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+    ;; tufte-handout class for writing classy handouts and papers
+    ;; (setq org-latex-classes nil)
+    (add-to-list 'org-latex-classes
+      '("tufte-handout"
+         "\\documentclass{tufte-handout}
+\\usepackage{array, booktabs, caption}
+\\hypersetup{pdftex,colorlinks=true,allcolors=blue}
+\\usepackage{color}
+\\usepackage{amssymb}
+\\usepackage{amsmath}
+\\usepackage{gensymb}
+\\usepackage{nicefrac}
+\\usepackage{units}"
+         ("\\section{%s}" . "\\section*{%s}")
+         ("\\subsection{%s}" . "\\subsection*{%s}")
+         ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+         ("\\paragraph{%s}" . "\\paragraph*{%s}")
+         ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
     (setq org-latex-default-class "jf/article")
 
     (use-package ox-gfm
@@ -3366,10 +3418,11 @@ With a PREFIX jump to the agenda without starting the clock."
         (string= (treesit-node-text field) "Run")))))
 
 (defun go-ts-mode--testing-run-name (node)
-  "Get imenu t.Run node name."
-  (let* ((args (treesit-node-child-by-field-name node "arguments")))
-    (format "%s" (treesit-node-text (car (treesit-node-children args "argument_list"))))))
-
+  "Get imenu t.Run NODE name."
+  (let* ((args
+           (treesit-node-child-by-field-name node "arguments")))
+    (format "%s"
+      (treesit-node-text (car (treesit-node-children args "argument_list"))))))
 
 (defvar consult--xref-history nil)
 
@@ -5604,6 +5657,7 @@ method, get the containing class."
   (setq-default go-test-args "-count 1 -v"))
 
 (defun jf/go-ts-mode-configurator ()
+  (message "🐂 TS Mode")
   (add-to-list
    'treesit-simple-imenu-settings
     `("t.Run" "\\`call_expression\\'" go-ts-mode--testing-run-node-p go-ts-mode--testing-run-name))
@@ -6378,14 +6432,14 @@ See `jf/comment-header-regexp/major-modes-alis'."
   (add-to-list 'eglot-server-programs
     '(angular-mode
        "node /opt/homebrew/lib/node_modules/@angular/language-server --ngProbeLocations /opt/homebrew/lib/node_modules --tsProbeLocations /opt/homebrew/lib/node_modules --stdio"))
-  (add-to-list 'eglot-servier-programs
+  (add-to-list 'eglot-server-programs
     '(angular-ts-mode
        "node /opt/homebrew/lib/node_modules/@angular/language-server --ngProbeLocations /opt/homebrew/lib/node_modules --tsProbeLocations /opt/homebrew/lib/node_modules --stdio"))
   :hook ((eglot-managed-mode . jf/eglot-managed-mode)))
 
 (add-hook 'go-ts-mode-hook 'flymake-mode 8)
 ;; (add-hook 'go-ts-mode-hook 'flymake-show-buffer-diagnostics 9)
-(add-hook 'go-ts-mode-hook 'eglot-ensure 10)
+;; (add-hook 'go-ts-mode-hook 'eglot-ensure 10)
 (add-hook 'elixir-ts-mode-hook 'eglot-ensure 10)
 
 ;; Optional: install eglot-format-buffer as a save hook.
