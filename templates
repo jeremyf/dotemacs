@@ -132,13 +132,13 @@ go-ts-mode go-mode
 (options "type " (p "Options for: " optInterface) "Option interface {"
   n> "apply(*" optInterface ")" n
   "}"
-  n n"type with" (p "With: " withOpt) " struct {}"
-  n n "func (w with" withOpt ") apply(o *" optInterface ") {"
+  n n"type " (string-inflection-camelcase-function optInterface) "Option_" (p "Option Name: " withOpt) " struct {}"
+  n n "func (o " (string-inflection-camelcase-function optInterface) "Option_" withOpt ") apply(i *" optInterface ") {"
   n> "// Make it so!"
   n> q
   n "}"
-  n n "func With" withOpt "() " optInterface "Option {"
-  n> "return with" withOpt "{}"
+  n n "func " optInterface "Option_" withOpt "() " optInterface "Option {"
+  n> "return " (string-inflection-camelcase-function optInterface) "Option_" withOpt "{}"
   n "}")
 
 ;;;; web-mode

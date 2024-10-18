@@ -1228,7 +1228,13 @@ This uses `split-window-right' but follows with the cursor."
          (window-height . 0.1)
          (dedicated . t)
          (preserve-size . (t . t)))
-       ("\\*rspec-compilation\\*"
+       ("\\*\\.<gocov\\>$"
+
+         (display-buffer-pop-up-window)
+         (dedicated . t)
+
+         (body-function . prot-window-select-fit-size))
+       ((or "\\*rspec-compilation\\*")
          (display-buffer-reuse-mode-window
            display-buffer-below-selected))
        ((derived-mode . reb-mode) ; M-x re-builder
@@ -1342,27 +1348,25 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
     "Set the various custom faces for both `treesit' and `tree-sitter'."
     (ef-themes-with-colors
       (setq hl-todo-keyword-faces
-        `(("HOLD" . ,yellow)
+        `(
            ("TODO" . ,red)
-           ("QUESTION" .,yellow)
-           ("BLOCKED" . ,yellow)
-           ("NEXT" . ,blue)
-           ("THEM" . ,magenta)
-           ("PROG" . ,cyan-warmer)
-           ("OKAY" . ,green-warmer)
-           ("DONT" . ,yellow-warmer)
            ("FAIL" . ,red-warmer)
-           ("BUG" . ,red-warmer)
+           ("FIXME" . ,red-warmer)
+           ("REVIEW" . ,red)
            ("DONE" . ,green)
            ("NOTE" . ,blue-warmer)
-           ("KLUDGE" . ,cyan)
-           ("HACK" . ,cyan)
-           ("TEMP" . ,red)
-           ("FIXME" . ,red-warmer)
-           ("XXX+" . ,red-warmer)
-           ("REVIEW" . ,red)
+           ("HACK" . ,blue-warmer)
+           ("SEE" . ,blue-warmer)
+           ("QUESTION" .,yellow)
+           ("BLOCKED" . ,yellow)
            ("DEPRECATED" . ,yellow)))
       (custom-set-faces
+        `(go-coverage-untracked
+           ((,c :foreground ,fg-dim :background ,bg-dim)))
+        `(go-coverage-8
+           ((,c :foreground ,fg-added :background ,bg-added)))
+        `(go-coverage-0
+           ((,c :foreground ,fg-removed :background ,bg-removed)))
         `(denote-faces-link
            ((,c (:inherit link
                   :box (:line-width (1 . 1)
@@ -5553,8 +5557,20 @@ method, get the containing class."
 (use-package go-ts-mode
   :straight (:type built-in)
   :hook (go-ts-mode . jf/go-ts-mode-configurator)
-  :bind (:map go-ts-mode-map (("s-." . 'jf/go/toggle-test-impl)))
+  :bind (:map go-ts-mode-map
+          (("s-." . 'jf/go/toggle-test-impl)
+            ("H-e c" . 'jf/go/show-coverage)))
   :config
+  (defun jf/go/show-coverage (&optional coverage-file)
+    (interactive)
+    (let* ((file (or coverage-file "test.coverage")))
+      (if (f-file-p file)
+        (let ((pos (point)))
+          (go-coverage file)
+          (when (< pos (max-char))
+            (goto-char pos)))
+        (go-test-current-project))))
+
   (defun jf/go/toggle-test-impl ()
     "As `projectile-toggle-between-implementation-and-test'."
     (interactive)
@@ -5700,8 +5716,10 @@ method, get the containing class."
 
 (use-package gotest
   :straight t
+  :after go-ts-mode
   :config
-  (setq-default go-test-args "-count 1 -v"))
+  (setq-default go-run-go-command "LOGGING_LEVEL=22 go")
+  (setq-default go-test-args (concat "-count 1 -v -coverprofile=test.coverage")))
 
 (defun jf/go-ts-mode-configurator ()
   (message "🐂 TS Mode")
@@ -6678,10 +6696,11 @@ See `jf/comment-header-regexp/major-modes-alis'."
   (global-tab-line-mode 1)
   (recentf-mode 1)
   (setq
-   tab-line-new-button-show nil  ;; do not show add-new button
-   tab-line-close-button-show nil  ;; do not show close button
-   tab-line-separator " "  ;; delimitation between tabs
-   ))
+    tab-line-new-button-show nil  ;; do not show add-new button
+    tab-line-close-button-show nil  ;; do not show close button
+    tab-line-separator " "  ;; delimitation between tabs
+    )
+
 
   ;; (global-set-key (kbd "C-<prior>") 'tab-line-switch-to-prev-tab)
   (global-set-key (kbd "s-{") 'tab-line-switch-to-prev-tab)
@@ -6689,7 +6708,7 @@ See `jf/comment-header-regexp/major-modes-alis'."
   (global-set-key (kbd "s-}") 'tab-line-switch-to-next-tab)
   ;; (global-set-key (kbd "C-S-<prior>") 'intuitive-tab-line-shift-tab-left)
   ;; (global-set-key (kbd "C-S-<next>") 'intuitive-tab-line-shift-tab-right)
-  (global-set-key (kbd "C-S-t") 'recentf-open-most-recent-file)
+  (global-set-key (kbd "C-S-t") 'recentf-open-most-recent-file))
 
 (use-package org-bookmark-heading
   ;; Emacs bookmark support for Org-mode.
@@ -7187,6 +7206,9 @@ Alternative suggestions are: - '(\"\\\"“\" . \"\\\"\")"
     '("samvera-labs/geomash"
        "samvera-labs/hyku_knapsack"
        "samvera/bulkrax"
+       "samvera/maintenance"
+       "samvera/hydra-works"
+       "samvera/hydra-head"
        "samvera/hyku"
        "samvera/hyku-next"
        "samvera/valkyrie"
