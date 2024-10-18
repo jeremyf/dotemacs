@@ -5297,6 +5297,53 @@ The misspelled word is taken from OVERLAY.  WORD is the corrected word."
   :init
   (setq treesit-font-lock-level 4)
   :preface
+  (defun jf/treesit/func-signature/dwim ()
+    "Kill current function signature at point."
+    (interactive)
+    (when-let ((node
+	               (treesit-parent-until
+	                 (treesit-node-at (point))
+	                 (lambda (n)
+		                 (or
+		                   (string= "function_declaration" (treesit-node-type n))
+		                   (string= "call_expression" (treesit-node-type n))))
+	                 t)))
+      (pcase (treesit-node-type node)
+        ("function_declaration"
+          (jf/treesit/get-signature/function node))
+        ("call_expression"
+          (save-excursion
+	          (call-interactively #'xref-find-definitions)
+	          (jf/treesit/get-signature/function
+	            (treesit-parent-until
+	              (treesit-node-at (point))
+	              (lambda (n)
+	                (string= "function_declaration" (treesit-node-type n)))
+	              t)))))))
+
+  (defun jf/treesit/get-signature/function (node)
+    "For the given NODE add its parameters and result to kill ring.
+
+This function is to \"copy\" the implementation details of the node."
+    (let ((node-type (treesit-node-type node)))
+      (if (string= "function_declaration" node-type)
+	      (let* ((strings
+		             (list
+		               (treesit-node-text
+		                 (treesit-node-child-by-field-name node "parameters"))
+		               (treesit-node-text
+		                 (treesit-node-child-by-field-name node "result"))))
+		            (msg
+		              (concat "func" (s-join " " (-non-nil strings)))))
+	        (message
+	          "%s func dsignature: %s"
+	          (treesit-node-text
+		          (treesit-node-child-by-field-name node "name"))
+	          msg)
+	        (kill-new msg))
+	      (user-error "given node %s (type %s) not function_declaration"
+		      node node-type))))
+
   (defun jf/treesit/function-select ()
     "Select the current function at point."
     (interactive)
@@ -6234,6 +6281,7 @@ See `jf/comment-header-regexp/major-modes-alis'."
           ("H-e n" . flymake-goto-next-error)
           ("H-e p" . flymake-goto-prev-error)
           ("H-e r" . eglot-reconnect)
+          ("H-e s" . jf/treesit/func-signature/dwim)
           ("H-e m" . eglot-rename))
   ;; :straight (:type built-in) The Language Server Protocol (LSP)
   ;; is a game changer; having access to that tooling is very much a
