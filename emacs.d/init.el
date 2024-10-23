@@ -2324,7 +2324,7 @@ function is ever added to that hook."
     (add-to-list 'org-export-global-macros
       '("kbd" . "@@html:<kbd>@@$1@@html:</kbd>@@"))
     (add-to-list 'org-export-global-macros
-      '("cite" . "@@html:<cite>@@$1@@html:</cite>@@"))
+      '("cite" . "@@latex:\\textit{@@@@html:<cite>@@$1@@html:</cite>@@@@latex:}@@"))
     (add-to-list 'org-export-global-macros
       '("dfn" . "@@html:<dfn>@@$1@@html:</dfn>@@"))
     (add-to-list 'org-export-global-macros
@@ -2338,11 +2338,11 @@ function is ever added to that hook."
     (add-to-list 'org-export-global-macros
       '("abbr-plural" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" abbr=\"t\" plural=\"t\" >}}@@"))
     (add-to-list 'org-export-global-macros
-      '("i" . "@@latex:\\emph{@@@@html:<i class=\"dfn\">@@$1@@html:</i>@@@@latex:}@@"))
+      '("i" . "@@latex:\\textit{@@@@html:<i class=\"dfn\">@@$1@@html:</i>@@@@latex:}@@"))
     (add-to-list 'org-export-global-macros
-      '("mechanic" . "@@latex:\\emph{@@@@html:<i class=\"mechanic\">@@$1@@html:</i>@@@@latex:}@@"))
+      '("mechanic" . "@@latex:\\textit{@@@@html:<i class=\"mechanic\">@@$1@@html:</i>@@@@latex:}@@"))
     (add-to-list 'org-export-global-macros
-      '("m" . "@@latex:\\emph{@@@@html:<i class=\"mechanic\">@@$1@@html:</i>@@@@latex:}@@"))
+      '("m" . "@@latex:\\textit{@@@@html:<i class=\"mechanic\">@@$1@@html:</i>@@@@latex:}@@"))
     (add-to-list 'org-export-global-macros
       '("newline" . "@@latex:\\@@ @@html:<br />@@"))
     (add-to-list 'org-export-global-macros
@@ -4661,6 +4661,7 @@ PARG is part of the method signature for `org-link-parameters'."
                (denote-directory)))
             (file (funcall project-read-file-name-function
                     "Select note: "
+                    (denote-file-prompt)
                     (denote-all-files)
                     ;; Filter might be nil; if so pass nil.  Otherwise
                     ;; the string.
@@ -6300,7 +6301,8 @@ See `jf/comment-header-regexp/major-modes-alis'."
           ("H-e p" . flymake-goto-prev-error)
           ("H-e r" . eglot-reconnect)
           ("H-e s" . jf/treesit/func-signature/dwim)
-          ("H-e m" . eglot-rename))
+          ("H-e m" . eglot-rename)
+          ("H-e i" . eglot-find-implementation))
   ;; :straight (:type built-in) The Language Server Protocol (LSP)
   ;; is a game changer; having access to that tooling is very much a
   ;; nice to have.
