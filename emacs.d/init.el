@@ -2115,19 +2115,18 @@ Each member's `car' is title and `cdr' is `org-mode' element."
               headline))))))
 
   (defun jf/org-mode/configurator ()
-    (add-hook 'org-mode-hook
-      (lambda ()
-        "Add localized hooks for `org-mode'."
-        (add-hook 'before-save-hook
-          #'jf/org-mode/recalculate-buffer-tables nil :local)
-        (add-hook 'before-save-hook
-          #'jf/org-add-ids-to-headlines-in-file nil 'local)
-        (add-hook 'focus-out-hook
-          #'org-save-all-org-buffers nil :local)))
-    (jf/org-capf)
+    "Configure `org-mode' to my particulars."
     (setq-local tab-width 8)
+    (add-hook 'before-save-hook
+      #'jf/org-mode/recalculate-buffer-tables nil :local)
+    ;; (add-hook 'before-save-hook
+    ;;   #'jf/org-add-ids-to-headlines-in-file nil 'local)
+    (add-hook 'focus-out-hook
+      #'org-save-all-org-buffers nil :local)
+    (jf/org-capf)
     (turn-on-visual-line-mode)
     (electric-pair-mode -1))
+
   (defun jf/denote-org-capture ()
     "An org-capture conformant function for capturing to a blog-post."
     (if denote-last-path
@@ -6032,9 +6031,9 @@ The generated and indented TOC will be inserted at point."
   ;; when I'm not working in Javascript.
   :straight t)
 
-(use-package vterm
-  ;; A terminal in Emacs.
-  :straight t)
+;; (use-package vterm
+;;   ;; A terminal in Emacs.
+;;   :straight t)
 
 (use-package web-mode
   ;; Help consistently edit web documents of SGML markup dialetcs.

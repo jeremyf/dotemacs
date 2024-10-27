@@ -73,9 +73,10 @@ org-mode
 (rpg "[[abbr:20221009T115226][RPG]] " q)
 (ie "[[abbr:20230825T130802][i.e.]] " q "")
 (clocktable "#+BEGIN: clocktable :scope file :tcolumns 1 :block untilnow :narrow 80! :step year :stepskip0 t :fileskip0 t :filetitle t\n#+END:")
-(lore24-transclude "#+TRANSCLUDE: [[id:" p "]] :only-contents :exclude-elements \"drawer keyword headline\"")
+;; (lore24-transclude "#+TRANSCLUDE: [[id:" p "]] :only-contents :exclude-elements \"drawer keyword headline\"")
 
-(tsomb-date (p "Day: " day t) "[[date:1627-05-" (format "%02d" (string-to-number day)) "][May " day "]]" q)
+(ntable "#+CAPTION: " (p "Caption: " caption) n "#+NAME: " (jf/tor-convert-text-to-slug caption) n "|" q "|" n)
+;; (tsomb-date (p "Day: " day t) "[[date:1627-05-" (format "%02d" (string-to-number day)) "][May " day "]]" q)
 
 (local-var "# -*- " (p "Variable name: ")": " (p "Value: ") "; -*-")
 (macro-cite "{{{cite(" (p (completing-read "Cite: " (jf/org-macro-value-list "cite"))) ")}}}")
