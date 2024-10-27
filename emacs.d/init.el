@@ -4661,7 +4661,6 @@ PARG is part of the method signature for `org-link-parameters'."
             (file (funcall project-read-file-name-function
                     "Select note: "
                     (denote-file-prompt)
-                    (denote-all-files)
                     ;; Filter might be nil; if so pass nil.  Otherwise
                     ;; the string.
                     (when filter
@@ -5722,7 +5721,6 @@ method, get the containing class."
   (setq-default go-test-args (concat "-count 1 -v -coverprofile=test.coverage")))
 
 (defun jf/go-ts-mode-configurator ()
-  (message "🐂 TS Mode")
   (add-to-list
    'treesit-simple-imenu-settings
     `("t.Run" "\\`call_expression\\'" go-ts-mode--testing-run-node-p go-ts-mode--testing-run-name))
@@ -6294,12 +6292,13 @@ See `jf/comment-header-regexp/major-modes-alis'."
 ;; the lightweight nature of `eglot'.
 (use-package eglot
   :straight t
-  :bind (:map eglot-mode-map
-          ("H-e h" . flymake-show-buffer-diagnostics)
-          ("H-e n" . flymake-goto-next-error)
-          ("H-e p" . flymake-goto-prev-error)
+  :bind
+  ("H-e h" . flymake-show-buffer-diagnostics)
+  ("H-e n" . flymake-goto-next-error)
+  ("H-e p" . flymake-goto-prev-error)
+  (:map eglot-mode-map
           ("H-e r" . eglot-reconnect)
-          ("H-e s" . jf/treesit/func-signature/dwim)
+          ;; ("H-e s" . jf/treesit/func-signature/dwim)
           ("H-e m" . eglot-rename)
           ("H-e i" . eglot-find-implementation))
   ;; :straight (:type built-in) The Language Server Protocol (LSP)
