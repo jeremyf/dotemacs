@@ -1352,6 +1352,7 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
            ("TODO" . ,red)
            ("FAIL" . ,red-warmer)
            ("FIXME" . ,red-warmer)
+           ("IMPORTANT" . ,red-warmer)
            ("REVIEW" . ,red)
            ("DONE" . ,green)
            ("NOTE" . ,blue-warmer)
@@ -5718,7 +5719,7 @@ method, get the containing class."
   :after go-ts-mode
   :config
   (setq-default go-run-go-command "LOGGING_LEVEL=22 go")
-  (setq-default go-test-args (concat "-count 1 -v -coverprofile=test.coverage")))
+  (setq-default go-test-args (concat "-count 1 -v  --failfast -coverprofile=test.coverage")))
 
 (defun jf/go-ts-mode-configurator ()
   (add-to-list
@@ -5735,8 +5736,17 @@ method, get the containing class."
 (defvar jf/minor-mode/go-ts-test-mode-map
   (let ((map
           (make-sparse-keymap)))
-    (define-key map (kbd "C-c C-c") #'go-test-current-file)
+    (define-key map (kbd "C-c C-c") #'jf/go-test-current)
     map))
+
+(defun jf/go-test-current (prefix)
+  "Run current test when PREFIX nil, otherwise current file."
+  (interactive "P")
+  (if prefix
+    (let ((current-prefix-arg nil))
+      (go-test-current-test))
+    (let ((current-prefix-arg nil))
+      (go-test-current-file))))
 
 (defvar jf/minor-mode/go-ts-implementation-mode-map
   (let ((map
