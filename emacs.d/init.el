@@ -1349,22 +1349,21 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
     (ef-themes-with-colors
       (setq hl-todo-keyword-faces
         `(
-           ("TODO" . ,red-warmer)
-           ("FAIL" . ,red-warmer)
-           ("FIXME" . ,red-warmer)
-           ("IMPORTANT" . ,red-warmer)
-           ("REVIEW" . ,red-warmer)
-           ("WARNING" . ,red-warmer)
-           ("DONE" . ,green)
+           ;; The first five are from Github:
+           ;; https://github.com/orgs/community/discussions/16925
            ("NOTE" . ,blue-warmer)
+           ("TIP" . ,green)
+           ("IMPORTANT" . ,magenta-cooler)
+           ("WARNING" . ,yellow)
+           ("CAUTION" .,red-warmer)
+           ;; Other keywords that I'm using
            ("HACK" . ,blue-warmer)
-           ("TIP" . ,blue-warmer)
-           ("INFO" . ,blue-warmer)
-           ("SEE" . ,yellow)
+           ("TODO" . ,red-warmer)
+           ("FIXME" . ,red-warmer)
+           ("DONE" . ,green)
            ("QUESTION" .,yellow)
-           ("CAUTION" .,yellow)
            ("BLOCKED" . ,yellow)
-           ("DEPRECATED" . ,yellow)))
+           ("WAITING" . ,yellow)))
       (custom-set-faces
         `(go-coverage-untracked
            ((,c :foreground ,fg-dim :background ,bg-dim)))
@@ -5882,6 +5881,8 @@ method, get the containing class."
   :config (magit-todos-mode)
   :commands (magit-todos-list)
   :custom (magit-todos-exclude-globs '(".git/" "public/" "vendor/"))
+  ;; (magit-todos-keywords-list
+  ;;   '("TODO" "HACK" "QUESTION" "BLOCKED" "WAITING" "FIXME"))
   (magit-todos-insert-after
     '(bottom) nil nil
     "Changed by setter of obsolete option `magit-todos-insert-at'")
