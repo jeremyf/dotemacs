@@ -1362,6 +1362,7 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
            ("INFO" . ,blue-warmer)
            ("SEE" . ,yellow)
            ("QUESTION" .,yellow)
+           ("CAUTION" .,yellow)
            ("BLOCKED" . ,yellow)
            ("DEPRECATED" . ,yellow)))
       (custom-set-faces
