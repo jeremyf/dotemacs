@@ -1349,15 +1349,18 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
     (ef-themes-with-colors
       (setq hl-todo-keyword-faces
         `(
-           ("TODO" . ,red)
+           ("TODO" . ,red-warmer)
            ("FAIL" . ,red-warmer)
            ("FIXME" . ,red-warmer)
            ("IMPORTANT" . ,red-warmer)
-           ("REVIEW" . ,red)
+           ("REVIEW" . ,red-warmer)
+           ("WARNING" . ,red-warmer)
            ("DONE" . ,green)
            ("NOTE" . ,blue-warmer)
            ("HACK" . ,blue-warmer)
-           ("SEE" . ,blue-warmer)
+           ("TIP" . ,blue-warmer)
+           ("INFO" . ,blue-warmer)
+           ("SEE" . ,yellow)
            ("QUESTION" .,yellow)
            ("BLOCKED" . ,yellow)
            ("DEPRECATED" . ,yellow)))
