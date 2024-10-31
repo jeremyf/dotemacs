@@ -5717,6 +5717,23 @@ method, get the containing class."
       :override t
       '((ERROR) @font-lock-warning-face))))
 
+(use-package go-tag
+  ;; go install github.com/fatih/gomodifytags@latest
+  :straight t
+  :bind (:map go-ts-mode-map
+          (("H-g d" . #'go-browse-doc)
+            ("H-g t" . #'go-tag-add)
+            ("H-g H-g f" . #'go-goto-function)
+            ("H-g H-g d" . #'go-goto-docstring)
+            ("H-g H-g a" . #'go-goto-arguments)
+            ("H-g T" . #'go-tag-remove))))
+
+(use-package go-fill-struct
+  ;; go install github.com/davidrjenni/reftools/cmd/fillstruct@latest
+  :straight t
+  :bind (:map go-ts-mode-map
+          (("H-g f" . #'go-fill-struct))))
+
 (use-package gotest
   :straight t
   :after go-ts-mode
@@ -5725,6 +5742,18 @@ method, get the containing class."
   (setq-default go-test-args (concat "-count 1 -v  --failfast -coverprofile=test.coverage")))
 
 (defun jf/go-ts-mode-configurator ()
+  ;; From go-mode
+  (setq-local paragraph-start
+              (concat "[[:space:]]*\\(?:"
+                      comment-start-skip
+                      "\\|\\*/?[[:space:]]*\\|\\)$"))
+  (setq-local paragraph-separate paragraph-start)
+  (setq-local fill-paragraph-function #'go-fill-paragraph)
+  (setq-local fill-forward-paragraph-function #'go--fill-forward-paragraph)
+  (setq-local adaptive-fill-function #'go--find-fill-prefix)
+  (setq-local adaptive-fill-first-line-regexp "")
+  (setq-local comment-line-break-function #'go--comment-indent-new-line)
+
   (add-to-list
    'treesit-simple-imenu-settings
     `("t.Run" "\\`call_expression\\'" go-ts-mode--testing-run-node-p go-ts-mode--testing-run-name))
