@@ -5720,6 +5720,7 @@ method, get the containing class."
 (use-package go-tag
   ;; go install github.com/fatih/gomodifytags@latest
   :straight t
+  :after go-ts-mode
   :bind (:map go-ts-mode-map
           (("H-g d" . #'go-browse-doc)
             ("H-g t" . #'go-tag-add)
@@ -5731,6 +5732,7 @@ method, get the containing class."
 (use-package go-fill-struct
   ;; go install github.com/davidrjenni/reftools/cmd/fillstruct@latest
   :straight t
+  :after go-ts-mode
   :bind (:map go-ts-mode-map
           (("H-g f" . #'go-fill-struct))))
 
@@ -5928,6 +5930,8 @@ method, get the containing class."
   :mode (("README\\.md\\'" . gfm-mode)
           ("\\.md\\'" . gfm-mode)
           ("\\.markdown\\'" . gfm-mode))
+  :custom
+  (markdown-fontify-code-blocks-natively t)
   :config
   (defun jf/markdown-mode-configurator ()
     (setq-local markdown-hide-urls t)
@@ -5939,8 +5943,41 @@ method, get the containing class."
     (if (file-exists-p "/opt/homebrew/bin/pandoc")
       "/opt/homebrew/bin/pandoc"
       "/usr/local/bin/pandoc"))
-  (font-lock-add-keywords 'markdown-mode
-    '(("{{[^}]+}}" . 'font-lock-function-name-face))))
+  (dolist (m '(markdown-mode gfm-mode))
+    (font-lock-add-keywords m
+      '(("{{[^}]+}}" . font-lock-function-name-face))))
+
+  (defun matches-in-buffer (regexp &optional buffer)
+  "return a list of matches of REGEXP in BUFFER or the current buffer if not given."
+  (let ((matches))
+    (save-match-data
+      (save-excursion
+        (with-current-buffer (or buffer (current-buffer))
+          (save-restriction
+            (widen)
+            (goto-char 1)
+            (while (search-forward-regexp regexp nil t 1)
+              (push (match-string 0) matches)))))
+      matches)))
+
+
+;; (defconst jf/hugo-shortcode-regexp
+;;   "\\({{[^ ]? +\\)\\([^ ]+\\)\\([^}]+\\)\\([^ ]?}}\\)"
+;;   "Regular expression for matching Hugo shortcodes.
+;; Group 1 and 4 matches the opening and closing go template brackets.
+;; Group 2 matches the shortcod name.
+;; Group 3 matches all of the slop inbetween
+;; "
+;;   )
+;;   (defun jf/hugo-match-shortcode-tag (last)
+;;     "Match HUGO Shortcode tags from point to LAST."
+;;     (when (markdown-match-inline-generic jf/hugo-shortcode-regexp last t))
+;;     (set-match-data (list
+;;                       (match-beginning 1) (match-end 1)
+;;                       (match-beginning 2) (match-end 2)
+;;                       (match-beginning 3) (match-end 3)
+;;                       (match-beginning 4) (match-end 4)
+;;                       )))
 
 (defun jf/markdown-toc (&optional depth)
   "Extract DEPTH of headings from the current Markdown buffer.
