@@ -1323,7 +1323,7 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
 (mapc #'disable-theme custom-enabled-themes)
 
 (use-package ef-themes
-  :straight t
+  :straight (ef-themes :host github :repo "protesilaos/ef-themes")
   :init
   (defvar jf/themes-plist '()
     "The named themes by pallette.")
@@ -6315,6 +6315,7 @@ See `jf/comment-header-regexp/major-modes-alis'."
           ("H-e r" . eglot-reconnect)
           ;; ("H-e s" . jf/treesit/func-signature/dwim)
           ("H-e m" . eglot-rename)
+          ("H-e a" . eglot-code-actions)
           ("H-e i" . eglot-find-implementation))
   ;; :straight (:type built-in) The Language Server Protocol (LSP)
   ;; is a game changer; having access to that tooling is very much a
@@ -6537,6 +6538,11 @@ See `jf/comment-header-regexp/major-modes-alis'."
   :config	(eglot-booster-mode)
   (advice-add 'eglot-completion-at-point
     :around #'cape-wrap-buster))
+
+(use-package eglot-hierarchy
+  :straight (:host github :repo "dolmens/eglot-hierarchy")
+  :bind (:map eglot-mode-map ("H-e ." . eglot-hierarchy-call-hierarchy))
+  :after eglot)
 
 (use-package eldoc
   ;; Helps with rendering documentation
