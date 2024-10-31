@@ -5945,39 +5945,7 @@ method, get the containing class."
       "/usr/local/bin/pandoc"))
   (dolist (m '(markdown-mode gfm-mode))
     (font-lock-add-keywords m
-      '(("{{[^}]+}}" . font-lock-function-name-face))))
-
-  (defun matches-in-buffer (regexp &optional buffer)
-  "return a list of matches of REGEXP in BUFFER or the current buffer if not given."
-  (let ((matches))
-    (save-match-data
-      (save-excursion
-        (with-current-buffer (or buffer (current-buffer))
-          (save-restriction
-            (widen)
-            (goto-char 1)
-            (while (search-forward-regexp regexp nil t 1)
-              (push (match-string 0) matches)))))
-      matches)))
-
-
-;; (defconst jf/hugo-shortcode-regexp
-;;   "\\({{[^ ]? +\\)\\([^ ]+\\)\\([^}]+\\)\\([^ ]?}}\\)"
-;;   "Regular expression for matching Hugo shortcodes.
-;; Group 1 and 4 matches the opening and closing go template brackets.
-;; Group 2 matches the shortcod name.
-;; Group 3 matches all of the slop inbetween
-;; "
-;;   )
-;;   (defun jf/hugo-match-shortcode-tag (last)
-;;     "Match HUGO Shortcode tags from point to LAST."
-;;     (when (markdown-match-inline-generic jf/hugo-shortcode-regexp last t))
-;;     (set-match-data (list
-;;                       (match-beginning 1) (match-end 1)
-;;                       (match-beginning 2) (match-end 2)
-;;                       (match-beginning 3) (match-end 3)
-;;                       (match-beginning 4) (match-end 4)
-;;                       )))
+      '(("{{[^}]+}}" . font-lock-function-name-face)))))
 
 (defun jf/markdown-toc (&optional depth)
   "Extract DEPTH of headings from the current Markdown buffer.
@@ -7032,7 +7000,10 @@ See `jf/comment-header-regexp/major-modes-alis'."
     :type 'hook))
 
 (use-package mastodon
-  :straight (:host github :repo "jeremyf/mastodon.el")
+  :preface
+  (use-package tp
+    :straight (:host codeberg :repo "martianh/tp.el"))
+  :straight (:host codeberg :repo "martianh/mastodon.el")
   :config (setq mastodon-instance-url "https://dice.camp"
             mastodon-active-user "takeonrules"))
 
