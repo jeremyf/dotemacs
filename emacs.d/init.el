@@ -5487,7 +5487,7 @@ method, get the containing class."
   ;; my font of choice.  Namely adding just a bit more spacing for the
   ;; `scopeline' overlay, thus making line heights inconsistent.
   :config (setq scopeline-overlay-prefix "  ~ ")
-  :hook ((ruby-mode ruby-ts-mode) . scopeline-mode))
+  :hook ((ruby-mode ruby-ts-mode go-mode go-ts-mode) . scopeline-mode))
 
 (use-package bundler
   ;; For Ruby package management
@@ -6284,25 +6284,25 @@ See `jf/comment-header-regexp/major-modes-alis'."
     (which-function-mode)
     ))
 
-(use-package copilot
-  ;; I want to explore this a bit, but by default want it "off" and to
-  ;; be as unobtrusive.
-  :straight (:host github
-              :repo "zerolfx/copilot.el"
-              :files ("dist" "*.el"))
-  :bind (:map copilot-mode-map
-          (("C-c 0 <return>" . copilot-accept-completion)
-            ("C-c 0 <down>" .  copilot-next-completion)
-            ("C-c 0 <up>" . copilot-previous-completion)
-            ("C-c 0 DEL" . copilot-clear-overlay)
-            ("C-c 0 TAB" . copilot-panel-complete)
-            ("C-c 0 ESC" . copilot-mode)))
-  :bind ("C-c 0 ESC" . copilot-mode)
-  :custom
-  ;; Copilot...never give me code comment recommendations.
-  (copilot-disable-predicates '(er--point-is-in-comment-p))
-  (copilot-idle-delay 1.5)
-  :ensure t)
+;; (use-package copilot
+;;   ;; I want to explore this a bit, but by default want it "off" and to
+;;   ;; be as unobtrusive.
+;;   :straight (:host github
+;;               :repo "zerolfx/copilot.el"
+;;               :files ("dist" "*.el"))
+;;   :bind (:map copilot-mode-map
+;;           (("C-c 0 <return>" . copilot-accept-completion)
+;;             ("C-c 0 <down>" .  copilot-next-completion)
+;;             ("C-c 0 <up>" . copilot-previous-completion)
+;;             ("C-c 0 DEL" . copilot-clear-overlay)
+;;             ("C-c 0 TAB" . copilot-panel-complete)
+;;             ("C-c 0 ESC" . copilot-mode)))
+;;   :bind ("C-c 0 ESC" . copilot-mode)
+;;   :custom
+;;   ;; Copilot...never give me code comment recommendations.
+;;   (copilot-disable-predicates '(er--point-is-in-comment-p))
+;;   (copilot-idle-delay 1.5)
+;;   :ensure t)
 
 (use-package ruby-ts-mode
   :straight (:type built-in)
@@ -6569,7 +6569,7 @@ See `jf/comment-header-regexp/major-modes-alis'."
 (use-package eglot-booster
   :straight (:host github :repo "jdtsmith/eglot-booster")
   :after eglot
-  :config	(eglot-booster-mode)
+  :hook ((eglot-managed-mode . eglot-booster-mode))
   (advice-add 'eglot-completion-at-point
     :around #'cape-wrap-buster))
 
