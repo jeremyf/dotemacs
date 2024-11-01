@@ -7006,12 +7006,14 @@ See `jf/comment-header-regexp/major-modes-alis'."
     :type 'hook))
 
 (use-package mastodon
+  :custom
+  (mastodon-tl--timeline-posts-count "50"
+    mastodon-instance-url "https://dice.camp"
+    mastodon-active-user "takeonrules")
   :preface
   (use-package tp
     :straight (:host codeberg :repo "martianh/tp.el"))
-  :straight (:host codeberg :repo "martianh/mastodon.el")
-  :config (setq mastodon-instance-url "https://dice.camp"
-            mastodon-active-user "takeonrules"))
+  :straight (:host codeberg :repo "martianh/mastodon.el"))
 
 (use-package doc-view
   ;; A package for improving the in Emacs viewing experience of PDFs.
