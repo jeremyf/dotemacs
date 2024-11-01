@@ -6839,7 +6839,8 @@ See `jf/comment-header-regexp/major-modes-alis'."
     logos-scroll-lock nil
     logos-olivetti t
     logos-outline-regexp-alist
-    `((emacs-lisp-mode . "^;;;+ ")
+    `((mastodon-mode . "^🐘")
+       (emacs-lisp-mode . "^;;;+ ")
        (org-mode . "^\\*+ +")
        (markdown-mode . "^\\#+ +")))
   (defun logos--reveal-entry ()
@@ -6932,6 +6933,11 @@ See `jf/comment-header-regexp/major-modes-alis'."
     (when (eq major-mode 'org-mode)
       (org-modern-mode -1)))
   (advice-add 'olivetti-mode :before #'jf/olivetti-mode))
+
+(setq jf/toot-prefix "🐘")
+(defun jf/mastodon-tl--insert-status (&rest args)
+  (insert "🐘  ·  ·  ·  ·  ·  ·  ·"))
+(advice-add 'mastodon-tl--insert-status :before #'jf/mastodon-tl--insert-status)
 
 (use-package easy-mmode
   ;; The built in package for crafting minor-modes.  I know their
