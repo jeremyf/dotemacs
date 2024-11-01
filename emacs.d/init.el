@@ -5487,8 +5487,11 @@ method, get the containing class."
   ;; my font of choice.  Namely adding just a bit more spacing for the
   ;; `scopeline' overlay, thus making line heights inconsistent.
   :config (setq scopeline-overlay-prefix "  ~ ")
+
   (add-to-list 'scopeline-targets
     '(go-mode "function_declaration" "func_literal" "method_declaration" "if_statement" "for_statement" "type_declaration" "call_expression"))
+  (add-to-list 'scopeline-targets
+    '(go-ts-mode "function_declaration" "func_literal" "method_declaration" "if_statement" "for_statement" "type_declaration" "call_expression"))
   :hook (prog-mode . scopeline-mode))
 
 (use-package bundler
