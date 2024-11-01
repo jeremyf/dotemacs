@@ -6566,13 +6566,13 @@ See `jf/comment-header-regexp/major-modes-alis'."
 
 ;; See https://elixir-lsp.github.io/elixir-ls/getting-started/emacs/
 
-(use-package eglot-booster
-  :straight (:host github :repo "jdtsmith/eglot-booster")
-  :after eglot
-  :hook ((eglot-managed-mode . eglot-booster-mode))
-  :config
-  (advice-add 'eglot-completion-at-point
-    :around #'cape-wrap-buster))
+;; (use-package eglot-booster
+;;   :straight (:host github :repo "jdtsmith/eglot-booster")
+;;   :after eglot
+;;   :hook ((eglot-managed-mode . eglot-booster-mode))
+;;   :config
+;;   (advice-add 'eglot-completion-at-point
+;;     :around #'cape-wrap-buster))
 
 (use-package eglot-hierarchy
   :straight (:host github :repo "dolmens/eglot-hierarchy")
@@ -7004,7 +7004,7 @@ See `jf/comment-header-regexp/major-modes-alis'."
     :type 'hook))
 
 
-(unless (file-p (expand-file-name "~/.work-machine"))
+(unless (file-exists-p (expand-file-name "~/.work-machine"))
   (use-package mastodon
     :custom
     (mastodon-tl--timeline-posts-count "50"
