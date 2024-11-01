@@ -5487,7 +5487,9 @@ method, get the containing class."
   ;; my font of choice.  Namely adding just a bit more spacing for the
   ;; `scopeline' overlay, thus making line heights inconsistent.
   :config (setq scopeline-overlay-prefix "  ~ ")
-  :hook ((ruby-mode ruby-ts-mode go-mode go-ts-mode) . scopeline-mode))
+  (add-to-list 'scopeline-targets
+    '(go-mode "function_declaration" "func_literal" "method_declaration" "if_statement" "for_statement" "type_declaration" "call_expression"))
+  :hook (prog-mode . scopeline-mode))
 
 (use-package bundler
   ;; For Ruby package management
@@ -7004,21 +7006,21 @@ See `jf/comment-header-regexp/major-modes-alis'."
     :type 'hook))
 
 
-(unless (file-exists-p (expand-file-name "~/.work-machine"))
-  (use-package mastodon
-    :custom
-    (mastodon-tl--timeline-posts-count "50"
-      mastodon-instance-url "https://dice.camp"
-      mastodon-active-user "takeonrules")
-    :preface
-    (use-package tp
-      :straight (:host codeberg :repo "martianh/tp.el"))
-    :straight (:host codeberg :repo "martianh/mastodon.el")
-    :config
-    (defun jf/mastodon-tl--insert-status (&rest args)
-      (insert "🐘  ·  ·  ·  ·  ·  ·  ·"))
-    (advice-add 'mastodon-tl--insert-status
-      :before #'jf/mastodon-tl--insert-status)))
+;; (unless (file-exists-p (expand-file-name "~/.work-machine"))
+;;   (use-package mastodon
+;;     :custom
+;;     (mastodon-tl--timeline-posts-count "50"
+;;       mastodon-instance-url "https://dice.camp"
+;;       mastodon-active-user "takeonrules")
+;;     :preface
+;;     (use-package tp
+;;       :straight (:host codeberg :repo "martianh/tp.el"))
+;;     :straight (:host codeberg :repo "martianh/mastodon.el")
+;;     :config
+;;     (defun jf/mastodon-tl--insert-status (&rest args)
+;;       (insert "🐘  ·  ·  ·  ·  ·  ·  ·"))
+;;     (advice-add 'mastodon-tl--insert-status
+;;       :before #'jf/mastodon-tl--insert-status)))
 
 (use-package doc-view
   ;; A package for improving the in Emacs viewing experience of PDFs.
