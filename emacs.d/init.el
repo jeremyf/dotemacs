@@ -6570,6 +6570,7 @@ See `jf/comment-header-regexp/major-modes-alis'."
   :straight (:host github :repo "jdtsmith/eglot-booster")
   :after eglot
   :hook ((eglot-managed-mode . eglot-booster-mode))
+  :config
   (advice-add 'eglot-completion-at-point
     :around #'cape-wrap-buster))
 
@@ -6935,9 +6936,6 @@ See `jf/comment-header-regexp/major-modes-alis'."
   (advice-add 'olivetti-mode :before #'jf/olivetti-mode))
 
 (setq jf/toot-prefix "🐘")
-(defun jf/mastodon-tl--insert-status (&rest args)
-  (insert "🐘  ·  ·  ·  ·  ·  ·  ·"))
-(advice-add 'mastodon-tl--insert-status :before #'jf/mastodon-tl--insert-status)
 
 (use-package easy-mmode
   ;; The built in package for crafting minor-modes.  I know their
@@ -7005,15 +7003,22 @@ See `jf/comment-header-regexp/major-modes-alis'."
     "Hook when `jf/minor-mode/presenter' deactivated."
     :type 'hook))
 
-(use-package mastodon
-  :custom
-  (mastodon-tl--timeline-posts-count "50"
-    mastodon-instance-url "https://dice.camp"
-    mastodon-active-user "takeonrules")
-  :preface
-  (use-package tp
-    :straight (:host codeberg :repo "martianh/tp.el"))
-  :straight (:host codeberg :repo "martianh/mastodon.el"))
+
+(unless (file-p (expand-file-name "~/.work-machine"))
+  (use-package mastodon
+    :custom
+    (mastodon-tl--timeline-posts-count "50"
+      mastodon-instance-url "https://dice.camp"
+      mastodon-active-user "takeonrules")
+    :preface
+    (use-package tp
+      :straight (:host codeberg :repo "martianh/tp.el"))
+    :straight (:host codeberg :repo "martianh/mastodon.el")
+    :config
+    (defun jf/mastodon-tl--insert-status (&rest args)
+      (insert "🐘  ·  ·  ·  ·  ·  ·  ·"))
+    (advice-add 'mastodon-tl--insert-status
+      :before #'jf/mastodon-tl--insert-status)))
 
 (use-package doc-view
   ;; A package for improving the in Emacs viewing experience of PDFs.
