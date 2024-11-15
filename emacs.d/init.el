@@ -1361,6 +1361,7 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
            ("TODO" . ,red-warmer)
            ("FIXME" . ,red-warmer)
            ("DONE" . ,green)
+           ("ASSUMPTION" .,yellow)
            ("QUESTION" .,yellow)
            ("BLOCKED" . ,yellow)
            ("WAITING" . ,yellow)))
@@ -5812,7 +5813,6 @@ method, get the containing class."
   :bind
   (:map ruby-mode-map
     (("C-M-h" . jf/treesit/function-select)
-      ("C-c y f" . jf/treesit/yank-qualified-method-fname)
       ("C-c w r" . jf/treesit/wrap-rubocop)
       ("M-{" . ruby-beginning-of-block)
       ("M-}" . ruby-end-of-block)))
@@ -6123,11 +6123,12 @@ The generated and indented TOC will be inserted at point."
     (yaml-pro-ts--imenu-node-label (treesit-node-at (point) 'yaml)))
   :straight t)
 
-;; (use-package combobulate
-;;   :straight (:host github :repo "mickeynp/combobulate")
-;;   :hook ((json-ts-mode . combobulate-mode)
-;;           (html-ts-mode . combobulate-mode)
-;;           (yaml-ts-mode . combobulate-mode)))
+(use-package combobulate
+  :straight (:host github :repo "mickeynp/combobulate")
+  :hook ((json-ts-mode . combobulate-mode)
+          (html-ts-mode . combobulate-mode)
+          (go-ts-mode . combobulate-mode)
+          (yaml-ts-mode . combobulate-mode)))
 
 (use-package yard-mode
   ;; My prefered Ruby documentation syntax
@@ -6351,11 +6352,13 @@ See `jf/comment-header-regexp/major-modes-alis'."
   ("H-e n" . flymake-goto-next-error)
   ("H-e p" . flymake-goto-prev-error)
   (:map eglot-mode-map
-          ("H-e r" . eglot-reconnect)
-          ;; ("H-e s" . jf/treesit/func-signature/dwim)
-          ("H-e m" . eglot-rename)
-          ("H-e a" . eglot-code-actions)
-          ("H-e i" . eglot-find-implementation))
+    ("H-e r" . eglot-reconnect)
+    ;; Type M-/ then M-? to jump to definition and then find its usage
+    ("M-/" . jf/treesit/jump-to-declaration-identifier)
+    ;; ("H-e s" . jf/treesit/func-signature/dwim)
+    ("H-e m" . eglot-rename)
+    ("H-e a" . eglot-code-actions)
+    ("H-e i" . eglot-find-implementation))
   ;; :straight (:type built-in) The Language Server Protocol (LSP)
   ;; is a game changer; having access to that tooling is very much a
   ;; nice to have.
@@ -6375,6 +6378,20 @@ See `jf/comment-header-regexp/major-modes-alis'."
            )
           . eglot-ensure)
   :config
+  (defun jf/treesit/jump-to-declaration-identifier ()
+    "Within a defun context, jump to the identifier.
+
+Useful for Eglot."
+    (interactive)
+    (if-let* ((dfn
+                (treesit-defun-at-point))
+               (dfn-identifier
+                 (car (treesit-filter-child
+                        dfn
+                        (lambda (node)
+                          (string= "identifier"
+                            (treesit-node-type node)))))))
+      (goto-char (treesit-node-start dfn-identifier))))
   ;; Cribbed from:
   ;; https://codeberg.org/mekeor/init/src/commit/11e3d86aa18090a5e3a6f0d29373c24373f29aaf/init.el#L666-L811
   ;;
