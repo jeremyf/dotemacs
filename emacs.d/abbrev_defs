@@ -804,6 +804,7 @@
     ("comdemnation" "condemnation" nil :count 1)
     ("comemmorates" "commemorates" nil :count 1)
     ("comemoretion" "commemoration" nil :count 1)
+    ("comform" "conform" nil :count 0)
     ("comision" "commission" nil :count 1)
     ("comisioned" "commissioned" nil :count 1)
     ("comisioner" "commissioner" nil :count 1)

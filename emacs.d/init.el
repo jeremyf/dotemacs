@@ -1579,7 +1579,7 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
       "Search Dotemacs"
       :dir "~/git/dotemacs/"
       :files "*.*"
-      :menu ("Projects" "j d" "Dotemacs")))
+      :menu ("Projects" "j ." "Dotemacs")))
 
   :init (setq ripgrep-arguments "--ignore-case --follow")
   ;; I want to ensure that I'm following symlinks.  This is important
@@ -2122,6 +2122,7 @@ Each member's `car' is title and `cdr' is `org-mode' element."
   (defun jf/org-mode/configurator ()
     "Configure `org-mode' to my particulars."
     (setq-local tab-width 8)
+    (jinx-mode 1)
     (add-hook 'before-save-hook
       #'jf/org-mode/recalculate-buffer-tables nil :local)
     ;; (add-hook 'before-save-hook
@@ -3098,6 +3099,12 @@ to Backlog."
          plain (clock)
          "%(jf/denote/capture-wrap :link \"%L\" :content \"%i\")"
          :empty-lines 1)
+       ("j" "Journal"
+         plain (file+olp+datetree
+                 "~/git/org/denote/private/20241114T075414--personal-journal__personal_private.org")
+         "%?"
+         :empty-lines-before 1
+         :empty-lines-after 1)
        ("i" "Immediate to Clock"
          plain (clock)
          "%i%?"
@@ -4650,6 +4657,23 @@ Consider different logic if IS-A-SERIES."
     :key ?i
     :create-fn 'jf/denote/create-indices-entry)
 
+  (dolist (denote-domain jf/denote/subdirectories)
+    (let* ((denote-domain
+             (substring-no-properties denote-domain))
+            (menu-key-chord
+              (concat "D "
+                (seq-subseq denote-domain 0 1)))
+            (title
+              (s-titleize denote-domain))
+            (full-dir
+              (f-join (denote-directory) denote-domain)))
+      (when (f-dir-p full-dir)
+        (rg-define-search rg-projects-dotemacs
+          "Search Denote "
+          :dir full-dir
+          :files "*.*"
+          :menu ("Denote" menu-key-chord title)))))
+
   (cl-defun jf/org-link-complete-link-for (parg &key
                                             scheme filter subdirectory)
     "Prompt for `denote' with filename FILTER in the given SUBDIRECTORY.
@@ -5214,6 +5238,10 @@ with the series."
   :straight (sdcv-mode :type git :host github :repo "gucong/emacs-sdcv")
   :bind ("C-c C-'" . sdcv-search))
 
+(use-package synosaurus
+  ;; brew install wordnet
+  :straight (synosaurus :type git :host github :repo "hpdeifel/synosaurus")
+  :custom (synosaurus-choose-method 'default))
 
 (use-package unicode-fonts
   ;; Before the emojii...
@@ -5266,6 +5294,9 @@ with the series."
   ;; `brew install enchant`
   :straight t
   :bind ("M-$" . #'jinx-correct)
+  :bind (:map jinx-mode-map
+          (("M-e n" . jinx-next)
+          ("M-e n" . jinx-previous)))
   :config
   (add-to-list 'jinx-exclude-faces '(prog-mode font-lock-string-face))
   ;; From https://github.com/minad/jinx/wiki
@@ -5277,8 +5308,6 @@ The misspelled word is taken from OVERLAY.  WORD is the corrected word."
                     (overlay-end overlay))))
       (message "Abbrev: %s -> %s" abbrev word)
       (define-abbrev global-abbrev-table abbrev word)))
-
-
   (advice-add 'jinx--correct-replace :before #'jinx--add-to-abbrev))
 
 
@@ -5493,7 +5522,7 @@ method, get the containing class."
     '(go-mode "function_declaration" "func_literal" "method_declaration" "if_statement" "for_statement" "type_declaration" "call_expression"))
   (add-to-list 'scopeline-targets
     '(go-ts-mode "function_declaration" "func_literal" "method_declaration" "if_statement" "for_statement" "type_declaration" "call_expression"))
-  :hook (prog-mode . scopeline-mode))
+  :hook ((go-ts-mode go-mode) . scopeline-mode))
 
 (use-package bundler
   ;; For Ruby package management
@@ -7029,10 +7058,11 @@ Useful for Eglot."
 (when (file-exists-p (expand-file-name "~/.my-computer"))
   (use-package mastodon
     :custom
-    (mastodon-tl--timeline-posts-count "50"
+    (mastodon-tl--timeline-posts-count "50")
+    :preface
+    (setq
       mastodon-instance-url "https://dice.camp"
       mastodon-active-user "takeonrules")
-    :preface
     (use-package tp
       :straight (:host codeberg :repo "martianh/tp.el"))
     :straight (:host codeberg :repo "martianh/mastodon.el")
@@ -7618,7 +7648,7 @@ If not set  DEFAULT or prompt for it."
     (cl-defun jf/export-org-to-tor--global-buffer-prop-set (&key key value)
       "Set global property named KEY to VALUE for current buffer."
       (goto-char (point-min))
-      (forward-line 4)
+      (search-forward-regexp "^$")
       (insert (format "\n#+%s: %s" (upcase key) value)))
 
     (defvar jf/tor-session-report-location
