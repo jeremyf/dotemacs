@@ -6157,7 +6157,12 @@ The generated and indented TOC will be inserted at point."
   :hook ((json-ts-mode . combobulate-mode)
           ;; (html-ts-mode . combobulate-mode)
           (go-ts-mode . combobulate-mode)
-          (yaml-ts-mode . combobulate-mode)))
+          (yaml-ts-mode . combobulate-mode))
+  :config
+  ;; The splice functions are destructive and clobber long-used
+  ;; navigation commands.
+  (dolist (key '("M-<down>" "M-<up>" "M-<left>" "M-<right>"))
+    (keymap-unset combobulate-key-map key)))
 
 (use-package yard-mode
   ;; My prefered Ruby documentation syntax
