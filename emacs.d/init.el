@@ -6155,7 +6155,7 @@ The generated and indented TOC will be inserted at point."
 (use-package combobulate
   :straight (:host github :repo "mickeynp/combobulate")
   :hook ((json-ts-mode . combobulate-mode)
-          (html-ts-mode . combobulate-mode)
+          ;; (html-ts-mode . combobulate-mode)
           (go-ts-mode . combobulate-mode)
           (yaml-ts-mode . combobulate-mode)))
 
@@ -7470,6 +7470,15 @@ The `magit-gitdir' is the project's .git directory."
   (global-undo-tree-mode +1))
 
 (with-eval-after-load 'org
+  ;; https://sachachua.com/blog/2024/11/changing-org-mode-underlines-to-the-html-mark-element/
+  (setf (alist-get 'underline org-html-text-markup-alist)
+    "<mark>%s</mark>")
+  ;; These are more of the recommended markup for HTML.  And leaves open
+  ;; the I-tag for idiomatic.
+  (setf (alist-get 'bold org-html-text-markup-alist)
+        "<strong>%s</strong>")
+  (setf (alist-get 'italic org-html-text-markup-alist)
+        "<em>%s</em>")
   (use-package ox
     :straight (:type built-in))
   (use-package ox-hugo
