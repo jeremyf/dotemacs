@@ -6162,7 +6162,7 @@ The generated and indented TOC will be inserted at point."
   :config
   ;; The splice functions are destructive and clobber long-used
   ;; navigation commands.
-  (dolist (key '("M-<down>" "M-<up>" "M-<left>" "M-<right>"))
+  (dolist (key '("C-M-h" "M-<down>" "M-<up>" "M-<left>" "M-<right>"))
     (keymap-unset combobulate-key-map key)))
 
 (use-package yard-mode
