@@ -1426,7 +1426,8 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
            ((,c :foreground ,red))))))
   ;; I had '(:light ef-cyprus) but the differentiation between function
   ;; and comment was not adequate
-  (setq jf/themes-plist '(:dark ef-bio :light ef-elea-light)))
+  ;; (setq jf/themes-plist '(:dark ef-bio :light ef-elea-light))
+  (setq jf/themes-plist '(:dark ef-rosa :light ef-elea-light)))
 
 (use-package custom
   :straight (:type built-in)
