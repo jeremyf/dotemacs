@@ -55,6 +55,7 @@
 
 ;; See https://github.com/radian-software/straight.el/issues/1146
 (use-package straight
+  :straight t
   :custom
   ;; add project and flymake to the pseudo-packages variable so straight.el doesn't download a separate version than what eglot downloads.
   (straight-built-in-pseudo-packages '(emacs nadvice python image-mode project flymake))
