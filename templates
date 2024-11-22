@@ -60,7 +60,8 @@ markdown-mode markdown-ts-mode
 ;;;; org-mode
 org-mode
 
-
+(utoday "[[date:" (format-time-string "%Y-%m-%d") "][Today]]")
+(ltoday "[[date:" (format-time-string "%Y-%m-%d") "][today]]")
 (beamer
   n "#+OPTIONS: H:2 num:t"
   n "#+BEAMER_THEME: Madrid"

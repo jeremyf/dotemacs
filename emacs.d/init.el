@@ -2330,7 +2330,7 @@ function is ever added to that hook."
     (add-to-list 'org-export-global-macros
       '("kbd" . "@@html:<kbd>@@$1@@html:</kbd>@@"))
     (add-to-list 'org-export-global-macros
-      '("cite" . "@@latex:\\textit{@@@@html:<cite>@@$1@@html:</cite>@@@@latex:}@@"))
+      '("cite" . "@@latex:\\textit{@@@@html:<cite>@@$1@@html:</cite>@@@@latex:}@@ "))
     (add-to-list 'org-export-global-macros
       '("dfn" . "@@html:<dfn>@@$1@@html:</dfn>@@"))
     (add-to-list 'org-export-global-macros
