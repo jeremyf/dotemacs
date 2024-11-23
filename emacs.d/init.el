@@ -991,11 +991,11 @@ The ARGS are the rest of the ARGS passed to the ADVISED-FUNCTION."
          :default-height 160)
        (coding
          :default-family "IntoneMono Nerd Font Mono"
-         :default-weight light
-         :bold-weight medium
+         :default-weight regular
+         :bold-weight bold
          :default-height 130)
        (biggest
-         :default-weight light
+         :default-weight regular
          :default-height 220
          :bold-weight bold)
        (reading
@@ -1005,7 +1005,7 @@ The ARGS are the rest of the ARGS passed to the ADVISED-FUNCTION."
          :bold-weight bold)
        (t
          :default-family "IntoneMono Nerd Font Mono"
-         :default-weight light
+         :default-weight regular
          :default-height 130
          :fixed-pitch-family nil ; falls back to :default-family
          :fixed-pitch-weight nil ; falls back to :default-weight
@@ -1017,7 +1017,7 @@ The ARGS are the rest of the ARGS passed to the ADVISED-FUNCTION."
          :variable-pitch-weight nil
          :variable-pitch-height 1.0
          :bold-family nil ; use whatever the underlying face has
-         :bold-weight medium
+         :bold-weight bold
          :italic-family nil
          :italic-slant italic
          :line-spacing nil)))
@@ -2425,11 +2425,11 @@ function is ever added to that hook."
       :init
       (require 'ox-gfm))
 
-    (use-package igist
-      :straight t
-      :config
-      (setq igist-current-user-name "jeremyf")
-      (setq igist-auth-marker 'igist))
+    ;; (use-package igist
+    ;;   :straight t
+    ;;   :config
+    ;;   (setq igist-current-user-name "jeremyf")
+    ;;   (setq igist-auth-marker 'igist))
 
     ;; In
     ;; https://takeonrules.com/2022/02/26/note-taking-with-org-roam-and-transclusion/,
@@ -8704,7 +8704,7 @@ This encodes the logic for creating a project."
         ("n" "Github Notifications…" gh-notify)
         ("s" "Search note content…" consult-notes-search-in-all-notes)
         ("S" "Search note filename…" consult-notes)
-        ("C-t" "Start a timer…" tmr-with-description)
+        ("C-t" "Start a timer…" tmr-with-details)
         ("u" jf/org-mode/agenda-files-update)]
       ["Denote"
         ("d a" jf/project/add-project-path :if jf/denote?)
