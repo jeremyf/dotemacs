@@ -3562,7 +3562,6 @@ The symbol at point is added to the future history."
   ;;; now I won't have that way open.
   ("s-t" . consult-projectile)
   ("s-p" . consult-projectile)
-  ("H-t" . consult-projectile)
   ("H-p" . consult-projectile))
 
 (use-package corfu
@@ -5946,7 +5945,12 @@ method, get the containing class."
   :init (setq json-reformat:indent-width 2))
 
 (use-package hl-todo
+  ;; A simple package to highlight todos identify by the
+  ;; `hl-todo-keyword-faces'.
   :straight t
+  :bind (:map hl-todo-mode
+          (("H-t n" . hl-todo-next)
+            ("H-t p" . hl-todo-previous)))
   :config (global-hl-todo-mode))
 
 
