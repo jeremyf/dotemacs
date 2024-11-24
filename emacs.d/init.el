@@ -5841,6 +5841,11 @@ method, get the containing class."
   :global nil
   :keymap jf/minor-mode/go-ts-implementation-mode-map)
 
+(use-package outline-indent
+  ;; Simple and basic collapsable outline modes.
+  :straight t
+  :hook (prog-mode . outline-indent-minor-mode))
+
 (use-package ruby-mode
   ;; My language of choice for professional work.
   :straight (:type built-in)
