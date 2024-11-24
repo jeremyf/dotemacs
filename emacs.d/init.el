@@ -327,6 +327,10 @@ Else, evaluate the whole buffer."
           "Copied buffer file name '%s' to the clipboard."
           filename)))))
 
+(use-package files
+  :straight (:type built-in)
+  :custom (make-backup-files nil))
+
 (use-package subword
   ;; With subword-mode, HelloWorld is two words for navigation.
   :straight (:type built-in)
