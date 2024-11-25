@@ -852,7 +852,7 @@ Else, evaluate the whole buffer."
   :custom (imenu-list-focus-after-activation t)
   (imenu-list-size 0.4)
   (imenu-list-position 'right)
-  :bind ("s-4" . 'imenu-list-smart-toggle)
+  :bind ("s-i" . 'imenu-list-smart-toggle)
   :bind (:map imenu-list-major-mode-map ("o" . 'imenu-list-goto-entry))
   :straight t)
 
@@ -6645,6 +6645,18 @@ Useful for Eglot."
   :straight (:host github :repo "dolmens/eglot-hierarchy")
   :bind (:map eglot-mode-map ("H-e ." . eglot-hierarchy-call-hierarchy))
   :after eglot)
+
+(use-package consult-eglot
+  :after (consult eglot)
+  :straight t)
+
+(use-package consult-eglot-embark
+  :straight t
+  :config
+  (with-eval-after-load 'embark
+    (with-eval-after-load 'consult-eglot
+      (require 'consult-eglot-embark)
+      (consult-eglot-embark-mode))))
 
 (use-package eldoc
   ;; Helps with rendering documentation

@@ -126,7 +126,7 @@ text-mode
 ;; (banner comment-start (make-string (length title) ?=) n comment-start (p "Title: " title) n comment-start (make-string (length title) ?=))
 
 go-ts-mode go-mode
-
+(regex "rx := regexp.MustCompile(`" p "`)")
 (db "runtime.Breakpoint()" n)
 (tnew  "package " p "_test" n n "import(" n "  \"testing\"" n "  \"github.com/stretchr/testify/assert\"" n ")" n n "func Test" p "(t *testing.T) {" n q n "  assert.Nil(t, nil)" n "}")
 (thelper "func helper" p "(t *testing.T) {" n > "t.Helper()" n > q n "}")
