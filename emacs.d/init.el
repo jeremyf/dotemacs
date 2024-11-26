@@ -8496,7 +8496,7 @@ With one PREFIX go to place where we would jump on capture."
 Added in cases where we want to inject the actual file."
     (with-current-buffer (find-file-noselect filename)
       (let ((paths
-              (cl-maplist #'read
+              (-map #'read
                 (cdar (org-collect-keywords '("PROJECT_PATHS"))))))
         (setq paths (cons (cons "Notes" filename) paths)))))
 
