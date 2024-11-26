@@ -7083,22 +7083,22 @@ Useful for Eglot."
     :type 'hook))
 
 
-(when (file-exists-p (expand-file-name "~/.my-computer"))
-  (use-package mastodon
-    :custom
-    (mastodon-tl--timeline-posts-count "50")
-    :preface
-    (setq
-      mastodon-instance-url "https://dice.camp"
-      mastodon-active-user "takeonrules")
-    (use-package tp
-      :straight (:host codeberg :repo "martianh/tp.el"))
-    :straight (:host codeberg :repo "martianh/mastodon.el")
-    :config
-    (defun jf/mastodon-tl--insert-status (&rest args)
-      (insert "🐘  ·  ·  ·  ·  ·  ·  ·"))
-    (advice-add 'mastodon-tl--insert-status
-      :before #'jf/mastodon-tl--insert-status)))
+;; (when (file-exists-p (expand-file-name "~/.my-computer"))
+;;   (use-package mastodon
+;;     :custom
+;;     (mastodon-tl--timeline-posts-count "50")
+;;     :preface
+;;     (setq
+;;       mastodon-instance-url "https://dice.camp"
+;;       mastodon-active-user "takeonrules")
+;;     (use-package tp
+;;       :straight (:host codeberg :repo "martianh/tp.el"))
+;;     :straight (:host codeberg :repo "martianh/mastodon.el")
+;;     :config
+;;     (defun jf/mastodon-tl--insert-status (&rest args)
+;;       (insert "🐘  ·  ·  ·  ·  ·  ·  ·"))
+;;     (advice-add 'mastodon-tl--insert-status
+;;       :before #'jf/mastodon-tl--insert-status)))
 
 (use-package doc-view
   ;; A package for improving the in Emacs viewing experience of PDFs.
