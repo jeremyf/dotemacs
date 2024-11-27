@@ -6334,10 +6334,13 @@ See `jf/comment-header-regexp/major-modes-alis'."
     "Do the configuration of all the things."
     ;; I'll type my own parenthesis thank you very much.
     ;; (electric-pair-mode)
-    (flymake-mode 1)
+
+    ;; CVE-2024-53920
+    ;; https://eshelyaron.com/posts/2024-11-27-emacs-aritrary-code-execution-and-how-to-avoid-it.html
+    (unless (derived-mode-p 'emacs-lisp-mode)
+      (flymake-mode 1))
     (setq truncate-lines t)
-    (which-function-mode)
-    ))
+    (which-function-mode)))
 
 ;; (use-package copilot
 ;;   ;; I want to explore this a bit, but by default want it "off" and to
@@ -7119,6 +7122,7 @@ Useful for Eglot."
   ;; Without this, I was not seeing `rss' command.
   :demand 3
   :custom
+  (shr-inhibit-images t)
   (elfeed-curl-timeout 90)
   (elfeed-db-directory "~/Documents/.elfeed")
   :bind ((:map elfeed-search-mode-map
