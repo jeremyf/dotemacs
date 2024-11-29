@@ -1,4 +1,4 @@
-;;; init.el --- Emacs configuration for Jeremy Friesen -*- lexical-binding: t; -*-
+s;;; init.el --- Emacs configuration for Jeremy Friesen -*- lexical-binding: t; -*-
 ;;
 ;;; Commentary:
 ;;
@@ -77,6 +77,34 @@
     (defun jf/garbage-collect-maybe ()
       (unless (frame-focus-state)
         (garbage-collect)))))
+
+
+;; From https://protesilaos.com/codelog/2024-11-28-basic-emacs-configuration/
+(defun  prot/keyboard-quit-dwim ()
+  "Do-What-I-Mean behaviour for a general `keyboard-quit'.
+
+The generic `keyboard-quit' does not do the expected thing when
+the minibuffer is open.  Whereas we want it to close the
+minibuffer, even without explicitly focusing it.
+
+The DWIM behaviour of this command is as follows:
+
+- When the region is active, disable it.
+- When a minibuffer is open, but not focused, close the minibuffer.
+- When the Completions buffer is selected, close it.
+- In every other case use the regular `keyboard-quit'."
+  (interactive)
+  (cond
+    ((region-active-p)
+      (keyboard-quit))
+    ((derived-mode-p  'completion-list-mode)
+      (delete-completion-window))
+    ((>  ( minibuffer-depth)  0)
+      (abort-recursive-edit))
+    (t
+      (keyboard-quit))))
+
+(define-key global-map (kbd "C-g")  #'prot/keyboard-quit-dwim)
 
 (use-package emacs
   ;; Setting baseline behavior for Emacs.
@@ -930,9 +958,11 @@ The ARGS are the rest of the ARGS passed to the ADVISED-FUNCTION."
                     (goto-char (point-min))
                     (forward-line
                       (1- (string-to-number line-number))))))
-              (t (funcall func args))))
+              ;; (t (funcall func args))))
+              (t (apply func (list url)))))
 
-          (funcall func args)))
+          ;; (funcall func args)))
+          (apply func (list url))))
       (apply advised-function func args)))
 
   (advice-add 'link-hint--apply
@@ -1334,8 +1364,8 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
     "The named themes by pallette.")
   :config
   (setq ef-themes-common-palette-overrides
-      '((bg-region bg-green-intense)
-        (fg-region fg-main)))
+    '((bg-region bg-green-intense)
+       (fg-region fg-main)))
   (setq ef-themes-headings ; read the manual's entry or the doc string
     '((0 . (bold 1.4))
        (1 . (variable-pitch bold 1.7))
@@ -2351,6 +2381,8 @@ function is ever added to that hook."
     (add-to-list 'org-export-global-macros
       '("i" . "@@latex:\\textit{@@@@html:<i class=\"dfn\">@@$1@@html:</i>@@@@latex:}@@"))
     (add-to-list 'org-export-global-macros
+      '("em" . "@@latex:\\textit{@@@@html:<em>@@$1@@html:</em>@@@@latex:}@@"))
+    (add-to-list 'org-export-global-macros
       '("mechanic" . "@@latex:\\textit{@@@@html:<i class=\"mechanic\">@@$1@@html:</i>@@@@latex:}@@"))
     (add-to-list 'org-export-global-macros
       '("m" . "@@latex:\\textit{@@@@html:<i class=\"mechanic\">@@$1@@html:</i>@@@@latex:}@@"))
@@ -2454,10 +2486,10 @@ function is ever added to that hook."
       (org-modern-replace-stars
         '("➊" "➋" "➌" "➍" "➎" "➏" "➐" "➑" "➒" "•"))
       (org-modern-star 'replace)
-        ;; Showing the depth of stars helps with the speed keys
-        ;; as well as gives a clearer indicator of the depth of
-        ;; the outline.
-        (org-modern-hide-stars nil)
+      ;; Showing the depth of stars helps with the speed keys
+      ;; as well as gives a clearer indicator of the depth of
+      ;; the outline.
+      (org-modern-hide-stars nil)
       :config (global-org-modern-mode))
 
     ;; For automatically showing the invisible parts of org-mode.
@@ -3087,19 +3119,97 @@ to Backlog."
         (plist-get params :key))))
 
   (load "jf-campaign.el")
+
+  (defun jf/org/capture/quote/name-that-block ()
+    "Name a quote/verse block from capture block.
+
+Use `denote-sluggify' as the naming function for the quote"
+    (let* (
+            ;; The evaluated text thus far.  With prompts completed.
+            (template
+              (plist-get org-capture-current-plist :template))
+            ;; By convention the second line of the template is the
+            ;; first line of the content block
+            (first-line-of-block-content
+              (nth 1 (s-split "\n" template)))
+            ;; Derive the name of the block by leveraging
+            ;; `denote-sluggify'.
+            (name
+              (s-join "-"
+                (seq-take
+                  (s-split "-"
+                    (denote-sluggify 'title
+                      first-line-of-block-content))
+                  8))))
+      (save-excursion
+        (save-restriction
+          ;; Place the name of the quote just above the start of the
+          ;; block.
+          (goto-char (point-min))
+          (insert (format "#+NAME: %s\n" name))))))
+
+  (defun jf/org/capture/quote-location ()
+    "Position to a selected “quotable” element base on prompts.
+
+Narrow focus to a tag, then a named element."
+    (let* (
+            ;; Prompt to select a tag from the current org file.
+            (tag
+              (completing-read "Tag: " (org-get-buffer-tags) nil t))
+            ;; With the given tag, find all associated headlines that match that
+            ;; tag.
+            (headline-alist
+              (org-element-map
+                (org-element-parse-buffer 'headline)
+                'headline
+                (lambda (headline)
+                  (when
+                    (and
+                      (eq (org-element-property :level headline) 2)
+                      (member tag (org-element-property :tags headline)))
+                    (let ((title
+                            (org-element-property :title headline))
+                           (subtitle
+                             (org-entry-get headline "SUBTITLE"))
+                           (author
+                             (org-entry-get headline "AUTHOR")))
+                      (cons
+                        (format "«%s»%s"
+                          (if subtitle
+                            (concat title ": " subtitle)
+                            title)
+                          (if author
+                            (concat " by " author)
+                            ""))
+                        (org-element-property :contents-end headline)))))))
+            ;; Prompt me to pick one of those headlines.
+            (headline
+              (completing-read
+                (concat "Choose from " tag ": ") headline-alist nil t)))
+      (goto-char (alist-get headline headline-alist nil nil #'string=))))
+  (defconst jf/bibliography-filename
+    "~/git/org/denote/private/20241124T080648--bibliography__personal.org"
+    "Dude, you can put your books in here.")
+
   (setq org-capture-templates
-    '(("a" "To Agenda"
-        entry (file jf/agenda-filename/local)
-        "* TODO %?"
-        :clock-keep t
-        :empty-lines-before 1
-        :jump-to-captured t)
-       ("d" "To Denote"
-         plain (file denote-last-path)
-         #'jf/denote-org-capture
-         :no-save t
-         :immediate-finish nil
-         :kill-buffer t
+    '(
+       ("w" "Work"
+         entry
+         (file+headline jf/bibliography-filename "Works")
+         "%^{Title} %^g\n:PROPERTIES:\n:CUSTOM_ID: %(org-id-new)\n:AUTHOR: %^{AUTHOR}\n:END:\n%?"
+         :jump-to-captured t)
+       ("q" "Quote"
+         plain
+         (file+function jf/bibliography-filename
+           jf/org/capture/quote-location)
+         "#+begin_%^{Type|quote|quote|verse}\n%^{Text}\n#+end_%\\1"
+         :prepare-finalize jf/org/capture/quote/name-that-block
+         :jump-to-captured t
+         :empty-lines 1)
+       ("p" "Person to Quote"
+         entry
+         (file+headline jf/bibliography-filename "People")
+         "%^{Name} :people:\n:PROPERTIES:\n:CUSTOM_ID: %(org-id-new)\n:END:\n%?"
          :jump-to-captured t)
        ("c" "Content to Clock"
          plain (clock)
@@ -3115,29 +3225,6 @@ to Backlog."
          plain (clock)
          "%i%?"
          :immediate-finish t)
-       ("k" "Kill to Clock"
-         plain (clock)
-         "%c" :immediate-finish t)
-       ("l" "#Lore24 Entry"
-         plain (file+olp+datetree jf/lore24-filename)
-         "%?"
-         :clock-in t
-         :clock-keep t
-         :empty-lines-before 1
-         :jump-to-captured t)
-       ("n" "NPC"
-         entry (file+headline jf/campaign/file-name
-                 "Non-Player Characters")
-         "* %(jf/campaign/random-npc-as-entry)\n%?"
-         :empty-lines-after 1
-         :jump-to-captured t)
-       ("t" "Today I Learned"
-         plain (file+olp+datetree
-                 "~/git/org/denote/glossary/20221009T115751--today-i-learned__TodayILearned.org")
-         "[[date:%(format-time-string \"%Y-%m-%d\")][Today]] I learned %?"
-         :empty-lines-before 1
-         :empty-lines-after 1
-         :clock-keep t)
        ("N" "Note for project task"
          plain (function jf/org-mode/capture/project-task/find)
          "%T\n\n%?"
@@ -3887,7 +3974,7 @@ Useful if you want a more robust view into the recommend candidates."
   (tempel-key "H-m u" update_block org-mode-map)
   (tempel-key "H-m v" verb_block org-mode-map)
   (tempel-key "H-m c" macro-cite org-mode-map)
-  (tempel-key "H-m i" macro-idiomatic org-mode-map)
+  (tempel-key "H-m e" macro-emphatic org-mode-map)
   (tempel-key "H-m m" macro-mechanic org-mode-map)
   (tempel-key "H-m k" macro-keyboard org-mode-map))
 
@@ -4515,58 +4602,58 @@ See `denote-file-prompt'"
   (jf/denote/create-functions-for :domain "private"
     :key ?v)
 
-  (cl-defun jf/denote/create-epigraph (&key
-                                        (body
-                                          (read-from-minibuffer
-                                            "Epigraph Text: "))
-                                        ;; Todo prompt for Author Name
-                                        (author_name
-                                          (read-from-minibuffer
-                                            "Author Name: "))
-                                        ;; Todo prompt for Work Title
-                                        (work_title
-                                          (read-from-minibuffer
-                                            "Work Title: "))
-                                        (nth-words 8))
-    "Create an epigraph from BODY, AUTHOR_NAME, and WORK_TITLE.
+  ;; (cl-defun jf/denote/create-epigraph (&key
+;;                                         (body
+;;                                           (read-from-minibuffer
+;;                                             "Epigraph Text: "))
+;;                                         ;; Todo prompt for Author Name
+;;                                         (author_name
+;;                                           (read-from-minibuffer
+;;                                             "Author Name: "))
+;;                                         ;; Todo prompt for Work Title
+;;                                         (work_title
+;;                                           (read-from-minibuffer
+;;                                             "Work Title: "))
+;;                                         (nth-words 8))
+;;     "Create an epigraph from BODY, AUTHOR_NAME, and WORK_TITLE.
 
-Default the note’s title to the first NTH-WORDS of the BODY."
-    (interactive)
-    (let* ((body-as-list
-             (s-split-words body))
-            (title (s-join " " (if (> (length body-as-list) nth-words)
-                                 (cl-subseq body-as-list 0 nth-words)
-                                 body-as-list)))
-            (template (concat
-                        ;; The name of the author
-                        "#+AUTHOR_NAME: " author_name "\n"
-                        ;; Where can you “find” this author?
-                        "#+AUTHOR_URL:\n"
-                        ;; The GLOSSARY_KEY for the given author
-                        "#+AUTHOR_KEY:\n"
-                        ;; What’s the title of the work?
-                        "#+WORK_TITLE: " work_title "\n"
-                        ;; Where can you “get” this work?
-                        "#+WORK_URL:\n"
-                        ;; The GLOSSARY_KEY for the given work
-                        "#+WORK_KEY:\n"
-                        ;; Indicates if this is a poem (or not)
-                        "#+POEM:\n"
-                        ;; The page in which this passage appears in the
-                        ;; given work.
-                        "#+PAGE:\n"
-                        ;; The name of the translator
-                        "#+TRANSLATOR_NAME:\n")))
-      (denote title
-        nil
-        'org
-        (f-join (denote-directory) "epigraphs")
-        nil
-        template)))
+;; Default the note’s title to the first NTH-WORDS of the BODY."
+;;     (interactive)
+;;     (let* ((body-as-list
+;;              (s-split-words body))
+;;             (title (s-join " " (if (> (length body-as-list) nth-words)
+;;                                  (cl-subseq body-as-list 0 nth-words)
+;;                                  body-as-list)))
+;;             (template (concat
+;;                         ;; The name of the author
+;;                         "#+AUTHOR_NAME: " author_name "\n"
+;;                         ;; Where can you “find” this author?
+;;                         "#+AUTHOR_URL:\n"
+;;                         ;; The GLOSSARY_KEY for the given author
+;;                         "#+AUTHOR_KEY:\n"
+;;                         ;; What’s the title of the work?
+;;                         "#+WORK_TITLE: " work_title "\n"
+;;                         ;; Where can you “get” this work?
+;;                         "#+WORK_URL:\n"
+;;                         ;; The GLOSSARY_KEY for the given work
+;;                         "#+WORK_KEY:\n"
+;;                         ;; Indicates if this is a poem (or not)
+;;                         "#+POEM:\n"
+;;                         ;; The page in which this passage appears in the
+;;                         ;; given work.
+;;                         "#+PAGE:\n"
+;;                         ;; The name of the translator
+;;                         "#+TRANSLATOR_NAME:\n")))
+;;       (denote title
+;;         nil
+;;         'org
+;;         (f-join (denote-directory) "epigraphs")
+;;         nil
+;;         template)))
 
-  (jf/denote/create-functions-for :domain "epigraphs"
-    :key ?e
-    :create-fn 'jf/denote/create-epigraph)
+  ;; (jf/denote/create-functions-for :domain "epigraphs"
+  ;;   :key ?e
+  ;;   :create-fn 'jf/denote/create-epigraph)
 
   (cl-defun jf/denote/create-glossary-entry (&key
                                               (title (read-from-minibuffer "Name the Entry: "))
@@ -4847,16 +4934,64 @@ PARG is for a conformant method signature."
             (format "%s" text))))))
 
   (org-link-set-parameters "epigraph"
-    :complete (lambda (&optional parg)
-                (jf/org-link-complete-link-for
-                  parg
-                  :scheme "epigraph"
-                  :subdirectory "epigraphs"))
+    :complete #'jf/org-link-ol-complete/epigraph
     :export (lambda (link description format protocol)
               (jf/denote/link-ol-epigraph-link
                 link description format protocol))
     :face #'jf/org-faces-epigraph
-    :follow #'denote-link-ol-follow)
+    :follow #'jf/org-link-ol-follow/epigraph)
+
+  (defun jf/org-link-ol-complete/epigraph ()
+    "Find and insert an epigraph for export.
+
+Wires into `org-insert-link'."
+    (let* ((buffer
+	           (find-file-noselect jf/bibliography-filename))
+            (candidates
+	            (save-excursion
+	              (with-current-buffer buffer
+	                (org-element-map
+		                (org-element-parse-buffer)
+		                '(quote-block verse-block)
+	                  (lambda (el)
+		                  ;; Skip un-named blocks as we can’t link to them.
+		                  (when-let* ((id
+			                              (org-element-property :name el))
+			                             (left
+			                               (org-element-property
+			                                 :contents-begin el))
+			                             (right
+			                               (org-element-property
+			                                 :contents-end el))
+			                             (text
+			                               (s-trim
+			                                 (s-replace "\n" " "
+					                               (buffer-substring-no-properties
+					                                 left
+					                                 (if (< (- right left) 72)
+					                                   right
+					                                   (+ left 72)))))))
+		                    (cons text id)))))))
+            (candidate
+              (completing-read "Epigraph: " candidates nil t))
+            (id
+              (alist-get candidate candidates nil nil #'string=)))
+      (when id
+        (progn
+          (message "Added %S to the kill ring" candidate)
+          (kill-new candidate)
+      (format "epigraph:%s" id)))))
+
+
+  (defun jf/org-link-ol-follow/epigraph (name)
+    "Follow the NAME to the epigraph."
+    (let* ((file
+             jf/bibliography-filename)
+            (case-fold-search
+              t))
+      (find-file file)
+      (search-forward-regexp (format "^#\\+name: +%s$" name))
+      (pulsar--pulse)))
 
   (org-link-set-parameters "elfeed"
     :follow #'elfeed-link-open
@@ -5301,7 +5436,7 @@ with the series."
   :bind ("M-$" . #'jinx-correct)
   :bind (:map jinx-mode-map
           (("M-e n" . jinx-next)
-          ("M-e n" . jinx-previous)))
+            ("M-e n" . jinx-previous)))
   :config
   (add-to-list 'jinx-exclude-faces '(prog-mode font-lock-string-face))
   ;; From https://github.com/minad/jinx/wiki
@@ -5786,9 +5921,9 @@ method, get the containing class."
 (defun jf/go-ts-mode-configurator ()
   ;; From go-mode
   (setq-local paragraph-start
-              (concat "[[:space:]]*\\(?:"
-                      comment-start-skip
-                      "\\|\\*/?[[:space:]]*\\|\\)$"))
+    (concat "[[:space:]]*\\(?:"
+      comment-start-skip
+      "\\|\\*/?[[:space:]]*\\|\\)$"))
   (setq-local paragraph-separate paragraph-start)
   (setq-local fill-paragraph-function #'go-fill-paragraph)
   (setq-local fill-forward-paragraph-function #'go--fill-forward-paragraph)
@@ -5797,7 +5932,7 @@ method, get the containing class."
   (setq-local comment-line-break-function #'go--comment-indent-new-line)
 
   (add-to-list
-   'treesit-simple-imenu-settings
+    'treesit-simple-imenu-settings
     `("t.Run" "\\`call_expression\\'" go-ts-mode--testing-run-node-p go-ts-mode--testing-run-name))
   (setq-local tab-width 2)
   (setq-local eglot-stay-out-of '(imenu))
@@ -5948,9 +6083,8 @@ method, get the containing class."
   ;; A simple package to highlight todos identify by the
   ;; `hl-todo-keyword-faces'.
   :straight t
-  :bind (:map hl-todo-mode
-          (("H-t n" . hl-todo-next)
-            ("H-t p" . hl-todo-previous)))
+  :bind (("H-t n" . hl-todo-next)
+          ("H-t p" . hl-todo-previous))
   :config (global-hl-todo-mode))
 
 
@@ -6342,26 +6476,6 @@ See `jf/comment-header-regexp/major-modes-alis'."
     (setq truncate-lines t)
     (which-function-mode)))
 
-;; (use-package copilot
-;;   ;; I want to explore this a bit, but by default want it "off" and to
-;;   ;; be as unobtrusive.
-;;   :straight (:host github
-;;               :repo "zerolfx/copilot.el"
-;;               :files ("dist" "*.el"))
-;;   :bind (:map copilot-mode-map
-;;           (("C-c 0 <return>" . copilot-accept-completion)
-;;             ("C-c 0 <down>" .  copilot-next-completion)
-;;             ("C-c 0 <up>" . copilot-previous-completion)
-;;             ("C-c 0 DEL" . copilot-clear-overlay)
-;;             ("C-c 0 TAB" . copilot-panel-complete)
-;;             ("C-c 0 ESC" . copilot-mode)))
-;;   :bind ("C-c 0 ESC" . copilot-mode)
-;;   :custom
-;;   ;; Copilot...never give me code comment recommendations.
-;;   (copilot-disable-predicates '(er--point-is-in-comment-p))
-;;   (copilot-idle-delay 1.5)
-;;   :ensure t)
-
 (use-package ruby-ts-mode
   :straight (:type built-in)
   :config
@@ -6750,16 +6864,16 @@ Useful for Eglot."
 
   (setq magit-repository-directories jf/git-project-paths)
   (projectile-register-project-type 'go
-  '("go.mod")
-  :project-file "go.mod"
-  :test-suffix "_test"
-  :related-files-fn #'jf/projectile/go-related-files)
+    '("go.mod")
+    :project-file "go.mod"
+    :test-suffix "_test"
+    :related-files-fn #'jf/projectile/go-related-files)
 
-(defun jf/projectile/go-related-files (path)
-  (when (string-match "\\.go$" path)
-    (if (s-ends-with? "_test.go" path)
-      (list :impl (replace-regexp-in-string "_test\\.go$" ".go" path))
-      (list :test (replace-regexp-in-string "\\.go$" "_test.go" path))))))
+  (defun jf/projectile/go-related-files (path)
+    (when (string-match "\\.go$" path)
+      (if (s-ends-with? "_test.go" path)
+        (list :impl (replace-regexp-in-string "_test\\.go$" ".go" path))
+        (list :test (replace-regexp-in-string "\\.go$" "_test.go" path))))))
 
 (use-package bookmark+
   ;; https://www.emacswiki.org/emacs/BookmarkPlus
@@ -6829,28 +6943,28 @@ Useful for Eglot."
 ;;     ("H-a g" . activities-revert)
 ;;     ("H-a l" . activities-list)))
 
-(use-package intuitive-tab-line
-  :straight (:host github :repo "thread314/intuitive-tab-line-mode")
-  :custom
-  (tab-line-tabs-function 'intuitive-tab-line-buffers-list)
-  (tab-line-switch-cycling t)
-  :config
-  (global-tab-line-mode 1)
-  (recentf-mode 1)
-  (setq
-    tab-line-new-button-show nil  ;; do not show add-new button
-    tab-line-close-button-show nil  ;; do not show close button
-    tab-line-separator " "  ;; delimitation between tabs
-    )
+;; (use-package intuitive-tab-line
+;;   :straight (:host github :repo "thread314/intuitive-tab-line-mode")
+;;   :custom
+;;   (tab-line-tabs-function 'intuitive-tab-line-buffers-list)
+;;   (tab-line-switch-cycling t)
+;;   :config
+;;   (global-tab-line-mode 1)
+;;   (recentf-mode 1)
+;;   (setq
+;;     tab-line-new-button-show nil  ;; do not show add-new button
+;;     tab-line-close-button-show nil  ;; do not show close button
+;;     tab-line-separator " "  ;; delimitation between tabs
+;;     )
 
 
-  ;; (global-set-key (kbd "C-<prior>") 'tab-line-switch-to-prev-tab)
-  (global-set-key (kbd "s-{") 'tab-line-switch-to-prev-tab)
-  ;; (global-set-key (kbd "C-<next>") 'tab-line-switch-to-next-tab)
-  (global-set-key (kbd "s-}") 'tab-line-switch-to-next-tab)
-  ;; (global-set-key (kbd "C-S-<prior>") 'intuitive-tab-line-shift-tab-left)
-  ;; (global-set-key (kbd "C-S-<next>") 'intuitive-tab-line-shift-tab-right)
-  (global-set-key (kbd "C-S-t") 'recentf-open-most-recent-file))
+;;   ;; (global-set-key (kbd "C-<prior>") 'tab-line-switch-to-prev-tab)
+;;   (global-set-key (kbd "s-{") 'tab-line-switch-to-prev-tab)
+;;   ;; (global-set-key (kbd "C-<next>") 'tab-line-switch-to-next-tab)
+;;   (global-set-key (kbd "s-}") 'tab-line-switch-to-next-tab)
+;;   ;; (global-set-key (kbd "C-S-<prior>") 'intuitive-tab-line-shift-tab-left)
+;;   ;; (global-set-key (kbd "C-S-<next>") 'intuitive-tab-line-shift-tab-right)
+;;   (global-set-key (kbd "C-S-t") 'recentf-open-most-recent-file))
 
 (use-package org-bookmark-heading
   ;; Emacs bookmark support for Org-mode.
@@ -6886,7 +7000,7 @@ Useful for Eglot."
                  (end nil))
             (save-excursion
               (if (derived-mode-p 'emacs-lisp-mode)
-                  (mark-defun)
+                (mark-defun)
                 (mark-paragraph))
               (setq beg (point))
               (setq end (mark)))
@@ -7512,9 +7626,10 @@ The `magit-gitdir' is the project's .git directory."
   ;; These are more of the recommended markup for HTML.  And leaves open
   ;; the I-tag for idiomatic.
   (setf (alist-get 'bold org-html-text-markup-alist)
-        "<strong>%s</strong>")
+    "<strong>%s</strong>")
+  ;; This will allow me to skip the i macro.
   (setf (alist-get 'italic org-html-text-markup-alist)
-        "<em>%s</em>")
+    "<i class=\"dfn\">%s</i>")
   (use-package ox
     :straight (:type built-in))
   (use-package ox-hugo
@@ -8821,9 +8936,9 @@ This encodes the logic for creating a project."
 ;;       (async-shell-command "brew install autossh"))))
 
 (dir-locals-set-class-variables
-     'go-lang
-     '((nil . ((projectile-git-fd-args .
-     "-H -0 -tf --strip-cwd-prefix -c never -E vendor/ -E pkg/ -E docs/ -E .git")))))
+  'go-lang
+  '((nil . ((projectile-git-fd-args .
+              "-H -0 -tf --strip-cwd-prefix -c never -E vendor/ -E pkg/ -E docs/ -E .git")))))
 
 (dir-locals-set-directory-class
   "~/git/converge-cloud/marketplace-provider" 'go-lang)
@@ -8838,16 +8953,16 @@ This encodes the logic for creating a project."
   "~/git/converge-cloud/morpho-service-broker" 'go-lang)
 
 (custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(safe-local-variable-values
-    '((projectile-git-fd-args .
-        "-H -0 -tf --strip-cwd-prefix -c never -E vendor/ -E pkg/ -E docs/ -E .git")
-       (projectile-git-command .
-         "git ls-files -zco --exclude-from=.projectile.gitignore")
-       )))
+  ;; custom-set-variables was added by Custom.
+  ;; If you edit it by hand, you could mess it up, so be careful.
+  ;; Your init file should contain only one such instance.
+  ;; If there is more than one, they won't work right.
+  '(safe-local-variable-values
+     '((projectile-git-fd-args .
+         "-H -0 -tf --strip-cwd-prefix -c never -E vendor/ -E pkg/ -E docs/ -E .git")
+        (projectile-git-command .
+          "git ls-files -zco --exclude-from=.projectile.gitignore")
+        )))
 
 (provide 'init)
 ;;; init.el ends here

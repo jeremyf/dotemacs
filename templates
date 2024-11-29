@@ -84,7 +84,7 @@ org-mode
 (local-var "# -*- " (p "Variable name: ")": " (p "Value: ") "; -*-")
 (macro-cite "{{{cite(" (p (completing-read "Cite: " (jf/org-macro-value-list "cite"))) ")}}}")
 (macro-keyboard "{{{kbd(" (p (completing-read "Keyboard: " (jf/org-macro-value-list "kbd"))) ")}}}")
-(macro-idiomatic "{{{i(" (p (completing-read "Idiom: " (jf/org-macro-value-list "i"))) ")}}}")
+(macro-emphatic "{{{em(" (p (completing-read "Emphasis: " (jf/org-macro-value-list "em"))) ")}}}")
 (macro-mechanic "{{{m(" (p (completing-read "Mechanic: " (jf/org-macro-value-list "m(?:echanic)?"))) ")}}}")
 (errant-monster "** " (p "Monster Name") n
   ":PROPERTIES:" n
