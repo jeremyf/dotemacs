@@ -4935,43 +4935,137 @@ PARG is for a conformant method signature."
 
   (org-link-set-parameters "epigraph"
     :complete #'jf/org-link-ol-complete/epigraph
-    :export (lambda (link description format protocol)
-              (jf/denote/link-ol-epigraph-link
-                link description format protocol))
+    :export #'jf/org-link-ol-export/epigraph
     :face #'jf/org-faces-epigraph
     :follow #'jf/org-link-ol-follow/epigraph)
+
+  (defun jf/org-link-ol-export/epigraph (link description format protocol)
+    "Export the text of the LINK epigraph in the corresponding FORMAT.
+
+We ignore the DESCRIPTION and probably the PROTOCOL."
+    (let ((buffer
+            (find-file-noselect jf/bibliography-filename)))
+      (save-excursion
+        (with-current-buffer buffer
+          (let* ((epigraph
+                   (car
+                     (org-element-map
+                       (org-element-parse-buffer)
+                       '(quote-block verse-block)
+                       (lambda (el)
+                         ;; Skip un-named blocks as we can’t link to
+                         ;; them.
+                         (when (string=
+                                 (org-element-property :name el)
+                                 link)
+                           el)))))
+                  (class
+                    (if (eq 'verse-block (org-element-type epigraph))
+                      "verse"
+                      "quote"))
+                  (lineage
+                    (org-element-lineage epigraph))
+                  (context
+                    (car
+                      (seq-filter
+                        (lambda (el)
+                          (and
+                            (eq (org-element-type el) 'headline)
+                            (= (org-element-property :level el) 2)))
+                        lineage)))
+                  (people?
+                    (member "people"
+                      (org-element-property :tags context)))
+                  (work
+                    (if people?
+                      ""
+                      (car (org-element-property :title context))))
+                  (author
+                    (if people?
+                      (car (org-element-property :title context))
+                      (org-entry-get context "AUTHOR")))
+                  (text
+                    (buffer-substring-no-properties
+                      (org-element-property
+                        :contents-begin epigraph)
+                      (org-element-property
+                        :contents-end epigraph))))
+            (cond
+              ;; QUESTION: Am I concerned with the backlinks?  They are
+              ;; cute, but are they worth it?  Assume I persist the ID,
+              ;; I can rebuild that logic.
+              ((or (eq format 'html)
+                 (eq format 'md))
+                (format "<blockquote class=\"%s\">\n%s%s</blockquote>\n"
+                  class
+                  (if (string= class "verse")
+                    (s-replace "\n" "<br />\n" text)
+                    text)
+                  (cond
+                    ((and (s-present? work) (s-present? author))
+                      (format "\n<footer>&mdash;%s, <cite>%s</cite></footer>"
+                        author work))
+                    ((s-present? work)
+                      (format "\n<footer>&mdash; <cite>%s</cite></footer>"
+                        work))
+                    ((s-present? author)
+                      (format "\n<footer>&mdash; %s</footer>"
+                        author))
+                    (t ""))))
+              ((eq format 'latex)
+                (format "\\begin{%s}\n%s\n\\end{%s}\n"
+                  class
+                  (if (string= "verse" class)
+                    (s-replace "\n" "\\\\\n" text)
+                    text)
+                  class))
+              ((eq format 'ascii)
+                (let ((use-hard-newlines t))
+                  (s-replace
+                    "\n" hard-newline
+                    (format "%s%s"
+                      text
+                      (cond
+                        ((and (s-present? work) (s-present? author))
+                          (format "\n\n—%s, “%s”" author work))
+                        ((s-present? work)
+                          (format "\n\n—“%s”" work))
+                        ((s-present? author)
+                          (format "\n\n—“%s”" author))
+                        (t ""))))))
+              (t nil)))))))
 
   (defun jf/org-link-ol-complete/epigraph ()
     "Find and insert an epigraph for export.
 
 Wires into `org-insert-link'."
     (let* ((buffer
-	           (find-file-noselect jf/bibliography-filename))
+             (find-file-noselect jf/bibliography-filename))
             (candidates
-	            (save-excursion
-	              (with-current-buffer buffer
-	                (org-element-map
-		                (org-element-parse-buffer)
-		                '(quote-block verse-block)
-	                  (lambda (el)
-		                  ;; Skip un-named blocks as we can’t link to them.
-		                  (when-let* ((id
-			                              (org-element-property :name el))
-			                             (left
-			                               (org-element-property
-			                                 :contents-begin el))
-			                             (right
-			                               (org-element-property
-			                                 :contents-end el))
-			                             (text
-			                               (s-trim
-			                                 (s-replace "\n" " "
-					                               (buffer-substring-no-properties
-					                                 left
-					                                 (if (< (- right left) 72)
-					                                   right
-					                                   (+ left 72)))))))
-		                    (cons text id)))))))
+              (save-excursion
+                (with-current-buffer buffer
+                  (org-element-map
+                    (org-element-parse-buffer)
+                    '(quote-block verse-block)
+                    (lambda (el)
+                      ;; Skip un-named blocks as we can’t link to them.
+                      (when-let* ((id
+                                    (org-element-property :name el))
+                                   (left
+                                     (org-element-property
+                                       :contents-begin el))
+                                   (right
+                                     (org-element-property
+                                       :contents-end el))
+                                   (text
+                                     (s-trim
+                                       (s-replace "\n" " "
+                                         (buffer-substring-no-properties
+                                           left
+                                           (if (< (- right left) 72)
+                                             right
+                                             (+ left 72)))))))
+                        (cons text id)))))))
             (candidate
               (completing-read "Epigraph: " candidates nil t))
             (id
