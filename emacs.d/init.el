@@ -4895,44 +4895,6 @@ PARG is for conformant method signature."
 PARG is for a conformant method signature."
     (message "TODO, implement link for %s" date))
 
-  ;; I want to be able to link and export my epigraph entries.  For now,
-  ;; I'm going to focus on the HTML and Markdown version; as most often
-  ;; when I include an epigraph it is for my blog posts.
-  (cl-defun jf/denote/link-ol-epigraph-link (link
-                                              description format protocol
-                                              &key
-                                              additional-hugo-parameters
-                                              (jf/exporting-org-to-tor
-                                                jf/exporting-org-to-tor))
-    "Export the epigraph for given LINK, DESCRIPTION, PROTOCOL, and FORMAT.
-
-  NOTE: This only works for blog export.
-  TODO: Consider how to expand beyond blog support."
-    (cond
-      ((and
-         jf/exporting-org-to-tor
-         (or (eq format 'html) (eq format 'md)))
-        (format "{{< epigraph key=\"%s\" >}}" link))
-      ((or (eq format 'html) (eq format 'md))
-        (concat "<blockquote>\n"
-          (jf/epigraph-text-for :identifier link)
-          "\n</blockquote>"))
-      (t nil)))
-
-  (cl-defun jf/epigraph-text-for (&key identifier)
-    "Return the epigraph text for `denote' IDENTIFIER."
-    (let ((filename
-            (denote-get-path-by-id identifier)))
-      (with-current-buffer (find-file-noselect filename)
-        (let ((text
-                (s-join "\n\n" (org-element-map
-                                 (org-element-parse-buffer)
-                                 'paragraph
-                                 (lambda (p) (caddr p))))))
-          (if (cadar (org-collect-keywords '("POEM")))
-            (format "<pre class=\"poem\">\n%s\n</pre>" text)
-            (format "%s" text))))))
-
   (org-link-set-parameters "epigraph"
     :complete #'jf/org-link-ol-complete/epigraph
     :export #'jf/org-link-ol-export/epigraph
@@ -4991,11 +4953,17 @@ We ignore the DESCRIPTION and probably the PROTOCOL."
                       (org-element-property
                         :contents-end epigraph))))
             (cond
-              ;; QUESTION: Am I concerned with the backlinks?  They are
-              ;; cute, but are they worth it?  Assume I persist the ID,
-              ;; I can rebuild that logic.
-              ((or (eq format 'html)
-                 (eq format 'md))
+              ((and
+                 ;; This represents the logic in Take on Rules before
+                 ;; <2024-11-30 Sat>.
+                 ;;
+                 ;; QUESTION: Am I concerned with the backlinks?  They
+                 ;; are cute, but are they worth it?  Assume I persist
+                 ;; the ID, I can rebuild that logic.
+                 jf/exporting-org-to-tor
+                 (or (eq format 'html) (eq format 'md)))
+                (format "{{< epigraph key=\"%s\" >}}" link))
+              ((or (eq format 'html) (eq format 'md))
                 (format "<blockquote class=\"%s\">\n%s%s</blockquote>\n"
                   class
                   (if (string= class "verse")
@@ -5013,11 +4981,19 @@ We ignore the DESCRIPTION and probably the PROTOCOL."
                         author))
                     (t ""))))
               ((eq format 'latex)
-                (format "\\begin{%s}\n%s\n\\end{%s}\n"
+                (format "\\begin{%s}\n%s%s\n\\end{%s}\n"
                   class
                   (if (string= "verse" class)
                     (s-replace "\n" "\\\\\n" text)
                     text)
+                  (cond
+                    ((and (s-present? work) (s-present? author))
+                      (format "---%s, \\textit{%s}" author work))
+                    ((s-present? work)
+                      (format "---\\textit{%s}" work))
+                    ((s-present? author)
+                      (format "---%s" author))
+                    (t ""))
                   class))
               ((eq format 'ascii)
                 (let ((use-hard-newlines t))
@@ -5031,7 +5007,7 @@ We ignore the DESCRIPTION and probably the PROTOCOL."
                         ((s-present? work)
                           (format "\n\n—“%s”" work))
                         ((s-present? author)
-                          (format "\n\n—“%s”" author))
+                          (format "\n\n—%s" author))
                         (t ""))))))
               (t nil)))))))
 
@@ -5084,6 +5060,7 @@ Wires into `org-insert-link'."
             (case-fold-search
               t))
       (find-file file)
+      (goto-char (point-min))
       (search-forward-regexp (format "^#\\+name: +%s$" name))
       (pulsar--pulse)))
 
