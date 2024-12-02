@@ -3375,7 +3375,7 @@ Narrow focus to a tag, then a named element."
           ("M-g s-o" . consult-org-agenda)
           ("M-g M-g" . consult-goto-line)
           ("s-l" . consult-goto-line)
-          ("C-l" . consult-goto-line)
+          ;; ("C-l" . consult-goto-line)
           ("M-g o" . consult-outline)
           ("M-g m" . consult-mark)
           ("M-g M" . consult-global-mark)
@@ -6378,7 +6378,7 @@ The generated and indented TOC will be inserted at point."
           ;; (html-ts-mode . combobulate-mode)
           (go-ts-mode . combobulate-mode)
           (yaml-ts-mode . combobulate-mode))
-  :config
+  :init
   ;; The splice functions are destructive and clobber long-used
   ;; navigation commands.
   (dolist (key '("C-M-h" "M-<down>" "M-<up>" "M-<left>" "M-<right>"))
