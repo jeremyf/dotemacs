@@ -7166,8 +7166,9 @@ Useful for Eglot."
       vi-tilde-fringe-mode)
     (setq-local original-display-fill-column-indicator-mode
       display-fill-column-indicator-mode)
-    (setq-local original-git-gutter-mode
-      git-gutter-mode)
+    (when (fboundp 'git-gutter-mode)
+      (setq-local original-git-gutter-mode
+        git-gutter-mode))
     (setq-local original-display-line-numbers-mode
       display-line-numbers-mode)
     (setq-local original-org-modern-block-fringe
@@ -7182,7 +7183,9 @@ Useful for Eglot."
     (vi-tilde-fringe-mode -1)
     (display-line-numbers-mode -1)
     (display-fill-column-indicator-mode -1)
-    (git-gutter-mode -1))
+    (when (fboundp 'git-gutter-mode)
+      (git-gutter-mode -1))
+    )
   (defun jf/olivetti-mode-off-hook ()
     "Restore some visual chatter."
     (setq-local flymake-fringe-indicator-position
@@ -7194,9 +7197,10 @@ Useful for Eglot."
     (display-fill-column-indicator-mode
       original-display-fill-column-indicator-mode)
     (display-line-numbers-mode
-      original-display-line-numbers-mode)
-    (git-gutter-mode
-      original-git-gutter-mode)
+     original-display-line-numbers-mode)
+    (when (fboundp 'git-gutter-mode)
+      (git-gutter-mode
+       original-git-gutter-mode))
     (setq-local org-modern-block-fringe
       original-org-modern-block-fringe))
   (defun jf/olivetti-mode (&rest args)
@@ -7618,19 +7622,19 @@ The `magit-gitdir' is the project's .git directory."
   ;; history.
   :straight (:host github :repo "emacsmirror/git-timemachine"))
 
-(use-package git-gutter
-  ;; Show the current git state in the gutter.  As you edit a line in a
-  ;; file track by git, the indicators change to reflect if this is a
-  ;; modification, addition, or deletion.
-  :straight t
-  :custom (git-gutter:update-interval 0.25)
-  :bind ("C-x g =" . git-gutter:popup-hunk)
-  ("C-x g p" . git-gutter:previous-hunk)
-  ("C-x g n" . git-gutter:next-hunk)
-  :init (global-git-gutter-mode t)
-  (setq git-gutter:modified-sign "%"
-    git-gutter:added-sign "+"
-    git-gutter:deleted-sign "-"))
+;; (use-package git-gutter
+;;   ;; Show the current git state in the gutter.  As you edit a line in a
+;;   ;; file track by git, the indicators change to reflect if this is a
+;;   ;; modification, addition, or deletion.
+;;   :straight t
+;;   :custom (git-gutter:update-interval 0.25)
+;;   :bind ("C-x g =" . git-gutter:popup-hunk)
+;;   ("C-x g p" . git-gutter:previous-hunk)
+;;   ("C-x g n" . git-gutter:next-hunk)
+;;   :init (global-git-gutter-mode t)
+;;   (setq git-gutter:modified-sign "%"
+;;     git-gutter:added-sign "+"
+;;     git-gutter:deleted-sign "-"))
 
 (use-package git-link
   ;; Type ~M-x git-link~ and the function pushes the Git forge URL to
