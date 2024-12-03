@@ -1,4 +1,4 @@
-s;;; init.el --- Emacs configuration for Jeremy Friesen -*- lexical-binding: t; -*-
+;;; init.el --- Emacs configuration for Jeremy Friesen -*- lexical-binding: t; -*-
 ;;
 ;;; Commentary:
 ;;
