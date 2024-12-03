@@ -1401,6 +1401,8 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
            ("BLOCKED" . ,yellow)
            ("WAITING" . ,yellow)))
       (custom-set-faces
+        `(amread-highlight-face
+           ((,c :foreground ,fg-main :background ,bg-search-lazy)))
         `(go-coverage-untracked
            ((,c :foreground ,fg-dim :background ,bg-dim)))
         `(go-coverage-8
@@ -7505,6 +7507,11 @@ Alternative suggestions are: - '(\"\\\"“\" . \"\\\"\")"
   ;; A package that emboldens word stems, helping read a bit faster.
   :straight t
   :custom (stem-reading-overlay t))
+
+(use-package amread-mode
+  ;; A speadreading package.
+  :straight t
+  :commands (amread-mode))
 
 (use-package git-modes
   ;; A mode for editing gitconfig files.
