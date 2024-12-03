@@ -6974,9 +6974,34 @@ Useful for Eglot."
   ;; mad.  C-g will eventually break the loop.)  i only use one
   ;; bookmark file so this isn't a problem but it really does seem
   ;; like a bmkp bug.
+
   (customize-set-value 'bmkp-last-as-first-bookmark-file nil)
+  (add-hook 'bmkp-write-bookmark-file-hook
+    #'jf/bookmark+/remediate-bookmark-file)
+
+  (defun jf/bookmark+/remediate-bookmark-file (&optional file)
+    "Fix FILE format to conform to `bookmark+'.
+
+In updating to Emacs 30.x, I encountered problems with saving the
+bookmark file.  What was happening is that the read format is assumed to
+have a line that is only \")\".  However the writing was not doing that.
+
+This function remediates the observed written format to conform to the
+expected read format."
+    (with-current-buffer
+      (find-file-noselect (or file bookmark-default-file))
+      (save-excursion
+        (goto-char (point-max))
+        (if (re-search-backward "^)" nil t)
+          (message "%s already well formatted" bookmark-default-file)
+          (progn
+            (goto-char (point-max))
+            (re-search-backward ")")
+            (insert "\n")
+            (save-buffer))))))
   ;; auto-set bookmarks.
-  (setq bmkp-automatic-bookmark-mode-delay 30))
+  ;; (setq bmkp-automatic-bookmark-mode-delay 30)
+  )
 
 ;; (use-package activities
 ;;   ;; https://takeonrules.com/2024/05/18/a-quiet-morning-of-practice-to-address-an-observed-personal-computering-workflow-snag/
