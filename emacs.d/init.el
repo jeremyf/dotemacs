@@ -1020,27 +1020,27 @@ The ARGS are the rest of the ARGS passed to the ADVISED-FUNCTION."
        (smaller
          :default-height 120)
        (default
-         :default-height 130)
+         :default-height 125)
        (bigger
          :default-height 160)
        (coding
          :default-family "IntoneMono Nerd Font Mono"
-         :default-weight regular
-         :bold-weight bold
-         :default-height 130)
+         :default-weight light
+         :bold-weight medium
+         :default-height 125)
        (biggest
-         :default-weight regular
+         :default-weight light
          :default-height 220
-         :bold-weight bold)
+         :bold-weight medium)
        (reading
          :default-weight semilight
          :default-family "ETBembo"
          :default-height 220
-         :bold-weight bold)
+         :bold-weight medium)
        (t
          :default-family "IntoneMono Nerd Font Mono"
-         :default-weight regular
-         :default-height 130
+         :default-weight light
+         :default-height 1
          :fixed-pitch-family nil ; falls back to :default-family
          :fixed-pitch-weight nil ; falls back to :default-weight
          :fixed-pitch-height 1.0
@@ -1051,7 +1051,7 @@ The ARGS are the rest of the ARGS passed to the ADVISED-FUNCTION."
          :variable-pitch-weight nil
          :variable-pitch-height 1.0
          :bold-family nil ; use whatever the underlying face has
-         :bold-weight bold
+         :bold-weight medium
          :italic-family nil
          :italic-slant italic
          :line-spacing nil)))
