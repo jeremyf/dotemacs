@@ -3183,12 +3183,14 @@ Narrow focus to a tag, then a named element."
                           (if author
                             (concat " by " author)
                             ""))
-                        (org-element-property :contents-end headline)))))))
+                        (org-element-property :contents-begin headline)))))))
             ;; Prompt me to pick one of those headlines.
             (headline
               (completing-read
                 (concat "Choose from " tag ": ") headline-alist nil t)))
-      (goto-char (alist-get headline headline-alist nil nil #'string=))))
+      (goto-char (alist-get headline headline-alist nil nil #'string=))
+      (while (org-element-type-p (org-element-at-point) '(drawer property-drawer keyword planning))
+        (goto-char (org-element-property :end (org-element-at-point))))))
   (defconst jf/bibliography-filename
     "~/git/org/denote/private/20241124T080648--bibliography__personal.org"
     "Dude, you can put your books in here.")
