@@ -3191,7 +3191,11 @@ Narrow focus to a tag, then a named element."
       (goto-char (alist-get headline headline-alist nil nil #'string=))
       (while (org-element-type-p (org-element-at-point) '(drawer property-drawer keyword planning))
         (goto-char (org-element-property :end (org-element-at-point))))))
-  (defconst jf/bibliography-filename
+  (defvar jf/filename/shopping-list
+    "~/Library/CloudStorage/ProtonDrive-jeremy@jeremyfriesen.com/planning/books-to-get-from-bibliography.txt"
+    "Dude, these are the books I'm curious about.")
+
+  (defvar jf/filename/bibliography
     "~/git/org/denote/private/20241124T080648--bibliography__personal.org"
     "Dude, you can put your books in here.")
 
@@ -3199,12 +3203,13 @@ Narrow focus to a tag, then a named element."
     '(
        ("w" "Work"
          entry
-         (file+headline jf/bibliography-filename "Works")
+         (file+headline jf/filename/bibliography "Works")
          "%^{Title} %^g\n:PROPERTIES:\n:CUSTOM_ID: %(org-id-new)\n:AUTHOR: %^{AUTHOR}\n:END:\n%?"
-         :jump-to-captured t)
+         :jump-to-captured t
+         :after-finalize jf/bibliography/export-shopping-list)
        ("q" "Quote"
          plain
-         (file+function jf/bibliography-filename
+         (file+function jf/filename/bibliography
            jf/org/capture/quote-location)
          "#+begin_%^{Type|quote|quote|verse}\n%^{Text}\n#+end_%\\1"
          :prepare-finalize jf/org/capture/quote/name-that-block
@@ -3212,7 +3217,7 @@ Narrow focus to a tag, then a named element."
          :empty-lines 1)
        ("p" "Person to Quote"
          entry
-         (file+headline jf/bibliography-filename "People")
+         (file+headline jf/filename/bibliography "People")
          "%^{Name} :people:\n:PROPERTIES:\n:CUSTOM_ID: %(org-id-new)\n:END:\n%?"
          :jump-to-captured t)
        ("c" "Content to Clock"
@@ -4899,6 +4904,64 @@ PARG is for conformant method signature."
 PARG is for a conformant method signature."
     (message "TODO, implement link for %s" date))
 
+  (defun jf/bibliography/export-shopping-list (&optional file)
+    "Export my book shopping list to the given FILE."
+    (interactive)
+    (let* ((works
+             (save-excursion
+               (with-current-buffer
+                 (find-file-noselect jf/filename/bibliography)
+                 (org-map-entries
+                   (lambda ()
+                     (list
+                       :title
+                       (concat
+                         (org-element-property
+                           :title (org-element-at-point))
+                         (if-let ((subtitle
+                                    (org-entry-get
+                                      (org-element-at-point)
+                                      "SUBTITLE")))
+                           (format ": %s" subtitle)
+                           ""))
+                       :author
+                       (org-entry-get
+                         (org-element-at-point) "AUTHOR")
+                       :editor
+                       (org-entry-get
+                         (org-element-at-point) "EDITOR")
+                       ))
+                   "+LEVEL=2+books+shoppingList" 'file))))
+            (sorted-works
+              (sort works
+                :key (lambda (work)
+                       (if-let ((author
+                                  (plist-get work :author)))
+                         (car (last
+                                (s-split " "
+                                  (car (s-split " and " author))) 1))
+                         (if-let ((editor
+                                    (plist-get work :editor)))
+                           (car (last
+                                  (s-split " "
+                                    (car (s-split " and " editor))) 1))
+                           ""))))))
+      (let ((buffer
+              (find-file-noselect (or file jf/filename/shopping-list))))
+        (with-current-buffer buffer
+          (delete-region (point-min) (point-max))
+          (insert "Books from Jeremy's “shopping list” that he’s considering:\n\n")
+          (dolist (work sorted-works)
+            (insert (format "- “%s”%s%s\n"
+                      (plist-get work :title)
+                      (if-let ((author (plist-get work :author)))
+                        (concat " by " author)
+                        "")
+                      (if-let ((editor (plist-get work :editor)))
+                        (concat " edited by " editor)
+                        ""))))
+          (save-buffer)))))
+
   (org-link-set-parameters "epigraph"
     :complete #'jf/org-link-ol-complete/epigraph
     :export #'jf/org-link-ol-export/epigraph
@@ -4910,7 +4973,7 @@ PARG is for a conformant method signature."
 
 We ignore the DESCRIPTION and probably the PROTOCOL."
     (let ((buffer
-            (find-file-noselect jf/bibliography-filename)))
+            (find-file-noselect jf/filename/bibliography)))
       (save-excursion
         (with-current-buffer buffer
           (let* ((epigraph
@@ -5020,7 +5083,7 @@ We ignore the DESCRIPTION and probably the PROTOCOL."
 
 Wires into `org-insert-link'."
     (let* ((buffer
-             (find-file-noselect jf/bibliography-filename))
+             (find-file-noselect jf/filename/bibliography))
             (candidates
               (save-excursion
                 (with-current-buffer buffer
@@ -5060,7 +5123,7 @@ Wires into `org-insert-link'."
   (defun jf/org-link-ol-follow/epigraph (name)
     "Follow the NAME to the epigraph."
     (let* ((file
-             jf/bibliography-filename)
+             jf/filename/bibliography)
             (case-fold-search
               t))
       (find-file file)
