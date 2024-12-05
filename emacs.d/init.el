@@ -3199,6 +3199,21 @@ Narrow focus to a tag, then a named element."
     "~/git/org/denote/private/20241124T080648--bibliography__personal.org"
     "Dude, you can put your books in here.")
 
+  (defun jf/org-sort-entries/ignoring-stop-words ()
+    "Sort org entries while ignoring stop words."
+    (interactive)
+    (org-sort-entries
+      nil
+      ?f
+      (lambda ()
+        "Remove the leading stop words from the title."
+        (let ((heading
+                (nth 4 (org-heading-components)))
+               (case-fold-search t))
+          (replace-regexp-in-string
+            "^\\(The\\|A\\|An\\) " "" heading)))
+      #'string<))
+
   (setq org-capture-templates
     '(
        ("w" "Work"
@@ -4915,15 +4930,8 @@ PARG is for a conformant method signature."
                    (lambda ()
                      (list
                        :title
-                       (concat
-                         (org-element-property
-                           :title (org-element-at-point))
-                         (if-let ((subtitle
-                                    (org-entry-get
-                                      (org-element-at-point)
-                                      "SUBTITLE")))
-                           (format ": %s" subtitle)
-                           ""))
+                       (org-element-property
+                         :title (org-element-at-point))
                        :author
                        (org-entry-get
                          (org-element-at-point) "AUTHOR")
@@ -5031,20 +5039,22 @@ We ignore the DESCRIPTION and probably the PROTOCOL."
                  (or (eq format 'html) (eq format 'md)))
                 (format "{{< epigraph key=\"%s\" >}}" link))
               ((or (eq format 'html) (eq format 'md))
-                (format "<blockquote class=\"%s\">\n%s%s</blockquote>\n"
+                (format "<blockquote class=\"%s epigraph\" data-id=\"%s\">\n%s%s</blockquote>\n"
                   class
-                  (if (string= class "verse")
-                    (s-replace "\n" "<br />\n" text)
-                    text)
+                  id
+                  ;; (if (string= class "verse")
+                  ;;   (s-replace "\n" "<br />\n" text)
+                  (org-export-string-as text 'html t)
+                  ;; )
                   (cond
                     ((and (s-present? work) (s-present? author))
-                      (format "\n<footer>&mdash;%s, <cite>%s</cite></footer>"
+                      (format "\n<footer>&#8213;%s, <cite>%s</cite></footer>"
                         author work))
                     ((s-present? work)
-                      (format "\n<footer>&mdash; <cite>%s</cite></footer>"
+                      (format "\n<footer>&#8213; <cite>%s</cite></footer>"
                         work))
                     ((s-present? author)
-                      (format "\n<footer>&mdash; %s</footer>"
+                      (format "\n<footer>&#8213; %s</footer>"
                         author))
                     (t ""))))
               ((eq format 'latex)
@@ -5063,7 +5073,7 @@ We ignore the DESCRIPTION and probably the PROTOCOL."
                     (t ""))
                   class))
               ((eq format 'ascii)
-                (let ((use-hard-newlines t))
+                (let* ((use-hard-newlines t))
                   (s-replace
                     "\n" hard-newline
                     (format "%s%s"
