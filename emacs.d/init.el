@@ -5242,6 +5242,7 @@ Wires into `org-insert-link'."
       (pulsar--pulse)))
 
   (org-link-set-parameters "work"
+    ;; TODO: Allow link to specify to include author.
     :follow #'jf/org-link-ol-follow/work
     :complete #'jf/org-link-ol-complete/work
     :export #'jf/org-link-ol-export/work
@@ -5329,7 +5330,11 @@ We ignore the DESCRIPTION and probably the PROTOCOL."
               ((or (eq format 'html) (eq format 'md))
                 (format "<cite data-id=\"%s\">%s</cite>"
                   link
-                  (plist-get work :title)))
+                  (if-let ((url
+                             (plist-get work :url)))
+                    (format "<a href=\"%s\">%s</a>"
+                      url (plist-get work :title))
+                  (plist-get work :title))))
               ((eq format 'latex)
                 (format "\\textit{%s}"
                   (plist-get work :title)))
