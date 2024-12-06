@@ -5096,6 +5096,8 @@ We ignore the DESCRIPTION and probably the PROTOCOL."
                                  (org-element-property :name el)
                                  link)
                            el)))))
+                  (id
+                    (org-element-property :name epigraph))
                   (class
                     (if (eq 'verse-block (org-element-type epigraph))
                       "verse"
@@ -7481,22 +7483,22 @@ expected read format."
     :type 'hook))
 
 
-;; (when (file-exists-p (expand-file-name "~/.my-computer"))
-;;   (use-package mastodon
-;;     :custom
-;;     (mastodon-tl--timeline-posts-count "50")
-;;     :preface
-;;     (setq
-;;       mastodon-instance-url "https://dice.camp"
-;;       mastodon-active-user "takeonrules")
-;;     (use-package tp
-;;       :straight (:host codeberg :repo "martianh/tp.el"))
-;;     :straight (:host codeberg :repo "martianh/mastodon.el")
-;;     :config
-;;     (defun jf/mastodon-tl--insert-status (&rest args)
-;;       (insert "🐘  ·  ·  ·  ·  ·  ·  ·"))
-;;     (advice-add 'mastodon-tl--insert-status
-;;       :before #'jf/mastodon-tl--insert-status)))
+(when (file-exists-p (expand-file-name "~/.my-computer"))
+  (use-package mastodon
+    :custom
+    (mastodon-tl--timeline-posts-count "50")
+    :preface
+    (setq
+      mastodon-instance-url "https://dice.camp"
+      mastodon-active-user "takeonrules")
+    (use-package tp
+      :straight (:host codeberg :repo "martianh/tp.el"))
+    :straight (:host codeberg :repo "martianh/mastodon.el")
+    :config
+    (defun jf/mastodon-tl--insert-status (&rest args)
+      (insert "🐘  ·  ·  ·  ·  ·  ·  ·"))
+    (advice-add 'mastodon-tl--insert-status
+      :before #'jf/mastodon-tl--insert-status)))
 
 (use-package doc-view
   ;; A package for improving the in Emacs viewing experience of PDFs.
@@ -7686,6 +7688,10 @@ Alternative suggestions are: - '(\"\\\"“\" . \"\\\"\")"
 (use-package amread-mode
   ;; A speadreading package.
   :straight t
+  :custom
+  (amread-word-speed 9.5)
+  (amread-scroll-style 'word)
+  (amread-voice-reader-language 'english)
   :commands (amread-mode))
 
 (use-package git-modes
