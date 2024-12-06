@@ -5051,7 +5051,7 @@ PARG is for a conformant method signature."
                    (text
                      (plist-get epigraph :text)))
               (insert
-                (format "<section class=\"epigraphs\"><blockquote data-id=\"%s\">%s%s\n</blockquote></section>"
+                (format "<section class=\"epigraphs\"><blockquote data-id=\"%s\">%s%s\n</blockquote></section>\n"
                   (plist-get epigraph :id)
                   (if (eq (plist-get epigraph :type) 'verse-block)
                     (concat "<pre class=\"verse\">"  text "</pre>")
@@ -5067,7 +5067,7 @@ PARG is for a conformant method signature."
                       (format "\n<footer>&#8213; %s</footer>"
                         author))
                     (t ""))))))
-          (buffer-save))
+          (save-buffer))
         (message "Done exporting epigraphs to blog"))))
 
   (org-link-set-parameters "epigraph"
