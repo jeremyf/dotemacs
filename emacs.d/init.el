@@ -1436,9 +1436,11 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
         `(jf/org-faces-date
            ((,c :underline nil :foreground ,cyan-faint)))
         `(jf/org-faces-epigraph
-           ((,c :underline nil :slant oblique :foreground ,fg-alt)))
+           ((,c :underline nil :slant italic :foreground ,fg-alt)))
+        `(jf/org-faces-work
+           ((,c :underline nil :slant italic :bold t)))
         `(jf/org-faces-abbr
-           ((,c :underline t :slant oblique :foreground ,fg-dim)))
+           ((,c :underline t :slant italic :foreground ,fg-dim)))
         `(org-list-dt
            ((,c :bold t :slant italic :foreground ,fg-alt)))
         `(font-lock-misc-punctuation-face
@@ -3155,9 +3157,6 @@ Use `denote-sluggify' as the naming function for the quote"
 
 Narrow focus to a tag, then a named element."
     (let* (
-            ;; Prompt to select a tag from the current org file.
-            (tag
-              (completing-read "Tag: " (org-get-buffer-tags) nil t))
             ;; With the given tag, find all associated headlines that match that
             ;; tag.
             (headline-alist
@@ -3166,9 +3165,7 @@ Narrow focus to a tag, then a named element."
                 'headline
                 (lambda (headline)
                   (when
-                    (and
-                      (eq (org-element-property :level headline) 2)
-                      (member tag (org-element-property :tags headline)))
+                    (eq (org-element-property :level headline) 2)
                     (let ((title
                             (org-element-property :title headline))
                            (subtitle
@@ -3187,7 +3184,7 @@ Narrow focus to a tag, then a named element."
             ;; Prompt me to pick one of those headlines.
             (headline
               (completing-read
-                (concat "Choose from " tag ": ") headline-alist nil t)))
+                "Quotable: "  headline-alist nil t)))
       (goto-char (alist-get headline headline-alist nil nil #'string=))
       (while (org-element-type-p (org-element-at-point) '(drawer property-drawer keyword planning))
         (goto-char (org-element-property :end (org-element-at-point))))))
@@ -5240,8 +5237,106 @@ Wires into `org-insert-link'."
               t))
       (find-file file)
       (goto-char (point-min))
-      (search-forward-regexp (format "^#\\+name: +%s$" name))
+      (let ((case-fold-search t))
+        (search-forward-regexp (format "^#\\+name: +%s$" name)))
       (pulsar--pulse)))
+
+  (org-link-set-parameters "work"
+    :follow #'jf/org-link-ol-follow/work
+    :complete #'jf/org-link-ol-complete/work
+    :export #'jf/org-link-ol-export/work
+    :face #'jf/org-faces-work)
+
+  (defun jf/org-link-ol-follow/work (name)
+    "Follow the NAME to the work."
+    (let* ((file
+             jf/filename/bibliography)
+            (case-fold-search
+              t))
+      (find-file file)
+      (goto-char (point-min))
+      (let ((case-fold-search t))
+        (search-forward-regexp
+          (format "^:custom_id:[[:space:]]+%s$" name))
+        (call-interactively #'org-previous-visible-heading))
+      (pulsar--pulse)))
+
+  (defun jf/org-link-ol-complete/work ()
+    "Prompt for a work from my bibliography"
+    (interactive)
+    (let* ((buffer
+             (find-file-noselect jf/filename/bibliography))
+            (works
+              (save-excursion
+                (with-current-buffer buffer
+                  ;; With the given tag, find all associated headlines
+                  ;; that match that tag.
+                  (org-map-entries
+                    (lambda ()
+                      (let* ((headline
+                               (org-element-at-point))
+                              (title
+                                (org-element-property :title headline))
+                              (subtitle
+                                (org-entry-get headline "SUBTITLE")))
+                        (cons
+                          (format "%s"
+                            (if subtitle
+                              (concat title ": " subtitle)
+                              title))
+                          (org-entry-get headline "CUSTOM_ID"))))
+                    "+LEVEL=2+!people" 'file))))
+            (work
+              (completing-read "Citable: " works nil t)))
+      (when-let ((id
+                   (alist-get work works nil nil #'string=)))
+        (progn
+          (message "Added %S to the kill ring" work)
+          (kill-new work)
+          (format "work:%s" id)))))
+
+  (defun jf/org-link-ol-export/work (link description format protocol)
+    "Export the text of the LINK work in the corresponding FORMAT.
+
+We ignore the DESCRIPTION and probably the PROTOCOL."
+    (let ((buffer
+            (find-file-noselect jf/filename/bibliography)))
+      (save-excursion
+        (with-current-buffer buffer
+          (when-let* ((work
+                        (car
+                          (org-element-map
+                            (org-element-parse-buffer)
+                            '(headline)
+                            (lambda (el)
+                              ;; Skip un-named blocks as we can’t link to
+                              ;; them.
+                              (when (string=
+                                      (org-entry-get el "CUSTOM_ID")
+                                      link)
+                                (let ((title
+                                        (car
+                                        (org-element-property :title el))))
+                                  (list
+                                    :title
+                                    (if-let ((subtitle
+                                               (org-entry-get el "SUBTITLE")))
+                                      (format "%s: %s" title subtitle)
+                                      title)
+                                    :url
+                                    (org-entry-get el "ROAM_REFS")))))))))
+            (cond
+              ((or (eq format 'html) (eq format 'md))
+                (format "<cite data-id=\"%s\">%s</cite>"
+                  link
+                  (plist-get work :title)))
+              ((eq format 'latex)
+                (format "\\textit{%s}"
+                  (plist-get work :title)))
+              ((eq format 'ascii)
+                (format "“%s”"
+                  (plist-get work :title)))
+              (t nil)))))))
 
   (org-link-set-parameters "elfeed"
     :follow #'elfeed-link-open
@@ -5275,6 +5370,11 @@ Wires into `org-insert-link'."
 
   (defface jf/org-faces-epigraph '((default :inherit link))
     "Face used to style `org-mode' epigraph links in the buffer."
+    :group 'denote-faces
+    :package-version '(denote . "0.5.0"))
+
+  (defface jf/org-faces-work '((default :inherit link))
+    "Face used to style `org-mode' cite links in the buffer."
     :group 'denote-faces
     :package-version '(denote . "0.5.0"))
 
