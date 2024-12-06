@@ -3199,6 +3199,11 @@ Narrow focus to a tag, then a named element."
     "~/git/org/denote/private/20241124T080648--bibliography__personal.org"
     "Dude, you can put your books in here.")
 
+  (defvar jf/filename/bibliography-takeonrules
+    "~/git/takeonrules.source/content/site-map/epigraphs/index.md"
+    "Page that I generate and push to the
+https://takeonrules.com/site-map/epigraphs url.")
+
   (defun jf/org-sort-entries/ignoring-stop-words ()
     "Sort org entries while ignoring stop words."
     (interactive)
@@ -4969,6 +4974,101 @@ PARG is for a conformant method signature."
                         (concat " edited by " editor)
                         ""))))
           (save-buffer)))))
+
+
+  (defun jf/bibliography/export-epigraphs (&optional file)
+    "Export epigraphs to my blog."
+    (interactive)
+    (let* ((epigraphs
+             (save-excursion
+               (with-current-buffer
+                 (find-file-noselect jf/filename/bibliography)
+                 (elfeed--shuffle
+                   (org-element-map
+                     (org-element-parse-buffer)
+                     '(quote-block verse-block)
+                     (lambda (el)
+                       ;; Skip un-named blocks as we can’t link to them.
+                       (when-let* ((id
+                                     (org-element-property :name el)))
+                         (let* ((lineage
+                                  (org-element-lineage el))
+                                 (h-node
+                                   (car
+                                     (seq-filter
+                                       (lambda (el)
+                                         (and
+                                           (eq (org-element-type el) 'headline)
+                                           (= (org-element-property :level el) 2)))
+                                       lineage)))
+                                 (people?
+                                   (member "people"
+                                     (org-element-property :tags h-node))))
+                           (list
+                             :id id
+                             :type (org-element-type el)
+                             :work (if people?
+                                     ""
+                                     (car
+                                       (org-element-property
+                                         :title h-node)))
+                             :author
+                             (if people?
+                               (car
+                                 (org-element-property :title h-node))
+                               (org-entry-get h-node "AUTHOR"))
+                             :text
+                             (buffer-substring-no-properties
+                               (org-element-property
+                                 :contents-begin el)
+                               (org-element-property
+                                 :contents-end el))))))))))))
+      (let* ((buffer
+               (find-file-noselect
+                 (or file jf/filename/bibliography-takeonrules))))
+        (with-current-buffer buffer
+          (delete-region (point-min) (point-max))
+          (insert
+            "---\n"
+            "date: 2021-07-22 19:23:43.883686000 -04:00 \n"
+            "full_width: true\n"
+            "images: []\n"
+            "lastmod: " (format-time-string "%Y-%m-%d %H:%M:%S.%N %z") "\n"
+            "layout: page\n"
+            "permalink: \"/site-map/epigraphs/\"\n"
+            "title: Epigraphs\n"
+            "type: page\n"
+            "---\n"
+            "\n"
+            "Ever since reading {{< glossary key=\"DUNE-NOVEL\" >}} by {{< glossary key=\"FRANK-HERBERT\" >}} I've loved epigraphs.  "
+            "In that novel, the epigraphs are quotes from fictional works written within the Dune universe.  "
+            "Below are quotes that I've gathered, and in some cases, I've used as epigraphs throughout <cite>Take on Rules</cite>.\n")
+          (dolist (epigraph epigraphs)
+            (let ((work
+                    (plist-get epigraph :work))
+                   (author
+                     (plist-get epigraph :author))
+                   (text
+                     (plist-get epigraph :text)))
+              (insert
+                (format "<section class=\"epigraphs\"><blockquote data-id=\"%s\">%s%s\n</blockquote></section>"
+                  (plist-get epigraph :id)
+                  (if (eq (plist-get epigraph :type) 'verse-block)
+                    (concat "<pre class=\"verse\">"  text "</pre>")
+                    (org-export-string-as (s-trim text) 'html t))
+                  (cond
+                    ((and (s-present? work) (s-present? author))
+                      (format "\n<footer>&#8213;%s, <cite>%s</cite></footer>"
+                        author work))
+                    ((s-present? work)
+                      (format "\n<footer>&#8213; <cite>%s</cite></footer>"
+                        work))
+                    ((s-present? author)
+                      (format "\n<footer>&#8213; %s</footer>"
+                        author))
+                    (t ""))))))
+          (buffer-save))
+        (message "Done exporting epigraphs to blog"))))
 
   (org-link-set-parameters "epigraph"
     :complete #'jf/org-link-ol-complete/epigraph
