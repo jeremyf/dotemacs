@@ -7223,6 +7223,29 @@ Useful for Eglot."
         (list :impl (replace-regexp-in-string "_test\\.go$" ".go" path))
         (list :test (replace-regexp-in-string "\\.go$" "_test.go" path))))))
 
+(use-package eplot :straight
+  (:host github :repo "larsmagne/eplot"))
+
+(Use-package casual-suite
+  :straight t
+  :config
+  (use-package casual-avy
+    :straight t)
+  (keymap-set calc-mode-map "H-c" #'casual-calc-tmenu)
+  (keymap-set dired-mode-map "H-c" #'casual-dired-tmenu)
+  (keymap-set isearch-mode-map "H-c" #'casual-isearch-tmenu)
+  (keymap-set ibuffer-mode-map "H-c" #'casual-ibuffer-tmenu)
+  (keymap-set ibuffer-mode-map "H-c f" #'casual-ibuffer-filter-tmenu)
+  (keymap-set ibuffer-mode-map "H-c s" #'casual-ibuffer-sortby-tmenu)
+  (keymap-set Info-mode-map "H-c" #'casual-info-tmenu)
+  (keymap-set reb-mode-map "H-c" #'casual-re-builder-tmenu)
+  (keymap-set reb-lisp-mode-map "H-c" #'casual-re-builder-tmenu)
+  (keymap-set bookmark-bmenu-mode-map "H-c" #'casual-bookmarks-tmenu)
+  (keymap-set org-agenda-mode-map "H-c" #'casual-agenda-tmenu)
+  (keymap-set symbol-overlay-map "H-c" #'casual-symbol-overlay-tmenu)
+  (keymap-global-set "H-c a" #'casual-avy-tmenu)
+  (keymap-global-set "H-c e" #'casual-editkit-main-tmenu))
+
 (use-package bookmark+
   ;; https://www.emacswiki.org/emacs/BookmarkPlus
   ;;
