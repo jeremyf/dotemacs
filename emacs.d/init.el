@@ -1438,7 +1438,7 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
         `(jf/org-faces-epigraph
            ((,c :underline nil :slant italic :foreground ,fg-alt)))
         `(jf/org-faces-work
-           ((,c :underline nil :slant italic :bold t)))
+           ((,c :underline nil :slant italic :bold t :foreground ,mail-cite-0)))
         `(jf/org-faces-abbr
            ((,c :underline t :slant italic :foreground ,fg-dim)))
         `(org-list-dt
@@ -4067,7 +4067,7 @@ literal then add a fuzzy search)."
   ;; For example, I type "C-c", wait a moment and get a menu that shows
   ;; me what key bindings start with "C-c"; and then I can type the
   ;; following key and execute that command.
-  :straight t
+  :straight (:type built-in)
   :custom
   (which-key-side-window-max-width 0.5)
   (which-key-min-column-description-width 60)
@@ -5171,7 +5171,7 @@ We ignore the DESCRIPTION and probably the PROTOCOL."
                       (format "---%s" author))
                     (t ""))
                   class))
-              ((eq format 'ascii)
+              (t
                 (let* ((use-hard-newlines t))
                   (s-replace
                     "\n" hard-newline
@@ -5184,8 +5184,7 @@ We ignore the DESCRIPTION and probably the PROTOCOL."
                           (format "\n\n—“%s”" work))
                         ((s-present? author)
                           (format "\n\n—%s" author))
-                        (t ""))))))
-              (t nil)))))))
+                        (t ""))))))))))))
 
   (defun jf/org-link-ol-complete/epigraph ()
     "Find and insert an epigraph for export.
@@ -5304,6 +5303,7 @@ We ignore the DESCRIPTION and probably the PROTOCOL."
             (find-file-noselect jf/filename/bibliography)))
       (save-excursion
         (with-current-buffer buffer
+          ;; First we find the corresponding work and possible URL.
           (when-let* ((work
                         (car
                           (org-element-map
@@ -5326,6 +5326,7 @@ We ignore the DESCRIPTION and probably the PROTOCOL."
                                       title)
                                     :url
                                     (org-entry-get el "ROAM_REFS")))))))))
+            ;; Then we create the corresponding format.
             (cond
               ((or (eq format 'html) (eq format 'md))
                 (format "<cite data-id=\"%s\">%s</cite>"
@@ -5338,10 +5339,9 @@ We ignore the DESCRIPTION and probably the PROTOCOL."
               ((eq format 'latex)
                 (format "\\textit{%s}"
                   (plist-get work :title)))
-              ((eq format 'ascii)
+              (t
                 (format "“%s”"
-                  (plist-get work :title)))
-              (t nil)))))))
+                  (plist-get work :title)))))))))
 
   (org-link-set-parameters "elfeed"
     :follow #'elfeed-link-open
