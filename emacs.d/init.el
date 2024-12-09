@@ -5372,7 +5372,7 @@ We ignore the DESCRIPTION and probably the PROTOCOL."
     :package-version '(denote . "0.5.0"))
 
   (defface jf/org-faces-work '((default :inherit link))
-    "Face used to style `org-mode' cite links in the buffer."
+    "Face used to style `org-mode' work links in the buffer."
     :group 'denote-faces
     :package-version '(denote . "0.5.0"))
 
@@ -7261,7 +7261,8 @@ Useful for Eglot."
     (setq bookmark-default-file "~/emacs-bookmarks.el")
 
     ;; Save the `bookmark-file' each time I modify a bookmark.
-    (setq bookmark-save-flag 1))
+    ;; (setq bookmark-save-flag 1)
+    )
   :config
   ;; (define-key bookmark-bmenu-mode-map (kbd "s-o") #'ace-window)
 
