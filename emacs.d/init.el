@@ -6843,6 +6843,7 @@ See `jf/comment-header-regexp/major-modes-alis'."
   ("H-e n" . flymake-goto-next-error)
   ("H-e p" . flymake-goto-prev-error)
   (:map eglot-mode-map
+    ("H-e s" . consult-eglot-symbols)
     ("H-e r" . eglot-reconnect)
     ;; Type M-/ then M-? to jump to definition and then find its usage
     ("M-/" . jf/treesit/jump-to-declaration-identifier)
