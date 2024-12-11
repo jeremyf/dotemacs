@@ -114,6 +114,7 @@ The DWIM behaviour of this command is as follows:
   ;; messing me up a bit.  Also enable a few that I find helpful.  (I’ll
   ;; enable a lot more later).
   (unbind-key "C-z") ;; `suspend-frame'
+  (unbind-key "<f2>") ;; `suspend-frame'
   (unbind-key "s-o") ;; `ns-open-file-using-panel'
   (unbind-key "C-x C-c") ;; `save-buffers-kill-terminal'
 
@@ -6241,7 +6242,42 @@ method, get the containing class."
   :after go-ts-mode
   :config
   (setq-default go-run-go-command "LOGGING_LEVEL=22 go")
+  (setq-default go-test-go-command "LOGGING_LEVEL=22 go")
   (setq-default go-test-args (concat "-count 1 -v  --failfast -coverprofile=test.coverage")))
+
+(use-package dape
+  :straight t)
+
+(use-package repeat
+  :straight (:type built-in)
+  :config
+  (repeat-mode))
+
+(use-package gotest-ts
+  :straight (:host github :repo "chmouel/gotest-ts.el")
+  :init
+  (defun jf/dape/go-test-at-point ()
+    "Run `dape' for go test at point.
+
+See https://github.com/chmouel/gotest-ts.el"
+    (interactive)
+    (dape (dape--config-eval-1
+            `(modes (go-ts-mode)
+               ensure dape-ensure-command
+               fn dape-config-autoport
+               command "dlv"
+               command-args ("dap" "--listen" "127.0.0.1::autoport")
+               command-cwd dape-cwd-fn
+               port :autoport
+               :type "debug"
+               :request "launch"
+               :mode "test"
+               :cwd dape-cwd-fn
+               :program (lambda () (concat "./" (file-relative-name default-directory (funcall dape-cwd-fn))))
+               :args (lambda ()
+                       (when-let* ((test-name (gotest-ts-get-subtest-ts)))
+                         (if test-name `["-test.run" ,test-name]
+                           (error "No test selected")))))))))
 
 (defun jf/go-ts-mode-configurator ()
   ;; From go-mode
@@ -6274,13 +6310,13 @@ method, get the containing class."
     map))
 
 (defun jf/go-test-current (prefix)
-  "Run current test when PREFIX nil, otherwise current file."
+  "Run current test.  When PREFIX given run using `dape`."
   (interactive "P")
   (if prefix
     (let ((current-prefix-arg nil))
-      (go-test-current-test))
+      (jf/dape/go-test-at-point))
     (let ((current-prefix-arg nil))
-      (go-test-current-file))))
+      (gotest-ts-run-dwim))))
 
 (defvar jf/minor-mode/go-ts-implementation-mode-map
   (let ((map
