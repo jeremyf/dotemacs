@@ -7226,7 +7226,7 @@ Useful for Eglot."
 (use-package eplot :straight
   (:host github :repo "larsmagne/eplot"))
 
-(Use-package casual-suite
+(use-package casual-suite
   :straight t
   :config
   (use-package casual-avy
