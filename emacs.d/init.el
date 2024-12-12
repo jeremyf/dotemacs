@@ -6255,6 +6255,10 @@ method, get the containing class."
 
 (use-package gotest-ts
   :straight (:host github :repo "chmouel/gotest-ts.el")
+  :custom (dape-cwd-fn #'jf/dape-cwd-fn)
+  :config
+  (defun jf/dape-cwd-fn ()
+    default-directory)
   :init
   (defun jf/dape/go-test-at-point ()
     "Run `dape' for go test at point.
