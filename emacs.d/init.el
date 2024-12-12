@@ -7145,6 +7145,10 @@ Useful for Eglot."
 (use-package emacs
   :straight (:type built-in)
   :config
+  (add-to-list 'save-some-buffers-action-alist
+             (list "d"
+                   (lambda (buffer) (diff-buffer-with-file (buffer-file-name buffer)))
+                   "show diff between the buffer and its file"))
   ;; From
   ;; https://emacs.dyerdwelling.family/emacs/20230414111409-emacs--indexing-emacs-init/
   ;;
@@ -7235,8 +7239,8 @@ Useful for Eglot."
   (keymap-set dired-mode-map "H-c" #'casual-dired-tmenu)
   (keymap-set isearch-mode-map "H-c" #'casual-isearch-tmenu)
   (keymap-set ibuffer-mode-map "H-c" #'casual-ibuffer-tmenu)
-  (keymap-set ibuffer-mode-map "H-c f" #'casual-ibuffer-filter-tmenu)
-  (keymap-set ibuffer-mode-map "H-c s" #'casual-ibuffer-sortby-tmenu)
+  (keymap-set ibuffer-mode-map "H-f" #'casual-ibuffer-filter-tmenu)
+  (keymap-set ibuffer-mode-map "H-s" #'casual-ibuffer-sortby-tmenu)
   (keymap-set Info-mode-map "H-c" #'casual-info-tmenu)
   (keymap-set reb-mode-map "H-c" #'casual-re-builder-tmenu)
   (keymap-set reb-lisp-mode-map "H-c" #'casual-re-builder-tmenu)
