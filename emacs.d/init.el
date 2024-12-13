@@ -5120,16 +5120,6 @@ We ignore the DESCRIPTION and probably the PROTOCOL."
                       (org-element-property
                         :contents-end epigraph))))
             (cond
-              ((and
-                 ;; This represents the logic in Take on Rules before
-                 ;; <2024-11-30 Sat>.
-                 ;;
-                 ;; QUESTION: Am I concerned with the backlinks?  They
-                 ;; are cute, but are they worth it?  Assume I persist
-                 ;; the ID, I can rebuild that logic.
-                 jf/exporting-org-to-tor
-                 (or (eq format 'html) (eq format 'md)))
-                (format "{{< epigraph key=\"%s\" >}}" link))
               ((or (eq format 'html) (eq format 'md))
                 (format "<blockquote class=\"%s epigraph\" data-id=\"%s\">\n%s%s</blockquote>\n"
                   class
@@ -5216,9 +5206,9 @@ Wires into `org-insert-link'."
               (alist-get candidate candidates nil nil #'string=)))
       (when id
         (progn
-          (message "Added %S to the kill ring" candidate)
-          (kill-new candidate)
-      (format "epigraph:%s" id)))))
+           (message "Added %S to the kill ring" candidate)
+           (kill-new candidate)
+           (format "epigraph:%s" id)))))
 
 
   (defun jf/org-link-ol-follow/epigraph (name)
@@ -5248,7 +5238,10 @@ Wires into `org-insert-link'."
               t))
       (find-file file)
       (goto-char (point-min))
-      (let ((case-fold-search t))
+      (let ((case-fold-search
+              t)
+             (name
+               (car (s-split "::" name))))
         (search-forward-regexp
           (format "^:custom_id:[[:space:]]+%s$" name))
         (call-interactively #'org-previous-visible-heading))
@@ -5283,17 +5276,26 @@ Wires into `org-insert-link'."
               (completing-read "Citable: " works nil t)))
       (when-let ((id
                    (alist-get work works nil nil #'string=)))
-        (progn
+        (let ((include-author
+                (yes-or-no-p "Include Author: ")))
           (message "Added %S to the kill ring" work)
           (kill-new work)
-          (format "work:%s" id)))))
+          (format "work:%s%s"
+            id
+            (if include-author "::author" ""))))))
 
   (defun jf/org-link-ol-export/work (link description format protocol)
     "Export the text of the LINK work in the corresponding FORMAT.
 
 We ignore the DESCRIPTION and probably the PROTOCOL."
-    (let ((buffer
-            (find-file-noselect jf/filename/bibliography)))
+    (let* ((buffer
+            (find-file-noselect jf/filename/bibliography))
+           (link-with-author
+             (s-split "::" link))
+            (link
+              (car link-with-author))
+            (with-author
+              (s-present? (cadr link-with-author))))
       (save-excursion
         (with-current-buffer buffer
           ;; First we find the corresponding work and possible URL.
@@ -5317,24 +5319,35 @@ We ignore the DESCRIPTION and probably the PROTOCOL."
                                                (org-entry-get el "SUBTITLE")))
                                       (format "%s: %s" title subtitle)
                                       title)
+                                    :author
+                                    (org-entry-get el "AUTHOR")
                                     :url
                                     (org-entry-get el "ROAM_REFS")))))))))
+            (let ((author-suffix
+                    (if (and
+                        with-author
+                        (s-present? (plist-get work :author)))
+                    (format " by %s" (plist-get work :author))
+                    "")))
             ;; Then we create the corresponding format.
             (cond
               ((or (eq format 'html) (eq format 'md))
-                (format "<cite data-id=\"%s\">%s</cite>"
+                (format "<cite data-id=\"%s\">%s</cite>%s"
                   link
                   (if-let ((url
                              (plist-get work :url)))
                     (format "<a href=\"%s\">%s</a>"
                       url (plist-get work :title))
-                  (plist-get work :title))))
+                    (plist-get work :title))
+                  author-suffix))
               ((eq format 'latex)
-                (format "\\textit{%s}"
-                  (plist-get work :title)))
+                (format "\\textit{%s}%s"
+                  (plist-get work :title)
+                  author-suffix))
               (t
-                (format "“%s”"
-                  (plist-get work :title)))))))))
+                (format "“%s”%s"
+                  (plist-get work :title)
+                  author-suffix)))))))))
 
   (org-link-set-parameters "elfeed"
     :follow #'elfeed-link-open
@@ -7645,8 +7658,26 @@ expected read format."
   (elfeed-curl-timeout 90)
   (elfeed-db-directory "~/Documents/.elfeed")
   :bind ((:map elfeed-search-mode-map
-           ("q" . jf/elfeed-save-db-and-bury)))
+           (("+" . jf/elfeed-search-tag-all)
+             ("q" . jf/elfeed-save-db-and-bury)))
+          (:map elfeed-show-mode-map
+            (("+" . jf/elfeed-show-tag)
+              ("-" . elfeed-show-untag))))
   :config
+  (defun jf/elfeed-search-tag-all ()
+    "Apply TAG to all selected entries."
+    (interactive)
+    (elfeed-search-tag-all
+      (intern (completing-read "Tag: "
+                  (elfeed-db-get-all-tags)))))
+  (defun jf/elfeed-show-tag ()
+    "Add TAGS to the displayed entry."
+    (interactive)
+    (apply #'elfeed-show-tag
+      (mapcar
+        #'intern
+        (completing-read-multiple "Tag(s): "
+          (elfeed-db-get-all-tags)))))
   (setq elfeed-show-entry-switch #'jf/elfeed-show-entry-switch)
   (setq-default elfeed-search-filter "@2-days-ago +unread ")
   (defun jf/elfeed-show-entry-switch(buffer)
