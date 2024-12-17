@@ -5527,69 +5527,6 @@ When USE_HUGO_SHORTCODE is given use glossary based exporting."
     (jf/denote/capture-reference
       :url (elfeed-entry-link elfeed-show-entry)))
 
-  (defvar jf/bookmark-make-record-function/browse-url/title ""
-    "Used for capturing the title from the browser current tab.")
-
-  (defvar jf/bookmark-make-record-function/browse-url/url ""
-    "Used for capturing the url from the browser current tab.")
-
-  (defun jf/bookmark-url (url title)
-    "Create a `browse-url' bookmark for URL and TITLE."
-    (let* ((jf/bookmark-make-record-function/browse-url/title
-             title)
-            (jf/bookmark-make-record-function/browse-url/url
-              url)
-            (bookmark-make-record-function
-              #'jf/bookmark-make-record-function/browse-url))
-      (bookmark-set-internal nil title nil)))
-
-  (defun jf/bookmark-make-record-function/browse-url()
-    "Function to build the bookmark structure."
-    `(,jf/bookmark-make-record-function/browse-url/title
-       (location . ,jf/bookmark-make-record-function/browse-url/url)
-       (handler . jf/browse-url-bookmark-jump)))
-
-  (defun jf/browse-url-bookmark-jump (bookmark)
-    "Default bookmark handler for browser."
-    (browse-url (bookmark-prop-get bookmark 'location)))
-
-  (put 'jf/browse-url-bookmark-jump 'bookmark-handler-type "BROWSE")
-
-  (defun jf/menu--bookmark-safari ()
-    "Create `bookmark+' for current Safari page."
-    (interactive)
-    (require 'grab-mac-link)
-    (let* ((url-and-title
-             (grab-mac-link-safari-1))
-            (title
-              (read-string
-                (concat "URL: " (car url-and-title) "\nTitle: ")
-                (cadr url-and-title))))
-      (jf/bookmark-url (car url-and-title) title)))
-
-  (defun jf/menu--bookmark-firefox ()
-    "Create `bookmark+' for current Firefox page."
-    (interactive)
-    (require 'grab-mac-link)
-    (let* ((url-and-title
-             (grab-mac-link-firefox-1))
-            (title
-              (read-string
-                (concat "URL: " (car url-and-title) "\nTitle: ")
-                (cadr url-and-title))))
-      (jf/bookmark-url (car url-and-title) title)))
-
-  (defun jf/menu--bookmark-chrome ()
-    "Create `bookmark+' for current Chrome page."
-    (interactive)
-    (require 'grab-mac-link)
-    (let* ((url-and-title
-             (grab-mac-link-chrome-1))
-            (title
-              (read-string
-                (concat "URL: " (car url-and-title) "\nTitle: ")
-                (cadr url-and-title))))
-      (jf/bookmark-url (car url-and-title) title)))
 
   ;; I'd love to avoid re-fetching the content.
   (cl-defun jf/sanitized-dom (&key html)
@@ -7271,6 +7208,7 @@ Useful for Eglot."
 (use-package eplot :straight
   (:host github :repo "larsmagne/eplot"))
 
+
 (use-package casual-suite
   :straight t
   :config
@@ -7292,63 +7230,78 @@ Useful for Eglot."
   (keymap-global-set "H-c e" #'casual-editkit-main-tmenu))
 
 (use-package bookmark
-    :straight (:type built-in)
-    :config
-    ;; On each machine I use, I have different bookmarks, yet they all
-    ;; point to the same location.
-    (setq bookmark-default-file "~/emacs-bookmarks.el")
+  :straight (:type built-in)
+  :config
+  ;; On each machine I use, I have different bookmarks, yet they all
+  ;; point to the same location.
+  (setq bookmark-default-file "~/emacs-bookmarks.el")
 
-    ;; Save the `bookmark-file' each time I modify a bookmark.
-    ;; (setq bookmark-save-flag 1)
-    )
-;; (use-package bookmark+
-;;   ;; https://www.emacswiki.org/emacs/BookmarkPlus
-;;   ;;
-;;   ;; Enhancements to the built-in Emacs bookmarking feature.
-;;   :straight t
-;;   :demand t
-;;   :init
+  ;; Save the `bookmark-file' each time I modify a bookmark.
+  (setq bookmark-save-flag 1)
 
-;;   :config
-;;   ;; (define-key bookmark-bmenu-mode-map (kbd "s-o") #'ace-window)
+  (defvar jf/bookmark-make-record-function/browse-url/title ""
+    "Used for capturing the title from the browser current tab.")
 
-;;   ;; when this is not set to `nil' explicitly, auto-save bookmarks
-;;   ;; gets itself into an infinite loop attempting to autosave and
-;;   ;; write the custom value to custom-file.el.  this happens only when
-;;   ;; the buffer associated with the bookmark has not been saved. (to
-;;   ;; reproduce the issue, remove the customize-set-value sexp, find a
-;;   ;; new file, and wait 30 seconds; it'll start printing messages like
-;;   ;; mad.  C-g will eventually break the loop.)  i only use one
-;;   ;; bookmark file so this isn't a problem but it really does seem
-;;   ;; like a bmkp bug.
+  (defvar jf/bookmark-make-record-function/browse-url/url ""
+    "Used for capturing the url from the browser current tab.")
 
-;;   (customize-set-value 'bmkp-last-as-first-bookmark-file nil)
-;;   (add-hook 'bmkp-write-bookmark-file-hook
-;;     #'jf/bookmark+/remediate-bookmark-file)
+  (defun jf/bookmark-url (url title)
+    "Create a `browse-url' bookmark for URL and TITLE."
+    (let* ((jf/bookmark-make-record-function/browse-url/title
+             title)
+            (jf/bookmark-make-record-function/browse-url/url
+              url)
+            (bookmark-make-record-function
+              #'jf/bookmark-make-record-function/browse-url))
+      (bookmark-set-internal nil title nil)))
 
-;;   (defun jf/bookmark+/remediate-bookmark-file (&optional file)
-;;     "Fix FILE format to conform to `bookmark+'.
+  (defun jf/bookmark-make-record-function/browse-url()
+    "Function to build the bookmark structure."
+    `(,jf/bookmark-make-record-function/browse-url/title
+       (location . ,jf/bookmark-make-record-function/browse-url/url)
+       (handler . jf/browse-url-bookmark-jump)))
 
-;; In updating to Emacs 30.x, I encountered problems with saving the
-;; bookmark file.  What was happening is that the read format is assumed to
-;; have a line that is only \")\".  However the writing was not doing that.
+  (defun jf/browse-url-bookmark-jump (bookmark)
+    "Default bookmark handler for browser."
+    (browse-url (bookmark-prop-get bookmark 'location)))
 
-;; This function remediates the observed written format to conform to the
-;; expected read format."
-;;     (with-current-buffer
-;;       (find-file-noselect (or file bookmark-default-file))
-;;       (save-excursion
-;;         (goto-char (point-max))
-;;         (if (re-search-backward "^)" nil t)
-;;           (message "%s already well formatted" bookmark-default-file)
-;;           (progn
-;;             (goto-char (point-max))
-;;             (re-search-backward ")")
-;;             (insert "\n")
-;;             (save-buffer))))))
-;;   ;; auto-set bookmarks.
-;;   ;; (setq bmkp-automatic-bookmark-mode-delay 30)
-;;   )
+  (put 'jf/browse-url-bookmark-jump 'bookmark-handler-type "BROWSE")
+
+  (defun jf/menu--bookmark-safari ()
+    "Create `bookmark+' for current Safari page."
+    (interactive)
+    (require 'grab-mac-link)
+    (let* ((url-and-title
+             (grab-mac-link-safari-1))
+            (title
+              (read-string
+                (concat "URL: " (car url-and-title) "\nTitle: ")
+                (cadr url-and-title))))
+      (jf/bookmark-url (car url-and-title) title)))
+
+  (defun jf/menu--bookmark-firefox ()
+    "Create `bookmark+' for current Firefox page."
+    (interactive)
+    (require 'grab-mac-link)
+    (let* ((url-and-title
+             (grab-mac-link-firefox-1))
+            (title
+              (read-string
+                (concat "URL: " (car url-and-title) "\nTitle: ")
+                (cadr url-and-title))))
+      (jf/bookmark-url (car url-and-title) title)))
+
+  (defun jf/menu--bookmark-chrome ()
+    "Create `bookmark+' for current Chrome page."
+    (interactive)
+    (require 'grab-mac-link)
+    (let* ((url-and-title
+             (grab-mac-link-chrome-1))
+            (title
+              (read-string
+                (concat "URL: " (car url-and-title) "\nTitle: ")
+                (cadr url-and-title))))
+      (jf/bookmark-url (car url-and-title) title))))
 
 ;; (use-package activities
 ;;   ;; https://takeonrules.com/2024/05/18/a-quiet-morning-of-practice-to-address-an-observed-personal-computering-workflow-snag/
