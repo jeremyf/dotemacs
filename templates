@@ -53,8 +53,6 @@ fundamental-mode
 ;;;; markdown-mode
 markdown-mode markdown-ts-mode
 
-(tor "[Take on Rules](https://takeonrules.com)")
-
 (ghcallout "> [!" (p (completing-read "Callout Type:" '("NOTE" "TIP" "IMPORTANT" "CAUTION" "WARNING") nil t)) "]" n "> " q)
 
 ;;;; org-mode
