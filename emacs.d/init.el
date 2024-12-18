@@ -8282,15 +8282,17 @@ If not set  DEFAULT or prompt for it."
       (if (jf/blog-entry?)
         (let* ((metadata
                  (jf/org-keywords-as-plist
-                   :keywords-regexp "\\(ROAM_REFS\\|DESCRIPTION\\)"))
+                   :keywords-regexp "\\(ROAM_REFS\\|DESCRIPTION\\|TITLE\\)"))
                 (url
                   (lax-plist-get metadata "ROAM_REFS"))
+                (title
+                  (lax-plist-get metadata "TITLE"))
                 (description
                   (lax-plist-get metadata "DESCRIPTION")))
           (call-interactively #'mastodon-toot)
           (end-of-buffer)
           (insert (s-join "\n\n"
-                    (flatten-list (list description url)))))
+                    (flatten-list (list title description url)))))
         (user-error "Current buffer is not a blog post")))
 
     (cl-defun jf/jump_to_corresponding_hugo_file (&key (buffer (current-buffer)))
