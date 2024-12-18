@@ -5126,7 +5126,7 @@ We ignore the DESCRIPTION and probably the PROTOCOL."
                   id
                   (if (string= class "verse")
                     (s-replace "\n" "<br />\n" text)
-                    (org-export-string-as 'html text t))
+                    (org-export-string-as text 'html t))
                   (cond
                     ((and (s-present? work) (s-present? author))
                       (format "\n<footer>&#8213;%s, <cite>%s</cite></footer>"
@@ -7816,7 +7816,10 @@ Alternative suggestions are: - '(\"\\\"“\" . \"\\\"\")"
     (require 'olivetti)
     (olivetti-mode 1)
     (text-scale-set 2))
-  :bind (:map eww-mode-map ("U" . eww-up-url))
+  (unbind-key "u" shr-map)
+  :bind (:map eww-mode-map
+          ("u" . eww-up-url)
+          ("h" . eww-home-url))
   :bind (("C-s-o" . browse-url-at-point))
   :hook ((eww-mode . jf/reader-visual)))
 
