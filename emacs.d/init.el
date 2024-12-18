@@ -5124,10 +5124,9 @@ We ignore the DESCRIPTION and probably the PROTOCOL."
                 (format "<blockquote class=\"%s epigraph\" data-id=\"%s\">\n%s%s</blockquote>\n"
                   class
                   id
-                  ;; (if (string= class "verse")
-                  ;;   (s-replace "\n" "<br />\n" text)
-                  (org-export-string-as text 'html t)
-                  ;; )
+                  (if (string= class "verse")
+                    (s-replace "\n" "<br />\n" text)
+                    (org-export-string-as 'html text t))
                   (cond
                     ((and (s-present? work) (s-present? author))
                       (format "\n<footer>&#8213;%s, <cite>%s</cite></footer>"
