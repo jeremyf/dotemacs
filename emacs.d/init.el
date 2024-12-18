@@ -7859,6 +7859,26 @@ See https://developer.mozilla.org/en-US/docs/Glossary/Block-level_content"
   (shr-display-block "nav")
   (shr-display-block "section")
 
+  (defun eww-first-url ()
+    "Go to the page marked `first'.
+A page is marked `first' if rel=\"first\" appears in a <link> or <a> tag."
+    (interactive nil eww-mode)
+    (let ((best-url
+            (plist-get eww-data :first)))
+      (if best-url
+	      (eww-browse-url (shr-expand-url best-url (plist-get eww-data :url)))
+        (user-error "No `first' for this page"))))
+
+  (defun eww-last-url ()
+    "Go to the page marked `last'.
+A page is marked `last' if rel=\"last\" appears in a <link> or <a> tag."
+    (interactive nil eww-mode)
+    (let ((best-url
+            (plist-get eww-data :last)))
+      (if best-url
+	      (eww-browse-url (shr-expand-url best-url (plist-get eww-data :url)))
+        (user-error "No `last' for this page"))))
+
   (setq browse-url-browser-function 'browse-url-default-macosx-browser)
   (defun jf/reader-visual ()
     ;; A little bit of RSS beautification.
@@ -7869,6 +7889,8 @@ See https://developer.mozilla.org/en-US/docs/Glossary/Block-level_content"
   (unbind-key "u" shr-map)
   :bind (:map eww-mode-map
           ("u" . eww-up-url)
+          ("M-<left>" . eww-first-url)
+          ("M-<right>" . eww-last-url)
           ("h" . eww-home-url))
   :bind (("C-s-o" . browse-url-at-point))
   :hook ((eww-mode . jf/reader-visual)))
