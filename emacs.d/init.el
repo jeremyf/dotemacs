@@ -7519,13 +7519,14 @@ Useful for Eglot."
   :hook (olivetti-mode-on . jf/olivetti-mode-on-hook)
   (olivetti-mode-off . jf/olivetti-mode-off-hook)
   :config
-  ;; I'm typically aiming for 80 character `fill-column'.
-  (setq olivetti-body-width 80)
-  (setq olivetti-minimum-body-width 80)
+  (setq olivetti-body-width 60)
+  (setq olivetti-minimum-body-width 60)
   (setq olivetti-style 'fancy)
   (setq olivetti-recall-visual-line-mode-entry-state t)
   :config
   (defun jf/olivetti-mode-on-hook ()
+    (text-scale-adjust 0)
+    (text-scale-adjust 2)
     "Remove some visual chatter."
     (setq-local original-flymake-fringe-indicator-position
       flymake-fringe-indicator-position)
