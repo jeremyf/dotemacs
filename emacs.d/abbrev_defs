@@ -1,6 +1,7 @@
 ;;-*-coding: utf-8;-*-
 (define-abbrev-table 'global-abbrev-table
   '(
+    ("Disobednience" "Disobedience" nil :count 0)
     ("Dunedain" "Dúnedain" nil :count 1)
     ("Epigrahps" "Epigraphs" nil :count 0)
     ("abandonned" "abandoned" nil :count 1)
@@ -669,6 +670,7 @@
     ("carnigie" "Carnegie" nil :count 1)
     ("carreer" "career" nil :count 1)
     ("carrers" "careers" nil :count 1)
+    ("carress" "caress" nil :count 0)
     ("carribbean" "Caribbean" nil :count 1)
     ("carribean" "Caribbean" nil :count 1)
     ("carryng" "carrying" nil :count 1)
@@ -1166,6 +1168,7 @@
     ("detailled" "detailed" nil :count 1)
     ("detatched" "detached" nil :count 1)
     ("deteoriated" "deteriorated" nil :count 1)
+    ("detered" "deterred" nil :count 0)
     ("deteriate" "deteriorate" nil :count 1)
     ("deterioriating" "deteriorating" nil :count 1)
     ("determinining" "determining" nil :count 1)
@@ -2119,7 +2122,7 @@
     ("journied" "journeyed" nil :count 1)
     ("journies" "journeys" nil :count 1)
     ("jstu" "just" nil :count 1)
-    ("jsut" "just" nil :count 1)
+    ("jsut" "just" nil :count 2)
     ("juadaism" "Judaism" nil :count 1)
     ("juadism" "Judaism" nil :count 1)
     ("judical" "judicial" nil :count 1)
@@ -2828,6 +2831,7 @@
     ("praries" "prairies" nil :count 1)
     ("pratice" "practice" nil :count 1)
     ("preample" "preamble" nil :count 1)
+    ("precarcity" "precarity" nil :count 0)
     ("precedessor" "predecessor" nil :count 1)
     ("preceed" "precede" nil :count 1)
     ("preceeded" "preceded" nil :count 1)

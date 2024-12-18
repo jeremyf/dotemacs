@@ -7264,6 +7264,8 @@ Useful for Eglot."
     "Default bookmark handler for browser."
     (browse-url (bookmark-prop-get bookmark 'location)))
 
+  ;; In the bookmark list page, identify the type as BROWSE for those
+  ;; captured by `jf/bookmark-url'
   (put 'jf/browse-url-bookmark-jump 'bookmark-handler-type "BROWSE")
 
   (defun jf/menu--bookmark-safari ()
