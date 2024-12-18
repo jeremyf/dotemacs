@@ -7813,9 +7813,10 @@ See https://developer.mozilla.org/en-US/docs/Glossary/Block-level_content"
 
   (shr-display-block "article")
   (shr-display-block "aside")
-  (shr-display-block "section")
-  (shr-display-block "nav")
+  (shr-display-block "footer")
   (shr-display-block "header")
+  (shr-display-block "nav")
+  (shr-display-block "section")
 
   (setq browse-url-browser-function 'browse-url-default-macosx-browser)
   (defun jf/reader-visual ()
