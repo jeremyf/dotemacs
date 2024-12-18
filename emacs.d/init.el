@@ -7797,17 +7797,25 @@ Alternative suggestions are: - '(\"\\\"“\" . \"\\\"\")"
           'help-echo datetime
           'mouse-face 'highlight))))
 
-  ;; EWW lacks a style for article
-  (defun shr-tag-article (dom)
-    (shr-ensure-paragraph)
-    (shr-generic dom)
-    (shr-ensure-paragraph))
+  (defmacro shr-display-block (tag)
+    "Register TAG a paragraph (in CSS parlance \"display:block;\").
 
-  ;; EWW lacks a style for section; This is quite provisional
-  (defun shr-tag-section (dom)
-    (shr-ensure-paragraph)
-    (shr-generic dom)
-    (shr-ensure-paragraph))
+See https://developer.mozilla.org/en-US/docs/Glossary/Block-level_content"
+    (let ((fname
+            (intern (format "shr-tag-%s" tag)))
+           (docstring
+             (format "Render \"%s\" tag as paragraph." tag)))
+      `(defun ,fname (dom)
+        ,docstring
+        (shr-ensure-paragraph)
+        (shr-generic dom)
+        (shr-ensure-paragraph))))
+
+  (shr-display-block "article")
+  (shr-display-block "aside")
+  (shr-display-block "section")
+  (shr-display-block "nav")
+  (shr-display-block "header")
 
   (setq browse-url-browser-function 'browse-url-default-macosx-browser)
   (defun jf/reader-visual ()
