@@ -1,6 +1,7 @@
 ;;-*-coding: utf-8;-*-
 (define-abbrev-table 'global-abbrev-table
   '(
+    ("Aristitilian" "Aristotelian" nil :count 0)
     ("Disobednience" "Disobedience" nil :count 0)
     ("Dunedain" "Dúnedain" nil :count 1)
     ("Epigrahps" "Epigraphs" nil :count 0)
@@ -1019,6 +1020,7 @@
     ("convertables" "convertibles" nil :count 1)
     ("convertion" "conversion" nil :count 1)
     ("conviced" "convinced" nil :count 1)
+    ("convieniences" "conveniences" nil :count 0)
     ("convienient" "convenient" nil :count 1)
     ("coordiantion" "coordination" nil :count 1)
     ("coorperations" "corporations" nil :count 1)
@@ -1410,6 +1412,7 @@
     ("enlargments" "enlargements" nil :count 1)
     ("enourmous" "enormous" nil :count 1)
     ("enourmously" "enormously" nil :count 1)
+    ("enquired" "inquired" nil :count 0)
     ("ensconsed" "ensconced" nil :count 1)
     ("entaglements" "entanglements" nil :count 1)
     ("enteratinment" "entertainment" nil :count 1)
@@ -3231,7 +3234,7 @@
     ("resignement" "resignment" nil :count 1)
     ("resistable" "resistible" nil :count 1)
     ("resistence" "resistance" nil :count 1)
-    ("resistent" "resistant" nil :count 1)
+    ("resistent" "resistant" nil :count 2)
     ("respectivly" "respectively" nil :count 1)
     ("responce" "response" nil :count 1)
     ("responibilities" "responsibilities" nil :count 1)
