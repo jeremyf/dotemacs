@@ -8081,6 +8081,8 @@ The `magit-gitdir' is the project's .git directory."
   ;; history.
   :straight (:host github :repo "emacsmirror/git-timemachine"))
 
+(use-package diff-hl
+  :straight t)
 ;; (use-package git-gutter
 ;;   ;; Show the current git state in the gutter.  As you edit a line in a
 ;;   ;; file track by git, the indicators change to reflect if this is a
