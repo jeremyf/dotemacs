@@ -5264,25 +5264,48 @@ Wires into `org-insert-link'."
                               (title
                                 (org-element-property :title headline))
                               (subtitle
-                                (org-entry-get headline "SUBTITLE")))
+                                (org-entry-get headline "SUBTITLE"))
+                              (author
+                                (org-entry-get headline "AUTHOR")))
                         (cons
-                          (format "%s"
+                          (format "«%s»%s"
                             (if subtitle
                               (concat title ": " subtitle)
-                              title))
-                          (org-entry-get headline "CUSTOM_ID"))))
+                              title)
+                            (if (s-present? author)
+                              (concat " by "author) ""))
+                          (list
+                            :id (org-entry-get headline "CUSTOM_ID")
+                            :title title
+                            :subtitle subtitle
+                            :author author))))
                     "+LEVEL=2+!people" 'file))))
             (work
               (completing-read "Citable: " works nil t)))
-      (when-let ((id
+      (when-let ((work-data
                    (alist-get work works nil nil #'string=)))
-        (let ((include-author
-                (yes-or-no-p "Include Author: ")))
-          (message "Added %S to the kill ring" work)
-          (kill-new work)
-          (format "work:%s%s"
-            id
-            (if include-author "::author" ""))))))
+        (let* ((include-author
+                 (and (plist-get work-data :author)
+                   (yes-or-no-p "Include Author: ")))
+                (include-subtitle
+                  (and (plist-get work-data :subtitle)
+                    (yes-or-no-p "Include Subtitle: ")))
+                (desc
+                  (format "«%s%s»%s"
+                    (plist-get work-data :title)
+                    (if include-subtitle
+                      (format ": %s" (plist-get work-data :subtitle))
+                      "")
+                    (if include-author
+                      (format " by %s" (plist-get work-data :author))
+                      "")
+                    )))
+          (message "Added %S to the kill ring" desc)
+          (kill-new desc)
+          (format "work:%s%s%s"
+            (plist-get work-data :id)
+            (if include-author "::author" "")
+            (if include-author "::subtitle" ""))))))
 
   (defun jf/org-link-ol-export/work (link description format protocol)
     "Export the text of the LINK work in the corresponding FORMAT.
@@ -5290,12 +5313,14 @@ Wires into `org-insert-link'."
 We ignore the DESCRIPTION and probably the PROTOCOL."
     (let* ((buffer
             (find-file-noselect jf/filename/bibliography))
-           (link-with-author
+           (link-with-properties
              (s-split "::" link))
             (link
-              (car link-with-author))
+              (car link-with-properties))
             (with-author
-              (s-present? (cadr link-with-author))))
+              (member "author" link-with-properties))
+            (with-subtitle
+              (member "subtitle" link-with-properties)))
       (save-excursion
         (with-current-buffer buffer
           ;; First we find the corresponding work and possible URL.
@@ -5315,9 +5340,13 @@ We ignore the DESCRIPTION and probably the PROTOCOL."
                                         (org-element-property :title el))))
                                   (list
                                     :title
+                                    title
+                                    :subtitle
                                     (if-let ((subtitle
                                                (org-entry-get el "SUBTITLE")))
-                                      (format "%s: %s" title subtitle)
+                                      (if with-subtitle
+                                        title
+                                        (format "%s: %s" title subtitle))
                                       title)
                                     :author
                                     (org-entry-get el "AUTHOR")
