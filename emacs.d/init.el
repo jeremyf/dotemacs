@@ -1402,6 +1402,16 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
            ("BLOCKED" . ,yellow)
            ("WAITING" . ,yellow)))
       (custom-set-faces
+        `(shr-blockquote
+           ((,c :foreground ,docstring)))
+        `(shr-dfn
+           ((,c :slant italic :foreground ,keyword)))
+        `(shr-dt
+           ((,c :slant italic :foreground ,keyword)))
+        `(shr-cite
+           ((,c :underline nil :slant italic :bold t :foreground ,mail-cite-0)))
+        `(shr-aside
+           ((,c :foreground ,comment :background ,bg-alt)))
         `(amread-highlight-face
            ((,c :foreground ,fg-main :background ,bg-search-lazy)))
         `(go-coverage-untracked
@@ -7193,9 +7203,9 @@ Useful for Eglot."
   :straight (:type built-in)
   :config
   (add-to-list 'save-some-buffers-action-alist
-             (list "d"
-                   (lambda (buffer) (diff-buffer-with-file (buffer-file-name buffer)))
-                   "show diff between the buffer and its file"))
+    (list "d"
+      (lambda (buffer) (diff-buffer-with-file (buffer-file-name buffer)))
+      "show diff between the buffer and its file"))
   ;; From
   ;; https://emacs.dyerdwelling.family/emacs/20230414111409-emacs--indexing-emacs-init/
   ;;
@@ -7822,10 +7832,10 @@ It will display entries without switching to them."
   :config
   (setq shr-cookie-policy nil)
   (defun shr-tag-dfn (dom)
-    (shr-fontize-dom dom 'italic))
+    (shr-generic dom))
 
   (defun shr-tag-cite (dom)
-    (shr-fontize-dom dom 'italic))
+    (shr-generic dom))
 
   (defun shr-tag-q (dom)
     (shr-insert (car shr-around-q-tag))
@@ -7869,7 +7879,7 @@ Alternative suggestions are: - '(\"\\\"“\" . \"\\\"\")"
           'help-echo datetime
           'mouse-face 'highlight))))
 
-  (defmacro shr-display-block (tag)
+  (defmacro shr-display-block (tag &optional face)
     "Register TAG a paragraph (in CSS parlance \"display:block;\").
 
 See https://developer.mozilla.org/en-US/docs/Glossary/Block-level_content"
@@ -7878,10 +7888,10 @@ See https://developer.mozilla.org/en-US/docs/Glossary/Block-level_content"
            (docstring
              (format "Render \"%s\" tag as paragraph." tag)))
       `(defun ,fname (dom)
-        ,docstring
-        (shr-ensure-paragraph)
-        (shr-generic dom)
-        (shr-ensure-paragraph))))
+         ,docstring
+         (shr-ensure-paragraph)
+         (shr-generic dom)
+         (shr-ensure-paragraph))))
 
   (shr-display-block "article")
   (shr-display-block "aside")
@@ -7889,6 +7899,29 @@ See https://developer.mozilla.org/en-US/docs/Glossary/Block-level_content"
   (shr-display-block "header")
   (shr-display-block "nav")
   (shr-display-block "section")
+
+  (defmacro jf/shr-facify (tag)
+    "Create and apply the face to the given TAG."
+    (let ((face
+            (intern (concat "shr-" tag)))
+           (docstring-face
+            (format "Face for <%s> elements." tag)))
+    `(progn
+       (defface ,face
+         '((default :inherit shr-text))
+         ,docstring-face)
+       (advice-add (intern (concat "shr-tag-" ,tag))
+         :around
+         (lambda (advised-function func &rest args)
+           (let ((start (point)))
+             (apply advised-function func args)
+             (shr-add-font start (point) (intern (concat "shr-" ,tag)))))))))
+
+  (jf/shr-facify "blockquote")
+  (jf/shr-facify "aside")
+  (jf/shr-facify "cite")
+  (jf/shr-facify "dfn")
+  (jf/shr-facify "dt")
 
   (defun eww-first-url ()
     "Go to the page marked `first'.
@@ -8596,10 +8629,10 @@ If `consult--read' is defined, use that.  Otherwise fallback to
       (jf/tor-list-by-key-from-filename
         :key "tag" :filename "data/glossary.yml"))
 
-    (defun jf/tor-epigraph-list ()
-      "Return a list of epigraph keys from TakeOnRules.com."
-      (jf/tor-list-by-key-from-filename
-        :key "key" :filename "data/epigraphs.yml"))
+    ;; (defun jf/tor-epigraph-list ()
+    ;;   "Return a list of epigraph keys from TakeOnRules.com."
+    ;;   (jf/tor-list-by-key-from-filename
+    ;;     :key "key" :filename "data/epigraphs.yml"))
 
     (defun jf/tor-game-list ()
       "Return a list of games from TakeOnRules.com."
