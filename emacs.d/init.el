@@ -901,9 +901,11 @@ Else, evaluate the whole buffer."
 
 When given PREFIX use `eww-browse-url'."
     (interactive "P")
-    (let ((browse-url-browser-function
-            (if prefix #'eww-browse-url browse-url-browser-function)))
-      (link-hint-open-link)))
+    (if prefix
+      (link-hint-open-link)
+      (let ((browse-url-browser-function
+              #'eww-browse-url))
+        (link-hint-open-link))))
 
   (defun jf/link-hint--apply (advised-function func &rest args)
     "Hijack opening `org-mode' URLs by attempting to open local file.
@@ -2292,7 +2294,7 @@ CHANNEL is ignored."
         ""
         (cond
           ((eq back-end 'latex)
-            (format "\\item[{%s:}] %s\n" term value))
+            (format "\\item[\\textbf{{%s:}}] %s\n" term value))
           ((eq back-end 'md)
             (format "%s\n: %s\n" term value))
           (t data)))))
@@ -2328,7 +2330,7 @@ holding contextual information."
                                                        text
                                                        _tags
                                                        _info)
-    "Only render the TEXT of the headlin.
+    "Only render the TEXT of the headline.
 See `org-latex-format-headline-function' for details."
     text)
 
@@ -2372,8 +2374,8 @@ function is ever added to that hook."
   (with-eval-after-load 'org
     (use-package ox
       :straight (ox :type built-in))
-    (add-to-list 'org-export-filter-options-functions
-      #'jf/org-export-change-options)
+    ;; (add-to-list 'org-export-filter-options-functions
+    ;;   #'jf/org-export-change-options)
    ;;; Org Export and Composition Functionality
     (setq org-export-global-macros (list))
 
@@ -2396,7 +2398,7 @@ function is ever added to that hook."
     (add-to-list 'org-export-global-macros
       '("i" . "@@latex:\\textit{@@@@html:<i class=\"dfn\">@@$1@@html:</i>@@@@latex:}@@"))
     (add-to-list 'org-export-global-macros
-      '("em" . "@@latex:\\textit{@@@@html:<em>@@$1@@html:</em>@@@@latex:}@@"))
+      '("em" . "@@latex:\\textit{@@@@html:<em>@@$1@@html:</em> @@@@latex:}@@"))
     (add-to-list 'org-export-global-macros
       '("mechanic" . "@@latex:\\textit{@@@@html:<i class=\"mechanic\">@@$1@@html:</i>@@@@latex:}@@"))
     (add-to-list 'org-export-global-macros
@@ -3135,6 +3137,14 @@ to Backlog."
 
   (load "jf-campaign.el")
 
+  (defun jf/org/capture/dictionary/sort ()
+    "Sort the dictionary."
+    (save-excursion
+      (save-restriction
+        (org-backward-paragraph)
+        (forward-line)
+        (org-sort-list nil ?a))))
+
   (defun jf/org/capture/quote/name-that-block ()
     "Name a quote/verse block from capture block.
 
@@ -3228,13 +3238,30 @@ https://takeonrules.com/site-map/epigraphs url.")
       #'string<))
 
   (setq org-capture-templates
-    '(
-       ("w" "Work"
+    '(("c" "Content to Clock"
+         plain (clock)
+         "%(jf/denote/capture-wrap :link \"%L\" :content \"%i\")"
+        :empty-lines 1)
+       ("d" "Dictionary"
+         plain (file
+                 "~/git/org/denote/indices/20230108T083359--a-dictionary-of-discovered-words__CreativeWriting_personal.org")
+         "- %^{Term} :: %^{Description}; %a"
+         :after-finalize jf/org/capture/dictionary/sort)
+       ("j" "Journal"
+         plain (file+olp+datetree
+                 "~/git/org/denote/private/20241114T075414--personal-journal__personal_private.org")
+         "%?"
+         :empty-lines-before 1
+         :empty-lines-after 1)
+       ;; ("i" "Immediate to Clock"
+       ;;   plain (clock)
+       ;;   "%i%?"
+       ;;   :immediate-finish t)
+       ("p" "Person to Quote"
          entry
-         (file+headline jf/filename/bibliography "Works")
-         "%^{Title} %^g\n:PROPERTIES:\n:CUSTOM_ID: %(org-id-new)\n:AUTHOR: %^{AUTHOR}\n:END:\n%?"
-         :jump-to-captured t
-         :after-finalize jf/bibliography/export-shopping-list)
+         (file+headline jf/filename/bibliography "People")
+         "%^{Name} :people:\n:PROPERTIES:\n:CUSTOM_ID: %(org-id-new)\n:END:\n%?"
+         :jump-to-captured t)
        ("q" "Quote"
          plain
          (file+function jf/filename/bibliography
@@ -3243,30 +3270,18 @@ https://takeonrules.com/site-map/epigraphs url.")
          :prepare-finalize jf/org/capture/quote/name-that-block
          :jump-to-captured t
          :empty-lines 1)
-       ("p" "Person to Quote"
+       ("w" "Work"
          entry
-         (file+headline jf/filename/bibliography "People")
-         "%^{Name} :people:\n:PROPERTIES:\n:CUSTOM_ID: %(org-id-new)\n:END:\n%?"
-         :jump-to-captured t)
-       ("c" "Content to Clock"
-         plain (clock)
-         "%(jf/denote/capture-wrap :link \"%L\" :content \"%i\")"
-         :empty-lines 1)
-       ("j" "Journal"
-         plain (file+olp+datetree
-                 "~/git/org/denote/private/20241114T075414--personal-journal__personal_private.org")
-         "%?"
-         :empty-lines-before 1
-         :empty-lines-after 1)
-       ("i" "Immediate to Clock"
-         plain (clock)
-         "%i%?"
-         :immediate-finish t)
-       ("N" "Note for project task"
-         plain (function jf/org-mode/capture/project-task/find)
-         "%T\n\n%?"
-         :empty-lines-before 1
-         :empty-lines-after 1))))
+         (file+headline jf/filename/bibliography "Works")
+         "%^{Title} %^g\n:PROPERTIES:\n:CUSTOM_ID: %(org-id-new)\n:AUTHOR: %^{AUTHOR}\n:END:\n%?"
+         :jump-to-captured t
+         :after-finalize jf/org/capture/finalize-work)
+       ;; ("N" "Note for project task"
+       ;;   plain (function jf/org-mode/capture/project-task/find)
+       ;;   "%T\n\n%?"
+       ;;   :empty-lines-before 1
+       ;;   :empty-lines-after 1)
+       )))
 
 (use-package verb
   ;; https://github.com/federicotdn/verb
@@ -4925,6 +4940,14 @@ PARG is for conformant method signature."
 PARG is for a conformant method signature."
     (message "TODO, implement link for %s" date))
 
+  (defun jf/org/capture/finalize-work ()
+    "Finalize works after capture."
+    (save-excursion
+      (save-restriction
+        (org-up-heading nil)
+        (jf/org-sort-entries/ignoring-stop-words)))
+    (jf/bibliography/export-shopping-list))
+
   (defun jf/bibliography/export-shopping-list (&optional file)
     "Export my book shopping list to the given FILE."
     (interactive)
@@ -5383,6 +5406,10 @@ We ignore the DESCRIPTION and probably the PROTOCOL."
                 (format "\\textit{%s}%s"
                   (plist-get work :title)
                   author-suffix))
+              ((eq format 'odt)
+                (format
+                  "<text:span text:style-name=\"%s\">%s</text:span>%s"
+                  "Emphasis" (plist-get work :title) author-suffix))
               (t
                 (format "“%s”%s"
                   (plist-get work :title)
@@ -5401,13 +5428,16 @@ We ignore the DESCRIPTION and probably the PROTOCOL."
                     (cons (match-string 1 link)
                       (match-string 2 link))))
                  (url
-                   (elfeed-entry-link entry))
+                   (xml-escape-string (elfeed-entry-link entry)))
                  (title
                    (elfeed-entry-title entry)))
         (pcase format
           ('html (format "<a href=\"%s\">%s</a>" url desc))
           ('md (format "[%s](%s)" desc url))
           ('latex (format "\\href{%s}{%s}" url desc))
+          ('odt
+	          (format "<text:a xlink:type=\"simple\" xlink:href=\"%s\">%s</text:a>"
+              url desc))
           ('texinfo (format "@uref{%s,%s}" url desc))
           (_ (format "%s (%s)" desc url)))
         (format "%s (%s)" desc url))
@@ -5449,7 +5479,8 @@ When USE_HUGO_SHORTCODE is given use glossary based exporting."
             (title
               (plist-get export-plist :title))
             (url
-              (plist-get export-plist :url))
+              (when-let ((u (plist-get export-plist :url)))
+                (xml-escape-string u)))
             (glossary_key
               (plist-get export-plist :key))
             (desc
@@ -5474,11 +5505,17 @@ When USE_HUGO_SHORTCODE is given use glossary based exporting."
           ((eq format 'md) (format "[%s](%s)" desc url))
           ((or (eq format 'latex) (eq format 'beamer))
             (format "\\href{%s}{%s}"
-              (replace-regexp-in-string "[\\{}$%&_#~^]" "\\\\\\&" path)
+              (replace-regexp-in-string "[\\{}$%&_#~^]" "\\\\\\&" url)
               desc))
-          ((eq format 'texinfo) (format "@uref{%s,%s}" path desc))
-          ((eq format 'ascii) (format "[%s] <denote:%s>" desc path))
-          (t path))
+          ((eq format 'texinfo) (format "@uref{%s,%s}" url desc))
+          ((eq format 'odt)
+            (format "<text:a xlink:type=\"simple\" xlink:href=\"%s\">%s</text:a>"
+		          url
+              desc))
+          (t (format "[%s](%s)" desc url))
+          ;; ((eq format 'odt) (org-odt-link url (format "%s" desc) (list)))
+          ;; (t path)
+          )
         desc)))
 
   (advice-add #'denote-link-ol-export
@@ -7699,7 +7736,19 @@ Useful for Eglot."
       :straight (:host codeberg :repo "martianh/tp.el"))
     :straight (:host codeberg :repo "martianh/mastodon.el")
     :config
+    (defun jf/mastodon-tl--reading (&optional prefix)
+      "Read my reading timeline.
+
+Forward PREFIX to `mastodon-tl--show-tag-timeline'."
+      (interactive "p")
+      (mastodon-tl--show-tag-timeline
+        prefix
+        '("reading" "books" "booktok"
+           "literature" "libraries" "bookstodon"
+           "writing" "library")))
+
     (defun jf/mastodon-tl--insert-status (&rest args)
+      "A little hack to help narrow region."
       (insert "🐘  ·  ·  ·  ·  ·  ·  ·"))
     (advice-add 'mastodon-tl--insert-status
       :before #'jf/mastodon-tl--insert-status)))
@@ -8421,7 +8470,11 @@ If not set  DEFAULT or prompt for it."
           (call-interactively #'mastodon-toot)
           (end-of-buffer)
           (insert (s-join "\n\n"
-                    (flatten-list (list title description url)))))
+                    (flatten-list
+                      (list
+                        (when title (format "“%s”" title))
+                        description
+                        url)))))
         (user-error "Current buffer is not a blog post")))
 
     (cl-defun jf/jump_to_corresponding_hugo_file (&key (buffer (current-buffer)))
