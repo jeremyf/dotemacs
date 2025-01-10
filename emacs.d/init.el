@@ -2237,13 +2237,13 @@ Each member's `car' is title and `cdr' is `org-mode' element."
 
   :config
   (defvar jf/org-mode/capture/filename
-    "~/git/org/denote/melange/20230210T184422--example-code__programming.org"
+    "~/Library/CloudStorage/ProtonDrive-jeremy@jeremyfriesen.com-folder/denote/melange/20230210T184422--example-code__programming.org"
     "The file where I'm capturing content.
 
 By default this is my example code project.")
 
   (defconst jf/agenda-filename/local
-    "~/git/org/denote/indices/20200501T120000--agenda.org"
+    "~/Library/CloudStorage/ProtonDrive-jeremy@jeremyfriesen.com-folder/denote/indices/20200501T120000--agenda.org"
     "A local (to the machine) agenda.
 
 Note, there's an assumption that a file of the given name will
@@ -2251,7 +2251,7 @@ exist on each machine, but its contents will be different based
 on the needs/constraints of the locality.")
 
   (defconst jf/lore24-filename
-    "~/git/org/denote/indices/20231225T130631--lore24-in-the-shadows-of-mont-brun__Lore24_campaigns_rpgs.org")
+    "~/Library/CloudStorage/ProtonDrive-jeremy@jeremyfriesen.com-folder/denote/indices/20231225T130631--lore24-in-the-shadows-of-mont-brun__Lore24_campaigns_rpgs.org")
 
   (defvar jf/link-to-project nil)
 
@@ -3210,11 +3210,11 @@ Narrow focus to a tag, then a named element."
       (while (org-element-type-p (org-element-at-point) '(drawer property-drawer keyword planning))
         (goto-char (org-element-property :end (org-element-at-point))))))
   (defvar jf/filename/shopping-list
-    "~/Library/CloudStorage/ProtonDrive-jeremy@jeremyfriesen.com/planning/books-to-get-from-bibliography.txt"
+    "~/Library/CloudStorage/ProtonDrive-jeremy@jeremyfriesen.com-folder/planning/books-to-get-from-bibliography.txt"
     "Dude, these are the books I'm curious about.")
 
   (defvar jf/filename/bibliography
-    "~/git/org/denote/private/20241124T080648--bibliography__personal.org"
+    "~/Library/CloudStorage/ProtonDrive-jeremy@jeremyfriesen.com-folder/denote/private/20241124T080648--bibliography__personal.org"
     "Dude, you can put your books in here.")
 
   (defvar jf/filename/bibliography-takeonrules
@@ -3244,13 +3244,13 @@ https://takeonrules.com/site-map/epigraphs url.")
         :empty-lines 1)
        ("d" "Dictionary"
          plain (file
-                 "~/git/org/denote/indices/20230108T083359--a-dictionary-of-discovered-words__CreativeWriting_personal.org")
+                 "~/Library/CloudStorage/ProtonDrive-jeremy@jeremyfriesen.com-folder/denote/indices/20230108T083359--a-dictionary-of-discovered-words__CreativeWriting_personal.org")
          "- %^{Term} :: %^{Description}; %a"
          :after-finalize jf/org/capture/dictionary/sort)
        ("j" "Journal"
          plain (file+olp+datetree
-                 "~/git/org/denote/private/20241114T075414--personal-journal__personal_private.org")
-         "%?"
+                 "~/Library/CloudStorage/ProtonDrive-jeremy@jeremyfriesen.com-folder/denote/private/20241114T075414--personal-journal__personal_private.org")
+         "[[date:%<%Y-%m-%d>][Today:]]\n\n- [ ] Read one book chapter\n- [ ] Read one poem\n- [ ] Read one essay\n- [ ] Read my daily feed\n- [ ] Write one response to a feed item\n\n%?"
          :empty-lines-before 1
          :empty-lines-after 1)
        ;; ("i" "Immediate to Clock"
@@ -4178,12 +4178,13 @@ literal then add a fuzzy search)."
   :hook (dired-mode . denote-dired-mode)
   (org-mode . denote-rename-buffer-mode)
   :init
+  (setq jf/denote-base-dir "~/Library/CloudStorage/ProtonDrive-jeremy@jeremyfriesen.com-folder/denote/")
   (setq denote-known-keywords
     (split-string-and-unquote
       (shell-command-to-string
         (concat
           "rg \"#\\+TAG:\\s([\\w-]+)\" "
-          (expand-file-name "denote/glossary" org-directory)
+          (expand-file-name "glossary" jf/denote-base-dir)
           " --only-matching"
           " --no-filename "
           " --follow "
@@ -4208,7 +4209,7 @@ literal then add a fuzzy search)."
   (setq denote-modules '(xref ffap))
   (setq denote-org-capture-specifiers
     "%(jf/denote/capture-wrap :link \"%L\" :content \"%i\")")
-  (setq denote-directory (expand-file-name "denote" org-directory))
+  (setq denote-directory jf/denote-base-dir)
   ;; These are the minimum viable prompts for notes
   (setq denote-prompts '(title keywords))
   ;; I love ‘org-mode format; reading ahead I'm setting this
@@ -4563,7 +4564,7 @@ See `denote-file-prompt'"
     (let* ((finder-fn
              (intern (concat "jf/denote/find-file--" domain)))
             (subdirectory
-              (f-join "~/git/org/denote" domain))
+              (f-join "~/Library/CloudStorage/ProtonDrive-jeremy@jeremyfriesen.com-folder/denote" domain))
             (finder-docstring
               (concat "Find file in \""
                 domain
@@ -7305,7 +7306,7 @@ Useful for Eglot."
     (mapcar (lambda (el) (cons el 1)) projectile-known-projects)
     "An alist of project directories.")
 
-  (dolist (dir (f-directories "~/git/org/denote/"))
+  (dolist (dir (f-directories "~/Library/CloudStorage/ProtonDrive-jeremy@jeremyfriesen.com-folder/denote/"))
     (add-to-list 'jf/git-project-paths
       (cons dir 1)))
 
@@ -7846,7 +7847,7 @@ It will display entries without switching to them."
   (defun jf/export-public-elfeed-opml ()
     "Export public OPML file."
     (let ((opml-body
-            (cl-loop for org-file in '("~/git/org/denote/indices/public-elfeed.org")
+            (cl-loop for org-file in '("~/Library/CloudStorage/ProtonDrive-jeremy@jeremyfriesen.com-folder/denote/indices/public-elfeed.org")
               concat
               (with-temp-buffer
                 (insert-file-contents
@@ -7868,8 +7869,8 @@ It will display entries without switching to them."
         (insert "</opml>\n")
         (save-buffer))))
   (setq rmh-elfeed-org-files nil)
-  (dolist (file '("~/git/org/denote/indices/public-elfeed.org"
-                   "~/git/org/denote/indices/private-elfeed.org"))
+  (dolist (file '("~/Library/CloudStorage/ProtonDrive-jeremy@jeremyfriesen.com-folder/denote/indices/public-elfeed.org"
+                   "~/Library/CloudStorage/ProtonDrive-jeremy@jeremyfriesen.com-folder/denote/indices/private-elfeed.org"))
     (when (f-exists? file)
       (add-to-list 'rmh-elfeed-org-files file))))
 
@@ -8808,7 +8809,7 @@ Add the blog post to the given SERIES with the given KEYWORDS."
               (previous-post-basename
                 (s-trim (shell-command-to-string
                           (concat
-                            "cd ~/git/org/denote/blog-posts; "
+                            "cd ~/Library/CloudStorage/ProtonDrive-jeremy@jeremyfriesen.com-folder/denote/blog-posts; "
                             "find *--lore24-entry-* | sort | "
                             "tail -1"))))
 
@@ -8942,7 +8943,7 @@ Add the blog post to the given SERIES with the given KEYWORDS."
   (org-noter-enable-update-renames)
   (setq org-noter-notes-search-path '())
   (dolist (path
-            '("~/Library/CloudStorage/ProtonDrive-jeremy@jeremyfriesen.com/"
+            '("~/Library/CloudStorage/ProtonDrive-jeremy@jeremyfriesen.com-folder/"
                "~/Documents/"))
     (when (f-dir-p path)
       ;; Add element to end of list.
