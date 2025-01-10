@@ -8250,7 +8250,24 @@ The `magit-gitdir' is the project's .git directory."
   (setf (alist-get 'italic org-html-text-markup-alist)
     "<i class=\"dfn\">%s</i>")
   (use-package ox
-    :straight (:type built-in))
+    :straight (:type built-in)
+    :config
+    (defun jf/org-odt-verse-block (_verse-block contents _info)
+      "Transcode a VERSE-BLOCK element from Org to ODT.
+CONTENTS is verse block contents.  INFO is a plist holding
+contextual information."
+      (let ((contents
+              (caddr _verse-block)))
+        (format "\n<text:p text:style-name=\"OrgVerse\">%s</text:p>"
+	        ;; Add line breaks to each line of verse.
+          (s-join
+            "<text:line-break/>"
+            (s-split "\n"
+	            (replace-regexp-in-string
+	              ;; Replace leading tabs and spaces.
+	              "^[ \t]+" #'org-odt--encode-tabs-and-spaces
+                contents))))))
+    (advice-add #'org-odt-verse-block :override #'jf/org-odt-verse-block))
   (use-package ox-hugo
     :straight t
     :after ox
