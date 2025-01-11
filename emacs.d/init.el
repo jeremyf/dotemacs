@@ -3986,7 +3986,7 @@ Useful if you want a more robust view into the recommend candidates."
                            ("TAB" . tempel-next)))
   :preface
   (cl-defun jf/org-macro-value-list (macro-name
-                                      &key (dir org-directory))
+                                      &key (dir jf/denote-base-dir))
     "List the unique inner text of all uses of MACRO-NAME in given DIR."
     (let ((path
             (if current-prefix-arg
@@ -4107,6 +4107,10 @@ literal then add a fuzzy search)."
   (which-key-setup-side-window-bottom)
   (which-key-show-major-mode))
 
+(defvar jf/denote-base-dir
+  (expand-file-name "~/Library/CloudStorage/ProtonDrive-jeremy@jeremyfriesen.com-folder/denote/")
+  "Where I put my notes.")
+
 (use-package denote
   ;; Preamble
   ;;
@@ -4178,7 +4182,6 @@ literal then add a fuzzy search)."
   :hook (dired-mode . denote-dired-mode)
   (org-mode . denote-rename-buffer-mode)
   :init
-  (setq jf/denote-base-dir "~/Library/CloudStorage/ProtonDrive-jeremy@jeremyfriesen.com-folder/denote/")
   (setq denote-known-keywords
     (split-string-and-unquote
       (shell-command-to-string
@@ -7851,7 +7854,7 @@ It will display entries without switching to them."
               concat
               (with-temp-buffer
                 (insert-file-contents
-                  (expand-file-name org-file org-directory))
+                  (expand-file-name org-file jf/denote-base-dir))
                 (rmh-elfeed-org-convert-org-to-opml
                   (current-buffer))))))
       (with-current-buffer
@@ -8519,7 +8522,7 @@ If not set  DEFAULT or prompt for it."
             (if (re-search-forward
                   "^org_id: \\([[:digit:]]+T[[:digit:]]+\\)$" nil t)
               (find-file (denote-get-path-by-id (match-string 1)))
-              (message "Unable to find Denote ID in buffer."))))))
+              (error "Unable to find Denote ID in buffer."))))))
 
     (defun jf/org-mode-get-keyword-key-value (kwd)
       "Map KWD to list."
@@ -8741,8 +8744,8 @@ If `consult--read' is defined, use that.  Otherwise fallback to
             "rg \"^[- ] " key ": .*$\" "
             (f-join directory filename)
             " --only-matching --no-filename | sed 's/^[ -] " key
-            ": //' | sort | tr '\n' '@'"))
-        "@"))
+            ": //' | sort | tr '\n' '🪓'"))
+        "🪓"))
 
     (cl-defun jf/list-filenames-with-file-text (&key matching in)
       "Build list of filenames MATCHING pattern IN the given directory."
@@ -8753,8 +8756,8 @@ If `consult--read' is defined, use that.  Otherwise fallback to
             (concat
               "rg \""
               matching "\" --only-matching --files-with-matches"
-              " --sortr modified | tr '\n' '@'"))
-          "@")))
+              " --sortr modified | tr '\n' '🪓'"))
+          "🪓")))
 
     (cl-defun jf/list-full-filenames-with-file-text (&key matching in
                                                       (switch "--files-with-matches"))
@@ -8764,8 +8767,8 @@ If `consult--read' is defined, use that.  Otherwise fallback to
           (concat
             "rg \""
             matching "\" " in " --only-matching " switch
-            " --sortr modified | tr '\n' '@'"))
-        "@"))
+            " --sortr modified | tr '\n' '🪓'"))
+        "🪓"))
 
     (defun jf/tor-page-relative-pathname-list ()
       "Return a list of pages for TakeOnRules.com."
@@ -8876,7 +8879,7 @@ Add the blog post to the given SERIES with the given KEYWORDS."
                   (concat
                     "rg \"^#\\+ROAM_REFS: .*(https://takeonrules.com"
                     path ")\" -r '$1' --files-with-matches "
-                    org-directory)))))
+                    jf/denote-base-dir)))))
 
     (defun jf/list-blog-tables (&optional table-number)
       "Return list of blog tables with form \"TABLE-NUMBER: CAPTION\"."
@@ -9266,7 +9269,7 @@ Added in cases where we want to inject the actual file."
         (setq paths (cons (cons "Notes" filename) paths)))))
 
   (cl-defun jf/project/list-projects (&key (project ".+")
-                                       (directory org-directory))
+                                       (directory jf/denote-base-dir))
     "Return a list of `cons' that match the given PROJECT.
 
 The `car' of the `cons' is the project (e.g. \"Take on Rules\").
@@ -9287,10 +9290,10 @@ otherwise."
           (concat
             "rg \"^#\\+PROJECT_NAME: +(" project ") *$\" " directory
             " --follow --only-matching --no-ignore-vcs --with-filename "
-            "-r '$1' | tr '\n' '@'"))
-        "@")))
+            "-r '$1' | tr '\n' '🪓'"))
+        "🪓")))
 
-  (cl-defun jf/project/get-project/project-source-code (&key (directory org-directory))
+  (cl-defun jf/project/get-project/project-source-code (&key (directory jf/denote-base-dir))
     "Return the current \"noted\" project name.
 
 Return nil if the current buffer is not part of a noted project.
