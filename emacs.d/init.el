@@ -356,6 +356,13 @@ Else, evaluate the whole buffer."
           "Copied buffer file name '%s' to the clipboard."
           filename)))))
 
+(defvar jf/denote-base-dir
+  (if (file-exists-p (expand-file-name "~/.my-computer"))
+    (file-truename "~/Library/CloudStorage/ProtonDrive-jeremy@jeremyfriesen.com-folder/denote/")
+    "~/Documents/denote/")
+  "Where I put my notes; I need to provision differently for personal and
+work computers.")
+
 (use-package files
   :straight (:type built-in)
   :custom (make-backup-files nil))
@@ -2237,13 +2244,13 @@ Each member's `car' is title and `cdr' is `org-mode' element."
 
   :config
   (defvar jf/org-mode/capture/filename
-    "~/Library/CloudStorage/ProtonDrive-jeremy@jeremyfriesen.com-folder/denote/melange/20230210T184422--example-code__programming.org"
+    (f-join jf/denote-base-dir "melange/20230210T184422--example-code__programming.org")
     "The file where I'm capturing content.
 
 By default this is my example code project.")
 
   (defconst jf/agenda-filename/local
-    "~/Library/CloudStorage/ProtonDrive-jeremy@jeremyfriesen.com-folder/denote/indices/20200501T120000--agenda.org"
+    (f-join jf/denote-base-dir "indices/20200501T120000--agenda.org")
     "A local (to the machine) agenda.
 
 Note, there's an assumption that a file of the given name will
@@ -2251,7 +2258,7 @@ exist on each machine, but its contents will be different based
 on the needs/constraints of the locality.")
 
   (defconst jf/lore24-filename
-    "~/Library/CloudStorage/ProtonDrive-jeremy@jeremyfriesen.com-folder/denote/indices/20231225T130631--lore24-in-the-shadows-of-mont-brun__Lore24_campaigns_rpgs.org")
+    (f-join jf/denote-base-dir "indices/20231225T130631--lore24-in-the-shadows-of-mont-brun__Lore24_campaigns_rpgs.org"))
 
   (defvar jf/link-to-project nil)
 
@@ -3214,7 +3221,7 @@ Narrow focus to a tag, then a named element."
     "Dude, these are the books I'm curious about.")
 
   (defvar jf/filename/bibliography
-    "~/Library/CloudStorage/ProtonDrive-jeremy@jeremyfriesen.com-folder/denote/private/20241124T080648--bibliography__personal.org"
+    (f-join jf/denote-base-dir "private/20241124T080648--bibliography__personal.org")
     "Dude, you can put your books in here.")
 
   (defvar jf/filename/bibliography-takeonrules
@@ -3238,18 +3245,18 @@ https://takeonrules.com/site-map/epigraphs url.")
       #'string<))
 
   (setq org-capture-templates
-    '(("c" "Content to Clock"
+    `(("c" "Content to Clock"
          plain (clock)
          "%(jf/denote/capture-wrap :link \"%L\" :content \"%i\")"
         :empty-lines 1)
        ("d" "Dictionary"
          plain (file
-                 "~/Library/CloudStorage/ProtonDrive-jeremy@jeremyfriesen.com-folder/denote/indices/20230108T083359--a-dictionary-of-discovered-words__CreativeWriting_personal.org")
+                 ,(f-join jf/denote-base-dir "indices/20230108T083359--a-dictionary-of-discovered-words__CreativeWriting_personal.org"))
          "- %^{Term} :: %^{Description}; %a"
          :after-finalize jf/org/capture/dictionary/sort)
        ("j" "Journal"
          plain (file+olp+datetree
-                 "~/Library/CloudStorage/ProtonDrive-jeremy@jeremyfriesen.com-folder/denote/private/20241114T075414--personal-journal__personal_private.org")
+                 ,(f-join jf/denote-base-dir "private/20241114T075414--personal-journal__personal_private.org"))
          "[[date:%<%Y-%m-%d>][Today:]]\n\n- [ ] Read one book chapter\n- [ ] Read one poem\n- [ ] Read one essay\n- [ ] Tend my daily feed\n- [ ] Write one response to a feed item\n\n%?"
          :empty-lines-before 1
          :empty-lines-after 1)
@@ -4113,10 +4120,6 @@ literal then add a fuzzy search)."
   (which-key-setup-side-window-bottom)
   (which-key-show-major-mode))
 
-(defvar jf/denote-base-dir
-  (expand-file-name "~/Library/CloudStorage/ProtonDrive-jeremy@jeremyfriesen.com-folder/denote/")
-  "Where I put my notes.")
-
 (use-package denote
   ;; Preamble
   ;;
@@ -4573,7 +4576,7 @@ See `denote-file-prompt'"
     (let* ((finder-fn
              (intern (concat "jf/denote/find-file--" domain)))
             (subdirectory
-              (f-join "~/Library/CloudStorage/ProtonDrive-jeremy@jeremyfriesen.com-folder/denote" domain))
+              (f-join jf/denote-base-dir domain))
             (finder-docstring
               (concat "Find file in \""
                 domain
@@ -7315,7 +7318,7 @@ Useful for Eglot."
     (mapcar (lambda (el) (cons el 1)) projectile-known-projects)
     "An alist of project directories.")
 
-  (dolist (dir (f-directories "~/Library/CloudStorage/ProtonDrive-jeremy@jeremyfriesen.com-folder/denote/"))
+  (dolist (dir (f-directories jf/denote-base-dir))
     (add-to-list 'jf/git-project-paths
       (cons dir 1)))
 
@@ -7830,7 +7833,7 @@ It will display entries without switching to them."
   (defun jf/export-public-elfeed-opml ()
     "Export public OPML file."
     (let ((opml-body
-            (cl-loop for org-file in '("~/Library/CloudStorage/ProtonDrive-jeremy@jeremyfriesen.com-folder/denote/indices/public-elfeed.org")
+            (cl-loop for org-file in `(,(f-join jf/denote-base-dir "indices/public-elfeed.org"))
               concat
               (with-temp-buffer
                 (insert-file-contents
@@ -7852,8 +7855,8 @@ It will display entries without switching to them."
         (insert "</opml>\n")
         (save-buffer))))
   (setq rmh-elfeed-org-files nil)
-  (dolist (file '("~/Library/CloudStorage/ProtonDrive-jeremy@jeremyfriesen.com-folder/denote/indices/public-elfeed.org"
-                   "~/Library/CloudStorage/ProtonDrive-jeremy@jeremyfriesen.com-folder/denote/indices/private-elfeed.org"))
+  (dolist (file `(,(f-join jf/denote-base-dir "indices/public-elfeed.org")
+                   ,(f-join jf/denote-base-dir "indices/private-elfeed.org")))
     (when (f-exists? file)
       (add-to-list 'rmh-elfeed-org-files file))))
 
@@ -8809,7 +8812,7 @@ Add the blog post to the given SERIES with the given KEYWORDS."
               (previous-post-basename
                 (s-trim (shell-command-to-string
                           (concat
-                            "cd ~/Library/CloudStorage/ProtonDrive-jeremy@jeremyfriesen.com-folder/denote/blog-posts; "
+                            "cd " (f-join jf/denote-base-dir "blog-posts") "; "
                             "find *--lore24-entry-* | sort | "
                             "tail -1"))))
 
