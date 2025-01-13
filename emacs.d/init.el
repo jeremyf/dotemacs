@@ -3250,7 +3250,7 @@ https://takeonrules.com/site-map/epigraphs url.")
        ("j" "Journal"
          plain (file+olp+datetree
                  "~/Library/CloudStorage/ProtonDrive-jeremy@jeremyfriesen.com-folder/denote/private/20241114T075414--personal-journal__personal_private.org")
-         "[[date:%<%Y-%m-%d>][Today:]]\n\n- [ ] Read one book chapter\n- [ ] Read one poem\n- [ ] Read one essay\n- [ ] Read my daily feed\n- [ ] Write one response to a feed item\n\n%?"
+         "[[date:%<%Y-%m-%d>][Today:]]\n\n- [ ] Read one book chapter\n- [ ] Read one poem\n- [ ] Read one essay\n- [ ] Tend my daily feed\n- [ ] Write one response to a feed item\n\n%?"
          :empty-lines-before 1
          :empty-lines-after 1)
        ;; ("i" "Immediate to Clock"
@@ -3294,6 +3294,12 @@ https://takeonrules.com/site-map/epigraphs url.")
   :straight t
   :config
   (setq org-web-tools-pandoc-sleep-time 1.5))
+
+(defun jf/md-to-org-region (start end)
+  "Convert region from markdown to org."
+  ;; From http://yummymelon.com/devnull/converting-a-markdown-region-to-org-revisited.html
+  (interactive "r")
+  (shell-command-on-region start end "pandoc -f markdown -t org" t t))
 
 (use-package abbrev
   ;; The =abbrev= package is simple and powerful, providing an
@@ -4946,11 +4952,11 @@ PARG is for a conformant method signature."
 
   (defun jf/org/capture/finalize-work ()
     "Finalize works after capture."
+    (jf/bibliography/export-shopping-list)
     (save-excursion
       (save-restriction
-        (org-up-heading nil)
-        (jf/org-sort-entries/ignoring-stop-words)))
-    (jf/bibliography/export-shopping-list))
+        (call-interactively #'org-up-heading nil)
+        (jf/org-sort-entries/ignoring-stop-words))))
 
   (defun jf/bibliography/export-shopping-list (&optional file)
     "Export my book shopping list to the given FILE."
