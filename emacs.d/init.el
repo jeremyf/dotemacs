@@ -7735,33 +7735,7 @@ Useful for Eglot."
 
 
 (when (file-exists-p (expand-file-name "~/.my-computer"))
-  (use-package mastodon
-    :custom
-    (mastodon-tl--timeline-posts-count "50")
-    :preface
-    (setq
-      mastodon-instance-url "https://dice.camp"
-      mastodon-active-user "takeonrules")
-    (use-package tp
-      :straight (:host codeberg :repo "martianh/tp.el"))
-    :straight (:host codeberg :repo "martianh/mastodon.el")
-    :config
-    (defun jf/mastodon-tl--reading (&optional prefix)
-      "Read my reading timeline.
-
-Forward PREFIX to `mastodon-tl--show-tag-timeline'."
-      (interactive "p")
-      (mastodon-tl--show-tag-timeline
-        prefix
-        '("reading" "books" "booktok"
-           "literature" "libraries" "bookstodon"
-           "writing" "library")))
-
-    (defun jf/mastodon-tl--insert-status (&rest args)
-      "A little hack to help narrow region."
-      (insert "🐘  ·  ·  ·  ·  ·  ·  ·"))
-    (advice-add 'mastodon-tl--insert-status
-      :before #'jf/mastodon-tl--insert-status)))
+  (load "personal.el"))
 
 (use-package doc-view
   ;; A package for improving the in Emacs viewing experience of PDFs.
