@@ -16,6 +16,7 @@
 #+LATEX_HEADER: \AtBeginEnvironment{tabular}{\smaller}
 #+LATEX_HEADER: \usepackage[printonlyused,nohyperlinks]{acronym}
 #+LATEX_HEADER: \usepackage[marginal,hang]{footmisc}
+#+LATEX_HEADER: \usepackage{mathabx}
 #+LATEX_HEADER: \usepackage{multicol}
 #+LATEX_HEADER: \setlength\columnsep{20pt}
 #+LATEX_HEADER: \hypersetup{colorlinks=true, linkcolor=blue, filecolor=magenta, urlcolor=cyan}

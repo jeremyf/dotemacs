@@ -357,9 +357,9 @@ Else, evaluate the whole buffer."
           filename)))))
 
 (defvar jf/denote-base-dir
-  (if (file-exists-p (expand-file-name "~/.my-computer"))
-    (file-truename "~/Library/CloudStorage/ProtonDrive-jeremy@jeremyfriesen.com-folder/denote/")
-    "~/Documents/denote/")
+  (file-truename
+    (if (file-exists-p (expand-file-name "~/.my-computer"))
+      "~/git/org/denote/" "~/Documents/denote/"))
   "Where I put my notes; I need to provision differently for personal and
 work computers.")
 
@@ -7757,7 +7757,7 @@ Useful for Eglot."
   :custom
   (shr-inhibit-images t)
   (elfeed-curl-timeout 90)
-  (elfeed-db-directory "~/Documents/.elfeed")
+  (elfeed-db-directory "~/Documents/.elfeed/")
   :bind ((:map elfeed-search-mode-map
            (("+" . jf/elfeed-search-tag-all)
              ("q" . jf/elfeed-save-db-and-bury)))
@@ -9477,7 +9477,9 @@ This encodes the logic for creating a project."
         ("s" "Search note content…" consult-notes-search-in-all-notes)
         ("S" "Search note filename…" consult-notes)
         ("C-t" "Start a timer…" tmr-with-details)
-        ("u" jf/org-mode/agenda-files-update)]
+        ("u" jf/org-mode/agenda-files-update)
+        ("z" "Rsync notes" jf/rsync-notes-to-cloud)
+        ]
       ["Denote"
         ("d a" jf/project/add-project-path :if jf/denote?)
         ("d c" jf/denote-org-capture/filename-set)
