@@ -618,7 +618,8 @@ work computers.")
   (defvar-local jf/mode-line-format/kbd-macro
     '(:eval
        (when (and (mode-line-window-selected-p) defining-kbd-macro)
-         (propertize " KMacro " 'face 'mode-line-highlight))))
+         (concat
+           (propertize " 𝕄 " 'face 'mode-line-highlight) " "))))
 
   (defvar-local jf/mode-line-format/buffer-name-and-status
     '(:eval
@@ -637,7 +638,7 @@ work computers.")
     "Return propertized mode line indicator for the major mode."
     (let ((indicator
             (cond
-              ((derived-mode-p 'text-mode) "§")
+              ((derived-mode-p 'text-mode) "¶")
               ((derived-mode-p 'prog-mode) "λ")
               ((derived-mode-p 'comint-mode) ">_")
               (t "◦"))))
@@ -652,8 +653,8 @@ work computers.")
                   (string-replace "-mode" "" (symbol-name major-mode)))
       'face (if (mode-line-window-selected-p)
               'mode-line 'mode-line-inactive)))
-
-  (defvar-local jf/mode-line-format/major-mode
+ 
+  (defvar-local jf/mode-line-format/major-mode 
     '(:eval
        (concat
          (jf/mode-line-format/major-mode-indicator)
@@ -669,7 +670,23 @@ work computers.")
                       'help-mode
                       'special-mode
                       'message-mode)))
-         (propertize " Narrow " 'face 'mode-line-highlight))))
+         (concat
+           (propertize " ⊆ " 'face 'mode-line-highlight) " "))))
+
+  (defvar-local jf/mode-line-format/org-clock
+    '(:eval
+       (when
+         (and
+           (mode-line-window-selected-p)
+           org-clock-current-task
+           (not (derived-mode-p
+                  'Info-mode
+                  'help-mode
+                  'special-mode
+                  'message-mode)))
+         (concat
+           ;; The symbol that most looks like an analogue stop watch.
+           (propertize " ⨶ " 'face 'mode-line-highlight) " "))))
 
   (defvar jf/mode-line-format/vterm-map
     (let ((map
@@ -796,6 +813,7 @@ work computers.")
                         jf/mode-line-format/major-mode
                         jf/mode-line-format/misc-info
                         jf/mode-line-format/narrow
+                        jf/mode-line-format/org-clock
                         jf/mode-line-format/project
                         jf/mode-line-format/vc-branch
                         jf/mode-line-format/vterm
@@ -805,6 +823,7 @@ work computers.")
 
   (setq-default mode-line-format
     '("%e" " "
+       jf/mode-line-format/org-clock
        jf/mode-line-format/vterm
        jf/mode-line-format/kbd-macro
        jf/mode-line-format/narrow
@@ -1234,6 +1253,8 @@ This uses `split-window-right' but follows with the cursor."
   (setq display-buffer-alist
     `(;; no window
        ("\\`\\*Async Shell Command\\*\\'"
+         (display-buffer-no-window))
+       ("^\\*rsync-"
          (display-buffer-no-window))
        ("\\`\\*\\(Warnings\\|Compile-Log\\|Org Links\\)\\*\\'"
          (display-buffer-no-window)
@@ -3254,12 +3275,22 @@ https://takeonrules.com/site-map/epigraphs url.")
                  ,(f-join jf/denote-base-dir "indices/20230108T083359--a-dictionary-of-discovered-words__CreativeWriting_personal.org"))
          "- %^{Term} :: %^{Description}; %a"
          :after-finalize jf/org/capture/dictionary/sort)
-       ("j" "Journal"
+       ("j" "Start Today's Journal Entry"
          plain (file+olp+datetree
                  ,(f-join jf/denote-base-dir "private/20241114T075414--personal-journal__personal_private.org"))
          "[[date:%<%Y-%m-%d>][Today:]]\n\n- [ ] Read one book chapter\n- [ ] Read one poem\n- [ ] Read one essay\n- [ ] Tend my daily feed\n- [ ] Write one response to a feed item\n\n%?"
          :empty-lines-before 1
-         :empty-lines-after 1)
+         :empty-lines-after 1
+         :clock-in t
+         :clock-resume t)
+       ("J" "Add to Today's Journal Entry"
+         plain (file+olp+datetree
+                 ,(f-join jf/denote-base-dir "private/20241114T075414--personal-journal__personal_private.org"))
+         "%?"
+         :empty-lines-before 1
+         :empty-lines-after 1
+         :clock-in t
+         :clock-resume t)
        ;; ("i" "Immediate to Clock"
        ;;   plain (clock)
        ;;   "%i%?"
@@ -5417,12 +5448,22 @@ We ignore the DESCRIPTION and probably the PROTOCOL."
                   author-suffix))
               ((eq format 'latex)
                 (format "\\textit{%s}%s"
-                  (plist-get work :title)
+                  (if-let ((url
+                             (plist-get work :url)))
+                    (format "\\href{%s}{%s}"
+                      url (plist-get work :title))
+                    (plist-get work :title))
                   author-suffix))
               ((eq format 'odt)
                 (format
                   "<text:span text:style-name=\"%s\">%s</text:span>%s"
-                  "Emphasis" (plist-get work :title) author-suffix))
+                  "Emphasis"
+                  (if-let ((url
+                             (plist-get work :url)))
+                    (format "<text:a xlink:type=\"simple\" xlink:href=\"%s\">%s</text:a>"
+                      url (plist-get work :title))
+                    (plist-get work :title))
+                  author-suffix))
               (t
                 (format "“%s”%s"
                   (plist-get work :title)
@@ -9478,7 +9519,6 @@ This encodes the logic for creating a project."
         ("S" "Search note filename…" consult-notes)
         ("C-t" "Start a timer…" tmr-with-details)
         ("u" jf/org-mode/agenda-files-update)
-        ("z" "Rsync notes" jf/rsync-notes-to-cloud)
         ]
       ["Denote"
         ("d a" jf/project/add-project-path :if jf/denote?)

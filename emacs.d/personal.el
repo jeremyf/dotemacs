@@ -5,17 +5,25 @@
   (shell-command
     (concat "rsync -a " jf/denote-base-dir " "
       (file-truename "~/Library/CloudStorage/ProtonDrive-jeremy@jeremyfriesen.com-folder/denote/")
-      " --exclude .git/&"))
-  (message "Synchronizing elfeed database to cloud...")
-  (shell-command
-    (concat "rsync -a " elfeed-db-directory " "
-      (file-truename "~/Library/CloudStorage/ProtonDrive-jeremy@jeremyfriesen.com-folder/.elfeed/")
-       " --exclude .git/&")))
+      " --exclude .git/&")
+    "*rsync-denote-to-cloud*"
+    "*rsync-denote-to-cloud*")
+
+  ;; Only perform sync 20% of the time; as its somewhat expensive.
+  (if (= 0 (random 5))
+    (progn
+      (message "Synchronizing elfeed database to cloud...")
+      (shell-command
+        (concat "tar -cvzf "
+          (file-truename "~/Library/CloudStorage/ProtonDrive-jeremy@jeremyfriesen.com-folder/elfeed.tar.gz")
+          " " elfeed-db-directory "&")
+        "*rsync-elfeed-to-cloud*"
+        "*rsync-elfeed-to-cloud*"))
+    (message "Skipping elfeed database sync")))
 
 ;; Based on the idea of habit stacking, whenever I pull down my RSS
 ;; feed, I'll go ahead and sync my notes.
 (advice-add #'jf/elfeed-load-db-and-open :before #'jf/rsync-files-to-cloud)
-
 (add-hook 'after-init-hook #'jf/rsync-files-to-cloud)
 
 (use-package tp
