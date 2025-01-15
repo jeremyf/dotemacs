@@ -653,8 +653,8 @@ work computers.")
                   (string-replace "-mode" "" (symbol-name major-mode)))
       'face (if (mode-line-window-selected-p)
               'mode-line 'mode-line-inactive)))
- 
-  (defvar-local jf/mode-line-format/major-mode 
+
+  (defvar-local jf/mode-line-format/major-mode
     '(:eval
        (concat
          (jf/mode-line-format/major-mode-indicator)
