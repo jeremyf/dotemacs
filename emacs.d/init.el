@@ -6415,6 +6415,7 @@ See https://github.com/chmouel/gotest-ts.el"
 
 (defun jf/go-ts-mode-configurator ()
   ;; From go-mode
+  (hl-todo-mode 1)
   (setq-local paragraph-start
     (concat "[[:space:]]*\\(?:"
       comment-start-skip
