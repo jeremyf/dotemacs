@@ -56,3 +56,23 @@ Forward PREFIX to `mastodon-tl--show-tag-timeline'."
     (insert "🐘  ·  ·  ·  ·  ·  ·  ·"))
   (advice-add 'mastodon-tl--insert-status
     :before #'jf/mastodon-tl--insert-status))
+
+(add-to-list 'org-capture-templates
+  `("j" "Start Today's Journal Entry"
+     plain (file+olp+datetree
+             ,(f-join jf/denote-base-dir "private/20241114T075414--personal-journal__personal_private.org"))
+     "[[date:%<%Y-%m-%d>][Today:]]\n\n- [ ] Read one book chapter\n- [ ] Read one poem\n- [ ] Read one essay\n- [ ] Tend my daily feed\n- [ ] Write one response to a feed item\n\n%?"
+     :empty-lines-before 1
+     :empty-lines-after 1
+     :clock-in t
+     :clock-resume t))
+
+(add-to-list 'org-capture-templates
+  `("J" "Add to Today's Journal Entry"
+     plain (file+olp+datetree
+             ,(f-join jf/denote-base-dir "private/20241114T075414--personal-journal__personal_private.org"))
+     "%?"
+     :empty-lines-before 1
+     :empty-lines-after 1
+     :clock-in t
+     :clock-resume t))

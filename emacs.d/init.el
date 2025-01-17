@@ -3275,22 +3275,6 @@ https://takeonrules.com/site-map/epigraphs url.")
                  ,(f-join jf/denote-base-dir "indices/20230108T083359--a-dictionary-of-discovered-words__CreativeWriting_personal.org"))
          "- %^{Term} :: %^{Description}; %a"
          :after-finalize jf/org/capture/dictionary/sort)
-       ("j" "Start Today's Journal Entry"
-         plain (file+olp+datetree
-                 ,(f-join jf/denote-base-dir "private/20241114T075414--personal-journal__personal_private.org"))
-         "[[date:%<%Y-%m-%d>][Today:]]\n\n- [ ] Read one book chapter\n- [ ] Read one poem\n- [ ] Read one essay\n- [ ] Tend my daily feed\n- [ ] Write one response to a feed item\n\n%?"
-         :empty-lines-before 1
-         :empty-lines-after 1
-         :clock-in t
-         :clock-resume t)
-       ("J" "Add to Today's Journal Entry"
-         plain (file+olp+datetree
-                 ,(f-join jf/denote-base-dir "private/20241114T075414--personal-journal__personal_private.org"))
-         "%?"
-         :empty-lines-before 1
-         :empty-lines-after 1
-         :clock-in t
-         :clock-resume t)
        ;; ("i" "Immediate to Clock"
        ;;   plain (clock)
        ;;   "%i%?"
@@ -7779,9 +7763,6 @@ Useful for Eglot."
     :type 'hook))
 
 
-(when (file-exists-p (expand-file-name "~/.my-computer"))
-  (load "personal.el"))
-
 (use-package doc-view
   ;; A package for improving the in Emacs viewing experience of PDFs.
   :straight (doc-view :type built-in)
@@ -9585,6 +9566,10 @@ This encodes the logic for creating a project."
 (with-eval-after-load "ox"
   (require 'edraw-org)
   (edraw-org-setup-exporter))
+
+(when (file-exists-p (expand-file-name "~/.my-computer"))
+  (load "personal.el")
+  (load "work.el"))
 
 ;; (use-package detached
 ;;   ;; Run detached shell commands that can keep running even after
