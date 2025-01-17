@@ -1254,7 +1254,7 @@ This uses `split-window-right' but follows with the cursor."
     `(;; no window
        ("\\`\\*Async Shell Command\\*\\'"
          (display-buffer-no-window))
-       ("^\\*rsync-"
+       ("^\\*syncthing-"
          (display-buffer-no-window))
        ("\\`\\*\\(Warnings\\|Compile-Log\\|Org Links\\)\\*\\'"
          (display-buffer-no-window)
@@ -3238,7 +3238,7 @@ Narrow focus to a tag, then a named element."
       (while (org-element-type-p (org-element-at-point) '(drawer property-drawer keyword planning))
         (goto-char (org-element-property :end (org-element-at-point))))))
   (defvar jf/filename/shopping-list
-    "~/Library/CloudStorage/ProtonDrive-jeremy@jeremyfriesen.com-folder/planning/books-to-get-from-bibliography.txt"
+    "~/SyncThings/source/books-to-get-from-bibliography.txt"
     "Dude, these are the books I'm curious about.")
 
   (defvar jf/filename/bibliography
@@ -4276,6 +4276,7 @@ literal then add a fuzzy search)."
        ("…" . "")  ;; Ellipsis
        ("—" . "-") ;; em dash
        ("–" . "-") ;; en dash
+       (":" . "-")
        )
     "Map of diacritic to non-diacritic form.")
   (defun jf/remove-diacritics-from (string)

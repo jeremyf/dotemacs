@@ -1,30 +1,30 @@
-(defun jf/rsync-files-to-cloud ()
-  "Synchronize files to cloud storage."
+(defun jf/syncthing-aling ()
+  "Synchronize files into SyncThing bucket."
   (interactive)
+  ;; Ensure we have our queue and our ready location
+  (mkdir (file-truename "~/SyncThings/queue") t)
+  (mkdir (file-truename "~/SyncThings/source") t)
   (message "Synchronzing denote files to cloud...")
-  (shell-command
-    (concat "rsync -a " jf/denote-base-dir " "
-      (file-truename "~/Library/CloudStorage/ProtonDrive-jeremy@jeremyfriesen.com-folder/denote/")
-      " --exclude .git/&")
-    "*rsync-denote-to-cloud*"
-    "*rsync-denote-to-cloud*")
-
-  ;; Only perform sync 20% of the time; as its somewhat expensive.
-  (if (= 0 (random 5))
+  ;; There's a 1 in 6 chance that we'll perform the sync.  Toss that d6.
+  (if (= 0 (random 6))
     (progn
-      (message "Synchronizing elfeed database to cloud...")
+      (message "Syncing elfeed database...")
+      ;; We tar zip into one directory (our queue) and then move that
+      ;; file in its complete state into the ready directory.  As move
+      ;; is instantaneous and we don't need to worry about syncthing
+      ;; picking up a partially completed file.
       (shell-command
         (concat "tar -cvzf "
-          (file-truename "~/Library/CloudStorage/ProtonDrive-jeremy@jeremyfriesen.com-folder/elfeed.tar.gz")
-          " " elfeed-db-directory "&")
-        "*rsync-elfeed-to-cloud*"
-        "*rsync-elfeed-to-cloud*"))
-    (message "Skipping elfeed database sync")))
+          (file-truename "~/SyncThings/queue/elfeed.tar.gz")
+          " " elfeed-db-directory " && mv -f ~/SyncThings/queue/elfeed.tar.gz ~/SyncThings/source&")
+        "*syncthing-aling*"
+        "*syncthing-aling*"))
+    (message "I'll get you next time Gadget")))
 
 ;; Based on the idea of habit stacking, whenever I pull down my RSS
 ;; feed, I'll go ahead and sync my notes.
-(advice-add #'jf/elfeed-load-db-and-open :before #'jf/rsync-files-to-cloud)
-(add-hook 'after-init-hook #'jf/rsync-files-to-cloud)
+(advice-add #'jf/elfeed-load-db-and-open :before #'jf/syncthing-aling)
+(add-hook 'after-init-hook #'jf/syncthing-aling)
 
 (use-package tp
   :straight (:host codeberg :repo "martianh/tp.el")
