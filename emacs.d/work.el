@@ -20,6 +20,7 @@
 (defvar jf/work/filename-for-mbos
   (denote-get-path-by-id "20250117T101521")
   "Where I put my MBOs.")
+
 (add-to-list 'org-capture-templates
   '("J" "Journal task progress for MBO"
      plain (file+function
@@ -58,7 +59,9 @@
   "The default filter for collecting MBO tasks.")
 
 (defun jf/work/position-in-mbo-journal-entry ()
-  "Position point just before the selected journal."
+  "Position point just before the selected journal.
+
+Included to allow the re-use of logic for different 3rd level tasks."
   (let ((jf/work/org-map-entries-mbo-task-filter
           "+LEVEL=3+mbos+tasks+journals"))
     (jf/work/position-at-end-of-mbo-task-entity)))
@@ -99,8 +102,12 @@ For inserting plain text."
           (task
             (completing-read
               "Task: " incomplete-mbo-tasks nil t)))
+    ;; The contents-end of the task is the begining of the line that
+    ;; contains the next heading.  Which the capture process for a
+    ;; "plain" item then interprets as "add an item to the current
+    ;; heading".  Not ideal, so
     (goto-char
-      (- (alist-get task incomplete-mbo-tasks nil nil #'string=) 1))))
+      (1- (alist-get task incomplete-mbo-tasks nil nil #'string=)))))
 
 (defun jf/work/position-at-start-of-mbo ()
   "Position point at start of MBO.
