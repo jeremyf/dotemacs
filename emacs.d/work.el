@@ -105,7 +105,7 @@ For inserting plain text."
     ;; The contents-end of the task is the begining of the line that
     ;; contains the next heading.  Which the capture process for a
     ;; "plain" item then interprets as "add an item to the current
-    ;; heading".  Not ideal, so
+    ;; heading".  Not ideal, so move point backwards one character.
     (goto-char
       (1- (alist-get task incomplete-mbo-tasks nil nil #'string=)))))
 
