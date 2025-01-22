@@ -5,8 +5,8 @@
   (mkdir (file-truename "~/SyncThings/queue") t)
   (mkdir (file-truename "~/SyncThings/source") t)
   (message "Synchronzing denote files to cloud...")
-  ;; There's a 1 in 6 chance that we'll perform the sync.  Toss that d6.
-  (if (= 0 (random 6))
+  ;; There's a 1 in 10 chance that we'll perform the sync.  Toss that d10.
+  (if (= 0 (random 10))
     (progn
       (message "Syncing elfeed database...")
       ;; We tar zip into one directory (our queue) and then move that
