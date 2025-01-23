@@ -22,7 +22,7 @@
   "Where I put my MBOs.")
 
 (add-to-list 'org-capture-templates
-  '("J" "Journal task progress for MBO"
+  '("T" "Add to task for MBO"
      plain (file+function
              jf/work/filename-for-mbos
              jf/work/position-at-end-of-mbo-task-entity)
@@ -33,7 +33,7 @@
      :clock-resume t))
 
 (add-to-list 'org-capture-templates
-  '("j" "Journal task for MBO"
+  '("t" "New task for MBO"
      entry (file+function
              jf/work/filename-for-mbos
              jf/work/position-at-start-of-mbo)
@@ -44,7 +44,7 @@
      :clock-resume t))
 
 (add-to-list 'org-capture-templates
-  '("e" "Engineering Journal entry for MBO"
+  '("j" "Journal entry for MBO"
      plain (file+function
              jf/work/filename-for-mbos
              jf/work/position-in-mbo-journal-entry)
