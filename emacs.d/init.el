@@ -1453,7 +1453,7 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
         `(shr-cite
            ((,c :underline nil :slant italic :bold t :foreground ,mail-cite-0)))
         `(shr-aside
-           ((,c :foreground ,comment :background ,bg-dim))
+           ((,c :foreground ,comment :background ,bg-dim)))
         `(amread-highlight-face
            ((,c :foreground ,fg-main :background ,bg-search-lazy)))
         `(go-coverage-untracked
@@ -1519,7 +1519,7 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   ;; I had '(:light ef-cyprus) but the differentiation between function
   ;; and comment was not adequate
   ;; (setq jf/themes-plist '(:dark ef-bio :light ef-elea-light))
-  (setq jf/themes-plist '(:dark ef-rosa :light ef-elea-light)))
+  (setq jf/themes-plist '(:dark ef-symbiosis :light ef-elea-light)))
 
 (use-package custom
   :straight (:type built-in)
@@ -2818,61 +2818,61 @@ Assumes that I'm on a :projects: headline.
   ;;       (org-roam-db-sync)
   ;;       (org-roam-update-org-id-locations))))
 
-  (cl-defun jf/org-agenda/send-forward-task ()
-    "Send an `org-mode' task node forward."
-    (interactive)
-    (save-excursion
-      (let* ((day-project-task
-               (jf/org-agenda/timesheet/get-day-and-project-and-task-at-point))
-              (from-project
-                (plist-get day-project-task :project))
-              (from-task
-                (plist-get day-project-task :task)))
-        ;; Narrowing the region to perform quicker queries on the
-        ;; element
-        (narrow-to-region (org-element-property :begin from-task)
-          (org-element-property :end from-task))
+  ;; (cl-defun jf/org-agenda/send-forward-task ()
+  ;;   "Send an `org-mode' task node forward."
+  ;;   (interactive)
+  ;;   (save-excursion
+  ;;     (let* ((day-project-task
+  ;;              (jf/org-agenda/timesheet/get-day-and-project-and-task-at-point))
+  ;;             (from-project
+  ;;               (plist-get day-project-task :project))
+  ;;             (from-task
+  ;;               (plist-get day-project-task :task)))
+  ;;       ;; Narrowing the region to perform quicker queries on the
+  ;;       ;; element
+  ;;       (narrow-to-region (org-element-property :begin from-task)
+  ;;         (org-element-property :end from-task))
 
-        ;; Grab each section for the from-task and convert that into
-        ;; text.
-        ;;
-        ;; Yes we have the from-task, however, we haven't parsed that
-        ;; entity.  Without parsing that element, the
-        ;; `org-element-contents' returns nil.
-        (let ((content
-                (s-join "\n"
-                  (org-element-map (org-element-parse-buffer)
-                    'section
-                    (lambda (section)
-                      (mapconcat
-                        (lambda (element)
-                          (pcase (org-element-type element)
-                            ;; I want to skip my time entries
-                            ('drawer nil)
-                            (_ (buffer-substring-no-properties
-                                 (org-element-property
-                                   :begin element)
-                                 (org-element-property
-                                   :end element)))))
-                        (org-element-contents section)
-                        "\n"))))))
-          (widen)
-          (org-capture-string
-            (format "%s %s :%s:\n\n%s %s %s :%s:\n%s"
-              (s-repeat (org-element-property :level from-project) "*")
-              (org-element-property :raw-value from-project)
-              (s-join ":" (org-element-property :tags from-project))
-              (s-repeat (org-element-property :level from-task) "*")
-              (org-element-property :todo-keyword from-task)
-              (org-element-property :raw-value from-task)
-              (s-join ":" (org-element-property :tags from-task))
-              content)
-            "d"))
-        ;; Now that we've added the content, let's tidy up the
-        ;; from-task.
-        (goto-char (org-element-property :contents-begin from-task))
-        ;; Prompt for the todo state of the original task.
-        (call-interactively 'org-todo))))
+  ;;       ;; Grab each section for the from-task and convert that into
+  ;;       ;; text.
+  ;;       ;;
+  ;;       ;; Yes we have the from-task, however, we haven't parsed that
+  ;;       ;; entity.  Without parsing that element, the
+  ;;       ;; `org-element-contents' returns nil.
+  ;;       (let ((content
+  ;;               (s-join "\n"
+  ;;                 (org-element-map (org-element-parse-buffer)
+  ;;                   'section
+  ;;                   (lambda (section)
+  ;;                     (mapconcat
+  ;;                       (lambda (element)
+  ;;                         (pcase (org-element-type element)
+  ;;                           ;; I want to skip my time entries
+  ;;                           ('drawer nil)
+  ;;                           (_ (buffer-substring-no-properties
+  ;;                                (org-element-property
+  ;;                                  :begin element)
+  ;;                                (org-element-property
+  ;;                                  :end element)))))
+  ;;                       (org-element-contents section)
+  ;;                       "\n"))))))
+  ;;         (widen)
+  ;;         (org-capture-string
+  ;;           (format "%s %s :%s:\n\n%s %s %s :%s:\n%s"
+  ;;             (s-repeat (org-element-property :level from-project) "*")
+  ;;             (org-element-property :raw-value from-project)
+  ;;             (s-join ":" (org-element-property :tags from-project))
+  ;;             (s-repeat (org-element-property :level from-task) "*")
+  ;;             (org-element-property :todo-keyword from-task)
+  ;;             (org-element-property :raw-value from-task)
+  ;;             (s-join ":" (org-element-property :tags from-task))
+  ;;             content)
+  ;;           "d"))
+  ;;       ;; Now that we've added the content, let's tidy up the
+  ;;       ;; from-task.
+  ;;       (goto-char (org-element-property :contents-begin from-task))
+  ;;       ;; Prompt for the todo state of the original task.
+  ;;       (call-interactively 'org-todo))))
 
   (defun jf/org-agenda/timesheet/get-day-and-project-and-task-at-point ()
     "Return a plist of :day, :project, and :task for element at point."
@@ -3080,7 +3080,7 @@ The return value is a list of `cons' with the `car' values of:
          ("block-text" . , block-text))))
 
   (cl-defun jf/denote/capture-wrap (&key link content)
-    "Given INK and CONTENT return a string to insert into the capture."
+    "Given LINK and CONTENT return a string to insert into the capture."
     ;; We must do funny business with the link to discern the type.
     (let* ((elements
              (s-split "::"
@@ -7398,6 +7398,7 @@ Useful for Eglot."
   (keymap-global-set "H-c a" #'casual-avy-tmenu)
   (keymap-global-set "H-c e" #'casual-editkit-main-tmenu))
 
+
 (use-package bookmark
   :straight (:type built-in)
   :config
@@ -7782,6 +7783,12 @@ Useful for Eglot."
   :bind (:map doc-view-mode-map
           ("C-c g" . doc-view-goto-page)))
 
+(use-package url-vars
+  :straight (:type built-in)
+  :custom
+  (url-privacy-level '(email lastloc os emacs))
+  (url-user-agent "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:128.0) Gecko/20100101 Firefox/128.0"))
+
 (use-package elfeed
   ;; An Emacs RSS reader.  I’ve used Google Reader, Feedly, Inoreader,
   ;; and Newsboat.  I wrote about
@@ -7794,6 +7801,7 @@ Useful for Eglot."
   (shr-inhibit-images t)
   (elfeed-curl-timeout 90)
   (elfeed-db-directory "~/Documents/.elfeed/")
+  (elfeed-user-agent url-user-agent)
   :bind ((:map elfeed-search-mode-map
            (("+" . jf/elfeed-search-tag-all)
              ("q" . jf/elfeed-save-db-and-bury)))
@@ -7816,7 +7824,9 @@ Useful for Eglot."
         (completing-read-multiple "Tag(s): "
           (elfeed-db-get-all-tags)))))
   (setq elfeed-show-entry-switch #'jf/elfeed-show-entry-switch)
-  (setq-default elfeed-search-filter "@2-days-ago +unread ")
+  ;; I want to keep pulling down this feed, but not have it at the front
+  ;; of my reading
+  (setq-default elfeed-search-filter "@2-days-ago +unread ~RPG[[:space:]]Planet")
   (defun jf/elfeed-show-entry-switch(buffer)
     (switch-to-buffer buffer)
     (setq-local shr-inhibit-images t)
@@ -7836,7 +7846,8 @@ Useful for Eglot."
     (elfeed-update)
     (elfeed-db-load)
     (elfeed-search-update--force))
-  (defalias 'rss 'jf/elfeed-load-db-and-open)
+  (defalias 'rss 'jf/elfeed-load-db-and-open
+    "Fetch RSS Feed.")
 
   ;; From https://karthinks.com/blog/lazy-elfeed/
   (defun elfeed-search-show-entry-pre (&optional lines)
@@ -8395,7 +8406,9 @@ Take on Rules using the \"blockquote\" special block."
       (setq jf/exporting-org-to-tor t)
       (with-current-buffer buffer
         (save-excursion
-          (let* ((export-global-plist
+          (let* ((org-export-exclude-tags
+                   '("noexport" "private"))
+                  (export-global-plist
                    (jf/org-keywords-as-plist))
                   (section
                     (jf/export-org-to-tor--global-buffer-prop-ensure
@@ -9581,7 +9594,7 @@ This encodes the logic for creating a project."
   (require 'edraw-org)
   (edraw-org-setup-exporter))
 
-(when (file-exists-p (expand-file-name "~/.my-computer"))
+(if (file-exists-p (expand-file-name "~/.my-computer"))
   (load "personal.el")
   (load "work.el"))
 

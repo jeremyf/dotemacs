@@ -128,81 +128,80 @@ Forward PREFIX to `mastodon-tl--show-tag-timeline'."
       (goto-char (1- position))
       (user-error "Missing :private: entry for date %S" entry-date))))
 
-(use-package notmuch
-  ;; Consider the NotMuch Mail Emacs tips and tricks: https://notmuchmail.org/emacstips/
-  ;;
-  ;; https://blog.tomecek.net/post/removing-messages-with-notmuch/
-  :load-path  "/opt/homebrew/share/emacs/site-lisp/notmuch"
-  :bind (("H-/" . #'notmuch-search-transient))
-  :custom
-  ((notmuch-saved-searches
-     '((:name "inbox" :query "tag:inbox" :key "i" :sort-order newest-first)
-        (:name "unread" :query "tag:unread" :key "u" :sort-order newest-first)
-        (:name "correspondence" :query "tag:correspondence" :key "c" :sort-order newest-first)
-        (:name "flagged" :query "tag:flagged" :key "f" :sort-order newest-first)
-        (:name "sent" :query "tag:sent" :key "t" :sort-order newest-first)
-        (:name "drafts" :query "tag:draft" :key "d" :sort-order newest-first)
-        (:name "all mail" :query "*" :key "a" :sort-order newest-first)))
-    (notmuch-init-file "~/.notmuch-config"))
-  :config
-  /(setq notmuch-fcc-dirs "sent")
-  (setq mail-specify-envelope-from t)
-  (define-key notmuch-search-mode-map (kbd "C-k")
-    (lambda ()
-      "Delete message."
-      (interactive)
-      (notmuch-search-tag (list "+deleted" "-inbox"))
-      (notmuch-search-next-thread)))
-  (define-key notmuch-tree-mode-map (kbd "C-k")
-    (lambda ()
-      "Delete message."
-      (interactive)
-      (notmuch-tree-tag (list "+deleted" "-inbox"))
-      (notmuch-tree-next-matching-message)))
+;; (use-package notmuch
+;;   ;; Consider the NotMuch Mail Emacs tips and tricks: https://notmuchmail.org/emacstips/
+;;   ;;
+;;   ;; https://blog.tomecek.net/post/removing-messages-with-notmuch/
+;;   :load-path  "/opt/homebrew/share/emacs/site-lisp/notmuch"
+;;   :custom
+;;   ((notmuch-saved-searches
+;;      '((:name "inbox" :query "tag:inbox" :key "i" :sort-order newest-first)
+;;         (:name "unread" :query "tag:unread" :key "u" :sort-order newest-first)
+;;         (:name "correspondence" :query "tag:correspondence" :key "c" :sort-order newest-first)
+;;         (:name "flagged" :query "tag:flagged" :key "f" :sort-order newest-first)
+;;         (:name "sent" :query "tag:sent" :key "t" :sort-order newest-first)
+;;         (:name "drafts" :query "tag:draft" :key "d" :sort-order newest-first)
+;;         (:name "all mail" :query "*" :key "a" :sort-order newest-first)))
+;;     (notmuch-init-file "~/.notmuch-config"))
+;;   :config
+;;   /(setq notmuch-fcc-dirs "sent")
+;;   (setq mail-specify-envelope-from t)
+;;   (define-key notmuch-search-mode-map (kbd "C-k")
+;;     (lambda ()
+;;       "Delete message."
+;;       (interactive)
+;;       (notmuch-search-tag (list "+deleted" "-inbox"))
+;;       (notmuch-search-next-thread)))
+;;   (define-key notmuch-tree-mode-map (kbd "C-k")
+;;     (lambda ()
+;;       "Delete message."
+;;       (interactive)
+;;       (notmuch-tree-tag (list "+deleted" "-inbox"))
+;;       (notmuch-tree-next-matching-message)))
 
-  (defun jf/notmuch/expunge-deleted ()
-    "Expunge deleted emails."
-    (interactive)
-    (shell-command
-      "for x in $(notmuch search --output=files tag:deleted | rg \":2(,.*[^T])?$\" | sed -E \"s/:2(,.+)?$/:2/g\" ) ; do mv $x ${x}T ; done")
-    ;; "notmuch search --output=files tag:deleted | tr '\\n' '\\0' | xargs -0 -L 1 rm ; notmuch new 1&> /dev/null")
-  )
+;;   (defun jf/notmuch/expunge-deleted ()
+;;     "Expunge deleted emails."
+;;     (interactive)
+;;     (shell-command
+;;       "for x in $(notmuch search --output=files tag:deleted | rg \":2(,.*[^T])?$\" | sed -E \"s/:2(,.+)?$/:2/g\" ) ; do mv $x ${x}T ; done")
+;;     ;; "notmuch search --output=files tag:deleted | tr '\\n' '\\0' | xargs -0 -L 1 rm ; notmuch new 1&> /dev/null")
+;;   )
 
-  (defun jf/notmuch-unthreaded-show-recipient-if-sent (format-string result)
-    (let* ((headers (plist-get result :headers))
-            (to (plist-get headers :To))
-            (author (plist-get headers :From))
-            (face (if (plist-get result :match)
-                    'notmuch-tree-match-author-face
-                    'notmuch-tree-no-match-author-face)))
-      (propertize
-        (format format-string
-          (if (string-match "jeremy@jeremyfriesen.com" author)
-            (concat "↦ " (notmuch-tree-clean-address to))
-            (notmuch-tree-clean-address to)
-            author))
-        'face face)))
+;;   (defun jf/notmuch-unthreaded-show-recipient-if-sent (format-string result)
+;;     (let* ((headers (plist-get result :headers))
+;;             (to (plist-get headers :To))
+;;             (author (plist-get headers :From))
+;;             (face (if (plist-get result :match)
+;;                     'notmuch-tree-match-author-face
+;;                     'notmuch-tree-no-match-author-face)))
+;;       (propertize
+;;         (format format-string
+;;           (if (string-match "jeremy@jeremyfriesen.com" author)
+;;             (concat "↦ " (notmuch-tree-clean-address to))
+;;             (notmuch-tree-clean-address to)
+;;             author))
+;;         'face face)))
 
-  (setq notmuch-unthreaded-result-format
-    '(("date" . "%12s  ")
-       (jf/notmuch-unthreaded-show-recipient-if-sent . "%-20.20s")
-       ((("subject" . "%s"))
-         . " %-54s ")
-       ("tags" . "(%s)"))))
+;;   (setq notmuch-unthreaded-result-format
+;;     '(("date" . "%12s  ")
+;;        (jf/notmuch-unthreaded-show-recipient-if-sent . "%-20.20s")
+;;        ((("subject" . "%s"))
+;;          . " %-54s ")
+;;        ("tags" . "(%s)"))))
 
-(use-package ol-notmuch
-  :straight t
-  :after notmuch)
-(use-package notmuch-transient
-  :straight t
-  :after notmuch)
+;; (use-package ol-notmuch
+;;   :straight t
+;;   :after notmuch)
+;; (use-package notmuch-transient
+;;   :straight t
+;;   :after notmuch)
 
-(use-package notmuch-addr
-  ;; Relies on Emacs 27.1 updated completion framework.
-  :straight t
-  :config
-  (with-eval-after-load 'notmuch-address
-    (notmuch-addr-setup)))
+;; (use-package notmuch-addr
+;;   ;; Relies on Emacs 27.1 updated completion framework.
+;;   :straight t
+;;   :config
+;;   (with-eval-after-load 'notmuch-address
+;;     (notmuch-addr-setup)))
 
 (use-package mu4e
   ;; This follows the build from https://vhbelvadi.com/emacs-mu4e-on-macos.
