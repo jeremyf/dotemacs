@@ -156,14 +156,10 @@ Forward PREFIX to `mastodon-tl--show-tag-timeline'."
           (buffer
             (get-buffer-create "*epigraph*")))
     (with-current-buffer buffer
-      (read-only-mode -1)
-      (use-local-map (copy-keymap text-mode-map))
-      (local-set-key (kbd "q") #'bury-buffer)
-      (local-set-key (kbd "g") #'jf/epigraph/random)
       (erase-buffer)
       (insert content)
       (text-mode)
-      (read-only-mode t)
+      (jf/epigraph-mode t)
       (pop-to-buffer buffer
         `((display-buffer-in-side-window)
            (side . bottom)
@@ -171,6 +167,20 @@ Forward PREFIX to `mastodon-tl--show-tag-timeline'."
            (window-parameters
              (tab-line-format . none)
              (no-delete-other-windows . t)))))))
+
+(defvar jf/epigraph-mode-map
+  (let ((map
+          (make-sparse-keymap)))
+    (define-key map (kbd "q") #'bury-buffer)
+    (define-key map (kbd "g") #'jf/epigraph/random)
+    map)
+  "Map for `jf/epigraph-mode'.")
+
+(define-minor-mode jf/epigraph-mode
+  "Defined for rendering random epigraph."
+  :init-value nil
+  :global nil
+  :keymap jf/epigraph-mode-map)
 
 (defun jf/epigraphs/all-randomized ()
   (save-excursion
