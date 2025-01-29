@@ -1487,7 +1487,10 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
         `(jf/tabs-face
            ((,c :underline (:style wave :color ,bg-blue-intense))))
         `(jf/org-faces-date
-           ((,c :underline nil :foreground ,cyan-faint)))
+           ((,c :underline nil
+              :foreground ,cyan-faint
+              :underline (:color ,cyan-faint
+                           :style dots))))
         `(jf/org-faces-epigraph
            ((,c :underline nil :slant italic :foreground ,fg-alt)))
         `(jf/org-faces-work
