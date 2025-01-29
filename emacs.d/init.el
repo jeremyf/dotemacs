@@ -1453,7 +1453,7 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
         `(shr-cite
            ((,c :underline nil :slant italic :bold t :foreground ,mail-cite-0)))
         `(shr-aside
-           ((,c :foreground ,comment :background ,bg-alt)))
+           ((,c :foreground ,comment :background ,bg-dim))
         `(amread-highlight-face
            ((,c :foreground ,fg-main :background ,bg-search-lazy)))
         `(go-coverage-untracked
