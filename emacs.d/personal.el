@@ -128,6 +128,95 @@ Forward PREFIX to `mastodon-tl--show-tag-timeline'."
       (goto-char (1- position))
       (user-error "Missing :private: entry for date %S" entry-date))))
 
+(defun jf/epigraph/random ()
+  "Open a random epigraph for reading and review."
+  (interactive)
+  (let* ((use-hard-newlines
+           t)
+          (epigraph
+            (car (jf/epigraphs/all-randomized)))
+          (text
+            (plist-get epigraph :text))
+          (author
+            (plist-get epigraph :author))
+          (work
+            (plist-get epigraph :work))
+          (content
+            ;; TODO: Put this in a buffer
+            (format "%s%s"
+              text
+              (cond
+                ((and (s-present? author) (s-present? work))
+                  (format "\n―%s, «%s»" author work))
+                ((s-present? author)
+                  (format "\n―%s" author))
+                ((s-present? work)
+                  (format "\n―«%s»" work))
+                (t ""))))
+          (buffer
+            (get-buffer-create "*epigraph*")))
+    (with-current-buffer buffer
+      (read-only-mode -1)
+      (use-local-map (copy-keymap text-mode-map))
+      (local-set-key (kbd "q") #'bury-buffer)
+      (local-set-key (kbd "g") #'jf/epigraph/random)
+      (erase-buffer)
+      (insert content)
+      (text-mode)
+      (read-only-mode t)
+      (pop-to-buffer buffer
+        `((display-buffer-in-side-window)
+           (side . bottom)
+           (window-width 72)
+           (window-parameters
+             (tab-line-format . none)
+             (no-delete-other-windows . t)))))))
+
+(defun jf/epigraphs/all-randomized ()
+  (save-excursion
+    (with-current-buffer
+      (find-file-noselect jf/filename/bibliography)
+      (elfeed--shuffle
+        (org-element-map
+          (org-element-parse-buffer)
+          '(quote-block verse-block)
+          (lambda (el)
+            ;; Skip un-named blocks as we can’t link to them.
+            (when-let* ((id
+                          (org-element-property :name el)))
+              (let* ((lineage
+                       (org-element-lineage el))
+                      (h-node
+                        (car
+                          (seq-filter
+                            (lambda (el)
+                              (and
+                                (eq (org-element-type el) 'headline)
+                                (= (org-element-property :level el) 2)))
+                            lineage)))
+                      (people?
+                        (member "people"
+                          (org-element-property :tags h-node))))
+                (list
+                  :id id
+                  :type (org-element-type el)
+                  :work (if people?
+                          ""
+                          (car
+                            (org-element-property
+                              :title h-node)))
+                  :author
+                  (if people?
+                    (car
+                      (org-element-property :title h-node))
+                    (org-entry-get h-node "AUTHOR"))
+                  :text
+                  (buffer-substring-no-properties
+                    (org-element-property
+                      :contents-begin el)
+                    (org-element-property
+                      :contents-end el)))))))))))
+
 ;; (use-package notmuch
 ;;   ;; Consider the NotMuch Mail Emacs tips and tricks: https://notmuchmail.org/emacstips/
 ;;   ;;
