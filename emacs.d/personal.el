@@ -128,53 +128,67 @@ Forward PREFIX to `mastodon-tl--show-tag-timeline'."
       (goto-char (1- position))
       (user-error "Missing :private: entry for date %S" entry-date))))
 
+(defvar jf/epigraphs/cache
+  nil
+  "When non-nil, use this cache for picking a random epigraphs.")
+
 (defun jf/epigraph/random ()
   "Open a random epigraph for reading and review."
   (interactive)
-  (let* ((use-hard-newlines
-           t)
-          (epigraph
-            (car (jf/epigraphs/all-randomized)))
-          (text
-            (plist-get epigraph :text))
-          (author
-            (plist-get epigraph :author))
-          (work
-            (plist-get epigraph :work))
-          (content
-            ;; TODO: Put this in a buffer
-            (format "%s%s"
-              text
-              (cond
-                ((and (s-present? author) (s-present? work))
-                  (format "\n―%s, «%s»" author work))
-                ((s-present? author)
-                  (format "\n―%s" author))
-                ((s-present? work)
-                  (format "\n―«%s»" work))
-                (t ""))))
-          (buffer
-            (get-buffer-create "*epigraph*")))
-    (with-current-buffer buffer
-      (erase-buffer)
-      (insert content)
-      (text-mode)
-      (jf/epigraph-mode t)
-      (pop-to-buffer buffer
-        `((display-buffer-in-side-window)
-           (side . bottom)
-           (window-width 72)
-           (window-parameters
-             (tab-line-format . none)
-             (no-delete-other-windows . t)))))))
+  (let ((epigraphs
+          (or jf/epigraphs/cache (jf/epigraphs/all-randomized))))
+    (setq jf/epigraphs/cache epigraphs)
+    (let* ((use-hard-newlines
+             t)
+            (epigraph
+              (seq-random-elt epigraphs))
+            (id
+              (plist-get epigraph :id))
+            (text
+              (plist-get epigraph :text))
+            (author
+              (plist-get epigraph :author))
+            (work
+              (plist-get epigraph :work))
+            (content
+              (format "%s%s"
+                text
+                (cond
+                  ((and (s-present? author) (s-present? work))
+                    (format "\n―%s, [[epigraph:%s][%s]]" author id work))
+                  ((s-present? author)
+                    (format "\n―[[epigraph:%s][%s]]" id author))
+                  ((s-present? work)
+                    (format "\n―[[epigraph:%s][%s]]" id work))
+                  (t ""))))
+            (buffer
+              (get-buffer-create "*epigraph*")))
+      ;; (message "%s" content)
+      (with-current-buffer buffer
+        (erase-buffer)
+        (insert content)
+        (org-mode)
+        (jf/epigraph-mode t)
+        (pop-to-buffer buffer
+          `((display-buffer-in-side-window)
+             (side . bottom)
+             (window-width 72)
+             (window-parameters
+               (tab-line-format . none)
+               (no-delete-other-windows . t))))))))
 
 (defvar jf/epigraph-mode-map
   (let ((map
           (make-sparse-keymap)))
-    (define-key map (kbd "q") #'bury-buffer)
+    (define-key map (kbd "q") #'jf/epigraph/bury-buffer)
     (define-key map (kbd "g") #'jf/epigraph/random)
     map)
   "Map for `jf/epigraph-mode'.")
+
+(defun jf/epigraph/bury-buffer ()
+  (interactive)
+  (setq jf/epigraphs/cache nil)
+  (bury-buffer))
 
 (define-minor-mode jf/epigraph-mode
   "Defined for rendering random epigraph."
