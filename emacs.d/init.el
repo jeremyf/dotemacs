@@ -1307,10 +1307,8 @@ This uses `split-window-right' but follows with the cursor."
          (dedicated . t)
          (preserve-size . (t . t)))
        ("\\*\\.<gocov\\>$"
-
          (display-buffer-pop-up-window)
          (dedicated . t)
-
          (body-function . prot-window-select-fit-size))
        ((or "\\*rspec-compilation\\*")
          (display-buffer-reuse-mode-window
@@ -1874,6 +1872,8 @@ future copy)."
                              ("C-x n t" . jf/org-mode/narrow-to-date)
                              ("C-j" . avy-goto-char-timer)))
   :config
+  (setq org-closed-keep-when-no-todo t)
+  (setq org-agenda-include-inactive-timestamps t)
   (org-clock-persistence-insinuate)
   (setq org-use-speed-commands t)
   (setq org-agenda-clockreport-parameter-plist
@@ -3257,7 +3257,7 @@ Narrow focus to a tag, then a named element."
     "Dude, these are the books I'm curious about.")
 
   (defvar jf/filename/bibliography
-    (f-join jf/denote-base-dir "private/20241124T080648--bibliography__personal.org")
+    (f-join jf/denote-base-dir "private/20241124T080648--bibliography__projects.org")
     "Dude, you can put your books in here.")
 
   (defvar jf/filename/bibliography-takeonrules
@@ -8276,6 +8276,16 @@ The `magit-gitdir' is the project's .git directory."
   (global-undo-tree-mode +1))
 
 (with-eval-after-load 'org
+  (let ((query
+          (format "TODO=\"DONE\"+CLOSED>=\"<%s>\""
+            (format-time-string "%Y-01-01"))))
+    (add-to-list 'org-agenda-custom-commands
+      `("d" "Done this year"
+         ((tags ,query))))
+    (let ((query (concat "books+" query)))
+      (add-to-list 'org-agenda-custom-commands
+        `("b" "Books read this year"
+           ((tags ,query))))))
   ;; https://sachachua.com/blog/2024/11/changing-org-mode-underlines-to-the-html-mark-element/
   (setf (alist-get 'underline org-html-text-markup-alist)
     "<mark>%s</mark>")

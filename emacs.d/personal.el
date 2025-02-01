@@ -342,7 +342,7 @@ Forward PREFIX to `mastodon-tl--show-tag-timeline'."
   (setq mu4e-maildir-shortcuts
     '(("/inbox"     . ?i)
        ("/Sent"      . ?s)
-       ("/Labels/corresponence" . ?c)
+       ("/Archive" . ?A)
        ("/Trash"     . ?t)
        ("/Drafts"    . ?d)
        ("/All Mail"  . ?a)))
