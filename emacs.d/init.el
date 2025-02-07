@@ -7830,7 +7830,7 @@ Useful for Eglot."
   (setq elfeed-show-entry-switch #'jf/elfeed-show-entry-switch)
   ;; I want to keep pulling down this feed, but not have it at the front
   ;; of my reading
-  (setq-default elfeed-search-filter "@2-days-ago +unread ~RPG[[:space:]]Planet")
+  (setq-default elfeed-search-filter "@2-days-ago -skip +unread ~RPG[[:space:]]Planet")
   (defun jf/elfeed-show-entry-switch(buffer)
     (switch-to-buffer buffer)
     (setq-local shr-inhibit-images t)

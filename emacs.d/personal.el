@@ -68,7 +68,7 @@ Forward PREFIX to `mastodon-tl--show-tag-timeline'."
   '("j" "Start Today's Journal Entry"
      plain (file+olp+datetree
              jf/personal/filename-for-journal)
-     "[[date:%<%Y-%m-%d>][Today:]]\n\n- [ ] Contact representatives\n- [ ] Take one more action\n- [ ] Read one book chapter\n- [ ] Read one poem\n- [ ] Read one essay\n- [ ] Tend my daily feed\n- [ ] Write one response to a feed item\n\n%?\n\n**** Private Thoughts :private:\n:PROPERTIES:\n:END:\n"
+     "[[date:%<%Y-%m-%d>][Today:]]\n\n- [ ] Contact representatives\n- [ ] One small light\n- [ ] Read one book chapter\n- [ ] Read one poem\n- [ ] Read one essay\n- [ ] Tend my daily feed\n- [ ] Write one response to a feed item\n\n%?\n\n**** Private Thoughts :private:\n:PROPERTIES:\n:END:\n"
      :empty-lines-before 1
      :empty-lines-after 1
      :clock-in t
@@ -137,11 +137,12 @@ Forward PREFIX to `mastodon-tl--show-tag-timeline'."
         "Browser: "
         (mapcar
           (lambda (el)
-            (s-trim (s-replace "*" "" el)))
+            (s-trim el))
           (s-split "\n"
             (s-trim
               (shell-command-to-string "defaultbrowser")))))))
-  (shell-command (concat "defaultbrowser " name)))
+  (shell-command
+    (format "defaultbrowser %s" (s-trim (s-replace "*" "" name)))))
 
 (defvar jf/epigraphs/cache
   nil
