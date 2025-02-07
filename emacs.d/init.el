@@ -927,6 +927,7 @@ work computers.")
 
 When given PREFIX use `eww-browse-url'."
     (interactive "P")
+    (shell-command "defaultbrowser mullvadbrowser 2>&1 1>/dev/null")
     (if prefix
       (link-hint-open-link)
       (let ((browse-url-browser-function

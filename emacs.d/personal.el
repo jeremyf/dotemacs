@@ -68,7 +68,7 @@ Forward PREFIX to `mastodon-tl--show-tag-timeline'."
   '("j" "Start Today's Journal Entry"
      plain (file+olp+datetree
              jf/personal/filename-for-journal)
-     "[[date:%<%Y-%m-%d>][Today:]]\n\n- [ ] Read one book chapter\n- [ ] Read one poem\n- [ ] Read one essay\n- [ ] Tend my daily feed\n- [ ] Write one response to a feed item\n\n%?\n\n**** Private Thoughts :private:\n:PROPERTIES:\n:END:\n"
+     "[[date:%<%Y-%m-%d>][Today:]]\n\n- [ ] Contact representatives\n- [ ] Take one more action\n- [ ] Read one book chapter\n- [ ] Read one poem\n- [ ] Read one essay\n- [ ] Tend my daily feed\n- [ ] Write one response to a feed item\n\n%?\n\n**** Private Thoughts :private:\n:PROPERTIES:\n:END:\n"
      :empty-lines-before 1
      :empty-lines-after 1
      :clock-in t
@@ -127,6 +127,21 @@ Forward PREFIX to `mastodon-tl--show-tag-timeline'."
                           (org-element-property :contents-end hl)))))))
       (goto-char (1- position))
       (user-error "Missing :private: entry for date %S" entry-date))))
+
+(defun jf/default-browser (&optional name)
+  "Set the default browser based on the given NAME."
+  ;; brew install defaultbrowser
+  (interactive
+    (list
+      (completing-read
+        "Browser: "
+        (mapcar
+          (lambda (el)
+            (s-trim (s-replace "*" "" el)))
+          (s-split "\n"
+            (s-trim
+              (shell-command-to-string "defaultbrowser")))))))
+  (shell-command (concat "defaultbrowser " name)))
 
 (defvar jf/epigraphs/cache
   nil
@@ -272,13 +287,11 @@ Forward PREFIX to `mastodon-tl--show-tag-timeline'."
 ;;       (notmuch-tree-tag (list "+deleted" "-inbox"))
 ;;       (notmuch-tree-next-matching-message)))
 
-;;   (defun jf/notmuch/expunge-deleted ()
-;;     "Expunge deleted emails."
-;;     (interactive)
-;;     (shell-command
-;;       "for x in $(notmuch search --output=files tag:deleted | rg \":2(,.*[^T])?$\" | sed -E \"s/:2(,.+)?$/:2/g\" ) ; do mv $x ${x}T ; done")
-;;     ;; "notmuch search --output=files tag:deleted | tr '\\n' '\\0' | xargs -0 -L 1 rm ; notmuch new 1&> /dev/null")
-;;   )
+  (defun jf/notmuch/expunge-deleted ()
+    "Expunge deleted emails."
+    (interactive)
+    (shell-command
+      "for x in $(notmuch search --output=files tag:deleted | rg \":2(,.*[^T])?$\" | sed -E \"s/:2(,.+)?$/:2/g\" ) ; do mv $x ${x}T ; done"))
 
 ;;   (defun jf/notmuch-unthreaded-show-recipient-if-sent (format-string result)
 ;;     (let* ((headers (plist-get result :headers))
