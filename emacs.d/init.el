@@ -3036,7 +3036,7 @@ HEADLINE does not exist, write it at the end of the file."
       "\n#+END_${block-type}"))
 
   (defvar jf/org-mode/capture/template/while-clocking
-    (concat "Reviewing [[${remote-url}][${function-name}]] "
+    (concat "[[${remote-url}][${function-name}]] "
       "\n\n#+BEGIN_${block-type} ${block-mode}"
       "\n${block-text}"
       "\n#+END_${block-type}"))
@@ -3344,7 +3344,7 @@ https://takeonrules.com/site-map/epigraphs url.")
   ;; auto-correct that I configure.  No more “teh” in my text.
   :straight (:type built-in)
   :custom (abbrev-file-name (file-truename
-                              "~/git/dotemacs/emacs.d/abbrev_defs"))
+                              "~/SyncThings/source/abbrev_defs"))
   :hook (text-mode . abbrev-mode))
 
 (use-package emacs

@@ -68,7 +68,7 @@ Forward PREFIX to `mastodon-tl--show-tag-timeline'."
   '("j" "Start Today's Journal Entry"
      plain (file+olp+datetree
              jf/personal/filename-for-journal)
-     "[[date:%<%Y-%m-%d>][Today:]]\n\n- [ ] Contact representatives\n- [ ] One small light\n- [ ] Read one book chapter\n- [ ] Read one poem\n- [ ] Read one essay\n- [ ] Tend my daily feed\n- [ ] Write one response to a feed item\n\n%?\n\n**** Private Thoughts :private:\n:PROPERTIES:\n:END:\n"
+     "[[date:%<%Y-%m-%d>][Today:]]\n\n- [ ] Contact representatives\n- [ ] One small light\n- [ ] Read one book chapter\n- [ ] Read one poem\n- [ ] Read one essay\n- [ ] Tend my daily feed\n- [ ] Write one response to a feed item\n\n%T :: %?\n\n**** Private Thoughts :private:\n:PROPERTIES:\n:END:\n"
      :empty-lines-before 1
      :empty-lines-after 1
      :clock-in t
@@ -89,7 +89,7 @@ Forward PREFIX to `mastodon-tl--show-tag-timeline'."
      plain (file+function
              jf/personal/filename-for-journal
              jf/personal/position-in-private-thoughts)
-     "%T :: %?"
+     "%T :: From %a.  %?"
      :empty-lines-before 1
      :empty-lines-after 1
      :clock-in t
@@ -104,6 +104,17 @@ Forward PREFIX to `mastodon-tl--show-tag-timeline'."
      :empty-lines-before 1
      :empty-lines-after 1
      :immediate-finish t))
+
+(add-to-list 'org-capture-templates
+  `("t" "Task"
+     entry (file+headline
+             jf/personal/filename-for-journal
+             "Tasks")
+     "TODO %^{Task}\n\n%T :: %(jf/denote/capture-wrap :link \"%L\" :content \"%i\")"
+     :empty-lines-before 1
+     :empty-lines-after 1
+     :clock-in t
+     :clock-resume t))
 
 (defun jf/personal/position-in-private-thoughts ()
   "Position to the end of today's private thoughts."
