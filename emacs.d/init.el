@@ -6447,11 +6447,15 @@ See https://github.com/chmouel/gotest-ts.el"
 
 (defun jf/go-test-current (prefix)
   "Run current test.  When PREFIX given run using `dape`."
-  (interactive "P")
-  (if prefix
-    (let ((current-prefix-arg nil))
-      (jf/dape/go-test-at-point))
-    (let ((current-prefix-arg nil))
+  (interactive "p")
+  (cond
+    ((>= prefix 16)
+      (let ((current-prefix-arg nil))
+        (go-test-current-file)))
+    ((>= prefix 4)
+      (let ((current-prefix-arg nil))
+        (jf/dape/go-test-at-point)))
+    (t
       (gotest-ts-run-dwim))))
 
 (defvar jf/minor-mode/go-ts-implementation-mode-map
@@ -6591,6 +6595,7 @@ See https://github.com/chmouel/gotest-ts.el"
   ;; the branch but not in main.
   :config (magit-todos-mode)
   :commands (magit-todos-list)
+  :bind (("H-t H-t" . magit-todos-list))
   :custom (magit-todos-exclude-globs '(".git/" "public/" "vendor/"))
   ;; (magit-todos-keywords-list
   ;;   '("TODO" "HACK" "QUESTION" "BLOCKED" "WAITING" "FIXME"))
@@ -6798,17 +6803,17 @@ The generated and indented TOC will be inserted at point."
     (yaml-pro-ts--imenu-node-label (treesit-node-at (point) 'yaml)))
   :straight t)
 
-(use-package combobulate
-  :straight (:host github :repo "mickeynp/combobulate")
-  :hook ((json-ts-mode . combobulate-mode)
-          ;; (html-ts-mode . combobulate-mode)
-          (go-ts-mode . combobulate-mode)
-          (yaml-ts-mode . combobulate-mode))
-  :init
-  ;; The splice functions are destructive and clobber long-used
-  ;; navigation commands.
-  (dolist (key '("C-M-h" "M-<down>" "M-<up>" "M-<left>" "M-<right>"))
-    (keymap-unset combobulate-key-map key)))
+;; (use-package combobulate
+;;   :straight (:host github :repo "mickeynp/combobulate")
+;;   :hook ((json-ts-mode . combobulate-mode)
+;;           ;; (html-ts-mode . combobulate-mode)
+;;           (go-ts-mode . combobulate-mode)
+;;           (yaml-ts-mode . combobulate-mode))
+;;   :init
+;;   ;; The splice functions are destructive and clobber long-used
+;;   ;; navigation commands.
+;;   (dolist (key '("C-M-h" "M-<down>" "M-<up>" "M-<left>" "M-<right>"))
+;;     (keymap-unset combobulate-key-map key)))
 
 (use-package yard-mode
   ;; My prefered Ruby documentation syntax
@@ -6894,6 +6899,10 @@ See `add-log-current-defun-function'."
         (message "%s" text)
         (kill-new (substring-no-properties text)))
       (user-error "Warning: Point not on function")))
+  (bind-key "C-M-e"
+    #'end-of-defun prog-mode-map)
+  (bind-key "C-M-a"
+    #'beginning-of-defun prog-mode-map)
   (bind-key "C-c y f"
     #'jf/yank-current-scoped-function-name prog-mode-map)
   (bind-key "C-c y f"
