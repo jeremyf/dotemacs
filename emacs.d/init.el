@@ -3281,6 +3281,34 @@ https://takeonrules.com/site-map/epigraphs url.")
             "^\\(The\\|A\\|An\\) " "" heading)))
       #'string<))
 
+  (setq jf/elfeed-reading-priorities
+    '("1st" "2nd" "3rd" "4th" "5th")
+    "The priorities and their index")
+
+  (defun jf/org-sort-entries/by-elfeed-tag-priority ()
+    "Sort org entries by elfeed tag priority."
+    (interactive)
+    (org-sort-entries
+      nil
+      ?f
+      (lambda ()
+        (format "%s-%s"
+          ;; Find the priority elfeed tag.
+          (or
+            (cl-position
+              (car
+                (cl-intersection
+                  (org-element-property :tags (org-element-at-point))
+                  jf/elfeed-reading-priorities
+                  :test
+                  #'string=))
+              jf/elfeed-reading-priorities
+              :test #'string=)
+            9)
+          ;; And the title.
+          (org-element-property :title (org-element-at-point))))
+      #'string<))
+
   (setq org-capture-templates
     `(("c" "Content to Clock"
          plain (clock)
@@ -7816,12 +7844,26 @@ Useful for Eglot."
   (elfeed-db-directory "~/Documents/.elfeed/")
   (elfeed-user-agent url-user-agent)
   :bind ((:map elfeed-search-mode-map
-           (("+" . jf/elfeed-search-tag-all)
+           (("/" . jf/elfeed-filter-by-ordinality)
+             ("+" . jf/elfeed-search-tag-all)
              ("q" . jf/elfeed-save-db-and-bury)))
           (:map elfeed-show-mode-map
             (("+" . jf/elfeed-show-tag)
               ("-" . elfeed-show-untag))))
   :config
+  (defun jf/elfeed-filter-by-ordinality ()
+    "Select a default filter and update elfeed."
+    (interactive)
+    (let* ((filters
+             '(("First (1st)" . "+1st +unread")
+                ("Second (2nd)" . "@7-days-ago +2nd +unread")
+                ("Third (3rd)" . "@7-days-ago +3rd +unread")
+                ("Outlets" . "@2-days-ago +outlet")))
+            (filter
+              (completing-read "Elfeed Filter: " filters nil t)))
+      (setq elfeed-search-filter
+        (alist-get filter filters nil nil #'string=))
+      (elfeed-search-update :force)))
   (defun jf/elfeed-search-tag-all ()
     "Apply TAG to all selected entries."
     (interactive)
@@ -7839,7 +7881,7 @@ Useful for Eglot."
   (setq elfeed-show-entry-switch #'jf/elfeed-show-entry-switch)
   ;; I want to keep pulling down this feed, but not have it at the front
   ;; of my reading
-  (setq-default elfeed-search-filter "@2-days-ago -skip +unread ~RPG[[:space:]]Planet")
+  (setq-default elfeed-search-filter "@2-days-ago +1st +unread")
   (defun jf/elfeed-show-entry-switch(buffer)
     (switch-to-buffer buffer)
     (setq-local shr-inhibit-images t)
@@ -7893,12 +7935,12 @@ It will display entries without switching to them."
   (defun jf/export-public-elfeed-opml ()
     "Export public OPML file."
     (let ((opml-body
-            (cl-loop for org-file in `(,(f-join jf/denote-base-dir "indices/public-elfeed.org"))
+            (cl-loop for org-file in `(,(f-join jf/denote-base-dir "indices/elfeed.org"))
               concat
               (with-temp-buffer
                 (insert-file-contents
                   (expand-file-name org-file jf/denote-base-dir))
-                (rmh-elfeed-org-convert-org-to-opml
+                (jf/elfeed-org-convert-org-to-opml
                   (current-buffer))))))
       (with-current-buffer
         (find-file-noselect "~/git/takeonrules.source/static/blogroll.xml")
@@ -7914,9 +7956,76 @@ It will display entries without switching to them."
         (insert "  </body>\n")
         (insert "</opml>\n")
         (save-buffer))))
+
+  (defvar jf/elfeed-blogroll-tag "blogroll"
+    "The tag I give to RSS feed items that I'll share on my blogroll.")
+
+  (defun jf/elfeed-org-convert-org-to-opml (org-buffer)
+    "Convert Org buffer content to OPML format.
+Argument ORG-BUFFER the buffer to write the OPML content to.
+
+Modification of `rmh-elfeed-org-convert-org-to-opml'."
+    (let (need-ends
+           opml-body)
+      (with-current-buffer org-buffer
+        (let ((org-inhibit-startup t)
+               (org-mode-hook nil))
+          (org-mode))
+        (org-element-map (rmh-elfeed-org-import-trees
+                           rmh-elfeed-org-tree-id) 'headline
+          (lambda (h)
+            (let* ((current-level (org-element-property :level h))
+                    (tags (org-element-property :tags h))
+                    (heading (org-element-property :raw-value h))
+                    (link-and-title (and (string-match "^\\[\\[\\(http.+?\\)\\]\\[\\(.+?\\)\\]\\]" heading)
+                                      (list (match-string-no-properties 0 heading)
+                                        (match-string-no-properties 1 heading)
+                                        (match-string-no-properties 2 heading))))
+                    (hyperlink (and (string-match "^\\[\\[\\(http.+?\\)\\]\\(?:\\[.+?\\]\\)?\\]" heading)
+                                 (list (match-string-no-properties 0 heading)
+                                   (match-string-no-properties 1 heading))))
+                    url
+                    title
+                    opml-outline)
+              ;; fill missing end outlines
+              (while (and (car need-ends) (>= (car need-ends) current-level))
+                (let* ((level (pop need-ends)))
+                  (setq opml-body (concat opml-body (format "  %s</outline>\n"
+                                                      (make-string (* 2 level) ? ))))))
+
+              (cond ((string-prefix-p "http" heading)
+                      (setq url heading)
+                      (setq title (or (elfeed-feed-title (elfeed-db-get-feed heading)) "Unknown")))
+                (link-and-title (setq url (nth 1 link-and-title))
+                  (setq title (nth 2 link-and-title)))
+                (hyperlink (setq url (nth 1 hyperlink))
+                  (setq title (or (elfeed-feed-title (elfeed-db-get-feed (nth 1 hyperlink))) "Unknown")))
+                (t (setq title heading)))
+              (if url
+                (setq opml-outline (format "  %s<outline title=\"%s\" xmlUrl=\"%s\"/>\n"
+                                     (make-string (* 2 current-level) ? )
+                                     (xml-escape-string title)
+                                     (xml-escape-string url)))
+                (unless (string-prefix-p "entry-title" heading)
+                  (unless (member rmh-elfeed-org-tree-id tags)
+                    ;; insert category title only when it is neither the top
+                    ;; level elfeed node nor the entry-title node
+                    (progn
+                      (push current-level need-ends)
+                      (setq opml-outline (format "  %s<outline title=\"%s\">\n"
+                                           (make-string (* 2 current-level) ? )
+                                           (xml-escape-string title)))))))
+              (when (member jf/elfeed-blogroll-tag tags)
+                (setq opml-body (concat opml-body opml-outline)))))))
+
+      ;; fill missing end outlines at end
+      (while (car need-ends)
+        (let* ((level (pop need-ends)))
+          (setq opml-body (concat opml-body (format "  %s</outline>\n"
+                                              (make-string (* 2 level) ? ))))))
+      opml-body))
   (setq rmh-elfeed-org-files nil)
-  (dolist (file `(,(f-join jf/denote-base-dir "indices/public-elfeed.org")
-                   ,(f-join jf/denote-base-dir "indices/private-elfeed.org")))
+  (dolist (file `(,(f-join jf/denote-base-dir "indices/elfeed.org")))
     (when (f-exists? file)
       (add-to-list 'rmh-elfeed-org-files file))))
 
