@@ -96,10 +96,10 @@ Forward PREFIX to `mastodon-tl--show-tag-timeline'."
      :clock-resume t))
 
 (add-to-list 'org-capture-templates
-  `("b" "Blogroll"
+  `("r" "Add to RSS Feed"
      entry (file+headline
-             "~/git/org/denote/indices/private-elfeed.org"
-             "Private Blog Roll")
+             "~/git/org/denote/indices/elfeed.org"
+             "RSS Feed")
      "%^{URL} %^g"
      :empty-lines-before 1
      :empty-lines-after 1

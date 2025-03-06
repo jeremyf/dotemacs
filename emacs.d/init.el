@@ -1873,6 +1873,26 @@ future copy)."
                              ("C-x n t" . jf/org-mode/narrow-to-date)
                              ("C-j" . avy-goto-char-timer)))
   :config
+  (defun my-assign-custom-ids ()
+    "Derive custom ID's based on `org-mode' headline.
+
+  When duplicates encountered prompt for an alternate.
+
+From Sacha's Post."
+    (interactive)
+    (let ((custom-ids
+            (org-map-entries (lambda () (org-entry-get (point) "CUSTOM_ID")) "CUSTOM_ID={.}")))
+      (org-map-entries
+        (lambda ()
+          (let ((slug
+                  (replace-regexp-in-string
+                    "^-\\|-$" ""
+                    (replace-regexp-in-string "[^A-Za-z0-9]+" "-"
+                      (downcase (string-join (org-get-outline-path t) " "))))))
+            (while (member slug custom-ids)
+              (setq slug (read-string "Manually set custom ID: " slug)))
+            (org-entry-put (point) "CUSTOM_ID" slug)))
+        "-CUSTOM_ID={.}")))
   (setq org-closed-keep-when-no-todo t)
   (setq org-agenda-include-inactive-timestamps t)
   (org-clock-persistence-insinuate)
@@ -3372,7 +3392,7 @@ https://takeonrules.com/site-map/epigraphs url.")
   ;; auto-correct that I configure.  No more “teh” in my text.
   :straight (:type built-in)
   :custom (abbrev-file-name (file-truename
-                              "~/SyncThings/source/abbrev_defs"))
+                              "~/git/dotemacs/emacs.d/abbrev_defs"))
   :hook (text-mode . abbrev-mode))
 
 (use-package emacs
@@ -6791,9 +6811,12 @@ The generated and indented TOC will be inserted at point."
   ;; when I'm not working in Javascript.
   :straight t)
 
-;; (use-package vterm
-;;   ;; A terminal in Emacs.
-;;   :straight t)
+(use-package vterm
+  ;; A terminal in Emacs.
+  :straight t)
+
+(use-package eat
+  :straight t)
 
 (use-package web-mode
   ;; Help consistently edit web documents of SGML markup dialetcs.
@@ -7855,10 +7878,10 @@ Useful for Eglot."
     "Select a default filter and update elfeed."
     (interactive)
     (let* ((filters
-             '(("First (1st)" . "+1st +unread")
-                ("Second (2nd)" . "@7-days-ago +2nd +unread")
-                ("Third (3rd)" . "@7-days-ago +3rd +unread")
-                ("Outlets" . "@2-days-ago +outlet")))
+            '(("First (1st)" . "+1st +unread")
+               ("Second (2nd)" . "@7-days-ago +2nd +unread")
+               ("Third (3rd)" . "@7-days-ago +3rd +unread")
+               ("Outlets" . "@2-days-ago +outlet")))
             (filter
               (completing-read "Elfeed Filter: " filters nil t)))
       (setq elfeed-search-filter
