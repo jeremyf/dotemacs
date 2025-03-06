@@ -1873,26 +1873,26 @@ future copy)."
                              ("C-x n t" . jf/org-mode/narrow-to-date)
                              ("C-j" . avy-goto-char-timer)))
   :config
-  (defun my-assign-custom-ids ()
-    "Derive custom ID's based on `org-mode' headline.
+  ;; (defun my-assign-custom-ids ()
+  ;;     "Derive custom ID's based on `org-mode' headline.
 
-  When duplicates encountered prompt for an alternate.
+  ;;   When duplicates encountered prompt for an alternate.
 
-From Sacha's Post."
-    (interactive)
-    (let ((custom-ids
-            (org-map-entries (lambda () (org-entry-get (point) "CUSTOM_ID")) "CUSTOM_ID={.}")))
-      (org-map-entries
-        (lambda ()
-          (let ((slug
-                  (replace-regexp-in-string
-                    "^-\\|-$" ""
-                    (replace-regexp-in-string "[^A-Za-z0-9]+" "-"
-                      (downcase (string-join (org-get-outline-path t) " "))))))
-            (while (member slug custom-ids)
-              (setq slug (read-string "Manually set custom ID: " slug)))
-            (org-entry-put (point) "CUSTOM_ID" slug)))
-        "-CUSTOM_ID={.}")))
+  ;; From Sacha's Post."
+  ;;     (interactive)
+  ;;     (let ((custom-ids
+  ;;             (org-map-entries (lambda () (org-entry-get (point) "CUSTOM_ID")) "CUSTOM_ID={.}")))
+  ;;       (org-map-entries
+  ;;         (lambda ()
+  ;;           (let ((slug
+  ;;                   (replace-regexp-in-string
+  ;;                     "^-\\|-$" ""
+  ;;                     (replace-regexp-in-string "[^A-Za-z0-9]+" "-"
+  ;;                       (downcase (string-join (org-get-outline-path t) " "))))))
+  ;;             (while (member slug custom-ids)
+  ;;               (setq slug (read-string "Manually set custom ID: " slug)))
+  ;;             (org-entry-put (point) "CUSTOM_ID" slug)))
+  ;;         "-CUSTOM_ID={.}")))
   (setq org-closed-keep-when-no-todo t)
   (setq org-agenda-include-inactive-timestamps t)
   (org-clock-persistence-insinuate)
@@ -2433,77 +2433,77 @@ function is ever added to that hook."
     (when jf/org-mode/enable-buffer-wide-recalculation
       (progn
         (org-table-recalculate-buffer-tables)
-        (org-dblock-update '(4)))))
+        (org-dblock-update '(4))))))
 
-  (with-eval-after-load 'org
-    (use-package ox
-      :straight (ox :type built-in))
-    ;; (add-to-list 'org-export-filter-options-functions
-    ;;   #'jf/org-export-change-options)
+(with-eval-after-load 'org
+  (use-package ox
+    :straight (ox :type built-in))
+  ;; (add-to-list 'org-export-filter-options-functions
+  ;;   #'jf/org-export-change-options)
    ;;; Org Export and Composition Functionality
-    (setq org-export-global-macros (list))
+  (setq org-export-global-macros (list))
 
-    (add-to-list 'org-export-global-macros
-      '("kbd" . "@@html:<kbd>@@$1@@html:</kbd>@@"))
-    (add-to-list 'org-export-global-macros
-      '("cite" . "@@latex:\\textit{@@@@html:<cite>@@$1@@html:</cite>@@@@latex:}@@ "))
-    (add-to-list 'org-export-global-macros
-      '("dfn" . "@@html:<dfn>@@$1@@html:</dfn>@@"))
-    (add-to-list 'org-export-global-macros
-      '("mark" . "@@html:<mark>@@$1@@html:</mark>@@"))
-    (add-to-list 'org-export-global-macros
-      '("scene-date" . "#+begin_marginnote\nThe scene occurs on @@html:<span class=\"time\">@@$1@@html:</span>@@.\n#+end_marginnote"))
-    (add-to-list 'org-export-global-macros
-      '("mention" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" >}}@@"))
-    (add-to-list 'org-export-global-macros
-      '("abbr" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" abbr=\"t\" >}}@@"))
-    (add-to-list 'org-export-global-macros
-      '("abbr-plural" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" abbr=\"t\" plural=\"t\" >}}@@"))
-    (add-to-list 'org-export-global-macros
-      '("i" . "@@latex:\\textit{@@@@html:<i class=\"dfn\">@@$1@@html:</i>@@@@latex:}@@"))
-    (add-to-list 'org-export-global-macros
-      '("em" . "@@latex:\\textit{@@@@html:<em>@@$1@@html:</em> @@@@latex:}@@"))
-    (add-to-list 'org-export-global-macros
-      '("mechanic" . "@@latex:\\textit{@@@@html:<i class=\"mechanic\">@@$1@@html:</i>@@@@latex:}@@"))
-    (add-to-list 'org-export-global-macros
-      '("m" . "@@latex:\\textit{@@@@html:<i class=\"mechanic\">@@$1@@html:</i>@@@@latex:}@@"))
-    (add-to-list 'org-export-global-macros
-      '("newline" . "@@latex:\\@@ @@html:<br />@@"))
-    (add-to-list 'org-export-global-macros
-      '("newpage" . "@@latex:\newpage@@"))
-    (add-to-list 'org-export-global-macros
-      '("rune" . "@@hugo:<span class=\"rune\">@@$1@@hugo:</span>@@"))
-    (add-to-list 'org-export-global-macros
-      '("linkToSeries" . "@@hugo:{{< linkToSeries \"@@$1@@hugo:\" >}}@@"))
-    (add-to-list 'org-latex-classes
-      '("jf/article"
-         "\\documentclass[11pt,letter]{article}
+  (add-to-list 'org-export-global-macros
+    '("kbd" . "@@html:<kbd>@@$1@@html:</kbd>@@"))
+  (add-to-list 'org-export-global-macros
+    '("cite" . "@@latex:\\textit{@@@@html:<cite>@@$1@@html:</cite>@@@@latex:}@@ "))
+  (add-to-list 'org-export-global-macros
+    '("dfn" . "@@html:<dfn>@@$1@@html:</dfn>@@"))
+  (add-to-list 'org-export-global-macros
+    '("mark" . "@@html:<mark>@@$1@@html:</mark>@@"))
+  (add-to-list 'org-export-global-macros
+    '("scene-date" . "#+begin_marginnote\nThe scene occurs on @@html:<span class=\"time\">@@$1@@html:</span>@@.\n#+end_marginnote"))
+  (add-to-list 'org-export-global-macros
+    '("mention" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" >}}@@"))
+  (add-to-list 'org-export-global-macros
+    '("abbr" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" abbr=\"t\" >}}@@"))
+  (add-to-list 'org-export-global-macros
+    '("abbr-plural" . "@@hugo:{{< glossary key=\"@@$1@@hugo:\" abbr=\"t\" plural=\"t\" >}}@@"))
+  (add-to-list 'org-export-global-macros
+    '("i" . "@@latex:\\textit{@@@@html:<i class=\"dfn\">@@$1@@html:</i>@@@@latex:}@@"))
+  (add-to-list 'org-export-global-macros
+    '("em" . "@@latex:\\textit{@@@@html:<em>@@$1@@html:</em> @@@@latex:}@@"))
+  (add-to-list 'org-export-global-macros
+    '("mechanic" . "@@latex:\\textit{@@@@html:<i class=\"mechanic\">@@$1@@html:</i>@@@@latex:}@@"))
+  (add-to-list 'org-export-global-macros
+    '("m" . "@@latex:\\textit{@@@@html:<i class=\"mechanic\">@@$1@@html:</i>@@@@latex:}@@"))
+  (add-to-list 'org-export-global-macros
+    '("newline" . "@@latex:\\@@ @@html:<br />@@"))
+  (add-to-list 'org-export-global-macros
+    '("newpage" . "@@latex:\newpage@@"))
+  (add-to-list 'org-export-global-macros
+    '("rune" . "@@hugo:<span class=\"rune\">@@$1@@hugo:</span>@@"))
+  (add-to-list 'org-export-global-macros
+    '("linkToSeries" . "@@hugo:{{< linkToSeries \"@@$1@@hugo:\" >}}@@"))
+  (add-to-list 'org-latex-classes
+    '("jf/article"
+       "\\documentclass[11pt,letter]{article}
 \\usepackage[letter]{anysize}
 \\usepackage{minted}
 \\usepackage{array, booktabs, caption}
 \\usemintedstyle{emacs}
 \\usepackage[colorlinks = true,
         urlcolor  = blue]{hyperref}"
-         ("\\section{%s}" . "\\section{%s}")
-         ("\\subsection{%s}" . "\\subsection{%s}")
-         ("\\subsubsection{%s}" . "\\subsubsection{%s}")
-         ("\\paragraph{%s}" . "\\paragraph{%s}")
-         ("\\subparagraph{%s}" . "\\subparagraph{%s}")))
-    (add-to-list 'org-latex-classes
-      '("jf/landscape"
-         "\\documentclass[11pt,letter,landscape]{article}
+       ("\\section{%s}" . "\\section{%s}")
+       ("\\subsection{%s}" . "\\subsection{%s}")
+       ("\\subsubsection{%s}" . "\\subsubsection{%s}")
+       ("\\paragraph{%s}" . "\\paragraph{%s}")
+       ("\\subparagraph{%s}" . "\\subparagraph{%s}")))
+  (add-to-list 'org-latex-classes
+    '("jf/landscape"
+       "\\documentclass[11pt,letter,landscape]{article}
 \\usepackage[letter]{anysize}
 \\usepackage{minted}
 \\usepackage{array, booktabs, caption}
 \\usemintedstyle{emacs}"
-         ("\\section{%s}" . "\\section{%s}")
-         ("\\subsection{%s}" . "\\subsection{%s}")
-         ("\\subsubsection{%s}" . "\\subsubsection{%s}")
-         ("\\paragraph{%s}" . "\\paragraph{%s}")
-         ("\\subparagraph{%s}" . "\\subparagraph{%s}")))
-    (add-to-list 'org-latex-classes
-      '("tuftebook"
-         "\\documentclass[notoc,sfsidenotes]{tufte-book}
+       ("\\section{%s}" . "\\section{%s}")
+       ("\\subsection{%s}" . "\\subsection{%s}")
+       ("\\subsubsection{%s}" . "\\subsubsection{%s}")
+       ("\\paragraph{%s}" . "\\paragraph{%s}")
+       ("\\subparagraph{%s}" . "\\subparagraph{%s}")))
+  (add-to-list 'org-latex-classes
+    '("tuftebook"
+       "\\documentclass[notoc,sfsidenotes]{tufte-book}
 \\usepackage{array, booktabs, caption}
 \\hypersetup{pdftex,colorlinks=true,allcolors=blue}
 \\usepackage{hypcap}
@@ -2512,16 +2512,16 @@ function is ever added to that hook."
 \\usepackage{gensymb}
 \\usepackage{nicefrac}
 \\usepackage{units}"
-         ("\\section{%s}" . "\\section*{%s}")
-         ("\\subsection{%s}" . "\\subsection*{%s}")
-         ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-         ("\\paragraph{%s}" . "\\paragraph*{%s}")
-         ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
-    ;; tufte-handout class for writing classy handouts and papers
-    ;; (setq org-latex-classes nil)
-    (add-to-list 'org-latex-classes
-      '("tufte-handout"
-         "\\documentclass{tufte-handout}
+       ("\\section{%s}" . "\\section*{%s}")
+       ("\\subsection{%s}" . "\\subsection*{%s}")
+       ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+       ("\\paragraph{%s}" . "\\paragraph*{%s}")
+       ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+  ;; tufte-handout class for writing classy handouts and papers
+  ;; (setq org-latex-classes nil)
+  (add-to-list 'org-latex-classes
+    '("tufte-handout"
+       "\\documentclass{tufte-handout}
 \\usepackage{array, booktabs, caption}
 \\hypersetup{pdftex,colorlinks=true,allcolors=blue}
 \\usepackage{color}
@@ -2530,241 +2530,241 @@ function is ever added to that hook."
 \\usepackage{gensymb}
 \\usepackage{nicefrac}
 \\usepackage{units}"
-         ("\\section{%s}" . "\\section*{%s}")
-         ("\\subsection{%s}" . "\\subsection*{%s}")
-         ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
-         ("\\paragraph{%s}" . "\\paragraph*{%s}")
-         ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
-    (setq org-latex-default-class "jf/article")
+       ("\\section{%s}" . "\\section*{%s}")
+       ("\\subsection{%s}" . "\\subsection*{%s}")
+       ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
+       ("\\paragraph{%s}" . "\\paragraph*{%s}")
+       ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
+  (setq org-latex-default-class "jf/article")
 
-    (use-package ox-gfm
-      :straight t
-      :init
-      (require 'ox-gfm))
+  (use-package ox-gfm
+    :straight t
+    :init
+    (require 'ox-gfm))
 
-    ;; (use-package igist
-    ;;   :straight t
-    ;;   :config
-    ;;   (setq igist-current-user-name "jeremyf")
-    ;;   (setq igist-auth-marker 'igist))
+  ;; (use-package igist
+  ;;   :straight t
+  ;;   :config
+  ;;   (setq igist-current-user-name "jeremyf")
+  ;;   (setq igist-auth-marker 'igist))
 
-    ;; In
-    ;; https://takeonrules.com/2022/02/26/note-taking-with-org-roam-and-transclusion/,
+  ;; In
+  ;; https://takeonrules.com/2022/02/26/note-taking-with-org-roam-and-transclusion/,
 
-    ;; I wrote about ~org-transclusion~.  The quick version,
-    ;; ~org-transclusion~ allows you to include text from one file into
-    ;; another.  This allows for document composition.
-    (use-package org-transclusion
-      :straight t
-      :init (setq org-transclusion-exclude-elements
-              '(property-drawer keyword)))
+  ;; I wrote about ~org-transclusion~.  The quick version,
+  ;; ~org-transclusion~ allows you to include text from one file into
+  ;; another.  This allows for document composition.
+  (use-package org-transclusion
+    :straight t
+    :init (setq org-transclusion-exclude-elements
+            '(property-drawer keyword)))
 
-    ;; I love the work of Daniel Mendler (https://github.com/minad).
-    ;; This package gives a bit of visual chrome to org files.
-    (use-package org-modern
-      :straight (:host github :repo "minad/org-modern")
-      :custom
-      (org-modern-replace-stars
-        '("➊" "➋" "➌" "➍" "➎" "➏" "➐" "➑" "➒" "•"))
-      (org-modern-star 'replace)
-      ;; Showing the depth of stars helps with the speed keys
-      ;; as well as gives a clearer indicator of the depth of
-      ;; the outline.
-      (org-modern-hide-stars nil)
-      :config (global-org-modern-mode))
+  ;; I love the work of Daniel Mendler (https://github.com/minad).
+  ;; This package gives a bit of visual chrome to org files.
+  (use-package org-modern
+    :straight (:host github :repo "minad/org-modern")
+    :custom
+    (org-modern-replace-stars
+      '("➊" "➋" "➌" "➍" "➎" "➏" "➐" "➑" "➒" "•"))
+    (org-modern-star 'replace)
+    ;; Showing the depth of stars helps with the speed keys
+    ;; as well as gives a clearer indicator of the depth of
+    ;; the outline.
+    (org-modern-hide-stars nil)
+    :config (global-org-modern-mode))
 
-    ;; For automatically showing the invisible parts of org-mode.
-    (use-package org-appear
-      :straight (:type git :host github :repo "awth13/org-appear")
-      :hook (org-mode . org-appear-mode)))
+  ;; For automatically showing the invisible parts of org-mode.
+  (use-package org-appear
+    :straight (:type git :host github :repo "awth13/org-appear")
+    :hook (org-mode . org-appear-mode)))
 
-  (defun jf/org-confirm-babel-evaluate (lang body)
-    "Regardless of LANG and BODY approve it."
-    nil)
+(defun jf/org-confirm-babel-evaluate (lang body)
+  "Regardless of LANG and BODY approve it."
+  nil)
 
-  ;; Org Mode time tracking and task tracking adjustments
+;; Org Mode time tracking and task tracking adjustments
 
-  (defun jf/org-mode/agenda-project-prompt ()
-    "Prompt for project based on existing projects in agenda file.
+(defun jf/org-mode/agenda-project-prompt ()
+  "Prompt for project based on existing projects in agenda file.
 
     Note: I tried this as interactive, but the capture templates
     insist that it should not be interactive."
-    (completing-read
-      "Project: "
-      (sort
-        (seq-uniq
-          (org-map-entries
-            (lambda ()
-              (org-element-property :raw-value (org-element-at-point)))
-            "+LEVEL=4+projects" 'agenda))
-        #'string<)))
+  (completing-read
+    "Project: "
+    (sort
+      (seq-uniq
+        (org-map-entries
+          (lambda ()
+            (org-element-property :raw-value (org-element-at-point)))
+          "+LEVEL=4+projects" 'agenda))
+      #'string<)))
 
-  ;; When I jump to a new task for the day, I want to position that task
-  ;; within the prompted project.  Inspiration from
-  ;; https://gist.github.com/webbj74/0ab881ed0ce61153a82e.
-  (cl-defun jf/org-mode/agenda-find-project-node (
-                                                   &key
-                                                   (tag "projects")
-                                                   (project (jf/org-mode/agenda-project-prompt))
-                                                   ;; The `file+olp+datetree` directive creates a headline like
-                                                   ;; “2022-09-03 Saturday”.
-                                                   (within_headline (format-time-string "%Y-%m-%d %A")))
-    "Position `point' at the end of the given PROJECT WITHIN_HEADLINE.
+;; When I jump to a new task for the day, I want to position that task
+;; within the prompted project.  Inspiration from
+;; https://gist.github.com/webbj74/0ab881ed0ce61153a82e.
+(cl-defun jf/org-mode/agenda-find-project-node (
+                                                 &key
+                                                 (tag "projects")
+                                                 (project (jf/org-mode/agenda-project-prompt))
+                                                 ;; The `file+olp+datetree` directive creates a headline like
+                                                 ;; “2022-09-03 Saturday”.
+                                                 (within_headline (format-time-string "%Y-%m-%d %A")))
+  "Position `point' at the end of the given PROJECT WITHIN_HEADLINE.
 
 And use the given TAG."
-    ;; We need to be using the right agenda file.
-    (with-current-buffer (find-file-noselect
-                           jf/agenda-filename/local)
-      (let ((existing-position
-              (org-element-map
-                (org-element-parse-buffer)
-                'headline
-                ;; Finds the end position of:
-                ;; - a level 4 headline
-                ;; - that is tagged as a :projects:
-                ;; - is titled as the given project
-                ;; - and is within the given headline
-                (lambda (hl)
-                  (and (=(org-element-property :level hl) 4)
-                    ;; I can't use the :title attribute as it is a more
-                    ;; complicated structure; this gets me the raw
-                    ;; string.
-                    (string= project
-                      (plist-get (cadr hl) :raw-value))
-                    (member tag
-                      (org-element-property :tags hl))
-                    ;; The element must have an ancestor with a headline
-                    ;; of today
-                    (string= within_headline
-                      (plist-get
-                        ;; I want the raw title, no styling nor tags
-                        (cadr
-                          (car
-                            (org-element-lineage hl)))
-                        :raw-value))
-                    (org-element-property :end hl)))
-                nil t)))
-        (if existing-position
-          ;; Go to the existing position for this project
-          (goto-char existing-position)
-          (progn
-            ;; Go to the end of the file and append the project to the
-            ;; end
-            (goto-char (point-max))
-            ;; Ensure we have a headline for the given day
-            (unless (org-element-map
-                      (org-element-parse-buffer)
-                      'headline
-                      (lambda (hl)
-                        (string= within_headline
-                          (plist-get
-                            ;; I want the raw title, no styling nor tags
-                            (cadr (car (org-element-lineage hl)))
-                            :raw-value))))
-              (insert (concat "\n\n*** "within_headline)))
-            (insert (concat "\n\n**** " project " :" tag ":\n\n")))))))
+  ;; We need to be using the right agenda file.
+  (with-current-buffer (find-file-noselect
+                         jf/agenda-filename/local)
+    (let ((existing-position
+            (org-element-map
+              (org-element-parse-buffer)
+              'headline
+              ;; Finds the end position of:
+              ;; - a level 4 headline
+              ;; - that is tagged as a :projects:
+              ;; - is titled as the given project
+              ;; - and is within the given headline
+              (lambda (hl)
+                (and (=(org-element-property :level hl) 4)
+                  ;; I can't use the :title attribute as it is a more
+                  ;; complicated structure; this gets me the raw
+                  ;; string.
+                  (string= project
+                    (plist-get (cadr hl) :raw-value))
+                  (member tag
+                    (org-element-property :tags hl))
+                  ;; The element must have an ancestor with a headline
+                  ;; of today
+                  (string= within_headline
+                    (plist-get
+                      ;; I want the raw title, no styling nor tags
+                      (cadr
+                        (car
+                          (org-element-lineage hl)))
+                      :raw-value))
+                  (org-element-property :end hl)))
+              nil t)))
+      (if existing-position
+        ;; Go to the existing position for this project
+        (goto-char existing-position)
+        (progn
+          ;; Go to the end of the file and append the project to the
+          ;; end
+          (goto-char (point-max))
+          ;; Ensure we have a headline for the given day
+          (unless (org-element-map
+                    (org-element-parse-buffer)
+                    'headline
+                    (lambda (hl)
+                      (string= within_headline
+                        (plist-get
+                          ;; I want the raw title, no styling nor tags
+                          (cadr (car (org-element-lineage hl)))
+                          :raw-value))))
+            (insert (concat "\n\n*** "within_headline)))
+          (insert (concat "\n\n**** " project " :" tag ":\n\n")))))))
 
-  (cl-defun jf/org-mode/agenda-find-blocked-node ()
-    "Add a blocker node to today."
-    (jf/org-mode/agenda-find-project-node :tag "blockers"
-      :project (concat
-                 "Blockers for "
-                 (format-time-string
-                   "%Y-%m-%d"))))
+(cl-defun jf/org-mode/agenda-find-blocked-node ()
+  "Add a blocker node to today."
+  (jf/org-mode/agenda-find-project-node :tag "blockers"
+    :project (concat
+               "Blockers for "
+               (format-time-string
+                 "%Y-%m-%d"))))
 
-  (cl-defun jf/org-mode/agenda-find-merge-request-node ()
-    "Add a mergerequest node to today."
-    (jf/org-mode/agenda-find-project-node :tag "mergerequests"
-      :project (concat "Merge Requests for "
-                 (format-time-string
-                   "%Y-%m-%d"))))
+(cl-defun jf/org-mode/agenda-find-merge-request-node ()
+  "Add a mergerequest node to today."
+  (jf/org-mode/agenda-find-project-node :tag "mergerequests"
+    :project (concat "Merge Requests for "
+               (format-time-string
+                 "%Y-%m-%d"))))
 
-  ;; Takes my notes for the day and formats them for a summary report.
-  (defun jf/org-mode/agenda-to-stand-up-summary (parg)
-    "Copy to the kill ring the day's time-tracked summary.
+;; Takes my notes for the day and formats them for a summary report.
+(defun jf/org-mode/agenda-to-stand-up-summary (parg)
+  "Copy to the kill ring the day's time-tracked summary.
 
 When given PARG, prompt for the day of interest.
 
 NOTE: This follows the convention that projects are on headline 4 and
 tasks within projects are headline 5."
-    (interactive "P")
-    (with-current-buffer (find-file-noselect
-                           jf/agenda-filename/local)
-      (save-excursion
-        (let ((within_headline
-                ;; Use the CCYY-MM-DD Dayname format and prompt for a
-                ;; date if PREFIX-ARG given.
-                (format-time-string "%Y-%m-%d %A"
-                  (when (car parg)
-                    (org-read-date nil t nil "Pick a day:" )))))
-          (kill-new
-            (concat "*Summary of " within_headline "*\n\n"
-              (s-trim
-                (s-join
-                  "\n"
-                  (org-element-map
-                    (org-element-parse-buffer)
-                    'headline
-                    (lambda (hl)
-                      (when (member
-                              within_headline
-                              (mapcar
-                                (lambda (ancestor)
-                                  (plist-get (cadr ancestor)
-                                    :raw-value))
-                                (org-element-lineage hl)))
-                        (pcase (org-element-property :level hl)
-                          (4
-                            (concat "\n"
-                              (plist-get (cadr hl) :raw-value)))
-                          (5
-                            (if (and
-                                  (member "mergerequest"
-                                    (org-element-property :tags hl))
-                                  (eq 'done
-                                    (org-element-property
-                                      :todo-type hl)))
-                              nil
-                              (concat "- "
-                                (plist-get (cadr hl) :raw-value))))
-                          (_ nil)))))))))
-          (jf/create-scratch-buffer)
-          (yank)))))
+  (interactive "P")
+  (with-current-buffer (find-file-noselect
+                         jf/agenda-filename/local)
+    (save-excursion
+      (let ((within_headline
+              ;; Use the CCYY-MM-DD Dayname format and prompt for a
+              ;; date if PREFIX-ARG given.
+              (format-time-string "%Y-%m-%d %A"
+                (when (car parg)
+                  (org-read-date nil t nil "Pick a day:" )))))
+        (kill-new
+          (concat "*Summary of " within_headline "*\n\n"
+            (s-trim
+              (s-join
+                "\n"
+                (org-element-map
+                  (org-element-parse-buffer)
+                  'headline
+                  (lambda (hl)
+                    (when (member
+                            within_headline
+                            (mapcar
+                              (lambda (ancestor)
+                                (plist-get (cadr ancestor)
+                                  :raw-value))
+                              (org-element-lineage hl)))
+                      (pcase (org-element-property :level hl)
+                        (4
+                          (concat "\n"
+                            (plist-get (cadr hl) :raw-value)))
+                        (5
+                          (if (and
+                                (member "mergerequest"
+                                  (org-element-property :tags hl))
+                                (eq 'done
+                                  (org-element-property
+                                    :todo-type hl)))
+                            nil
+                            (concat "- "
+                              (plist-get (cadr hl) :raw-value))))
+                        (_ nil)))))))))
+        (jf/create-scratch-buffer)
+        (yank)))))
 
-  (defun jf/org-mode/narrow-to-date (date)
-    "Narrow agenda to given DATE agenda subtree."
-    (interactive (list (if current-prefix-arg
-                         (org-read-date nil nil nil "Pick a day:")
-                         (format-time-string "%Y-%m-%d"))))
-    (widen)
-    (goto-char (point-max))
-    (re-search-backward (concat "^\*\*\* " date))
-    (end-of-line)
-    (org-narrow-to-subtree)
-    (message "Narrowing to %s agenda" date))
+(defun jf/org-mode/narrow-to-date (date)
+  "Narrow agenda to given DATE agenda subtree."
+  (interactive (list (if current-prefix-arg
+                       (org-read-date nil nil nil "Pick a day:")
+                       (format-time-string "%Y-%m-%d"))))
+  (widen)
+  (goto-char (point-max))
+  (re-search-backward (concat "^\*\*\* " date))
+  (end-of-line)
+  (org-narrow-to-subtree)
+  (message "Narrowing to %s agenda" date))
 
-  ;; I’m responsible for tracking my work time.  I want a way to quickly
-  ;; see what that is for the current week.
-  ;;
-  ;; A utility function providing an overrview
-  (cl-defun jf/org-mode/weekly-report ()
-    "Jump to my weekly time tracker.
+;; I’m responsible for tracking my work time.  I want a way to quickly
+;; see what that is for the current week.
+;;
+;; A utility function providing an overrview
+(cl-defun jf/org-mode/weekly-report ()
+  "Jump to my weekly time tracker.
 
 Useful for providing me with an overview of my total tracked time
 for the week."
-    (interactive)
-    (find-file jf/agenda-filename/local)
-    (require 'pulsar)
-    (pulsar-pulse-line)
-    (org-clock-report 4))
+  (interactive)
+  (find-file jf/agenda-filename/local)
+  (require 'pulsar)
+  (pulsar-pulse-line)
+  (org-clock-report 4))
 
-  ;; Another task at end of month is to transcribing my agenda’s
-  ;; timesheet to entries in our time tracking software.  From the day’s
-  ;; project link in the =org-clock-report=, I want to copy the
-  ;; headlines of each of the tasks.  I fill out my time sheets one day
-  ;; at a time.
-  (defun jf/org-mode/time-entry-for-project-and-day ()
-    "Function to help report time for Scientist.com.
+;; Another task at end of month is to transcribing my agenda’s
+;; timesheet to entries in our time tracking software.  From the day’s
+;; project link in the =org-clock-report=, I want to copy the
+;; headlines of each of the tasks.  I fill out my time sheets one day
+;; at a time.
+(defun jf/org-mode/time-entry-for-project-and-day ()
+  "Function to help report time for Scientist.com.
 
 Assumes that I'm on a :projects: headline.
 
@@ -2772,297 +2772,297 @@ Assumes that I'm on a :projects: headline.
 - Create a list of the tasks.
 - Write this information to the message buffer.
 - Then move to the next heading level."
-    (interactive)
-    (let* ((project
-             (plist-get (cadr (org-element-at-point)) :raw-value))
-            (tasks
-              (s-join "\n"
-                (org-with-wide-buffer
-                  (when (org-goto-first-child)
-                    (cl-loop collect (concat "- "
-                                       (org-no-properties
-                                         (org-get-heading t t t t)))
-                      while (outline-get-next-sibling))))))
-            (hours (/ (org-clock-sum-current-item) 60.0))
-            (output (format "Tasks:\n%s\nProject: %s\nHours: %s\n"
-                      tasks
-                      project
-                      hours)))
-      (kill-new tasks)
-      (message output)))
+  (interactive)
+  (let* ((project
+           (plist-get (cadr (org-element-at-point)) :raw-value))
+          (tasks
+            (s-join "\n"
+              (org-with-wide-buffer
+                (when (org-goto-first-child)
+                  (cl-loop collect (concat "- "
+                                     (org-no-properties
+                                       (org-get-heading t t t t)))
+                    while (outline-get-next-sibling))))))
+          (hours (/ (org-clock-sum-current-item) 60.0))
+          (output (format "Tasks:\n%s\nProject: %s\nHours: %s\n"
+                    tasks
+                    project
+                    hours)))
+    (kill-new tasks)
+    (message output)))
 
-  ;; Org Mode has built-in capabilities for exporting to HTML (and other
-  ;; languages).  The following function does just a bit more.  It
-  ;; converts the org region to HTML and sends it to the clipboard as an
-  ;; RTF datatype.
-  ;;
-  ;; Why is that nice?  As an RTF datatype, the paste receiver better
-  ;; handles the HTML (e.g., I can more readily paste into an Email and
-  ;; it pastes as expected).
-  ;;
-  ;; See
-  ;; https://kitchingroup.cheme.cmu.edu/blog/2016/06/16/Copy-formatted-org-mode-text-from-Emacs-to-other-applications/
-  ;; for more details.  One addition I made was to add the
-  ;; ~-inputencoding UTF-8~ switch.  Without it, I would end up with
-  ;; some weird characters from odd smartquote handling.
-  (defun jf/org-mode/delete-link ()
-    "Remove the link part of `org-mode' keeping only description."
-    (interactive)
-    (let ((elem
-            (org-element-context)))
-      (when (eq (car elem) 'link)
-        (let* ((content-begin
-                 (org-element-property :contents-begin elem))
-                (content-end
-                  (org-element-property :contents-end elem))
-                (link-begin
-                  (org-element-property :begin elem))
-                (link-end
-                  (org-element-property :end elem)))
-          (when (and content-begin content-end)
-            (let ((content
-                    (buffer-substring-no-properties
-                      content-begin content-end)))
-              (delete-region link-begin link-end)
-              (insert (concat content " "))))))))
-  ;; ;; I have left the following for posterity.  It's something that
-  ;; ;; I've stubmled upon in the past and might stumble again if I
-  ;; ;; return to `org-roam'.
-  ;;
-  ;; (defun jf/force-org-rebuild-cache (prefix-arg)
-  ;;   "Call functions to rebuild the applicable `org-mode' and `org-roam' cache(s).
+;; Org Mode has built-in capabilities for exporting to HTML (and other
+;; languages).  The following function does just a bit more.  It
+;; converts the org region to HTML and sends it to the clipboard as an
+;; RTF datatype.
+;;
+;; Why is that nice?  As an RTF datatype, the paste receiver better
+;; handles the HTML (e.g., I can more readily paste into an Email and
+;; it pastes as expected).
+;;
+;; See
+;; https://kitchingroup.cheme.cmu.edu/blog/2016/06/16/Copy-formatted-org-mode-text-from-Emacs-to-other-applications/
+;; for more details.  One addition I made was to add the
+;; ~-inputencoding UTF-8~ switch.  Without it, I would end up with
+;; some weird characters from odd smartquote handling.
+(defun jf/org-mode/delete-link ()
+  "Remove the link part of `org-mode' keeping only description."
+  (interactive)
+  (let ((elem
+          (org-element-context)))
+    (when (eq (car elem) 'link)
+      (let* ((content-begin
+               (org-element-property :contents-begin elem))
+              (content-end
+                (org-element-property :contents-end elem))
+              (link-begin
+                (org-element-property :begin elem))
+              (link-end
+                (org-element-property :end elem)))
+        (when (and content-begin content-end)
+          (let ((content
+                  (buffer-substring-no-properties
+                    content-begin content-end)))
+            (delete-region link-begin link-end)
+            (insert (concat content " "))))))))
+;; ;; I have left the following for posterity.  It's something that
+;; ;; I've stubmled upon in the past and might stumble again if I
+;; ;; return to `org-roam'.
+;;
+;; (defun jf/force-org-rebuild-cache (prefix-arg)
+;;   "Call functions to rebuild the applicable `org-mode' and `org-roam' cache(s).
 
-  ;; When given PREFIX_ARG, clear the org-roam database (via
-  ;;  `org-roam-db-clear-all') then sync.  This will slow down the sync."
-  ;;   (interactive "P")
-  ;;   (org-id-update-id-locations)
-  ;;   (when (fboundp 'org-roam-db-clear-all)
-  ;;     (progn
-  ;;       (when (car prefix-arg) (org-roam-db-clear-all))
-  ;;       (org-roam-db-sync)
-  ;;       (org-roam-update-org-id-locations))))
+;; When given PREFIX_ARG, clear the org-roam database (via
+;;  `org-roam-db-clear-all') then sync.  This will slow down the sync."
+;;   (interactive "P")
+;;   (org-id-update-id-locations)
+;;   (when (fboundp 'org-roam-db-clear-all)
+;;     (progn
+;;       (when (car prefix-arg) (org-roam-db-clear-all))
+;;       (org-roam-db-sync)
+;;       (org-roam-update-org-id-locations))))
 
-  ;; (cl-defun jf/org-agenda/send-forward-task ()
-  ;;   "Send an `org-mode' task node forward."
-  ;;   (interactive)
-  ;;   (save-excursion
-  ;;     (let* ((day-project-task
-  ;;              (jf/org-agenda/timesheet/get-day-and-project-and-task-at-point))
-  ;;             (from-project
-  ;;               (plist-get day-project-task :project))
-  ;;             (from-task
-  ;;               (plist-get day-project-task :task)))
-  ;;       ;; Narrowing the region to perform quicker queries on the
-  ;;       ;; element
-  ;;       (narrow-to-region (org-element-property :begin from-task)
-  ;;         (org-element-property :end from-task))
+;; (cl-defun jf/org-agenda/send-forward-task ()
+;;   "Send an `org-mode' task node forward."
+;;   (interactive)
+;;   (save-excursion
+;;     (let* ((day-project-task
+;;              (jf/org-agenda/timesheet/get-day-and-project-and-task-at-point))
+;;             (from-project
+;;               (plist-get day-project-task :project))
+;;             (from-task
+;;               (plist-get day-project-task :task)))
+;;       ;; Narrowing the region to perform quicker queries on the
+;;       ;; element
+;;       (narrow-to-region (org-element-property :begin from-task)
+;;         (org-element-property :end from-task))
 
-  ;;       ;; Grab each section for the from-task and convert that into
-  ;;       ;; text.
-  ;;       ;;
-  ;;       ;; Yes we have the from-task, however, we haven't parsed that
-  ;;       ;; entity.  Without parsing that element, the
-  ;;       ;; `org-element-contents' returns nil.
-  ;;       (let ((content
-  ;;               (s-join "\n"
-  ;;                 (org-element-map (org-element-parse-buffer)
-  ;;                   'section
-  ;;                   (lambda (section)
-  ;;                     (mapconcat
-  ;;                       (lambda (element)
-  ;;                         (pcase (org-element-type element)
-  ;;                           ;; I want to skip my time entries
-  ;;                           ('drawer nil)
-  ;;                           (_ (buffer-substring-no-properties
-  ;;                                (org-element-property
-  ;;                                  :begin element)
-  ;;                                (org-element-property
-  ;;                                  :end element)))))
-  ;;                       (org-element-contents section)
-  ;;                       "\n"))))))
-  ;;         (widen)
-  ;;         (org-capture-string
-  ;;           (format "%s %s :%s:\n\n%s %s %s :%s:\n%s"
-  ;;             (s-repeat (org-element-property :level from-project) "*")
-  ;;             (org-element-property :raw-value from-project)
-  ;;             (s-join ":" (org-element-property :tags from-project))
-  ;;             (s-repeat (org-element-property :level from-task) "*")
-  ;;             (org-element-property :todo-keyword from-task)
-  ;;             (org-element-property :raw-value from-task)
-  ;;             (s-join ":" (org-element-property :tags from-task))
-  ;;             content)
-  ;;           "d"))
-  ;;       ;; Now that we've added the content, let's tidy up the
-  ;;       ;; from-task.
-  ;;       (goto-char (org-element-property :contents-begin from-task))
-  ;;       ;; Prompt for the todo state of the original task.
-  ;;       (call-interactively 'org-todo))))
+;;       ;; Grab each section for the from-task and convert that into
+;;       ;; text.
+;;       ;;
+;;       ;; Yes we have the from-task, however, we haven't parsed that
+;;       ;; entity.  Without parsing that element, the
+;;       ;; `org-element-contents' returns nil.
+;;       (let ((content
+;;               (s-join "\n"
+;;                 (org-element-map (org-element-parse-buffer)
+;;                   'section
+;;                   (lambda (section)
+;;                     (mapconcat
+;;                       (lambda (element)
+;;                         (pcase (org-element-type element)
+;;                           ;; I want to skip my time entries
+;;                           ('drawer nil)
+;;                           (_ (buffer-substring-no-properties
+;;                                (org-element-property
+;;                                  :begin element)
+;;                                (org-element-property
+;;                                  :end element)))))
+;;                       (org-element-contents section)
+;;                       "\n"))))))
+;;         (widen)
+;;         (org-capture-string
+;;           (format "%s %s :%s:\n\n%s %s %s :%s:\n%s"
+;;             (s-repeat (org-element-property :level from-project) "*")
+;;             (org-element-property :raw-value from-project)
+;;             (s-join ":" (org-element-property :tags from-project))
+;;             (s-repeat (org-element-property :level from-task) "*")
+;;             (org-element-property :todo-keyword from-task)
+;;             (org-element-property :raw-value from-task)
+;;             (s-join ":" (org-element-property :tags from-task))
+;;             content)
+;;           "d"))
+;;       ;; Now that we've added the content, let's tidy up the
+;;       ;; from-task.
+;;       (goto-char (org-element-property :contents-begin from-task))
+;;       ;; Prompt for the todo state of the original task.
+;;       (call-interactively 'org-todo))))
 
-  (defun jf/org-agenda/timesheet/get-day-and-project-and-task-at-point ()
-    "Return a plist of :day, :project, and :task for element at point."
-    (let* ((task
-             (jf/org-agenda-headline-for-level :level 5))
-            (project (progn
-                       (org-up-heading-safe)
-                       (org-element-at-point)))
-            (day (progn
-                   (org-up-heading-safe)
-                   (org-element-at-point))))
-      (list :project project :task task :day day)))
+(defun jf/org-agenda/timesheet/get-day-and-project-and-task-at-point ()
+  "Return a plist of :day, :project, and :task for element at point."
+  (let* ((task
+           (jf/org-agenda-headline-for-level :level 5))
+          (project (progn
+                     (org-up-heading-safe)
+                     (org-element-at-point)))
+          (day (progn
+                 (org-up-heading-safe)
+                 (org-element-at-point))))
+    (list :project project :task task :day day)))
 
-  (cl-defun jf/org-agenda-headline-for-level (&key (level 5))
-    "Find the `org-mode' ancestor headline with LEVEL."
-    (let ((element
-            (org-element-at-point)))
-      (if (eq 'headline (org-element-type element))
-        (let ((element-level
-                (org-element-property :level element)))
-          (cond
-            ((= level element-level)
-              (progn (message "Found %s" element) element))
-            ((> level element-level)
-              (user-error
-                "Selected element %s is higher level"
-                element-level))
-            ((< level element-level)
-              (progn
-                (org-up-heading-safe)
-                (jf/org-agenda-headline-for-level :level level)))))
-        (progn
-          (org-back-to-heading)
-          (jf/org-agenda-headline-for-level :level level)))))
+(cl-defun jf/org-agenda-headline-for-level (&key (level 5))
+  "Find the `org-mode' ancestor headline with LEVEL."
+  (let ((element
+          (org-element-at-point)))
+    (if (eq 'headline (org-element-type element))
+      (let ((element-level
+              (org-element-property :level element)))
+        (cond
+          ((= level element-level)
+            (progn (message "Found %s" element) element))
+          ((> level element-level)
+            (user-error
+              "Selected element %s is higher level"
+              element-level))
+          ((< level element-level)
+            (progn
+              (org-up-heading-safe)
+              (jf/org-agenda-headline-for-level :level level)))))
+      (progn
+        (org-back-to-heading)
+        (jf/org-agenda-headline-for-level :level level)))))
 
-  ;; https://www.reddit.com/r/emacs/comments/yjobc2/what_method_do_you_use_to_create_internal_links/
-  (defun jf/org-get-headlines (&optional max-depth)
-    "Get `org-mode' headline text within current buffer."
-    (org-element-map (org-element-parse-buffer 'headline nil t)
-      'headline (lambda (headline)
-                  (and
-                    (if (integerp max-depth)
-                      (>= max-depth
-                        (org-element-property :level headline))
-                      t)
-                    (org-element-property :title headline)))))
+;; https://www.reddit.com/r/emacs/comments/yjobc2/what_method_do_you_use_to_create_internal_links/
+(defun jf/org-get-headlines (&optional max-depth)
+  "Get `org-mode' headline text within current buffer."
+  (org-element-map (org-element-parse-buffer 'headline nil t)
+    'headline (lambda (headline)
+                (and
+                  (if (integerp max-depth)
+                    (>= max-depth
+                      (org-element-property :level headline))
+                    t)
+                  (org-element-property :title headline)))))
 
-  (defun jf/org-link-to-headline ()
-    "Insert an internal link to a headline."
-    (interactive)
-    (let* ((headlines
-             (jf/org-get-headlines))
-            (choice
-              (completing-read "Headings: " headlines nil t))
-            (desc
-              (read-string "Description: " choice)))
-      (org-insert-link buffer-file-name (concat "*" choice) desc)))
+(defun jf/org-link-to-headline ()
+  "Insert an internal link to a headline."
+  (interactive)
+  (let* ((headlines
+           (jf/org-get-headlines))
+          (choice
+            (completing-read "Headings: " headlines nil t))
+          (desc
+            (read-string "Description: " choice)))
+    (org-insert-link buffer-file-name (concat "*" choice) desc)))
 
-  ;; If the example doesn't exist, create the example in the file
+;; If the example doesn't exist, create the example in the file
 
-  (cl-defun jf/org-mode/capture/prompt-for-example (&optional
-                                                     given-mode
-                                                     &key
-                                                     (tag "example"))
-    "Prompt for the GIVEN-MODE example with given TAG."
-    (let* ((mode
-             (or given-mode (completing-read "Example:"
-                              '("Existing" "New" "Stored")))))
-      (cond
-        ((string= mode "New")
-          (let ((example
-                  (read-string "New Example Name: "
-                    nil
-                    nil
-                    (format-time-string "%Y-%m-%d %H:%M:%S"))))
-            (with-current-buffer (find-file-noselect
-                                   jf/org-mode/capture/filename)
-              (jf/org-mode/capture/set-position-file :headline nil
-                :tag "examples"
-                :depth 1)
-              (insert (s-format jf/org-mode/capture/example-template
-                        'aget
-                        (list (cons "example" example)
-                          (cons "tag" tag))))
-              example)))
-        ((string= mode "Existing")
+(cl-defun jf/org-mode/capture/prompt-for-example (&optional
+                                                   given-mode
+                                                   &key
+                                                   (tag "example"))
+  "Prompt for the GIVEN-MODE example with given TAG."
+  (let* ((mode
+           (or given-mode (completing-read "Example:"
+                            '("Existing" "New" "Stored")))))
+    (cond
+      ((string= mode "New")
+        (let ((example
+                (read-string "New Example Name: "
+                  nil
+                  nil
+                  (format-time-string "%Y-%m-%d %H:%M:%S"))))
           (with-current-buffer (find-file-noselect
                                  jf/org-mode/capture/filename)
-            (let ((examples
-                    (org-map-entries
-                      (lambda ()
-                        (org-element-property
-                          :title (org-element-at-point)))
-                      (concat "+LEVEL=2+" tag) 'file)))
-              (if examples
-                (completing-read "Example: " examples nil t)
-                (jf/org-mode/capture/prompt-for-example
-                  "New" :tag tag)))))
-        ((string= mode "Stored")
-          (or jf/org-mode/capture/stored-context
-            (jf/org-mode/capture/prompt-for-example "Existing"
-              :tag tag))))))
+            (jf/org-mode/capture/set-position-file :headline nil
+              :tag "examples"
+              :depth 1)
+            (insert (s-format jf/org-mode/capture/example-template
+                      'aget
+                      (list (cons "example" example)
+                        (cons "tag" tag))))
+            example)))
+      ((string= mode "Existing")
+        (with-current-buffer (find-file-noselect
+                               jf/org-mode/capture/filename)
+          (let ((examples
+                  (org-map-entries
+                    (lambda ()
+                      (org-element-property
+                        :title (org-element-at-point)))
+                    (concat "+LEVEL=2+" tag) 'file)))
+            (if examples
+              (completing-read "Example: " examples nil t)
+              (jf/org-mode/capture/prompt-for-example
+                "New" :tag tag)))))
+      ((string= mode "Stored")
+        (or jf/org-mode/capture/stored-context
+          (jf/org-mode/capture/prompt-for-example "Existing"
+            :tag tag))))))
 
-  (defvar jf/org-mode/capture/example-template
-    (concat "\n\n** TODO ${example} :${tag}:\n\n*** TODO Context\n\n"
-      "*** Code :code:\n\n*** TODO Discussion\n\n"
-      "*** COMMENT Refactoring\n\n"))
+(defvar jf/org-mode/capture/example-template
+  (concat "\n\n** TODO ${example} :${tag}:\n\n*** TODO Context\n\n"
+    "*** Code :code:\n\n*** TODO Discussion\n\n"
+    "*** COMMENT Refactoring\n\n"))
 
-  (defvar jf/org-mode/capture/stored-context
-    nil
-    "A cached value to help quickly capture items.")
+(defvar jf/org-mode/capture/stored-context
+  nil
+  "A cached value to help quickly capture items.")
 
-  (cl-defun jf/org-mode/capture/set-position-file (&key
-                                                    (headline (jf/org-mode/capture/prompt-for-example))
-                                                    (tag "code")
-                                                    (depth 3))
-    "Position `point' at the end of HEADLINE.
+(cl-defun jf/org-mode/capture/set-position-file (&key
+                                                  (headline (jf/org-mode/capture/prompt-for-example))
+                                                  (tag "code")
+                                                  (depth 3))
+  "Position `point' at the end of HEADLINE.
 
 The HEADLINE must have the given TAG and be at the given DEPTH
 and be a descendent of the given PARENT_HEADLINE.  If the
 HEADLINE does not exist, write it at the end of the file."
-    ;; We need to be using the right agenda file.
-    (with-current-buffer (find-file-noselect
-                           jf/org-mode/capture/filename)
-      (setq jf/org-mode/capture/stored-context headline)
-      (let* ((existing-position
-               (org-element-map
-                 (org-element-parse-buffer)
-                 'headline
-                 (lambda (hl)
-                   (and (=(org-element-property :level hl) depth)
-                     (member tag
-                       (org-element-property :tags hl))
-                     (if headline
-                       (string= headline
-                         (plist-get
-                           (cadr
-                             (car
-                               (org-element-lineage hl)))
-                           :raw-value))
-                       t)
-                     (org-element-property :end hl)))
-                 nil t)))
-        (goto-char existing-position))))
+  ;; We need to be using the right agenda file.
+  (with-current-buffer (find-file-noselect
+                         jf/org-mode/capture/filename)
+    (setq jf/org-mode/capture/stored-context headline)
+    (let* ((existing-position
+             (org-element-map
+               (org-element-parse-buffer)
+               'headline
+               (lambda (hl)
+                 (and (=(org-element-property :level hl) depth)
+                   (member tag
+                     (org-element-property :tags hl))
+                   (if headline
+                     (string= headline
+                       (plist-get
+                         (cadr
+                           (car
+                             (org-element-lineage hl)))
+                         :raw-value))
+                     t)
+                   (org-element-property :end hl)))
+               nil t)))
+      (goto-char existing-position))))
 
-  ;; With Heavy inspiration from http://www.howardism.org/Technical/Emacs/capturing-content.html
-  (defvar jf/org-mode/capture/template/default
-    (concat "\n**** ${function-name}"
-      "\n:PROPERTIES:"
-      "\n:CAPTURED_AT: ${captured-at}"
-      "\n:REMOTE_URL: [[${remote-url}][${function-name}]]"
-      "\n:LOCAL_FILE: [[file:${file-name}::${line-number}]]"
-      "\n:FUNCTION_NAME: ${function-name}"
-      "\n:END:\n"
-      "\n#+BEGIN_${block-type} ${block-mode}"
-      "\n${block-text}"
-      "\n#+END_${block-type}"))
+;; With Heavy inspiration from http://www.howardism.org/Technical/Emacs/capturing-content.html
+(defvar jf/org-mode/capture/template/default
+  (concat "\n**** ${function-name}"
+    "\n:PROPERTIES:"
+    "\n:CAPTURED_AT: ${captured-at}"
+    "\n:REMOTE_URL: [[${remote-url}][${function-name}]]"
+    "\n:LOCAL_FILE: [[file:${file-name}::${line-number}]]"
+    "\n:FUNCTION_NAME: ${function-name}"
+    "\n:END:\n"
+    "\n#+BEGIN_${block-type} ${block-mode}"
+    "\n${block-text}"
+    "\n#+END_${block-type}"))
 
-  (defvar jf/org-mode/capture/template/while-clocking
-    (concat "[[${remote-url}][${function-name}]] "
-      "\n\n#+BEGIN_${block-type} ${block-mode}"
-      "\n${block-text}"
-      "\n#+END_${block-type}"))
+(defvar jf/org-mode/capture/template/while-clocking
+  (concat "[[${remote-url}][${function-name}]] "
+    "\n\n#+BEGIN_${block-type} ${block-mode}"
+    "\n${block-text}"
+    "\n#+END_${block-type}"))
 
-  (cl-defun jf/org-mode/capture/get-field-values (block-text)
-    "Get the text between START and END returning a fields and values.
+(cl-defun jf/org-mode/capture/get-field-values (block-text)
+  "Get the text between START and END returning a fields and values.
 
 The return value is a list of `cons' with the `car' values of:
 
@@ -3074,300 +3074,301 @@ The return value is a list of `cons' with the `car' values of:
 - block-type
 - block-mode
 - block-text"
-    (require 'magit)
-    (require 'git-link)
-    (let* ((file-name (buffer-file-name (current-buffer)))
-            (org-src-mode (replace-regexp-in-string
-                            "-\\(ts-\\)?mode"
-                            ""
-                            (format "%s" major-mode)))
-            (func-name (which-function))
-            (type (cond
-                    ((eq major-mode 'nov-mode) "QUOTE")
-                    ((derived-mode-p 'prog-mode) "SRC")
-                    (t "SRC" "EXAMPLE")))
-            (file-base (if file-name
-                         (file-name-nondirectory file-name)
-                         (format "%s" (current-buffer))))
-            (line-number (line-number-at-pos (region-beginning)))
-            (remote-link (when (magit-list-remotes)
-                           (progn
-                             (call-interactively 'git-link)
-                             (car kill-ring)))))
-      `(("function-name" . ,(or func-name "Unknown"))
-         ("captured-at" . ,(format-time-string "%Y-%m-%d %H:%M"))
-         ("remote-url" . ,remote-link)
-         ("file-name" . ,file-name)
-         ("line-number" . ,line-number)
-         ("block-type" . ,type)
-         ("block-mode" . ,org-src-mode)
-         ("block-text" . , block-text))))
+  (require 'magit)
+  (require 'git-link)
+  (let* ((file-name (buffer-file-name (current-buffer)))
+          (org-src-mode (replace-regexp-in-string
+                          "-\\(ts-\\)?mode"
+                          ""
+                          (format "%s" major-mode)))
+          (func-name (which-function))
+          (type (cond
+                  ((eq major-mode 'nov-mode) "QUOTE")
+                  ((derived-mode-p 'prog-mode) "SRC")
+                  (t "SRC" "EXAMPLE")))
+          (file-base (if file-name
+                       (file-name-nondirectory file-name)
+                       (format "%s" (current-buffer))))
+          (line-number (line-number-at-pos (region-beginning)))
+          (remote-link (when (magit-list-remotes)
+                         (progn
+                           (call-interactively 'git-link)
+                           (car kill-ring)))))
+    `(("function-name" . ,(or func-name "Unknown"))
+       ("captured-at" . ,(format-time-string "%Y-%m-%d %H:%M"))
+       ("remote-url" . ,remote-link)
+       ("file-name" . ,file-name)
+       ("line-number" . ,line-number)
+       ("block-type" . ,type)
+       ("block-mode" . ,org-src-mode)
+       ("block-text" . , block-text))))
 
-  (cl-defun jf/denote/capture-wrap (&key link content)
-    "Given LINK and CONTENT return a string to insert into the capture."
-    ;; We must do funny business with the link to discern the type.
-    (let* ((elements
-             (s-split "::"
-               (string-replace "]]" "" (string-replace "[[" "" link))))
-            (parts (s-split ":" (car elements)))
-            (type (car parts))
-            (path (s-join ":" (cdr parts))))
-      (cond
-        ;; The 'eww-mode never fires :(
-        ((eq 'eww-mode major-mode)
-          (save-excursion
-            (let* ((url
-                     (plist-get eww-data :url))
-                    (title
-                      (plist-get eww-data :title)))
-              (concat "#+attr_shortcode:"
-                (when title (concat " :cite " title))
-                (when url (concat " :cite_url " url))
-                "\n#+begin_blockquote\n"
-                content
-                "\n#+end_blockquote\n%?"))))
-        ((string= "elfeed" type)
-          (save-excursion
-            (funcall (org-link-get-parameter type :follow) path)
-            (let ((url
-                    (elfeed-entry-link elfeed-show-entry))
-                   (title
-                     (elfeed-entry-title elfeed-show-entry))
-                   (author
-                     (plist-get
-                       (car (plist-get
-                              (elfeed-entry-meta elfeed-show-entry)
-                              :authors))
-                       :name)))
-              (concat (when (or author title url) "#+attr_shortcode:")
-                (when author (concat " :pre " author))
-                (when title (concat " :cite " title))
-                (when url (concat " :cite_url " url))
-                "\n#+begin_blockquote\n"
-                content
-                "\n#+end_blockquote\n%?"))))
-        ((string= "file" type)
-          (save-excursion
-            ;; When capturing an HTML file, when the second parameter
-            ;; was nil, the `org-link-open-as-file' would launch an
-            ;; external web browser.  Not desired behvaior for a content
-            ;; capture.
-            (org-link-open-as-file path t)
-            (s-format jf/org-mode/capture/template/while-clocking
-              'aget
-              (jf/org-mode/capture/get-field-values content))))
-        ((or (string= "http" type) (string= "https" type))
-          (save-excursion
-            (concat "#+attr_shortcode: :cite_url " link
+(cl-defun jf/denote/capture-wrap (&key link content)
+  "Given LINK and CONTENT return a string to insert into the capture."
+  ;; We must do funny business with the link to discern the type.
+  (let* ((elements
+           (s-split "::"
+             (string-replace "]]" "" (string-replace "[[" "" link))))
+          (parts (s-split ":" (car elements)))
+          (type (car parts))
+          (path (s-join ":" (cdr parts))))
+    (cond
+      ;; The 'eww-mode never fires :(
+      ((eq 'eww-mode major-mode)
+        (save-excursion
+          (let* ((url
+                   (plist-get eww-data :url))
+                  (title
+                    (plist-get eww-data :title)))
+            (concat "#+attr_shortcode:"
+              (when title (concat " :cite " title))
+              (when url (concat " :cite_url " url))
               "\n#+begin_blockquote\n"
               content
-              "\n#+end_blockquote\n%?")))
-        (t (concat "\n#+begin_example\n"
-             content
-             "\n#+end_example")))))
+              "\n#+end_blockquote\n%?"))))
+      ((string= "elfeed" type)
+        (save-excursion
+          (funcall (org-link-get-parameter type :follow) path)
+          (let ((url
+                  (elfeed-entry-link elfeed-show-entry))
+                 (title
+                   (elfeed-entry-title elfeed-show-entry))
+                 (author
+                   (plist-get
+                     (car (plist-get
+                            (elfeed-entry-meta elfeed-show-entry)
+                            :authors))
+                     :name)))
+            (concat (when (or author title url) "#+attr_shortcode:")
+              (when author (concat " :pre " author))
+              (when title (concat " :cite " title))
+              (when url (concat " :cite_url " url))
+              "\n#+begin_blockquote\n"
+              content
+              "\n#+end_blockquote\n%?"))))
+      ((string= "file" type)
+        (save-excursion
+          ;; When capturing an HTML file, when the second parameter
+          ;; was nil, the `org-link-open-as-file' would launch an
+          ;; external web browser.  Not desired behvaior for a content
+          ;; capture.
+          (org-link-open-as-file path t)
+          (s-format jf/org-mode/capture/template/while-clocking
+            'aget
+            (jf/org-mode/capture/get-field-values content))))
+      ((or (string= "http" type) (string= "https" type))
+        (save-excursion
+          (concat "#+attr_shortcode: :cite_url " link
+            "\n#+begin_blockquote\n"
+            content
+            "\n#+end_blockquote\n%?")))
+      (t (concat "\n#+begin_example\n"
+           content
+           "\n#+end_example")))))
 
-  (defun jf/org-mode/capture/parameters (prefix)
-    "A logic lookup table by PREFIX."
-    (cond
-      ;; When we're clocking and no prefix is given...
-      ((and
-         (= 1 prefix)
-         (fboundp 'org-clocking-p) (org-clocking-p))
-        (list :key "i"
-          :template jf/org-mode/capture/template/while-clocking))
-      ;; We're not clocking or we provided a prefix.
-      (t (list :key "c"
-           :template jf/org-mode/capture/template/default))))
+(defun jf/org-mode/capture/parameters (prefix)
+  "A logic lookup table by PREFIX."
+  (cond
+    ;; When we're clocking and no prefix is given...
+    ((and
+       (= 1 prefix)
+       (fboundp 'org-clocking-p) (org-clocking-p))
+      (list :key "i"
+        :template jf/org-mode/capture/template/while-clocking))
+    ;; We're not clocking or we provided a prefix.
+    (t (list :key "c"
+         :template jf/org-mode/capture/template/default))))
 
-  (cl-defun jf/org-mode/capture/insert-content-dwim (start end prefix)
-    "Capture the text between START and END.
+(cl-defun jf/org-mode/capture/insert-content-dwim (start end prefix)
+  "Capture the text between START and END.
 
 Without PREFIX and not clocking capture clock otherwise capture
 to Backlog."
-    (interactive "r\np")
-    ;; There is a data structure looking to exist.  That structure is:
-    ;;
-    ;; - org-capture-key (default "c")
-    ;; - template jf/org-mode/capture/template/default
-    (let ((params
-            (jf/org-mode/capture/parameters prefix))
-           (block-text
-             (buffer-substring-no-properties start end)))
-      (org-capture-string
-        (s-format (plist-get params :template)
-          'aget
-          (jf/org-mode/capture/get-field-values block-text))
-        (plist-get params :key))))
+  (interactive "r\np")
+  ;; There is a data structure looking to exist.  That structure is:
+  ;;
+  ;; - org-capture-key (default "c")
+  ;; - template jf/org-mode/capture/template/default
+  (let ((params
+          (jf/org-mode/capture/parameters prefix))
+         (block-text
+           (buffer-substring-no-properties start end)))
+    (org-capture-string
+      (s-format (plist-get params :template)
+        'aget
+        (jf/org-mode/capture/get-field-values block-text))
+      (plist-get params :key))))
 
-  (load "jf-campaign.el")
+(load "jf-campaign.el")
 
-  (defun jf/org/capture/dictionary/sort ()
-    "Sort the dictionary."
-    (save-excursion
-      (save-restriction
-        (org-backward-paragraph)
-        (forward-line)
-        (org-sort-list nil ?a))))
+(defun jf/org/capture/dictionary/sort ()
+  "Sort the dictionary."
+  (save-excursion
+    (save-restriction
+      (org-backward-paragraph)
+      (forward-line)
+      (org-sort-list nil ?a))))
 
-  (defun jf/org/capture/quote/name-that-block ()
-    "Name a quote/verse block from capture block.
+(defun jf/org/capture/quote/name-that-block ()
+  "Name a quote/verse block from capture block.
 
 Use `denote-sluggify' as the naming function for the quote"
-    (let* (
-            ;; The evaluated text thus far.  With prompts completed.
-            (template
-              (plist-get org-capture-current-plist :template))
-            ;; By convention the second line of the template is the
-            ;; first line of the content block
-            (first-line-of-block-content
-              (nth 1 (s-split "\n" template)))
-            ;; Derive the name of the block by leveraging
-            ;; `denote-sluggify'.
-            (name
-              (s-join "-"
-                (seq-take
-                  (s-split "-"
-                    (denote-sluggify 'title
-                      first-line-of-block-content))
-                  8))))
-      (save-excursion
-        (save-restriction
-          ;; Place the name of the quote just above the start of the
-          ;; block.
-          (goto-char (point-min))
-          (insert (format "#+NAME: %s\n" name))))))
+  (let* (
+          ;; The evaluated text thus far.  With prompts completed.
+          (template
+            (plist-get org-capture-current-plist :template))
+          ;; By convention the second line of the template is the
+          ;; first line of the content block
+          (first-line-of-block-content
+            (nth 1 (s-split "\n" template)))
+          ;; Derive the name of the block by leveraging
+          ;; `denote-sluggify'.
+          (name
+            (s-join "-"
+              (seq-take
+                (s-split "-"
+                  (denote-sluggify 'title
+                    first-line-of-block-content))
+                8))))
+    (save-excursion
+      (save-restriction
+        ;; Place the name of the quote just above the start of the
+        ;; block.
+        (goto-char (point-min))
+        (insert (format "#+NAME: %s\n" name))))))
 
-  (defun jf/org/capture/quote-location ()
-    "Position to a selected “quotable” element base on prompts.
+(defun jf/org/capture/quote-location ()
+  "Position to a selected “quotable” element base on prompts.
 
 Narrow focus to a tag, then a named element."
-    (let* (
-            ;; With the given tag, find all associated headlines that match that
-            ;; tag.
-            (headline-alist
-              (org-element-map
-                (org-element-parse-buffer 'headline)
-                'headline
-                (lambda (headline)
-                  (when
-                    (eq (org-element-property :level headline) 2)
-                    (let ((title
-                            (org-element-property :title headline))
-                           (subtitle
-                             (org-entry-get headline "SUBTITLE"))
-                           (author
-                             (org-entry-get headline "AUTHOR")))
-                      (cons
-                        (format "«%s»%s"
-                          (if subtitle
-                            (concat title ": " subtitle)
-                            title)
-                          (if author
-                            (concat " by " author)
-                            ""))
-                        (org-element-property :contents-begin headline)))))))
-            ;; Prompt me to pick one of those headlines.
-            (headline
-              (completing-read
-                "Quotable: "  headline-alist nil t)))
-      (goto-char (alist-get headline headline-alist nil nil #'string=))
-      (while (org-element-type-p (org-element-at-point) '(drawer property-drawer keyword planning))
-        (goto-char (org-element-property :end (org-element-at-point))))))
-  (defvar jf/filename/shopping-list
-    "~/SyncThings/source/books-to-get-from-bibliography.txt"
-    "Dude, these are the books I'm curious about.")
+  (let* (
+          ;; With the given tag, find all associated headlines that match that
+          ;; tag.
+          (headline-alist
+            (org-element-map
+              (org-element-parse-buffer 'headline)
+              'headline
+              (lambda (headline)
+                (when
+                  (eq (org-element-property :level headline) 2)
+                  (let ((title
+                          (org-element-property :title headline))
+                         (subtitle
+                           (org-entry-get headline "SUBTITLE"))
+                         (author
+                           (org-entry-get headline "AUTHOR")))
+                    (cons
+                      (format "«%s»%s"
+                        (if subtitle
+                          (concat title ": " subtitle)
+                          title)
+                        (if author
+                          (concat " by " author)
+                          ""))
+                      (org-element-property :contents-begin headline)))))))
+          ;; Prompt me to pick one of those headlines.
+          (headline
+            (completing-read
+              "Quotable: "  headline-alist nil t)))
+    (goto-char (alist-get headline headline-alist nil nil #'string=))
+    (while (org-element-type-p (org-element-at-point) '(drawer property-drawer keyword planning))
+      (goto-char (org-element-property :end (org-element-at-point))))))
+(defvar jf/filename/shopping-list
+  "~/SyncThings/source/books-to-get-from-bibliography.txt"
+  "Dude, these are the books I'm curious about.")
 
-  (defvar jf/filename/bibliography
-    (f-join jf/denote-base-dir "private/20241124T080648--bibliography__projects.org")
-    "Dude, you can put your books in here.")
+(defvar jf/filename/bibliography
+  (f-join jf/denote-base-dir "private/20241124T080648--bibliography__projects.org")
+  "Dude, you can put your books in here.")
 
-  (defvar jf/filename/bibliography-takeonrules
-    "~/git/takeonrules.source/content/site-map/epigraphs/index.md"
-    "Page that I generate and push to the
+(defvar jf/filename/bibliography-takeonrules
+  "~/git/takeonrules.source/content/site-map/epigraphs/index.md"
+  "Page that I generate and push to the
 https://takeonrules.com/site-map/epigraphs url.")
 
-  (defun jf/org-sort-entries/ignoring-stop-words ()
-    "Sort org entries while ignoring stop words."
-    (interactive)
-    (org-sort-entries
-      nil
-      ?f
-      (lambda ()
-        "Remove the leading stop words from the title."
-        (let ((heading
-                (nth 4 (org-heading-components)))
-               (case-fold-search t))
-          (replace-regexp-in-string
-            "^\\(The\\|A\\|An\\) " "" heading)))
-      #'string<))
+(defun jf/org-sort-entries/ignoring-stop-words ()
+  "Sort org entries while ignoring stop words."
+  (interactive)
+  (org-sort-entries
+    nil
+    ?f
+    (lambda ()
+      "Remove the leading stop words from the title."
+      (let ((heading
+              (nth 4 (org-heading-components)))
+             (case-fold-search t))
+        (replace-regexp-in-string
+          "^\\(The\\|A\\|An\\) " "" heading)))
+    #'string<))
 
-  (setq jf/elfeed-reading-priorities
-    '("1st" "2nd" "3rd" "4th" "5th")
-    "The priorities and their index")
+(defvar jf/elfeed-reading-priorities
+  '("1st" "2nd" "3rd" "4th" "5th")
+  "The priorities for RSS feeds, from which we can derive their index and
+sort accordingly.")
 
-  (defun jf/org-sort-entries/by-elfeed-tag-priority ()
-    "Sort org entries by elfeed tag priority."
-    (interactive)
-    (org-sort-entries
-      nil
-      ?f
-      (lambda ()
-        (format "%s-%s"
-          ;; Find the priority elfeed tag.
-          (or
-            (cl-position
-              (car
-                (cl-intersection
-                  (org-element-property :tags (org-element-at-point))
-                  jf/elfeed-reading-priorities
-                  :test
-                  #'string=))
-              jf/elfeed-reading-priorities
-              :test #'string=)
-            9)
-          ;; And the title.
-          (org-element-property :title (org-element-at-point))))
-      #'string<))
+(defun jf/org-sort-entries/by-elfeed-tag-priority ()
+  "Sort org entries by elfeed tag priority."
+  (interactive)
+  (org-sort-entries
+    nil
+    ?f
+    (lambda ()
+      (format "%s-%s"
+        ;; Find the priority elfeed tag.
+        (or
+          (cl-position
+            (car
+              (cl-intersection
+                (org-element-property :tags (org-element-at-point))
+                jf/elfeed-reading-priorities
+                :test
+                #'string=))
+            jf/elfeed-reading-priorities
+            :test #'string=)
+          9)
+        ;; And the title.
+        (org-element-property :title (org-element-at-point))))
+    #'string<))
 
-  (setq org-capture-templates
-    `(("c" "Content to Clock"
-         plain (clock)
-         "%(jf/denote/capture-wrap :link \"%L\" :content \"%i\")"
-        :empty-lines 1)
-       ("d" "Dictionary"
-         plain (file
-                 ,(f-join jf/denote-base-dir "indices/20230108T083359--a-dictionary-of-discovered-words__CreativeWriting_personal.org"))
-         "- %^{Term} :: %^{Description}; %a"
-         :after-finalize jf/org/capture/dictionary/sort)
-       ;; ("i" "Immediate to Clock"
-       ;;   plain (clock)
-       ;;   "%i%?"
-       ;;   :immediate-finish t)
-       ("p" "Person to Quote"
-         entry
-         (file+headline jf/filename/bibliography "People")
-         "%^{Name} :people:\n:PROPERTIES:\n:CUSTOM_ID: %(org-id-new)\n:END:\n%?"
-         :jump-to-captured t)
-       ("q" "Quote"
-         plain
-         (file+function jf/filename/bibliography
-           jf/org/capture/quote-location)
-         "#+begin_%^{Type|quote|quote|verse}\n%^{Text}\n#+end_%\\1"
-         :prepare-finalize jf/org/capture/quote/name-that-block
-         :jump-to-captured t
-         :empty-lines 1)
-       ("w" "Work"
-         entry
-         (file+headline jf/filename/bibliography "Works")
-         "%^{Title} %^g\n:PROPERTIES:\n:CUSTOM_ID: %(org-id-new)\n:AUTHOR: %^{AUTHOR}\n:END:\n%?"
-         :jump-to-captured t
-         :after-finalize jf/org/capture/finalize-work)
-       ;; ("N" "Note for project task"
-       ;;   plain (function jf/org-mode/capture/project-task/find)
-       ;;   "%T\n\n%?"
-       ;;   :empty-lines-before 1
-       ;;   :empty-lines-after 1)
-       )))
+(setq org-capture-templates
+  `(("c" "Content to Clock"
+      plain (clock)
+      "%(jf/denote/capture-wrap :link \"%L\" :content \"%i\")"
+      :empty-lines 1)
+     ("d" "Dictionary"
+       plain (file
+               ,(f-join jf/denote-base-dir "indices/20230108T083359--a-dictionary-of-discovered-words__CreativeWriting_personal.org"))
+       "- %^{Term} :: %^{Description}; %a"
+       :after-finalize jf/org/capture/dictionary/sort)
+     ;; ("i" "Immediate to Clock"
+     ;;   plain (clock)
+     ;;   "%i%?"
+     ;;   :immediate-finish t)
+     ("p" "Person to Quote"
+       entry
+       (file+headline jf/filename/bibliography "People")
+       "%^{Name} :people:\n:PROPERTIES:\n:CUSTOM_ID: %(org-id-new)\n:END:\n%?"
+       :jump-to-captured t)
+     ("q" "Quote"
+       plain
+       (file+function jf/filename/bibliography
+         jf/org/capture/quote-location)
+       "#+begin_%^{Type|quote|quote|verse}\n%^{Text}\n#+end_%\\1"
+       :prepare-finalize jf/org/capture/quote/name-that-block
+       :jump-to-captured t
+       :empty-lines 1)
+     ("w" "Work"
+       entry
+       (file+headline jf/filename/bibliography "Works")
+       "%^{Title} %^g\n:PROPERTIES:\n:CUSTOM_ID: %(org-id-new)\n:AUTHOR: %^{AUTHOR}\n:END:\n%?"
+       :jump-to-captured t
+       :after-finalize jf/org/capture/finalize-work)
+     ;; ("N" "Note for project task"
+     ;;   plain (function jf/org-mode/capture/project-task/find)
+     ;;   "%T\n\n%?"
+     ;;   :empty-lines-before 1
+     ;;   :empty-lines-after 1)
+     ))
 
 (use-package verb
   ;; https://github.com/federicotdn/verb
@@ -6813,9 +6814,6 @@ The generated and indented TOC will be inserted at point."
 
 (use-package vterm
   ;; A terminal in Emacs.
-  :straight t)
-
-(use-package eat
   :straight t)
 
 (use-package web-mode
