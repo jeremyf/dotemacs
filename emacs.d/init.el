@@ -3875,26 +3875,7 @@ Useful if you want a more robust view into the recommend candidates."
           ("C-c p s" . cape-symbol)
           ("C-c p w" . cape-dict)))
 
-(use-package grab-mac-link
-  ;; Grab a link from a variety of MacOS applications.
-  :straight t
-  ;; Ensuring we load these, as I'll need them later.
-  :commands (grab-mac-link-safari-1 grab-mac-link-firefox-1)
-  :config
-  ;; A replacement function for existing grab-mac-link-make-html-link
-  (defun jf/grab-mac-link-make-html-link (url name)
-    "Using HTML syntax, link to and cite the URL with the NAME."
-    (format (concat "<cite>"
-              "<a href=\"%s\" class=\"u-url p-name\" rel=\"cite\">"
-              "%s"
-              "</a>"
-              "</cite>")
-      url name))
-  ;; The function advice to override the default behavior
-  (advice-add 'grab-mac-link-make-html-link
-    :override 'jf/grab-mac-link-make-html-link
-    '((name . "jnf")))
-  :bind (("C-c g" . grab-mac-link)))
+(load "~/git/dotemacs/emacs.d/grab-mac-link-revised.el")
 
 (use-package helpful
   ;; Help me lookup definitions and details.
