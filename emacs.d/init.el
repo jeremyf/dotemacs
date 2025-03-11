@@ -3368,7 +3368,7 @@ sort accordingly.")
      ("w" "Work"
        entry
        (file+headline jf/filename/bibliography "Works")
-       "%^{Title} %^g\n:PROPERTIES:\n:CUSTOM_ID: %(org-id-new)\n:AUTHOR: %^{AUTHOR}\n:END:\n%?"
+       "%^{Title} %^g\n:PROPERTIES:\n:CUSTOM_ID: %(org-id-new)\n:SUBTITLE:%^{Subtitle}\n:AUTHOR: %^{Author}\n:END:\n%?"
        :jump-to-captured t
        :after-finalize jf/org/capture/finalize-work)
      ;; ("N" "Note for project task"
@@ -4044,15 +4044,6 @@ Useful if you want a more robust view into the recommend candidates."
          (styles orderless)))
     orderless-component-separator #'orderless-escapable-split-on-space
     orderless-style-dispatchers '(+orderless-dispatch)))
-
-(use-package org-mac-link
-  ;; Similar to `grab-mac-link' but a bit specific to `org-mode'.
-  ;;
-  ;; I often use this when reading while writing blog posts.
-  :after (grab-mac-link)
-  :straight (org-mac-link :type git
-              :host gitlab :repo "aimebertrand/org-mac-link")
-  :bind (:map org-mode-map (("C-c g" . org-mac-link-get-link))))
 
 (use-package tempel
   ;; For awhile, I'd used yasnippets; themselves inspired by my beloved
@@ -8545,6 +8536,7 @@ Take on Rules using the \"blockquote\" special block."
       "Export current org BUFFER for TakeOnRules post."
       (interactive)
       ;; Ensure that we have an ID property.
+      (jf/bibliography/export-to-takeonrules)
       (setq jf/exporting-org-to-tor t)
       (with-current-buffer buffer
         (save-excursion

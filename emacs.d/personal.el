@@ -65,17 +65,7 @@ Forward PREFIX to `mastodon-tl--show-tag-timeline'."
   "Where I put my journal.")
 
 (add-to-list 'org-capture-templates
-  '("j" "Start Today's Journal Entry"
-     plain (file+olp+datetree
-             jf/personal/filename-for-journal)
-     "[[date:%<%Y-%m-%d>][Today:]]\n\n- [ ] Contact representatives\n- [ ] One small light\n- [ ] Read one book chapter\n- [ ] Read one poem\n- [ ] Read one essay\n- [ ] Tend my daily feed\n- [ ] Write one response to a feed item\n\n%T :: %?\n\n**** Private Thoughts :private:\n:PROPERTIES:\n:END:\n"
-     :empty-lines-before 1
-     :empty-lines-after 1
-     :clock-in t
-     :clock-resume t))
-
-(add-to-list 'org-capture-templates
-  `("J" "Add to Today's Journal Entry"
+  '("j" "Journal Entry"
      plain (file+olp+datetree
              jf/personal/filename-for-journal)
      "%T :: %?"
@@ -399,3 +389,78 @@ Forward PREFIX to `mastodon-tl--show-tag-timeline'."
   ;;     smtpmail-smtp-service 1025
   ;;     smtpmail-stream-type  'ssl)
   )
+
+(defvar jf/filename/bibliography-takeonrules
+  (file-truename "~/git/takeonrules.source/content/site-map/bibliography/_index.md"))
+
+(defun jf/bibliography/export-to-takeonrules (&optional file)
+  "Export completed bibliography reading to FILE."
+  (interactive)
+  (let* ((works
+           (save-excursion
+             (with-current-buffer
+               (find-file-noselect jf/filename/bibliography)
+               (org-map-entries
+                 (lambda ()
+                   (list
+                     :title
+                     (org-element-property
+                       :title (org-element-at-point))
+                     :subtitle
+                     (org-entry-get
+                       (org-element-at-point) "SUBTITLE")
+                     :author
+                     (org-entry-get
+                       (org-element-at-point) "AUTHOR")
+                     :editor
+                     (org-entry-get
+                       (org-element-at-point) "EDITOR")
+                     ))
+                 "+LEVEL=2+books-skipBibliography+TODO=\"DONE\"" 'file))))
+          (buffer
+            (find-file-noselect (or file jf/filename/bibliography-takeonrules))))
+    (with-current-buffer buffer
+      (delete-region (point-min) (point-max))
+      (insert
+        (concat
+          "---\n"
+          "Sitemap:\n"
+          "  ChangeFreq: monthly\n"
+          "  Priority: 0.45\n"
+          "date: 2023-07-01 16:56:12.000000000 -04:00\n"
+          "images: []\n"
+          "lastmod: " (format-time-string "%Y-%m-%d %H:%M:%S.%N %z") "\n"
+          "layout: page\n"
+          "licenses:\n"
+          "- all-rights-reserved\n"
+          "permalink: \"/site-map/bibliography/\"\n"
+          "schema_dot_org_type: AboutPage\n"
+          "skipCreativeContentLicense: true\n"
+          "title: Bibliography\n"
+          "type: page\n"
+          "---\n"
+          "\n"
+          "In {{< linkToTable \"249\" >}}, I list most of the books that I've read.  I have chosen to exclude most {{< glossary key=\"RPG\" >}} books; in part because there are so many.  I plan to create a Ludography; a list of games that I've played, both {{< glossary key=\"RPG\" >}} and otherwise.\n"
+          "\n"
+          "{{< table table_number=\"249\" caption=\"Most of the Books that I've Read\" >}}\n"
+          "<thead>\n"
+          "<tr><th scope=\"col\">Title</th><th scope=\"col\">Author</th></tr>\n"
+          "</thead>\n"
+          "<tbody>\n"
+          (s-join "\n"
+            (mapcar (lambda (work)
+	                    (format "<tr><td><cite>%s%s</cite></td><td>%s%s</td></tr>"
+                        (lax-plist-get work :title)
+                        (if-let ((subtitle
+                                   (lax-plist-get work :subtitle)))
+                          (concat ": " subtitle)
+                          "")
+                        (lax-plist-get work :author)
+                        (if-let ((editor
+                                   (lax-plist-get work :editor)))
+                          (concat "Editor: " editor)
+                          "")))
+              works))
+          "\n<tbody>\n"
+          "{{< /table >}}\n"))
+      (save-buffer))))

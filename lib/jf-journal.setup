@@ -1,0 +1,34 @@
+#+LATEX_CLASS: jf/landscape
+#+LATEX_HEADER: \usepackage[linktocpage=true]{hyperref}
+#+LATEX_HEADER: \usepackage[french,english]{babel}
+#+LATEX_HEADER: \usepackage[a4paper,top=3cm,bottom=3cm]{geometry}
+#+LATEX_HEADER: \usepackage{minimalist}
+#+LATEX_HEADER: \usepackage{fontspec}
+#+LATEX_HEADER: \usepackage{caption} \captionsetup{labelfont=bf,font={sf,small}}
+#+LATEX_HEADER: \setmainfont{TeX Gyre Pagella}
+#+LATEX_HEADER: \usepackage{enumitem} \setlist{nosep}
+#+LATEX_HEADER: \usepackage{longtable}
+#+LATEX_HEADER: \usepackage{microtype}
+#+LATEX_HEADER: \AtBeginEnvironment{longtable}{\footnotesize}
+#+LATEX_HEADER: \usepackage[marginal,hang]{footmisc}
+#+LATEX_HEADER: \usepackage{relsize,etoolbox}
+#+LATEX_HEADER: \AtBeginEnvironment{quote}{\smaller}
+#+LATEX_HEADER: \AtBeginEnvironment{tabular}{\smaller}
+#+LATEX_HEADER: \usepackage[printonlyused,nohyperlinks]{acronym}
+#+LATEX_HEADER: \usepackage[marginal,hang]{footmisc}
+#+LATEX_HEADER: \usepackage{mathabx}
+#+LATEX_HEADER: \usepackage{multicol}
+#+LATEX_HEADER: \setlength\columnsep{20pt}
+#+LATEX_HEADER: \hypersetup{colorlinks=true, linkcolor=blue, filecolor=magenta, urlcolor=cyan}
+#+LATEX_HEADER: \tolerance=1000
+#+LATEX_HEADER: \usepackage{float}
+#+LATEX_HEADER: \usepackage{rotating}
+#+LATEX_HEADER: \usepackage{sectsty}
+#+LATEX_HEADER: \usepackage{titlesec}
+#+LATEX_HEADER: \titleformat{\section}{\normalfont\fontsize{12}{18}\bfseries}{\thesection}{1em}{}
+#+LATEX_HEADER: \setcounter{secnumdepth}{1}
+#+OPTIONS: toc:3 tags:nil
+
+#+LATEX: \begin{multicols}{2}
+#+LATEX: \let\oldhref\href
+#+LATEX: \renewcommand{\href}[2]{\oldhref{#1}{#2}\footnote{\url{#1}}}
