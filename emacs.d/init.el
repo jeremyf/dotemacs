@@ -1762,6 +1762,7 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   ;; folks in the #emacs fediverse.  Hence something that is more likely
   ;; to see maintenance.
   :straight t
+  :custom (emacs-everywhere-major-mode-function #'emacs-everywhere-major-mode-org-or-markdown)
   :config
   (setq emacs-everywhere-frame-parameters
     '((name . "emacs-everywhere")
