@@ -1762,15 +1762,22 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   ;; folks in the #emacs fediverse.  Hence something that is more likely
   ;; to see maintenance.
   :straight t
-  :custom (emacs-everywhere-major-mode-function #'emacs-everywhere-major-mode-org-or-markdown)
-  :config
-  (setq emacs-everywhere-frame-parameters
+  :custom
+  (emacs-everywhere-major-mode-function #'emacs-everywhere-major-mode-org-or-markdown)
+  (emacs-everywhere-frame-parameters
     '((name . "emacs-everywhere")
-       (fullscreen)
-       (width . 0.33)
-       (height . 0.5)
+       (width . 80)
+       (height . 12)
+       (user-position . t)
        (top . 0)
-       (left . 0))))
+       (left . 0)))
+  :config
+  ;; Create a nice editing experience, in which we have a well maximized
+  ;; screen.  The position and fullscreen don't work.  So I'm relying on
+  ;; setting a small frame, then expanding it to maximum.
+  (add-hook 'emacs-everywhere-mode-hook #'olivetti-mode)
+  (add-hook 'emacs-everywhere-mode-hook #'toggle-frame-maximized)
+  )
 
 (use-package ws-butler
   ;; Keep white space tidy.
