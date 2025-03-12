@@ -1208,7 +1208,7 @@ The ARGS are the rest of the ARGS passed to the ADVISED-FUNCTION."
           (forward-char 1))
         (t ad-do-it)))))
 
-(define-key global-map (kbd "s-SPC") #'jf/insert-non-breaking-space)
+(define-key global-map (kbd "C-M-s-SPC") #'jf/insert-non-breaking-space)
 
 (defun jf/insert-non-breaking-space (&optional prefix)
   "Insert a non-breaking space PREFIX number of times"
@@ -3211,8 +3211,9 @@ to Backlog."
 
 (defun jf/org/capture/dictionary/sort ()
   "Sort the dictionary."
-  (save-excursion
-    (save-restriction
+  (save-restriction
+    (widen)
+    (save-excursion
       (org-backward-paragraph)
       (forward-line)
       (org-sort-list nil ?a))))
@@ -3238,8 +3239,9 @@ Use `denote-sluggify' as the naming function for the quote"
                   (denote-sluggify 'title
                     first-line-of-block-content))
                 8))))
-    (save-excursion
-      (save-restriction
+    (save-restriction
+      (widen)
+      (save-excursion
         ;; Place the name of the quote just above the start of the
         ;; block.
         (goto-char (point-min))
@@ -3289,7 +3291,7 @@ Narrow focus to a tag, then a named element."
   (f-join jf/denote-base-dir "private/20241124T080648--bibliography__projects.org")
   "Dude, you can put your books in here.")
 
-(defvar jf/filename/bibliography-takeonrules
+(defvar jf/filename/epigraphy-takeonrules
   "~/git/takeonrules.source/content/site-map/epigraphs/index.md"
   "Page that I generate and push to the
 https://takeonrules.com/site-map/epigraphs url.")
@@ -5017,8 +5019,9 @@ PARG is for a conformant method signature."
   (defun jf/org/capture/finalize-work ()
     "Finalize works after capture."
     (jf/bibliography/export-shopping-list)
-    (save-excursion
-      (save-restriction
+    (save-restriction
+      (widen)
+      (save-excursion
         (call-interactively #'org-up-heading nil)
         (jf/org-sort-entries/ignoring-stop-words))))
 
@@ -5026,23 +5029,25 @@ PARG is for a conformant method signature."
     "Export my book shopping list to the given FILE."
     (interactive)
     (let* ((works
-             (save-excursion
-               (with-current-buffer
-                 (find-file-noselect jf/filename/bibliography)
-                 (org-map-entries
-                   (lambda ()
-                     (list
-                       :title
-                       (org-element-property
-                         :title (org-element-at-point))
-                       :author
-                       (org-entry-get
-                         (org-element-at-point) "AUTHOR")
-                       :editor
-                       (org-entry-get
-                         (org-element-at-point) "EDITOR")
-                       ))
-                   "+LEVEL=2+books+shoppingList" 'file))))
+             (save-restriction
+               (widen)
+               (save-excursion
+                 (with-current-buffer
+                   (find-file-noselect jf/filename/bibliography)
+                   (org-map-entries
+                     (lambda ()
+                       (list
+                         :title
+                         (org-element-property
+                           :title (org-element-at-point))
+                         :author
+                         (org-entry-get
+                           (org-element-at-point) "AUTHOR")
+                         :editor
+                         (org-entry-get
+                           (org-element-at-point) "EDITOR")
+                         ))
+                     "+LEVEL=2+books+shoppingList" 'file)))))
             (sorted-works
               (sort works
                 :key (lambda (work)
@@ -5078,52 +5083,54 @@ PARG is for a conformant method signature."
     "Export epigraphs to my blog."
     (interactive)
     (let* ((epigraphs
-             (save-excursion
-               (with-current-buffer
-                 (find-file-noselect jf/filename/bibliography)
-                 (elfeed--shuffle
-                   (org-element-map
-                     (org-element-parse-buffer)
-                     '(quote-block verse-block)
-                     (lambda (el)
-                       ;; Skip un-named blocks as we can’t link to them.
-                       (when-let* ((id
-                                     (org-element-property :name el)))
-                         (let* ((lineage
-                                  (org-element-lineage el))
-                                 (h-node
-                                   (car
-                                     (seq-filter
-                                       (lambda (el)
-                                         (and
-                                           (eq (org-element-type el) 'headline)
-                                           (= (org-element-property :level el) 2)))
-                                       lineage)))
-                                 (people?
-                                   (member "people"
-                                     (org-element-property :tags h-node))))
-                           (list
-                             :id id
-                             :type (org-element-type el)
-                             :work (if people?
-                                     ""
+             (save-restriction
+               (widen)
+               (save-excursion
+                 (with-current-buffer
+                   (find-file-noselect jf/filename/bibliography)
+                   (elfeed--shuffle
+                     (org-element-map
+                       (org-element-parse-buffer)
+                       '(quote-block verse-block)
+                       (lambda (el)
+                         ;; Skip un-named blocks as we can’t link to them.
+                         (when-let* ((id
+                                       (org-element-property :name el)))
+                           (let* ((lineage
+                                    (org-element-lineage el))
+                                   (h-node
                                      (car
-                                       (org-element-property
-                                         :title h-node)))
-                             :author
-                             (if people?
-                               (car
-                                 (org-element-property :title h-node))
-                               (org-entry-get h-node "AUTHOR"))
-                             :text
-                             (buffer-substring-no-properties
-                               (org-element-property
-                                 :contents-begin el)
-                               (org-element-property
-                                 :contents-end el))))))))))))
+                                       (seq-filter
+                                         (lambda (el)
+                                           (and
+                                             (eq (org-element-type el) 'headline)
+                                             (= (org-element-property :level el) 2)))
+                                         lineage)))
+                                   (people?
+                                     (member "people"
+                                       (org-element-property :tags h-node))))
+                             (list
+                               :id id
+                               :type (org-element-type el)
+                               :work (if people?
+                                       ""
+                                       (car
+                                         (org-element-property
+                                           :title h-node)))
+                               :author
+                               (if people?
+                                 (car
+                                   (org-element-property :title h-node))
+                                 (org-entry-get h-node "AUTHOR"))
+                               :text
+                               (buffer-substring-no-properties
+                                 (org-element-property
+                                   :contents-begin el)
+                                 (org-element-property
+                                   :contents-end el)))))))))))))
       (let* ((buffer
                (find-file-noselect
-                 (or file jf/filename/bibliography-takeonrules))))
+                 (or file jf/filename/epigraphy-takeonrules))))
         (with-current-buffer buffer
           (delete-region (point-min) (point-max))
           (insert
@@ -5180,101 +5187,103 @@ PARG is for a conformant method signature."
 We ignore the DESCRIPTION and probably the PROTOCOL."
     (let ((buffer
             (find-file-noselect jf/filename/bibliography)))
-      (save-excursion
-        (with-current-buffer buffer
-          (let* ((epigraph
-                   (car
-                     (org-element-map
-                       (org-element-parse-buffer)
-                       '(quote-block verse-block)
-                       (lambda (el)
-                         ;; Skip un-named blocks as we can’t link to
-                         ;; them.
-                         (when (string=
-                                 (org-element-property :name el)
-                                 link)
-                           el)))))
-                  (id
-                    (org-element-property :name epigraph))
-                  (class
-                    (if (eq 'verse-block (org-element-type epigraph))
-                      "verse"
-                      "quote"))
-                  (lineage
-                    (org-element-lineage epigraph))
-                  (context
-                    (car
-                      (seq-filter
-                        (lambda (el)
-                          (and
-                            (eq (org-element-type el) 'headline)
-                            (= (org-element-property :level el) 2)))
-                        lineage)))
-                  (people?
-                    (member "people"
-                      (org-element-property :tags context)))
-                  (work
-                    (if people?
-                      ""
-                      (car (org-element-property :title context))))
-                  (author
-                    (if people?
-                      (car (org-element-property :title context))
-                      (org-entry-get context "AUTHOR")))
-                  (text
-                    (buffer-substring-no-properties
-                      (org-element-property
-                        :contents-begin epigraph)
-                      (org-element-property
-                        :contents-end epigraph))))
-            (cond
-              ((or (eq format 'html) (eq format 'md))
-                (format "<blockquote class=\"%s epigraph\" data-id=\"%s\">\n%s%s</blockquote>\n"
-                  class
-                  id
-                  (if (string= class "verse")
-                    (s-replace "\n" "<br />\n" text)
-                    (org-export-string-as text 'html t))
-                  (cond
-                    ((and (s-present? work) (s-present? author))
-                      (format "\n<footer>&#8213;%s, <cite>%s</cite></footer>"
-                        author work))
-                    ((s-present? work)
-                      (format "\n<footer>&#8213; <cite>%s</cite></footer>"
-                        work))
-                    ((s-present? author)
-                      (format "\n<footer>&#8213; %s</footer>"
-                        author))
-                    (t ""))))
-              ((eq format 'latex)
-                (format "\\begin{%s}\n%s%s\n\\end{%s}\n"
-                  class
-                  (if (string= "verse" class)
-                    (s-replace "\n" "\\\\\n" text)
-                    text)
-                  (cond
-                    ((and (s-present? work) (s-present? author))
-                      (format "---%s, \\textit{%s}" author work))
-                    ((s-present? work)
-                      (format "---\\textit{%s}" work))
-                    ((s-present? author)
-                      (format "---%s" author))
-                    (t ""))
-                  class))
-              (t
-                (let* ((use-hard-newlines t))
-                  (s-replace
-                    "\n" hard-newline
-                    (format "%s%s"
-                      text
-                      (cond
-                        ((and (s-present? work) (s-present? author))
-                          (format "\n\n—%s, “%s”" author work))
-                        ((s-present? work)
-                          (format "\n\n—“%s”" work))
-                        ((s-present? author)
-                          (format "\n\n—%s" author))
-                        (t ""))))))))))))
+      (save-restriction
+        (widen)
+        (save-excursion
+          (with-current-buffer buffer
+            (let* ((epigraph
+                     (car
+                       (org-element-map
+                         (org-element-parse-buffer)
+                         '(quote-block verse-block)
+                         (lambda (el)
+                           ;; Skip un-named blocks as we can’t link to
+                           ;; them.
+                           (when (string=
+                                   (org-element-property :name el)
+                                   link)
+                             el)))))
+                    (id
+                      (org-element-property :name epigraph))
+                    (class
+                      (if (eq 'verse-block (org-element-type epigraph))
+                        "verse"
+                        "quote"))
+                    (lineage
+                      (org-element-lineage epigraph))
+                    (context
+                      (car
+                        (seq-filter
+                          (lambda (el)
+                            (and
+                              (eq (org-element-type el) 'headline)
+                              (= (org-element-property :level el) 2)))
+                          lineage)))
+                    (people?
+                      (member "people"
+                        (org-element-property :tags context)))
+                    (work
+                      (if people?
+                        ""
+                        (car (org-element-property :title context))))
+                    (author
+                      (if people?
+                        (car (org-element-property :title context))
+                        (org-entry-get context "AUTHOR")))
+                    (text
+                      (buffer-substring-no-properties
+                        (org-element-property
+                          :contents-begin epigraph)
+                        (org-element-property
+                          :contents-end epigraph))))
+              (cond
+                ((or (eq format 'html) (eq format 'md))
+                  (format "<blockquote class=\"%s epigraph\" data-id=\"%s\">\n%s%s</blockquote>\n"
+                    class
+                    id
+                    (if (string= class "verse")
+                      (s-replace "\n" "<br />\n" text)
+                      (org-export-string-as text 'html t))
+                    (cond
+                      ((and (s-present? work) (s-present? author))
+                        (format "\n<footer>&#8213;%s, <cite>%s</cite></footer>"
+                          author work))
+                      ((s-present? work)
+                        (format "\n<footer>&#8213; <cite>%s</cite></footer>"
+                          work))
+                      ((s-present? author)
+                        (format "\n<footer>&#8213; %s</footer>"
+                          author))
+                      (t ""))))
+                ((eq format 'latex)
+                  (format "\\begin{%s}\n%s%s\n\\end{%s}\n"
+                    class
+                    (if (string= "verse" class)
+                      (s-replace "\n" "\\\\\n" text)
+                      text)
+                    (cond
+                      ((and (s-present? work) (s-present? author))
+                        (format "---%s, \\textit{%s}" author work))
+                      ((s-present? work)
+                        (format "---\\textit{%s}" work))
+                      ((s-present? author)
+                        (format "---%s" author))
+                      (t ""))
+                    class))
+                (t
+                  (let* ((use-hard-newlines t))
+                    (s-replace
+                      "\n" hard-newline
+                      (format "%s%s"
+                        text
+                        (cond
+                          ((and (s-present? work) (s-present? author))
+                            (format "\n\n—%s, “%s”" author work))
+                          ((s-present? work)
+                            (format "\n\n—“%s”" work))
+                          ((s-present? author)
+                            (format "\n\n—%s" author))
+                          (t "")))))))))))))
 
   (defun jf/org-link-ol-complete/epigraph ()
     "Find and insert an epigraph for export.
@@ -5283,39 +5292,41 @@ Wires into `org-insert-link'."
     (let* ((buffer
              (find-file-noselect jf/filename/bibliography))
             (candidates
-              (save-excursion
-                (with-current-buffer buffer
-                  (org-element-map
-                    (org-element-parse-buffer)
-                    '(quote-block verse-block)
-                    (lambda (el)
-                      ;; Skip un-named blocks as we can’t link to them.
-                      (when-let* ((id
-                                    (org-element-property :name el))
-                                   (left
-                                     (org-element-property
-                                       :contents-begin el))
-                                   (right
-                                     (org-element-property
-                                       :contents-end el))
-                                   (text
-                                     (s-trim
-                                       (s-replace "\n" " "
-                                         (buffer-substring-no-properties
-                                           left
-                                           (if (< (- right left) 72)
-                                             right
-                                             (+ left 72)))))))
-                        (cons text id)))))))
+              (save-restriction
+                (widen)
+                (save-excursion
+                  (with-current-buffer buffer
+                    (org-element-map
+                      (org-element-parse-buffer)
+                      '(quote-block verse-block)
+                      (lambda (el)
+                        ;; Skip un-named blocks as we can’t link to them.
+                        (when-let* ((id
+                                      (org-element-property :name el))
+                                     (left
+                                       (org-element-property
+                                         :contents-begin el))
+                                     (right
+                                       (org-element-property
+                                         :contents-end el))
+                                     (text
+                                       (s-trim
+                                         (s-replace "\n" " "
+                                           (buffer-substring-no-properties
+                                             left
+                                             (if (< (- right left) 72)
+                                               right
+                                               (+ left 72)))))))
+                          (cons text id))))))))
             (candidate
               (completing-read "Epigraph: " candidates nil t))
             (id
               (alist-get candidate candidates nil nil #'string=)))
       (when id
         (progn
-           (message "Added %S to the kill ring" candidate)
-           (kill-new candidate)
-           (format "epigraph:%s" id)))))
+          (message "Added %S to the kill ring" candidate)
+          (kill-new candidate)
+          (format "epigraph:%s" id)))))
 
 
   (defun jf/org-link-ol-follow/epigraph (name)
@@ -5344,6 +5355,7 @@ Wires into `org-insert-link'."
             (case-fold-search
               t))
       (find-file file)
+      (widen)
       (goto-char (point-min))
       (let ((case-fold-search
               t)
@@ -5360,33 +5372,35 @@ Wires into `org-insert-link'."
     (let* ((buffer
              (find-file-noselect jf/filename/bibliography))
             (works
-              (save-excursion
-                (with-current-buffer buffer
-                  ;; With the given tag, find all associated headlines
-                  ;; that match that tag.
-                  (org-map-entries
-                    (lambda ()
-                      (let* ((headline
-                               (org-element-at-point))
-                              (title
-                                (org-element-property :title headline))
-                              (subtitle
-                                (org-entry-get headline "SUBTITLE"))
-                              (author
-                                (org-entry-get headline "AUTHOR")))
-                        (cons
-                          (format "«%s»%s"
-                            (if subtitle
-                              (concat title ": " subtitle)
-                              title)
-                            (if (s-present? author)
-                              (concat " by "author) ""))
-                          (list
-                            :id (org-entry-get headline "CUSTOM_ID")
-                            :title title
-                            :subtitle subtitle
-                            :author author))))
-                    "+LEVEL=2+!people" 'file))))
+              (save-restriction
+                (widen)
+                (save-excursion
+                  (with-current-buffer buffer
+                    ;; With the given tag, find all associated headlines
+                    ;; that match that tag.
+                    (org-map-entries
+                      (lambda ()
+                        (let* ((headline
+                                 (org-element-at-point))
+                                (title
+                                  (org-element-property :title headline))
+                                (subtitle
+                                  (org-entry-get headline "SUBTITLE"))
+                                (author
+                                  (org-entry-get headline "AUTHOR")))
+                          (cons
+                            (format "«%s»%s"
+                              (if subtitle
+                                (concat title ": " subtitle)
+                                title)
+                              (if (s-present? author)
+                                (concat " by "author) ""))
+                            (list
+                              :id (org-entry-get headline "CUSTOM_ID")
+                              :title title
+                              :subtitle subtitle
+                              :author author))))
+                      "+LEVEL=2+!people" 'file)))))
             (work
               (completing-read "Citable: " works nil t)))
       (when-let ((work-data
@@ -5428,76 +5442,78 @@ We ignore the DESCRIPTION and probably the PROTOCOL."
               (member "author" link-with-properties))
             (with-subtitle
               (member "subtitle" link-with-properties)))
-      (save-excursion
-        (with-current-buffer buffer
-          ;; First we find the corresponding work and possible URL.
-          (when-let* ((work
-                        (car
-                          (org-element-map
-                            (org-element-parse-buffer)
-                            '(headline)
-                            (lambda (el)
-                              ;; Skip un-named blocks as we can’t link to
-                              ;; them.
-                              (when (string=
-                                      (org-entry-get el "CUSTOM_ID")
-                                      link)
-                                (let ((title
-                                        (car
-                                        (org-element-property :title el))))
-                                  (list
-                                    :title
-                                    title
-                                    :subtitle
-                                    (if-let ((subtitle
-                                               (org-entry-get el "SUBTITLE")))
-                                      (if with-subtitle
-                                        title
-                                        (format "%s: %s" title subtitle))
-                                      title)
-                                    :author
-                                    (org-entry-get el "AUTHOR")
-                                    :url
-                                    (org-entry-get el "ROAM_REFS")))))))))
-            (let ((author-suffix
-                    (if (and
-                        with-author
-                        (s-present? (plist-get work :author)))
-                    (format " by %s" (plist-get work :author))
-                    "")))
-            ;; Then we create the corresponding format.
-            (cond
-              ((or (eq format 'html) (eq format 'md))
-                (format "<cite data-id=\"%s\">%s</cite>%s"
-                  link
-                  (if-let ((url
-                             (plist-get work :url)))
-                    (format "<a href=\"%s\">%s</a>"
-                      url (plist-get work :title))
-                    (plist-get work :title))
-                  author-suffix))
-              ((eq format 'latex)
-                (format "\\textit{%s}%s"
-                  (if-let ((url
-                             (plist-get work :url)))
-                    (format "\\href{%s}{%s}"
-                      url (plist-get work :title))
-                    (plist-get work :title))
-                  author-suffix))
-              ((eq format 'odt)
-                (format
-                  "<text:span text:style-name=\"%s\">%s</text:span>%s"
-                  "Emphasis"
-                  (if-let ((url
-                             (plist-get work :url)))
-                    (format "<text:a xlink:type=\"simple\" xlink:href=\"%s\">%s</text:a>"
-                      url (plist-get work :title))
-                    (plist-get work :title))
-                  author-suffix))
-              (t
-                (format "“%s”%s"
-                  (plist-get work :title)
-                  author-suffix)))))))))
+      (save-restriction
+        (widen)
+        (save-excursion
+          (with-current-buffer buffer
+            ;; First we find the corresponding work and possible URL.
+            (when-let* ((work
+                          (car
+                            (org-element-map
+                              (org-element-parse-buffer)
+                              '(headline)
+                              (lambda (el)
+                                ;; Skip un-named blocks as we can’t link to
+                                ;; them.
+                                (when (string=
+                                        (org-entry-get el "CUSTOM_ID")
+                                        link)
+                                  (let ((title
+                                          (car
+                                            (org-element-property :title el))))
+                                    (list
+                                      :title
+                                      title
+                                      :subtitle
+                                      (if-let ((subtitle
+                                                 (org-entry-get el "SUBTITLE")))
+                                        (if with-subtitle
+                                          title
+                                          (format "%s: %s" title subtitle))
+                                        title)
+                                      :author
+                                      (org-entry-get el "AUTHOR")
+                                      :url
+                                      (org-entry-get el "ROAM_REFS")))))))))
+              (let ((author-suffix
+                      (if (and
+                            with-author
+                            (s-present? (plist-get work :author)))
+                        (format " by %s" (plist-get work :author))
+                        "")))
+                ;; Then we create the corresponding format.
+                (cond
+                  ((or (eq format 'html) (eq format 'md))
+                    (format "<cite data-id=\"%s\">%s</cite>%s"
+                      link
+                      (if-let ((url
+                                 (plist-get work :url)))
+                        (format "<a href=\"%s\">%s</a>"
+                          url (plist-get work :title))
+                        (plist-get work :title))
+                      author-suffix))
+                  ((eq format 'latex)
+                    (format "\\textit{%s}%s"
+                      (if-let ((url
+                                 (plist-get work :url)))
+                        (format "\\href{%s}{%s}"
+                          url (plist-get work :title))
+                        (plist-get work :title))
+                      author-suffix))
+                  ((eq format 'odt)
+                    (format
+                      "<text:span text:style-name=\"%s\">%s</text:span>%s"
+                      "Emphasis"
+                      (if-let ((url
+                                 (plist-get work :url)))
+                        (format "<text:a xlink:type=\"simple\" xlink:href=\"%s\">%s</text:a>"
+                          url (plist-get work :title))
+                        (plist-get work :title))
+                      author-suffix))
+                  (t
+                    (format "“%s”%s"
+                      (plist-get work :title)
+                      author-suffix))))))))))
 
   (org-link-set-parameters "elfeed"
     :follow #'elfeed-link-open
@@ -8953,10 +8969,10 @@ If `consult--read' is defined, use that.  Otherwise fallback to
       "Return list of REGEXP matches in BUFFER or the current buffer."
       (let ((matches))
         (save-match-data
-          (save-excursion
-            (with-current-buffer (or buffer (current-buffer))
-              (save-restriction
-                (widen)
+          (save-restriction
+            (widen)
+            (save-excursion
+              (with-current-buffer (or buffer (current-buffer))
                 (goto-char 1)
                 (while (search-forward-regexp regexp nil t 1)
                   (push (match-string 0) matches)))))
