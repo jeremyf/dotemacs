@@ -27,8 +27,11 @@
 (require 's)
 
 ;;;; Tables
+(random-table/register :name "The One Ring > Lore"
+  :data '("\n\t- Action :: {The One Ring > Lore > Action}\n\t- Aspect :: {The One Ring > Lore > Aspect}\n\t- Focus :: {The One Ring > Lore > Focus}"))
 
 (random-table/register :name "The One Ring > Lore > Action"
+  :private t
   :data '("⏿ Abandon" "⏿ Attack" "⏿ Betray" "⏿ Corrupt" "⏿ Defeat" "⏿ Weaken"
            "Aid" "Arrive" "Await" "Breach" "Break" "Capture"
            "Change" "Chase" "Command" "Control" "Create" "Defy"
@@ -43,6 +46,7 @@
            "ᚠ Believe" "ᚠ Bolster" "ᚠ Defend" "ᚠ Forgive" "ᚠ Resist" "ᚠ Strengthen"))
 
 (random-table/register :name "The One Ring > Lore > Aspect"
+  :private t
   :data '("⏿ Corrupted" "⏿ Cruel" "⏿ Deceptive" "⏿ Fell" "⏿ Ruined" "⏿ Treacherous"
            "Active" "Ancient" "Bold" "Bright" "Broken" "Cheerless"
            "Cold" "Concealed" "Dangerous" "Dark" "Dead" "Defended"
@@ -57,6 +61,7 @@
            "ᚠ Flourishing" "ᚠ Beautiful" "ᚠ Good" "ᚠ Kind" "ᚠ Gentle" "ᚠ Wondrous"))
 
 (random-table/register :name "The One Ring > Lore > Focus"
+  :private t
   :data '("⏿ Curse" "⏿ Despair" "⏿ Enemy" "⏿ Fear" "⏿ Shadow" "⏿ War"
            "Battle" "Border" "Burden" "Council" "Court" "Creature"
            "Darkness" "Death" "Defence" "Depths" "Doubt" "Dreams"
