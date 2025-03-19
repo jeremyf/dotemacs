@@ -3370,7 +3370,7 @@ sort accordingly.")
      ("w" "Work"
        entry
        (file+headline jf/filename/bibliography "Works")
-       "%^{Title} %^g\n:PROPERTIES:\n:CUSTOM_ID: %(org-id-new)\n:SUBTITLE:%^{Subtitle}\n:AUTHOR: %^{Author}\n:END:\n%?"
+       "%^{Title} %^g\n:PROPERTIES:\n:CUSTOM_ID: %(org-id-new)\n:SUBTITLE: %^{Subtitle}\n:AUTHOR: %^{Author}\n:END:\n%?"
        :jump-to-captured t
        :after-finalize jf/org/capture/finalize-work)
      ;; ("N" "Note for project task"
