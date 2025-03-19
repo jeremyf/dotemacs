@@ -140,7 +140,20 @@
      ("Murderous" "Overconfident" "Resentful" "Scheming" "Scornful" "Spiteful"))
     (("Subtle" "Swift" "Tall" "True-hearted" "Wary" "Wilful")
      ("Thieving" "Traitorous" "Troubled" "Tyrannical" "Uncaring" "Wavering"))
-    "Antonym of a PC's distinctive feature"))
+     "Antonym of a PC's distinctive feature"))
+
+(random-table/register :name "The One Ring > Distinctive Feature"
+  :data
+  '(((1 . 12) . "Synonym of a PC's distinctive feature")
+     ((13 . 24) . "Antonym of a PC's distinctive feature")
+     (25 . "Bold") (26 . "Cunning") (27 . "Eager") (28 . "Fair") (29 . "Fair-spoken") (30 . "Faithful")
+     (31 . "Arrogant") (32 . "Brutal") (33 . "Cowardly") (34 . "Cruel") (35 . "Deceitful") (36 . "Fearful")
+     (37 . "Fierce") (38 . "Generous") (39 . "Honourable") (40 . "Inquisitive") (41 . "Keen-eyed") (42 . "Lordly")
+     (43 . "Forgetful") (44 . "Grasping") (45 . "Guilt-ridden") (46 . "Haughty") (47 . "Idle") (48 . "Mistrustful")
+     (49 . "Merry") (50 . "Patient") (51 . "Proud") (52 . "Rustic") (53 . "Secretive") (54 . "Stern")
+     (55 . "Murderous") (56 . "Overconfident") (57 . "Resentful") (58 . "Scheming") (59 . "Scornful") (60 . "Spiteful")
+     (61 . "Subtle") (62 . "Swift") (63 . "Tall") (64 . "True-hearted") (65 . "Wary") (66 . "Wilful")
+     (67 . "Thieving") (68 . "Traitorous") (69 . "Troubled") (70 . "Tyrannical") (71 . "Uncaring") (72 . "Wavering")))
 
 ;;;;; Strider Mode
 (defconst jf/gaming/the-one-ring/strider-mode/event-table
