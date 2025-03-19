@@ -435,7 +435,7 @@ Success ᚠ (Skill: Battle; TN: 12; Roll: ᚠ Favourability: Neutral; Feat Dice:
       (cdr result_and_roll)
       favourability
       feat-die dice
-      (plist-get success-dice :rolls)
+      (s-join ", " (mapcar (lambda (roll) (format "%s" roll)) (plist-get success-dice :rolls)))
       (if is_weary " Weary: true;" "")
       (if is_miserable " Miserable: true;" ""))))
 
