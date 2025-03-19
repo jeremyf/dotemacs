@@ -7497,8 +7497,9 @@ Useful for Eglot."
   ;; captured by `jf/bookmark-url'
   (put 'jf/browse-url-bookmark-jump 'bookmark-handler-type "BROWSE")
 
+  ;; TODO: Create a macro and expand to what I already have.
   (defun jf/menu--bookmark-safari ()
-    "Create `bookmark+' for current Safari page."
+    "Create `bookmark' for current Safari page."
     (interactive)
     (require 'grab-mac-link)
     (let* ((url-and-title
@@ -7510,7 +7511,7 @@ Useful for Eglot."
       (jf/bookmark-url (car url-and-title) title)))
 
   (defun jf/menu--bookmark-firefox ()
-    "Create `bookmark+' for current Firefox page."
+    "Create `bookmark' for current Firefox page."
     (interactive)
     (require 'grab-mac-link)
     (let* ((url-and-title
@@ -7522,7 +7523,7 @@ Useful for Eglot."
       (jf/bookmark-url (car url-and-title) title)))
 
   (defun jf/menu--bookmark-chrome ()
-    "Create `bookmark+' for current Chrome page."
+    "Create `bookmark' for current Chrome page."
     (interactive)
     (require 'grab-mac-link)
     (let* ((url-and-title

@@ -2,7 +2,7 @@
   ;; Grab a link from a variety of MacOS applications.
   :straight (:host github :repo "stevenbagley/grab-mac-link.el")
   ;; Ensuring we load these, as I'll need them later.
-  :commands (grab-mac-link-safari-1 grab-mac-link-firefox-1)
+  :commands (grab-mac-link-safari-1 grab-mac-link-firefox-1 grab-mac-link-split)
   :config
   ;; A replacement function for existing grab-mac-link-make-html-link
   (defun jf/grab-mac-link-make-html-link (url name)
