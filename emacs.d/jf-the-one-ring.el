@@ -485,10 +485,10 @@ Success ᚠ (Skill: Battle; TN: 12; Roll: ᚠ Favourability: Neutral; Feat Dice:
 
 ;;;; Session Tracking
 (defvar jf/gaming/the-one-ring/strider-mode/character-sheet-filename
-  (file-truename "~/git/org/denote/melange/20221128T203953--duinhir-tailwind__TheOneRing_rpgs.org"))
+  (file-truename "~/git/org/denote/melange/20221128T203953==the=travels=of=duinhir=tailwind--duinhir-tailwind__TheOneRing_rpgs.org"))
 
 (defvar jf/gaming/the-one-ring/strider-mode/campaign-index-filename
-  (file-truename "~/git/org/denote/indices/20221129T091857--the-travels-of-duinhir-tailwind__rpgs_projects.org"))
+  (file-truename "~/git/org/denote/indices/20221129T091857==the=travels=of=duinhir=tailwind--the-travels-of-duinhir-tailwind__rpgs_projects.org"))
 
 (cl-defun jf/sidebar--build (&key
                              buffer-name
