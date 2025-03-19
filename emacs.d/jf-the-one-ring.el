@@ -363,10 +363,10 @@
 (defvar jf/gaming/the-one-ring/skills
   '("Athletics" "Awareness" "Awe" "Axe"
      "Battle" "Bow" "Courtesy" "Craft"
-     "Explore" "Healing" "Hunting" "Insight"
-     "Lore" "Persuade" "Riddle" "Scan"
-     "Song" "Spear" "Stealth" "Sword"
-     "Travel")
+     "Enhearten" "Explore" "Healing" "Hunting"
+     "Insight" "Lore" "Persuade" "Riddle"
+     "Scan" "Song" "Spear" "Stealth"
+     "Sword" "Travel")
   "The skills of “The One Ring”")
 
 (cl-defun jf/gaming/the-one-ring/roll/skill-check(skill
