@@ -7860,7 +7860,7 @@ Useful for Eglot."
   :custom
   (shr-inhibit-images t)
   (elfeed-curl-timeout 90)
-  (elfeed-db-directory "~/Documents/.elfeed/")
+  (elfeed-db-directory "~/.elfeed")
   (elfeed-user-agent url-user-agent)
   :bind ((:map elfeed-search-mode-map
            (("/" . jf/elfeed-filter-by-ordinality)
