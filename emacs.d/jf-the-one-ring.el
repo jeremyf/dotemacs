@@ -22,6 +22,7 @@
 
 ;;; Code
 
+(require 'random-table)
 (require 'transient)
 (require 'jf-quick-help)
 (require 's)
@@ -135,18 +136,6 @@
      "are many twisted horns of stained ivory"
      "is a vision of a beautiful creature, a phantom of the mind")))
 
-(defconst jf/gaming/the-one-ring/distinctive-features-table
-  '("Synonym of a PC's distinctive feature"
-    (("Bold" "Cunning" "Eager" "Fair" "Fair-spoken" "Faithful")
-     ("Arrogant" "Brutal" "Cowardly" "Cruel" "Deceitful" "Fearful"))
-    (("Fierce" "Generous" "Honourable" "Inquisitive" "Keen-eyed" "Lordly")
-     ("Forgetful" "Grasping" "Guilt-ridden" "Haughty" "Idle" "Mistrustful"))
-    (("Merry" "Patient" "Proud" "Rustic" "Secretive" "Stern")
-     ("Murderous" "Overconfident" "Resentful" "Scheming" "Scornful" "Spiteful"))
-    (("Subtle" "Swift" "Tall" "True-hearted" "Wary" "Wilful")
-     ("Thieving" "Traitorous" "Troubled" "Tyrannical" "Uncaring" "Wavering"))
-     "Antonym of a PC's distinctive feature"))
-
 (random-table/register :name "The One Ring > Distinctive Feature"
   :data
   '(((1 . 12) . "Synonym of a PC's distinctive feature")
@@ -160,93 +149,84 @@
      (61 . "Subtle") (62 . "Swift") (63 . "Tall") (64 . "True-hearted") (65 . "Wary") (66 . "Wilful")
      (67 . "Thieving") (68 . "Traitorous") (69 . "Troubled") (70 . "Tyrannical") (71 . "Uncaring") (72 . "Wavering")))
 
-;;;;; Strider Mode
-(defconst jf/gaming/the-one-ring/strider-mode/event-table
-  '(:table (:terrible-misfortune :despair :ill-choices :ill-choices
-                                :mishap :mishap :mishap :mishap
-                                :short-cut :short-cut :chance-meeting :joyful-sight)
-          :details
-          ( :terrible-misfortune
-            ( :consequence "If the roll fails, the target is Wounded."
-              :title "Terrible Misfortune"
-              :fatigue 3
-              :events
-              (("Dire confrontation" . "Noteworthy Encounter")
-               ("Rival Predator" . "HUNTING to avoid becoming the hunted")
-               ("Violent weather" . "EXPLORE to find shelter")
-               ("Hidden hazard" . "AWARENESS to avoid stumbling into danger")
-               ("Dangerous terrain" . "EXPLORE to find a safer route")
-               ("Stalking enemy" . "AWARENESS to spot the foul presence")))
-            :despair
-            ( :consequence "If the roll fails, gain 2 Shadow points (Dread)."
-              :title "Despair"
-              :fatigue 2
-              :events
-              (("Servants of the Enemy" . "Noteworthy Encounter")
-               ("Torrential weather" . "EXPLORE to find the least exposed path")
-               ("Nightmarish presence" . "AWARENESS to sense the danger")
-               ("Fading vigour" . "HUNTING to gain sustenance")
-               ("Corrupted site" . "EXPLORE to find your way out")
-               ("Grisly scene or foreboding portent" . "AWARENESS to be forewarned")))
-            :mishap
-            ( :consequence "If the roll fails, add 1 day to the length of the journey, and gain 1 additional Fatigue."
-              :title "Mishap"
-              :fatigue 2
-              :events
-              (("Sparse wildlife" . "HUNTING to forage what you can")
-               ("Lost direction" . "EXPLORE to find your way")
-               ("Obstructed path" . "AWARENESS to spot a way around")
-               ("Elusive quarry" . "HUNTING to track it down")
-               ("Rough terrain" . "EXPLORE to safely traverse")
-               ("Wandering enemies" . "AWARENESS to sense their coming")))
-            :ill-choices
-            ( :consequence "If the roll fails, gain 1 Shadow point (Dread)."
-              :title "Ill Choices"
-              :fatigue 2
-              :events
-              (("Mismanaged provisions" . "HUNTING to replenish stores")
-               ("Wayward path" . "EXPLORE to retrace your steps")
-               ("Overlooked hazard" . "AWARENESS to escape safely")
-               ("Lost quarry" . "HUNTING to follow its tracks")
-               ("Disorienting environs" . "EXPLORE to find your way")
-               ("Haunting visions" . "AWARENESS to over- come darkness")))
-            :short-cut
-            ( :consequence "If the roll succeeds, reduce the length of the journey by 1 day."
-              :title "Short Cut"
-              :fatigue 1
-              :events
-              (("Game trail" . "HUNTING to traverse the path")
-               ("Secluded path" . "EXPLORE to navigate the wilds")
-               ("Helpful tracks" . "AWARENESS to follow the tracks")
-               ("Animal guide" . "HUNTING to follow at a distance")
-               ("Favourable weather" . "EXPLORE to make the most of it")
-               ("Familiar waypoint" . "AWARENESS to recognize the landmark")))
-            :chance-meeting
-            ( :consequence "If the roll succeeds, no Fatigue is gained, and you may envision a favourable encounter."
-              :title "Chance Meeting"
-              :fatigue 1
-              :events
-              (("Lone hunter" . "HUNTING to trade stories")
-               ("Fellow traveller" . "EXPLORE to learn about the path ahead")
-               ("Discreet watcher" . "AWARENESS to spot them")
-               ("Noble beast" . "HUNTING to commune")
-               ("Secluded encampment" . "EXPLORE to find your way off the beaten path")
-               ("Auspicious gathering" . "Noteworthy Encounter")))
-            :joyful-sight
-            ( :consequence "If the roll succeeds, regain 1 Hope."
-              :title "Joyful Sight"
-              :fatigue 0
-              :events
-              (("Majestic creatures" . "HUNTING to observe without startling them")
-               ("Inspiring vista" . "EXPLORE to reach a vantage point")
-               ("Benevolent being" . "AWARENESS to sense their presence")
-               ("Abundant foraging" . "HUNTING to replenish your rations")
-               ("Ancient monument" . "AWARENESS to recognize its significance")
-               ("Peaceful sanctuary" . "Noteworthy Encounter"))))))
+(random-table/register :name "The One Ring > Journey Event"
+  ;; TODO: Add favourability roll.
+  :data
+  '((0 . "\n\t- Terrible Misfortune :: if the roll fails, the target is Wounded.\n\t- Fatigue :: 3\n\t- Event :: {The One Ring > Journey Event > Terrible Misfortune}")
+     (1 . "\n\t- Despair :: if the roll fails, gain 2 Shadow points (Dread).\n\t- Fatigue :: 2\n\t- Event :: {The One Ring > Journey Event > Despair}")
+     ((2 . 3) . "\n\t- Ill-Choices :: if the roll fails, gain 1 Shadow point (Dread).\n\t- Fatigue :: 2\n\t- Event :: {The One Ring > Journey Event > Ill-Choices}")
+     ((4 . 7) . "\n\t- Mishap :: if the roll fails, add 1 day to the length of the journey.\n\t- Fatigue :: 2\n\t- Event :: {The One Ring > Journey Event > Mishap}")
+     ((8 . 9) . "\n\t- Short-cut :: if the roll succeeds, reduce the length of the journey by 1 day.\n\t- Fatigue :: 1\n\t- Event :: {The One Ring > Journey Event > Short-Cut}")
+     (10 . "\n\t- Chance Meeting :: If the roll succeeds, no Fatigue is gained, and you may envision a favourable encounter.\n\t- Fatigue :: 1\n\t- Event :: {The One Ring > Journey Event > Chance Meeting}")
+     (11 . "\n\t- Joyful Sight :: If the roll succeeds, regain 1 Hope.\n\t- Fatigue :: 0\n\t- Event :: {The One Ring > Journey Event > Joyful Sight}")))
+
+(random-table/register :name "The One Ring > Journey Event > Terrible Misfortune"
+  :private t
+  :data
+  '("Dire confrontation (Noteworthy Encounter)"
+     "Rival Predator (HUNTING to avoid becoming the hunted)"
+     "Violent weather (EXPLORE to find shelter)"
+     "Hidden hazard (AWARENESS to avoid stumbling into danger)"
+     "Dangerous terrain (EXPLORE to find a safer route)"
+     "Stalking enemy(AWARENESS to spot the foul presence)"))
+(random-table/register :name "The One Ring > Journey Event > Terrible Misfortune"
+  :private t
+  :data
+  '("Servants of the Enemy (Noteworthy Encounter)"
+     "Torrential weather (EXPLORE to find the least exposed path)"
+     "Nightmarish presence (AWARENESS to sense the danger)"
+     "Fading vigour (HUNTING to gain sustenance)"
+     "Corrupted site (EXPLORE to find your way out)"
+     "Grisly scene or foreboding portent (AWARENESS to be forewarned)"))
+(random-table/register :name "The One Ring > Journey Event > Mishap"
+  :private t
+  :data
+  '("Sparse wildlife (HUNTING to forage what you can)"
+     "Lost direction (EXPLORE to find your way)"
+     "Obstructed path (AWARENESS to spot a way around)"
+     "Elusive quarry (HUNTING to track it down)"
+     "Rough terrain (EXPLORE to safely traverse)"
+     "Wandering enemies (AWARENESS to sense their coming)"))
+(random-table/register :name "The One Ring > Journey Event > Ill-Choices"
+  :private t
+  :data
+  '("Mismanaged provisions (HUNTING to replenish stores)"
+     "Wayward path (EXPLORE to retrace your steps)"
+     "Overlooked hazard (AWARENESS to escape safely)"
+     "Lost quarry (HUNTING to follow its tracks)"
+     "Disorienting environs (EXPLORE to find your way)"
+     "Haunting visions (AWARENESS to overcome darkness)"))
+(random-table/register :name "The One Ring > Journey Event > Short-Cut"
+  :private t
+  :data
+  '("Game trail (HUNTING to traverse the path)"
+     "Secluded path (EXPLORE to navigate the wilds)"
+     "Helpful tracks (AWARENESS to follow the tracks)"
+     "Animal guide (HUNTING to follow at a distance)"
+     "Favourable weather (EXPLORE to make the most of it)"
+     "Familiar waypoint (AWARENESS to recognize the landmark)"))
+(random-table/register :name "The One Ring > Journey Event > Chance Meeting"
+  :private t
+  :data
+  '("Lone hunter (HUNTING to trade stories)"
+     "Fellow traveller (EXPLORE to learn about the path ahead)"
+     "Discreet watcher (AWARENESS to spot them)"
+     "Noble beast (HUNTING to commune)"
+     "Secluded encampment (EXPLORE to find your way off the beaten path)"
+     "Auspicious gathering (Noteworthy Encounter)"))
+(random-table/register :name "The One Ring > Journey Event > Joyful Sight"
+  :private t
+  :data
+  '("Majestic creatures (HUNTING to observe without startling them)"
+     "Inspiring vista (EXPLORE to reach a vantage point)"
+     "Benevolent being (AWARENESS to sense their presence)"
+     "Abundant foraging (HUNTING to replenish your rations)"
+     "Ancient monument (AWARENESS to recognize its significance)"
+     "Peaceful sanctuary (Noteworthy Encounter)"))
 
 (defconst jf/gaming/the-one-ring/strider-mode/fortune-tables
   '(("ᚠ" .
-     ("The Eye of the Enemy focuses elsewhere. Decrease Eye Awareness by 1."
+     ("⏿ The Eye of the Enemy focuses elsewhere. Decrease Eye Awareness by 1."
       "You may bypass a threat without attracting notice"
       "You gain the attention of a potential ally"
       "An enemy inadvertently reveals their position"
@@ -257,9 +237,9 @@
       "You find a moment of comfort or safety"
       "You learn or realize something which gives helpful insight into your mission"
       "You encounter an opportunity suited to your nature or abilities"
-      "An unexpected ally appears or sends aid"))
+      "ᚠ An unexpected ally appears or sends aid"))
     ("⏿" .
-     ("Your actions catch the Eye of the Enemy. Increase Eye Awareness by 2."
+     ("⏿ Your actions catch the Eye of the Enemy. Increase Eye Awareness by 2."
       "You draw unwanted attention"
       "Your actions are observed by someone of ill-intent"
       "Unexpected enemies emerge or are sighted"
@@ -270,10 +250,11 @@
       "An old injury or stress resurfaces"
       "You learn or realize something which adds a new complication to your mission"
       "You face a test which is contrary to your nature or abilities"
-      "An ally becomes a hindrance or liability"))))
+      "ᚠ An ally becomes a hindrance or liability"))))
 
-(defconst jf/gaming/the-one-ring/strider-mode/revelation-episode-table
-  '("Internal strife or an external threat puts your Safe Haven in peril"
+(random-table/register :name "The One Ring > Revelation Episode"
+  :data
+  '("⏿ Internal strife or an external threat puts your Safe Haven in peril"
     "Unexpected danger arises on the path ahead, forcing you to seek a new route"
     "Nature is corrupted and turns against you"
     "Spies of the Enemy carry word of your mission"
@@ -284,8 +265,7 @@
     "You are tempted by something greatly desired, to the detriment of your mission"
     "Malicious lies cause others to mistrust or fear you"
     "Conflict brews between allies"
-    "An important ally is put in danger")
-  "Roll a 1d12; by convention the 0th is Sauron.")
+    "ᚠ An important ally is put in danger"))
 
 (defconst jf/gaming/the-one-ring/strider-mode/telling-table
   ;; List contains 12 elements; 0th index is "Sauron", then 1st through 10th are
@@ -488,7 +468,7 @@ Success ᚠ (Skill: Battle; TN: 12; Roll: ᚠ Favourability: Neutral; Feat Dice:
   (file-truename "~/git/org/denote/melange/20221128T203953==the=travels=of=duinhir=tailwind--duinhir-tailwind__TheOneRing_rpgs.org"))
 
 (defvar jf/gaming/the-one-ring/strider-mode/campaign-index-filename
-  (file-truename "~/git/org/denote/indices/20221129T091857==the=travels=of=duinhir=tailwind--the-travels-of-duinhir-tailwind__rpgs_projects.org"))
+  (file-truename "~/git/org/denote/indices/20221129T091857==the=travels=of=duinhir=tailwind--the-travels-of-duinhir-tailwind__projects_rpgs.org"))
 
 (cl-defun jf/sidebar--build (&key
                              buffer-name
@@ -572,40 +552,52 @@ to READ_ONLY."
     ("r d" "Distinctive features…"
      (lambda ()
        (interactive)
-       (insert
-        (concat "Distinctive Features: "
-                "“" (jf/roll-on-table jf/gaming/the-one-ring/distinctive-features-table) "” "
-                "“" (jf/roll-on-table jf/gaming/the-one-ring/distinctive-features-table) "”"))))
+       (let ((random-table/reporter
+               '(random-table/reporter/as-child-window kill-new message))
+              (random-table/report-formatter/function
+               #'random-table/report-formatter/only-roll))
+       (random-table/roll "Distinctive Features: ”{The One Ring > Distinctive Feature}” ”{The One Ring > Distinctive Feature}”"))))
     ("r f" "Feat die…"
      (lambda ()
        (interactive)
+       // TODO: Get this working with random-table.
        (insert
         (format "Feat Die: %s"
                 (call-interactively 'jf/gaming/the-one-ring/roll/feat-die)))))
     ("r F" "Fortune table"
      (lambda ()
        (interactive)
+       // TODO: Get this working with random-table.
        (insert (call-interactively 'jf/gaming/the-one-ring/roll/fortune-table))))
-    ("r j" "Journey event (Solo)"
-     (lambda ()
+     ("r j" "Journey event (Solo)"
+       (lambda ()
        (interactive)
-       (insert (call-interactively 'jf/gaming/the-one-ring/roll/solo-event-table))))
-    ("r l" "Lore table…"
-     (lambda ()
-       (interactive)
-       (insert (call-interactively 'jf/gaming/the-one-ring/roll/lore-table))))
-    ("r r" "Revelation Episode…"
-     (lambda ()
-       (interactive)
-       (insert (concat "Revelation Episode: "
-                       (jf/roll-on-table jf/gaming/the-one-ring/strider-mode/revelation-episode-table)))))
+       (let ((random-table/reporter
+               '(random-table/reporter/as-child-window kill-new message))
+              (random-table/report-formatter/function
+                #'random-table/report-formatter/only-roll))
+         (random-table/roll "Journey Event: {The One Ring > Journey Event}"))))
+     ("r l" "Lore table…"
+       (lambda ()
+         (interactive)
+         (let ((random-table/reporter
+                 #'random-table/reporter/as-child-window))
+           (random-table/roll "The One Ring > Lore"))))
+     ("r r" "Revelation Episode…"
+       (lambda ()
+         (interactive)
+         (let ((random-table/report-formatter/function
+                 #'random-table/report-formatter/only-roll))
+           (random-table/roll "Revelation: {The One Ring > Revelation Episode}"))))
     ("r s" "Skill check…"
      (lambda ()
        (interactive)
+       ;; I don't know how I'd shoe horn this into the random-table system.
        (insert (call-interactively 'jf/gaming/the-one-ring/roll/skill-check))))
     ("r t" "Telling table…"
      (lambda ()
        (interactive)
+       ;; TODO: get this working using the random table.
        (insert (call-interactively 'jf/gaming/the-one-ring/roll/telling-table))))
     ]
    ["Conditions"
