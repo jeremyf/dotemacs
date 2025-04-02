@@ -3554,7 +3554,8 @@ sort accordingly.")
           ("C-c r" . consult-recent-file)
           ;; ("C-c o" . consult-file-externally)
           ;; I've long favored Swiper mapped to c-s
-          ("C-s" . consult-line)
+          ("M-s s" . consult-line)
+          ("C-s" . isearch-forward)
           ;; Isearch integration
           ("M-s e" . consult-isearch-history)
           :map isearch-mode-map
@@ -7282,7 +7283,7 @@ Useful for Eglot."
   (add-to-list 'eglot-server-programs
     ;; By personal convention I'm having the most up to date version
     ;; added to the v0 directory
-    '(elixir-ts-mode "~/elixir-ls/v0/language_server.sh"))
+    '(elixir-ts-mode "~/elixir-ls/elixir-ls-v0.27.2/language_server.sh"))
   ;; https://github.com/emacs-lsp/lsp-mode/wiki/Install-Angular-Language-server
   ;; with modifications for homebrew
   (add-to-list 'eglot-server-programs
@@ -8267,6 +8268,7 @@ A page is marked `last' if rel=\"last\" appears in a <link> or <a> tag."
   :config
   (setq gh-notify-exclude-repo-limit
     '("samvera-labs/geomash"
+       "samvera-labs/bot_challenge_page"
        "samvera-labs/hyku_knapsack"
        "samvera/bulkrax"
        "samvera/maintenance"

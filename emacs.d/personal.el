@@ -129,22 +129,6 @@ Forward PREFIX to `mastodon-tl--show-tag-timeline'."
       (goto-char (1- position))
       (user-error "Missing :private: entry for date %S" entry-date))))
 
-(defun jf/default-browser (&optional name)
-  "Set the default browser based on the given NAME."
-  ;; brew install defaultbrowser
-  (interactive
-    (list
-      (completing-read
-        "Browser: "
-        (mapcar
-          (lambda (el)
-            (s-trim el))
-          (s-split "\n"
-            (s-trim
-              (shell-command-to-string "defaultbrowser")))))))
-  (shell-command
-    (format "defaultbrowser %s" (s-trim (s-replace "*" "" name)))))
-
 (defvar jf/epigraphs/cache
   nil
   "When non-nil, use this cache for picking a random epigraphs.")
