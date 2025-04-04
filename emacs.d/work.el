@@ -37,7 +37,7 @@
      entry (file+function
              jf/work/filename-for-mbos
              jf/work/position-at-start-of-mbo)
-     "TODO %^{Task} :tasks:\n:PROPERTIES:\n:ID: %(org-id-new)\n:END:\n%?"
+     "TODO %^{Task} :tasks:\n:PROPERTIES:\n:CUSTOM_ID: %(org-id-new)\n:END:\n%?"
      :empty-lines-before 1
      :empty-lines-after 1
      :clock-in t
@@ -55,7 +55,7 @@
      :clock-resume t))
 
 (defvar jf/work/org-map-entries-mbo-task-filter
-  "+LEVEL=3+mbos+tasks-journals+TODO!=\"DONE\""
+  "+LEVEL=4+mbos+tasks-journals+TODO!=\"DONE\""
   "The default filter for collecting MBO tasks.")
 
 (defun jf/work/position-in-mbo-journal-entry ()
@@ -63,7 +63,7 @@
 
 Included to allow the re-use of logic for different 3rd level tasks."
   (let ((jf/work/org-map-entries-mbo-task-filter
-          "+LEVEL=3+mbos+tasks+journals"))
+          "+LEVEL=4+mbos+tasks+journals"))
     (jf/work/position-at-end-of-mbo-task-entity)))
 
 (defun jf/work/position-at-end-of-mbo-task-entity ()
@@ -78,7 +78,7 @@ For inserting plain text."
                        (mbo
                          (car (org-element-lineage task)))
                        (quarter
-                         (cadr (org-element-lineage task))))
+                         (caddr (org-element-lineage task))))
                  (cons
                    (concat
                      (propertize
@@ -89,13 +89,13 @@ For inserting plain text."
                        'face 'consult-separator)
                      (propertize
                        (org-element-property :title mbo)
-                       'face 'org-level-2)
+                       'face 'org-level-3)
                      (propertize
                        " > "
                        'face 'consult-separator)
                      (propertize
                        (org-element-property :title task)
-                       'face 'org-level-3)
+                       'face 'org-level-4)
                      )
                    (org-element-property :contents-end task))))
              jf/work/org-map-entries-mbo-task-filter))
@@ -130,10 +130,10 @@ For inserting entity."
                        'face 'consult-separator)
                      (propertize
                        (org-element-property :title mbo)
-                       'face 'org-level-2)
+                       'face 'org-level-3)
                      )
                    (org-element-property :begin mbo))))
-             "+LEVEL=2+mbos-noexport+TODO!=\"DONE\""))
+             "+LEVEL=3+mbos-noexport+TODO!=\"DONE\""))
           (mbo
             (completing-read
               "MBO: " incomplete-mbos nil t)))
