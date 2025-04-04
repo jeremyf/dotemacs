@@ -4347,10 +4347,6 @@ literal then add a fuzzy search)."
       (jf/remove-diacritics-from
         (s-replace "=" "_" (s-replace "-" "_" str)))))
 
-  (defun jf/denote-link-ol-get-id ()
-    "Use `org-id-get' to find/create ID."
-    (org-id-get (point) 'create))
-
   (defun jf/denote-sluggify (args)
     (let ((type (car args))
            (text (cadr args)))
@@ -4378,8 +4374,6 @@ and use one of the extensions implied by `denote-file-type'."
       (denote-file-has-supported-extension-p filename)))
   (advice-add #'denote-sluggify
     :filter-args #'jf/denote-sluggify)
-  (advice-add #'denote-link-ol-get-id
-    :override #'jf/denote-link-ol-get-id)
   (advice-add #'denote-filename-is-note-p
     :override #'jf/denote-filename-is-note-p)
 
