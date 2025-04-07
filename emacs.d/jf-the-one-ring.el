@@ -149,16 +149,35 @@
      (61 . "Subtle") (62 . "Swift") (63 . "Tall") (64 . "True-hearted") (65 . "Wary") (66 . "Wilful")
      (67 . "Thieving") (68 . "Traitorous") (69 . "Troubled") (70 . "Tyrannical") (71 . "Uncaring") (72 . "Wavering")))
 
+(defun jf/gaming/the-one-ring/feat-die-with-favourability (_ &optional given-table)
+  (let* ((favourabilities
+           '(("Favoured" . (lambda (table)
+                             (nth (max (random (length table))
+                                    (random (length table)))
+                               table)))
+              ("Neutral" . (lambda (table)
+                             (seq-random-elt table)))
+              ("Ill-Favoured" . (lambda (table)
+                                  (nth (min (random (length table))
+                                         (random (length table)))
+                                    table))))))
+    (funcall
+      (alist-get (completing-read "Favourability: "
+                   favourabilities nil t)
+        favourabilities nil nil #'string=)
+      (or given-table jf/gaming/the-one-ring/feat-die))))
+
+
 (random-table/register :name "The One Ring > Journey Event"
-  ;; TODO: Add favourability roll.
+  :roller #'jf/gaming/the-one-ring/feat-die-with-favourability
   :data
-  '((0 . "\n\t- Terrible Misfortune :: if the roll fails, the target is Wounded.\n\t- Fatigue :: 3\n\t- Event :: {The One Ring > Journey Event > Terrible Misfortune}")
+  '(("⏿" . "\n\t- Terrible Misfortune :: if the roll fails, the target is Wounded.\n\t- Fatigue :: 3\n\t- Event :: {The One Ring > Journey Event > Terrible Misfortune}")
      (1 . "\n\t- Despair :: if the roll fails, gain 2 Shadow points (Dread).\n\t- Fatigue :: 2\n\t- Event :: {The One Ring > Journey Event > Despair}")
      ((2 . 3) . "\n\t- Ill-Choices :: if the roll fails, gain 1 Shadow point (Dread).\n\t- Fatigue :: 2\n\t- Event :: {The One Ring > Journey Event > Ill-Choices}")
      ((4 . 7) . "\n\t- Mishap :: if the roll fails, add 1 day to the length of the journey.\n\t- Fatigue :: 2\n\t- Event :: {The One Ring > Journey Event > Mishap}")
      ((8 . 9) . "\n\t- Short-cut :: if the roll succeeds, reduce the length of the journey by 1 day.\n\t- Fatigue :: 1\n\t- Event :: {The One Ring > Journey Event > Short-Cut}")
      (10 . "\n\t- Chance Meeting :: If the roll succeeds, no Fatigue is gained, and you may envision a favourable encounter.\n\t- Fatigue :: 1\n\t- Event :: {The One Ring > Journey Event > Chance Meeting}")
-     (11 . "\n\t- Joyful Sight :: If the roll succeeds, regain 1 Hope.\n\t- Fatigue :: 0\n\t- Event :: {The One Ring > Journey Event > Joyful Sight}")))
+     ("ᚠ" . "\n\t- ᚠ Joyful Sight :: If the roll succeeds, regain 1 Hope.\n\t- Fatigue :: 0\n\t- Event :: {The One Ring > Journey Event > Joyful Sight}")))
 
 (random-table/register :name "The One Ring > Journey Event > Terrible Misfortune"
   :private t
