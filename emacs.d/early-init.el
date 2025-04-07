@@ -1,7 +1,7 @@
 ;; Warning this `most-positive-fixnum' should not be the "resting" value.  After
 ;; we're done with initialization we want to set it to something more agreeable
 ;; (e.g. 20 MB or so)
-(setq gc-cons-threshold most-positive-fixnum
+(setopt gc-cons-threshold most-positive-fixnum
       gc-cons-percentage 0.6)
 
 ;; Same idea as above for the `file-name-handler-alist' and the
@@ -22,4 +22,4 @@
 
 ;; From straight.el, "Users of Emacs versions >= 27 will want to add
 ;; the following:"
-(setq package-enable-at-startup nil)
+(setopt package-enable-at-startup nil)

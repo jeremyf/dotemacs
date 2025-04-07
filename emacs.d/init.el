@@ -23,11 +23,11 @@
 (add-to-list 'load-path "~/git/dotemacs/emacs.d")
 
 ;; Let's just shunt those custom files into oblivion.
-(setq custom-file (make-temp-file "emacs-custom-"))
+(setopt custom-file (make-temp-file "emacs-custom-"))
 (load custom-file :noerror)
 
 ;; https://www.reddit.com/r/emacs/comments/mtb05k/emacs_init_time_decreased_65_after_i_realized_the/
-(setq straight-check-for-modifications
+(setopt straight-check-for-modifications
   '(check-on-save find-when-checking))
 
 ;; This preamble is part of straight-use-package My understanding, in
@@ -49,9 +49,9 @@
       (eval-print-last-sexp)))
   (load bootstrap-file nil 'nomessage))
 
-(setq straight-repository-branch "develop")
+(setopt straight-repository-branch "develop")
 (straight-use-package 'use-package)
-(setq use-package-always-ensure t)
+(setopt use-package-always-ensure t)
 
 ;; See https://github.com/radian-software/straight.el/issues/1146
 (use-package straight
@@ -67,9 +67,8 @@
 (use-package gcmh
   ;; *Gcmh* does garbage collection (GC) when the user is idle.
   :straight t
-  :init
-  (setq
-    gcmh-idle-delay 5
+  :custom
+  (gcmh-idle-delay 5
     gcmh-low-cons-threshold (* 1024 1024)
     gcmh-high-cons-threshold (* 16 1024 1024))
   :config (gcmh-mode)
@@ -151,15 +150,15 @@ The DWIM behaviour of this command is as follows:
   (set-keyboard-coding-system 'utf-8)
 
   ;; With 80 columns, I can always have two windows side-by-side.
-  (setq-default fill-column 80)
+  (setopt fill-column 80)
 
   ;; Doing a bit of configuration of my cursors.  The blinking provides
   ;; the queue and on 2024-05-18, I thought I'd give a try with the
   ;; hollow box.  Why?  It feels more retro.
-  (setq-default cursor-type 'bar)
+  (setopt cursor-type 'bar)
   (blink-cursor-mode t)
 
-  (setq
+  (setopt
     ;; Don't delink hardlinks
     backup-by-copying t
 
@@ -244,7 +243,7 @@ The DWIM behaviour of this command is as follows:
   ;; There’s inline documentation in most cases.  There might be little
   ;; bits worth teasing out but for the most part, you can move along
   ;; and reference this later.
-  (setq user-full-name "Jeremy Friesen"
+  (setopt user-full-name "Jeremy Friesen"
     user-mail-address "jeremy@jeremyfriesen.com")
 
   (defun jf/alist-prompt (prompt collection &rest args)
@@ -293,15 +292,15 @@ Else, evaluate the whole buffer."
     See `ns-alternate-modifier'."
     (interactive)
     (if ns-alternate-modifier
-      (progn (setq ns-alternate-modifier nil)
+      (progn (setopt ns-alternate-modifier nil)
         (message "Enabling OS X native Option modifier"))
-      (progn (setq ns-alternate-modifier 'meta)
+      (progn (setopt ns-alternate-modifier 'meta)
         (message "Disabling OX X native Option modifier"))))
 
   ;; Exposing one additional modifier key.  This opens up a significant
   ;; set of keys and no one (by default) binds to 'H-' while many bind
   ;; to 'C-c' or other 'C-' keys, leaving conflicts.
-  (setq ns-right-command-modifier 'hyper
+  (setopt ns-right-command-modifier 'hyper
     ns-right-alternate-modifier 'meta)
 
   (defun jf/yank-file-name-to-clipboard (arg)
@@ -402,8 +401,7 @@ work computers.")
   ;; navigate tasks that I'm working on over the course of a week or
   ;; more.
   :straight (:type built-in)
-  :config
-  (setq recentf-max-menu-items 50
+  :custom (recentf-max-menu-items 50
     recentf-max-saved-items 256)
   ;; Track recent
   (recentf-mode 1)
@@ -424,7 +422,7 @@ work computers.")
   :straight (:type built-in)
   :config
   (when (executable-find "rg")
-    (setq grep-program "rg")))
+    (setopt grep-program "rg")))
 
 (defun jf/sort-unique-lines (reverse beg end
                               &optional adjacent
@@ -448,13 +446,13 @@ work computers.")
   ;; I haven't used `ediff' much, but it's a good option for reviewing
   ;; file deltas.
   :straight (:type built-in)
-  :config
-  (setq ediff-keep-variants nil)
-  (setq ediff-make-buffers-readonly-at-startup nil)
-  (setq ediff-merge-revisions-with-ancestor t)
-  (setq ediff-show-clashes-only t)
-  (setq ediff-split-window-function 'split-window-horizontally)
-  (setq ediff-window-setup-function 'ediff-setup-windows-plain))
+  :custom
+  (ediff-keep-variants nil)
+  (ediff-make-buffers-readonly-at-startup nil)
+  (ediff-merge-revisions-with-ancestor t)
+  (ediff-show-clashes-only t)
+  (ediff-split-window-function 'split-window-horizontally)
+  (ediff-window-setup-function 'ediff-setup-windows-plain))
 
 (use-package dired
   ;; Oh `dired', you are a super powered directory editor.  For years I
@@ -464,16 +462,16 @@ work computers.")
   :straight (:type built-in)
   :custom (dired-listing-switches "-laGhpX")
   (dired-use-ls-dired t)
-  :config
   ;; When two dired buffers are open and you mark then rename a file, it
   ;; assume's you're moving the file from the one buffer to the other.
   ;; Very useful.
-  (setq dired-dwim-target t)
-  (setq dired-vc-rename-file t)
+  (dired-dwim-target t)
+  (dired-vc-rename-file t)
+  :config
   (with-eval-after-load 'dired
     ;; Bind dired-x-find-file.
-    (setq dired-x-hands-off-my-keys nil)
-    (require 'dired-x))
+    (require 'dired-x)
+    (setopt dired-x-hands-off-my-keys nil))
   :hook (dired-mode . dired-hide-details-mode))
 
 (use-package info
@@ -533,7 +531,7 @@ work computers.")
   :straight (lin :host gitlab :repo "protesilaos/lin")
   :init (global-hl-line-mode)
   :config (lin-global-mode 1)
-  (setq lin-face 'lin-blue))
+  :custom (lin-face 'lin-blue))
 
 (use-package pulsar
   ;; A little bit of visual feedback.  See
@@ -547,7 +545,8 @@ work computers.")
   (imenu-after-jump . pulsar-reveal-entry)
   :config
   (pulsar-global-mode 1)
-  (setq pulsar-face 'pulsar-magenta
+  :custom
+  (pulsar-face 'pulsar-magenta
     pulsar-delay 0.05)
   :bind (("C-c C-l" . jf/pulse)))
 
@@ -561,7 +560,7 @@ work computers.")
     (pulsar-pulse-line)))
 
 ;; Silence that bell by pulsing the line instead
-(setq ring-bell-function 'jf/pulse)
+(setopt ring-bell-function 'jf/pulse)
 
 (use-package rainbow-mode
   ;; When I toggle on Rainbow mode, it colorizes the text that is color
@@ -580,8 +579,8 @@ work computers.")
   ;; a recursed buffer.
   :straight t
   :demand t
-  :init
-  (setq enable-recursive-minibuffers t)
+  :custom
+  (enable-recursive-minibuffers t)
   :config
   (recursion-indicator-mode))
 
@@ -604,12 +603,11 @@ work computers.")
   ;; It can be helpful when pairing or presenting to have a log of your
   ;; key cominations.
   :straight t
-  :init
-  (setq keycast-mode-line-insert-after
-    'jf/mode-line-format/buffer-name-and-status)
-  (setq keycast-mode-line-remove-tail-elements nil)
-  (setq keycast-mode-line-window-predicate 'mode-line-window-selected-p)
-  (setq keycast-mode-line-format "%2s%k%2s(%c%R)"))
+  :custom
+  (keycast-mode-line-insert-after 'jf/mode-line-format/buffer-name-and-status
+  keycast-mode-line-remove-tail-elements nil
+  keycast-mode-line-window-predicate 'mode-line-window-selected-p
+  keycast-mode-line-format "%2s%k%2s(%c%R)"))
 
 (use-package emacs
   :straight (:type built-in)
@@ -849,8 +847,8 @@ work computers.")
   ;; it.  Narrow results from there.
   :bind (("C-j" . avy-goto-char-timer))
   :straight t
-  :config
-  (setq avy-dispatch-alist
+  :custom
+  (avy-dispatch-alist
     '((?. . jf/avy-action-embark)
        (?x . avy-action-kill-move)
        (?X . avy-action-kill-stay)
@@ -1042,7 +1040,7 @@ The ARGS are the rest of the ARGS passed to the ADVISED-FUNCTION."
   ;; selecting them.
   :straight t
   :config
-  (setq fontaine-presets
+  (setopt fontaine-presets
     ;; I'm naming the presets as "actions"; the mindset that I'm using
     ;; when wanting that font.
     '((smallest
@@ -1089,7 +1087,7 @@ The ARGS are the rest of the ARGS passed to the ADVISED-FUNCTION."
 
 (use-package nerd-icons
   :straight t
-  :config (setq nerd-icons-font-family "IntoneMono Nerd Font Mono"))
+  :custom (nerd-icons-font-family "IntoneMono Nerd Font Mono"))
 
 (use-package all-the-icons
   ;; It's nice to see icons as a quick visual helper.
@@ -1352,7 +1350,7 @@ This uses `split-window-right' but follows with the cursor."
                 (derived-mode . woman-mode)
                 "\\*\\(Man\\|woman\\).*"))
          (display-buffer-same-window))))
-  (setq confirm-kill-emacs #'yes-or-no-p)
+  (setopt confirm-kill-emacs #'yes-or-no-p)
   :config
   ;; For some reason, the C-x 5 0 keybindings don't set in my brain.
   (defun jf/bury-or-unbury-buffer (&optional prefix)
@@ -1405,7 +1403,7 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   (defvar jf/themes-plist '()
     "The named themes by pallette.")
   :config
-  (setq ef-themes-common-palette-overrides
+  (setopt ef-themes-common-palette-overrides
     '((bg-region bg-green-intense)
        (fg-region fg-main)))
   (setq ef-themes-headings ; read the manual's entry or the doc string
@@ -1418,7 +1416,7 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
        (6 . (rainbow 1.15))
        (t . (rainbow 1.1))))
   ;; When these are non-nil, the mode line uses the proportional font
-  (setq ef-themes-mixed-fonts t
+  (setopt ef-themes-mixed-fonts t
     ef-themes-variable-pitch-ui t)
 
   (defun jf/theme-custom-faces ()
@@ -1600,7 +1598,7 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   ;; the menu-like dispatch of `magit' functionality.
   :straight t
   ;; This exposes the --sign switch for git commit
-  :config (setq transient-default-level 5))
+  :config (setopt transient-default-level 5))
 
 (use-package ts
   ;; Timestamp library (not typescript)
@@ -1642,7 +1640,7 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   ;;   5.  Save (via ~C-x C-s~) or Cancel (via ~C-c C-k~).
   :after (embark-consult ripgrep)
   :config (setq wgrep-auto-save-buffer t)
-  (setq wgrep-change-readonly-file t)
+  (setopt wgrep-change-readonly-file t)
   :straight t
   :bind (:map grep-mode-map
           ("e" . wgrep-change-to-wgrep-mode)
@@ -1901,37 +1899,37 @@ future copy)."
   ;;               (setq slug (read-string "Manually set custom ID: " slug)))
   ;;             (org-entry-put (point) "CUSTOM_ID" slug)))
   ;;         "-CUSTOM_ID={.}")))
-  (setq org-closed-keep-when-no-todo t)
-  (setq org-agenda-include-inactive-timestamps t)
+  (setopt org-closed-keep-when-no-todo t)
+  (setopt org-agenda-include-inactive-timestamps t)
   (org-clock-persistence-insinuate)
-  (setq org-use-speed-commands t)
-  (setq org-agenda-clockreport-parameter-plist
+  (setopt org-use-speed-commands t)
+  (setopt org-agenda-clockreport-parameter-plist
     '(:link t :maxlevel 2 :stepskip0 t
        :fileskip0 t :filetitle t :tags t))
-  (setq org-outline-path-complete-in-steps nil)
-  (setq org-goto-interface #'outline-path-completion)
-  (setq org-time-stamp-rounding-minutes '(0 15))
-  (setq org-clock-rounding-minutes 15)
-  (setq org-link-frame-setup
+  (setopt org-outline-path-complete-in-steps nil)
+  (setopt org-goto-interface #'outline-path-completion)
+  (setopt org-time-stamp-rounding-minutes '(0 15))
+  (setopt org-clock-rounding-minutes 15)
+  (setopt org-link-frame-setup
     '((vm . vm-visit-folder-other-frame)
        (vm-imap . vm-visit-imap-folder-other-frame)
        (gnus . org-gnus-no-new-news)
        (file . find-file)
        (wl . wl-other-frame)))
-  (setq org-babel-ruby-wrapper-method
+  (setopt org-babel-ruby-wrapper-method
     (concat "results = self.instance_exec { %s } "
       "File.open('%s', 'w') { |f| "
       " f.write((results.class == String) ? results : results.inspect) "
       "}"))
 
-  (setq org-babel-ruby-pp-wrapper-method "require 'pp'
+  (setopt org-babel-ruby-pp-wrapper-method "require 'pp'
 results = self.instance_exec { %s }
 File.open('%s', 'w') { |f| $stdout = f; pp results }")
-  (setq org-clock-persist 'history)
-  (setq org-export-headline-levels 4)
+  (setopt org-clock-persist 'history)
+  (setopt org-export-headline-levels 4)
   ;; When I would load the agenda, I'd invariably type "l" to list the
   ;; entries.
-  (setq org-agenda-start-with-log-mode t)
+  (setopt org-agenda-start-with-log-mode 'only)
   ;; I continue to encounter issues with not properly generating table
   ;; of contents.  As such I used the following:
   ;;
@@ -1941,13 +1939,13 @@ File.open('%s', 'w') { |f| $stdout = f; pp results }")
   ;; often using are only available in Lua processing.
   ;;
   ;; See https://orgmode.org/worg/org-tutorials/org-latex-export.html#sec-12-3 for why 3
-  (setq org-latex-pdf-process
+  (setopt org-latex-pdf-process
     '("lualatex -shell-escape -interaction nonstopmode -output-directory %o %f"
        "lualatex -shell-escape -interaction nonstopmode -output-directory %o %f"
        "lualatex -shell-escape -interaction nonstopmode -output-directory %o %f"))
 
   ;; The 'minted backend provides souce code highlighting.
-  (setq
+  (setopt
     org-latex-src-block-backend 'minted
     org-latex-compiler "lualatex"
     org-latex-custom-lang-environments
@@ -1956,9 +1954,9 @@ File.open('%s', 'w') { |f| $stdout = f; pp results }")
                                 ("fontsize" "\\footnotesize")
                                 ("linenos" "")))
 
-  (setq
+  (setopt
     org-auto-align-tags nil
-    org-tags-column nil
+    org-tags-column 0
 
     org-confirm-babel-evaluate #'jf/org-confirm-babel-evaluate
     org-fontify-quote-and-verse-blocks t
@@ -2543,7 +2541,7 @@ function is ever added to that hook."
        ("\\subsubsection{%s}" . "\\subsubsection*{%s}")
        ("\\paragraph{%s}" . "\\paragraph*{%s}")
        ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
-  (setq org-latex-default-class "jf/article")
+  (setopt org-latex-default-class "jf/article")
 
   (use-package ox-gfm
     :straight t
@@ -2564,7 +2562,7 @@ function is ever added to that hook."
   ;; another.  This allows for document composition.
   (use-package org-transclusion
     :straight t
-    :init (setq org-transclusion-exclude-elements
+    :init (setopt org-transclusion-exclude-elements
             '(property-drawer keyword)))
 
   ;; I love the work of Daniel Mendler (https://github.com/minad).
@@ -3390,7 +3388,7 @@ sort accordingly.")
   ;; an `org-mode' file.
   :straight t
   :config
-  (setq org-web-tools-pandoc-sleep-time 1.5))
+  (setopt org-web-tools-pandoc-sleep-time 1.5))
 
 (defun jf/md-to-org-region (start end)
   "Convert region from markdown to org."
@@ -3423,13 +3421,13 @@ sort accordingly.")
   ;; Emacs 28: Hide commands in M-x which do not apply to the current
   ;; mode.  Corfu commands are hidden, since they are not supposed to be
   ;; used via M-x.
-  (setq read-extended-command-predicate
+  (setopt read-extended-command-predicate
     #'command-completion-default-include-p)
   ;; TAB cycle if there are only few candidates
-  (setq completion-cycle-threshold 3)
+  (setopt completion-cycle-threshold 3)
   ;; Enable indentation+completion using the TAB key.
   ;; `completion-at-point' is often bound to M-TAB.
-  (setq tab-always-indent 'complete)
+  (setopt tab-always-indent 'complete)
   ;; Add prompt indicator to `completing-read-multiple'.
   ;; Alternatively try `consult-completing-read-multiple'.
   (defun crm-indicator (args)
@@ -3444,7 +3442,7 @@ sort accordingly.")
       (cdr args)))
   (advice-add #'completing-read-multiple :filter-args #'crm-indicator)
   ;; Do not allow the cursor in the minibuffer prompt
-  (setq minibuffer-prompt-properties
+  (setopt minibuffer-prompt-properties
     '(read-only t cursor-intangible t face minibuffer-prompt))
   (add-hook 'minibuffer-setup-hook #'cursor-intangible-mode)
   :config
@@ -3566,12 +3564,12 @@ sort accordingly.")
   ;; The :init configuration is always executed (Not lazy)
   :init
   ;; Use Consult to select xref locations with preview
-  (setq xref-show-xrefs-function #'consult-xref
+  (setopt xref-show-xrefs-function #'consult-xref
     xref-show-definitions-function #'consult-xref)
   ;; Optionally configure the register formatting. This improves the
   ;; register preview for `consult-register', `consult-register-load',
   ;; `consult-register-store' and the Emacs built-ins.
-  (setq register-preview-delay 0.5
+  (setopt register-preview-delay 0.5
     register-preview-function #'consult-register-format)
   ;; Optionally tweak the register preview window.  This adds thin
   ;; lines, sorting and hides the mode line of the window.
@@ -4146,10 +4144,10 @@ literal then add a fuzzy search)."
   (define-key vertico-map (kbd "C-SPC")
     #'jf/vertico-restrict-to-matches)
   (vertico-mode 1)
-  (setq read-file-name-completion-ignore-case t
+  (setopt read-file-name-completion-ignore-case t
     read-buffer-completion-ignore-case t
     completion-ignore-case t)
-  (setq vertico-cycle t)
+  (setopt vertico-cycle t)
   :init
   ;; Type "C-3 return" and select the 3rd candidate in the list.
   (load "~/.emacs.d/straight/build/vertico/vertico-indexed.el" nil t)
@@ -5952,24 +5950,10 @@ The misspelled word is taken from OVERLAY.  WORD is the corrected word."
   ;; For remote code sharing/pairing
   :straight t)
 
-(use-package code-review
-  ;; Shall we review code via Magit?  I believe the answer must be yes.
-  :after magit
-  :straight (code-review
-              :type git
-              :host github
-              :repo "phelrine/code-review"
-              :branch "fix/closql-update")
-  :bind (:map forge-pullreq-mode-map
-          (("C-c r" . #'code-review-forge-pr-at-point)))
-  :config
-  (add-hook 'code-review-mode-hook #'emojify-mode)
-  (setq code-review-fill-column 80))
-
 (use-package treesit
   :straight (:type built-in)
   :init
-  (setq treesit-font-lock-level 4)
+  (setopt treesit-font-lock-level 4)
   :preface
   (defun jf/treesit/func-signature/dwim ()
     "Kill current function signature at point."
@@ -6604,7 +6588,7 @@ See https://github.com/chmouel/gotest-ts.el"
   ;; the the environment variable `WORKON_HOME` points to the right
   ;; place
   (venv-initialize-eshell)
-  (setq projectile-switch-project-action
+  (setopt projectile-switch-project-action
     '(lambda ()
        (venv-projectile-auto-workon)
        (projectile-find-file))))
@@ -7330,7 +7314,7 @@ Useful for Eglot."
   ;; Helps with rendering documentation
   ;; https://www.masteringemacs.org/article/seamlessly-merge-multiple-documentation-sources-eldoc
   :config
-  (setq eldoc-documentation-strategy
+  (setopt eldoc-documentation-strategy
     ;; 'eldoc-documentation-enthusiast))
     'eldoc-documentation-compose-eagerly)
   (add-to-list 'display-buffer-alist
@@ -7354,7 +7338,7 @@ Useful for Eglot."
   ;; Creating some outline modes.  Which has me thinking about an
   ;; outline mode for my agenda file.
   (defun jf/emacs-lisp-mode-configurator ()
-    (setq imenu-sort-function 'imenu--sort-by-name)
+    (setopt imenu-sort-function 'imenu--sort-by-name)
     (setq imenu-generic-expression
       '((nil "^;;[[:space:]]+-> \\(.*\\)$" 1)
          ("Variables"
@@ -7398,10 +7382,10 @@ Useful for Eglot."
     '("~/git/" "~/git/converge-cloud"))
   :bind ("s-." . projectile-toggle-between-implementation-and-test)
   :config
-  (setq projectile-create-missing-test-files t)
-  (setq projectile-git-command
+  (setopt projectile-create-missing-test-files t)
+  (setopt projectile-git-command
     "git ls-files -zco --exclude-standard -- ':!vendor/' ':!pkg/'")
-  (setq projectile-git-fd-args
+  (setopt projectile-git-fd-args
     "-H -0 -tf --strip-cwd-prefix -c never -E vendor/ -E pkg/ -E docs/ -E .git")
   (projectile-mode 1)
   ;; The default relevant `magit-list-repositories'
@@ -7414,7 +7398,7 @@ Useful for Eglot."
     (add-to-list 'jf/git-project-paths
       (cons dir 1)))
 
-  (setq magit-repository-directories jf/git-project-paths)
+  (setopt magit-repository-directories jf/git-project-paths)
   (projectile-register-project-type 'go
     '("go.mod")
     :project-file "go.mod"
@@ -8048,7 +8032,7 @@ Modification of `rmh-elfeed-org-convert-org-to-opml'."
   :straight t
   :custom (eww-auto-rename-buffer 'title)
   :config
-  (setq shr-cookie-policy nil)
+  (setopt shr-cookie-policy nil)
   (defun shr-tag-dfn (dom)
     (shr-generic dom))
 
@@ -8296,7 +8280,7 @@ A page is marked `last' if rel=\"last\" appears in a <link> or <a> tag."
   :config
   (defun jf/git-commit-mode-configurator ()
     "Prepare all of the commit buffer structure"
-    (setq fill-column git-commit-fill-column)
+    (setq-local fill-column git-commit-fill-column)
     (goto-char (point-min))
     (beginning-of-line-text)
     (when (looking-at-p "^$")
@@ -8362,7 +8346,7 @@ The `magit-gitdir' is the project's .git directory."
     (interactive (list (git-link--select-remote)))
     (git-link-homepage remote)
     (browse-url (car kill-ring)))
-  (setq git-link-use-commit t) ;; URL will be SHA instead of branch
+  (setopt git-link-use-commit t) ;; URL will be SHA instead of branch
   :straight t)
 
 (use-package git-messenger
@@ -9141,15 +9125,12 @@ Add the blog post to the given SERIES with the given KEYWORDS."
   :straight t
   :config (setq org-noter-doc-split-percentage '(0.67 . 0.33))
   (org-noter-enable-update-renames)
-  (setq org-noter-notes-search-path '())
+  (setopt org-noter-notes-search-path '())
   (dolist (path
-            '("~/Library/CloudStorage/ProtonDrive-jeremy@jeremyfriesen.com-folder/"
-               "~/Documents/"))
+            '("~/Documents/"))
     (when (f-dir-p path)
       ;; Add element to end of list.
-      (add-to-list 'org-noter-notes-search-path path t)))
-  (setq org-noter-default-notes-file-names
-    '("Notes.org")))
+      (add-to-list 'org-noter-notes-search-path path t))))
 
 (use-package avy-embark-collect
   :after (avy embark)
@@ -9164,7 +9145,7 @@ Add the blog post to the given SERIES with the given KEYWORDS."
   :straight (:type built-in)
   :hook (server-visit . server-visit-hook-custom-find)
   :config
-  (setq server-client-instructions nil)
+  (setopt server-client-instructions nil)
   (unless (server-running-p)
     (server-start))
 
@@ -9544,7 +9525,7 @@ When the `current-prefix-arg' is set always prompt for the project."
                    (format "Show SHR Images (%s)"
                      (if shr-inhibit-images " " "*")))
     (interactive)
-    (setq shr-inhibit-images (not shr-inhibit-images)))
+    (setopt shr-inhibit-images (not shr-inhibit-images)))
 
   (transient-define-suffix jf/jump-to/code-backlog ()
     "Jump to coding backlog"
@@ -9588,7 +9569,7 @@ When the `current-prefix-arg' is set always prompt for the project."
     :description "Update agenda files…"
     (interactive)
     (message "Updating `org-agenda-files'")
-    (setq org-agenda-files (jf/org-mode/agenda-files)))
+    (setopt org-agenda-files (jf/org-mode/agenda-files)))
   (add-hook 'after-init-hook #'jf/org-mode/agenda-files-update)
 
   (transient-define-suffix jf/enable-indent-for-tab-command ()
