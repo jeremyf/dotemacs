@@ -1642,11 +1642,15 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   :preface
   (defun jf/tmr-notification-notify (timer)
     "Dispatch a notification for TIMER."
-    (let ((title "TMR May Ring (Emacs tmr package)")
-           (description (tmr--timer-description timer)))
-      (ns-do-applescript (concat "display notification \""
-                           description
-                           "\" sound name \"Glass\""))))
+    (let ((title
+            "TMR May Ring (Emacs tmr package)")
+           (description
+             (tmr--timer-description timer)))
+      (if (eq system-type 'darwin)
+        (ns-do-applescript (concat "display notification \""
+                             description
+                             "\" sound name \"Glass\""))
+        (user-error "Unable to send tmr notification for OS"))))
   :custom (tmr-notify-function #'jf/notifications-notify)
   (tmr-timer-completed-functions
     (list #'tmr-print-message-for-completed-timer
@@ -1913,14 +1917,16 @@ future copy)."
         (kill-buffer buf)
         ;; Paste into TextEdit
         (when (car prefix)
-          (ns-do-applescript
-            (concat
-              "tell application \"TextEdit\"\n"
-              "\tactivate\n"
-              "\tset myrtf to the clipboard as «class RTF »\n"
-              "\tset mydoc to make new document\n"
-              "\tset text of mydoc to myrtf\n"
-              "end tell")))))))
+          (if (eq (system-type 'darwin))
+            (ns-do-applescript
+              (concat
+                "tell application \"TextEdit\"\n"
+                "\tactivate\n"
+                "\tset myrtf to the clipboard as «class RTF »\n"
+                "\tset mydoc to make new document\n"
+                "\tset text of mydoc to myrtf\n"
+                "end tell"))
+            (user-error "Unable to open RTF editor on OS"))))))
 
 (use-package org
   ;; Begin Org Mode (all it's glory)
@@ -9686,10 +9692,6 @@ This encodes the logic for creating a project."
          :if-nil typopunct-mode)
        ("m t" "Typopunct (*)" typopunct-mode
          :if-non-nil typopunct-mode)
-       ("m o" "MacOS Native Option ( )" jf/toggle-osx-alternate-modifier
-         :if-non-nil ns-right-alternate-modifier)
-       ("m o" "MacOS Native Option (*)" jf/toggle-osx-alternate-modifier
-         :if-nil ns-right-alternate-modifier)
        ("m i" jf/shr/toggle-images)
        ;; I find that in all of my shuffling that sometimes the TAB for
        ;; command gets lost.  This is my "Yup that happens and here's
