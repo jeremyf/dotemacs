@@ -331,6 +331,7 @@ Else, evaluate the whole buffer."
 
 (when (eq system-type 'darwin)
   (progn
+    (load "~/git/dotemacs/emacs.d/grab-mac-link-revised.el")
     ;; The following function facilitates a best of both worlds.  By
     ;; default, I want Option to be Meta (e.g. \"M-\") in Emacs.
     ;; However, I can toggle that setting.  That way if I need an umlaut
@@ -359,6 +360,49 @@ Else, evaluate the whole buffer."
       ns-function-modifier 'alt
       ns-right-command-modifier 'hyper
       ns-right-alternate-modifier 'meta)))
+
+(defmacro jf/grab-browser-links (browser)
+  (let ((bmk-fn
+          (intern (format "jf/menu--bookmark-%s" browser)))
+         (bmk-doc
+           (format "Create `bookmark' for current %s page." browser))
+         (ref-fn
+           (intern (format "jf/menu--org-capture-%s" browser)))
+         (ref-doc
+           (format "Create an `denote' entry from %s page." browser))
+         (grabber-fn
+           (intern (format "grab-mac-link-%s-1" browser))))
+    `(progn
+       (defun ,bmk-fn ()
+         ,bmk-doc
+         (interactive)
+         (if (eq system-type 'darwin)
+           (progn
+             (require 'grab-mac-link)
+             (let* ((url-and-title
+                      (,grabber-fn))
+                     (title
+                       (read-string
+                         (concat "URL: " (car url-and-title) "\nTitle: ")
+                         (cadr url-and-title))))
+               (jf/bookmark-url (car url-and-title) title)))
+           (user-error "My emacs for %s OS cannot yet bookmark %s page"
+             system-type
+             ,browser)))
+       (defun ,ref-fn ()
+         ,ref-doc
+         (interactive)
+         (if (eq system-type 'darwin)
+           (progn
+             (require 'grab-mac-link)
+             (jf/denote/capture-reference :url (car (,grabber-fn))))
+           (user-error "My emacs for %s OS cannot yet bookmark %s page"
+             system-type
+             ,browser))))))
+
+(jf/grab-browser-links "safari")
+(jf/grab-browser-links "firefox")
+(jf/grab-browser-links "chrome")
 
 (defvar jf/denote-base-dir
   (file-truename
@@ -3906,8 +3950,6 @@ Useful if you want a more robust view into the recommend candidates."
           ("C-c p s" . cape-symbol)
           ("C-c p w" . cape-dict)))
 
-(load "~/git/dotemacs/emacs.d/grab-mac-link-revised.el")
-
 (use-package helpful
   ;; Help me lookup definitions and details.
   :init
@@ -5688,24 +5730,6 @@ When USE_HUGO_SHORTCODE is given use glossary based exporting."
                 (user-error "Expected denote-id %s to have a %s acceptable property" denote-id new-type)))
             (user-error "Current element is of type %s; it must be one of the following: %s" type types)))
         (user-error "Current element must be of type 'link; it is %S" (car element)))))
-
-  (defun jf/menu--org-capture-firefox ()
-    "Create an `denote' entry from Firefox page."
-    (interactive)
-    (require 'grab-mac-link)
-    (jf/denote/capture-reference :url (car (grab-mac-link-firefox-1))))
-
-  (defun jf/menu--org-capture-chrome ()
-    "Create an `denote' entry from Chrome page."
-    (interactive)
-    (require 'grab-mac-link)
-    (jf/denote/capture-reference :url (car (grab-mac-link-chrome-1))))
-
-  (defun jf/menu--org-capture-safari ()
-    "Create an `denote' entry from Safari page."
-    (interactive)
-    (require 'grab-mac-link)
-    (jf/denote/capture-reference :url (car (grab-mac-link-safari-1))))
 
   (defun jf/capture/denote/from/eww-data ()
     "Create an `denote' entry from `eww' data."
@@ -7496,44 +7520,7 @@ Useful for Eglot."
 
   ;; In the bookmark list page, identify the type as BROWSE for those
   ;; captured by `jf/bookmark-url'
-  (put 'jf/browse-url-bookmark-jump 'bookmark-handler-type "BROWSE")
-
-  ;; TODO: Create a macro and expand to what I already have.
-  (defun jf/menu--bookmark-safari ()
-    "Create `bookmark' for current Safari page."
-    (interactive)
-    (require 'grab-mac-link)
-    (let* ((url-and-title
-             (grab-mac-link-safari-1))
-            (title
-              (read-string
-                (concat "URL: " (car url-and-title) "\nTitle: ")
-                (cadr url-and-title))))
-      (jf/bookmark-url (car url-and-title) title)))
-
-  (defun jf/menu--bookmark-firefox ()
-    "Create `bookmark' for current Firefox page."
-    (interactive)
-    (require 'grab-mac-link)
-    (let* ((url-and-title
-             (grab-mac-link-firefox-1))
-            (title
-              (read-string
-                (concat "URL: " (car url-and-title) "\nTitle: ")
-                (cadr url-and-title))))
-      (jf/bookmark-url (car url-and-title) title)))
-
-  (defun jf/menu--bookmark-chrome ()
-    "Create `bookmark' for current Chrome page."
-    (interactive)
-    (require 'grab-mac-link)
-    (let* ((url-and-title
-             (grab-mac-link-chrome-1))
-            (title
-              (read-string
-                (concat "URL: " (car url-and-title) "\nTitle: ")
-                (cadr url-and-title))))
-      (jf/bookmark-url (car url-and-title) title))))
+  (put 'jf/browse-url-bookmark-jump 'bookmark-handler-type "BROWSE"))
 
 ;; (use-package activities
 ;;   ;; https://takeonrules.com/2024/05/18/a-quiet-morning-of-practice-to-address-an-observed-personal-computering-workflow-snag/
