@@ -707,11 +707,27 @@ work computers.")
         'help-echo
                (concat "mouse-1:  #'jf/toggle-osx-alternate-modifier"))))
 
+  (defvar jf/mode-line-format/major-mode-map
+    (let ((map
+            (make-sparse-keymap)))
+      (define-key map [mode-line down-mouse-1]
+        #'jf/toggle-typopunct-mode)
+      map)
+    "Keymap to display `typopunct-mode'.")
   (defun jf/mode-line-format/major-mode-name ()
-    (propertize (capitalize
-                  (string-replace "-mode" "" (symbol-name major-mode)))
-      'face (if (mode-line-window-selected-p)
-              'mode-line 'mode-line-inactive)))
+    (let ((fmt
+            (if typopunct-mode "“%s”" "%s")))
+      (propertize
+        (format fmt
+          (capitalize
+            (string-replace "-mode" "" (symbol-name major-mode))))
+        'face
+        (if (mode-line-window-selected-p)
+          'mode-line 'mode-line-inactive)
+        'local-map
+        jf/mode-line-format/major-mode-map
+        'help-echo
+        (concat "mouse-1: #'jf/toggle-typopunct-mode"))))
 
   (defvar-local jf/mode-line-format/major-mode
     '(:eval
@@ -1173,6 +1189,13 @@ The ARGS are the rest of the ARGS passed to the ADVISED-FUNCTION."
   :custom (typopunct-buffer-language 'english)
   :config
   (add-hook 'org-mode-hook 'jf/typopunct-init)
+  (defun jf/toggle-typopunct-mode ()
+    "Toggle `typopunct-mode'."
+    (interactive)
+    (if typopunct-mode
+      (typopunct-mode -1)
+      (typopunct-mode 1))
+    (force-mode-line-update))
   (defun jf/typopunct-init ()
     (require 'typopunct)
     (typopunct-change-language 'english)
@@ -9687,11 +9710,6 @@ This encodes the logic for creating a project."
         ("B x" "Export to TakeOnRules…" jf/export-org-to-tor
           :if jf/blog-entry?)]]
     [["Modes"
-       ;; I could write functions for these, but this is concise enough
-       ("m t" "Typopunct ( )" typopunct-mode
-         :if-nil typopunct-mode)
-       ("m t" "Typopunct (*)" typopunct-mode
-         :if-non-nil typopunct-mode)
        ("m i" jf/shr/toggle-images)
        ;; I find that in all of my shuffling that sometimes the TAB for
        ;; command gets lost.  This is my "Yup that happens and here's
