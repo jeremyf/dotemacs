@@ -277,32 +277,6 @@ Else, evaluate the whole buffer."
       (kill-region (region-beginning) (region-end))
       (kill-line arg)))
 
-  ;; The following function facilitates a best of both worlds.  By
-  ;; default, I want Option to be Meta (e.g. \"M-\") in Emacs.
-  ;; However, I can toggle that setting.  That way if I need an umlaut
-  ;; (e.g., \"¨\"), I can use MacOS’s native functions to type \"⌥\" +
-  ;; \"u\".
-  ;;
-  ;; I like having MacOS’s native Option (e.g. =⌥=) modifier
-  ;; available.  But using that default in Emacs would be a
-  ;; significant hinderance.
-  (defun jf/toggle-osx-alternate-modifier ()
-    "Toggle native OS-X Option modifier setting.
-
-    See `ns-alternate-modifier'."
-    (interactive)
-    (if ns-alternate-modifier
-      (progn (setopt ns-alternate-modifier nil)
-        (message "Enabling OS X native Option modifier"))
-      (progn (setopt ns-alternate-modifier 'meta)
-        (message "Disabling OX X native Option modifier"))))
-
-  ;; Exposing one additional modifier key.  This opens up a significant
-  ;; set of keys and no one (by default) binds to 'H-' while many bind
-  ;; to 'C-c' or other 'C-' keys, leaving conflicts.
-  (setopt ns-right-command-modifier 'hyper
-    ns-right-alternate-modifier 'meta)
-
   (defun jf/yank-file-name-to-clipboard (arg)
     "Nab, I mean copy, the current buffer file name to the clipboard.
 
@@ -354,6 +328,37 @@ Else, evaluate the whole buffer."
         (message
           "Copied buffer file name '%s' to the clipboard."
           filename)))))
+
+(when (eq system-type 'darwin)
+  (progn
+    ;; The following function facilitates a best of both worlds.  By
+    ;; default, I want Option to be Meta (e.g. \"M-\") in Emacs.
+    ;; However, I can toggle that setting.  That way if I need an umlaut
+    ;; (e.g., \"¨\"), I can use MacOS’s native functions to type \"⌥\" +
+    ;; \"u\".
+    ;;
+    ;; I like having MacOS’s native Option (e.g. =⌥=) modifier
+    ;; available.  But using that default in Emacs would be a
+    ;; significant hinderance.
+    (defun jf/toggle-osx-alternate-modifier ()
+      "Toggle native OS-X Option modifier setting.
+
+    See `ns-alternate-modifier'."
+      (interactive)
+      (if (eq ns-right-alternate-modifier 'meta)
+        (progn (setopt ns-right-alternate-modifier nil)
+          (message "Enabling OS X native Option modifier"))
+        (progn (setopt ns-right-alternate-modifier 'meta)
+          (message "Disabling OX X native Option modifier")))
+      (force-mode-line-update))
+
+    ;; Exposing one additional modifier key.  This opens up a significant
+    ;; set of keys and no one (by default) binds to 'H-' while many bind
+    ;; to 'C-c' or other 'C-' keys, leaving conflicts.
+    (setopt
+      ns-function-modifier 'alt
+      ns-right-command-modifier 'hyper
+      ns-right-alternate-modifier 'meta)))
 
 (defvar jf/denote-base-dir
   (file-truename
@@ -619,6 +624,13 @@ work computers.")
          (concat
            (propertize " 𝕄 " 'face 'mode-line-highlight) " "))))
 
+  (defvar jf/mode-line-format/major-mode-indicator-map
+    (let ((map
+            (make-sparse-keymap)))
+      (define-key map [mode-line down-mouse-1] #'jf/toggle-osx-alternate-modifier)
+      map)
+    "Keymap to display when MacOS native keys are on.")
+
   (defvar-local jf/mode-line-format/buffer-name-and-status
     '(:eval
        (let ((name
@@ -643,8 +655,13 @@ work computers.")
       (propertize indicator
         'face
         (if (mode-line-window-selected-p)
-          'jf/mode-line-format/face-shadow
-          'mode-line-inactive))))
+          (if (eq ns-right-alternate-modifier nil)
+                 'jf/mode-line-format/face-shadow-highlight
+                 'jf/mode-line-format/face-shadow)
+          'mode-line-inactive)
+        'local-map jf/mode-line-format/major-mode-indicator-map
+        'help-echo
+               (concat "mouse-1:  #'jf/toggle-osx-alternate-modifier"))))
 
   (defun jf/mode-line-format/major-mode-name ()
     (propertize (capitalize
@@ -760,6 +777,10 @@ work computers.")
     '((t :foreground "#d0ffe0" :inherit shadow))
     "A face for symbols in the `mode-line'.")
 
+  (defface jf/mode-line-format/face-shadow-highlight
+    '((t :foreground "#d0ffe0" :inherit shadow))
+    "A face for highlighting symbols in the `mode-line'.")
+
   (defun jf/mode-line-format/vc-details (file branch)
     "Return the FILE and BRANCH."
     (propertize
@@ -832,7 +853,6 @@ work computers.")
        jf/mode-line-format/flymake " "
        jf/mode-line-format/eglot
        jf/mode-line-format/which-function
-       ;; jf/mode-line-format/misc-info
        )))
 
 (use-package ace-window
@@ -1481,6 +1501,8 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
            ((,c :foreground ,err)))
         `(jf/mode-line-format/face-shadow
            ((,c :foreground ,fg-mode-line)))
+        `(jf/mode-line-format/face-shadow-highlight
+           ((,c :foreground ,fg-mode-line :background ,bg-hover)))
         `(jf/tabs-face
            ((,c :underline (:style wave :color ,bg-blue-intense))))
         `(jf/org-faces-date
@@ -9678,9 +9700,9 @@ This encodes the logic for creating a project."
        ("m t" "Typopunct (*)" typopunct-mode
          :if-non-nil typopunct-mode)
        ("m o" "MacOS Native Option ( )" jf/toggle-osx-alternate-modifier
-         :if-non-nil ns-alternate-modifier)
+         :if-non-nil ns-right-alternate-modifier)
        ("m o" "MacOS Native Option (*)" jf/toggle-osx-alternate-modifier
-         :if-nil ns-alternate-modifier)
+         :if-nil ns-right-alternate-modifier)
        ("m i" jf/shr/toggle-images)
        ;; I find that in all of my shuffling that sometimes the TAB for
        ;; command gets lost.  This is my "Yup that happens and here's
