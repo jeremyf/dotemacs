@@ -29,17 +29,16 @@
 (use-package tp
   :straight (:host codeberg :repo "martianh/tp.el")
   :when (file-exists-p (expand-file-name "~/.my-computer")))
+
 (use-package mastodon
   ;; :straight (:host codeberg :repo "martianh/mastodon.el")
   :when (file-exists-p (expand-file-name "~/.my-computer"))
   :custom
   (mastodon-tl--timeline-posts-count "50")
-  :preface
-  (setq
+  :config
+  (setopt
     mastodon-instance-url "https://dice.camp"
     mastodon-active-user "takeonrules")
-
-  :config
   (defun jf/mastodon-tl--reading (&optional prefix)
     "Read my reading timeline.
 

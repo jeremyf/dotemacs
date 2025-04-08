@@ -1949,7 +1949,7 @@ future copy)."
                 "\tset mydoc to make new document\n"
                 "\tset text of mydoc to myrtf\n"
                 "end tell"))
-            (user-error "Unable to open RTF editor on OS"))))))
+            (user-error "Unable to open RTF editor on OS")))))))
 
 (use-package org
   ;; Begin Org Mode (all it's glory)
@@ -3379,10 +3379,6 @@ Narrow focus to a tag, then a named element."
 (defvar jf/filename/shopping-list
   "~/SyncThings/source/books-to-get-from-bibliography.txt"
   "Dude, these are the books I'm curious about.")
-
-(defvar jf/filename/bibliography
-  (f-join jf/denote-base-dir "private/20241124T080648--bibliography__projects.org")
-  "Dude, you can put your books in here.")
 
 (defvar jf/filename/epigraphy-takeonrules
   "~/git/takeonrules.source/content/site-map/epigraphs/index.md"
@@ -5886,6 +5882,10 @@ with the series."
         (setq denote-last-path
           (and (denote-file-is-note-p  fname) fname))))))
 (require 'denote)
+
+(defvar jf/filename/bibliography-takeonrules
+  (denote-get-path-by-id "20241124T080648")
+  "Dude, you can put your books in here.")
 
 (cl-defun jf/denote? (&key (buffer (current-buffer)))
   "Return non-nil when BUFFER is for `denote'."
