@@ -2415,9 +2415,6 @@ Note, there's an assumption that a file of the given name will
 exist on each machine, but its contents will be different based
 on the needs/constraints of the locality.")
 
-  (defconst jf/lore24-filename
-    (f-join jf/denote-base-dir "indices/20231225T130631--lore24-in-the-shadows-of-mont-brun__Lore24_campaigns_rpgs.org"))
-
   (defvar jf/link-to-project nil)
 
   (defun jf/project-as-tag ()
@@ -9005,67 +9002,6 @@ If `consult--read' is defined, use that.  Otherwise fallback to
                 (jf/matches-in-buffer "^#+ +.*$"))))
       (kill-new (jf/tor-convert-text-to-slug
                   (replace-regexp-in-string "^#+ +" "" heading))))
-
-    (cl-defun jf/create-lore-24-blog-entry (&key
-                                             (series "in-the-shadows-of-mont-brun")
-                                             (keywords '("lore24" "rpgs")))
-      "Create #Lore24 entry from current node.
-
-Add the blog post to the given SERIES with the given KEYWORDS."
-      (interactive)
-      ;; Guard against running this on non- `jf/lore24-filename'.
-      (unless (string=
-                (jf/filename/tilde-based
-                  (buffer-file-name (current-buffer)))
-                jf/lore24-filename)
-        (user-error "You must be in %S" jf/lore24-filename))
-      ;; Now that we know we're on the right buffer...
-      (let* (
-              ;; Get the node of the current entry I'm working from
-              (node-id (org-id-get-create))
-
-              ;; Prompt for a name.
-              (name (read-string "#Lore24 Blog Post Name: "))
-
-              ;; Determine the last blog post created.
-              (previous-post-basename
-                (s-trim (shell-command-to-string
-                          (concat
-                            "cd " (f-join jf/denote-base-dir "blog-posts") "; "
-                            "find *--lore24-entry-* | sort | "
-                            "tail -1"))))
-
-              ;; From the last blog post, derive the next index value.
-              (next-index (format "%03d"
-                            (+ 1
-                              (string-to-number
-                                (progn
-                                  (string-match
-                                    "--lore24-entry-\\([[:digit:]]+\\)-"
-                                    previous-post-basename)
-                                  (match-string-no-properties 1
-                                    previous-post-basename))))))
-
-              ;; We must name the post.  "Lore 24 - Entry NNN: Name"
-              (title (format "Lore24 - Entry %s: %s" next-index name ))
-
-              ;; The body of the blog post; by default I leverage
-              ;; `org-transclusion'.
-              (template
-                (format
-                  (concat "#+HUGO_CUSTOM_FRONT_MATTER: :series %s"
-                    "\n\n#+TRANSCLUDE: [[id:%s]] :only-contents "
-                    ":exclude-elements \"drawer keyword headline\"")
-                  series
-                  node-id))
-              ;; This will be a blog post.
-              (directory (f-join (denote-directory) "blog-posts"))
-
-              ;; Series are added as signature.
-              (signature (denote-sluggify-signature series)))
-
-        ;; Create the blog post
-        (denote title keywords 'org directory nil template signature)))
 
     (defun jf/path-to-table-number (table-number)
       (let* ((table-filename
