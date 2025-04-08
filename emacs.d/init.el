@@ -3858,8 +3858,6 @@ We want files to have the 'projects' `denote' keyword."
       ;;   (setq projects (cons file projects)))
       ;; (when (file-exists-p jf/agenda-filename/scientist)
       ;;   (setq projects (cons jf/agenda-filename/scientist projects)))
-      (when (file-exists-p jf/agenda-filename/local)
-        (setq projects (cons jf/agenda-filename/local projects)))
       projects))
 
   ;; (defun jf/journal/list-current-journals ()
@@ -4020,14 +4018,6 @@ Each member's `car' is title and `cdr' is `org-mode' element."
     "The file where I'm capturing content.
 
 By default this is my example code project.")
-
-  (defvar jf/agenda-filename/local
-    (denote-get-path-by-id "20200501T120000")
-    "A local (to the machine) agenda.
-
-Note, there's an assumption that a file of the given name will
-exist on each machine, but its contents will be different based
-on the needs/constraints of the locality.")
 
   (defvar jf/link-to-project nil)
 
@@ -4311,71 +4301,6 @@ function is ever added to that hook."
           "+LEVEL=4+projects" 'agenda))
       #'string<)))
 
-;; When I jump to a new task for the day, I want to position that task
-;; within the prompted project.  Inspiration from
-;; https://gist.github.com/webbj74/0ab881ed0ce61153a82e.
-(cl-defun jf/org-mode/agenda-find-project-node (
-                                                 &key
-                                                 (tag "projects")
-                                                 (project (jf/org-mode/agenda-project-prompt))
-                                                 ;; The `file+olp+datetree` directive creates a headline like
-                                                 ;; “2022-09-03 Saturday”.
-                                                 (within_headline (format-time-string "%Y-%m-%d %A")))
-  "Position `point' at the end of the given PROJECT WITHIN_HEADLINE.
-
-And use the given TAG."
-  ;; We need to be using the right agenda file.
-  (with-current-buffer (find-file-noselect
-                         jf/agenda-filename/local)
-    (let ((existing-position
-            (org-element-map
-              (org-element-parse-buffer)
-              'headline
-              ;; Finds the end position of:
-              ;; - a level 4 headline
-              ;; - that is tagged as a :projects:
-              ;; - is titled as the given project
-              ;; - and is within the given headline
-              (lambda (hl)
-                (and (=(org-element-property :level hl) 4)
-                  ;; I can't use the :title attribute as it is a more
-                  ;; complicated structure; this gets me the raw
-                  ;; string.
-                  (string= project
-                    (plist-get (cadr hl) :raw-value))
-                  (member tag
-                    (org-element-property :tags hl))
-                  ;; The element must have an ancestor with a headline
-                  ;; of today
-                  (string= within_headline
-                    (plist-get
-                      ;; I want the raw title, no styling nor tags
-                      (cadr
-                        (car
-                          (org-element-lineage hl)))
-                      :raw-value))
-                  (org-element-property :end hl)))
-              nil t)))
-      (if existing-position
-        ;; Go to the existing position for this project
-        (goto-char existing-position)
-        (progn
-          ;; Go to the end of the file and append the project to the
-          ;; end
-          (goto-char (point-max))
-          ;; Ensure we have a headline for the given day
-          (unless (org-element-map
-                    (org-element-parse-buffer)
-                    'headline
-                    (lambda (hl)
-                      (string= within_headline
-                        (plist-get
-                          ;; I want the raw title, no styling nor tags
-                          (cadr (car (org-element-lineage hl)))
-                          :raw-value))))
-            (insert (concat "\n\n*** "within_headline)))
-          (insert (concat "\n\n**** " project " :" tag ":\n\n")))))))
-
 (cl-defun jf/org-mode/agenda-find-blocked-node ()
   "Add a blocker node to today."
   (jf/org-mode/agenda-find-project-node :tag "blockers"
@@ -4391,58 +4316,6 @@ And use the given TAG."
                (format-time-string
                  "%Y-%m-%d"))))
 
-;; Takes my notes for the day and formats them for a summary report.
-(defun jf/org-mode/agenda-to-stand-up-summary (parg)
-  "Copy to the kill ring the day's time-tracked summary.
-
-When given PARG, prompt for the day of interest.
-
-NOTE: This follows the convention that projects are on headline 4 and
-tasks within projects are headline 5."
-  (interactive "P")
-  (with-current-buffer (find-file-noselect
-                         jf/agenda-filename/local)
-    (save-excursion
-      (let ((within_headline
-              ;; Use the CCYY-MM-DD Dayname format and prompt for a
-              ;; date if PREFIX-ARG given.
-              (format-time-string "%Y-%m-%d %A"
-                (when (car parg)
-                  (org-read-date nil t nil "Pick a day:" )))))
-        (kill-new
-          (concat "*Summary of " within_headline "*\n\n"
-            (s-trim
-              (s-join
-                "\n"
-                (org-element-map
-                  (org-element-parse-buffer)
-                  'headline
-                  (lambda (hl)
-                    (when (member
-                            within_headline
-                            (mapcar
-                              (lambda (ancestor)
-                                (plist-get (cadr ancestor)
-                                  :raw-value))
-                              (org-element-lineage hl)))
-                      (pcase (org-element-property :level hl)
-                        (4
-                          (concat "\n"
-                            (plist-get (cadr hl) :raw-value)))
-                        (5
-                          (if (and
-                                (member "mergerequest"
-                                  (org-element-property :tags hl))
-                                (eq 'done
-                                  (org-element-property
-                                    :todo-type hl)))
-                            nil
-                            (concat "- "
-                              (plist-get (cadr hl) :raw-value))))
-                        (_ nil)))))))))
-        (jf/create-scratch-buffer)
-        (yank)))))
-
 (defun jf/org-mode/narrow-to-date (date)
   "Narrow agenda to given DATE agenda subtree."
   (interactive (list (if current-prefix-arg
@@ -4454,21 +4327,6 @@ tasks within projects are headline 5."
   (end-of-line)
   (org-narrow-to-subtree)
   (message "Narrowing to %s agenda" date))
-
-;; I’m responsible for tracking my work time.  I want a way to quickly
-;; see what that is for the current week.
-;;
-;; A utility function providing an overrview
-(cl-defun jf/org-mode/weekly-report ()
-  "Jump to my weekly time tracker.
-
-Useful for providing me with an overview of my total tracked time
-for the week."
-  (interactive)
-  (find-file jf/agenda-filename/local)
-  (require 'pulsar)
-  (pulsar-pulse-line)
-  (org-clock-report 4))
 
 ;; Another task at end of month is to transcribing my agenda’s
 ;; timesheet to entries in our time tracking software.  From the day’s
@@ -7508,7 +7366,6 @@ Useful for Eglot."
   (keymap-global-set "H-c a" #'casual-avy-tmenu)
   (keymap-global-set "H-c e" #'casual-editkit-main-tmenu))
 
-
 (use-package bookmark
   :straight (:type built-in)
   :config
@@ -9488,12 +9345,6 @@ When the `current-prefix-arg' is set always prompt for the project."
   ;; Declaration for personal menu
   :straight (:type built-in)
   :config
-  (transient-define-suffix jf/jump-to/agenda-local ()
-    "Jump to local agenda"
-    :description "Agenda (Local)"
-    (interactive)
-    (find-file jf/agenda-filename/local))
-
   (transient-define-suffix jf/shr/toggle-images ()
     "Toggle showing or hiding images"
     :description (lambda ()
@@ -9612,7 +9463,6 @@ This encodes the logic for creating a project."
     ;; Todo, can I get this section into a function so I can duplicate
     ;; it in the jf/menu--tor?
     [["Jump to"
-       ("j a" jf/jump-to/agenda-local)
        ;; ("j c" "Capture Backlog" jf/jump-to/code-backlog)
        ("j d" "Denote File" jf/jump_to_corresponding_denote_file
          :if-derived markdown-mode)
