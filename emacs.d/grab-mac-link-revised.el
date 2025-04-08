@@ -18,7 +18,7 @@
   ;; Grab a link from a variety of MacOS applications.
   :straight (:host github :repo "stevenbagley/grab-mac-link.el")
   ;; Ensuring we load these, as I'll need them later.
-  :commands (grab-mac-link-safari-1 grab-mac-link-firefox-1 grab-mac-link-chrome-1 grab-mac-link-split)
+  :commands (grab-mac-link-safari-1 grab-mac-link-chrome-1 grab-mac-link-split)
   :config
   ;; A replacement function for existing grab-mac-link-make-html-link
   (defun jf/grab-mac-link-make-html-link (url name)
@@ -83,6 +83,7 @@ The `car' is the key, the `cdr' is the code.")
 
 (grab-mac-link-register-firefox-fork-func mullvad "Mullvad Browser")
 (grab-mac-link-register-firefox-fork-func librewolf "LibreWolf")
+(grab-mac-link-register-firefox-fork-func firefox "Firefox")
 
 ;;;###autoload
 (defun grab-mac-link-revised (app &optional link-type)
