@@ -1732,6 +1732,9 @@ work computers.")
     (setopt dired-x-hands-off-my-keys nil))
   :hook (dired-mode . dired-hide-details-mode))
 
+(use-package dired-filter
+  :straight t)
+
 (use-package info
   ;; A lot of offline documentation resides in the venerable `info'
   ;; format.  This allows me to access the info docs that are part of
