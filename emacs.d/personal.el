@@ -87,7 +87,7 @@ Forward PREFIX to `mastodon-tl--show-tag-timeline'."
 (add-to-list 'org-capture-templates
   `("r" "Add to RSS Feed"
      entry (file+headline
-             "~/git/org/denote/indices/elfeed.org"
+             ,(denote-get-path-by-id "20110202T000001")
              "RSS Feed")
      "%^{URL} %^g"
      :empty-lines-before 1

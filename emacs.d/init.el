@@ -466,22 +466,22 @@ Else, evaluate the whole buffer."
   ;; constraints and lack of external dependencies.  This package
   ;; provides portability.  It sits as an alternate to the amazing
   ;; `org-roam' package.
-  :straight (:host github :type git :repo "jeremyf/denote")
+  :straight t
   :after (org)
   :commands (denote-directory
               denote-file-prompt
               denote--title-prompt
               denote-get-path-by-id)
-  :bind ("H-i" . 'jf/denote/link-or-create)
+  :bind ("H-i" . 'denote-link-or-create)
   :hook (dired-mode . denote-dired-mode)
   (org-mode . denote-rename-buffer-mode)
   :init
-  (setq denote-known-keywords
+  (setopt denote-known-keywords
     (split-string-and-unquote
       (shell-command-to-string
         (concat
           "rg \"#\\+TAG:\\s([\\w-]+)\" "
-          (expand-file-name "glossary" jf/denote-base-dir)
+          jf/denote-base-dir
           " --only-matching"
           " --no-filename "
           " --follow "
@@ -496,24 +496,30 @@ Else, evaluate the whole buffer."
     (when-let* ((buffer (or buffer (current-buffer)))
                  (file (buffer-file-name buffer)))
       (and (denote-file-is-note-p file)
-        (string-match-p "\\/blog-posts\\/" file))))
+        (or
+          (string-match-p "\\/blog-posts\\/" file)
+          (string-match-p "_blogPosts" file)))))
   :config
-  (require 'denote-org-extras)
+  (use-package denote-org
+    :straight (:host github :type git :repo "protesilaos/denote-org")
+    :after (denote org))
   ;; (setq denote-journal-extras-title-format 'day-date-month-year)
-  (setq denote-infer-keywords t)
+  (setopt denote-rename-buffer-format "⟄ %D%b")
+  (setopt denote-rename-buffer-backlinks-indicator " ↜")
+  (setopt denote-infer-keywords nil)
   (setq denote-excluded-punctuation-regexp
     "[][{}!@#$%^&*()=+'\"?,.|;:~`‘’“”/—–]*")
   (setq denote-modules '(xref ffap))
   (setq denote-org-capture-specifiers
     "%(jf/denote/capture-wrap :link \"%L\" :content \"%i\")")
-  (setq denote-directory jf/denote-base-dir)
+  (setopt denote-directory jf/denote-base-dir)
   ;; These are the minimum viable prompts for notes
   (setq denote-prompts '(title keywords))
   ;; I love ‘org-mode format; reading ahead I'm setting this
-  (setq denote-file-type 'org)
+  (setopt denote-file-type 'org)
   ;; And `org-read-date' is an amazing bit of tech
   (setq denote-date-prompt-denote-date-prompt-use-org-read-date t)
-  (setq denote-file-name-slug-functions
+  (setopt denote-file-name-slug-functions
     '((title . jf/denote-sluggify-title)
        (signature . jf/denote-sluggify-signature)
        (keyword . jf/denote-sluggify-keyword)))
@@ -580,133 +586,8 @@ Else, evaluate the whole buffer."
                    (t
                      text)))))
 
-  (defun jf/denote-filename-is-note-p (filename)
-    "Return non-nil if FILENAME is a valid name for a Denote note.
-For our purposes, its path must be part of the variable
-`denote-directory', it must have a Denote identifier in its name,
-and use one of the extensions implied by `denote-file-type'."
-    (and (or
-           (string-match-p
-             "/Documents/denote-"
-             (expand-file-name filename))
-           (string-prefix-p
-             (denote-directory)
-             (expand-file-name filename)))
-      (denote-file-has-identifier-p filename)
-      (denote-file-has-supported-extension-p filename)))
   (advice-add #'denote-sluggify
     :filter-args #'jf/denote-sluggify)
-  (advice-add #'denote-filename-is-note-p
-    :override #'jf/denote-filename-is-note-p)
-
-  (defun jf/dired-rename-files-to-denote-schema ()
-    "Rename marked files in `dired-mode'."
-    (interactive)
-    (when (seq-find (lambda (file)
-                      (member
-                        (file-name-nondirectory file)
-                        '("." "..")))
-            (dired-get-marked-files))
-      (user-error "Can't rename \".\" or \"..\" files"))
-    (dolist (file (dired-get-marked-files))
-      (let ((current-prefix-arg nil))
-        (apply #'jf/rename-file-to-denote-schema
-          (list :file file :signature :prompt)))))
-
-  (defun jf/denote-sort-dired ()
-    "Sort current directory using `denote-sort-dired'."
-    (interactive)
-    (if (eq major-mode 'dired-mode)
-      (let ((denote-directory
-              default-directory))
-        (call-interactively #'denote-sort-dired)
-        (user-error "Current buffer not dired-mode"))))
-
-  (cl-defun jf/rename-file-to-denote-schema (&key file id title
-                                              keywords dir signature
-                                              force dry-run)
-    "Rename FILE using `denote' schema.
-
-When `current-prefix-arg' is non-nil prompt for many of the parameters.
-
-When no FILE is provided use `buffer-file-name'.
-
-- DIR: target directory to move the file to; by default put the
-       new file in the same directory.
-
-- ID: the identifier for this file, defaulting to one created via
-      `denote-create-unique-file-identifier'.
-
-- TITLE: The tile for this file; default's to a
-         `s-titleized-words' of the given FILE's base name.
-
-- KEYWORDS: A list of keywords to apply to the file.  When passed
-            :none, skip prompting, via `denote-keywords-prompt'
-            for a list of keywords.
-
-- SIGNATURE: The optional signature of the file.  When passed
-             :none, skip prompting for a signature.
-
-- FORCE: When non-nil, rename the file without prompting to
-         confirm the change.
-
-- DRY-RUN: When non-nil, do not perform the name change but
-           instead message the file's new name."
-    (interactive)
-    (let* ((file
-             (or file (if current-prefix-arg
-                        (call-interactively (lambda (f)
-                                              (interactive "f") f))
-                        (buffer-file-name))))
-            (title
-              (or title
-                (read-string "Title: "
-                  (denote-desluggify-title
-                    (or (denote-retrieve-filename-title file)
-                      (s-titleized-words (f-base file)))))))
-            (id
-              (or id
-                (denote-retrieve-filename-identifier file)
-                (denote-create-unique-file-identifier
-                  file (denote--get-all-used-ids))))
-            (keywords
-              (if (equal keywords :none)
-                '()
-                (or keywords
-                  (let ((kws
-                          (denote-extract-keywords-from-path file)))
-                    (completing-read-multiple "Keywords: "
-                      (delete-dups (append kws (denote-keywords)))
-                      nil nil (when kws
-                                (concat (s-join "," kws) ",")))))))
-            (signature
-              (or (when (equal signature :none) "")
-                (and signature (not (equal signature :prompt)))
-                (when (or current-prefix-arg (equal signature :prompt))
-		              (completing-read "Signature: "
-                    (jf/tor-series-list) nil nil
-                    (denote-retrieve-filename-signature file)))
-                ""))
-            (dir
-              (f-join
-                (or (and dir (not (equal dir :prompt)))
-                  (if (or current-prefix-arg (equal dir :prompt))
-                    (call-interactively (lambda (d)
-                                          (interactive "D") d))
-                    (f-dirname file)))
-                "./"))
-            (extension
-              (f-ext file t))
-            (new-file (denote-format-file-name
-                        dir id (cl-sort keywords #'string<)
-                        title extension signature)))
-      (if dry-run
-        (message "Changing %S to %S" file new-file)
-        (when (or force (denote-rename-file-prompt file new-file))
-          (denote-rename-file-and-buffer file new-file)
-          (denote-update-dired-buffers)))
-      new-file))
-
 
   (cl-defun jf/denote/org-property-from-id (&key identifier property)
     ;; This function helps me retrieve Org-Mode properties from the
@@ -737,7 +618,7 @@ This function is the plural version of
     ;; ;; Testing jf/denote/org-property-from-id
     ;; (message "%s" (jf/denote/org-property-from-id
     ;;     :identifier "20220930T215235"
-    ;;		 :property "ABBR"))
+    ;;     :property "ABBR"))
     ;; ;; Testing jf/denote/org-keywords-from-id
     ;; (message "%s" (jf/denote/org-keywords-from-id
     ;;     :identifier "20220930T215235"
@@ -780,226 +661,6 @@ This function is the plural version of
                          refs))
                      (lax-plist-get kw-plist "SAME_AS"))))))))
 
-  (defun jf/denote/link-or-create (target &optional id-only)
-    "Use `denote-link' on TARGET file, creating it if necessary.
-
-As `denote-link-or-create' but use `jf/denote/file-prompt'
-instead of `denote-file-prompt'.
-
-This function is intended for a global find of all notes.  With
-ID-ONLY link without title."
-    (interactive (list (jf/denote/file-prompt)
-                   current-prefix-arg))
-    (if (and target (file-exists-p target))
-      (let ((type
-              (denote-filetype-heuristics target)))
-        (denote-link target type
-          (denote--link-get-description target)
-          id-only)
-        )
-      (denote--command-with-title-history
-        #'denote-link-after-creating)))
-
-  (defun jf/denote/file-prompt (&optional files-matching-regexp)
-    "Prompt for a file based on subdirectories.
-
-See `denote-file-prompt'"
-    ;; I’m not looking at active silo-ing and want to be able to search
-    ;; specifically from the top-level and all subdirectories.
-    (when-let* ((vc-dirs-ignores (mapcar
-                                   (lambda (dir)
-                                     (concat dir "/"))
-                                   vc-directory-exclusion-list))
-                 (files (mapcan
-                          (lambda (sub-dir)
-                            (project--files-in-directory
-                              (f-join
-                                (denote-directory)
-                                sub-dir)
-                              vc-dirs-ignores))
-                          jf/denote/subdirectories))
-                 (file (funcall project-read-file-name-function
-                         "Select note" files nil 'file-name-history)))
-      (let ((completion-ignore-case
-              read-file-name-completion-ignore-case))
-        (add-to-history 'denote-file-history file)
-        file)))
-
-  (setq consult-notes-sources (list))
-  (setq jf/denote/subdirectories (list))
-
-  (defun jf/denote/find-file ()
-    "Find file in the current denote directory."
-    (interactive)
-    (require 'consult-projectile)
-    (require 'denote)
-    ;; For this query, override the `projectile-git-command' so that I
-    ;; can include my "denote/scientist" notes.
-    (let ((projectile-git-command
-            "git ls-files -zco --exclude-from=.projectile.gitignore"))
-      (consult-projectile--file (denote-directory))))
-
-  (cl-defmacro jf/denote/create-functions-for (&key domain
-                                                key (create-fn nil))
-    "A macro to CREATE-FN for the given DOMAIN.
-
-          The KEY is the ASCII value of the binding key.
-
-          Creates:
-
-          - Wrapping function of `jf/denote/find-file' that
-            narrows results to the given DOMAIN.
-
-          - Create linking function for DOMAIN.
-          - Add the domain to the `jf/denote/subdirectories'.
-          - Adds DOMAIN to `consult-notes-sources'."
-    (let* ((finder-fn
-             (intern (concat "jf/denote/find-file--" domain)))
-            (subdirectory
-              (f-join jf/denote-base-dir domain))
-            (finder-docstring
-              (concat "Find file in \""
-                domain
-                "\" subdirectory of `denote-directory'."))
-            (default-create-fn
-              (intern (concat "jf/denote/create--"
-                        domain
-                        "--default")))
-            (default-create-docstring
-              (concat "Create denote in \""
-                domain
-                "\" subdirectory of "
-                "`denote-directory'."))
-            (link-or-creator-fn
-              (intern (concat "jf/denote/link-or-create--" domain)))
-            (link-or-creator-docstring
-              (concat "Link to denote in \""
-                domain
-                "\" subdirectory of "
-                "`denote-directory'.")))
-      (when (f-exists? subdirectory)
-        `(progn
-           (add-to-list 'jf/denote/subdirectories ,domain)
-           (when (boundp 'consult-notes-sources)
-             (add-to-list
-               'consult-notes-sources
-               '(,domain ,key ,subdirectory)))
-           (defun ,default-create-fn ()
-             ,default-create-docstring
-             (interactive)
-             (let ((denote-directory
-                     (f-join (denote-directory) ,domain)))
-               (call-interactively #'denote)))
-           (bind-key (format "H-d c %c" ,key)
-             (or ,create-fn ',default-create-fn))
-           (bind-key (format "H-d f %c" ,key)
-             ',finder-fn)
-           (defun ,finder-fn ()
-             ,finder-docstring
-             (interactive)
-             (let ((denote-directory
-                     (f-join (denote-directory) ,domain)))
-               (call-interactively #'jf/denote/find-file)))
-           (bind-key (format "H-d l %c" ,key) ',link-or-creator-fn)
-           (defun ,link-or-creator-fn ()
-             ,link-or-creator-docstring
-             (interactive)
-             (let ((denote-directory
-                     (f-join (denote-directory) ,domain)))
-               (call-interactively #'denote-link-or-create)))
-           ))))
-
-  ;; The blog-post domain is for things that I have, will, or might
-  ;; publish to https://takeonrules.com
-  (jf/denote/create-functions-for :domain "blog-posts"
-    :key ?b)
-
-  (defun jf/denote/find-file--blog-posts-draft (filename)
-    "Find a draft FILENAME in the \"blog-posts\" denote sub-directory."
-    (interactive
-      (list (jf/find-file-via-matching
-              :prompt "Draft filename: "
-              :matching "^#\\+ROAM_REFS:"
-              :switch "--files-without-match"
-              :in (f-join (denote-directory) "blog-posts"))))
-    (find-file filename))
-  (bind-key "H-d f B" #'jf/denote/find-file--blog-posts-draft)
-
-  (defun jf/denote/create-scratch (title)
-    "Create a scratch note with TITLE."
-    (interactive (list (read-string
-                         "Scratch title: "
-                         (format-time-string "%Y-%m-%d Scratch"))))
-    (denote title
-      nil
-      'org
-      (f-join (denote-directory) "scratch")))
-
-  ;; The scratch domain is a place to capture random notes.  These can
-  ;; be promoted to another directory or eventually discarded.
-  (jf/denote/create-functions-for :domain "scratch"
-    :create-fn #'jf/denote/create-scratch
-    :key ?s)
-
-  (jf/denote/create-functions-for :domain "work"
-    :key ?w)
-
-  (jf/denote/create-functions-for :domain "private"
-    :key ?v)
-
-  ;; (cl-defun jf/denote/create-epigraph (&key
-;;                                         (body
-;;                                           (read-from-minibuffer
-;;                                             "Epigraph Text: "))
-;;                                         ;; Todo prompt for Author Name
-;;                                         (author_name
-;;                                           (read-from-minibuffer
-;;                                             "Author Name: "))
-;;                                         ;; Todo prompt for Work Title
-;;                                         (work_title
-;;                                           (read-from-minibuffer
-;;                                             "Work Title: "))
-;;                                         (nth-words 8))
-;;     "Create an epigraph from BODY, AUTHOR_NAME, and WORK_TITLE.
-
-;; Default the note’s title to the first NTH-WORDS of the BODY."
-;;     (interactive)
-;;     (let* ((body-as-list
-;;              (s-split-words body))
-;;             (title (s-join " " (if (> (length body-as-list) nth-words)
-;;                                  (cl-subseq body-as-list 0 nth-words)
-;;                                  body-as-list)))
-;;             (template (concat
-;;                         ;; The name of the author
-;;                         "#+AUTHOR_NAME: " author_name "\n"
-;;                         ;; Where can you “find” this author?
-;;                         "#+AUTHOR_URL:\n"
-;;                         ;; The GLOSSARY_KEY for the given author
-;;                         "#+AUTHOR_KEY:\n"
-;;                         ;; What’s the title of the work?
-;;                         "#+WORK_TITLE: " work_title "\n"
-;;                         ;; Where can you “get” this work?
-;;                         "#+WORK_URL:\n"
-;;                         ;; The GLOSSARY_KEY for the given work
-;;                         "#+WORK_KEY:\n"
-;;                         ;; Indicates if this is a poem (or not)
-;;                         "#+POEM:\n"
-;;                         ;; The page in which this passage appears in the
-;;                         ;; given work.
-;;                         "#+PAGE:\n"
-;;                         ;; The name of the translator
-;;                         "#+TRANSLATOR_NAME:\n")))
-;;       (denote title
-;;         nil
-;;         'org
-;;         (f-join (denote-directory) "epigraphs")
-;;         nil
-;;         template)))
-
-  ;; (jf/denote/create-functions-for :domain "epigraphs"
-  ;;   :key ?e
-  ;;   :create-fn 'jf/denote/create-epigraph)
-
   (cl-defun jf/denote/create-glossary-entry (&key
                                               (title (read-from-minibuffer "Name the Entry: "))
                                               (is-a-game (yes-or-no-p "Is this a game?"))
@@ -1028,7 +689,7 @@ See `denote-file-prompt'"
                         "#+ROAM_REFS:\n"
                         "#+TAG:\n" ;; TODO: Assert uniqueness
                         ))
-            (keywords (list)))
+            (keywords '("glossary")))
       ;; Add both "abbr" and the abbr to the keywords; both help in
       ;; searching results
       (when (s-present? abbr) (add-to-list 'keywords "abbr"))
@@ -1036,29 +697,11 @@ See `denote-file-prompt'"
       (denote title
         keywords
         'org
-        (f-join (denote-directory) "glossary")
+        (denote-directory)
         nil
         template
         (when (s-present? abbr)
           (progn (denote-sluggify-signature abbr))))))
-
-  (jf/denote/create-functions-for :domain "glossary"
-    :key ?g
-    :create-fn 'jf/denote/create-glossary-entry)
-  ;; Testing jf/denote/org-property-from-id
-  ;; (message "%s" (jf/denote/org-property-from-id :id "20220930T215235"
-  ;;                :property "ABBR"))
-
-  ;; All the other things; perhaps they could become blog posts, but for
-  ;; now they remain part of the mixture and medley.
-  (jf/denote/create-functions-for :domain "melange"
-    :key ?m)
-
-  ;; I do write notes about people I interact with.  Technically I have
-  ;; glossary entries for people.  But those entries are for folks I
-  ;; don’t interact with.
-  (jf/denote/create-functions-for :domain "people"
-    :key ?p)
 
   ;; On my site I write https://takeonrules.com/series/.  I track this
   ;; data in a YAML file; I’d like to treat this data similar to my
@@ -1087,44 +730,16 @@ Consider different logic if IS-A-SERIES."
         nil
         template)))
 
-  (jf/denote/create-functions-for :domain "references"
-    :key ?r)
-
-  (jf/denote/create-functions-for :domain "indices"
-    :key ?i
-    :create-fn 'jf/denote/create-indices-entry)
-
-  (dolist (denote-domain jf/denote/subdirectories)
-    (let* ((denote-domain
-             (substring-no-properties denote-domain))
-            (menu-key-chord
-              (concat "D "
-                (seq-subseq denote-domain 0 1)))
-            (title
-              (s-titleize denote-domain))
-            (full-dir
-              (f-join (denote-directory) denote-domain)))
-      (when (f-dir-p full-dir)
-        (rg-define-search rg-projects-dotemacs
-          "Search Denote "
-          :dir full-dir
-          :files "*.*"
-          :menu ("Denote" menu-key-chord title)))))
-
   (cl-defun jf/org-link-complete-link-for (parg &key
-                                            scheme filter subdirectory)
-    "Prompt for `denote' with filename FILTER in the given SUBDIRECTORY.
+                                            scheme filter)
+    "Prompt for `denote' with filename FILTER.
 
     Returns a string of format: \"SCHEME:<id>\" where <id> is
     an `denote' identifier.
 
 PARG is part of the method signature for `org-link-parameters'."
-    (let* ((denote-directory
-             (if subdirectory
-               (f-join (denote-directory)
-                 (concat subdirectory "/"))
-               (denote-directory)))
-            (file (denote-file-prompt (concat ".*" filter ".*"))))
+    (let* ((file
+             (denote-file-prompt (concat ".*" filter ".*"))))
       ;; This leverages a post v1.0.0 parameter of Denote
       ;; See https://git.sr.ht/~protesilaos/denote/commit/c6c3fc95c66ba093a266c775f411c0c8615c14c7
       (concat scheme ":" (denote-retrieve-filename-identifier file))))
@@ -1753,7 +1368,7 @@ We ignore the DESCRIPTION and probably the PROTOCOL."
           ('md (format "[%s](%s)" desc url))
           ('latex (format "\\href{%s}{%s}" url desc))
           ('odt
-	          (format "<text:a xlink:type=\"simple\" xlink:href=\"%s\">%s</text:a>"
+            (format "<text:a xlink:type=\"simple\" xlink:href=\"%s\">%s</text:a>"
               url desc))
           ('texinfo (format "@uref{%s,%s}" url desc))
           (_ (format "%s (%s)" desc url)))
@@ -1827,7 +1442,7 @@ When USE_HUGO_SHORTCODE is given use glossary based exporting."
           ((eq format 'texinfo) (format "@uref{%s,%s}" url desc))
           ((eq format 'odt)
             (format "<text:a xlink:type=\"simple\" xlink:href=\"%s\">%s</text:a>"
-		          url
+              url
               desc))
           (t (format "[%s](%s)" desc url))
           ;; ((eq format 'odt) (org-odt-link url (format "%s" desc) (list)))
@@ -1995,27 +1610,7 @@ with the series."
                     (denote-format-file-name
                       dir id keywords title extension series)))
             (denote-rename-file-and-buffer file new-name)
-            (denote-update-dired-buffers))))))
-
-  (transient-define-suffix jf/denote-org-capture/filename-set ()
-    "Work with `jf/denote-org-capture/filename'"
-    :description
-    '(lambda ()
-       (concat
-         "Denote Capture Filename: "
-         (propertize
-           (format "%s"
-             (and denote-last-path
-               (file-exists-p denote-last-path)
-               (denote-retrieve-filename-title denote-last-path)))
-           'face 'transient-argument)))
-    (interactive)
-    (if denote-last-path
-      (setq denote-last-path nil)
-      (let ((fname
-              (buffer-file-name (current-buffer))))
-        (setq denote-last-path
-          (and (denote-file-is-note-p  fname) fname))))))
+            (denote-update-dired-buffers)))))))
 (require 'denote)
 
 (defvar jf/denote-base-dir
@@ -2328,7 +1923,12 @@ work computers.")
         #'jf/toggle-typopunct-mode)
       map)
     "Keymap to display `typopunct-mode'.")
+
   (defun jf/mode-line-format/major-mode-name ()
+    "Render the major mode as text.
+
+When `typopunct-mode' is active, provide an actionable indicator of its
+active nature."
     (let ((fmt
             (if typopunct-mode "“%s”" "%s")))
       (propertize
@@ -2498,6 +2098,9 @@ work computers.")
              'jf/mode-line-format/face-shadow
              'mode-line-inactive)))))
 
+  ;; We need to acknowledge and accept that these are risky variables.
+  ;; If we do not, then Emacs will not render the variable in the
+  ;; modeline.
   (dolist (construct '(
                         jf/mode-line-format/buffer-name-and-status
                         jf/mode-line-format/eglot
@@ -2619,7 +2222,6 @@ work computers.")
 
 When given PREFIX use `eww-browse-url'."
     (interactive "P")
-    (shell-command "defaultbrowser mullvadbrowser 2>&1 1>/dev/null")
     (if prefix
       (link-hint-open-link)
       (let ((browse-url-browser-function
@@ -3963,14 +3565,6 @@ Each member's `car' is title and `cdr' is `org-mode' element."
     (turn-on-visual-line-mode)
     (electric-pair-mode -1))
 
-  (defun jf/denote-org-capture ()
-    "An org-capture conformant function for capturing to a blog-post."
-    (if denote-last-path
-      denote-org-capture-specifiers
-      (let ((denote-directory
-              (f-join denote-directory "blog-posts")))
-        (denote-org-capture))))
-
   ;; https://stackoverflow.com/questions/13340616/assign-ids-to-every-entry-in-org-mode
   (defun jf/org-add-ids-to-headlines-in-file ()
     "Add ID properties to all file's headlines without an ID."
@@ -4905,7 +4499,7 @@ sort accordingly.")
       :empty-lines 1)
      ("d" "Dictionary"
        plain (file
-               ,(f-join jf/denote-base-dir "indices/20230108T083359--a-dictionary-of-discovered-words__CreativeWriting_personal.org"))
+               ,(denote-get-path-by-id "20230108T083359"))
        "- %^{Term} :: %^{Description}; %a"
        :after-finalize jf/org/capture/dictionary/sort)
      ;; ("i" "Immediate to Clock"
@@ -5739,7 +5333,7 @@ literal then add a fuzzy search)."
   (which-key-setup-side-window-bottom)
   (which-key-show-major-mode))
 
-(defvar jf/filename/bibliography-takeonrules
+(defvar jf/filename/bibliography
   (denote-get-path-by-id "20241124T080648")
   "Dude, you can put your books in here.")
 
@@ -5754,6 +5348,7 @@ literal then add a fuzzy search)."
   ;;to search all files and start with a character (e.g. =b=) followed
   ;;by <space> to filter to the note source keyed as =s=
   ;;(e.g. Scientist).
+  :after (denote org)
   :straight (:type git :host github :repo "mclear-tools/consult-notes")
   ;; :after (consult denote)
   :bind
@@ -5762,11 +5357,18 @@ literal then add a fuzzy search)."
   ;; Ensuring that I search my denote/scientist sub-directory, which is
   ;; excluded from it's containing project's git repository.
   :custom (consult-notes-use-rg t)
+  (consult-notes-sources `(("Denote" ?d ,(denote-directory))))
   (consult-notes-ripgrep-args
     (concat
       "rg --null --line-buffered --color=never --max-columns=1000 "
       "--path-separator / --ignore-case --no-heading --line-number "
       "--follow --hidden --glob=!.git/ -L --sortr=accessed"))
+  :config
+  (setopt consult-notes-denote-files-function
+    (lambda () (denote-directory-files nil t t)))
+  (when (locate-library "denote")
+    (consult-notes-denote-mode))
+  (setopt consult-notes-denote-files-function #'denote-directory-files)
   :commands (consult-notes
               consult-notes-search-in-all-notes))
 
@@ -5890,25 +5492,25 @@ The misspelled word is taken from OVERLAY.  WORD is the corrected word."
     "Kill current function signature at point."
     (interactive)
     (when-let ((node
-	               (treesit-parent-until
-	                 (treesit-node-at (point))
-	                 (lambda (n)
-		                 (or
-		                   (string= "function_declaration" (treesit-node-type n))
-		                   (string= "call_expression" (treesit-node-type n))))
-	                 t)))
+                 (treesit-parent-until
+                   (treesit-node-at (point))
+                   (lambda (n)
+                     (or
+                       (string= "function_declaration" (treesit-node-type n))
+                       (string= "call_expression" (treesit-node-type n))))
+                   t)))
       (pcase (treesit-node-type node)
         ("function_declaration"
           (jf/treesit/get-signature/function node))
         ("call_expression"
           (save-excursion
-	          (call-interactively #'xref-find-definitions)
-	          (jf/treesit/get-signature/function
-	            (treesit-parent-until
-	              (treesit-node-at (point))
-	              (lambda (n)
-	                (string= "function_declaration" (treesit-node-type n)))
-	              t)))))))
+            (call-interactively #'xref-find-definitions)
+            (jf/treesit/get-signature/function
+              (treesit-parent-until
+                (treesit-node-at (point))
+                (lambda (n)
+                  (string= "function_declaration" (treesit-node-type n)))
+                t)))))))
 
   (defun jf/treesit/get-signature/function (node)
     "For the given NODE add its parameters and result to kill ring.
@@ -5916,22 +5518,22 @@ The misspelled word is taken from OVERLAY.  WORD is the corrected word."
 This function is to \"copy\" the implementation details of the node."
     (let ((node-type (treesit-node-type node)))
       (if (string= "function_declaration" node-type)
-	      (let* ((strings
-		             (list
-		               (treesit-node-text
-		                 (treesit-node-child-by-field-name node "parameters"))
-		               (treesit-node-text
-		                 (treesit-node-child-by-field-name node "result"))))
-		            (msg
-		              (concat "func" (s-join " " (-non-nil strings)))))
-	        (message
-	          "%s func dsignature: %s"
-	          (treesit-node-text
-		          (treesit-node-child-by-field-name node "name"))
-	          msg)
-	        (kill-new msg))
-	      (user-error "given node %s (type %s) not function_declaration"
-		      node node-type))))
+        (let* ((strings
+                 (list
+                   (treesit-node-text
+                     (treesit-node-child-by-field-name node "parameters"))
+                   (treesit-node-text
+                     (treesit-node-child-by-field-name node "result"))))
+                (msg
+                  (concat "func" (s-join " " (-non-nil strings)))))
+          (message
+            "%s func dsignature: %s"
+            (treesit-node-text
+              (treesit-node-child-by-field-name node "name"))
+            msg)
+          (kill-new msg))
+        (user-error "given node %s (type %s) not function_declaration"
+          node node-type))))
 
   (defun jf/treesit/function-select ()
     "Select the current function at point."
@@ -7325,10 +6927,6 @@ Useful for Eglot."
     (mapcar (lambda (el) (cons el 1)) projectile-known-projects)
     "An alist of project directories.")
 
-  (dolist (dir (f-directories jf/denote-base-dir))
-    (add-to-list 'jf/git-project-paths
-      (cons dir 1)))
-
   (setopt magit-repository-directories jf/git-project-paths)
   (projectile-register-project-type 'go
     '("go.mod")
@@ -7825,7 +7423,7 @@ It will display entries without switching to them."
   (defun jf/export-public-elfeed-opml ()
     "Export public OPML file."
     (let ((opml-body
-            (cl-loop for org-file in `(,(f-join jf/denote-base-dir "indices/elfeed.org"))
+            (cl-loop for org-file in `(,(denote-get-path-by-id "20110202T000001"))
               concat
               (with-temp-buffer
                 (insert-file-contents
@@ -7915,7 +7513,7 @@ Modification of `rmh-elfeed-org-convert-org-to-opml'."
                                               (make-string (* 2 level) ? ))))))
       opml-body))
   (setq rmh-elfeed-org-files nil)
-  (dolist (file `(,(f-join jf/denote-base-dir "indices/elfeed.org")))
+  (dolist (file `(,(denote-get-path-by-id "20110202T000001")))
     (when (f-exists? file)
       (add-to-list 'rmh-elfeed-org-files file))))
 
@@ -8025,7 +7623,7 @@ A page is marked `first' if rel=\"first\" appears in a <link> or <a> tag."
     (let ((best-url
             (plist-get eww-data :first)))
       (if best-url
-	      (eww-browse-url (shr-expand-url best-url (plist-get eww-data :url)))
+        (eww-browse-url (shr-expand-url best-url (plist-get eww-data :url)))
         (user-error "No `first' for this page"))))
 
   (defun eww-last-url ()
@@ -8035,7 +7633,7 @@ A page is marked `last' if rel=\"last\" appears in a <link> or <a> tag."
     (let ((best-url
             (plist-get eww-data :last)))
       (if best-url
-	      (eww-browse-url (shr-expand-url best-url (plist-get eww-data :url)))
+        (eww-browse-url (shr-expand-url best-url (plist-get eww-data :url)))
         (user-error "No `last' for this page"))))
 
   (setq browse-url-browser-function 'browse-url-default-macosx-browser)
@@ -8316,13 +7914,13 @@ contextual information."
       (let ((contents
               (caddr _verse-block)))
         (format "\n<text:p text:style-name=\"OrgVerse\">%s</text:p>"
-	        ;; Add line breaks to each line of verse.
+          ;; Add line breaks to each line of verse.
           (s-join
             "<text:line-break/>"
             (s-split "\n"
-	            (replace-regexp-in-string
-	              ;; Replace leading tabs and spaces.
-	              "^[ \t]+" #'org-odt--encode-tabs-and-spaces
+              (replace-regexp-in-string
+                ;; Replace leading tabs and spaces.
+                "^[ \t]+" #'org-odt--encode-tabs-and-spaces
                 contents))))))
     (advice-add #'org-odt-verse-block :override #'jf/org-odt-verse-block))
   (use-package ox-hugo
@@ -8425,15 +8023,18 @@ Take on Rules using the \"blockquote\" special block."
     (cl-defun jf/export-org-to-tor (&key (buffer (current-buffer)))
       "Export current org BUFFER for TakeOnRules post."
       (interactive)
+      ;; Rebuild the doc cache based on set values.
+      (org-set-regexps-and-options)
       ;; Ensure that we have an ID property.
       (jf/bibliography/export-to-takeonrules)
-      (setq jf/exporting-org-to-tor t)
       (with-current-buffer buffer
         (save-excursion
-          (let* ((org-export-exclude-tags
+          (let* ((jf/exporting-org-to-tor
+                   t)
+                  (org-export-exclude-tags
                    '("noexport" "private"))
                   (export-global-plist
-                   (jf/org-keywords-as-plist))
+                    (jf/org-keywords-as-plist))
                   (section
                     (jf/export-org-to-tor--global-buffer-prop-ensure
                       :key "HUGO_SECTION"
@@ -8460,8 +8061,7 @@ Take on Rules using the \"blockquote\" special block."
             ;; Write metadata
             (save-buffer)
             (unless org-transclusion-mode (org-transclusion-mode))
-            (org-open-file (org-hugo-export-wim-to-md nil nil t)))))
-      (setq jf/exporting-org-to-tor nil))
+            (org-open-file (org-hugo-export-wim-to-md nil nil t))))))
 
     (cl-defun jf/export-org-to-tor--inject-additional-front-matter (&key identifier title)
       "Export additional front matter.
@@ -8479,7 +8079,14 @@ Take on Rules using the \"blockquote\" special block."
                 "\n#+HUGO_LAYOUT: post"
                 "\n#+HUGO_DRAFT: true"
                 "\n#+HUGO_CUSTOM_FRONT_MATTER: :licenses '(by-nc-nd-4_0)"
-                "\n#+HUGO_CUSTOM_FRONT_MATTER: :org_id " identifier))
+                "\n#+HUGO_CUSTOM_FRONT_MATTER: :org_id " identifier
+                "\n#+HUGO_TAGS: "
+                (s-join " "
+                  (mapcar
+                    #'string-inflection-kebab-case-function
+                    (seq-intersection
+                      (org-get-tags)
+                      denote-known-keywords #'string=)))))
       (when-let ((kw-plist (jf/org-keywords-as-plist
                              :keywords-regexp "\\(SESSION_REPORT_DATE\\|SESSION_REPORT_LOCATION\\|SESSION_REPORT_GAME\\)")))
         (insert
@@ -9281,9 +8888,10 @@ otherwise."
       (split-string-and-unquote
         (shell-command-to-string
           (concat
-            "rg \"^#\\+PROJECT_NAME: +(" project ") *$\" " directory
+            "fd _projects " directory " | xargs rg \"^#\\+PROJECT_NAME: +(" project ") *$\" "
             " --follow --only-matching --no-ignore-vcs --with-filename "
-            "-r '$1' | tr '\n' '🪓'"))
+            "-r '$1' | tr '\n' '🪓'")
+          )
         "🪓")))
 
   (cl-defun jf/project/get-project/project-source-code (&key (directory jf/denote-base-dir))
@@ -9395,8 +9003,16 @@ When the `current-prefix-arg' is set always prompt for the project."
     :description "Update agenda files…"
     (interactive)
     (message "Updating `org-agenda-files'")
-    (setopt org-agenda-files (jf/org-mode/agenda-files)))
+    (setopt org-agenda-files (jf/org-mode/agenda-files))
+    (when (symbolp 'consult-notes-org-headings-files)
+      (setopt consult-notes-org-headings-files org-agenda-files)))
   (add-hook 'after-init-hook #'jf/org-mode/agenda-files-update)
+  ;; When I add or remove a tag, this could trigger an agenda update.
+  (add-hook 'denote-after-rename-file-hook #'jf/org-mode/agenda-files-update)
+  ;; When I'm adding and removing tags, I may very well wish to have an
+  ;; updated org-mode document.  The `org-set-regexps-and-options'
+  ;; rebuilds some of that cache.
+  (add-hook 'denote-after-rename-file-hook #'org-set-regexps-and-options)
 
   (transient-define-suffix jf/enable-indent-for-tab-command ()
     :description "Enable `indent-for-tab-command'"
@@ -9484,7 +9100,6 @@ This encodes the logic for creating a project."
         ]
       ["Denote"
         ("d a" jf/project/add-project-path :if jf/denote?)
-        ("d c" jf/denote-org-capture/filename-set)
         ("d p" jf/project/convert-document-to-project :if jf/denote?)
         ]
       ["Blogging"
