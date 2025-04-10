@@ -491,14 +491,26 @@ Else, evaluate the whole buffer."
           "}.gsub(/-(\\w)/) { |m| m[1].upcase }'"))
       "\n"))
   :preface
+  (defconst jf/denote/keywords/blogPosts
+    "blogPosts"
+    "The keyword used to indicate the note is slated to be a blogPost.")
+  (defconst jf/denote/keywords/games
+    "games"
+    "The keyword used to indicate the note is a game.")
+  (defconst jf/denote/keywords/abbr
+    "abbr"
+    "The keyword used to indicate the note is for an abbreviation.")
+  (defconst jf/denote/keywords/glossary
+    "glossary"
+    "The keyword used to indicate the note is part of my glossary.")
   (defun jf/blog-entry? (&optional buffer)
     "Return non-nil when BUFFER is a blog post."
     (when-let* ((buffer (or buffer (current-buffer)))
                  (file (buffer-file-name buffer)))
       (and (denote-file-is-note-p file)
-        (or
-          (string-match-p "\\/blog-posts\\/" file)
-          (string-match-p "_blogPosts" file)))))
+        (string-match-p
+          (format "_%s" jf/denote/keywords/blogPosts)
+          file))))
   :config
   (use-package denote-org
     :straight (:host github :type git :repo "protesilaos/denote-org")
@@ -507,27 +519,23 @@ Else, evaluate the whole buffer."
   (setopt denote-rename-buffer-format "⟄ %D%b")
   (setopt denote-rename-buffer-backlinks-indicator " ↜")
   (setopt denote-infer-keywords nil)
-  (setq denote-excluded-punctuation-regexp
-    "[][{}!@#$%^&*()=+'\"?,.|;:~`‘’“”/—–]*")
-  (setq denote-modules '(xref ffap))
-  (setq denote-org-capture-specifiers
+  (setopt denote-org-capture-specifiers
     "%(jf/denote/capture-wrap :link \"%L\" :content \"%i\")")
   (setopt denote-directory jf/denote-base-dir)
   ;; These are the minimum viable prompts for notes
-  (setq denote-prompts '(title keywords))
+  (setopt denote-prompts '(title keywords))
   ;; I love ‘org-mode format; reading ahead I'm setting this
   (setopt denote-file-type 'org)
   ;; And `org-read-date' is an amazing bit of tech
-  (setq denote-date-prompt-denote-date-prompt-use-org-read-date t)
   (setopt denote-file-name-slug-functions
     '((title . jf/denote-sluggify-title)
        (signature . jf/denote-sluggify-signature)
        (keyword . jf/denote-sluggify-keyword)))
 
-  (setq denote-file-name-letter-casing '((title . downcase)
-                                          (signature . downcase)
-                                          (keywords . verbatim)
-                                          (t . downcase)))
+  ;; (setq denote-file-name-letter-casing '((title . downcase)
+  ;;                                         (signature . downcase)
+  ;;                                         (keywords . verbatim)
+  ;;                                         (t . downcase)))
   (defvar jf/diacritics-to-non-diacritics-map
     '(("ž" . "z") ("Ž" . "Z")
        ("ý" . "y") ("ÿ" . "y") ("Ÿ" . "Y")
@@ -660,75 +668,6 @@ This function is the plural version of
                          (first (s-split " " refs t))
                          refs))
                      (lax-plist-get kw-plist "SAME_AS"))))))))
-
-  (cl-defun jf/denote/create-glossary-entry (&key
-                                              (title (read-from-minibuffer "Name the Entry: "))
-                                              (is-a-game (yes-or-no-p "Is this a game?"))
-                                              (abbr (read-from-minibuffer "Abbreviation (empty to skip): ")))
-    "Create a `denote' entry for the given TITLE and ABBR.
-
-    And if this IS-A-GAME then amend accordingly.
-
-    NOTE: At present there is no consideration for uniqueness."
-    (interactive)
-    (let* ((key
-             (downcase (denote-sluggify-title title)))
-            (template (concat "#+GLOSSARY_KEY: " key "\n"
-                        (when (s-present? abbr)
-                          (concat "#+ABBR: " abbr "\n"))
-                        ;; TODO: Include a prompt of existing
-                        ;; disclaimers
-                        "#+CONTENT_DISCLAIMER:\n"
-                        "#+DESCRIPTION:\n"
-                        (when is-a-game (concat "#+GAME: " key "\n"))
-                        "#+ITEMID:\n"
-                        "#+ITEMTYPE:\n"
-                        "#+NO_TITLE:\n"
-                        (when (s-present? abbr)
-                          "#+PLURAL_ABBR:\n#+PLURAL_TITLE:\n")
-                        "#+ROAM_REFS:\n"
-                        "#+TAG:\n" ;; TODO: Assert uniqueness
-                        ))
-            (keywords '("glossary")))
-      ;; Add both "abbr" and the abbr to the keywords; both help in
-      ;; searching results
-      (when (s-present? abbr) (add-to-list 'keywords "abbr"))
-      (when is-a-game (add-to-list 'keywords "game"))
-      (denote title
-        keywords
-        'org
-        (denote-directory)
-        nil
-        template
-        (when (s-present? abbr)
-          (progn (denote-sluggify-signature abbr))))))
-
-  ;; On my site I write https://takeonrules.com/series/.  I track this
-  ;; data in a YAML file; I’d like to treat this data similar to my
-  ;; glossary.
-  (cl-defun jf/denote/create-indices-entry (&key
-                                             (title
-                                               (read-from-minibuffer
-                                                 "Name the index: "))
-                                             (is-a-series
-                                               (yes-or-no-p
-                                                 "Take on Rules series?")))
-    "Create a `denote' index entry for the given TITLE.
-
-Consider different logic if IS-A-SERIES."
-    (interactive)
-    (let* ((keywords
-             (list))
-            (template (concat (when (s-present? is-a-series)
-                                "#+HIGHLIGHT: true\n"))))
-      (when (s-present? is-a-series)
-        (add-to-list 'keywords "series"))
-      (denote title
-        nil
-        'org
-        (f-join (denote-directory) "indices")
-        nil
-        template)))
 
   (cl-defun jf/org-link-complete-link-for (parg &key
                                             scheme filter)
@@ -4505,10 +4444,6 @@ sort accordingly.")
                ,(denote-get-path-by-id "20230108T083359"))
        "- %^{Term} :: %^{Description}; %a"
        :after-finalize jf/org/capture/dictionary/sort)
-     ;; ("i" "Immediate to Clock"
-     ;;   plain (clock)
-     ;;   "%i%?"
-     ;;   :immediate-finish t)
      ("p" "Person to Quote"
        entry
        (file+headline jf/filename/bibliography "People")
@@ -4527,13 +4462,7 @@ sort accordingly.")
        (file+headline jf/filename/bibliography "Works")
        "%^{Title} %^g\n:PROPERTIES:\n:CUSTOM_ID: %(org-id-new)\n:SUBTITLE: %^{Subtitle}\n:AUTHOR: %^{Author}\n:END:\n%?"
        :jump-to-captured t
-       :after-finalize jf/org/capture/finalize-work)
-     ;; ("N" "Note for project task"
-     ;;   plain (function jf/org-mode/capture/project-task/find)
-     ;;   "%T\n\n%?"
-     ;;   :empty-lines-before 1
-     ;;   :empty-lines-after 1)
-     ))
+       :after-finalize jf/org/capture/finalize-work)))
 
 (use-package verb
   ;; https://github.com/federicotdn/verb

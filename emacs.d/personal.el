@@ -26,13 +26,13 @@
 (advice-add #'jf/elfeed-load-db-and-open :before #'jf/syncthing-aling)
 (add-hook 'after-init-hook #'jf/syncthing-aling)
 
-(use-package tp
-  :straight (:host codeberg :repo "martianh/tp.el")
-  :when (file-exists-p (expand-file-name "~/.my-computer")))
-
 (use-package mastodon
   ;; :straight (:host codeberg :repo "martianh/mastodon.el")
   :when (file-exists-p (expand-file-name "~/.my-computer"))
+  :init
+  (use-package tp
+  :straight (:host codeberg :repo "martianh/tp.el")
+    :when (file-exists-p (expand-file-name "~/.my-computer")))
   :custom
   (mastodon-tl--timeline-posts-count "50")
   :config
@@ -64,6 +64,83 @@ Forward PREFIX to `mastodon-tl--show-tag-timeline'."
   "Where I put my journal.")
 
 (add-to-list 'org-capture-templates
+  '("b" "Blog Post"
+     plain (file denote-last-path)
+     (function
+       (lambda ()
+         (let* ((denote-use-title
+                  ;; If I don't provide the title, then it'll use the
+                  ;; active region as the title, and failing that list
+                  ;; previous titles I've used from which to select.
+                  ;; With this let clause, I'm asking for a clean title.
+                  (read-string "Blog Post Title: "))
+                 (denote-use-keywords
+                  `(,jf/denote/keywords/blogPosts))
+                 (denote-org-capture-specifiers
+                   ;; When I am capturing with an active region, use the
+                   ;; capture wrap; that is bring the highlighted region
+                   ;; along.  Else, when I'm not capturing with an
+                   ;; active region, just prompt to start writing.
+                   (if (use-region-p)
+                     "%(jf/denote/capture-wrap :link \"%L\" :content \"%i\")"
+                     "%?")))
+           (denote-org-capture))))
+     :no-save t
+     :immediate-finish nil
+     :kill-buffer t
+     :jump-to-captured t))
+
+(add-to-list 'org-capture-templates
+  '("g" "Glossary Entry"
+     plain (file denote-last-path)
+     (function
+       (lambda ()
+         ;; (setq-local keywords (list))
+         (let* ((keywords
+                  `(,jf/denote/keywords/glossary))
+                 (title
+                  (read-string "Glossary Entry Title: "))
+                 (is-a-game
+                   (yes-or-no-p "Is this a game?"))
+                 (is-a-tag
+                   (yes-or-no-p "Is a tag for Take on Rules?"))
+                 (abbr
+                   (read-from-minibuffer "Abbreviation (empty to skip): "))
+                 (key
+                   (downcase (denote-sluggify-title title))))
+           (when is-a-game
+             (add-to-list 'keywords jf/denote/keywords/games))
+           (when (s-present? abbr)
+             (add-to-list 'keywords jf/denote/keywords/abbr))
+           (let* ((denote-use-title
+                    title)
+                   (denote-use-template
+                     (concat
+                       "#+GLOSSARY_KEY: " key "\n"
+                       (when (s-present? abbr)
+                         (concat "#+ABBR: " abbr "\n"))
+                       (when is-a-game
+                         (concat "#+GAME: " key "\n"))
+                       (when (s-present? abbr)
+                         (concat
+                           "#+PLURAL_ABBR: %^{Plural Abbr|" abbr "s}\n"
+                           "#+PLURAL_TITLE: %^{Plural Title|" title "s}\n"))
+                       (when is-a-tag
+                         (concat "#+TAG: " key "\n"))))
+                   (denote-use-signature
+                     (when (s-present? abbr)
+                       (denote-sluggify-signature abbr)))
+                   (denote-use-keywords
+                     keywords)
+                   (denote-org-capture-specifiers
+                     "%?"))
+             (denote-org-capture)))))
+     :no-save t
+     :immediate-finish nil
+     :kill-buffer t
+     :jump-to-captured t))
+
+(add-to-list 'org-capture-templates
   '("j" "Journal Entry"
      plain (file+olp+datetree
              jf/personal/filename-for-journal)
@@ -89,7 +166,7 @@ Forward PREFIX to `mastodon-tl--show-tag-timeline'."
      entry (file+headline
              ,(denote-get-path-by-id "20110202T000001")
              "RSS Feed")
-     "%^{URL} %^g"
+     "%^{URL} %^g\n%?"
      :empty-lines-before 1
      :empty-lines-after 1
      :immediate-finish t))
