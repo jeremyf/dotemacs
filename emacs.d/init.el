@@ -221,8 +221,6 @@ The DWIM behaviour of this command is as follows:
     ;; Without this variable, it's C-u C-SPC everytime
     set-mark-command-repeat-pop t
 
-    show-trailing-whitespace t
-
     ;; https://www.masteringemacs.org/article/demystifying-emacs-window-manager
     switch-to-buffer-obey-display-actions t
 
@@ -6372,8 +6370,8 @@ The generated and indented TOC will be inserted at point."
 
 (use-package prog-mode
   :straight (:type built-in)
-  :hook (prog-mode . jf/prog-mode-configurator)
   :config
+  (add-hook 'prog-mode-hook #'jf/prog-mode-configurator)
   ;; I didn't know about `add-log-current-defun-function' until a blog
   ;; reader reached out.  Now, I'm making a general function for
   ;; different modes.
@@ -6468,8 +6466,16 @@ See `jf/comment-header-regexp/major-modes-alis'."
     ;; https://eshelyaron.com/posts/2024-11-27-emacs-aritrary-code-execution-and-how-to-avoid-it.html
     (unless (derived-mode-p 'emacs-lisp-mode)
       (flymake-mode 1))
+    (setq show-trailing-whitespace t)
     (setq truncate-lines t)
     (which-function-mode)))
+
+(use-package text-mode
+  :straight (:type built-in)
+  :config
+  (add-hook 'text-mode-hook #'jf/text-mode-configurator)
+  (defun jf/text-mode-configurator ()
+    (setq show-trailing-whitespace t)))
 
 (use-package ruby-ts-mode
   :straight (:type built-in)
