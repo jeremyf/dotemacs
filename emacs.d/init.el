@@ -684,14 +684,16 @@ PARG is part of the method signature for `org-link-parameters'."
   (cl-defun jf/denote/link-ol-abbr-with-property (link
                                                    description
                                                    format
-                                                   protocol
+                                                   info
                                                    &key
                                                    keyword
                                                    additional-hugo-parameters)
-    "Export a LINK with DESCRIPTION for the given PROTOCOL and FORMAT.
+    "Export a LINK with DESCRIPTION for the given FORMAT.
 
     FORMAT is an Org export backend.  We will discard the given
-    DESCRIPTION.  PROTOCOL is ignored."
+    DESCRIPTION.  We use the INFO to track which abbreviations we've
+    encountered; later using `jf/ox/filter-body/latex' to add an
+    abbreviations section."
     (let* ((keyword-alist
              (jf/denote/org-keywords-from-id
                :identifier link
@@ -705,6 +707,14 @@ PARG is part of the method signature for `org-link-parameters'."
             (key
               (car (alist-get
                      "GLOSSARY_KEY" keyword-alist nil nil #'string=))))
+      ;; When we encounter an abbreviation, add that to the list.  We'll
+      ;; later use that list to build a localized abbreviation element.
+      (let ((abbr-links
+              (plist-get info :abbr-links)))
+        (unless (alist-get keyword-value abbr-links nil nil #'string=)
+          (progn
+            (add-to-list 'abbr-links (cons keyword-value title))
+            (plist-put info :abbr-links abbr-links))))
       (cond
         ((or (eq format 'html) (eq format 'md))
           (if jf/exporting-org-to-tor
@@ -3674,9 +3684,6 @@ function is ever added to that hook."
 (with-eval-after-load 'org
   (use-package ox
     :straight (ox :type built-in))
-  ;; (add-to-list 'org-export-filter-options-functions
-  ;;   #'jf/org-export-change-options)
-   ;;; Org Export and Composition Functionality
   (setq org-export-global-macros (list))
 
   (add-to-list 'org-export-global-macros
@@ -3772,6 +3779,63 @@ function is ever added to that hook."
        ("\\paragraph{%s}" . "\\paragraph*{%s}")
        ("\\subparagraph{%s}" . "\\subparagraph*{%s}")))
   (setopt org-latex-default-class "jf/article")
+
+  (defun jf/org-export-change-options (plist backend)
+    "Conditinally add filter functions to our org-export."
+    (cond
+      ((equal backend 'latex)
+        (if-let ((filter-body
+                   (plist-get plist :filter-body)))
+          (progn
+            (add-to-list 'filter-body jf/ox/filter-body/latex)
+            (plist-put plist :filter-body filter-body))
+          (plist-put plist :filter-body '(jf/ox/filter-body/latex)))
+        (if-let ((filter-final-output
+                   (plist-get plist :filter-final-output)))
+          (progn
+            (add-to-list 'filter-final-output jf/ox/filter-final-output/latex)
+            (plist-put plist :filter-final-output filter-final-output))
+          (plist-put plist :filter-final-output '(jf/ox/filter-final-output/latex)))))
+    plist)
+
+  (add-to-list 'org-export-filter-options-functions
+    'jf/org-export-change-options)
+
+  (defun jf/ox/filter-final-output/latex (body backend info)
+  "Conditionally add an acronym package to exported LaTeX document."
+  (if-let ((abbr-links (plist-get info :abbr-links)))
+    (replace-regexp-in-string
+      "^\\\\documentclass\\(.*\\)"
+      (lambda (md)
+        "Acronym package to matching line."
+        (concat "\\\\documentclass" (match-string 1 md)
+          "\n\\\\usepackage[printonlyused,withpage]{acronym}"))
+      body)
+    body))
+
+(defun jf/ox/filter-body/latex (body backend info)
+  "Conditionally add a list of acronyms to the exported LaTeX document.
+
+To have a meaningful render, this requires using the acronym LaTeX
+package.  The `jf/ox/filter-final-output/latex' handles injecting that
+LaTeX package."
+  (if-let ((abbr-links (plist-get info :abbr-links)))
+    ;; We encountered some links, let's add a section.
+    (progn
+      (concat
+        body
+        "\n\\section{List of Acronyms}\n"
+        "\\begin{acronym}\n"
+        (mapconcat
+          (lambda (cell)
+            "Create an acro for link."
+            (format "\\acro{%s}{%s}" (car cell) (cdr cell)))
+          ;; Sort the keys alphabetically.  Otherwise they are rendered
+          ;; in the reverse order in which they are encountered.
+          (sort abbr-links :key #'car)
+          "\n")
+        "\n\\end{acronym}\n"))
+    body))
 
   (use-package ox-gfm
     :straight t
