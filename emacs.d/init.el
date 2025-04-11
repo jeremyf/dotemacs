@@ -4884,12 +4884,36 @@ The symbol at point is added to the future history."
                 ". --files-without-match --glob=\\!vendor | "
                 "xargs " consult-ripgrep-args)))
         (call-interactively #'consult-ripgrep))))
-  ;; I want recent files as well as project files as well as recent
-  ;; project files...Hence the override fb
-  (setq jf/consult--source-recent-file consult--source-recent-file)
-  (plist-put jf/consult--source-recent-file :narrow ?R)
-  (plist-put jf/consult--source-recent-file :name "Recent File")
-  (setq consult-projectile-sources
+  (defvar jf/consult--source-draft-blog-posts
+    `(:name "Draft Blog Posts"
+       :narrow ?D
+       :cateogry 'file
+       :face 'consult-file
+       :history file-name-history
+       :enabled (lambda ()
+                  (file-exists-p (expand-file-name "~/.my-computer")))
+       :action (lambda (f)
+                 (consult--file-action (f-join (denote-directory) f)))
+       :items (lambda ()
+                (split-string-and-unquote
+                  (shell-command-to-string
+                    ;; First narrow to files with tags
+                    (concat
+                      "cd " (denote-directory) "; fd \"_" jf/denote/keywords/blogPosts ".*\\."
+                      (symbol-name denote-file-type) "\" | "
+                      "xargs rg \"^#\\+ROAM_REFS:\" -i --files-without-match --sortr modified"))
+                  "\n")))
+    "A `consult--read' conformant structure for draft blog posts.")
+
+  (defvar jf/consult--source-recent-file
+    (let ((data consult--source-recent-file))
+      (plist-put data :narrow '(?R . "All Recent Files"))
+      (plist-put data :name "All Recent Files"))
+    "A `consult--read' conformant structure for all recent files.
+In my general finder function, I to have both recent project files as
+well as recent files spanning projects.  This adjustment makes that
+possible.")
+  (setopt consult-projectile-sources
     '( ;; key b
        consult-projectile--source-projectile-buffer
        ;; key f
@@ -4904,6 +4928,8 @@ The symbol at point is added to the future history."
        consult-projectile--source-projectile-recentf
        ;; key R
        jf/consult--source-recent-file
+       ;; key D
+       jf/consult--source-draft-blog-posts
        ;; key *
        consult--source-modified-buffer))
 
@@ -5315,62 +5341,19 @@ literal then add a fuzzy search)."
   (when-let* ((file (buffer-file-name buffer)))
     (denote-file-is-note-p file)))
 
-(use-package consult-notes
-  ;;Let’s add another way at looking up files.  I appreciate the ability
-  ;;to search all files and start with a character (e.g. =b=) followed
-  ;;by <space> to filter to the note source keyed as =s=
-  ;;(e.g. Scientist).
-  :after (denote org)
-  :straight (:type git :host github :repo "mclear-tools/consult-notes")
-  ;; :after (consult denote)
-  :bind
-  ("H-d s" . 'consult-notes-search-in-all-notes)
-  ("H-f" . 'consult-notes)
-  ;; Ensuring that I search my denote/scientist sub-directory, which is
-  ;; excluded from it's containing project's git repository.
-  :custom (consult-notes-use-rg t)
-  (consult-notes-file-dir-sources `(("Denote" ?d ,(denote-directory))))
-  (consult-notes-ripgrep-args
-    (concat
-      "rg --null --line-buffered --color=never --max-columns=1000 "
-      "--path-separator / --ignore-case --no-heading --line-number "
-      "--follow --hidden --glob=!.git/ -L --sortr=accessed"))
-  :config
-  (require 'consult-notes-denote)
-  ;; Add a draft blog post section to my consult notes.
-  (add-to-list 'consult-notes-all-sources
-    `(:name ,(propertize "Draft Blog Posts" 'face 'consult-notes-sep)
-       :narrow ?D
-       :cateogry consult-notes-category
-       :items jf/consult-notes/draft-blog-posts/items
-       :state  consult-notes-denote--state))
-  (defun jf/consult-notes/draft-blog-posts/items ()
-    "Return a propertized list of draft blog posts.
-
-The `consult-notes-denote--source' :items value has most all of the
-logic I want (encoded as a `lambda').  However, I want to provide my own
-files used in generating the candidates; this is done by way of a
-contextual override of `consult-notes-denote-files-function'.
-
-By convention, a draft blog post is one that is tagged with blogPosts
-but does not yet have a ROAM_REFS property (meaning I have not
-associated the org-mode document with the corresponding published URL of
-the document)."
-    (let ((consult-notes-denote-files-function
-            (lambda ()
-              (split-string-and-unquote
-                (shell-command-to-string
-                  ;; First narrow to files with tags
-                  (concat
-                    "fd \"_" jf/denote/keywords/blogPosts ".*\\."
-                    (symbol-name denote-file-type) "\" "
-                    (denote-directory) " | "
-                    "xargs rg \"^#\\+ROAM_REFS:\" -i --files-without-match --sortr modified"))
-                "\n"))))
-      (funcall (plist-get consult-notes-denote--source :items))))
-  :commands (consult-notes consult-notes-search-in-all-notes))
-
-
+(use-package consult-denote
+  ;; I had been using consult-notes, even writing about that package in
+  ;; http://takeonrules.com/2025/04/11/extending-consult-notes-package-to-add-draft-blog-post-candidates/
+  ;;
+  ;; The writing about it helped clarify what I was after, and I did
+  ;; learn something.  However, the `consult-denote' package is far more
+  ;; "compact" and serves my needs quite well.
+  :after (consult denote)
+  :straight t
+  :bind ("H-f" . #'consult-denote-find)
+  :custom
+  (consult-denote-grep-command #'consult-ripgrep)
+  (consult-denote-find-command #'consult-fd))
 
 (use-package emojify
   ;; All the people using emojiis; why not
