@@ -4751,28 +4751,6 @@ sort accordingly.")
     (if (car prefix)
       (consult-imenu-multi)
       (consult-imenu)))
-  (defun consult-clock-in (prefix &optional match)
-    "Clock into an Org agenda heading picking from MATCH.
-
-With a PREFIX jump to the agenda without starting the clock."
-    (interactive "P")
-    (let ((the-match
-            (or match "TODO=\"STARTED\"|TODO=\"TODO\"")))
-      (if prefix
-        (consult-org-agenda the-match)
-        (save-window-excursion
-          (consult-org-agenda the-match)
-          (org-clock-in)))))
-  (defun jf/consult-buffer-kill ()
-    "In `consult-buffer' kill the current candidate"
-    (interactive)
-    (let ((marker
-            (string #x200002)) ;; probably some internal detail :(
-           (candidate
-             (vertico--candidate)))
-      (when (s-ends-with? marker candidate)
-        (kill-buffer (s-replace marker "" candidate))
-        (vertico-next))))
   ;; Customizations
   :config
   (consult-customize
