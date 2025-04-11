@@ -4860,12 +4860,12 @@ The symbol at point is added to the future history."
           ("C-x C-j" . consult-dir-jump-file)))
 
 (use-package consult-projectile
-  ;; package provides a function I use everyday: ~M-x
+  ;; This package provides a function I use everyday: ~M-x
   ;; consult-projectile~.  When I invoke ~consult-projectile~, I have
   ;; the file completion for the current project.  I can also type =b= +
   ;; =SPACE= to narrow my initial search to open buffers in the project.
   ;; Or =p= + =space= to narrow to other projects; and then select a
-  ;; file within that project.
+  ;; file within that project.  And so much more.
   :commands (consult-projectile)
   :bind (("M-s r r" . consult-ripgrep)
           ("M-s r n" . jf/consult-ripgrep-no-generated))
@@ -4932,28 +4932,7 @@ possible.")
        jf/consult--source-draft-blog-posts
        ;; key *
        consult--source-modified-buffer))
-
-
-  (defun consult-find-file-with-preview (prompt
-                                          &optional dir default
-                                          mustmatch initial pred)
-    (interactive)
-    (let ((default-directory
-            (or dir default-directory)))
-      (consult--read #'read-file-name-internal
-        :state (consult--file-preview)
-        :prompt prompt
-        :initial initial
-        :require-match mustmatch
-        :predicate pred)))
   :bind
-  ;;; This overwrite `ns-open-file-using-panel'; the operating system's
-  ;;; "Finder"
-  ;; ("C-c o" . consult-projectile)
-  ;;; I have long had Cmd+t mapped to opening project files; however,
-  ;;; I'm noticing the way I'm typing this and it is feeling wrong.  So
-  ;;; now I won't have that way open.
-  ("s-t" . consult-projectile)
   ("s-p" . consult-projectile)
   ("H-p" . consult-projectile))
 
