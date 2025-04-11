@@ -5359,49 +5359,38 @@ literal then add a fuzzy search)."
       "--follow --hidden --glob=!.git/ -L --sortr=accessed"))
   :config
   (require 'consult-notes-denote)
+  ;; Add a draft blog post section to my consult notes.
   (add-to-list 'consult-notes-all-sources
     `(:name ,(propertize "Draft Blog Posts" 'face 'consult-notes-sep)
        :narrow ?D
        :cateogry consult-notes-category
-       :items jf/consult-notes/draft-blog-post/items
+       :items jf/consult-notes/draft-blog-posts/items
        :state  consult-notes-denote--state))
-  ;; This is an almost complete copy of
-  (defun jf/consult-notes/draft-blog-post/items ()
-    (let* ((max-width 0)
-            (cands (mapcar
-                     (lambda (f)
-                       (let* ((id
-                                (denote-retrieve-filename-identifier f))
-                               (title-1
-                                 (or (denote-retrieve-title-value f (denote-filetype-heuristics f)) (denote-retrieve-filename-title f)))
-                               (title
-                                 (if consult-notes-denote-display-id
-                                   (concat id " " title-1)
-                                   title-1))
-                               (dir
-                                 (file-relative-name (file-name-directory f) denote-directory))
-                               (keywords
-                                 (denote-extract-keywords-from-path f)))
-                         (propertize title 'denote-path f 'denote-keywords keywords)))
-                     (split-string-and-unquote
-                       (shell-command-to-string
-                         (concat
-                           "fd _" jf/denote/keywords/blogPosts " " (denote-directory) " | "
-                           "xargs rg \"^#\\+ROAM_REFS:\" -i --files-without-match --sortr modified"))
-                       "\n"))))
-      (mapcar (lambda (c)
-                (let* ((keywords (get-text-property 0 'denote-keywords c))
-                        (path (get-text-property 0 'denote-path c))
-                        (dirs (directory-file-name (file-relative-name (file-name-directory path) denote-directory))))
-                  (concat c
-                    ;; align keywords
-                    (propertize " " 'display `(space :align-to (+ left ,(+ 2 max-width))))
-					          (propertize (funcall consult-notes-denote-display-keywords-function keywords) 'face 'consult-notes-name)
-					          (when consult-notes-denote-dir
-					            (propertize (funcall consult-notes-denote-display-dir-function dirs) 'face 'consult-notes-name)))))
-        cands)))
-  :commands (consult-notes
-              consult-notes-search-in-all-notes))
+  (defun jf/consult-notes/draft-blog-posts/items ()
+    "Return a propertized list of draft blog posts.
+
+The `consult-notes-denote--source' :items value has most all of the
+logic I want (encoded as a `lambda').  However, I want to provide my own
+files used in generating the candidates; this is done by way of a
+contextual override of `consult-notes-denote-files-function'.
+
+By convention, a draft blog post is one that is tagged with blogPosts
+but does not yet have a ROAM_REFS property (meaning I have not
+associated the org-mode document with the corresponding published URL of
+the document)."
+    (let ((consult-notes-denote-files-function
+            (lambda ()
+              (split-string-and-unquote
+                (shell-command-to-string
+                  ;; First narrow to files with tags
+                  (concat
+                    "fd \"_" jf/denote/keywords/blogPosts ".*\\."
+                    (symbol-name denote-file-type) "\" "
+                    (denote-directory) " | "
+                    "xargs rg \"^#\\+ROAM_REFS:\" -i --files-without-match --sortr modified"))
+                "\n"))))
+      (funcall (plist-get consult-notes-denote--source :items))))
+  :commands (consult-notes consult-notes-search-in-all-notes))
 
 
 
