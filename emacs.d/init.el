@@ -6006,7 +6006,6 @@ See https://github.com/chmouel/gotest-ts.el"
 
 (defun jf/go-ts-mode-configurator ()
   ;; From go-mode
-  (hl-todo-mode 1)
   (setq-local paragraph-start
     (concat "[[:space:]]*\\(?:"
       comment-start-skip
@@ -6569,6 +6568,7 @@ See `jf/comment-header-regexp/major-modes-alis'."
     ;; https://eshelyaron.com/posts/2024-11-27-emacs-aritrary-code-execution-and-how-to-avoid-it.html
     (unless (derived-mode-p 'emacs-lisp-mode)
       (flymake-mode 1))
+    (hl-todo-mode t)
     (setq show-trailing-whitespace t)
     (setq truncate-lines t)
     (which-function-mode)))
