@@ -4399,13 +4399,11 @@ Use `denote-sluggify' as the naming function for the quote"
                   (denote-sluggify 'title
                     first-line-of-block-content))
                 8))))
-    (save-restriction
-      (widen)
-      (save-excursion
-        ;; Place the name of the quote just above the start of the
-        ;; block.
-        (goto-char (point-min))
-        (insert (format "#+NAME: %s\n" name))))))
+    (save-excursion
+      ;; Place the name of the quote just above the start of the
+      ;; block.
+      (goto-char (point-min))
+      (insert (format "#+NAME: %s\n" name)))))
 
 (defun jf/org/capture/quote-location ()
   "Position to a selected “quotable” element base on prompts.
