@@ -168,8 +168,7 @@ Forward PREFIX to `mastodon-tl--show-tag-timeline'."
              "RSS Feed")
      "%^{URL} %^g\n%?"
      :empty-lines-before 1
-     :empty-lines-after 1
-     :immediate-finish t))
+     :empty-lines-after 1))
 
 (add-to-list 'org-capture-templates
   `("t" "Task"

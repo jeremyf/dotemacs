@@ -514,6 +514,8 @@ Else, evaluate the whole buffer."
     :straight (:host github :type git :repo "protesilaos/denote-org")
     :after (denote org))
   ;; (setq denote-journal-extras-title-format 'day-date-month-year)
+  (setopt denote-link-description-format "%t")
+  (setopt denote-org-store-link-to-heading 'context)
   (setopt denote-rename-buffer-format "⟄ %D%b")
   (setopt denote-rename-buffer-backlinks-indicator " ↜")
   (setopt denote-infer-keywords nil)
@@ -555,6 +557,8 @@ Else, evaluate the whole buffer."
        ("à" . "a")
        ("Å" . "A") ("Ä" . "A") ("Ã" . "A") ("Â" . "A") ("Á" . "A")
        ("À" . "A")
+       ("«" . "")
+       ("»" . "")
        ("…" . "")  ;; Ellipsis
        ("—" . "-") ;; em dash
        ("–" . "-") ;; en dash
@@ -1145,6 +1149,15 @@ Wires into `org-insert-link'."
         (call-interactively #'org-previous-visible-heading))
       (pulsar--pulse)))
 
+  (defun jf/book-make-label (title subtitle author)
+    "From the given TITLE, SUBTITLE and AUTHOR return it's formatted label."
+    (format "«%s»%s"
+                              (if (s-present? subtitle)
+                                (concat title ": " subtitle)
+                                title)
+                              (if (s-present? author)
+                                (concat " by " author) "")))
+
   (defun jf/org-link-ol-complete/work ()
     "Prompt for a work from my bibliography"
     (interactive)
@@ -1168,12 +1181,7 @@ Wires into `org-insert-link'."
                                 (author
                                   (org-entry-get headline "AUTHOR")))
                           (cons
-                            (format "«%s»%s"
-                              (if subtitle
-                                (concat title ": " subtitle)
-                                title)
-                              (if (s-present? author)
-                                (concat " by "author) ""))
+                            (jf/book-make-label title subtitle author)
                             (list
                               :id (org-entry-get headline "CUSTOM_ID")
                               :title title
@@ -1191,15 +1199,10 @@ Wires into `org-insert-link'."
                   (and (plist-get work-data :subtitle)
                     (yes-or-no-p "Include Subtitle: ")))
                 (desc
-                  (format "«%s%s»%s"
+                  (jf/book-make-label
                     (plist-get work-data :title)
-                    (if include-subtitle
-                      (format ": %s" (plist-get work-data :subtitle))
-                      "")
-                    (if include-author
-                      (format " by %s" (plist-get work-data :author))
-                      "")
-                    )))
+                    (when include-subtitle (plist-get work-data :subtitle))
+                    (when include-author (plist-get work-data :author)))))
           (message "Added %S to the kill ring" desc)
           (kill-new desc)
           (format "work:%s%s%s"
@@ -2292,8 +2295,11 @@ The ARGS are the rest of the ARGS passed to the ADVISED-FUNCTION."
     '((smallest
         :default-height 100)
        (smaller
-         :default-height 120)
+         :default-height 110)
        (default
+         :default-family "IntoneMono Nerd Font Mono"
+         :default-weight light
+         :bold-weight medium
          :default-height 125)
        (bigger
          :default-height 160)
@@ -4426,13 +4432,7 @@ Narrow focus to a tag, then a named element."
                          (author
                            (org-entry-get headline "AUTHOR")))
                     (cons
-                      (format "«%s»%s"
-                        (if subtitle
-                          (concat title ": " subtitle)
-                          title)
-                        (if author
-                          (concat " by " author)
-                          ""))
+                      (jf/book-make-label title subtitle author)
                       (org-element-property :contents-begin headline)))))))
           ;; Prompt me to pick one of those headlines.
           (headline
