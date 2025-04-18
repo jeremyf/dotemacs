@@ -139,6 +139,7 @@ The DWIM behaviour of this command is as follows:
           ("s-i" . #'ibuffer)
           ("M-RET" . #'newline-and-indent))
   :bind (:map emacs-lisp-mode-map
+          ("H-e m" . 'symbol-overlay-rename)
           ("C-c C-c" . 'jf/eval-region-dwim))
   :config
   ;; Allow "y" or "n" to stand in for yes/no prompts
