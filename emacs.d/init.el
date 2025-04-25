@@ -2788,10 +2788,11 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   :config
   ;; In organizing the packages, I discovred that themes is part of the
   ;; `custom' package.
-  (defun jf/emacs-theme-by-osx-appearance ()
+  (defun jf/color-scheme-set-for-emacs (&optional given-scheme)
     "Function to load named theme."
-    (ef-themes-select
-      (plist-get jf/themes-plist (jf/current-macos-interface-style))))
+    (let ((scheme
+            (or given-scheme (funcall jf/color-scheme-func))))
+      (ef-themes-select (plist-get jf/themes-plist scheme))))
 
   ;; Theming hooks to further customize colors
   (defvar after-enable-theme-hook nil
@@ -2805,22 +2806,56 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
 
   (add-hook 'after-enable-theme-hook #'jf/theme-custom-faces)
 
+  (defvar jf/color-scheme-func
+    (if (eq system-type 'darwin)
+      #'jf/current-macos-interface-style
+      #'jf/current-color-scheme-gnome)
+    "Function that returns :dark or :light, depending on current color scheme.")
+
+  (defun jf/current-color-scheme-gnome ()
+    "Determine Gnome preferred theme."
+    (if (equal
+          "'prefer-light'"
+          (s-trim
+            (shell-command-to-string
+              "gsettings get org.gnome.desktop.interface color-scheme")))
+      :light :dark))
+
   (defun jf/current-macos-interface-style ()
+    "Determine MacOS preferred theme."
     (if (equal "Dark"
           (substring
             (shell-command-to-string
               "defaults read -g AppleInterfaceStyle") 0 4))
       :dark :light))
 
-  (defun jf/dark ()
+  (defun jf/color-scheme-system-toggle ()
     "Toggle system-wide Dark or Light setting."
     (interactive)
-    (shell-command
-      (concat "osascript -e 'tell application \"System Events\" "
-        "to tell appearance preferences "
-        "to set dark mode to not dark mode'"))
-    (jf/emacs-theme-by-osx-appearance))
-  (jf/emacs-theme-by-osx-appearance))
+    (pcase system-type
+      ('darwin
+        (shell-command
+          (concat "osascript -e 'tell application \"System Events\" "
+            "to tell appearance preferences "
+            "to set dark mode to not dark mode'")))
+      (_
+        (let ((scheme-theme
+                (if (eq :dark (jf/current-color-scheme-gnome))
+                  (cons "light" "Adwaita") (cons "dark" "Adwaita-dark"))))
+          (shell-command
+            (format
+              (concat
+                "gsettings set org.gnome.desktop.interface "
+                "color-scheme prefer-%s; "
+                "gsettings set org.gnome.desktop.interface "
+                "gtk-theme %s")
+              (car scheme-theme)
+              (cdr scheme-theme))))))
+    (jf/color-scheme-set-for-emacs))
+  (defalias 'jf/dark 'jf/color-scheme-system-toggle)
+
+  ;; Set the color scheme of emacs based on existing system function.
+  (jf/color-scheme-set-for-emacs))
 
 (use-package xref
   ;; Cross-referencing commands.  I suspect there's a lot more that I
