@@ -77,6 +77,22 @@
       (unless (frame-focus-state)
         (garbage-collect)))))
 
+(defun jf/gnome:toggle-night-light ()
+  "Toggle Gnome night light."
+  (interactive)
+  (let ((enabled
+          (if (string= "t"
+                (substring
+                  (shell-command-to-string
+                    "gsettings get org.gnome.settings-daemon.plugins.color night-light-enabled")
+                  0 1))
+            "false" "true")))
+    (shell-command
+      (format
+        (concat "gsettings set "
+          "org.gnome.settings-daemon.plugins.color "
+          "night-light-enabled %s")
+        enabled))))
 
 ;; From https://protesilaos.com/codelog/2024-11-28-basic-emacs-configuration/
 (defun  prot/keyboard-quit-dwim ()
