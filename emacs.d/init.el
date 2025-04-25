@@ -1614,10 +1614,11 @@ work computers.")
     recentf-max-saved-items 256)
   ;; Track recent
   (recentf-mode 1)
-  ;; Quietly save the recent file list every 10 minutes.
-  (run-at-time nil 600 (lambda ()
-                         (let ((save-silently t))
-                           (recentf-save-list)))))
+  :config
+  ;; Quietly save the recent file list every 5 minutes.
+  (run-at-time (current-time) 300 (lambda ()
+                                    (let ((save-silently t))
+                                      (recentf-save-list)))))
 
 (use-package autorevert
   :straight (:type built-in)
@@ -1862,13 +1863,14 @@ work computers.")
       (propertize indicator
         'face
         (if (mode-line-window-selected-p)
-          (if (eq ns-right-alternate-modifier nil)
-                 'jf/mode-line-format/face-shadow-highlight
-                 'jf/mode-line-format/face-shadow)
+          (if (and (boundp 'ns-right-alternate-modifier)
+                (eq ns-right-alternate-modifier nil))
+            'jf/mode-line-format/face-shadow-highlight
+            'jf/mode-line-format/face-shadow)
           'mode-line-inactive)
         'local-map jf/mode-line-format/major-mode-indicator-map
         'help-echo
-               (concat "mouse-1:  #'jf/toggle-osx-alternate-modifier"))))
+        (concat "mouse-1:  #'jf/toggle-osx-alternate-modifier"))))
 
   (defvar jf/mode-line-format/major-mode-map
     (let ((map
@@ -3171,7 +3173,7 @@ future copy)."
   ;; And I'm sure much more
   :preface
   (require 'cl-lib)
-  :straight (org :source org-elpa)
+  :straight (org :github "bzg/org-mode")
   :hook (org-mode . jf/org-mode/configurator)
   :bind (("C-c C-j" . jf/project/jump-to-task)
           ("C-c C-x C-j" . org-clock-goto)
@@ -4593,7 +4595,7 @@ sort accordingly.")
           ("M-DEL" . jf/delete-region-or-backward-word)
           ("C-M-<backspace>" . backward-kill-paragraph))
   :custom
-  (global-display-line-numbers-mode t)
+  (menu-bar-mode)
   (column-number-mode t)
   (global-display-fill-column-indicator-mode t)
   (delete-selection-mode t)
@@ -7157,14 +7159,6 @@ Useful for Eglot."
   :init
   (add-hook 'logos-page-motion-hook #'logos--reveal-entry))
 
-(use-package "nov.el"
-  ;; A package to help in reading epubs.
-  :straight t
-  :init (use-package esxml :straight t)
-  :config
-  (add-to-list 'auto-mode-alist '("\\.epub\\'" . nov-mode))
-  :custom (nov-text-width 80))
-
 (use-package so-long
   ;; Switch to `so-long' when the file gets too long for normal
   ;; processing.
@@ -7766,13 +7760,14 @@ A page is marked `last' if rel=\"last\" appears in a <link> or <a> tag."
        "harvard-lts/CURIOSity"
        "WGBH-MLA/ams")))
 
-(use-package git-commit
+(use-package git-commit-ts-mode
   :straight t
-  :hook ((git-commit-mode . jf/git-commit-mode-configurator))
-  :bind (:map git-commit-mode-map
+  :hook ((git-commit-ts-mode . jf/git-commit-mode-configurator))
+  :bind (:map git-commit-ts-mode-map
           (("TAB" .  #'completion-at-point)))
   :bind ("s-7" . #'structured-commit/write-message)
   :config
+  (setq git-commit-major-mode 'git-commit-ts-mode)
   (defun jf/git-commit-mode-configurator ()
     "Prepare all of the commit buffer structure"
     (setq-local fill-column git-commit-fill-column)
@@ -8622,6 +8617,7 @@ If `consult--read' is defined, use that.  Otherwise fallback to
       (1+ server-visit-files-custom-find:buffer-count))))
 
 (add-hook 'after-init-hook #'jf/enable-indent-for-tab-command)
+(add-hook 'after-init-hook #'global-display-line-numbers-mode)
 
 (use-package org
   ;; For projects and all
