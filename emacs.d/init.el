@@ -7528,7 +7528,7 @@ Modification of `rmh-elfeed-org-convert-org-to-opml'."
       opml-body))
   (setq rmh-elfeed-org-files nil)
   (dolist (file `(,(denote-get-path-by-id "20110202T000001")))
-    (when (f-exists? file)
+    (when (and file (f-exists? file))
       (add-to-list 'rmh-elfeed-org-files file))))
 
 (use-package eww
