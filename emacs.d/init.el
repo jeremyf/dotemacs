@@ -344,6 +344,10 @@ Else, evaluate the whole buffer."
           "Copied buffer file name '%s' to the clipboard."
           filename)))))
 
+(when (eq system-type 'gnu/linux)
+  (bind-key "s-c" 'copy-region-as-kill)
+  (bind-key "s-s" 'save-buffer))
+
 (when (eq system-type 'darwin)
   (progn
     (load "~/git/dotemacs/emacs.d/grab-mac-link-revised.el")
