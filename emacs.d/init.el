@@ -77,7 +77,7 @@
       (unless (frame-focus-state)
         (garbage-collect)))))
 
-(defun jf/gnome:toggle-night-light ()
+(defun jf/linux:toggle-night-light ()
   "Toggle Gnome night light."
   (interactive)
   (let ((enabled
@@ -93,6 +93,11 @@
           "org.gnome.settings-daemon.plugins.color "
           "night-light-enabled %s")
         enabled))))
+
+(defun jf/linux:radio-silence ()
+  "Soft block laptop radios (e.g. bluetooth and wifi)"
+  (interactive)
+  (shell-command "rfkill block all"))
 
 ;; From https://protesilaos.com/codelog/2024-11-28-basic-emacs-configuration/
 (defun  prot/keyboard-quit-dwim ()
