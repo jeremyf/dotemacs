@@ -350,7 +350,11 @@ Else, evaluate the whole buffer."
           filename)))))
 
 (when (eq system-type 'gnu/linux)
+  (use-package grab-x-link
+    :straight (:host github :repo "jeremyf/dotemacs" :files ("emacs.d/grab-x-link")))
+  ;; Favoring this over `cua-mode'
   (bind-key "s-c" 'copy-region-as-kill)
+  (bind-key "s-a" 'mark-whole-buffer)
   (bind-key "s-s" 'save-buffer))
 
 (when (eq system-type 'darwin)
