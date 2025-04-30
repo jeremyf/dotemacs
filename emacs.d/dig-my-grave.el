@@ -43,6 +43,7 @@
      ("Elixir" . "#+begin_src elixir-ts\n#+end_src")
      ("Plant UML (puml)" . "#+begin_src plantuml\n@startuml\n!theme amiga\n\n@enduml\n#+end_src")
      ("Ruby" . "#+begin_src ruby\n#+end_src")
+     ("Sudo" . "#+begin_src shell :dir \"/sudo::/\" :cache no :export source :results raw silent\n#+end_src")
      ("Update" . tempel-insert-update_block)
      ("Verb" . tempel-insert-verb_block))
 
