@@ -154,6 +154,8 @@ markdown org), if LINK-TYPE is omitted or nil, plain link will be used."
 (cl-defmacro grab-x-link:register-app (&key menu-key menu-label classname name key suffix)
   "Leverage xdotool to copy the URL and title from the found window.
 
+We intersect the name and classname in xdotool.
+
 MENU-KEY: when choosing what to grab, this is the key to select the app.
 MENU-LABEL: label for the grab menu app name.
 NAME: the xdotool --name parameter
