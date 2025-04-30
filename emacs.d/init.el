@@ -77,27 +77,6 @@
       (unless (frame-focus-state)
         (garbage-collect)))))
 
-(defun jf/linux:toggle-night-light ()
-  "Toggle Gnome night light."
-  (interactive)
-  (let ((enabled
-          (if (string= "t"
-                (substring
-                  (shell-command-to-string
-                    "gsettings get org.gnome.settings-daemon.plugins.color night-light-enabled")
-                  0 1))
-            "false" "true")))
-    (shell-command
-      (format
-        (concat "gsettings set "
-          "org.gnome.settings-daemon.plugins.color "
-          "night-light-enabled %s")
-        enabled))))
-
-(defun jf/linux:radio-silence ()
-  "Soft block laptop radios (e.g. bluetooth and wifi)"
-  (interactive)
-  (shell-command "rfkill block all"))
 
 ;; From https://protesilaos.com/codelog/2024-11-28-basic-emacs-configuration/
 (defun  prot/keyboard-quit-dwim ()
@@ -353,6 +332,64 @@ Else, evaluate the whole buffer."
 (when (eq system-type 'gnu/linux)
   (use-package grab-x-link
     :straight (:host github :repo "jeremyf/dotemacs" :files ("emacs.d/grab-x-link")))
+
+  (cl-defmacro jf/linux:gsettings-toggler (name &key property match on_match on_miss)
+    "Toggle the NAME setting via the PROPERTY.
+
+When the first 4 characters MATCH set the property to ON_MATCH;
+otherwise set it to the ON_MISS value."
+    (let ((docstring
+            (concat "Toggle " name " for Gnome desktop."))
+           (func-name
+             (intern (concat "jf/linux:toggle-" name))))
+      `(defun ,func-name ()
+         ,docstring
+         (interactive)
+         (let ((value
+                 (if (string= ,match
+                       (substring
+                         (shell-command-to-string
+                           (concat "gsettings get " ,property))
+                         0 4))
+                   ,on_match ,on_miss)))
+           (shell-command
+             (concat "gsettings set " ,property " " value))))))
+
+  (jf/linux:gsettings-toggler "Trackpad"
+    :property "org.gnome.desktop.peripherals.touchpad send-events"
+    :match "'ena"
+    :on_match "disabled"
+    :on_miss "enabled")
+
+  (jf/linux:gsettings-toggler "Night Light"
+    :property "org.gnome.settings-daemon.plugins.color night-light-enabled"
+    :match "true"
+    :on_match "false"
+    :on_miss "true")
+
+  (defun jf/linux:radio-silence ()
+    "Soft block laptop radios (e.g. bluetooth and wlan).
+
+Related to `jf/linux:radio-broadcast'."
+    (interactive)
+    (shell-command "rfkill block all"))
+
+  (defun jf/linux:radio-broadcast (&optional all identifiers)
+    "Soft unblock laptop radios (e.g. bluetooth and wlan)
+
+When ALL is non-nil unblock all radios.  Other unblock only the wlan.
+
+Related to `jf/linux:radio-silence'."
+    (interactive "P")
+    (let ((identifiers
+            (mapconcat
+              (lambda (el) el)
+              (or identifiers '("wlan"))
+              " ")))
+      (shell-command
+        (concat "rfkill unblock "
+          (if all "all" identifiers)))))
+
   ;; Favoring this over `cua-mode'
   (bind-key "s-c" 'copy-region-as-kill)
   (bind-key "s-a" 'mark-whole-buffer)
@@ -2861,29 +2898,64 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
               "defaults read -g AppleInterfaceStyle") 0 4))
       :dark :light))
 
+  (defvar jf/color-scheme-system-toggle-functions
+    '(jf/color-scheme:gnome-color-scheme
+       jf/color-scheme:gnome-gtk-theme
+       jf/color-scheme:copyq-theme
+       jf/color-scheme:emacs-theme)
+    "A list of arity one functions that set component schemes based on the
+input parameter.
+
+When the parameter is non-nil, favor the dark option.  Otherwise favor
+the light option.")
+
+  (defun jf/color-scheme:gnome-color-scheme (lightp)
+    "Set the gnome color scheme based on LIGHTP (e.g. light/dark)."
+    (shell-command
+      (format
+        "gsettings set org.gnome.desktop.interface color-scheme prefer-%s"
+        (if lightp "light" "dark"))))
+
+  (defun  jf/color-scheme:gnome-gtk-theme (lightp)
+    "Set the gnome gtk theme based on LIGHTP (e.g. light/dark)."
+    (let ((theme
+            (if lightp "Adwaita" "Adwaita-dark")))
+      (shell-command
+        (format
+          "gsettings set org.gnome.desktop.interface gtk-theme %s"
+          theme))))
+
+  (defun jf/color-scheme:copyq-theme (lightp)
+    "Set the copyq theme based on LIGHTP (e.g. light/dark)."
+    (shell-command
+      (format
+        "copyq loadTheme %s/solarized-%s.ini"
+        (s-trim
+          (shell-command-to-string "copyq info themes"))
+        (if lightp "light" "dark"))))
+
+  (defun jf/color-scheme:emacs-theme (lightp)
+    "Set the emacs theme based on LIGHTP (e.g. light/dark)."
+    (ef-themes-select
+      (plist-get jf/themes-plist
+        (if lightp :light :dark))))
+
   (defun jf/color-scheme-system-toggle ()
     "Toggle system-wide Dark or Light setting."
     (interactive)
     (pcase system-type
       ('darwin
-        (shell-command
-          (concat "osascript -e 'tell application \"System Events\" "
-            "to tell appearance preferences "
-            "to set dark mode to not dark mode'")))
-      (_
-        (let ((scheme-theme
-                (if (eq :dark (jf/current-color-scheme-gnome))
-                  (cons "light" "Adwaita") (cons "dark" "Adwaita-dark"))))
+        (progn
           (shell-command
-            (format
-              (concat
-                "gsettings set org.gnome.desktop.interface "
-                "color-scheme prefer-%s; "
-                "gsettings set org.gnome.desktop.interface "
-                "gtk-theme %s")
-              (car scheme-theme)
-              (cdr scheme-theme))))))
-    (jf/color-scheme-set-for-emacs))
+            (concat "osascript -e 'tell application \"System Events\" "
+              "to tell appearance preferences "
+              "to set dark mode to not dark mode'"))
+          (jf/color-scheme-set-for-emacs)))
+      (_
+        (let ((lightp
+                (eq :dark (jf/current-color-scheme-gnome))))
+          (dolist (fn jf/color-scheme-system-toggle-functions)
+            (funcall fn lightp))))))
   (defalias 'jf/dark 'jf/color-scheme-system-toggle)
 
   ;; Set the color scheme of emacs based on existing system function.
