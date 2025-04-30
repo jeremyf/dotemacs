@@ -177,7 +177,10 @@ The DWIM behaviour of this command is as follows:
   ;; hollow box.  Why?  It feels more retro.
   (setopt cursor-type 'bar)
   (blink-cursor-mode t)
-
+  (setopt
+    tool-bar-mode -1)
+  (setopt
+    scroll-bar-mode 'right)
   (setopt
     ;; Don't delink hardlinks
     backup-by-copying t
