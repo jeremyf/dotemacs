@@ -71,7 +71,7 @@
       string)
     ((string= (substring string (- (length string) (length suffix))) suffix)
       (substring string 0 (- (length suffix))))
-    (_ string)))
+    (t string)))
 
 (defun grab-x-link--get-clipboard ()
   "Get the contents of the clipboard.
