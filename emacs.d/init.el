@@ -134,12 +134,10 @@ The DWIM behaviour of this command is as follows:
   ;; messing me up a bit.  Also enable a few that I find helpful.  (I’ll
   ;; enable a lot more later).
   (unbind-key "C-z") ;; `suspend-frame'
+  (unbind-key "M-z") ;; `zap-to-char'
   (unbind-key "<f2>") ;; `suspend-frame'
   (unbind-key "s-o") ;; `ns-open-file-using-panel'
   (unbind-key "C-x C-c") ;; `save-buffers-kill-terminal'
-
-  ;; Hide the icons of the Emacs toolbar
-  (tool-bar-mode -1)
 
   ;; Ensuring I have an autosave directory.  On a few rare occassions
   ;; this has saved me from lost "work".
