@@ -9271,43 +9271,6 @@ This encodes the logic for creating a project."
   (load "personal.el")
   (load "work.el"))
 
-;; (use-package detached
-;;   ;; Run detached shell commands that can keep running even after
-;;   ;; I quit emacs.
-;;   ;;
-;;   ;; We will need the 'dtach' command installed for the detached
-;;   ;; package to work.
-;;   ;;
-;;   ;; '$ brew install dtach'
-;;   :straight t
-;;   (unless (executable-find "dtach")
-;;     (async-shell-command "brew install dtach")))
-
-;; (let ((ip4g-dir
-;;        (expand-file-name "~/git/morpho-utils/emacs")))
-;;   (when (file-directory-p ip4g-dir)
-;;     (unless (executable-find "openstack")
-;;       (async-shell-command "brew install openstackclient"))
-;;     (unless (executable-find "autossh")
-;;       (async-shell-command "brew install autossh"))))
-
-(dir-locals-set-class-variables
-  'go-lang
-  '((nil . ((projectile-git-fd-args .
-              "-H -0 -tf --strip-cwd-prefix -c never -E vendor/ -E pkg/ -E docs/ -E .git")))))
-
-(dir-locals-set-directory-class
-  "~/git/converge-cloud/marketplace-provider" 'go-lang)
-
-(dir-locals-set-directory-class
-  "~/git/converge-cloud/concierge" 'go-lang)
-
-(dir-locals-set-directory-class
-  "~/git/converge-cloud/morpho-account-service" 'go-lang)
-
-(dir-locals-set-directory-class
-  "~/git/converge-cloud/morpho-service-broker" 'go-lang)
-
 (custom-set-variables
   ;; custom-set-variables was added by Custom.
   ;; If you edit it by hand, you could mess it up, so be careful.

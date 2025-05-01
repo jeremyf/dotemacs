@@ -1,3 +1,21 @@
+(dir-locals-set-class-variables
+  'go-lang
+  '((nil . ((projectile-git-fd-args .
+              "-H -0 -tf --strip-cwd-prefix -c never -E vendor/ -E pkg/ -E docs/ -E .git")))))
+
+(dir-locals-set-directory-class
+  "~/git/converge-cloud/marketplace-provider" 'go-lang)
+
+(dir-locals-set-directory-class
+  "~/git/converge-cloud/concierge" 'go-lang)
+
+(dir-locals-set-directory-class
+  "~/git/converge-cloud/morpho-account-service" 'go-lang)
+
+(dir-locals-set-directory-class
+  "~/git/converge-cloud/morpho-service-broker" 'go-lang)
+
+
 ;; At my current employer, I have quarterly managed business objectives
 ;; (MBOs).  These focal activities involve: initiation, tracking work,
 ;; and completion (with supporting documentation).
