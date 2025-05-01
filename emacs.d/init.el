@@ -156,10 +156,10 @@ The DWIM behaviour of this command is as follows:
   ;; hollow box.  Why?  It feels more retro.
   (setopt cursor-type 'bar)
   (blink-cursor-mode t)
-  (setopt
-    tool-bar-mode -1)
-  (setopt
-    scroll-bar-mode 'right)
+  (setopt scroll-bar-mode 'right)
+  (tool-bar-mode -1)
+  ;; (setopt
+  ;;   scroll-bar-mode 'right)
   (setopt
     ;; Don't delink hardlinks
     backup-by-copying t
@@ -7736,7 +7736,43 @@ A page is marked `last' if rel=\"last\" appears in a <link> or <a> tag."
         (eww-browse-url (shr-expand-url best-url (plist-get eww-data :url)))
         (user-error "No `last' for this page"))))
 
-  (setq browse-url-browser-function 'browse-url-default-macosx-browser)
+  (setopt browse-url-browser-function
+    (if (eq system-type 'darwin)
+      'browse-url-default-macosx-browser
+      'browse-url-librewolf))
+
+  ;; TODO: Rework the following variables and function into a macro.m
+  (defvar browse-url-librewolf-program "librewolf")
+  (defvar browse-url-librewolf-arguments nil)
+  (defun browse-url-librewolf (url &optional new-window)
+    "Ask the LibreWolf WWW browser to load URL.
+Defaults to the URL around or before point.  Passes the strings
+in the variable `browse-url-librewolf-arguments' to LibreWolf.
+
+Interactively, if the variable `browse-url-new-window-flag' is non-nil,
+loads the document in a new LibreWolf window.  A non-nil prefix argument
+reverses the effect of `browse-url-new-window-flag'.
+
+If `browse-url-librewolf-new-window-is-tab' is non-nil, then
+whenever a document would otherwise be loaded in a new window, it
+is loaded in a new tab in an existing window instead.
+
+Non-interactively, this uses the optional second argument NEW-WINDOW
+instead of `browse-url-new-window-flag'."
+    (interactive (browse-url-interactive-arg "URL: "))
+    (setq url (browse-url-encode-url url))
+    (let* ((process-environment (browse-url-process-environment)))
+      (apply #'start-process
+        (concat "librewolf " url) nil
+        browse-url-librewolf-program
+        (append
+          browse-url-librewolf-arguments
+          (if (browse-url-maybe-new-window new-window)
+            (if browse-url-librewolf-new-window-is-tab
+              '("-new-tab")
+              '("-new-window")))
+          (list url)))))
+
   (defun jf/reader-visual ()
     ;; A little bit of RSS beautification.
     "A method to turn on visual line mode and adjust text scale."
