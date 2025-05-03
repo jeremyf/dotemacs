@@ -188,29 +188,32 @@ SUFFIX: The suffix to strip from the returned title.
                          ,suffix)))
            (cons url title))))))
 
-(grab-x-link:register-app
-  :menu-key ?f
-  :menu-label "[f]irefox"
-  :name "Firefox"
-  :classname "Navigator"
-  :key "alt+l Escape alt+l alt+c Escape"
-  :suffix " - Mozilla Firefox")
+(when (executable-find "firefox")
+  (grab-x-link:register-app
+    :menu-key ?f
+    :menu-label "[f]irefox"
+    :name "Firefox"
+    :classname "Navigator"
+    :key "ctrl+l Escape ctrl+l ctrl+c Escape"
+    :suffix " - Mozilla Firefox"))
 
-(grab-x-link:register-app
-  :menu-key ?l
-  :menu-label "[l]ibrewolf"
-  :name "Librewolf"
-  :classname "Navigator"
-  :key "ctrl+l Escape ctrl+l ctrl+c Escape"
-  :suffix " - LibreWolf")
+(when (executable-find "librewolf")
+  (grab-x-link:register-app
+    :menu-key ?l
+    :menu-label "[l]ibrewolf"
+    :name "Librewolf"
+    :classname "Navigator"
+    :key "ctrl+l Escape ctrl+l ctrl+c Escape"
+    :suffix " — LibreWolf"))
 
-(grab-x-link:register-app
-  :menu-key ?m
-  :menu-label "[m]ullvad"
-  :name "Mullvad"
-  :classname "Navigator"
-  :key "ctrl+l Escape ctrl+l ctrl+c Escape"
-  :suffix " - Mullvad Browser")
+(when (executable-find "mullvad-browser")
+  (grab-x-link:register-app
+    :menu-key ?m
+    :menu-label "[m]ullvad"
+    :name "Mullvad"
+    :classname "Navigator"
+    :key "ctrl+l Escape ctrl+l ctrl+c Escape"
+    :suffix " - Mullvad Browser"))
 
 (bind-key "C-c g" 'grab-x-link)
 
