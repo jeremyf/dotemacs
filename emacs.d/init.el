@@ -5470,7 +5470,18 @@ literal then add a fuzzy search)."
   :bind ("H-f" . #'consult-denote-find)
   :custom
   (consult-denote-grep-command #'consult-ripgrep)
-  (consult-denote-find-command #'consult-fd))
+  :config
+  (setopt consult-denote-find-command
+    ;; fd version 8 does not work with consult's parameters.  I know
+    ;; that fd 10 works.
+    (if (and
+          (executable-find "fd")
+          (<= 10
+            (string-to-number
+              (shell-command-to-string
+                "fd --version | rg \"fd (\\d+)\" -r '\$1' --only-matching"))))
+      #'consult-fd
+    #'consult-find)))
 
 (use-package emojify
   ;; All the people using emojiis; why not
