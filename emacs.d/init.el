@@ -336,8 +336,8 @@ Else, evaluate the whole buffer."
   (cl-defmacro jf/linux:gsettings-toggler (name &key property match on_match on_miss)
     "Toggle the NAME setting via the PROPERTY.
 
-When the first 4 characters MATCH set the property to ON_MATCH;
-otherwise set it to the ON_MISS value."
+When the PROPERTY is a MATCH set the property to ON_MATCH; otherwise set
+it to the ON_MISS value."
     (let ((docstring
             (concat "Toggle " name " for Gnome desktop."))
            (func-name
@@ -347,17 +347,17 @@ otherwise set it to the ON_MISS value."
          (interactive)
          (let ((value
                  (if (string= ,match
-                       (substring
+                       (s-trim
                          (shell-command-to-string
-                           (concat "gsettings get " ,property))
-                         0 4))
+                           (concat "gsettings get " ,property))))
                    ,on_match ,on_miss)))
            (shell-command
-             (concat "gsettings set " ,property " " value))))))
+             (concat "gsettings set " ,property " " value))
+           (message "%s: %s" ,name value)))))
 
   (jf/linux:gsettings-toggler "Trackpad"
     :property "org.gnome.desktop.peripherals.touchpad send-events"
-    :match "'ena"
+    :match "'enabled'"
     :on_match "disabled"
     :on_miss "enabled")
 
