@@ -8545,8 +8545,7 @@ If `consult--read' is defined, use that.  Otherwise fallback to
             "rg \"^[- ] " key ": .*$\" "
             (f-join directory filename)
             " --only-matching --no-filename | sed 's/^[ -] " key
-            ": //' | sort | tr '\n' '🪓'"))
-        "🪓"))
+            ": //' | sort"))))
 
     (cl-defun jf/list-filenames-with-file-text (&key matching in)
       "Build list of filenames MATCHING pattern IN the given directory."
@@ -8557,8 +8556,7 @@ If `consult--read' is defined, use that.  Otherwise fallback to
             (concat
               "rg \""
               matching "\" --only-matching --files-with-matches"
-              " --sortr modified | tr '\n' '🪓'"))
-          "🪓")))
+              " --sortr modified")))))
 
     (cl-defun jf/list-full-filenames-with-file-text (&key matching in
                                                       (switch "--files-with-matches"))
@@ -8568,8 +8566,7 @@ If `consult--read' is defined, use that.  Otherwise fallback to
           (concat
             "rg \""
             matching "\" " in " --only-matching " switch
-            " --sortr modified | tr '\n' '🪓'"))
-        "🪓"))
+            " --sortr modified"))))
 
     (defun jf/tor-page-relative-pathname-list ()
       "Return a list of pages for TakeOnRules.com."
