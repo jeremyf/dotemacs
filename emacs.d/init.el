@@ -2397,8 +2397,8 @@ The ARGS are the rest of the ARGS passed to the ADVISED-FUNCTION."
          :fixed-pitch-serif-family nil ; falls back to :default-family
          :fixed-pitch-serif-weight nil ; falls back to :default-weight
          :fixed-pitch-serif-height 1.0
-         :variable-pitch-family "IntoneMono Nerd Font Propo"
-         :variable-pitch-weight nil
+         :variable-pitch-family "IntoneMono Nerd Font Propo Light"
+         :variable-pitch-weight light
          :variable-pitch-height 1.0
          :bold-family nil ; use whatever the underlying face has
          :bold-weight medium
