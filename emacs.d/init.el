@@ -7747,42 +7747,11 @@ A page is marked `last' if rel=\"last\" appears in a <link> or <a> tag."
         (eww-browse-url (shr-expand-url best-url (plist-get eww-data :url)))
         (user-error "No `last' for this page"))))
 
-  (setopt browse-url-browser-function
-    (if (eq system-type 'darwin)
-      'browse-url-default-macosx-browser
-      'browse-url-librewolf))
-
-  ;; TODO: Rework the following variables and function into a macro.m
-  (defvar browse-url-librewolf-program "librewolf")
-  (defvar browse-url-librewolf-arguments nil)
-  (defun browse-url-librewolf (url &optional new-window)
-    "Ask the LibreWolf WWW browser to load URL.
-Defaults to the URL around or before point.  Passes the strings
-in the variable `browse-url-librewolf-arguments' to LibreWolf.
-
-Interactively, if the variable `browse-url-new-window-flag' is non-nil,
-loads the document in a new LibreWolf window.  A non-nil prefix argument
-reverses the effect of `browse-url-new-window-flag'.
-
-If `browse-url-librewolf-new-window-is-tab' is non-nil, then
-whenever a document would otherwise be loaded in a new window, it
-is loaded in a new tab in an existing window instead.
-
-Non-interactively, this uses the optional second argument NEW-WINDOW
-instead of `browse-url-new-window-flag'."
-    (interactive (browse-url-interactive-arg "URL: "))
-    (setq url (browse-url-encode-url url))
-    (let* ((process-environment (browse-url-process-environment)))
-      (apply #'start-process
-        (concat "librewolf " url) nil
-        browse-url-librewolf-program
-        (append
-          browse-url-librewolf-arguments
-          (if (browse-url-maybe-new-window new-window)
-            (if browse-url-librewolf-new-window-is-tab
-              '("-new-tab")
-              '("-new-window")))
-          (list url)))))
+  ;; Favor librewolf as default firefox browser, failing that mullvad.
+  (if (executable-find "librewolf")
+    (setopt browse-url-firefox-program "librewolf")
+    (when (executable-find "mullvad-browser")
+      (setopt browse-url-firefox-program "mullvad-browser")))
 
   (defun jf/reader-visual ()
     ;; A little bit of RSS beautification.
