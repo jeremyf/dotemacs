@@ -6566,14 +6566,30 @@ See `add-log-current-defun-function'."
         (message "%s" text)
         (kill-new (substring-no-properties text)))
       (user-error "Warning: Point not on function")))
+  (defun jf/yank-current-scoped-function-as-org-mode-link ()
+    "Yank the current function and region as an `org-mode' link."
+    (interactive)
+    (if-let ((text
+               (funcall add-log-current-defun-function)))
+      (let ((link
+              (format "[[%s][%s]]"
+                (call-interactively #'git-link)
+                text)))
+        (message link)
+        (kill-new (substring-no-properties link)))
+      (user-error "Warning: Point not on function")))
   (bind-key "C-M-e"
     #'end-of-defun prog-mode-map)
   (bind-key "C-M-a"
     #'beginning-of-defun prog-mode-map)
   (bind-key "C-c y f"
     #'jf/yank-current-scoped-function-name prog-mode-map)
+  (bind-key "C-c y o"
+    #'jf/yank-current-scoped-function-as-org-mode-link prog-mode-map)
   (bind-key "C-c y f"
     #'jf/yank-current-scoped-function-name emacs-lisp-mode-map)
+  (bind-key "C-c y o"
+    #'jf/yank-current-scoped-function-as-org-mode-link emacs-lisp-mode-map)
 
   (defvar jf/comment-header-regexp/major-modes-alist
     '((emacs-lisp-mode . "^;;;+$")
