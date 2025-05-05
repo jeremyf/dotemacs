@@ -137,7 +137,7 @@ For inserting entity."
                (let* ((mbo
                         (org-element-at-point))
                        (quarter
-                         (car (org-element-lineage mbo))))
+                         (cadr (org-element-lineage mbo))))
                  (cons
                    (concat
                      (propertize
