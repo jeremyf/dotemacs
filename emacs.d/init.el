@@ -7768,6 +7768,11 @@ A page is marked `last' if rel=\"last\" appears in a <link> or <a> tag."
   :bind (("C-s-o" . browse-url-at-point))
   :hook ((eww-mode . jf/reader-visual)))
 
+;; Given that I have tools to grab results from the browser; it makes
+;; sense to have tools to launch a search in my browser.
+(use-package emacs-websearch
+  :straight '(emacs-websearch :host github :repo "zhenhua-wang/emacs-websearch"))
+
 (use-package stem-reading-mode
   ;; A package that emboldens word stems, helping read a bit faster.
   :straight t
