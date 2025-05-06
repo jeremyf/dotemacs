@@ -7900,14 +7900,20 @@ A page is marked `last' if rel=\"last\" appears in a <link> or <a> tag."
        "harvard-lts/CURIOSity"
        "WGBH-MLA/ams")))
 
+(use-package git-commit
+  :straight t
+  :config
+  (setopt git-commit-major-mode #'git-commit-ts-mode))
+
 (use-package git-commit-ts-mode
   :straight t
+  :after (magit git-commit)
+  :mode "\\COMMIT_MESSAGE\\'"
   :hook ((git-commit-ts-mode . jf/git-commit-mode-configurator))
   :bind (:map git-commit-ts-mode-map
           (("TAB" .  #'completion-at-point)))
   :bind ("s-7" . #'structured-commit/write-message)
   :config
-  (setq git-commit-major-mode 'git-commit-ts-mode)
   (defun jf/git-commit-mode-configurator ()
     "Prepare all of the commit buffer structure"
     (setq-local fill-column git-commit-fill-column)
