@@ -9027,9 +9027,8 @@ otherwise."
           (concat
             "fd _projects " directory " | xargs rg \"^#\\+PROJECT_NAME: +(" project ") *$\" "
             " --follow --only-matching --no-ignore-vcs --with-filename "
-            "-r '$1' | tr '\n' '🪓'")
-          )
-        "🪓")))
+            "-r '$1' | tr '\n' '#'"))
+        "#")))
 
   (cl-defun jf/project/get-project/project-source-code (&key (directory jf/denote-base-dir))
     "Return the current \"noted\" project name.
