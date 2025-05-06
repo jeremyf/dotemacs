@@ -2358,10 +2358,16 @@ The ARGS are the rest of the ARGS passed to the ADVISED-FUNCTION."
   ;; selecting them.
   :straight t
   :config
+  (defvar variable-pitch-name
+    (if (eq system-type 'darwin)
+      "IntoneMono Nerd Font Propo"
+      "IntoneMono Nerd Font Propo Light")
+    "Provide an inflection point for OS fonts.  Namely they are named just a
+bit differently.")
   (setopt fontaine-presets
     ;; I'm naming the presets as "actions"; the mindset that I'm using
     ;; when wanting that font.
-    '((smallest
+    `((smallest
         :default-height 100)
        (smaller
          :default-height 110)
@@ -2396,7 +2402,7 @@ The ARGS are the rest of the ARGS passed to the ADVISED-FUNCTION."
          :fixed-pitch-serif-family nil ; falls back to :default-family
          :fixed-pitch-serif-weight nil ; falls back to :default-weight
          :fixed-pitch-serif-height 1.0
-         :variable-pitch-family "IntoneMono Nerd Font Propo Light"
+         :variable-pitch-family ,variable-pitch-name
          :variable-pitch-weight light
          :variable-pitch-height 1.0
          :bold-family nil ; use whatever the underlying face has
