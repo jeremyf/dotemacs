@@ -123,7 +123,6 @@ The DWIM behaviour of this command is as follows:
   (make-directory "~/.emacs.d/autosaves/" t)
   :bind (("M-[" . #'backward-paragraph)
           ("s-[" . #'backward-paragraph)
-          ("H-s". #'save-buffer)
           ("M-]" . #'forward-paragraph)
           ("s-]" . #'forward-paragraph)
           ("C-k" . #'jf/kill-line-or-region)
@@ -5467,7 +5466,9 @@ literal then add a fuzzy search)."
   ;; "compact" and serves my needs quite well.
   :after (consult denote)
   :straight t
-  :bind ("H-f" . #'consult-denote-find)
+  :bind
+  ("H-f" . #'consult-denote-find)
+  ("H-s" . #'consult-denote-grep)
   :custom
   (consult-denote-grep-command #'consult-ripgrep)
   :config
