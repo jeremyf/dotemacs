@@ -5599,6 +5599,9 @@ The misspelled word is taken from OVERLAY.  WORD is the corrected word."
   :straight (:type built-in)
   :init
   (setopt treesit-font-lock-level 4)
+  :config
+  (add-to-list 'treesit-language-source-alist
+             '(gitcommit . ("https://github.com/gbprod/tree-sitter-gitcommit")))
   :preface
   (defun jf/treesit/func-signature/dwim ()
     "Kill current function signature at point."
