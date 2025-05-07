@@ -5606,6 +5606,29 @@ The misspelled word is taken from OVERLAY.  WORD is the corrected word."
   :init
   (setopt treesit-font-lock-level 4)
   :config
+  (defvar jf/treesit-lang-cache
+    (make-hash-table :test 'equal)
+    "Cache the expensive computation of treelit language availability.
+
+See `jf/treesit-language-available-p' for usage.")
+
+  (defun jf/treesit-language-available-p (fn lang &rest rest)
+    "Caching around the CPU expensive `treesit-language-available-p'."
+    ;; I did some profiling of `treesit-language-available-p', and found
+    ;; that when moving around via consult (and therefore preview) this
+    ;; function was contributing to 75% of the CPU time.  And it was run
+    ;; each time.
+    (let ((cached-value
+            (gethash lang jf/treesit-lang-cache 'miss)))
+      (if (eq 'miss cached-value)
+        (let ((value
+                (apply fn lang rest)))
+          (puthash lang value jf/treesit-lang-cache)
+          value)
+        cached-value)))
+  (advice-add #'treesit-language-available-p
+    :around #'jf/treesit-language-available-p)
+
   (add-to-list 'treesit-language-source-alist
              '(gitcommit . ("https://github.com/gbprod/tree-sitter-gitcommit")))
   :preface
