@@ -5478,6 +5478,9 @@ literal then add a fuzzy search)."
   :custom
   (consult-denote-grep-command #'consult-ripgrep)
   :config
+  ;; Consult favors fdfind over fd; so I'm changing that behavior to
+  ;; simplify.
+  (setopt consult-fd-args '("fd" "--full-path --color=never"))
   (setopt consult-denote-find-command
     ;; fd version 8 does not work with consult's parameters.  I know
     ;; that fd 10 works.
