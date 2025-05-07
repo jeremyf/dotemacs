@@ -7822,6 +7822,10 @@ A page is marked `last' if rel=\"last\" appears in a <link> or <a> tag."
           :straight t
           :custom (with-editor-emacsclient-executable
                     (file-truename "~/bin/git_editor")))
+  :config
+  ;; git-commit is a package shipped with transient.
+  (require 'git-commit)
+  (setopt git-commit-major-mode #'git-commit-ts-mode)
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;; Adding format to git-commit-fill-column of 72 as best practice.
   (setq git-commit-fill-column 72)
@@ -7912,7 +7916,6 @@ A page is marked `last' if rel=\"last\" appears in a <link> or <a> tag."
           (("TAB" .  #'completion-at-point)))
   :bind ("s-7" . #'structured-commit/write-message)
   :config
-  (setopt git-commit-major-mode #'git-commit-ts-mode)
   (defun jf/git-commit-mode-configurator ()
     "Prepare all of the commit buffer structure"
     (setq-local fill-column git-commit-fill-column)
