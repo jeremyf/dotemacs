@@ -3006,7 +3006,7 @@ the light option.")
 (use-package transient
   ;; A package for creating turbo-charged menus.  It is the backbone for
   ;; the menu-like dispatch of `magit' functionality.
-  :straight t
+  :straight (:host github :repo "magit/transient")
   ;; This exposes the --sign switch for git commit
   :config (setopt transient-default-level 5))
 
@@ -5161,7 +5161,7 @@ Useful if you want a more robust view into the recommend candidates."
 (use-package helpful
   ;; Help me lookup definitions and details.
   :init
-  (use-package transient :straight t)
+  (use-package transient :straight (:host github :repo "magit/transient"))
   ;; I'm going to talk about this later, but I'm adding this to the
   ;; menu, so I may as well state the dependency.
   (use-package embark :straight t)
@@ -6480,17 +6480,6 @@ The generated and indented TOC will be inserted at point."
     (yaml-pro-ts--imenu-node-label (treesit-node-at (point) 'yaml)))
   :straight t)
 
-;; (use-package combobulate
-;;   :straight (:host github :repo "mickeynp/combobulate")
-;;   :hook ((json-ts-mode . combobulate-mode)
-;;           ;; (html-ts-mode . combobulate-mode)
-;;           (go-ts-mode . combobulate-mode)
-;;           (yaml-ts-mode . combobulate-mode))
-;;   :init
-;;   ;; The splice functions are destructive and clobber long-used
-;;   ;; navigation commands.
-;;   (dolist (key '("C-M-h" "M-<down>" "M-<up>" "M-<left>" "M-<right>"))
-;;     (keymap-unset combobulate-key-map key)))
 
 (use-package yard-mode
   ;; My prefered Ruby documentation syntax
@@ -7909,10 +7898,10 @@ A page is marked `last' if rel=\"last\" appears in a <link> or <a> tag."
        "harvard-lts/CURIOSity"
        "WGBH-MLA/ams")))
 
-(use-package git-commit
-  :straight t
-  :config
-  (setopt git-commit-major-mode #'git-commit-ts-mode))
+;; (use-package git-commit
+;;   :straight t
+;;   :config
+;;   )
 
 (use-package git-commit-ts-mode
   :straight t
@@ -7923,6 +7912,7 @@ A page is marked `last' if rel=\"last\" appears in a <link> or <a> tag."
           (("TAB" .  #'completion-at-point)))
   :bind ("s-7" . #'structured-commit/write-message)
   :config
+  (setopt git-commit-major-mode #'git-commit-ts-mode)
   (defun jf/git-commit-mode-configurator ()
     "Prepare all of the commit buffer structure"
     (setq-local fill-column git-commit-fill-column)
@@ -9102,7 +9092,7 @@ When the `current-prefix-arg' is set always prompt for the project."
 
 (use-package transient
   ;; Declaration for personal menu
-  :straight (:type built-in)
+  :straight (:host github :repo "magit/transient")
   :config
   (transient-define-suffix jf/shr/toggle-images ()
     "Toggle showing or hiding images"
