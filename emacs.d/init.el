@@ -7265,7 +7265,6 @@ Useful for Eglot."
   ;; configuration package.  Super sweet!
   :straight t)
 
-
 (use-package logos
   ;; A `narrow-region' extension that moves towards providing a
   ;; presentation-type experience.
@@ -7291,8 +7290,7 @@ Useful for Eglot."
     logos-scroll-lock nil
     logos-olivetti t
     logos-outline-regexp-alist
-    `((mastodon-mode . "^🐘")
-       (emacs-lisp-mode . "^;;;+ ")
+    `((emacs-lisp-mode . "^;;;+ ")
        (org-mode . "^\\*+ +")
        (markdown-mode . "^\\#+ +")))
   (defun logos--reveal-entry ()
@@ -7382,8 +7380,6 @@ Useful for Eglot."
     (when (eq major-mode 'org-mode)
       (org-modern-mode -1)))
   (advice-add 'olivetti-mode :before #'jf/olivetti-mode))
-
-(setq jf/toot-prefix "🐘")
 
 (use-package easy-mmode
   ;; The built in package for crafting minor-modes.  I know their

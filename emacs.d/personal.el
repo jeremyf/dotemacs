@@ -31,7 +31,7 @@
   :when (file-exists-p (expand-file-name "~/.my-computer"))
   :init
   (use-package tp
-  :straight (:host codeberg :repo "martianh/tp.el")
+    :straight (:host codeberg :repo "martianh/tp.el")
     :when (file-exists-p (expand-file-name "~/.my-computer")))
   :custom
   (mastodon-tl--timeline-posts-count "50")
@@ -50,9 +50,18 @@ Forward PREFIX to `mastodon-tl--show-tag-timeline'."
          "literature" "libraries" "bookstodon"
          "writing" "library")))
 
+  (defvar jf/toot-prefix "🐘"
+    "The value that we insert before each mastodon toot.
+
+Useful for narrowing regions.")
+  (setq
+    logos-outline-regepx-alist
+    (append `((mastodon-mode . ,(concat "^" jf/toot-prefix)))
+      logos-outline-regexp-alist))
+
   (defun jf/mastodon-tl--insert-status (&rest args)
     "A little hack to help narrow region."
-    (insert "🐘  ·  ·  ·  ·  ·  ·  ·"))
+    (insert jf/toot-prefix " ·  ·  ·  ·  ·  ·  ·"))
   (advice-add 'mastodon-tl--insert-status
     :before #'jf/mastodon-tl--insert-status))
 
