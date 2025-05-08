@@ -390,64 +390,6 @@ Forward PREFIX to `mastodon-tl--show-tag-timeline'."
 ;;   (with-eval-after-load 'notmuch-address
 ;;     (notmuch-addr-setup)))
 
-(use-package mu4e
-  ;; This follows the build from https://vhbelvadi.com/emacs-mu4e-on-macos.
-  ;;
-  ;; One variation: the tls_trust_file in ~/.msmtprc did not need to
-  ;; come from the Apple Keychain.  But was from "Export TLS
-  ;; Certificates from the Proton Bridge > Settings > Advanced Settings
-  :load-path  "/opt/homebrew/share/emacs/site-lisp/mu/mu4e"
-  :init (require 'smtpmail)
-  :config
-  ;; BINARIES
-  (setq mu4e-mu-binary (executable-find "mu")
-    mu4e-get-mail-command (concat (executable-find "mbsync") " -a")
-    sendmail-program (executable-find "msmtp"))
-  (setq mu4e-user-mail-address-list '("jeremy@jeremyfriesen.com"))
-  (setq mu4e-change-filenames-when-moving t ; avoid sync conflicts
-    mu4e-update-interval (* 10 60) ; check mail 10 minutes
-    mu4e-compose-format-flowed t ; re-flow mail so it's not hard wrapped
-    mu4e-maildir "~/Maildir/proton")
-  (setq mu4e-drafts-folder "/Drafts"
-    mu4e-sent-folder   "/Sent"
-    mu4e-refile-folder "/All Mail"
-    mu4e-trash-folder  "/Trash")
-  (setq mu4e-completing-read-function 'completing-read)
-  (setq mu4e-maildir-shortcuts
-    '(("/inbox"     . ?i)
-       ("/Sent"      . ?s)
-       ("/Archive" . ?A)
-       ("/Trash"     . ?t)
-       ("/Drafts"    . ?d)
-       ("/All Mail"  . ?a)))
-  (setq mu4e-use-fancy-chars t)
-
-  ;; SENDING
-  (setq send-mail-function 'message-send-mail-with-sendmail
-    message-send-mail-function 'message-send-mail-with-sendmail)
-  (setq message-sendmail-envelope-from 'header)
-
-  ;; POLICIES
-  (setq mu4e-context-policy 'pick-first)
-  (setq mu4e-compose-context-policy 'ask)
-  (setq message-kill-buffer-on-exit t)
-  (setq mu4e-hide-index-messages t)
-  (setq org-mu4e-link-query-in-headers-mode nil)
-  (setq mu4e-headers-visible-lines 25)
-  (setq mu4e-view-show-addresses t)
-
-  (setq mu4e-headers-include-related t)
-  (setq mu4e-headers-show-threads t)
-  (setq message-citation-line-function 'message-insert-formatted-citation-line)
-  (setq message-citation-line-format "%N @ %Y-%m-%d %H:%M :\n")
-
-
-  ;; (setq message-send-mail-function 'smtpmail-send-it
-  ;;     auth-sources '("~/.authinfo") ;need to use gpg version but only local smtp stored for now
-  ;;     smtpmail-smtp-server "127.0.0.1"
-  ;;     smtpmail-smtp-service 1025
-  ;;     smtpmail-stream-type  'ssl)
-  )
 
 (defvar jf/filename/bibliography-takeonrules
   (file-truename "~/git/takeonrules.source/content/site-map/bibliography/_index.md"))
@@ -820,3 +762,68 @@ entry."
             book-from-builder my-cache-of-books)
           (message "Appended %s to bibliography"
             (jf/book-label book-from-builder)))))))
+
+(defvar jf/site-lisp:mu4e
+  (if (f-exists? "/usr/local/share/emacs/site-lisp/mu4e")
+    "/usr/local/share/emacs/site-lisp/mu4e"
+    "/opt/homebrew/share/emacs/site-lisp/mu/mu4e"))
+;; (add-to-list 'load-path jf/site-lisp:mu4e)
+;; (require 'mu4e)
+(use-package mu4e
+  :load-path jf/site-lisp:mu4e
+  ;; This follows the build from https://vhbelvadi.com/emacs-mu4e-on-macos.
+  ;;
+  ;; One variation: the tls_trust_file in ~/.msmtprc did not need to
+  ;; come from the Apple Keychain.  But was from "Export TLS
+  ;; Certificates from the Proton Bridge > Settings > Advanced Settings
+  ;; :load-path "/usr/share/emacs/site-lisp/mu4e" ;; jf/site-lisp
+  :init (require 'smtpmail)
+  :config
+  ;; BINARIES
+  (setq mu4e-mu-binary (executable-find "mu")
+    mu4e-get-mail-command (concat (executable-find "mbsync") " -a")
+    sendmail-program (executable-find "msmtp"))
+  (setq mu4e-user-mail-address-list '("jeremy@jeremyfriesen.com"))
+  (setq mu4e-change-filenames-when-moving t ; avoid sync conflicts
+    mu4e-update-interval (* 10 60) ; check mail 10 minutes
+    mu4e-compose-format-flowed t ; re-flow mail so it's not hard wrapped
+    mu4e-maildir "~/Maildir/proton")
+  (setq mu4e-drafts-folder "/Drafts"
+    mu4e-sent-folder   "/Sent"
+    mu4e-refile-folder "/All Mail"
+    mu4e-trash-folder  "/Trash")
+  (setq mu4e-completing-read-function 'completing-read)
+  (setq mu4e-maildir-shortcuts
+    '(("/inbox"     . ?i)
+       ("/Sent"      . ?s)
+       ("/Archive" . ?a)
+       ("/Trash"     . ?t)
+       ("/Drafts"    . ?d)))
+  (setq mu4e-use-fancy-chars t)
+
+  ;; SENDING
+  (setq send-mail-function 'message-send-mail-with-sendmail
+    message-send-mail-function 'message-send-mail-with-sendmail)
+  (setq message-sendmail-envelope-from 'header)
+  (add-hook 'mu4e-compose-mode-hook (lambda () (setq-local fill-column 80)))
+  ;; POLICIES
+  (setq mu4e-context-policy 'pick-first)
+  (setq mu4e-compose-context-policy 'ask)
+  (setq message-kill-buffer-on-exit t)
+  (setq mu4e-hide-index-messages t)
+  (setq org-mu4e-link-query-in-headers-mode nil)
+  (setq mu4e-headers-visible-lines 25)
+  (setq mu4e-view-show-addresses t)
+
+  (setq mu4e-headers-include-related t)
+  (setq mu4e-headers-show-threads t)
+  (setq message-citation-line-function 'message-insert-formatted-citation-line)
+  (setq message-citation-line-format "%N @ %Y-%m-%d %H:%M :\n")
+
+
+  ;; (setq message-send-mail-function 'smtpmail-send-it
+  ;;     auth-sources '("~/.authinfo") ;need to use gpg version but only local smtp stored for now
+  ;;     smtpmail-smtp-server "127.0.0.1"
+  ;;     smtpmail-smtp-service 1025
+  ;;     smtpmail-stream-type  'ssl)
+  )
