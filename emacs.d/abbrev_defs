@@ -1422,6 +1422,7 @@
     ("engeneering" "engineering" nil :count 1)
     ("engieneer" "engineer" nil :count 1)
     ("engieneers" "engineers" nil :count 1)
+    ("engrained" "ingrained" nil :count 0)
     ("enlargment" "enlargement" nil :count 1)
     ("enlargments" "enlargements" nil :count 1)
     ("enourmous" "enormous" nil :count 1)
