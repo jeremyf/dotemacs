@@ -1681,6 +1681,15 @@ work computers.")
   ;; Track recent
   (recentf-mode 1)
   :config
+  (defun jf/recentf-keeper (file)
+    (and
+      (not
+        (s-starts-with? (file-truename elfeed-db-directory)
+          (file-truename file)))
+      (not
+        (s-starts-with? (file-truename "~/Maildir/")
+          (file-truename file)))))
+  (setopt recentf-keep '(jf/recentf-keeper))
   ;; Quietly save the recent file list every 5 minutes.
   (run-at-time (current-time) 300 (lambda ()
                                     (let ((save-silently t))
