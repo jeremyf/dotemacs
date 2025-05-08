@@ -7265,40 +7265,6 @@ Useful for Eglot."
   ;; configuration package.  Super sweet!
   :straight t)
 
-(use-package edit-indirect
-  ;; A nice package for editing regions in separate buffers.  It doesn't
-  ;; appear to get the mode guess right.  I haven't used this as much as
-  ;; `narrow-region'.  Perhaps it can go?
-  :straight t
-  :bind ("C-x n e" . #'jf/edit-indirect-region-or-function)
-  :config
-  (defun jf/edit-indirect-region-or-function ()
-    "Create indirect buffer to edit current region or function."
-    (interactive)
-    (if (use-region-p)
-      (edit-indirect-region (region-beginning) (region-end))
-      (cond
-        ;; As of <2024-05-18 Sat> emacs-lisp does not work with treesit.
-        ((or (derived-mode-p 'emacs-lisp-mode)
-           (derived-mode-p 'text-mode))
-          (let ((beg nil)
-                 (end nil))
-            (save-excursion
-              (if (derived-mode-p 'emacs-lisp-mode)
-                (mark-defun)
-                (mark-paragraph))
-              (setq beg (point))
-              (setq end (mark)))
-            (edit-indirect-region beg end t)))
-        ((derived-mode-p 'prog-mode)
-          (if-let (func (treesit-defun-at-point))
-            (edit-indirect-region
-              (treesit-node-start func)
-              (treesit-node-end func))
-            (user-error "Cannot indirect edit; "
-              "Select region or be within a function")))
-        (t (user-error "Unable to indirect edit current context"))))))
-
 
 (use-package logos
   ;; A `narrow-region' extension that moves towards providing a
