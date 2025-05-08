@@ -3297,7 +3297,6 @@ future copy)."
           )
   :bind (:map org-mode-map (("C-c j" . org-goto)
                              ("C-c C-j" . jf/project/jump-to-task)
-                             ("C-x n t" . jf/org-mode/narrow-to-date)
                              ("C-j" . avy-goto-char-timer)))
   :config
   ;; (defun my-assign-custom-ids ()
@@ -4074,17 +4073,6 @@ LaTeX package."
                (format-time-string
                  "%Y-%m-%d"))))
 
-(defun jf/org-mode/narrow-to-date (date)
-  "Narrow agenda to given DATE agenda subtree."
-  (interactive (list (if current-prefix-arg
-                       (org-read-date nil nil nil "Pick a day:")
-                       (format-time-string "%Y-%m-%d"))))
-  (widen)
-  (goto-char (point-max))
-  (re-search-backward (concat "^\*\*\* " date))
-  (end-of-line)
-  (org-narrow-to-subtree)
-  (message "Narrowing to %s agenda" date))
 
 ;; Another task at end of month is to transcribing my agenda’s
 ;; timesheet to entries in our time tracking software.  From the day’s
