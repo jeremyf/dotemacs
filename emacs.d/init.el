@@ -5093,17 +5093,18 @@ possible.")
        ;; key p
        consult-projectile--source-projectile-project
        ;; key d
-       consult-projectile--source-projectile-dir
+       ;; consult-projectile--source-projectile-dir
        ;; key m
-       consult--source-bookmark
+       ;; consult--source-bookmark
        ;; key r
        consult-projectile--source-projectile-recentf
        ;; key R
-       jf/consult--source-recent-file
+       ;; jf/consult--source-recent-file
        ;; key D
-       jf/consult--source-draft-blog-posts
+       ;; jf/consult--source-draft-blog-posts
        ;; key *
-       consult--source-modified-buffer))
+       ;; consult--source-modified-buffer
+       ))
   :bind
   ("s-p" . consult-projectile)
   ("H-p" . consult-projectile))
