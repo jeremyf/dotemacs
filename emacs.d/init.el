@@ -4075,30 +4075,31 @@ LaTeX package."
 
 (defun narrow-or-widen-dwim (p)
   "Widen if buffer is narrowed, narrow-dwim otherwise.
-Dwim means: region, org-src-block, org-subtree, or
-defun, whichever applies first. Narrowing to
-org-src-block actually calls `org-edit-src-code'.
 
-With prefix P, don't widen, just narrow even if buffer
-is already narrowed."
-  ;; [Emacs narrow-or-widen-dwim · Endless Parentheses](https://endlessparentheses.com/emacs-narrow-or-widen-dwim.html)
+Dwim means: region, org-src-block, org-subtree, or defun, whichever
+applies first. Narrowing to org-src-block actually calls
+`org-edit-src-code'.
+
+With prefix P, don't widen, just narrow even if buffer is already
+narrowed."
+  ;; https://endlessparentheses.com/emacs-narrow-or-widen-dwim.html
   (interactive "P")
   (declare (interactive-only))
   (cond ((and (buffer-narrowed-p) (not p)) (widen))
-        ((region-active-p)
-         (narrow-to-region (region-beginning)
-                           (region-end)))
-        ((derived-mode-p 'org-mode)
-         ;; `org-edit-src-code' is not a real narrowing
-         ;; command. Remove this first conditional if
-         ;; you don't want it.
-         (cond ((ignore-errors (org-edit-src-code) t)
-                (delete-other-windows))
-               ((ignore-errors (org-narrow-to-block) t))
-               (t (org-narrow-to-subtree))))
-        ((derived-mode-p 'latex-mode)
-         (LaTeX-narrow-to-environment))
-        (t (narrow-to-defun))))
+    ((region-active-p)
+      (narrow-to-region (region-beginning)
+        (region-end)))
+    ((derived-mode-p 'org-mode)
+      ;; `org-edit-src-code' is not a real narrowing
+      ;; command. Remove this first conditional if
+      ;; you don't want it.
+      (cond ((ignore-errors (org-edit-src-code) t)
+              (delete-other-windows))
+        ((ignore-errors (org-narrow-to-block) t))
+        (t (org-narrow-to-subtree))))
+    ((derived-mode-p 'latex-mode)
+      (LaTeX-narrow-to-environment))
+    (t (narrow-to-defun))))
 
 ;; This line actually replaces Emacs' entire narrowing
 ;; keymap, that's how much I like this command. Only
@@ -7277,7 +7278,6 @@ Useful for Eglot."
   :config
   (let ((map
           global-map))
-    (define-key map [remap narrow-to-region] #'logos-narrow-dwim)
     (define-key map [remap forward-page] #'logos-forward-page-dwim)
     (define-key map [remap backward-page] #'logos-backward-page-dwim))
   (setq logos-outlines-are-pages t)
