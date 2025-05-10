@@ -7841,7 +7841,7 @@ A page is marked `last' if rel=\"last\" appears in a <link> or <a> tag."
   :config
   ;; git-commit is a package shipped with transient.
   (require 'git-commit)
-  (setopt git-commit-major-mode #'git-commit-ts-mode)
+  (setopt git-commit-major-mode 'git-commit-ts-mode)
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;; Adding format to git-commit-fill-column of 72 as best practice.
   (setq git-commit-fill-column 72)

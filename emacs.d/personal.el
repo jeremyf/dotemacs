@@ -4,10 +4,12 @@
   ;; Ensure we have our queue and our ready location
   (mkdir (file-truename "~/SyncThings/queue") t)
   (mkdir (file-truename "~/SyncThings/source") t)
-  (message "Synchronzing denote files to cloud...")
   ;; There's a 1 in 10 chance that we'll perform the sync.  Toss that d10.
   (if (= 0 (random 10))
     (progn
+      (message "Clearing mail log...")
+      (shell-command
+        "cat /dev/null > ~/.msmtp.log")
       (message "Syncing elfeed database...")
       ;; We tar zip into one directory (our queue) and then move that
       ;; file in its complete state into the ready directory.  As move
