@@ -3672,7 +3672,11 @@ Each member's `car' is title and `cdr' is `org-mode' element."
       #'org-save-all-org-buffers nil :local)
     (jf/org-capf)
     (turn-on-visual-line-mode)
-    (electric-pair-mode -1))
+    (electric-pair-mode -1)
+    ;; https://baty.net/posts/2025/05/set-point-at-first-heading-when-opening-org-mode-file/
+    (goto-char (point-min))
+    (when (re-search-forward "^\\*+ " nil t)
+        (goto-char (match-beginning 0))))
 
   ;; https://stackoverflow.com/questions/13340616/assign-ids-to-every-entry-in-org-mode
   (defun jf/org-add-ids-to-headlines-in-file ()
