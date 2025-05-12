@@ -6765,7 +6765,7 @@ See `jf/comment-header-regexp/major-modes-alis'."
 ;; I've been exploring either `lsp-mode' or `eglot' and thusfar prefer
 ;; the lightweight nature of `eglot'.
 (use-package eglot
-  :straight t
+  :straight (:type built-in)
   :bind
   ("H-e h" . flymake-show-buffer-diagnostics)
   ("H-e n" . flymake-goto-next-error)
