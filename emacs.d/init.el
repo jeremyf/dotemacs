@@ -4077,11 +4077,11 @@ LaTeX package."
                (format-time-string
                  "%Y-%m-%d"))))
 
-(defun narrow-or-widen-dwim (p)
+(defun narrow-or-widen-dwim (prefix)
   "Widen if buffer is narrowed, narrow-dwim otherwise.
 
-Dwim means: region, org-src-block, org-subtree, or defun, whichever
-applies first. Narrowing to org-src-block actually calls
+Dwim means: region, org-src-block, org-subtree, logos outline, or defun,
+whichever applies first.  Narrowing to org-src-block actually calls
 `org-edit-src-code'.
 
 With prefix P, don't widen, just narrow even if buffer is already
@@ -4089,7 +4089,9 @@ narrowed."
   ;; https://endlessparentheses.com/emacs-narrow-or-widen-dwim.html
   (interactive "P")
   (declare (interactive-only))
-  (cond ((and (buffer-narrowed-p) (not p)) (widen))
+  (cond
+    ((and (buffer-narrowed-p)
+       (not prefix)) (widen))
     ((region-active-p)
       (narrow-to-region (region-beginning)
         (region-end)))
@@ -4103,6 +4105,8 @@ narrowed."
         (t (org-narrow-to-subtree))))
     ((derived-mode-p 'latex-mode)
       (LaTeX-narrow-to-environment))
+    ((and (fboundp 'logos--page-p) (logos--page-p))
+      (logos--narrow-to-page 0))
     (t (narrow-to-defun))))
 
 ;; This line actually replaces Emacs' entire narrowing
