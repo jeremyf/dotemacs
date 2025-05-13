@@ -7297,11 +7297,7 @@ Useful for Eglot."
     logos-variable-pitch t
     logos-buffer-read-only t
     logos-scroll-lock nil
-    logos-olivetti t
-    logos-outline-regexp-alist
-    `((emacs-lisp-mode . "^;;;+ ")
-       (org-mode . "^\\*+ +")
-       (markdown-mode . "^\\#+ +")))
+    logos-olivetti t)
   (defun logos--reveal-entry ()
     "Reveal Org or Outline entry."
     (cond

@@ -31,6 +31,7 @@
 (use-package mastodon
   ;; :straight (:host codeberg :repo "martianh/mastodon.el")
   :when (file-exists-p (expand-file-name "~/.my-computer"))
+  :after (logos)
   :init
   (use-package tp
     :straight (:host codeberg :repo "martianh/tp.el")
@@ -56,8 +57,9 @@ Forward PREFIX to `mastodon-tl--show-tag-timeline'."
     "The value that we insert before each mastodon toot.
 
 Useful for narrowing regions.")
-  (setq
-    logos-outline-regepx-alist
+
+  (setq-default
+    logos-outline-regexp-alist
     (append `((mastodon-mode . ,(concat "^" jf/toot-prefix)))
       logos-outline-regexp-alist))
 
