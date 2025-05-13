@@ -3713,8 +3713,7 @@ Each member's `car' is title and `cdr' is `org-mode' element."
           ("C-c l i" . org-insert-link)
           ("C-c l h" . jf/org-link-to-headline)
           ("M-g o" . consult-org-heading))
-  :bind (("s-8" . #'jf/org-mode/capture/insert-content-dwim)
-          ("C-c l s" . org-store-link)
+  :bind (("C-c l s" . org-store-link)
           ("C-c a" . org-agenda)
           ("C-c c" . org-capture)
           ("C-s-t" . org-toggle-link-display))
@@ -4521,39 +4520,6 @@ The return value is a list of `cons' with the `car' values of:
       (t (concat "\n#+begin_example\n"
            content
            "\n#+end_example")))))
-
-(defun jf/org-mode/capture/parameters (prefix)
-  "A logic lookup table by PREFIX."
-  (cond
-    ;; When we're clocking and no prefix is given...
-    ((and
-       (= 1 prefix)
-       (fboundp 'org-clocking-p) (org-clocking-p))
-      (list :key "i"
-        :template jf/org-mode/capture/template/while-clocking))
-    ;; We're not clocking or we provided a prefix.
-    (t (list :key "c"
-         :template jf/org-mode/capture/template/default))))
-
-(cl-defun jf/org-mode/capture/insert-content-dwim (start end prefix)
-  "Capture the text between START and END.
-
-Without PREFIX and not clocking capture clock otherwise capture
-to Backlog."
-  (interactive "r\np")
-  ;; There is a data structure looking to exist.  That structure is:
-  ;;
-  ;; - org-capture-key (default "c")
-  ;; - template jf/org-mode/capture/template/default
-  (let ((params
-          (jf/org-mode/capture/parameters prefix))
-         (block-text
-           (buffer-substring-no-properties start end)))
-    (org-capture-string
-      (s-format (plist-get params :template)
-        'aget
-        (jf/org-mode/capture/get-field-values block-text))
-      (plist-get params :key))))
 
 (load "jf-campaign.el")
 
