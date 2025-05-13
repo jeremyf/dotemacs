@@ -156,3 +156,15 @@ For inserting entity."
             (completing-read
               "MBO: " incomplete-mbos nil t)))
     (goto-char (alist-get mbo incomplete-mbos nil nil #'string=))))
+
+(with-eval-after-load 'dape
+  ;; Add Go debug configuration
+  ;; `attach host "127.0.0.1" port 2345 :mode "remote" :type "go"`
+  (add-to-list 'dape-configs
+               `(sb-attach-to-air
+                  modes (go-mode go-ts-mode)
+                  port 2345
+                  host "127.0.0.1"
+                  :type "go"
+                  :mode "remote"
+                  :request "attach")))
