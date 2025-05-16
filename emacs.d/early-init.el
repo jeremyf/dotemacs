@@ -1,11 +1,4 @@
-;; Warning this `most-positive-fixnum' should not be the "resting" value.  After
-;; we're done with initialization we want to set it to something more agreeable
-;; (e.g. 20 MB or so)
-(setopt gc-cons-threshold most-positive-fixnum
-      gc-cons-percentage 0.6)
-
-;; Same idea as above for the `file-name-handler-alist' and the
-;; `vc-handled-backends' with regard to startup speed optimisation.
+;; A startup optimization with regard to startup speed optimisation.
 ;; Here I am storing the default value with the intent of restoring it
 ;; via the `emacs-startup-hook'.
 (defvar jf-emacs--file-name-handler-alist file-name-handler-alist)
@@ -13,11 +6,20 @@
 (setq file-name-handler-alist nil
       vc-handled-backends nil)
 
+;; From https://jackjamison.xyz/blog/emacs-garbage-collection/
+(defun jf/minibuffer-setup-hook ()
+  ;; With
+  (setq gc-cons-threshold most-positive-fixnum))
+(add-hook 'minibuffer-setup-hook 'jf/minibuffer-exit-hook)
+(defun jf/minibuffer-exit-hook ()
+  (setq gc-cons-threshold 256 * 1024 * 1024))
+(add-hook 'minibuffer-exit-hook 'jf/minibuffer-exit-hook)
+(setopt gc-cons-threshold most-positive-fixnum)
+(run-with-idle-timer 1.2 t 'garbage-collect)
+
 (add-hook 'emacs-startup-hook
   (lambda ()
-    ;; Let's go with 1 GB of memory; I have it to spare.
-    (setq gc-cons-threshold (* 1024 1024 1024)
-      gc-cons-percentage 0.2
+    (setq
       file-name-handler-alist jf-emacs--file-name-handler-alist
       vc-handled-backends jf-emacs--vc-handled-backends)))
 
