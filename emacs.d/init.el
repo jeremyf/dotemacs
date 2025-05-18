@@ -5026,7 +5026,7 @@ The symbol at point is added to the future history."
         (call-interactively #'consult-ripgrep))))
   (defvar jf/consult--source-draft-blog-posts
     `(:name "Draft Blog Posts"
-       :narrow ?D
+       :narrow ?d
        :cateogry 'file
        :face 'consult-file
        :history file-name-history
@@ -5063,13 +5063,13 @@ possible.")
        ;; key d
        ;; consult-projectile--source-projectile-dir
        ;; key m
-       ;; consult--source-bookmark
+       consult--source-bookmark
        ;; key r
        consult-projectile--source-projectile-recentf
        ;; key R
        ;; jf/consult--source-recent-file
-       ;; key D
-       ;; jf/consult--source-draft-blog-posts
+       ;; key d
+       jf/consult--source-draft-blog-posts
        ;; key *
        ;; consult--source-modified-buffer
        ))
