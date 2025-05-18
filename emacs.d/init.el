@@ -1930,11 +1930,13 @@ work computers.")
   (defun jf/mode-line-format/major-mode-indicator ()
     "Return propertized mode line indicator for the major mode."
     (let ((indicator
+            (if (fboundp 'nerd-icons-icon-for-mode)
+              (nerd-icons-icon-for-mode major-mode)
             (cond
               ((derived-mode-p 'text-mode) "¶")
               ((derived-mode-p 'prog-mode) "λ")
               ((derived-mode-p 'comint-mode) ">_")
-              (t "◦"))))
+              (t "◦")))))
       (propertize indicator
         'face
         (if (mode-line-window-selected-p)
@@ -2425,17 +2427,9 @@ bit differently.")
   :straight t
   :custom (nerd-icons-font-family "IntoneMono Nerd Font Mono"))
 
-(use-package all-the-icons
-  ;; It's nice to see icons as a quick visual helper.
-  :straight t)
-
-(use-package all-the-icons-dired
-  ;; Incorporates file icons with file listings of dired.  /Note/: On
-  ;; 2021-04-11 I was getting the following error with this package:
-  ;; "*ERROR*: Symbol's value as variable is void: file"
+(use-package nerd-icons-dired
   :straight t
-  :after all-the-icons
-  :hook (dired-mode . all-the-icons-dired-mode))
+  :hook (dired-mode . nerd-icons-dired-mode))
 
 (use-package typopunct
   ;; A package that provides some automatic replacement of strings of
