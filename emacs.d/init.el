@@ -5507,7 +5507,7 @@ literal then add a fuzzy search)."
       ;; For Linux
       (set-fontset-font t
         'symbol
-        (font-spec :family "Symbola")
+        (font-spec :family "Noto Color Emoji")
         frame
         'prepend)))
   ;; For when Emacs is started in GUI mode:
