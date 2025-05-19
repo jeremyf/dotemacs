@@ -2849,6 +2849,7 @@ the light option.")
   :straight (:type built-in)
   :custom
   (xref-file-name-display 'project-relative)
+  (xref-auto-jump-to-first-xref 'show)
   (xref-search-program 'ripgrep))
 
 (use-package tmr
@@ -2885,7 +2886,7 @@ the light option.")
   ;; the menu-like dispatch of `magit' functionality.
   :straight (:host github :repo "magit/transient")
   ;; This exposes the --sign switch for git commit
-  :config (setopt transient-default-level 5))
+  :config (setopt transient-default-level 7))
 
 (use-package ts
   ;; Timestamp library (not typescript)
