@@ -64,20 +64,6 @@
 ;; When you open Emacs, grab all the space on the screen
 (add-to-list 'initial-frame-alist '(fullscreen . maximized))
 
-(use-package gcmh
-  ;; *Gcmh* does garbage collection (GC) when the user is idle.
-  :straight t
-  :custom
-  (gcmh-idle-delay 5
-    gcmh-low-cons-threshold (* 1024 1024)
-    gcmh-high-cons-threshold (* 16 1024 1024))
-  :config (gcmh-mode)
-  (add-function :after after-focus-change-function
-    (defun jf/garbage-collect-maybe ()
-      (unless (frame-focus-state)
-        (garbage-collect)))))
-
-
 ;; From https://protesilaos.com/codelog/2024-11-28-basic-emacs-configuration/
 (defun  prot/keyboard-quit-dwim ()
   "Do-What-I-Mean behaviour for a general `keyboard-quit'.
@@ -1786,7 +1772,9 @@ work computers.")
   ;; It's nice to have a gentle reminder showing me the recommended
   ;; column width for the current buffer.
   :straight (:type built-in)
-  :hook (prog-mode . display-fill-column-indicator-mode))
+  :hook
+  (prog-mode . display-fill-column-indicator-mode)
+  (text-mode . display-fill-column-indicator-mode))
 
 (use-package kind-icon
   ;; This packages helps provide additional icons for functions and
