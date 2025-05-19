@@ -1164,7 +1164,6 @@ Wires into `org-insert-link'."
           (kill-new candidate)
           (format "epigraph:%s" id)))))
 
-
   (defun jf/org-link-ol-follow/epigraph (name)
     "Follow the NAME to the epigraph."
     (let* ((file
@@ -2418,7 +2417,6 @@ bit differently.")
     (force-mode-line-update)))
 
 (define-key global-map (kbd "C-M-s-SPC") #'jf/insert-non-breaking-space)
-
 (defun jf/insert-non-breaking-space (&optional prefix)
   "Insert a non-breaking space PREFIX number of times"
   (interactive "p")
