@@ -3944,6 +3944,10 @@ LaTeX package."
                (format-time-string
                  "%Y-%m-%d"))))
 
+;; This line actually replaces Emacs' entire narrowing
+;; keymap, that's how much I like this command. Only
+;; copy it if that's what you want.
+(define-key ctl-x-map "n" #'narrow-or-widen-dwim)
 (defun narrow-or-widen-dwim (prefix)
   "Widen if buffer is narrowed, narrow-dwim otherwise.
 
@@ -3976,10 +3980,6 @@ narrowed."
       (logos--narrow-to-page 0))
     (t (narrow-to-defun))))
 
-;; This line actually replaces Emacs' entire narrowing
-;; keymap, that's how much I like this command. Only
-;; copy it if that's what you want.
-(define-key ctl-x-map "n" #'narrow-or-widen-dwim)
 
 ;; Another task at end of month is to transcribing my agenda’s
 ;; timesheet to entries in our time tracking software.  From the day’s
