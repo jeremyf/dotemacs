@@ -12,7 +12,7 @@
   (setq gc-cons-threshold most-positive-fixnum))
 (add-hook 'minibuffer-setup-hook 'jf/minibuffer-exit-hook)
 (defun jf/minibuffer-exit-hook ()
-  (setq gc-cons-threshold 256 * 1024 * 1024))
+  (setq gc-cons-threshold 80 * 1024 * 1024))
 (add-hook 'minibuffer-exit-hook 'jf/minibuffer-exit-hook)
 (setopt gc-cons-threshold most-positive-fixnum)
 (run-with-idle-timer 1.2 t 'garbage-collect)
