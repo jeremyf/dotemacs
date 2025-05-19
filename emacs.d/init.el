@@ -4389,8 +4389,7 @@ sort accordingly.")
       "%(jf/denote/capture-wrap :link \"%L\" :content \"%i\")"
       :empty-lines 1)
      ("d" "Dictionary"
-       plain (file
-               ,(denote-get-path-by-id "20230108T083359"))
+       plain (file jf/filename/dictionary)
        "- %^{Term} :: %^{Description}; %a"
        :after-finalize jf/org/capture/dictionary/sort)
      ("p" "Person to Quote"
@@ -5197,6 +5196,9 @@ literal then add a fuzzy search)."
   (which-key-mode)
   (which-key-setup-side-window-bottom)
   (which-key-show-major-mode))
+
+(defvar jf/filename/dictionary
+  (denote-get-path-by-id "20230108T083359"))
 
 (defvar jf/filename/bibliography
   (denote-get-path-by-id "20241124T080648")
