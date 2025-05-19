@@ -1953,17 +1953,17 @@ work computers.")
     (let ((map
             (make-sparse-keymap)))
       (define-key map [mode-line down-mouse-1]
-        #'jf/toggle-typopunct-mode)
+        #'jf/toggle-typo-mode)
       map)
-    "Keymap to display `typopunct-mode'.")
+    "Keymap to display `typo-mode'.")
 
   (defun jf/mode-line-format/major-mode-name ()
     "Render the major mode as text.
 
-When `typopunct-mode' is active, provide an actionable indicator of its
+When `typo-mode' is active, provide an actionable indicator of its
 active nature."
     (let ((fmt
-            (if typopunct-mode "“%s”" "%s")))
+            (if typo-mode "“%s”" "%s")))
       (propertize
         (format fmt
           (capitalize
@@ -1974,7 +1974,7 @@ active nature."
         'local-map
         jf/mode-line-format/major-mode-map
         'help-echo
-        (concat "mouse-1: #'jf/toggle-typopunct-mode"))))
+        (concat "mouse-1: #'jf/toggle-typo-mode"))))
 
   (defvar-local jf/mode-line-format/major-mode
     '(:eval
@@ -2431,117 +2431,18 @@ bit differently.")
   :straight t
   :hook (dired-mode . nerd-icons-dired-mode))
 
-(use-package typopunct
-  ;; A package that provides some automatic replacement of strings of
-  ;; keys.  For example in text-mode, when I type three periods
-  ;; (e.g. “.”) typopunct replaces that with an ellipsis (e.g. “…”)
+(use-package typo
   :straight t
-  :custom (typopunct-buffer-language 'english)
-  :config
-  (add-hook 'org-mode-hook 'jf/typopunct-init)
-  (defun jf/toggle-typopunct-mode ()
-    "Toggle `typopunct-mode'."
+  :hook (text-mode . typo-mode)
+  :config (typo-global-mode 1)
+  (defun jf/toggle-typo-mode ()
+    "Toggle `typo-mode'."
     (interactive)
-    (if typopunct-mode
-      (typopunct-mode -1)
-      (typopunct-mode 1))
-    (force-mode-line-update))
-  (defun jf/typopunct-init ()
-    (require 'typopunct)
-    (typopunct-change-language 'english)
-    (typopunct-mode 1))
-  ;; To insert a typographical ellipsis sign (…) on three consecutive
-  ;; dots, or a middle dot (·) on ‘^.’
-  (defconst typopunct-ellipsis (decode-char 'ucs #x2026))
-  (defconst typopunct-middot   (decode-char 'ucs #xB7)) ; or 2219
-  (defun typopunct-insert-ellipsis-or-middot (arg)
-    "Change three consecutive dots to a typographical ellipsis mark."
-    (interactive "p")
-    (cond
-      ((and (= 1 arg)
-         (eq (char-before) ?^))
-        (delete-char -1)
-        (insert typopunct-middot))
-      ((and (= 1 arg)
-         (eq this-command last-command)
-         (looking-back "\\.\\." 1))
-        (replace-match "")
-        (insert typopunct-ellipsis))
-      (t
-        (self-insert-command arg))))
-  (define-key typopunct-map "." 'typopunct-insert-ellipsis-or-middot)
-  ;; feet, arcminutes, derivatives
-  (defconst typopunct-prime  (decode-char 'ucs #x2032))
-  ;; inches, arcseconds, double derivatives
-  (defconst typopunct-dprime (decode-char 'ucs #x2033))
-  (defconst typopunct-tprime (decode-char 'ucs #x2034))
-  ;; The minus sign (−) is separate from the hyphen (-), en dash (–) and
-  ;; em dash (—). To build upon the clever behavior of the ‘-’ key
-  (defconst typopunct-minus (decode-char 'ucs #x2212))
-  (defconst typopunct-pm    (decode-char 'ucs #xB1))
-  (defconst typopunct-mp    (decode-char 'ucs #x2213))
-  (defadvice typopunct-insert-typographical-dashes
-    (around minus-or-pm activate)
-    (cond
-      ((or (eq (char-before) typopunct-em-dash)
-         (looking-back "\\([[:blank:]]\\|^\\)\\^" 2))
-        (delete-char -1)
-        (insert typopunct-minus))
-      ((looking-back "[^[:blank:]]\\^" 1)
-        (insert typopunct-minus))
-      ((looking-back "+/" 1)
-        (progn (replace-match "")
-          (insert typopunct-pm)))
-      (t ad-do-it)))
-  (defun typopunct-insert-mp (arg)
-    (interactive "p")
-    (if (and (= 1 arg) (looking-back "-/" 2))
-      (progn (replace-match "")
-        (insert typopunct-mp))
-      (self-insert-command arg)))
-  (define-key typopunct-map "+" 'typopunct-insert-mp)
-  (defconst typopunct-times (decode-char 'ucs #xD7))
-  (defun typopunct-insert-times (arg)
-    "Insert multiplication sign at ARG."
-    (interactive "p")
-    (if (and (= 1 arg) (looking-back "\\([[:blank:]]\\|^\\)\\^"))
-      (progn (delete-char -1)
-        (insert typopunct-times))
-      (self-insert-command arg)))
-  (define-key typopunct-map "x" 'typopunct-insert-times)
-  (defadvice typopunct-insert-quotation-mark (around wrap-region activate)
-    (let* ((lang (or (get-text-property (point) 'typopunct-language)
-                   typopunct-buffer-language))
-            (omark (if single
-                     (typopunct-opening-single-quotation-mark lang)
-                     (typopunct-opening-quotation-mark lang)))
-            (qmark (if single
-                     (typopunct-closing-single-quotation-mark lang)
-                     (typopunct-closing-quotation-mark lang))))
-      (cond
-        (mark-active
-          (let ((skeleton-end-newline
-                  nil)
-                 (singleo
-                   (typopunct-opening-single-quotation-mark lang))
-                 (singleq
-                   (typopunct-closing-single-quotation-mark lang)))
-            (if (> (point) (mark))
-              (exchange-point-and-mark))
-            (save-excursion
-              (while (re-search-forward
-                       (regexp-quote (string omark)) (mark) t)
-                (replace-match
-                  (regexp-quote (string singleo)) nil nil)))
-            (save-excursion
-              (while (re-search-forward
-                       (regexp-quote (string qmark)) (mark) t)
-                (replace-match
-                  (regexp-quote (string singleq)) nil nil)))
-            (skeleton-insert (list nil omark '_ qmark) -1)))
-        ((looking-at (regexp-opt (list (string omark) (string qmark))))
-          (forward-char 1))
-        (t ad-do-it)))))
+    (if typo-mode
+      (typo-mode -1)
+      (typo-mode 1))
+    (message "Toggling typo-mode.")
+    (force-mode-line-update)))
 
 (define-key global-map (kbd "C-M-s-SPC") #'jf/insert-non-breaking-space)
 
