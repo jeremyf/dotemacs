@@ -5984,40 +5984,35 @@ See https://github.com/chmouel/gotest-ts.el"
     (define-key python-ts-mode-map
       (kbd "M-.") #'xref-find-definitions)
     (jf/python-mode-configurator))
-  (add-hook 'python-ts-mode-hook #'jf/python-ts-mode-configurator))
+  (add-hook 'python-ts-mode-hook #'jf/python-ts-mode-configurator)
 
-(use-package flymake-ruff
-  :straight t)
-;; :hook (eglot-managed-mode . flymake-ruff-load))
+  (use-package python-docstring
+    :straight t)
 
-(use-package python-docstring
-  :straight t)
-
-(use-package pydoc-info
-  :straight t
-  :config
-  (dolist (python '(python-mode python-ts-mode))
-    (info-lookup-add-help
-      :mode python
-      :parse-rule 'pydoc-info-python-symbol-at-point
-      :doc-spec
-      '(("(python)Index" pydoc-info-lookup-transform-entry)
-         ("(sphinx)Index" pydoc-info-lookup-transform-entry)))))
-
-(use-package virtualenvwrapper
-  :straight t
-  :config
-  ;; if you want interactive shell support
-  (venv-initialize-interactive-shells)
-  ;; if you want eshell support note that setting `venv-location` is not
-  ;; necessary if you use the default location (`~/.virtualenvs`), or if
-  ;; the the environment variable `WORKON_HOME` points to the right
-  ;; place
-  (venv-initialize-eshell)
-  (setopt projectile-switch-project-action
-    '(lambda ()
-       (venv-projectile-auto-workon)
-       (projectile-find-file))))
+  (use-package pydoc-info
+    :straight t
+    :config
+    (dolist (python '(python-mode python-ts-mode))
+      (info-lookup-add-help
+        :mode python
+        :parse-rule 'pydoc-info-python-symbol-at-point
+        :doc-spec
+        '(("(python)Index" pydoc-info-lookup-transform-entry)
+           ("(sphinx)Index" pydoc-info-lookup-transform-entry)))))
+  (use-package virtualenvwrapper
+    :straight t
+    :config
+    ;; if you want interactive shell support
+    (venv-initialize-interactive-shells)
+    ;; if you want eshell support note that setting `venv-location` is not
+    ;; necessary if you use the default location (`~/.virtualenvs`), or if
+    ;; the the environment variable `WORKON_HOME` points to the right
+    ;; place
+    (venv-initialize-eshell)
+    (setopt projectile-switch-project-action
+      '(lambda ()
+         (venv-projectile-auto-workon)
+         (projectile-find-file)))))
 
 (use-package json-mode
   ;; The web's data structure of choice is JSON.
@@ -6508,7 +6503,7 @@ See `jf/comment-header-regexp/major-modes-alis'."
            html-mode html-ts-mode
            js-mode js-ts-mode
            json-mode json-ts-mode ;; npm i -g vscode-langservers-extracted
-           python-mode python-ts-mode
+           python-mode python-ts-mode ;; brew install python-lsp-server
            ruby-mode ruby-ts-mode
            scss-mode scss-ts-mode
            typescript-ts-mode typescript-mode ;; https://github.com/typescript-language-server/typescript-language-server
