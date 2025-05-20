@@ -2407,6 +2407,8 @@ bit differently.")
   :straight t
   :hook (text-mode . typo-mode)
   :config (typo-global-mode 1)
+  ;; I definitely don’t want my ‘ key to serve double duty
+  (unbind-key "`" typo-mode-map)
   (defun jf/toggle-typo-mode ()
     "Toggle `typo-mode'."
     (interactive)
