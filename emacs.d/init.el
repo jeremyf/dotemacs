@@ -3062,8 +3062,7 @@ the light option.")
   ;; screen.  The position and fullscreen don't work.  So I'm relying on
   ;; setting a small frame, then expanding it to maximum.
   (add-hook 'emacs-everywhere-mode-hook #'olivetti-mode)
-  (add-hook 'emacs-everywhere-mode-hook #'toggle-frame-maximized)
-  )
+  (add-hook 'emacs-everywhere-mode-hook #'toggle-frame-maximized))
 
 (use-package ws-butler
   ;; Keep white space tidy.
@@ -3913,38 +3912,6 @@ LaTeX package."
   "Regardless of LANG and BODY approve it."
   nil)
 
-;; Org Mode time tracking and task tracking adjustments
-
-(defun jf/org-mode/agenda-project-prompt ()
-  "Prompt for project based on existing projects in agenda file.
-
-    Note: I tried this as interactive, but the capture templates
-    insist that it should not be interactive."
-  (completing-read
-    "Project: "
-    (sort
-      (seq-uniq
-        (org-map-entries
-          (lambda ()
-            (org-element-property :raw-value (org-element-at-point)))
-          "+LEVEL=4+projects" 'agenda))
-      #'string<)))
-
-(cl-defun jf/org-mode/agenda-find-blocked-node ()
-  "Add a blocker node to today."
-  (jf/org-mode/agenda-find-project-node :tag "blockers"
-    :project (concat
-               "Blockers for "
-               (format-time-string
-                 "%Y-%m-%d"))))
-
-(cl-defun jf/org-mode/agenda-find-merge-request-node ()
-  "Add a mergerequest node to today."
-  (jf/org-mode/agenda-find-project-node :tag "mergerequests"
-    :project (concat "Merge Requests for "
-               (format-time-string
-                 "%Y-%m-%d"))))
-
 ;; This line actually replaces Emacs' entire narrowing
 ;; keymap, that's how much I like this command. Only
 ;; copy it if that's what you want.
@@ -3980,40 +3947,6 @@ narrowed."
     ((and (fboundp 'logos--page-p) (logos--page-p))
       (logos--narrow-to-page 0))
     (t (narrow-to-defun))))
-
-
-;; Another task at end of month is to transcribing my agenda’s
-;; timesheet to entries in our time tracking software.  From the day’s
-;; project link in the =org-clock-report=, I want to copy the
-;; headlines of each of the tasks.  I fill out my time sheets one day
-;; at a time.
-(defun jf/org-mode/time-entry-for-project-and-day ()
-  "Function to help report time for Scientist.com.
-
-Assumes that I'm on a :projects: headline.
-
-- Sum the hours (in decimal form) for the tasks.
-- Create a list of the tasks.
-- Write this information to the message buffer.
-- Then move to the next heading level."
-  (interactive)
-  (let* ((project
-           (plist-get (cadr (org-element-at-point)) :raw-value))
-          (tasks
-            (s-join "\n"
-              (org-with-wide-buffer
-                (when (org-goto-first-child)
-                  (cl-loop collect (concat "- "
-                                     (org-no-properties
-                                       (org-get-heading t t t t)))
-                    while (outline-get-next-sibling))))))
-          (hours (/ (org-clock-sum-current-item) 60.0))
-          (output (format "Tasks:\n%s\nProject: %s\nHours: %s\n"
-                    tasks
-                    project
-                    hours)))
-    (kill-new tasks)
-    (message output)))
 
 ;; Org Mode has built-in capabilities for exporting to HTML (and other
 ;; languages).  The following function does just a bit more.  It
