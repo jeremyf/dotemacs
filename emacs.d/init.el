@@ -1955,6 +1955,15 @@ active nature."
          " "
          (jf/mode-line-format/major-mode-name))))
 
+  (defun jf/mode-line-indicator (nerd-fn nerd-icon fallback face)
+    (concat
+      (propertize
+        (format " %s "
+          (if (fboundp nerd-fn)
+            (funcall nerd-fn nerd-icon)
+            fallback))
+        'face face) " "))
+
   (defvar-local jf/mode-line-format/narrow
     '(:eval
        (when (and (mode-line-window-selected-p)
@@ -1964,8 +1973,8 @@ active nature."
                       'help-mode
                       'special-mode
                       'message-mode)))
-         (concat
-           (propertize " ⊆ " 'face 'mode-line-highlight) " "))))
+         (jf/mode-line-indicator
+           'nerd-icons-mdicon "nf-md-filter" "⊆" 'mode-line-highlight))))
 
   (defvar-local jf/mode-line-format/org-clock
     '(:eval
@@ -1978,9 +1987,10 @@ active nature."
                   'help-mode
                   'special-mode
                   'message-mode)))
-         (concat
-           ;; The symbol that most looks like an analogue stop watch.
-           (propertize " ⨶ " 'face 'mode-line-highlight) " "))))
+         ;; The symbol that most looks like an analogue stop watch.
+         (jf/mode-line-indicator
+           'nerd-icons-mdicon "nf-md-clock_outline"
+           "⨶" 'mode-line-highlight))))
 
   (defvar jf/mode-line-format/vterm-map
     (let ((map
