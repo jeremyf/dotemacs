@@ -6155,7 +6155,9 @@ The generated and indented TOC will be inserted at point."
 
 (use-package vterm
   ;; A terminal in Emacs.
-  :straight t)
+  :straight t
+  :config
+  (setopt vterm-always-compile-module t))
 
 (use-package web-mode
   ;; Help consistently edit web documents of SGML markup dialetcs.
@@ -8760,8 +8762,6 @@ When the `current-prefix-arg' is set always prompt for the project."
           (jf/project/get-project/current-clock)
           (jf/project/get-project/project-source-code)))
       (completing-read "Project: " (jf/project/list-projects)))))
-
-(require 'org-charsheet)
 
 (use-package transient
   ;; Declaration for personal menu
