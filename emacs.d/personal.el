@@ -1,3 +1,35 @@
+(defvar jf/subscribe-me/default-tags
+  '("1st" "provisional")
+  "Default tags to apply when subscribing to an RSS feed.")
+
+(defun jf/subscribe-me (&optional url tags)
+  "Subscribe to the given URL.
+
+URL is assumed to be either of an RSS feed or Atom feed."
+  (interactive
+    (list
+      (if (derived-mode-p 'eww-mode)
+        (progn
+          (call-interactively #'eww-copy-alternate-url)
+          (car kill-ring))
+        (user-error "current buffer is not 'eww-mode'"))))
+  (let ((tags
+          (or tags jf/subscribe-me/default-tags)))
+    (save-excursion
+      (save-restriction
+        (require 'org)
+        (widen)
+        ;; Where I add RSS entries.
+        (org-capture-goto-target "r")
+        (org-insert-subheading nil)
+        (insert url " :" (s-join ":" tags) ":\n"
+          ":PROPERTIES:\n"
+          ":ID: " (org-id-new) "\n"
+          ":DATE_ADDED: " (format-time-string "%Y-%m-%d") "\n"
+          ":END:\n")
+        (save-buffer)
+        (bury-buffer)))))
+
 (defun jf/syncthing-aling ()
   "Synchronize files into SyncThing bucket."
   (interactive)
