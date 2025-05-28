@@ -2744,6 +2744,9 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   ;; (setq jf/themes-plist '(:dark ef-bio :light ef-elea-light))
   (setq jf/themes-plist '(:dark ef-symbiosis :light ef-elea-light)))
 
+(use-package doric-themes
+  :straight (:host github :repo "protesilaos/doric-themes"))
+
 (use-package custom
   :straight (:type built-in)
   :config
