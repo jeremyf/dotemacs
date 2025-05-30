@@ -1262,99 +1262,107 @@ Wires into `org-insert-link'."
             (if include-author "::author" "")
             (if include-author "::subtitle" ""))))))
 
-  (defun jf/org-link-ol-export/work (link description format protocol)
+  (defvar jf/works/cache
+    (make-hash-table :test 'equal)
+    "A cache of all works ready for exporting.
+
+See `jf/works/populate'.")
+
+  (defun jf/works/populate (&optional clear-cache)
+    "Populates and returns the `jf/works/cache'.
+
+When CLEAR-CACHE is non-nil, clobber the cache and rebuild."
+    (when clear-cache (clrhash jf/works/cache))
+    (when (hash-table-empty-p jf/works/cache)
+      (save-excursion
+        (with-current-buffer
+          (find-file-noselect jf/filename/bibliography)
+          (save-restriction
+            (widen)
+            (message "Rebuilding `jf/works/cache'...")
+            (org-map-entries
+              (lambda ()
+                (let ((el (org-element-at-point)))
+                  ;; Skip un-named blocks as we can’t link to
+                  ;; them.
+                  (when-let ((id
+                               (org-entry-get el "CUSTOM_ID")))
+                    (puthash id
+                      (list
+                        :title
+                        (org-element-property :title el)
+                        :subtitle
+                        (org-entry-get el "SUBTITLE")
+                        :author
+                        (org-entry-get el "AUTHOR")
+                        :url
+                        (org-entry-get el "ROAM_REFS"))
+                      jf/works/cache))))
+              (concat "+level=2+works") 'file)))))
+    jf/works/cache)
+
+  (defun jf/org-link-ol-export/work (link description format channel)
     "Export the text of the LINK work in the corresponding FORMAT.
 
-We ignore the DESCRIPTION and probably the PROTOCOL."
-    (let* ((buffer
-            (find-file-noselect jf/filename/bibliography))
-           (link-with-properties
+We ignore the DESCRIPTION and probably the CHANNEL."
+    (let* ((link-with-properties
              (s-split "::" link))
             (link
               (car link-with-properties))
             (with-author
               (member "author" link-with-properties))
             (with-subtitle
-              (member "subtitle" link-with-properties)))
-      (save-restriction
-        (widen)
-        (save-excursion
-          (with-current-buffer buffer
-            ;; First we find the corresponding work and possible URL.
-            (when-let* ((work
-                          (car
-                            (org-element-map
-                              (org-element-parse-buffer)
-                              '(headline)
-                              (lambda (el)
-                                ;; Skip un-named blocks as we can’t link to
-                                ;; them.
-                                (when (string=
-                                        (org-entry-get el "CUSTOM_ID")
-                                        link)
-                                  (let ((title
-                                          (car
-                                            (org-element-property :title el))))
-                                    (list
-                                      :title
-                                      title
-                                      :subtitle
-                                      (if-let ((subtitle
-                                                 (org-entry-get el "SUBTITLE")))
-                                        (if with-subtitle
-                                          title
-                                          (format "%s: %s" title subtitle))
-                                        title)
-                                      :author
-                                      (org-entry-get el "AUTHOR")
-                                      :url
-                                      (org-entry-get el "ROAM_REFS")))))))))
-              (let ((author-suffix
-                      (if (and
-                            with-author
-                            (s-present? (plist-get work :author)))
-                        (format " by %s" (plist-get work :author))
-                        "")))
-                ;; Then we create the corresponding format.
-                (cond
-                  ((or (eq format 'html) (eq format 'md))
-                    (format "<cite data-id=\"%s\">%s</cite>%s"
-                      link
-                      (if-let ((url
-                                 (plist-get work :url)))
-                        (format "<a href=\"%s\">%s</a>"
-                          url (plist-get work :title))
-                        (plist-get work :title))
-                      author-suffix))
-                  ((eq format 'latex)
-                    (format "\\textit{%s}%s"
-                      (if-let ((url
-                                 (plist-get work :url)))
-                        (format "\\href{%s}{%s}"
-                          url (plist-get work :title))
-                        (plist-get work :title))
-                      author-suffix))
-                  ((eq format 'odt)
-                    (format
-                      "<text:span text:style-name=\"%s\">%s</text:span>%s"
-                      "Emphasis"
-                      (if-let ((url
-                                 (plist-get work :url)))
-                        (format "<text:a xlink:type=\"simple\" xlink:href=\"%s\">%s</text:a>"
-                          url (plist-get work :title))
-                        (plist-get work :title))
-                      author-suffix))
-                  (t
-                    (format "“%s”%s"
-                      (plist-get work :title)
-                      author-suffix))))))))))
+              (member "subtitle" link-with-properties))
+            (works
+              (jf/works/populate)))
+      (when-let ((work
+                   (gethash link works)))
+        (let ((author-suffix
+                (if (and
+                      with-author
+                      (s-present? (plist-get work :author)))
+                  (format " by %s" (plist-get work :author))
+                  "")))
+          ;; Then we create the corresponding format.
+          (cond
+            ((or (eq format 'html) (eq format 'md))
+              (format "<cite data-id=\"%s\">%s</cite>%s"
+                link
+                (if-let ((url
+                           (plist-get work :url)))
+                  (format "<a href=\"%s\">%s</a>"
+                    url (plist-get work :title))
+                  (plist-get work :title))
+                author-suffix))
+            ((eq format 'latex)
+              (format "\\textit{%s}%s"
+                (if-let ((url
+                           (plist-get work :url)))
+                  (format "\\href{%s}{%s}"
+                    url (plist-get work :title))
+                  (plist-get work :title))
+                author-suffix))
+            ((eq format 'odt)
+              (format
+                "<text:span text:style-name=\"%s\">%s</text:span>%s"
+                "Emphasis"
+                (if-let ((url
+                           (plist-get work :url)))
+                  (format "<text:a xlink:type=\"simple\" xlink:href=\"%s\">%s</text:a>"
+                    url (plist-get work :title))
+                  (plist-get work :title))
+                author-suffix))
+            (t
+              (format "“%s”%s"
+                (plist-get work :title)
+                author-suffix)))))))
 
   (org-link-set-parameters "elfeed"
     :follow #'elfeed-link-open
     :store #'elfeed-link-store-link
     :export #'elfeed-link-export-link)
 
-  (defun elfeed-link-export-link (link desc format _protocol)
+  (defun elfeed-link-export-link (link desc format _channel)
     "Export `org-mode' `elfeed' LINK with DESC for FORMAT."
     (if (string-match "\\([^#]+\\)#\\(.+\\)" link)
       (if-let* ((entry
