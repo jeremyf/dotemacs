@@ -793,9 +793,9 @@ PARG is part of the method signature for `org-link-parameters'."
                   parg
                   :scheme "abbr"
                   :filter "_abbr"))
-    :export (lambda (link description format protocol)
+    :export (lambda (link description format channel)
               (jf/denote/link-ol-abbr-with-property
-                link description format protocol
+                link description format channel
                 :keyword "ABBR"
                 :additional-hugo-parameters "abbr=\"t\""))
     :face #'jf/org-faces-abbr
@@ -808,9 +808,9 @@ PARG is part of the method signature for `org-link-parameters'."
                   parg
                   :scheme "abbr-plural"
                   :filter "_abbr"))
-    :export (lambda (link description format protocol)
+    :export (lambda (link description format channel)
               (jf/denote/link-ol-abbr-with-property
-                link description format protocol
+                link description format channel
                 :keyword "PLURAL_ABBR"
                 :additional-hugo-parameters "abbr=\"t\" plural=\"t\""))
     :face #'jf/org-faces-abbr
@@ -836,8 +836,8 @@ months; and most often year, month, and days.
 PARG is for conformant method signature."
     (format "date:%s" (org-read-date)))
 
-  (cl-defun jf/denote/link-export-date (link description format protocol)
-    "Export a date for given LINK, DESCRIPTION, FORMAT, and PROTOCOL."
+  (cl-defun jf/denote/link-export-date (link description format channel)
+    "Export a date for given LINK, DESCRIPTION, FORMAT, and CHANNEL."
     (cond
       ((or (eq format 'html) (eq format 'md))
         (format "<time datetime=\"%s\" title=\"%s\">%s</time>"
@@ -1017,10 +1017,10 @@ PARG is for a conformant method signature."
     :face #'jf/org-faces-epigraph
     :follow #'jf/org-link-ol-follow/epigraph)
 
-  (defun jf/org-link-ol-export/epigraph (link description format protocol)
+  (defun jf/org-link-ol-export/epigraph (link description format channel)
     "Export the text of the LINK epigraph in the corresponding FORMAT.
 
-We ignore the DESCRIPTION and probably the PROTOCOL."
+We ignore the DESCRIPTION and probably the CHANNEL."
     (let ((buffer
             (find-file-noselect jf/filename/bibliography)))
       (save-restriction
@@ -1408,7 +1408,7 @@ We ignore the DESCRIPTION and probably the CHANNEL."
   (defun jf/denote/link-ol-export (link description format)
     "Export a `denote:' link from Org files.
 
-The LINK, DESCRIPTION, FORMAT, and PROTOCOL are handled by the
+The LINK, DESCRIPTION, FORMAT, and CHANNEL are handled by the
 export backend.
 
 When USE_HUGO_SHORTCODE is given use glossary based exporting."
@@ -8673,7 +8673,7 @@ With one PREFIX go to place where we would jump on capture."
         ;; Try the path as an org-link (e.g. path ==
         ;; "denote:20230328T093100")
         (t (when-let* ((type-target (s-split ":" path))
-                        ;; There's a registered handler for the protocol
+                        ;; There's a registered handler for the channel
                         ;; (e.g. "denote")
                         (follow-func (org-link-get-parameter
                                        (car type-target) :follow)))
