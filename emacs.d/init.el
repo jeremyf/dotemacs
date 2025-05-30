@@ -8197,11 +8197,6 @@ If `consult--read' is defined, use that.  Otherwise fallback to
       (jf/tor-list-by-key-from-filename
         :key "tag" :filename "data/glossary.yml"))
 
-    ;; (defun jf/tor-epigraph-list ()
-    ;;   "Return a list of epigraph keys from TakeOnRules.com."
-    ;;   (jf/tor-list-by-key-from-filename
-    ;;     :key "key" :filename "data/epigraphs.yml"))
-
     (defun jf/tor-game-list ()
       "Return a list of games from TakeOnRules.com."
       (jf/tor-list-by-key-from-filename
