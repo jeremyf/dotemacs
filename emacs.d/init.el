@@ -4543,6 +4543,7 @@ sort accordingly.")
           ;; ("C-c o" . consult-file-externally)
           ;; I've long favored Swiper mapped to c-s
           ("M-s s" . consult-line)
+          ("M-j" . consult-line)
           ("C-s" . isearch-forward)
           ;; Isearch integration
           ("M-s e" . consult-isearch-history)
@@ -7661,6 +7662,7 @@ The `magit-gitdir' is the project's .git directory."
   ;; of the line on which I called `git-link'.  This is helpful for
   ;; sharing links with other folks.  I use this /all of the time./ See
   ;; https://github.com/sshaw/git-link.
+  :bind (("C-c l g" . git-link))
   :config
   (defun jf/git-browse-to-repository (remote)
     "Open in external browser the current repository's given REMOTE."
