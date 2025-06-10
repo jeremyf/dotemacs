@@ -1,10 +1,20 @@
 (dir-locals-set-class-variables
+  'pcloud-cli
+  '((nil . ((eglot-workspace-configuration .
+              (
+                :elixirLS (
+                            :projectDir "pcloud_cli_integration/")
+                ))))))
+(dir-locals-set-class-variables
   'go-lang
   '((nil . ((projectile-git-fd-args .
               "-H -0 -tf --strip-cwd-prefix -c never -E vendor/ -E pkg/ -E docs/ -E .git")))))
 
 (dir-locals-set-directory-class
   "~/git/converge-cloud/marketplace-provider" 'go-lang)
+
+(dir-locals-set-directory-class
+  "~/git/converge-cloud/morpho-pcloud-cli/" 'pcloud-cli)
 
 (dir-locals-set-directory-class
   "~/git/converge-cloud/concierge" 'go-lang)
