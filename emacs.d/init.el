@@ -5222,14 +5222,11 @@ literal then add a fuzzy search)."
   ;; https://www.gnu.org/software/emacs/manual/html_node/elisp/Creating-Frames.html
   (add-hook 'after-make-frame-functions '--set-emoji-font))
 
-(use-package sdcv-mode
-  ;; This follows from
+(use-package sdcv
   ;; http://mbork.pl/2017-01-14_I'm_now_using_the_right_dictionary
-  ;;
-  ;; Namely I want to use a more inspiring dictionary for the poetry and
-  ;; prose.
-  :straight (sdcv-mode :type git :host github :repo "gucong/emacs-sdcv")
-  :bind ("C-c C-'" . sdcv-search))
+  ;; Except, I'm using the Melpa package.
+  :bind ("C-c C-'" . sdcv-search-input)
+  :straight t)
 
 (use-package synosaurus
   ;; brew install wordnet
