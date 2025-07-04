@@ -189,7 +189,7 @@ Useful for narrowing regions.")
   '("j" "Journal Entry"
      plain (file+olp+datetree
              jf/personal/filename-for-journal)
-     "%T :: %?"
+     "{{{nt(%?)}}}"
      :empty-lines-before 1
      :empty-lines-after 1
      :clock-in t

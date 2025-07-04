@@ -3762,6 +3762,8 @@ function is ever added to that hook."
   (add-to-list 'org-export-global-macros
     '("m" . "@@latex:\\textit{@@@@html:<i class=\"mechanic\">@@$1@@html:</i>@@@@latex:}@@"))
   (add-to-list 'org-export-global-macros
+    '("nt" . "@@latex:\\textsc{@@@@html:<i class=\"new-thought\">@@$1@@html:</i>@@@@latex:}@@"))
+  (add-to-list 'org-export-global-macros
     '("newline" . "@@latex:\\@@ @@html:<br />@@"))
   (add-to-list 'org-export-global-macros
     '("newpage" . "@@latex:\newpage@@"))
@@ -4286,6 +4288,7 @@ Narrow focus to a tag, then a named element."
     (goto-char (alist-get headline headline-alist nil nil #'string=))
     (while (org-element-type-p (org-element-at-point) '(drawer property-drawer keyword planning))
       (goto-char (org-element-property :end (org-element-at-point))))))
+
 (defvar jf/filename/shopping-list
   "~/SyncThings/source/books-to-get-from-bibliography.txt"
   "Dude, these are the books I'm curious about.")
@@ -5077,6 +5080,19 @@ Useful if you want a more robust view into the recommend candidates."
   (tempel-key "H-m m" macro-mechanic org-mode-map)
   (tempel-key "H-m k" macro-keyboard org-mode-map))
 
+
+;; I'm considering this
+;; (use-package slash-commands
+;;   :straight (:host github :repo "bluzky/slash-commands")
+;;   :config (global-slash-commands-mode 1)
+;;   (defun insert-date ()
+;;     "Insert current date at point."
+;;     (interactive)
+;;     (insert (format-time-string "%Y-%m-%d")))
+;;   ;; Register it
+;;   (slash-commands-register-commands
+;;     '(("date" . insert-date))))
+
 (use-package vertico
   ;; Another one of minad's packages which improves my day to day
   ;; experience.  I find the user experience wonderful when pairing
@@ -5225,6 +5241,7 @@ literal then add a fuzzy search)."
 (use-package sdcv
   ;; http://mbork.pl/2017-01-14_I'm_now_using_the_right_dictionary
   ;; Except, I'm using the Melpa package.
+  :commands (sdcv-search)
   :bind ("C-c C-'" . sdcv-search-input)
   :straight t)
 
