@@ -6783,6 +6783,7 @@ Useful for Eglot."
   ;; Convenient organization and commands for projects.
   :straight t
   :custom
+  (projectile-enable-caching t)
   (projectile-project-search-path
     '("~/git/" "~/git/converge-cloud"))
   :bind ("s-." . projectile-toggle-between-implementation-and-test)
