@@ -50,6 +50,8 @@ emacs-lisp-mode
 ;;;; fundamental-mode
 fundamental-mode
 
+(dejavu "déjà vu")
+
 ;;;; markdown-mode
 markdown-mode markdown-ts-mode
 

@@ -6669,7 +6669,7 @@ Useful for Eglot."
 
   ;; https://github.com/emacs-lsp/lsp-mode/wiki/Install-Angular-Language-server
   ;; with modifications for homebrew
-  (add-to-list 'eglot-server-programs
+    (add-to-list 'eglot-server-programs
     '(angular-mode
        "node /opt/homebrew/lib/node_modules/@angular/language-server --ngProbeLocations /opt/homebrew/lib/node_modules --tsProbeLocations /opt/homebrew/lib/node_modules --stdio"))
   (add-to-list 'eglot-server-programs
@@ -7956,7 +7956,7 @@ If not set  DEFAULT or prompt for it."
       "Set global property named KEY to VALUE for current buffer."
       (goto-char (point-min))
       (search-forward-regexp "^$")
-      (insert (format "\n#+%s: %s" (upcase key) value)))
+      (insert (format "#+%s: %s\n" (upcase key) value)))
 
     (defvar jf/tor-session-report-location
       '("around the table"
