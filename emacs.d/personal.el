@@ -872,3 +872,28 @@ entry."
   ;;     smtpmail-smtp-service 1025
   ;;     smtpmail-stream-type  'ssl)
   )
+
+(use-package libmpdel
+  :straight t)
+
+(use-package mpdel
+  :after libmpdel
+  :straight t
+  :custom (mpdel-prefix-key (kbd "H-m"))
+  :config (mpdel-mode))
+
+(use-package bongo
+  :straight t)
+
+(use-package vlc
+  :straight t)
+
+;; Before M-x xeft ensure that I have installed xapian (e.g. `brew
+;; install xapian`).
+(use-package xeft
+  :straight t
+  :custom
+  (xeft-directory "~/git/org/denote/")
+  (xeft-ignore-extension '("png" "jpg" "jpeg" "tex" "pdf" "html" "org_archive"))
+  (xeft-extensions '("org"))
+  (xeft-title-function #'file-name-nondirectory))

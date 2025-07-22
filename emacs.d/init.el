@@ -413,46 +413,43 @@ Related to `jf/linux:radio-silence'."
       ns-right-alternate-modifier 'meta)))
 
 (defmacro jf/grab-browser-links (browser)
-  (let ((bmk-fn
-          (intern (format "jf/menu--bookmark-%s" browser)))
-         (bmk-doc
-           (format "Create `bookmark' for current %s page." browser))
-         (ref-fn
-           (intern (format "jf/menu--org-capture-%s" browser)))
-         (ref-doc
-           (format "Create an `denote' entry from %s page." browser))
-         (grabber-fn
-           (intern (format "grab-mac-link-%s-1" browser))))
+  (let* ((browser (downcase browser))
+          (bmk-fn
+            (intern (format "jf/menu--bookmark-%s" browser)))
+          (bmk-doc
+            (format "Create `bookmark' for current %s page." browser))
+          (ref-fn
+            (intern (format "jf/menu--org-capture-%s" browser)))
+          (ref-doc
+            (format "Create an `denote' entry from %s page." browser))
+          (grabber-fn
+            (if (eq system-type 'darwin)
+              (progn
+                (require 'grab-mac-link)
+                (intern (format "grab-mac-link-%s-1" browser)))
+              (progn
+                (require 'grab-x-link)
+                (intern (format "grab-x-link-%s" browser))))))
     `(progn
        (defun ,bmk-fn ()
          ,bmk-doc
          (interactive)
-         (if (eq system-type 'darwin)
-           (progn
-             (require 'grab-mac-link)
-             (let* ((url-and-title
+         (let* ((url-and-title
                       (,grabber-fn))
                      (title
                        (read-string
                          (concat "URL: " (car url-and-title) "\nTitle: ")
                          (cadr url-and-title))))
                (jf/bookmark-url (car url-and-title) title)))
-           (user-error "My emacs for %s OS cannot yet bookmark %s page"
-             system-type
-             ,browser)))
        (defun ,ref-fn ()
          ,ref-doc
          (interactive)
-         (if (eq system-type 'darwin)
-           (progn
-             (require 'grab-mac-link)
-             (jf/denote/capture-reference :url (car (,grabber-fn))))
-           (user-error "My emacs for %s OS cannot yet bookmark %s page"
-             system-type
-             ,browser))))))
+         (jf/denote/capture-reference :url (car (,grabber-fn)))))))
 
 (jf/grab-browser-links "safari")
 (jf/grab-browser-links "firefox")
+(jf/grab-browser-links "librewolf")
+(jf/grab-browser-links "mullvad")
 (jf/grab-browser-links "chrome")
 
 (use-package denote
@@ -934,6 +931,17 @@ PARG is for a conformant method signature."
                                        (org-element-property :name el)))
                            (let* ((lineage
                                     (org-element-lineage el))
+                                   ;; Loop
+                                   (citable-work
+                                     (car
+                                       (seq-filter
+                                         (lambda (el)
+                                           (and
+                                             (eq (org-element-type el) 'headline)
+                                             (or (member "citables"
+                                                   (org-element-property :tags el))
+                                               (= (org-element-property :level el) 2))))
+                                         lineage)))
                                    (h-node
                                      (car
                                        (seq-filter
@@ -952,7 +960,7 @@ PARG is for a conformant method signature."
                                        ""
                                        (car
                                          (org-element-property
-                                           :title h-node)))
+                                           :title citable-work)))
                                :author
                                (if people?
                                  (car
@@ -6991,7 +6999,7 @@ Useful for Eglot."
   :straight t
   :bind
   (:map so-long-mode-map
-    ("C-s" . isearch-forward)
+q    ("C-s" . isearch-forward)
     ("C-r" . isearch-backward))
   :config (global-so-long-mode 1))
 
@@ -7008,9 +7016,8 @@ Useful for Eglot."
   (setq olivetti-recall-visual-line-mode-entry-state t)
   :config
   (defun jf/olivetti-mode-on-hook ()
-    (text-scale-adjust 0)
-    (text-scale-adjust 2)
     "Remove some visual chatter."
+    (text-scale-adjust 2)
     (setq-local original-flymake-fringe-indicator-position
       flymake-fringe-indicator-position)
     (setq-local original-vi-tilde-fringe-mode
@@ -7039,6 +7046,7 @@ Useful for Eglot."
     )
   (defun jf/olivetti-mode-off-hook ()
     "Restore some visual chatter."
+    (text-scale-adjust 0)
     (setq-local flymake-fringe-indicator-position
       original-flymake-fringe-indicator-position)
     (when (eq major-mode 'org-mode)
@@ -8960,6 +8968,8 @@ This encodes the logic for creating a project."
         ("b b" "Bookmarks" bookmark-bmenu-list)
         ("b c" "Chrome" jf/menu--bookmark-chrome)
         ("b f" "Firefox" jf/menu--bookmark-firefox)
+        ("b l" "Librewolf" jf/menu--bookmark-librewolf)
+        ("b m" "Mullvad" jf/menu--bookmark-mullvad)
         ("b s" "Safari" jf/menu--bookmark-safari)
         ]])
   :bind ("s-1" . #'jf/menu))
