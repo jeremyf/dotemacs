@@ -435,12 +435,14 @@ Related to `jf/linux:radio-silence'."
          ,bmk-doc
          (interactive)
          (let* ((url-and-title
-                      (,grabber-fn))
-                     (title
-                       (read-string
-                         (concat "URL: " (car url-and-title) "\nTitle: ")
-                         (cadr url-and-title))))
-               (jf/bookmark-url (car url-and-title) title)))
+                  (,grabber-fn))
+                 (url
+                   (car url-and-title))
+                 (title
+                   (read-string
+                     (concat "URL: " url "\nTitle: ")
+                     (cdr url-and-title))))
+               (jf/bookmark-url url title)))
        (defun ,ref-fn ()
          ,ref-doc
          (interactive)
@@ -1268,7 +1270,7 @@ Wires into `org-insert-link'."
           (format "work:%s%s%s"
             (plist-get work-data :id)
             (if include-author "::author" "")
-            (if include-author "::subtitle" ""))))))
+            (if include-subtitle "::subtitle" ""))))))
 
   (defvar jf/works/cache
     (make-hash-table :test 'equal)
