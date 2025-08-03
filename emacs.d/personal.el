@@ -187,20 +187,9 @@ Useful for narrowing regions.")
 
 (add-to-list 'org-capture-templates
   '("j" "Journal Entry"
-     plain (file+olp+datetree
+     entry (file+olp+datetree
              jf/personal/filename-for-journal)
-     "{{{nt(%?)}}}"
-     :empty-lines-before 1
-     :empty-lines-after 1
-     :clock-in t
-     :clock-resume t))
-
-(add-to-list 'org-capture-templates
-  `("v" "Add to Today's Private Thoughts"
-     plain (file+function
-             jf/personal/filename-for-journal
-             jf/personal/position-in-private-thoughts)
-     "%T :: From %a.  %?"
+     "At %(format-time-string \"%R\")\n:PROPERTIES:\n:CUSTOM_ID: journal-%(format-time-string \"%Y%m%d-%H%M\")\n:END:\n%?"
      :empty-lines-before 1
      :empty-lines-after 1
      :clock-in t
@@ -888,12 +877,5 @@ entry."
 (use-package vlc
   :straight t)
 
-;; Before M-x xeft ensure that I have installed xapian (e.g. `brew
-;; install xapian`).
-(use-package xeft
-  :straight t
-  :custom
-  (xeft-directory "~/git/org/denote/")
-  (xeft-ignore-extension '("png" "jpg" "jpeg" "tex" "pdf" "html" "org_archive"))
-  (xeft-extensions '("org"))
-  (xeft-title-function #'file-name-nondirectory))
+(use-package p-search
+  :straight (:host github :repo "zkry/p-search"))

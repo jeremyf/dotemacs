@@ -7786,16 +7786,18 @@ contextual information."
     ;;   folks.
     ;; - marginnote :: a "dangling" note that is only partially part of
     ;;                 the conversation.
-    ;; - poem :: because poetic spacing is critical.
     ;; - inline_comments :: a concession that I need different comments
     ;;                      based on context; and that marginalia may be
     ;;                      too much in some cases.
     ;; - update :: I write updates for my blog posts; corrections or
     ;;             additions based on new information.
     (org-hugo-paired-shortcodes
-      "blockquote marginnote poem inlinecomment update")
+      "blockquote marginnote inlinecomment update")
     (hugo-use-code-for-kbd t)
+    (org-hugo-base-dir (file-truename "~/git/takeonrules.source/"))
+    (org-hugo-front-matter-format "yaml")
     :config
+    (setq org-hugo-section (format-time-string "posts/%Y"))
     (defconst jf/tor-home-directory
       (file-truename "~/git/takeonrules.source")
       "The home directory of TakeOnRules.com Hugo repository.")
@@ -7874,6 +7876,7 @@ Take on Rules using the \"blockquote\" special block."
 
     (defvar jf/exporting-org-to-tor nil
       "Not nil while performing export of org file to Take on Rules.")
+
 
     (cl-defun jf/export-org-to-tor (&key (buffer (current-buffer)))
       "Export current org BUFFER for TakeOnRules post."
