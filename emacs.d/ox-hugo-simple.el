@@ -12,7 +12,6 @@
 
 
 ;; TODO: Handle margin notes and other sort of blocks
-;; TODO: Handle date time.
 (org-export-define-derived-backend 'takeonrules 'md
   :translate-alist
   '(
@@ -66,17 +65,15 @@ org-export backend derived from the 'md backend."
               (let ((s (jf/denote-sluggify-title
                          (org-element-property :title blogPost))))
                 (org-entry-put blogPost "SLUG" s)
-                s))))
-      (or (org-element-property :CUSTOM_ID blogPost)
-        (org-entry-put blogPost "CUSTOM_ID"
-          (format "blogPost-%s"
-            (jf/denote-sluggify-title
-              (org-element-property :title blogPost)))))
+                s)))
+           (custom_id
+             (or (org-element-property :CUSTOM_ID blogPost)
+               (org-entry-put blogPost "CUSTOM_ID"
+                 (format "blogPost-%s"
+                   (jf/denote-sluggify-title
+                     (org-element-property :title blogPost)))))))
       (or (org-element-property :ID blogPost)
-        (org-entry-put blogPost "ID"
-          (format "blogPost-%s"
-            (jf/denote-sluggify-title
-              (org-element-property :title blogPost)))))
+        (org-entry-put blogPost "ID" custom_id))
       (or (org-element-property :PUBLISHED_AT blogPost)
         (org-entry-put blogPost "PUBLISHED_AT"
           (format-time-string "%Y-%m-%d %H:%M:%S %z")))
@@ -102,7 +99,7 @@ org-export backend derived from the 'md backend."
                (f-join jf/tor-home-directory "content" "posts"
                  (format-time-string "%Y")))))
       (and (org-export-to-file 'takeonrules file nil t t t)
-        (org-open-file file)))))
+        (find-file-other-window file)))))
 
 (defun org-hugo-simple-inner-template (contents info)
   "Transcode CONTENTS to markdown body.
@@ -168,7 +165,10 @@ We also rely on the org-element at point."
            (org-entry-get (point) "PUBLISHED_AT"))
          (tags
            (mapcar
+             ;; Convert the camel case to kebab (all lower case)
              #'string-inflection-kebab-case-function
+             ;; We intersect my allowed tags and those assigned to the
+             ;; headline.
              (seq-intersection
                (org-get-tags (point) t)
                denote-known-keywords #'string=)))

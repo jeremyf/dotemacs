@@ -1499,6 +1499,7 @@ node in one of my agenda files."
               (save-restriction
                 (widen)
                 (goto-char (cdr filename-and-pos))
+                (org-todo 'done)
                 (org-entry-put (org-element-at-point) "ROAM_REFS" url)))))
         (user-error "Unable to find org_id %s for url %s" identifier url))))
 
@@ -2687,8 +2688,10 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
            ;; Other keywords that I'm using
            ("HACK" . ,blue-warmer)
            ("TODO" . ,red-warmer)
+           ("DRAFT" . ,red-warmer)
            ("FIXME" . ,red-warmer)
            ("DONE" . ,green)
+           ("PUBLISHED" . ,green)
            ("ASSUMPTION" .,yellow)
            ("QUESTION" .,yellow)
            ("BLOCKED" . ,yellow)
@@ -7015,7 +7018,7 @@ Useful for Eglot."
   :straight t
   :bind
   (:map so-long-mode-map
-q    ("C-s" . isearch-forward)
+    ("C-s" . isearch-forward)
     ("C-r" . isearch-backward))
   :config (global-so-long-mode 1))
 
