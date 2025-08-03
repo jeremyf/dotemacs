@@ -838,7 +838,7 @@ PARG is for conformant method signature."
   (cl-defun jf/denote/link-export-date (link description format channel)
     "Export a date for given LINK, DESCRIPTION, FORMAT, and CHANNEL."
     (cond
-      ((or (eq format 'html) (eq format 'md))
+      ((or (eq format 'html) (eq format 'md) (eq format 'takeonrules))
         (format "<time datetime=\"%s\" title=\"%s\">%s</time>"
           link link description))
       ((eq format 'beamer)

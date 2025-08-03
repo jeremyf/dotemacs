@@ -15,8 +15,11 @@
 ;; TODO: Handle date time.
 (org-export-define-derived-backend 'takeonrules 'md
   :translate-alist
-  '((inner-template . org-hugo-simple-inner-template)
-     (footnote-reference . org-hugo-simple-footnote-reference))
+  '(
+     (footnote-reference . org-hugo-simple-footnote-reference)
+     (inner-template . org-hugo-simple-inner-template)
+     (timestamp . org-hugo-simple-timestamp)
+     )
   :filters-alist
   '((:filter-body org-hugo-simple-body-filter))
   :options-alist
@@ -154,6 +157,23 @@ We also rely on the org-element at point."
                     ("type" . "post")
                     ("draft" . "true")
                     ("licenses" . ("by-nc-nd-4_0"))))))
+
+(defun org-hugo-simple-timestamp (timestamp _contents info)
+  "Transcode a TIMESTAMP object from Org to HTML.
+CONTENTS is nil.  INFO is a plist holding contextual
+information."
+  (let* ((as-plain-text
+           (org-timestamp-translate timestamp))
+          (time
+            (org-timestamp-to-time timestamp))
+          (datetime-attr
+            (if (string-match-p ":[[:digit:]][[:digit:]]\>$" as-plain-text)
+              (format-time-string "%Y-%m-%d %R" time)
+              (format-time-string "%Y-%m-%d" time))))
+    (format "<time datetime=\"%s\">%s</time>"
+      datetime-attr
+      (string-trim
+        (replace-regexp-in-string "--" "&#x2013;" (org-html-plain-text as-plain-text info))))))
 
 (provide 'ox-hugo-simple)
 ;;; ox-hugo-simple.el ends here
