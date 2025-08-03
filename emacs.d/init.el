@@ -3322,13 +3322,14 @@ File.open('%s', 'w') { |f| $stdout = f; pp results }")
                              org-directory
                              "/captured-notes.org")
     org-log-done 'time
-    org-todo-keywords '((type "TODO(t)"
+    org-todo-keywords '((sequence "TODO(t)"
                           "STARTED(s!)"
                           "BLOCKED(b@/!)"
                           "WAITING(w@/!)"
                           "|"
-                          "CANCELED(c@/!)"
-                          "DONE(d!)")))
+                          "DONE(d!)")
+                         (sequence "DRAFT(D) | PUBLISHED(p)")
+                         (sequence "|" "CANCELED(c@/!)")))
   (defun jf/org-capf ()
     "The `completion-at-point-functions' I use for `org-mode'."
     (setq-local completion-at-point-functions

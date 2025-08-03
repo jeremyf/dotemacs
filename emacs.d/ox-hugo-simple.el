@@ -174,6 +174,8 @@ We also rely on the org-element at point."
                denote-known-keywords #'string=)))
          (title
            (car (plist-get info :title)))
+         (slug
+           (org-entry-get (point) "SLUG"))
          (org_id
            (org-entry-get (point) "ID")))
     (yaml-encode `(("title" . ,title)
@@ -181,6 +183,7 @@ We also rely on the org-element at point."
                     ("org_id" . ,org_id)
                     ("date" . ,published_at)
                     ("tags" . ,tags)
+                    ("slug" . ,slug)
                     ;; These could become a variable, but for now, we'll
                     ;; leave things hard-coded.
                     ("author" . ("Jeremy Friesen"))
