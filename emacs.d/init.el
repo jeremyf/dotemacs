@@ -1475,18 +1475,32 @@ When USE_HUGO_SHORTCODE is given use glossary based exporting."
     '((name . "wrapper")))
 
   (defun jf/associate-blog-post-url-with-identifier (url identifier)
-    "Associate given URL with the `denote' IDENTIFIER."
+    "Associate given URL with correct note.
+
+This might be either the `denote' IDENTIFIER or the ID of an `org-mode'
+node in one of my agenda files."
     (message "Associating URL: %s with IDENTIFIER: %s." identifier url)
-    (let* ((filename
-             (denote-get-path-by-id identifier))
-            (buffer
+    (if-let ((filename
+               (denote-get-path-by-id identifier)))
+      (let ((buffer
               (find-file-noselect filename)))
-      (with-current-buffer buffer
-        (jf/export-org-to-tor--global-buffer-prop-ensure
-          :key "ROAM_REFS"
-          :plist (jf/org-keywords-as-plist :keywords-regexp "ROAM_REFS")
-          :default url)
-        (save-buffer))))
+        (with-current-buffer buffer
+          (jf/export-org-to-tor--global-buffer-prop-ensure
+            :key "ROAM_REFS"
+            :plist (jf/org-keywords-as-plist :keywords-regexp "ROAM_REFS")
+            :default url)
+          (save-buffer)))
+      (if-let ((filename-and-pos
+                 (org-id-find identifier)))
+        (let ((buffer
+                (find-file-noselect (car filename-and-pos))))
+          (with-current-buffer buffer
+            (save-excursion
+              (save-restriction
+                (widen)
+                (goto-char (cdr filename-and-pos))
+                (org-entry-put (org-element-at-point) "ROAM_REFS" url)))))
+        (user-error "Unable to find org_id %s for url %s" identifier url))))
 
   (defun jf/org-mode/convert-link-type (&optional element)
     "Replace the given `org-mode' ELEMENT's link type and text."
@@ -8020,6 +8034,8 @@ If not set  DEFAULT or prompt for it."
                         url)))))
         (user-error "Current buffer is not a blog post")))
 
+    ;; TODO: Will need to account for publishing blog posts from
+    ;; Journal.
     (cl-defun jf/jump_to_corresponding_hugo_file (&key (buffer (current-buffer)))
       "Find the TakeOnRules.com url in BUFFER and jump to Hugo file."
       (interactive)
@@ -8034,6 +8050,8 @@ If not set  DEFAULT or prompt for it."
               (jf/tor-find-hugo-file-by-url (match-string 1))
               (message "Unable to find Take on Rules URL in buffer."))))))
 
+    ;; TODO: Will need to account for publishing blog posts from
+    ;; Journal.
     (cl-defun jf/jump_to_corresponding_denote_file (&key (buffer (current-buffer)))
       "Find org_id in BUFFER and jump to corresponding `denote' file."
       (interactive)
