@@ -57,7 +57,7 @@ org-export backend derived from the 'md backend."
       (user-error
         "Current node is not child of headline tagged with :%s:"
         jf/denote/keywords/blogPosts))
-
+    (goto-char (org-element-property :begin blogPost))
     ;; Ensure we set metadata that we will use in the export for initial
     ;; publication as well as future updates (if any)
     (let ((slug
