@@ -112,30 +112,41 @@ Useful for narrowing regions.")
 
 (add-to-list 'org-capture-templates
   '("b" "Blog Post"
-     plain (file denote-last-path)
-     (function
-       (lambda ()
-         (let* ((denote-use-title
-                  ;; If I don't provide the title, then it'll use the
-                  ;; active region as the title, and failing that list
-                  ;; previous titles I've used from which to select.
-                  ;; With this let clause, I'm asking for a clean title.
-                  (read-string "Blog Post Title: "))
-                 (denote-use-keywords
-                  `(,jf/denote/keywords/blogPosts))
-                 (denote-org-capture-specifiers
-                   ;; When I am capturing with an active region, use the
-                   ;; capture wrap; that is bring the highlighted region
-                   ;; along.  Else, when I'm not capturing with an
-                   ;; active region, just prompt to start writing.
-                   (if (use-region-p)
-                     "%(jf/denote/capture-wrap :link \"%L\" :content \"%i\")"
-                     "%?")))
-           (denote-org-capture))))
-     :no-save t
-     :immediate-finish nil
-     :kill-buffer t
-     :jump-to-captured t))
+     entry (file+olp+datetree
+             jf/personal/filename-for-journal)
+     "DRAFT At %(format-time-string \"%R\") :blogPosts:\n:PROPERTIES:\n:CUSTOM_ID: journal-%(format-time-string \"%Y%m%d-%H%M\")\n:END:\n%?"
+     :empty-lines-before 1
+     :empty-lines-after 1
+     :jump-to-captured t
+     :clock-in t
+     :clock-resume t))
+
+;; (add-to-list 'org-capture-templates
+;;   '("b" "Blog Post"
+;;      plain (file denote-last-path)
+;;      (function
+;;        (lambda ()
+;;          (let* ((denote-use-title
+;;                   ;; If I don't provide the title, then it'll use the
+;;                   ;; active region as the title, and failing that list
+;;                   ;; previous titles I've used from which to select.
+;;                   ;; With this let clause, I'm asking for a clean title.
+;;                   (read-string "Blog Post Title: "))
+;;                  (denote-use-keywords
+;;                   `(,jf/denote/keywords/blogPosts))
+;;                  (denote-org-capture-specifiers
+;;                    ;; When I am capturing with an active region, use the
+;;                    ;; capture wrap; that is bring the highlighted region
+;;                    ;; along.  Else, when I'm not capturing with an
+;;                    ;; active region, just prompt to start writing.
+;;                    (if (use-region-p)
+;;                      "%(jf/denote/capture-wrap :link \"%L\" :content \"%i\")"
+;;                      "%?")))
+;;            (denote-org-capture))))
+;;      :no-save t
+;;      :immediate-finish nil
+;;      :kill-buffer t
+;;      :jump-to-captured t))
 
 (add-to-list 'org-capture-templates
   '("g" "Glossary Entry"
