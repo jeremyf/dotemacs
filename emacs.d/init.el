@@ -191,7 +191,7 @@ The DWIM behaviour of this command is as follows:
     kept-old-versions 5
 
     ;; Set a generous kill ring size.
-    kill-ring-max 128
+    kill-ring-max 512
 
     ;; Favor new bit code
     load-prefer-newer t
