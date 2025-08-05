@@ -5880,9 +5880,9 @@ See https://github.com/chmouel/gotest-ts.el"
   (setq-local adaptive-fill-first-line-regexp "")
   (setq-local comment-line-break-function #'go--comment-indent-new-line)
 
-  (add-to-list
-    'treesit-simple-imenu-settings
-    `("t.Run" "\\`call_expression\\'" go-ts-mode--testing-run-node-p go-ts-mode--testing-run-name))
+  ;; (add-to-list
+  ;;   'treesit-simple-imenu-settings
+  ;;   `("t.Run" "\\`call_expression\\'" go-ts-mode--testing-run-node-p go-ts-mode--testing-run-name))
   (setq-local tab-width 2)
   (setq-local eglot-stay-out-of '(imenu))
   (if (s-ends-with? "_test.go" (buffer-file-name))
@@ -6436,7 +6436,8 @@ See `jf/comment-header-regexp/major-modes-alis'."
     (hl-todo-mode t)
     (setq show-trailing-whitespace t)
     (setq truncate-lines t)
-    (which-function-mode)))
+    ;; (which-function-mode)
+    ))
 
 (use-package text-mode
   :straight (:type built-in)
@@ -6721,13 +6722,13 @@ Useful for Eglot."
 
 ;; See https://elixir-lsp.github.io/elixir-ls/getting-started/emacs/
 
-;; (use-package eglot-booster
-;;   :straight (:host github :repo "jdtsmith/eglot-booster")
-;;   :after eglot
-;;   :hook ((eglot-managed-mode . eglot-booster-mode))
-;;   :config
-;;   (advice-add 'eglot-completion-at-point
-;;     :around #'cape-wrap-buster))
+(use-package eglot-booster
+  :straight (:host github :repo "jdtsmith/eglot-booster")
+  :after eglot
+  :hook ((eglot-managed-mode . eglot-booster-mode))
+  :config
+  (advice-add 'eglot-completion-at-point
+    :around #'cape-wrap-buster))
 
 (use-package eglot-hierarchy
   :straight (:host github :repo "dolmens/eglot-hierarchy")
@@ -7653,6 +7654,7 @@ A page is marked `last' if rel=\"last\" appears in a <link> or <a> tag."
       (structured-commit/write-message))))
 
 (use-package structured-commit
+  ;; git log --pretty=format:"%s" | rg "\w*\((\w+)\)" -r '$1' --only-matching | sort | uniq | awk '{ print "INSERT INTO scopes (project, scope) VALUES (\"morpho-swagger\", \"" $1 "\");"}' | sqlite3 ~/.emacs.d/structured-commit.db
   :straight (:type git :host github
               :repo "jeremyf/structured-commit")
   :config
