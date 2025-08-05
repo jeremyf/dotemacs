@@ -77,6 +77,9 @@ org-export backend derived from the 'md backend."
       (or (org-element-property :PUBLISHED_AT blogPost)
         (org-entry-put blogPost "PUBLISHED_AT"
           (format-time-string "%Y-%m-%d %H:%M:%S %z")))
+      (when (org-entry-is-done-p)
+        (org-entry-put blogPost "LAST_MODIFIED_AT"
+          (format-time-string "%Y-%m-%d %H:%M:%S %z")))
       (or (org-element-property :DESCRIPTION blogPost)
         (org-entry-put blogPost "DESCRIPTION"
           (read-string "Description: ")))
@@ -159,38 +162,42 @@ INFO is a plist holding export options."
 We also rely on the org-element at point."
   ;; Instead of relying on the EXPORT_* per Org-Mode documentation, I'm
   ;; directly fetching the property.
-  (let ((description
-          (org-entry-get (point) "DESCRIPTION"))
-         (published_at
-           (org-entry-get (point) "PUBLISHED_AT"))
-         (tags
-           (mapcar
-             ;; Convert the camel case to kebab (all lower case)
-             #'string-inflection-kebab-case-function
-             ;; We intersect my allowed tags and those assigned to the
-             ;; headline.
-             (seq-intersection
-               (org-get-tags (point) t)
-               denote-known-keywords #'string=)))
-         (title
-           (car (plist-get info :title)))
-         (slug
-           (org-entry-get (point) "SLUG"))
-         (org_id
-           (org-entry-get (point) "ID")))
-    (yaml-encode `(("title" . ,title)
-                    ("description" . ,description)
-                    ("org_id" . ,org_id)
-                    ("date" . ,published_at)
-                    ("tags" . ,tags)
-                    ("slug" . ,slug)
-                    ;; These could become a variable, but for now, we'll
-                    ;; leave things hard-coded.
-                    ("author" . ("Jeremy Friesen"))
-                    ("layout" . "post")
-                    ("type" . "post")
-                    ("draft" . "true")
-                    ("licenses" . ("by-nc-nd-4_0"))))))
+  (let* ((description
+           (org-entry-get (point) "DESCRIPTION"))
+          (published_at
+            (org-entry-get (point) "PUBLISHED_AT"))
+          (tags
+            (mapcar
+              ;; Convert the camel case to kebab (all lower case)
+              #'string-inflection-kebab-case-function
+              ;; We intersect my allowed tags and those assigned to the
+              ;; headline.
+              (seq-intersection
+                (org-get-tags (point) t)
+                denote-known-keywords #'string=)))
+          (title
+            (car (plist-get info :title)))
+          (slug
+            (org-entry-get (point) "SLUG"))
+          (org_id
+            (org-entry-get (point) "ID"))
+          (metadata `(("title" . ,title)
+                       ("description" . ,description)
+                       ("org_id" . ,org_id)
+                       ("date" . ,published_at)
+                       ("tags" . ,tags)
+                       ("slug" . ,slug)
+                       ;; These could become a variable, but for now, we'll
+                       ;; leave things hard-coded.
+                       ("author" . ("Jeremy Friesen"))
+                       ("layout" . "post")
+                       ("type" . "post")
+                       ("draft" . "true")
+                       ("licenses" . ("by-nc-nd-4_0")))))
+    (when-let ((lastmod
+                 (org-entry-get (point) "LAST_MODIFIED_AT")))
+      (add-to-list 'metadata `("lastmod" . ,lastmod)))
+    (yaml-encode metadata)))
 
 (defun org-hugo-simple-timestamp (timestamp _contents info)
   "Transcode a TIMESTAMP object from Org to HTML time element.
