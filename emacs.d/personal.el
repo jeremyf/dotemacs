@@ -892,3 +892,6 @@ entry."
 
 (use-package p-search
   :straight (:host github :repo "zkry/p-search"))
+
+(use-package doric-themes
+  :straight (:host github :repo "protesilaos/doric-themes"))

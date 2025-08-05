@@ -1156,13 +1156,13 @@ Wires into `org-insert-link'."
                                        (org-element-property
                                          :contents-end el))
                                      (text
-                                       (s-trim
-                                         (s-replace "\n" " "
+                                       ;; Compress the result into a
+                                       ;; single line.
+                                       (s-replace "\n" "⮒"
+                                         (s-trim
                                            (buffer-substring-no-properties
                                              left
-                                             (if (< (- right left) 72)
-                                               right
-                                               (+ left 72)))))))
+                                             right)))))
                           (cons text id))))))))
             (candidate
               (completing-read "Epigraph: " candidates nil t))
@@ -1171,7 +1171,8 @@ Wires into `org-insert-link'."
       (when id
         (progn
           (message "Added %S to the kill ring" candidate)
-          (kill-new candidate)
+          ;; Expand the result into a single line.
+          (kill-new (s-replace "⮒" "\n" candidate))
           (format "epigraph:%s" id)))))
 
   (defun jf/org-link-ol-follow/epigraph (name)
@@ -1499,7 +1500,9 @@ node in one of my agenda files."
               (save-restriction
                 (widen)
                 (goto-char (cdr filename-and-pos))
-                (org-todo 'done)
+                (org-todo "PUBLISHED")
+                (org-clock-in)
+                (org-clock-out)
                 (org-entry-put (org-element-at-point) "ROAM_REFS" url)))))
         (user-error "Unable to find org_id %s for url %s" identifier url))))
 
@@ -3328,7 +3331,7 @@ File.open('%s', 'w') { |f| $stdout = f; pp results }")
                           "WAITING(w@/!)"
                           "|"
                           "DONE(d!)")
-                         (sequence "DRAFT(D) | PUBLISHED(p)")
+                         (sequence "DRAFT(D!)" "|" "PUBLISHED(p!)")
                          (sequence "|" "CANCELED(c@/!)")))
   (defun jf/org-capf ()
     "The `completion-at-point-functions' I use for `org-mode'."
@@ -4422,7 +4425,7 @@ sort accordingly.")
   ;; auto-correct that I configure.  No more “teh” in my text.
   :straight (:type built-in)
   :custom (abbrev-file-name (file-truename
-                              "~/git/dotemacs/emacs.d/abbrev_defs"))
+                              "~/SyncThings/source/emacs.d/abbrev_defs"))
   :hook (text-mode . abbrev-mode))
 
 (use-package emacs
@@ -8762,7 +8765,7 @@ otherwise."
         (shell-command-to-string
           (concat
             "fd _projects " directory " | xargs rg \"^#\\+PROJECT_NAME: +(" project ") *$\" "
-            " --follow --only-matching --no-ignore-vcs --with-filename "
+            " --ignore-case --follow --only-matching --no-ignore-vcs --with-filename "
             "-r '$1' | tr '\n' '#'"))
         "#")))
 
