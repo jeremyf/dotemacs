@@ -2982,43 +2982,13 @@ the light option.")
   (setopt wgrep-change-readonly-file t)
   :straight t
   :bind (:map grep-mode-map
-          ("e" . wgrep-change-to-wgrep-mode)
-          :map ripgrep-search-mode-map
           ("e" . wgrep-change-to-wgrep-mode)))
 
-(use-package rg
-  ;; A highly performant successor to the venerable grep.
-  :after (wgrep)
-  :custom (rg-keymap-prefix (kbd "C-c f"))
-  :config (rg-enable-menu)
-  ;; https://github.com/dajva/rg.el/issues/142 Give focus to *rg*
-  ;; buffer.
-  (add-to-list 'rg-finish-functions
-    (lambda (buffer _) (pop-to-buffer buffer)))
-
-  ;; Override the baseline rg-project to include files
-  (rg-define-search rg-project
-    :dir project
-    :files "*.*")
-
-  ;; Prompt for file types
-  (rg-define-search rg-project-prompt-for-files
-    :dir project
-    :menu ("Search" "P" "Project prompt file type"))
-
-  (when (f-dir-p "~/git/dotemacs/")
-    (rg-define-search rg-projects-dotemacs
-      "Search Dotemacs"
-      :dir "~/git/dotemacs/"
-      :files "*.*"
-      :menu ("Projects" "j ." "Dotemacs")))
-
-  :init (setq ripgrep-arguments "--ignore-case --follow")
-  ;; I want to ensure that I'm following symlinks.  This is important
-  ;; for my Personal Knowledge Management file structure and ensuring
-  ;; that private and public concepts don't bleed across machines.
-  (add-to-list 'rg-required-command-line-flags "--follow ")
-  :straight t)
+(use-package deadgrep
+  :straight t
+  :bind ("C-c f" . deadgrep)
+  (:map deadgrep-mode-map
+    ("e" . deadgrep-edit-mode)))
 
 (use-package visual-regexp
   ;; I haven't used much search and replace but the visual queues are
