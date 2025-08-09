@@ -60,49 +60,52 @@ org-export backend derived from the 'md backend."
     (goto-char (org-element-property :begin blogPost))
     ;; Ensure we set metadata that we will use in the export for initial
     ;; publication as well as future updates (if any)
-    (let ((slug
-            (or (org-element-property :SLUG blogPost)
-              (let ((s (jf/denote-sluggify-title
-                         (org-element-property :title blogPost))))
-                (org-entry-put blogPost "SLUG" s)
-                s)))
+    (let ((jf/exporting-org-to-tor
+            t)
+           (slug
+             (or (org-element-property :SLUG blogPost)
+               (let ((s (jf/denote-sluggify-title
+                          (org-element-property :title blogPost))))
+                 (org-entry-put blogPost "SLUG" s)
+                 s)))
            (custom_id
              (or (org-element-property :CUSTOM_ID blogPost)
-               (org-entry-put blogPost "CUSTOM_ID"
-                 (format "blogPost-%s"
-                   (jf/denote-sluggify-title
-                     (org-element-property :title blogPost)))))))
-      (or (org-element-property :ID blogPost)
-        (org-entry-put blogPost "ID" custom_id))
-      (or (org-element-property :PUBLISHED_AT blogPost)
-        (org-entry-put blogPost "PUBLISHED_AT"
-          (format-time-string "%Y-%m-%d %H:%M:%S %z")))
-      (when (org-entry-is-done-p)
-        (org-entry-put blogPost "LAST_MODIFIED_AT"
-          (format-time-string "%Y-%m-%d %H:%M:%S %z")))
-      (or (org-element-property :DESCRIPTION blogPost)
-        (org-entry-put blogPost "DESCRIPTION"
-          (read-string "Description: ")))
-      ;; We opt only for the filename, relying on the exporter to place
-      ;; the file in the correct location.
-      (or (org-element-property :EXPORT_FILE_NAME blogPost)
-        (org-entry-put blogPost "EXPORT_FILE_NAME"
-          (format "%s--%s"
-            (format-time-string "%Y%m%dT%H%M%S")
-            slug))))
+               (let ((id (format "blogPost-%s"
+                           (jf/denote-sluggify-title
+                             (org-element-property :title blogPost)))))
+                 (org-entry-put blogPost "CUSTOM_ID" id)
+                 id))))
+           (or (org-element-property :ID blogPost)
+             (org-entry-put blogPost "ID" custom_id))
+           (or (org-element-property :PUBLISHED_AT blogPost)
+             (org-entry-put blogPost "PUBLISHED_AT"
+               (format-time-string "%Y-%m-%d %H:%M:%S %z")))
+           (when (org-entry-is-done-p)
+             (org-entry-put blogPost "LAST_MODIFIED_AT"
+               (format-time-string "%Y-%m-%d %H:%M:%S %z")))
+           (or (org-element-property :DESCRIPTION blogPost)
+             (org-entry-put blogPost "DESCRIPTION"
+               (read-string "Description: ")))
+           ;; We opt only for the filename, relying on the exporter to place
+           ;; the file in the correct location.
+           (or (org-element-property :EXPORT_FILE_NAME blogPost)
+             (org-entry-put blogPost "EXPORT_FILE_NAME"
+               (format "%s--%s"
+                 (format-time-string "%Y%m%dT%H%M%S")
+                 slug)))
 
-    ;; With all of that done, we save the buffer to ensure the
-    ;; properties are set.
-    (save-buffer)
+      ;; With all of that done, we save the buffer to ensure the
+      ;; properties are set.
+      (save-buffer)
 
-    ;; Now we export the file to the correct location and open it upon
-    ;; completion.  It's always a good idea to review things.
-    (let* ((file
-             (org-export-output-file-name ".md" t
-               (f-join jf/tor-home-directory "content" "posts"
-                 (format-time-string "%Y")))))
-      (and (org-export-to-file 'takeonrules file nil t t t)
-        (find-file-other-window file)))))
+      ;; Now we export the file to the correct location and open it upon
+      ;; completion.  It's always a good idea to review things.
+      (let* ((file
+               (org-export-output-file-name ".md" t
+                 (f-join jf/tor-home-directory "content" "posts"
+                   (format-time-string "%Y")))))
+        (and (org-export-to-file 'takeonrules file nil t t t)
+          (find-file-other-window file))))))
 
 (defun org-hugo-simple-inner-template (contents info)
   "Transcode CONTENTS to markdown body.
@@ -192,11 +195,13 @@ We also rely on the org-element at point."
                        ("author" . ("Jeremy Friesen"))
                        ("layout" . "post")
                        ("type" . "post")
-                       ("draft" . "true")
                        ("licenses" . ("by-nc-nd-4_0")))))
-    (when-let ((lastmod
+    (if-let ((lastmod
                  (org-entry-get (point) "LAST_MODIFIED_AT")))
-      (add-to-list 'metadata `("lastmod" . ,lastmod)))
+      (add-to-list 'metadata `("lastmod" . ,lastmod))
+      ;; Assume that the first time we publish, this is in a draft
+      ;; state.  That is what picks up what I am to publish.
+      (add-to-list 'metadata '("draft" . "true")))
     (yaml-encode metadata)))
 
 (defun org-hugo-simple-timestamp (timestamp _contents info)

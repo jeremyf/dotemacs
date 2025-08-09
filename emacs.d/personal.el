@@ -895,3 +895,45 @@ entry."
 
 (use-package doric-themes
   :straight (:host github :repo "protesilaos/doric-themes"))
+
+(defun jf/convert-glossary (&optional from into)
+  "Convert given FILENAME to Glossary Entry"
+  (interactive)
+  (let ((into
+          (or into  jf/filename/glossary)))
+    (with-current-buffer (if from (find-file-noselect from) (current-buffer))
+      (save-excursion
+        (save-restriction
+          (widen)
+          (goto-char 0)
+          (let* ((properties
+                   (jf/org-keywords-as-plist :keywords-regexp ""))
+                  (title
+                    (org-get-title))
+                  (tags
+                    (org-get-tags)))
+            ;; Move past the initial front-matter
+            (while (or
+                     (string-match-p "^\#\+" (thing-at-point 'line))
+                     (string-match-p "\\`\\s-*$" (thing-at-point 'line)))
+              (next-line))
+            (let ((content
+                    (replace-regexp-in-string
+                      "^\*" "***"
+                      (buffer-substring (point) (point-max)))))
+              (with-current-buffer (find-file-noselect into)
+                (save-excursion
+                  (save-restriction
+                    (widen)
+                    (goto-char (point-max))
+                    (insert "\n** " title " " (lax-plist-get properties "FILETAGS") "\n")
+                    (insert ":PROPERTIES:\n")
+                    (dotimes (i (length properties))
+                      (when (= 0 (mod i 2))
+                        (let ((key (nth i properties)))
+                          (when (not (member key '("TITLE" "FILETAGS" "DATE" "ORIGINAL_ORG_ID")))
+                            (insert ":" (s-upcase (nth i properties)) ": " (nth (+ i 1) properties) "\n")))))
+                    (insert ":END:\n\n")
+                    (insert content)
+                    (save-buffer)))))))))
+    (find-file-other-frame into)))

@@ -566,8 +566,9 @@ Related to `jf/linux:radio-silence'."
     :straight (:host github :type git :repo "protesilaos/denote-org")
     :after (denote org))
   ;; (setq denote-journal-extras-title-format 'day-date-month-year)
+
   (setopt denote-link-description-format "%t")
-  (setopt denote-org-store-link-to-heading 'context)
+  (setopt denote-org-store-link-to-heading 'id)
   (setopt denote-rename-buffer-format "⟄ %D%b")
   (setopt denote-rename-buffer-backlinks-indicator " ↜")
   (setopt denote-infer-keywords nil)
@@ -689,39 +690,6 @@ This function is the plural version of
       (when (string= (file-name-extension filename) "org")
         (with-current-buffer (find-file-noselect filename)
           (org-collect-keywords keywords)))))
-
-  (defun jf/denote/plist-for-export-of-id (identifier)
-    "Given an IDENTIFIER export a `plist' with the following properties:
-
-    - :title
-    - :key
-    - :url
-
-    Return nil when:
-
-    - is not a denote file
-    - IDENTIFIER leads to a non `org-mode' file"
-    ;; Testing
-    ;; (message "%s" (jf/denote/plist-for-export-of-id "20221009T115949"))
-    (when-let ((filename (denote-get-path-by-id identifier)))
-      (when (string= (file-name-extension filename) "org")
-        (with-current-buffer (find-file-noselect filename)
-          (let ((kw-plist
-                  (jf/org-keywords-as-plist
-                    :keywords-regexp
-                    (concat "\\(TITLE\\|GLOSSARY_KEY\\|OFFER"
-                      "\\|ROAM_REFS\\|SAME_AS\\)"))))
-            (list
-              :title (lax-plist-get kw-plist "TITLE")
-              :key (lax-plist-get kw-plist "GLOSSARY_KEY")
-              :url (or
-                     (lax-plist-get kw-plist "OFFER")
-                     (when-let ((refs
-                                  (lax-plist-get kw-plist "ROAM_REFS")))
-                       (if (listp refs)
-                         (first (s-split " " refs t))
-                         refs))
-                     (lax-plist-get kw-plist "SAME_AS"))))))))
 
   (cl-defun jf/org-link-complete-link-for (parg &key
                                             scheme filter)
@@ -1416,6 +1384,108 @@ We ignore the DESCRIPTION and probably the CHANNEL."
     :group 'denote-faces
     :package-version '(denote . "0.5.0"))
 
+  (defun jf/denote/plist-for-export-of-id (identifier)
+    "Given an IDENTIFIER export a `plist' with the following properties:
+
+    - :title
+    - :key
+    - :url
+
+    Return nil when:
+
+    - is not a denote file
+    - IDENTIFIER leads to a non `org-mode' file"
+    (when-let ((filename (denote-get-path-by-id identifier)))
+      (when (string= (file-name-extension filename) "org")
+        (with-current-buffer (find-file-noselect filename)
+          (let ((kw-plist
+                  (jf/org-keywords-as-plist
+                    :keywords-regexp
+                    (concat "\\(TITLE\\|GLOSSARY_KEY\\|OFFER"
+                      "\\|ROAM_REFS\\|SAME_AS\\)"))))
+            (list
+              :title (lax-plist-get kw-plist "TITLE")
+              :key (lax-plist-get kw-plist "GLOSSARY_KEY")
+              :url (or
+                     (lax-plist-get kw-plist "OFFER")
+                     (when-let ((refs
+                                  (lax-plist-get kw-plist "ROAM_REFS")))
+                       (if (listp refs)
+                         (first (s-split " " refs t))
+                         refs))
+                     (lax-plist-get kw-plist "SAME_AS"))))))))
+
+  (defun jf/denote/link-ol-export-concept (path identifier &optional slug)
+    "Converge PATH, IDENTIFIER, and SLUG to a concept (as plist).
+
+Concept types are:
+
+- :glossary :: a personal glossary entry
+- :linkToSeries :: a series in my blog
+- :url :: a URL to some external source, maybe my blog
+- :internal :: a reference to an internal document; this may not be
+  possible.
+
+The plist will have the following keys:
+
+- :type
+- :target that will be a plist with subkeys :path, :identifier, :slug
+
+Each type will have the following keys:
+
+- :glossary :: :key
+- :linkToSeries :: :series
+- :url :: :title, :url, :cite
+- :internal :: :cite"
+    (if (string= (file-name-extension path) "org")
+      (cond
+        ((eq nil slug)
+          '(:title "doc-title" :link "doc-link" :key "doc-key" :url "doc-url"))
+        ((or (s-starts-with? "#" slug) (s-starts-with? "*" slug))
+          (let* ((normalized_slug
+                   (substring slug 1)))
+            (if-let ((headline
+                       (with-current-buffer (find-file-noselect path)
+                         (seq-first
+                           (org-map-entries
+                             #'org-element-at-point
+                             (format
+                               "CUSTOM_ID=\"%s\"|TITLE=\"%s\""
+                               normalized_slug
+                               normalized_slug)
+                             'file)))))
+              ;; (org-entry-get headline "ROAM_REFS")
+              (let ((data
+                      (list :title (org-element-property :title headline))))
+                (if-let* ((urls
+                            (or
+                              (org-entry-get headline "OFFER")
+                              (org-entry-get headline "ROAM_REFS")
+                              (org-entry-get headline "SAME_AS")))
+                           (url
+                             (xml-escape-string
+                               (car (s-split " " urls)))))
+                  (progn
+                    (plist-put data :cite t)
+                    (plist-put data :type 'url)
+                    (plist-put data :url url))
+                  (progn
+                    (plist-put data :type 'internal)
+                    (plist-put data :path 'normalized-slug)))
+                (when-let ((key
+                             (org-entry-get headline "GLOSSARY_KEY")))
+                  (plist-put data :type 'glossary)
+                  (plist-put data :key key))
+                (when-let ((key
+                             (org-entry-get headline "SERIES_KEY")))
+                  (plist-put data :type 'series)
+                  (plist-put data :key key))
+                data)
+              (user-error "unable to find headline for identifier %s slug %s" identifier slug))))
+          ;; '(:title "headline-title" :link "headline-link" :key "headline-key" :url "headline-url"))
+        (t
+          (user-error "unable to handle, at this time, context denote links.  Try 'id instead.")))))
+
   (defun jf/denote/link-ol-export (link description format)
     "Export a `denote:' link from Org files.
 
@@ -1423,38 +1493,26 @@ The LINK, DESCRIPTION, FORMAT, and CHANNEL are handled by the
 export backend.
 
 When USE_HUGO_SHORTCODE is given use glossary based exporting."
-    (let* ((path-id
-             (denote-link--ol-resolve-link-to-target link :path-id))
-            (path
-              (file-name-nondirectory (car path-id)))
-            (export-plist
-              (jf/denote/plist-for-export-of-id link))
-            (title
-              (plist-get export-plist :title))
+    (let* ((export-plist
+             (apply #'jf/denote/link-ol-export-concept (denote-link--ol-resolve-link-to-target link t)))
             (url
-              (when-let ((u (plist-get export-plist :url)))
-                (xml-escape-string u)))
-            (glossary_key
-              (plist-get export-plist :key))
+              (plist-get export-plist :url))
             (desc
-              (or description title)))
+              (or description (plist-get export-plist :title))))
       (if url
         (cond
-          ((and jf/exporting-org-to-tor glossary_key)
-            (format "{{< glossary key=\"%s\" >}}" glossary_key))
-          ;; Use the TakeOnRules shortcode that leverages Hugo built-in
-          ((and jf/exporting-org-to-tor
-             (s-starts-with? "https://takeonrules.com/" url))
-            (if (s-contains? "/series/" url)
-              (format "{{< linkToSeries \"%s\" >}}"
-                (nth 4
-                  (s-split "/"
-                    "https://takeonrules.com/series/one-two-three/")))
-              (format "{{< linkToPath \"%s\" >}}"
-                (s-trim
-                  (s-replace "https://takeonrules.com/" "/" url)))))
+          ;; TODO Consider links within document; especially when not
+          ;; exporting.  Use the TakeOnRules shortcode that leverages
+          ;; Hugo built-in
+          ((and jf/exporting-org-to-tor (eq (plist-get export-plist :type) 'series))
+            (format "{{< linkToSeries \"%s\" >}}" (plist-get export-plist :key)))
+          ((and jf/exporting-org-to-tor (eq (plist-get export-plist :type) 'glossary))
+            (format "{{< glossary key=\"%s\" >}}" (plist-get export-plist :key)))
           ((eq format 'html)
-            (format "<a href=\"%s\">%s</a>" url desc))
+            (format "%s<a href=\"%s\">%s</a>%s"
+              (if (plist-get export-plist :cite) "<cite>" "")
+              url desc
+              (if (plist-get export-plist :cite) "</cite>" "")))
           ((eq format 'md) (format "[%s](%s)" desc url))
           ((or (eq format 'latex) (eq format 'beamer))
             (format "\\href{%s}{%s}"
@@ -1834,10 +1892,10 @@ work computers.")
   ;; https://protesilaos.com/codelog/2022-03-14-emacs-pulsar-demo/
   :straight (pulsar :host gitlab :repo "protesilaos/pulsar")
   :hook
-  (consult-after-jump . pulsar-recenter-top)
+  ;; (consult-after-jump . pulsar-recenter-top)
   (consult-after-jump . pulsar-reveal-entry)
   ;; integration with the built-in `imenu':
-  (imenu-after-jump . pulsar-recenter-top)
+  ;; (imenu-after-jump . pulsar-recenter-top)
   (imenu-after-jump . pulsar-reveal-entry)
   :config
   (pulsar-global-mode 1)
@@ -3972,45 +4030,42 @@ narrowed."
       (logos--narrow-to-page 0))
     (t (narrow-to-defun))))
 
-;; Org Mode has built-in capabilities for exporting to HTML (and other
-;; languages).  The following function does just a bit more.  It
-;; converts the org region to HTML and sends it to the clipboard as an
-;; RTF datatype.
-;;
-;; Why is that nice?  As an RTF datatype, the paste receiver better
-;; handles the HTML (e.g., I can more readily paste into an Email and
-;; it pastes as expected).
-;;
-;; See
-;; https://kitchingroup.cheme.cmu.edu/blog/2016/06/16/Copy-formatted-org-mode-text-from-Emacs-to-other-applications/
-;; for more details.  One addition I made was to add the
-;; ~-inputencoding UTF-8~ switch.  Without it, I would end up with
-;; some weird characters from odd smartquote handling.
+(defun jf/org-link-to-headline (&optional arg)
+  "Insert link to an `org-mode' headline.
 
-;; https://www.reddit.com/r/emacs/comments/yjobc2/what_method_do_you_use_to_create_internal_links/
-(defun jf/org-get-headlines (&optional max-depth)
-  "Get `org-mode' headline text within current buffer."
-  (org-element-map (org-element-parse-buffer 'headline nil t)
-    'headline (lambda (headline)
-                (and
-                  (if (integerp max-depth)
-                    (>= max-depth
-                      (org-element-property :level headline))
-                    t)
-                  (org-element-property :title headline)))))
+When ARG is nil, use the current buffer's file as the source for
+headlines.  In the case where we are withing an `org-capture' we will
+prompt to choose a file from our `org-agenda-files'.
 
-(defun jf/org-link-to-headline ()
-  "Insert an internal link to a headline."
-  (interactive)
-  (let* ((headlines
-           (jf/org-get-headlines))
-          (choice
-            (completing-read "Headings: " headlines nil t))
-          (desc
-            (read-string "Description: " choice)))
-    (org-insert-link buffer-file-name (concat "*" choice) desc)))
-
-;; If the example doesn't exist, create the example in the file
+When ARG is non-nil, prompt for a source filename from the
+`org-agenda-files' candidate."
+  (interactive "P")
+  (let* ((filename
+           ;; When we are in a capture mode, we do not have a
+           ;; `buffer-file-name' so we need to prompt.
+           (if (or arg (not (buffer-file-name)))
+             (completing-read "Pick Agenda File: " org-agenda-files)
+             (buffer-file-name)))
+          (headline
+            (save-excursion
+              (with-current-buffer (find-file-noselect filename)
+                (consult-imenu)
+                (org-element-at-point))))
+          (custom_id
+            (or (org-entry-get headline "CUSTOM_ID")
+              (let ((id
+                      (org-id-new)))
+                (org-entry-put headline "CUSTOM_ID" id)
+                id)))
+          (title
+            (read-string "Description: "
+              (org-element-property :title headline))))
+    (org-insert-link
+      filename
+      (format "denote:%s::#%s"
+        (denote-retrieve-filename-identifier filename)
+        custom_id)
+      title)))
 
 (cl-defun jf/org-mode/capture/prompt-for-example (&optional
                                                    given-mode
@@ -5172,7 +5227,12 @@ literal then add a fuzzy search)."
   (which-key-show-major-mode))
 
 (defvar jf/filename/dictionary
-  (denote-get-path-by-id "20230108T083359"))
+  (denote-get-path-by-id "20230108T083359")
+  "Dude, you can put your new words here.")
+
+(defvar jf/filename/glossary
+  (denote-get-path-by-id "20250101T000000")
+  "Dude, you can put your concepts here.")
 
 (defvar jf/filename/bibliography
   (denote-get-path-by-id "20241124T080648")
