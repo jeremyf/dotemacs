@@ -896,9 +896,20 @@ entry."
 (use-package doric-themes
   :straight (:host github :repo "protesilaos/doric-themes"))
 
+;;; One Off Scripts
+;; Goal: to migrate all [[denote:identifier]] references to each
+;; glossary entry to [[denote:<GLOSSARY-FILE-IDENTIFIER>::#GLOSSARY-<OLD-IDENTIFIER>>]]
+(defun jf/convert-glossary-entries ()
+  (message "Δ Begin converting entries")
+  (dolist (filename (s-split "\n"
+                      (s-trim
+                        (shell-command-to-string "fd _glossary ~/git/org/denote"))))
+    (message "Δ converting %s" filename)
+    (jf/convert-glossary filename))
+  (message "Δ Done converting entries"))
+
 (defun jf/convert-glossary (&optional from into)
-  "Convert given FILENAME to Glossary Entry"
-  (interactive)
+  "Convert FROM file INTO Glossary Entry."
   (let ((into
           (or into  jf/filename/glossary)))
     (with-current-buffer (if from (find-file-noselect from) (current-buffer))
@@ -909,31 +920,59 @@ entry."
           (let* ((properties
                    (jf/org-keywords-as-plist :keywords-regexp ""))
                   (title
-                    (org-get-title))
-                  (tags
-                    (org-get-tags)))
+                    (org-get-title)))
             ;; Move past the initial front-matter
-            (while (or
-                     (string-match-p "^\#\+" (thing-at-point 'line))
-                     (string-match-p "\\`\\s-*$" (thing-at-point 'line)))
-              (next-line))
+            (while (and
+                     (> (point-max) (point))
+                     (or
+                       (string-match-p "^\#\+" (thing-at-point 'line))
+                       (string-match-p "\\`\\s-*$" (thing-at-point 'line))))
+              (next-line)
+              (end-of-line))
             (let ((content
-                    (replace-regexp-in-string
-                      "^\*" "***"
-                      (buffer-substring (point) (point-max)))))
-              (with-current-buffer (find-file-noselect into)
-                (save-excursion
-                  (save-restriction
-                    (widen)
-                    (goto-char (point-max))
-                    (insert "\n** " title " " (lax-plist-get properties "FILETAGS") "\n")
-                    (insert ":PROPERTIES:\n")
-                    (dotimes (i (length properties))
-                      (when (= 0 (mod i 2))
-                        (let ((key (nth i properties)))
-                          (when (not (member key '("TITLE" "FILETAGS" "DATE" "ORIGINAL_ORG_ID")))
-                            (insert ":" (s-upcase (nth i properties)) ": " (nth (+ i 1) properties) "\n")))))
-                    (insert ":END:\n\n")
-                    (insert content)
-                    (save-buffer)))))))))
-    (find-file-other-frame into)))
+                    (s-trim
+                      (replace-regexp-in-string
+                        "^\*" "***"
+                        (buffer-substring (point) (point-max))))))
+              (with-temp-buffer (concat "*migrating " title "*")
+                (insert "\n** " title " " (lax-plist-get properties "FILETAGS") "\n")
+                (insert ":PROPERTIES:\n")
+                (dotimes (i (length properties))
+                  (when (= 0 (mod i 2))
+                    (let ((key (nth i properties)))
+                      (when (string= key "GLOSSARY_KEY")
+                        (progn
+                          (insert ":ID: GLOSSARY-" (nth (+ i 1) properties) "\n")
+                          (insert ":CUSTOM_ID: GLOSSARY-" (nth (+ i 1) properties) "\n")))
+                      (when (not (member key '("TITLE" "FILETAGS" "DATE" "ORIGINAL_ORG_ID")))
+                        (insert ":" (s-upcase (nth i properties)) ": " (nth (+ i 1) properties) "\n")))))
+                (insert ":END:\n")
+                (insert content)
+                (append-to-file (point-min) (point-max) into)))))))))
+
+(defun jf/migrate-denote-links-for-glossary ()
+  (with-current-buffer (find-file-noselect "/home/jfriesen/Desktop/20250101T000000--glossary.org")
+    (org-map-entries
+      (lambda ()
+        (let* ((entry
+                 (org-element-at-point))
+                (identifier
+                  (org-entry-get entry "IDENTIFIER"))
+                (custom_id
+                  (org-entry-get entry "CUSTOM_ID"))
+                (glossary_key
+                  (org-entry-get entry "GLOSSARY_KEY")))
+          ;; Update org docs
+          (if custom_id
+            (shell-command
+              (format "cd ~/git/org/denote; lil-regy -f \":%s\\]\" -r \":20250101T000000::#%s]\" -d"
+                identifier custom_id))
+            (user-error "⧳ no custom id for %s" identifier))
+          ;; Update blog references
+          ;; TODO: Change my YAML file
+          (when glossary_key
+            (shell-command
+              (format "cd ~/git/takeonrules.source; lil-regy -f \"key=\\\"%s\\\"\" -r \"key=\\\"%s\\\"\" -d"
+                glossary_key custom_id)))))
+      "LEVEL=2+glossary"
+      'file)))
