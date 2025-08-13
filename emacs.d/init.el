@@ -2524,17 +2524,6 @@ bit differently.")
   (message "Toggling typo-mode.")
   (force-mode-line-update))
 
-(define-key global-map (kbd "C-M-s-SPC") #'jf/insert-non-breaking-space)
-(defun jf/insert-non-breaking-space (&optional prefix)
-  "Insert a non-breaking space PREFIX number of times"
-  (interactive "p")
-  (let ((times
-         (or prefix 1))
-        (char
-         (if (derived-mode-p 'html-mode)
-             "&nbsp;" " ")))
-    (insert (s-repeat times char))))
-
 (use-package window
   :preface (require 'prot-window)
   ;; Wrangle up how windows and buffers display.
