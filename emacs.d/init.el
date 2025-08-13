@@ -2029,7 +2029,7 @@ work computers.")
 When `typo-mode' is active, provide an actionable indicator of its
 active nature."
     (let ((fmt
-            (if typo-mode "“%s”" "%s")))
+            (if (and (boundp 'typo-mode) typo-mode) "“%s”" "%s")))
       (propertize
         (format fmt
           (capitalize
@@ -2509,18 +2509,20 @@ bit differently.")
 
 (use-package typo
   :straight t
+  :commands (typo-mode)
   :hook ((org-mode markdown-mode) . typo-mode)
   :config (typo-global-mode 1)
   ;; I definitely don’t want my ‘ key to serve double duty
-  (unbind-key "`" typo-mode-map)
-  (defun jf/toggle-typo-mode ()
-    "Toggle `typo-mode'."
-    (interactive)
-    (if typo-mode
-      (typo-mode -1)
-      (typo-mode 1))
-    (message "Toggling typo-mode.")
-    (force-mode-line-update)))
+  (unbind-key "`" typo-mode-map))
+
+(defun jf/toggle-typo-mode ()
+  "Toggle `typo-mode'."
+  (interactive)
+  (if (and (boundp 'typo-mode) typo-mode)
+    (typo-mode -1)
+    (typo-mode 1))
+  (message "Toggling typo-mode.")
+  (force-mode-line-update))
 
 (define-key global-map (kbd "C-M-s-SPC") #'jf/insert-non-breaking-space)
 (defun jf/insert-non-breaking-space (&optional prefix)
