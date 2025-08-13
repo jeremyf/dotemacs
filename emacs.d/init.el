@@ -1645,53 +1645,7 @@ The DOM could be as sanitized by `org-web-tools--sanitized-dom'."
         'org
         (f-join (denote-directory) domain)
         nil
-        (concat "#+ROAM_REFS: " url "\n\n" article))))
-
-  (cl-defun jf/org-mode/add-series-to-file (&key
-                                             file series drop-tags all)
-    "Add SERIES to FILE.
-
-Optionally DROP-TAGS, as there may have been a TAG associated
-with the series."
-    (interactive)
-    (with-current-buffer (if file
-                           (find-file-noselect file)
-                           (current-buffer))
-      (when (or current-prefix-arg all (jf/blog-entry?))
-        (let ((series
-                (or series
-                  (completing-read "Series: "
-                    (jf/tor-series-list) nil t))))
-          (unless (and (jf/blog-entry?)
-                    (s-contains? "#+HUGO_CUSTOM_FRONT_MATTER: :series "
-                      (buffer-substring-no-properties
-                        (point-min) (point-max))))
-            (save-excursion
-              (goto-char (point-min))
-              (re-search-forward "^$")
-              (insert "\n#+HUGO_CUSTOM_FRONT_MATTER: :series " series)
-              (save-buffer)))
-          (let* ((file
-                   (buffer-file-name))
-                  (id
-                    (denote-retrieve-filename-identifier file))
-                  (file-type
-                    'org)
-                  (title
-                    (denote-retrieve-title-value file file-type))
-                  (keywords
-                    (seq-difference
-                      (denote-retrieve-keywords-value file file-type)
-                      (flatten-list drop-tags)))
-                  (extension
-                    (denote-get-file-extension file))
-                  (dir
-                    (file-name-directory file))
-                  (new-name
-                    (denote-format-file-name
-                      dir id keywords title extension series)))
-            (denote-rename-file-and-buffer file new-name)
-            (denote-update-dired-buffers)))))))
+        (concat "#+ROAM_REFS: " url "\n\n" article)))))
 (require 'denote)
 
 (defvar jf/denote-base-dir
@@ -8040,29 +7994,6 @@ If not set  DEFAULT or prompt for it."
           (when (string-match property
                   (org-element-property :key el))
             el))))
-
-    (cl-defun jf/blog-post/tootify ()
-      "Create a toot from the current buffer."
-      (interactive)
-      (if (jf/blog-entry?)
-        (let* ((metadata
-                 (jf/org-keywords-as-plist
-                   :keywords-regexp "\\(ROAM_REFS\\|DESCRIPTION\\|TITLE\\)"))
-                (url
-                  (lax-plist-get metadata "ROAM_REFS"))
-                (title
-                  (lax-plist-get metadata "TITLE"))
-                (description
-                  (lax-plist-get metadata "DESCRIPTION")))
-          (call-interactively #'mastodon-toot)
-          (end-of-buffer)
-          (insert (s-join "\n\n"
-                    (flatten-list
-                      (list
-                        (when title (format "“%s”" title))
-                        description
-                        url)))))
-        (user-error "Current buffer is not a blog post")))
 
     ;; TODO: Will need to account for publishing blog posts from
     ;; Journal.

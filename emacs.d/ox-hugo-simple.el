@@ -39,20 +39,8 @@ org-export backend derived from the 'md backend."
     (user-error "Current buffer not 'org-mode"))
   (org-set-regexps-and-options)
   (jf/bibliography/export-to-takeonrules)
-  ;; Get element at point, then walk-up ancestry tree, finding headline
-  ;; node that has :blogPosts: tag.  We'll be exporting that.
-  (let* ((blogPost
-           (car
-             (seq-filter
-               (lambda (hl)
-                 (and
-                   (eq (org-element-type hl) 'headline)
-                   (member jf/denote/keywords/blogPosts
-                     (org-element-property :tags hl))
-                   hl))
-               (org-element-lineage (org-element-at-point) nil t)))))
-
-    ;; Ensure we are in an entry tagged as a blog post.
+  (let ((blogPost
+          (jf/org-mode/get-blog-post)))
     (unless blogPost
       (user-error
         "Current node is not child of headline tagged with :%s:"
@@ -226,6 +214,47 @@ information."
       (string-trim
         (replace-regexp-in-string "--" "&#x2013;"
           (org-html-plain-text as-plain-text info))))))
+(defun jf/org-mode/get-blog-post (&optional element)
+  "Get blogPost associated with current ELEMENT.
+
+When none found return `nil'."
+  (let ((epom
+          (or element (org-element-at-point))))
+    (car
+      (seq-filter
+        (lambda (hl)
+          (and
+            (eq (org-element-type hl) 'headline)
+            (member jf/denote/keywords/blogPosts
+              (org-element-property :tags hl))
+            hl))
+        (org-element-lineage epom nil t)))))
+
+(require 'mastodon)
+
+(defun jf/blog-post/tootify ()
+  "Create a toot from the current blog post."
+  (interactive)
+  (if-let ((blogPost
+             (jf/org-mode/get-blog-post)))
+    (progn
+      (call-interactively #'mastodon-toot)
+      (delete-rectangle (point-min) (point-max))
+      (insert
+        (s-join "\n\n"
+          (flatten-list
+            (list
+              (when-let ((title
+                           (org-element-property :title blogPost))))
+              (org-entry-get blogPost "DESCRIPTION")
+              (when-let ((roam_refs
+                           (org-entry-get blogPost "ROAM_REFS")))
+                (car (s-split " " roam_refs)))
+              ;; TODO: add tags.
+              )))))
+    (progn
+      (user-error "Unable to find blogPost at point.")
+      (pulsar-pulse-line-red))))
 
 (provide 'ox-hugo-simple)
 ;;; ox-hugo-simple.el ends here
