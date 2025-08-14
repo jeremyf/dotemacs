@@ -2521,7 +2521,7 @@ This uses `split-window-right' but follows with the cursor."
     (split-window-right)
     (balance-windows)
     (other-window 1))
-  (setopt display-buffer-alist
+  (setq display-buffer-alist
     `(;; no window
        ("\\`\\*Async Shell Command\\*\\'"
          (display-buffer-no-window))
@@ -2802,16 +2802,18 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
 
 
   :config
-  (setq bm-highlight-style 'bm-highlight-line-and-fringe)
-  (setq bm-marker 'bm-marker-left)
+  (setopt bm-in-lifo-order t)
+  (setopt bm-highlight-style 'bm-highlight-line-and-fringe)
+  (setopt bm-marker 'bm-marker-left)
   ;; Allow cross-buffer 'next'
-  (setq bm-cycle-all-buffers t)
+  (setopt bm-cycle-all-buffers t)
+  (setopt bm-annotation-width 32)
 
   ;; where to store persistant files
-  (setq bm-repository-file "~/.emacs.d/bm-repository")
+  (setopt bm-repository-file "~/.emacs.d/bm-repository")
 
   ;; save bookmarks
-  (setq-default bm-buffer-persistence t)
+  (setopt bm-buffer-persistence t)
 
   ;; Loading the repository from file when on start up.
   (add-hook 'after-init-hook 'bm-repository-load)
@@ -2848,10 +2850,12 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   (add-hook 'vc-before-checkin-hook #'bm-buffer-save)
 
 
-  :bind (("<f2>" . bm-next)
-          ("S-<f2>" . bm-previous)
-          ("C-<f2>" . bm-toggle))
-  )
+  :bind (("H-b H-n" . bm-common-next)
+          ("H-b H-p" . bm-common-previous)
+          ("H-b H-a" . bm-annotate)
+          ("H-b H-s" . bm-show-all)
+          ("H-b H-t" . bm-toggle)
+          ("H-b H-b" . bm-toggle)))
 (use-package custom
   :straight (:type built-in)
   :config
@@ -7592,7 +7596,7 @@ A page is marked `last' if rel=\"last\" appears in a <link> or <a> tag."
   :config
   ;; git-commit is a package shipped with transient.
   (require 'git-commit)
-  (setopt git-commit-major-mode 'git-commit-ts-mode)
+  (setq git-commit-major-mode 'git-commit-ts-mode)
   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
   ;; Adding format to git-commit-fill-column of 72 as best practice.
   (setq git-commit-fill-column 72)
@@ -8671,6 +8675,10 @@ When the `current-prefix-arg' is set always prompt for the project."
           (jf/project/get-project/current-clock)
           (jf/project/get-project/project-source-code)))
       (completing-read "Project: " (jf/project/list-projects)))))
+
+
+(use-package uniline
+  :straight t)
 
 (use-package transient
   ;; Declaration for personal menu
