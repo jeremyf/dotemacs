@@ -1,4 +1,4 @@
-;;; ox-takeonrules --- A Simplified Hugo Export -*- lexical-binding: t -*-
+;;; ox-hugo-simple --- A Simplified Hugo Export -*- lexical-binding: t -*-
 
 ;; Copyright (C) 2024 Jeremy Friesen
 ;; Author: Jeremy Friesen <jeremy@jeremyfriesen.com>
@@ -257,5 +257,5 @@ When none found return `nil'."
       (user-error "Unable to find blogPost at point.")
       (pulsar-pulse-line-red))))
 
-(provide 'ox-takeonrules)
-;;; ox-takeonrules.el ends here
+(provide 'ox-hugo-simple)
+;;; ox-hugo-simple.el ends here

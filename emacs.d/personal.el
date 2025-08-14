@@ -60,7 +60,7 @@ URL is assumed to be either of an RSS feed or Atom feed."
 (advice-add #'jf/elfeed-load-db-and-open :before #'jf/syncthing-aling)
 (add-hook 'after-init-hook #'jf/syncthing-aling)
 
-(require 'ox-hugo-simple)
+(require 'ox-takeonrules)
 
 (use-package mastodon
   ;; :straight (:host codeberg :repo "martianh/mastodon.el")
