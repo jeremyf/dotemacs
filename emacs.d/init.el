@@ -3780,7 +3780,7 @@ See `org-latex-format-headline-function' for details."
 
   ;; From https://emacs.stackexchange.com/questions/22210/auto-update-org-tables-before-each-export
   ;; Recalculate all org tables in the buffer when saving.
-  (defvar-local jf/org-mode/enable-buffer-wide-recalculation t
+  (defvar-local jf/org-mode/enable-buffer-wide-recalculation nil
     "When non-nil, recalculate all dynamic regions when saving the file.
 
 This variable is buffer local.")

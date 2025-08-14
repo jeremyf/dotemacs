@@ -438,6 +438,10 @@ Useful for narrowing regions.")
 ;;     (notmuch-addr-setup)))
 
 
+(defvar jf/filename/glossary-takeonrules
+  (file-truename "~/git/takeonrules.source/content/site-map/glossary/index.md"))
+(defvar jf/filename/glossary-data-takeonrules
+  (file-truename "~/git/takeonrules.source/data/glossary.yml"))
 (defvar jf/filename/bibliography-takeonrules
   (file-truename "~/git/takeonrules.source/content/site-map/bibliography/_index.md"))
 
@@ -942,8 +946,8 @@ entry."
                     (let ((key (nth i properties)))
                       (when (string= key "GLOSSARY_KEY")
                         (progn
-                          (insert ":ID: GLOSSARY-" (nth (+ i 1) properties) "\n")
-                          (insert ":CUSTOM_ID: GLOSSARY-" (nth (+ i 1) properties) "\n")))
+                          (insert ":ID: GLOSSARY-" (upcase (nth (+ i 1) properties)) "\n")
+                          (insert ":CUSTOM_ID: GLOSSARY-" (upcate (nth (+ i 1) properties)) "\n")))
                       (when (not (member key '("TITLE" "FILETAGS" "DATE" "ORIGINAL_ORG_ID")))
                         (insert ":" (s-upcase (nth i properties)) ": " (nth (+ i 1) properties) "\n")))))
                 (insert ":END:\n")
@@ -951,7 +955,7 @@ entry."
                 (append-to-file (point-min) (point-max) into)))))))))
 
 (defun jf/migrate-denote-links-for-glossary ()
-  (with-current-buffer (find-file-noselect "/home/jfriesen/Desktop/20250101T000000--glossary.org")
+  (with-current-buffer (find-file-noselect jf/filename/glossary)
     (org-map-entries
       (lambda ()
         (let* ((entry
@@ -965,14 +969,13 @@ entry."
           ;; Update org docs
           (if custom_id
             (shell-command
-              (format "cd ~/git/org/denote; lil-regy -f \":%s\\]\" -r \":20250101T000000::#%s]\" -d"
+              (format "cd ~/git/org/denote; lil-regy -f \":%s\\]\" -r \":20250101T000000::#%s]\" -d -- -i"
                 identifier custom_id))
             (user-error "⧳ no custom id for %s" identifier))
           ;; Update blog references
-          ;; TODO: Change my YAML file
           (when glossary_key
             (shell-command
-              (format "cd ~/git/takeonrules.source; lil-regy -f \"key=\\\"%s\\\"\" -r \"key=\\\"%s\\\"\" -d"
+              (format "cd ~/git/takeonrules.source; lil-regy -f \"key=\\\"%s\\\"\" -r \"key=\\\"%s\\\"\" -d -- -i"
                 glossary_key custom_id)))))
       "LEVEL=2+glossary"
       'file)))
