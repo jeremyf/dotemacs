@@ -25,4 +25,4 @@
 
 ;; From straight.el, "Users of Emacs versions >= 27 will want to add
 ;; the following:"
-(setopt package-enable-at-startup nil)
+(setq package-enable-at-startup nil)
