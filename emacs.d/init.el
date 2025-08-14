@@ -2521,7 +2521,7 @@ This uses `split-window-right' but follows with the cursor."
     (split-window-right)
     (balance-windows)
     (other-window 1))
-  (setq display-buffer-alist
+  (setopt display-buffer-alist
     `(;; no window
        ("\\`\\*Async Shell Command\\*\\'"
          (display-buffer-no-window))
@@ -7566,7 +7566,6 @@ A page is marked `last' if rel=\"last\" appears in a <link> or <a> tag."
   (setq auth-sources (list "~/.authinfo.pgp" "~/.authinfo")))
 
 (use-package forge
-  :bind ("C-s-f" . #'forge-dispatch)
   :straight (:host github :repo "magit/forge"))
 
 (use-package gh-notify
@@ -7605,11 +7604,6 @@ A page is marked `last' if rel=\"last\" appears in a <link> or <a> tag."
        "notch8/utk-hyku"
        "harvard-lts/CURIOSity"
        "WGBH-MLA/ams")))
-
-;; (use-package git-commit
-;;   :straight t
-;;   :config
-;;   )
 
 (use-package git-commit-ts-mode
   :straight t
@@ -7663,19 +7657,6 @@ The `magit-gitdir' is the project's .git directory."
 (use-package diff-hl
   :config (global-diff-hl-mode)
   :straight t)
-;; (use-package git-gutter
-;;   ;; Show the current git state in the gutter.  As you edit a line in a
-;;   ;; file track by git, the indicators change to reflect if this is a
-;;   ;; modification, addition, or deletion.
-;;   :straight t
-;;   :custom (git-gutter:update-interval 0.25)
-;;   :bind ("C-x g =" . git-gutter:popup-hunk)
-;;   ("C-x g p" . git-gutter:previous-hunk)
-;;   ("C-x g n" . git-gutter:next-hunk)
-;;   :init (global-git-gutter-mode t)
-;;   (setq git-gutter:modified-sign "%"
-;;     git-gutter:added-sign "+"
-;;     git-gutter:deleted-sign "-"))
 
 (use-package git-link
   ;; Type ~M-x git-link~ and the function pushes the Git forge URL to
@@ -8453,155 +8434,6 @@ If `consult--read' is defined, use that.  Otherwise fallback to
   ;; For projects and all
   :straight (org :source org-elpa)
   :config
-  (defun jf/org-mode/buffer-headline-tags ()
-    "Return a list of `org-mode' tags excluding filetags.
-
-  In the present implementation, I'm relying on `denote'
-  conventions.  However, by creating a function I'm hiding the
-  implementation details on how I get that."
-
-    ;; This is here to indicate the dependency
-    (require 'denote)
-    (let* ((all-tags
-             (org-get-buffer-tags))
-            (file-level-tags
-              (denote-extract-keywords-from-path (buffer-file-name))))
-      ;; Given that I want inherited tags and the filetags are
-      ;; considered to be on all headlines, I want to remove those tags.
-      (cl-reduce (lambda (mem el)
-                   (if (member
-                         (substring-no-properties (car el))
-                         file-level-tags)
-                     mem
-                     (add-to-list 'mem el)))
-        all-tags :initial-value '())))
-
-  (defun jf/org-mode/summarize-tags (&optional tags)
-    "Create `org-mode' buffer that summarizes the headlines for TAGS.
-
-This reducing function \"promotes\" the property drawer elements
-to list elements while providing the same functionality of an
-`org-mode' buffer.
-
-Some of this could be accomplished with column/table declarations
-but the headlines and content might not fit so well in the
-buffer."
-    (interactive (list
-                   (completing-read-multiple
-                     "Tags: "
-                     (jf/org-mode/buffer-headline-tags) nil t)))
-
-    (require 's)
-    ;; With the given tags map the headlines and their properties.
-    (let* ((prop-names-to-skip
-             ;; This is a list of headline properties that I really
-             ;; don't want to report.  I suspect some may be buffer
-             ;; specific.  But for now, this should be adequate.
-             ;;
-             ;; Perhaps in later iterations we'll prompt for additional
-             ;; ones to ignore.
-             '("ID" "ALLTAGS" "FILE" "PRIORITY" "ITEM" "TIMESTAMP"
-                "TIMESTAMP_IA" "CATEGORY" "TAGS"
-                "BLOCKED" "TODO" "CLOSED"))
-            (text-chunks
-              ;; In using `org-map-entries' I can access inherited tags,
-              ;; which I find structurally useful
-              (org-map-entries
-                ;; Yes this could be its own function but for now, we'll
-                ;; leave it at that.
-                (lambda ()
-                  (let* ((h (org-element-at-point))
-                          ;; Rebuild a terse header: depth, todo, title
-                          ;; only
-                          (header-text
-                            (format
-                              "%s%s %s\n"
-                              (s-repeat
-                                (org-element-property :level h) "*")
-                              (if-let ((todo
-                                         (org-element-property
-                                           :todo-keyword h)))
-                                (format " %s" todo) "")
-                              ;; Turn the headline into a link to the
-                              ;; document.
-                              (format "%s [[file:%s::*%s][%s]]"
-                                (org-element-property :title h)
-                                (buffer-file-name)
-                                ;; Strip out the progress cookie
-                                (replace-regexp-in-string
-                                  "\\[[^\]]*\\] +" ""
-                                  (org-element-property :title h))
-                                "link")))
-
-                          ;; Only select relevant properties, converting
-                          ;; those properties into a list of strings.
-                          (properties-text
-                            (seq-sort #'string<
-                              (cl-reduce
-                                (lambda (mem prop-value)
-                                  (if (member (car prop-value)
-                                        prop-names-to-skip)
-                                    ;; For awhile I was forgetting to
-                                    ;; always return the mem; which
-                                    ;; would clobber my results.
-                                    mem
-                                    (add-to-list 'mem
-                                      (format "- %s :: %s"
-                                        (car prop-value)
-                                        (cdr prop-value))
-                                      t)))
-                                (org-entry-properties h)
-                                :initial-value nil))))
-
-                    ;; If we have properties we want to render, we'll
-                    ;; have one format.
-                    (if properties-text
-                      (format "%s\n%s\n" header-text
-                        (s-join "\n" properties-text))
-                      header-text)))
-
-                ;; Select headlines matching any of the tags and that
-                ;; are not "DONE".
-                (format "+TODO<>\"DONE\"+%s"
-                  (s-join "|" tags))
-                'file 'comment))
-            ;; Let's have only one of these
-            (buffer-name "*Org Mode Tag Summary*")
-            (display-buffer-mark-dedicated t))
-
-      ;; When we've run this command again, so let's destroy what we had
-      ;; and start anew.
-      (when (get-buffer buffer-name) (kill-buffer buffer-name))
-      (get-buffer-create buffer-name)
-      (with-current-buffer buffer-name
-        ;; Minimize the chatter of the mode-line
-        (let ((mode-line
-                (concat
-                  (propertize (format " %s Tags: #%s"
-                                ;; Show a lock icon
-                                (char-to-string #xE0A2)
-                                (s-join " #" tags))
-                    'face 'mode-line-buffer-id)
-                  "  "
-                  (propertize
-                    "C-c C-k to exit"
-                    'face 'jf/mode-line-format/face-shadow))))
-          ;; This came from `org-mode' so let's continue to keep it that
-          ;; way.
-          (org-mode)
-          (insert (s-join "\n" text-chunks))
-          (goto-char (point-min))
-          ;; Let's not have the illusion that we're allowing ourselves
-          ;; to edit this text
-          (read-only-mode)
-          (pop-to-buffer buffer-name
-            `((display-buffer-in-side-window)
-               (side . right)
-               (window-width 72)
-               (window-parameters
-                 (tab-line-format . none)
-                 (mode-line-format . ,mode-line)
-                 (no-delete-other-windows . t))))))))
 
   (cl-defun jf/project/jump-to/notes (&key project)
     "Jump to the given PROJECT's notes file.
@@ -8794,34 +8626,6 @@ When the `current-prefix-arg' is set always prompt for the project."
     (interactive)
     (find-file jf/org-mode/capture/filename))
 
-  (transient-define-suffix jf/org-mode/add-description (description)
-    "Add Description to `org-mode'"
-    :description "Add Description…"
-    (interactive (list (read-string "Description: ")))
-    (when (jf/blog-entry?)
-      (save-excursion
-        (goto-char (point-min))
-        (re-search-forward "^$")
-        (insert "\n#+DESCRIPTION: " description))))
-
-  (transient-define-suffix jf/org-mode/add-session-report (date game location)
-    "Add metadata (DATE, GAME, and LOCATION) to current buffer."
-    :description "Add Session…"
-    (interactive (list
-                   (org-read-date
-                     nil nil nil "Session Date")
-                   (completing-read
-                     "Game: " (jf/tor-game-list))
-                   (completing-read
-                     "Location: " jf/tor-session-report-location)))
-    (when (jf/blog-entry?)
-      (save-excursion
-        (goto-char (point-min))
-        (re-search-forward "^$")
-        (insert "\n#+HUGO_CUSTOM_FRONT_MATTER: :sessionReport "
-          "'((date . \"" date "\") (game . \"" game "\") "
-          "(location . \"" location "\"))"))))
-
   ;; My agenda files are a bit dynamic.  At one point I was using daily
   ;; journals and kept the latest 14 in my agenda files.  I don't that
   ;; now but I do add "projects" (see `jf/project/add-project-path').
@@ -8922,16 +8726,7 @@ This encodes the logic for creating a project."
       ["Denote"
         ("d a" jf/project/add-project-path :if jf/denote?)
         ("d p" jf/project/convert-document-to-project :if jf/denote?)
-        ]
-      ["Blogging"
-        ("B d" jf/org-mode/add-description
-          :if jf/blog-entry?)
-        ("B r" jf/org-mode/add-session-report
-          :if jf/blog-entry?)
-        ("B s" "Add Series…" jf/org-mode/add-series-to-file
-          :if jf/blog-entry?)
-        ("B x" "Export to TakeOnRules…" jf/export-org-to-tor
-          :if jf/blog-entry?)]]
+        ]]
     [["Modes"
        ("m i" jf/shr/toggle-images)
        ;; I find that in all of my shuffling that sometimes the TAB for
