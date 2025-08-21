@@ -527,19 +527,18 @@ Related to `jf/linux:radio-silence'."
   (org-mode . denote-rename-buffer-mode)
   :init
   (setopt denote-known-keywords
-    (split-string-and-unquote
-      (shell-command-to-string
-        (concat
-          "rg \"#\\+TAG:\\s([\\w-]+)\" "
-          jf/denote-base-dir
-          " --only-matching"
-          " --no-filename "
-          " --follow "
-          " --replace '$1' | "
-          "ruby -ne 'puts $_.gsub(/^(\\w)\\w+-/) { |m| "
-          "  m[0].upcase + m[1..-1] "
-          "}.gsub(/-(\\w)/) { |m| m[1].upcase }'"))
-      "\n"))
+    (with-current-buffer (find-file-noselect jf/filename/glossary)
+      (save-restriction
+        (widen)
+        (org-map-entries
+          (lambda ()
+            (or
+              (org-entry-get (org-element-at-point) "TAG")
+              (user-error
+                "Glossary entry %S missing TAG property"
+                (org-element-property :title (org-element-at-point)))))
+          "+tags+LEVEL=2"
+          'file))))
   :preface
   (defconst jf/denote/keywords/blogPosts
     "blogPosts"
@@ -723,14 +722,14 @@ PARG is part of the method signature for `org-link-parameters'."
                :identifier link
                :keywords (list "TITLE"
                            keyword
-                           "GLOSSARY_KEY")))
+                           "CUSTOM_ID")))
             (title
               (car (alist-get "TITLE" keyword-alist nil nil #'string=)))
             (keyword-value
               (car (alist-get keyword keyword-alist nil nil #'string=)))
             (key
               (car (alist-get
-                     "GLOSSARY_KEY" keyword-alist nil nil #'string=))))
+                     "CUSTOM_ID" keyword-alist nil nil #'string=))))
       ;; When we encounter an abbreviation, add that to the list.  We'll
       ;; later use that list to build a localized abbreviation element.
       (let ((abbr-links
@@ -827,167 +826,6 @@ PARG is for a conformant method signature."
       (save-excursion
         (call-interactively #'org-up-heading nil)
         (jf/org-sort-entries/ignoring-stop-words))))
-
-  (defun jf/bibliography/export-shopping-list (&optional file)
-    "Export my book shopping list to the given FILE."
-    (interactive)
-    (let* ((works
-             (save-restriction
-               (widen)
-               (save-excursion
-                 (with-current-buffer
-                   (find-file-noselect jf/filename/bibliography)
-                   (org-map-entries
-                     (lambda ()
-                       (list
-                         :title
-                         (org-element-property
-                           :title (org-element-at-point))
-                         :author
-                         (org-entry-get
-                           (org-element-at-point) "AUTHOR")
-                         :editor
-                         (org-entry-get
-                           (org-element-at-point) "EDITOR")
-                         ))
-                     "+LEVEL=2+books+shoppingList" 'file)))))
-            (sorted-works
-              (sort works
-                :key (lambda (work)
-                       (if-let ((author
-                                  (plist-get work :author)))
-                         (car (last
-                                (s-split " "
-                                  (car (s-split " and " author))) 1))
-                         (if-let ((editor
-                                    (plist-get work :editor)))
-                           (car (last
-                                  (s-split " "
-                                    (car (s-split " and " editor))) 1))
-                           ""))))))
-      (let ((buffer
-              (find-file-noselect (or file jf/filename/shopping-list))))
-        (with-current-buffer buffer
-          (delete-region (point-min) (point-max))
-          (insert "Books from Jeremy's “shopping list” that he’s considering:\n\n")
-          (dolist (work sorted-works)
-            (insert (format "- “%s”%s%s\n"
-                      (plist-get work :title)
-                      (if-let ((author (plist-get work :author)))
-                        (concat " by " author)
-                        "")
-                      (if-let ((editor (plist-get work :editor)))
-                        (concat " edited by " editor)
-                        ""))))
-          (save-buffer)))))
-
-
-  (defun jf/bibliography/export-epigraphs (&optional file)
-    "Export epigraphs to my blog."
-    (interactive)
-    (let* ((epigraphs
-             (save-restriction
-               (widen)
-               (save-excursion
-                 (with-current-buffer
-                   (find-file-noselect jf/filename/bibliography)
-                   (elfeed--shuffle
-                     (org-element-map
-                       (org-element-parse-buffer)
-                       '(quote-block verse-block)
-                       (lambda (el)
-                         ;; Skip un-named blocks as we can’t link to them.
-                         (when-let* ((id
-                                       (org-element-property :name el)))
-                           (let* ((lineage
-                                    (org-element-lineage el))
-                                   ;; Loop
-                                   (citable-work
-                                     (car
-                                       (seq-filter
-                                         (lambda (el)
-                                           (and
-                                             (eq (org-element-type el) 'headline)
-                                             (or (member "citables"
-                                                   (org-element-property :tags el))
-                                               (= (org-element-property :level el) 2))))
-                                         lineage)))
-                                   (h-node
-                                     (car
-                                       (seq-filter
-                                         (lambda (el)
-                                           (and
-                                             (eq (org-element-type el) 'headline)
-                                             (= (org-element-property :level el) 2)))
-                                         lineage)))
-                                   (people?
-                                     (member "people"
-                                       (org-element-property :tags h-node))))
-                             (list
-                               :id id
-                               :type (org-element-type el)
-                               :work (if people?
-                                       ""
-                                       (car
-                                         (org-element-property
-                                           :title citable-work)))
-                               :author
-                               (if people?
-                                 (car
-                                   (org-element-property :title h-node))
-                                 (org-entry-get h-node "AUTHOR"))
-                               :text
-                               (buffer-substring-no-properties
-                                 (org-element-property
-                                   :contents-begin el)
-                                 (org-element-property
-                                   :contents-end el)))))))))))))
-      (let* ((buffer
-               (find-file-noselect
-                 (or file jf/filename/epigraphy-takeonrules))))
-        (with-current-buffer buffer
-          (delete-region (point-min) (point-max))
-          (insert
-            "---\n"
-            "date: 2021-07-22 19:23:43.883686000 -04:00 \n"
-            "full_width: true\n"
-            "images: []\n"
-            "lastmod: " (format-time-string "%Y-%m-%d %H:%M:%S.%N %z") "\n"
-            "layout: page\n"
-            "permalink: \"/site-map/epigraphs/\"\n"
-            "title: Epigraphs\n"
-            "type: page\n"
-            "---\n"
-            "\n"
-            "Ever since reading {{< glossary key=\"DUNE-NOVEL\" >}} by {{< glossary key=\"FRANK-HERBERT\" >}} I've loved epigraphs.  "
-            "In that novel, the epigraphs are quotes from fictional works written within the Dune universe.  "
-            "Below are quotes that I've gathered, and in some cases, I've used as epigraphs throughout <cite>Take on Rules</cite>.\n")
-          (dolist (epigraph epigraphs)
-            (let ((work
-                    (plist-get epigraph :work))
-                   (author
-                     (plist-get epigraph :author))
-                   (text
-                     (plist-get epigraph :text)))
-              (insert
-                (format "<section class=\"epigraphs\"><blockquote data-id=\"%s\">%s%s\n</blockquote></section>\n"
-                  (plist-get epigraph :id)
-                  (if (eq (plist-get epigraph :type) 'verse-block)
-                    (concat "<pre class=\"verse\">"  text "</pre>")
-                    (org-export-string-as (s-trim text) 'html t))
-                  (cond
-                    ((and (s-present? work) (s-present? author))
-                      (format "\n<footer>&#8213;%s, <cite>%s</cite></footer>"
-                        author work))
-                    ((s-present? work)
-                      (format "\n<footer>&#8213; <cite>%s</cite></footer>"
-                        work))
-                    ((s-present? author)
-                      (format "\n<footer>&#8213; %s</footer>"
-                        author))
-                    (t ""))))))
-          (save-buffer))
-        (message "Done exporting epigraphs to blog"))))
 
   (org-link-set-parameters "epigraph"
     :complete #'jf/org-link-ol-complete/epigraph
@@ -1401,11 +1239,11 @@ We ignore the DESCRIPTION and probably the CHANNEL."
           (let ((kw-plist
                   (jf/org-keywords-as-plist
                     :keywords-regexp
-                    (concat "\\(TITLE\\|GLOSSARY_KEY\\|OFFER"
+                    (concat "\\(TITLE\\|CUSTOM_ID\\|OFFER"
                       "\\|ROAM_REFS\\|SAME_AS\\)"))))
             (list
               :title (lax-plist-get kw-plist "TITLE")
-              :key (lax-plist-get kw-plist "GLOSSARY_KEY")
+              :key (lax-plist-get kw-plist "CUSTOM_ID")
               :url (or
                      (lax-plist-get kw-plist "OFFER")
                      (when-let ((refs
@@ -1473,7 +1311,7 @@ Each type will have the following keys:
                     (plist-put data :type 'internal)
                     (plist-put data :path 'normalized-slug)))
                 (when-let ((key
-                             (org-entry-get headline "GLOSSARY_KEY")))
+                             (org-entry-get headline "CUSTOM_ID")))
                   (plist-put data :type 'glossary)
                   (plist-put data :key key))
                 (when-let ((key
@@ -8246,27 +8084,6 @@ If `consult--read' is defined, use that.  Otherwise fallback to
                 (jf/list-filenames-with-file-text
                   :matching matching
                   :in in)))))
-
-
-    (defun jf/tor-tags-list ()
-      "Return a list of tags from TakeOnRules.com."
-      (jf/tor-list-by-key-from-filename
-        :key "tag" :filename "data/glossary.yml"))
-
-    (defun jf/tor-game-list ()
-      "Return a list of games from TakeOnRules.com."
-      (jf/tor-list-by-key-from-filename
-        :key "game" :filename "data/glossary.yml"))
-
-    (defun jf/tor-glossary-title-list ()
-      "Return a list of titles from TakeOnRules.com."
-      (jf/tor-list-by-key-from-filename
-        :key "title" :filename "data/glossary.yml"))
-
-    (defun jf/tor-glossary-key-list ()
-      "Return a list of keys from TakeOnRules.com glossary."
-      (jf/tor-list-by-key-from-filename
-        :key "key" :filename "data/glossary.yml"))
 
     (defun jf/tor-series-list ()
       "Return a list of series from TakeOnRules.com."

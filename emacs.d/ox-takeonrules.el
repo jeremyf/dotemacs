@@ -132,8 +132,8 @@ INFO is a plist holding contextual information."
                       (add-to-list 'entry (cons "offer" value)))
                     (when-let ((value (org-entry-get epom "ITEMID")))
                       (add-to-list 'entry (cons "itemid" value)))
-                    (when-let ((value (org-entry-get epom "GAME")))
-                      (add-to-list 'entry (cons "game" value)))
+                    ;; (when-let ((value (org-entry-get epom "GAME")))
+                    ;;   (add-to-list 'entry (cons "game" value)))
                     (when-let ((value (org-entry-get epom "ROAM_REFS")))
                       (add-to-list 'entry (cons "url" value)))
                     (when-let ((value (org-element-property :title epom)))
@@ -182,7 +182,7 @@ INFO is a plist holding contextual information."
             "<summary>\n"
             "<dfn>" title "</dfn>"
             (if abbr
-              (concat "(<abbr=\"" title "\">" abbr "</abbr>)") "")
+              (concat "(<abbr title=\"" title "\">" abbr "</abbr>)") "")
             ":\n"
             "<dl aria-label=\"Definition details for &ldquo;" title "&rdquoa;\" class=\"grid\">\n"
             (if url
@@ -278,7 +278,7 @@ INFO is a plist holding contextual information."
           "type: page\n"
           "---\n"
           "\n"
-          "Ever since reading {{< glossary key=\"DUNE-NOVEL\" >}} by {{< glossary key=\"FRANK-HERBERT\" >}} I've loved epigraphs.  "
+          "Ever since reading {{< glossary key=\"GLOSSARY-DUNE-NOVEL\" >}} by {{< glossary key=\"GLOSSARY-FRANK-HERBERT\" >}} I've loved epigraphs.  "
           "In that novel, the epigraphs are quotes from fictional works written within the Dune universe.  "
           "Below are quotes that I've gathered, and in some cases, I've used as epigraphs throughout <cite>Take on Rules</cite>.\n")
         (dolist (epigraph epigraphs)
@@ -720,11 +720,11 @@ We ignore the DESCRIPTION and probably the CHANNEL."
         (let ((kw-plist
                 (jf/org-keywords-as-plist
                   :keywords-regexp
-                  (concat "\\(TITLE\\|GLOSSARY_KEY\\|OFFER"
+                  (concat "\\(TITLE\\|CUSTOM_ID\\|OFFER"
                     "\\|ROAM_REFS\\|SAME_AS\\)"))))
           (list
             :title (lax-plist-get kw-plist "TITLE")
-            :key (lax-plist-get kw-plist "GLOSSARY_KEY")
+            :key (lax-plist-get kw-plist "CUSTOM_ID")
             :url (or
                    (lax-plist-get kw-plist "OFFER")
                    (when-let ((refs
@@ -792,7 +792,7 @@ Each type will have the following keys:
                   (plist-put data :type 'internal)
                   (plist-put data :path 'normalized-slug)))
               (when-let ((key
-                           (org-entry-get headline "GLOSSARY_KEY")))
+                           (org-entry-get headline "CUSTOM_ID")))
                 (plist-put data :type 'glossary)
                 (plist-put data :key key))
               (when-let ((key
@@ -1140,8 +1140,6 @@ When none found return `nil'."
               (org-element-property :tags hl))
             hl))
         (org-element-lineage epom nil t)))))
-
-(require 'mastodon)
 
 (defun jf/blog-post/tootify (&optional at-point)
   "Create a toot from the current blog post AT-POINT."

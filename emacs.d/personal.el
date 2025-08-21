@@ -30,6 +30,165 @@ URL is assumed to be either of an RSS feed or Atom feed."
         (save-buffer)
         (bury-buffer)))))
 
+(defun jf/bibliography/export-shopping-list (&optional file)
+    "Export my book shopping list to the given FILE."
+    (interactive)
+    (let* ((works
+             (save-restriction
+               (widen)
+               (save-excursion
+                 (with-current-buffer
+                   (find-file-noselect jf/filename/bibliography)
+                   (org-map-entries
+                     (lambda ()
+                       (list
+                         :title
+                         (org-element-property
+                           :title (org-element-at-point))
+                         :author
+                         (org-entry-get
+                           (org-element-at-point) "AUTHOR")
+                         :editor
+                         (org-entry-get
+                           (org-element-at-point) "EDITOR")
+                         ))
+                     "+LEVEL=2+books+shoppingList" 'file)))))
+            (sorted-works
+              (sort works
+                :key (lambda (work)
+                       (if-let ((author
+                                  (plist-get work :author)))
+                         (car (last
+                                (s-split " "
+                                  (car (s-split " and " author))) 1))
+                         (if-let ((editor
+                                    (plist-get work :editor)))
+                           (car (last
+                                  (s-split " "
+                                    (car (s-split " and " editor))) 1))
+                           ""))))))
+      (let ((buffer
+              (find-file-noselect (or file jf/filename/shopping-list))))
+        (with-current-buffer buffer
+          (delete-region (point-min) (point-max))
+          (insert "Books from Jeremy's “shopping list” that he’s considering:\n\n")
+          (dolist (work sorted-works)
+            (insert (format "- “%s”%s%s\n"
+                      (plist-get work :title)
+                      (if-let ((author (plist-get work :author)))
+                        (concat " by " author)
+                        "")
+                      (if-let ((editor (plist-get work :editor)))
+                        (concat " edited by " editor)
+                        ""))))
+          (save-buffer)))))
+
+(defun jf/bibliography/export-epigraphs (&optional file)
+    "Export epigraphs to my blog."
+    (interactive)
+    (let* ((epigraphs
+             (save-restriction
+               (widen)
+               (save-excursion
+                 (with-current-buffer
+                   (find-file-noselect jf/filename/bibliography)
+                   (elfeed--shuffle
+                     (org-element-map
+                       (org-element-parse-buffer)
+                       '(quote-block verse-block)
+                       (lambda (el)
+                         ;; Skip un-named blocks as we can’t link to them.
+                         (when-let* ((id
+                                       (org-element-property :name el)))
+                           (let* ((lineage
+                                    (org-element-lineage el))
+                                   ;; Loop
+                                   (citable-work
+                                     (car
+                                       (seq-filter
+                                         (lambda (el)
+                                           (and
+                                             (eq (org-element-type el) 'headline)
+                                             (or (member "citables"
+                                                   (org-element-property :tags el))
+                                               (= (org-element-property :level el) 2))))
+                                         lineage)))
+                                   (h-node
+                                     (car
+                                       (seq-filter
+                                         (lambda (el)
+                                           (and
+                                             (eq (org-element-type el) 'headline)
+                                             (= (org-element-property :level el) 2)))
+                                         lineage)))
+                                   (people?
+                                     (member "people"
+                                       (org-element-property :tags h-node))))
+                             (list
+                               :id id
+                               :type (org-element-type el)
+                               :work (if people?
+                                       ""
+                                       (car
+                                         (org-element-property
+                                           :title citable-work)))
+                               :author
+                               (if people?
+                                 (car
+                                   (org-element-property :title h-node))
+                                 (org-entry-get h-node "AUTHOR"))
+                               :text
+                               (buffer-substring-no-properties
+                                 (org-element-property
+                                   :contents-begin el)
+                                 (org-element-property
+                                   :contents-end el)))))))))))))
+      (let* ((buffer
+               (find-file-noselect
+                 (or file jf/filename/epigraphy-takeonrules))))
+        (with-current-buffer buffer
+          (delete-region (point-min) (point-max))
+          (insert
+            "---\n"
+            "date: 2021-07-22 19:23:43.883686000 -04:00 \n"
+            "full_width: true\n"
+            "images: []\n"
+            "lastmod: " (format-time-string "%Y-%m-%d %H:%M:%S.%N %z") "\n"
+            "layout: page\n"
+            "permalink: \"/site-map/epigraphs/\"\n"
+            "title: Epigraphs\n"
+            "type: page\n"
+            "---\n"
+            "\n"
+            "Ever since reading {{< glossary key=\"DUNE-NOVEL\" >}} by {{< glossary key=\"FRANK-HERBERT\" >}} I've loved epigraphs.  "
+            "In that novel, the epigraphs are quotes from fictional works written within the Dune universe.  "
+            "Below are quotes that I've gathered, and in some cases, I've used as epigraphs throughout <cite>Take on Rules</cite>.\n")
+          (dolist (epigraph epigraphs)
+            (let ((work
+                    (plist-get epigraph :work))
+                   (author
+                     (plist-get epigraph :author))
+                   (text
+                     (plist-get epigraph :text)))
+              (insert
+                (format "<section class=\"epigraphs\"><blockquote data-id=\"%s\">%s%s\n</blockquote></section>\n"
+                  (plist-get epigraph :id)
+                  (if (eq (plist-get epigraph :type) 'verse-block)
+                    (concat "<pre class=\"verse\">"  text "</pre>")
+                    (org-export-string-as (s-trim text) 'html t))
+                  (cond
+                    ((and (s-present? work) (s-present? author))
+                      (format "\n<footer>&#8213;%s, <cite>%s</cite></footer>"
+                        author work))
+                    ((s-present? work)
+                      (format "\n<footer>&#8213; <cite>%s</cite></footer>"
+                        work))
+                    ((s-present? author)
+                      (format "\n<footer>&#8213; %s</footer>"
+                        author))
+                    (t ""))))))
+          (save-buffer))
+        (message "Done exporting epigraphs to blog"))))
 (defun jf/syncthing-aling ()
   "Synchronize files into SyncThing bucket."
   (interactive)
@@ -59,8 +218,6 @@ URL is assumed to be either of an RSS feed or Atom feed."
 ;; feed, I'll go ahead and sync my notes.
 (advice-add #'jf/elfeed-load-db-and-open :before #'jf/syncthing-aling)
 (add-hook 'after-init-hook #'jf/syncthing-aling)
-
-(require 'ox-takeonrules)
 
 (use-package mastodon
   ;; :straight (:host codeberg :repo "martianh/mastodon.el")
@@ -446,7 +603,7 @@ Useful for narrowing regions.")
           "type: page\n"
           "---\n"
           "\n"
-          "In {{< linkToTable \"249\" >}}, I list most of the books that I've read.  I have chosen to exclude most {{< glossary key=\"RPG\" >}} books; in part because there are so many.  I plan to create a Ludography; a list of games that I've played, both {{< glossary key=\"RPG\" >}} and otherwise.\n"
+          "In {{< linkToTable \"249\" >}}, I list most of the books that I've read.  I have chosen to exclude most {{< glossary key=\"GLOSSARY-RPG\" >}} books; in part because there are so many.  I plan to create a Ludography; a list of games that I've played, both {{< glossary key=\"GLOSSARY-RPG\" >}} and otherwise.\n"
           "\n"
           "{{< table table_number=\"249\" caption=\"Most of the Books that I've Read\" >}}\n"
           "<thead>\n"
@@ -933,3 +1090,5 @@ entry."
                 glossary_key custom_id)))))
       "LEVEL=2+glossary"
       'file)))
+
+(require 'ox-takeonrules)
