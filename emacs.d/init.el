@@ -1315,7 +1315,10 @@ work computers.")
 
 (use-package files
   :straight (:type built-in)
-  :custom (make-backup-files nil))
+  :custom (make-backup-files nil)
+  :config
+  (add-hook 'after-save-hook
+    #'executable-make-buffer-file-executable-if-script-p))
 
 (use-package subword
   ;; With subword-mode, HelloWorld is two words for navigation.
@@ -3303,13 +3306,6 @@ Each member's `car' is title and `cdr' is `org-mode' element."
     (interactive)
     (org-map-entries 'org-id-get-create))
 
-  (org-babel-do-load-languages 'org-babel-load-languages
-    (append org-babel-load-languages
-      '((emacs-lisp . t)
-         (shell . t)
-         (verb . t)
-         (plantuml . t)
-         (ruby . t))))
   (add-to-list 'org-structure-template-alist '("m" . "marginnote"))
   (add-to-list 'org-structure-template-alist '("D" . "details"))
   (add-to-list 'org-structure-template-alist '("S" . "summary"))
@@ -3438,7 +3434,7 @@ See `org-latex-format-headline-function' for details."
 
   ;; From https://emacs.stackexchange.com/questions/22210/auto-update-org-tables-before-each-export
   ;; Recalculate all org tables in the buffer when saving.
-  (defvar-local jf/org-mode/enable-buffer-wide-recalculation nil
+  (defvar-local jf/org-mode/enable-buffer-wide-recalculation t
     "When non-nil, recalculate all dynamic regions when saving the file.
 
 This variable is buffer local.")
@@ -5830,6 +5826,13 @@ The generated and indented TOC will be inserted at point."
   :mode (("\\.plantuml\\'" . plantuml-mode))
   :mode (("\\.puml\\'" . plantuml-mode))
   :straight t)
+
+(use-package mermaid-mode
+  :straight t)
+(use-package ob-mermaid
+  :after (org)
+  :straight t
+  :custom (ob-mermaid-cli-path (executable-find "mmdc")))
 
 (use-package rspec-mode
   ;; I write most of my Ruby tests using rspec.  This tool helps manage
@@ -8479,6 +8482,15 @@ This encodes the logic for creating a project."
 (with-eval-after-load "ox"
   (require 'edraw-org)
   (edraw-org-setup-exporter))
+
+(org-babel-do-load-languages 'org-babel-load-languages
+  (append org-babel-load-languages
+    '((emacs-lisp . t)
+       (shell . t)
+       (mermaid . t)
+       (verb . t)
+       (plantuml . t)
+       (ruby . t))))
 
 (if (file-exists-p (expand-file-name "~/.my-computer"))
   (load "personal.el")
