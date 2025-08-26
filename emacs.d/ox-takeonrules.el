@@ -14,13 +14,11 @@
 ;; TODO: Handle margin notes and other sort of blocks
 (org-export-define-derived-backend 'takeonrules 'md
   :translate-alist
-  '(
-     (footnote-reference . org-hugo-simple-footnote-reference)
-     (inner-template . org-hugo-simple-inner-template)
-     (timestamp . org-hugo-simple-timestamp)
-     )
+  '((footnote-reference . org-takeonrules-footnote-reference)
+     (inner-template . org-takeonrules-inner-template)
+     (timestamp . org-takeonrules-timestamp))
   :filters-alist
-  '((:filter-body org-hugo-simple-body-filter))
+  '((:filter-body org-takeonrules-body-filter))
   :options-alist
   '((:with-toc nil "toc" nil)))
 
@@ -95,7 +93,7 @@ org-export backend derived from the 'md backend."
         (and (org-export-to-file 'takeonrules file nil t t t)
           (find-file-other-window file))))))
 
-(defun org-hugo-simple-inner-template (contents info)
+(defun org-takeonrules-inner-template (contents info)
   "Transcode CONTENTS to markdown body.
 
 INFO is a plist holding contextual information."
@@ -791,10 +789,12 @@ Each type will have the following keys:
                 (progn
                   (plist-put data :type 'internal)
                   (plist-put data :path 'normalized-slug)))
-              (when-let ((key
-                           (org-entry-get headline "CUSTOM_ID")))
-                (plist-put data :type 'glossary)
-                (plist-put data :key key))
+              (when (member "glossary"
+                      (org-get-tags headline))
+                (when-let ((key
+                             (org-entry-get headline "CUSTOM_ID")))
+                  (plist-put data :type 'glossary)
+                  (plist-put data :key key)))
               (when-let ((key
                            (org-entry-get headline "SERIES_KEY")))
                 (plist-put data :type 'series)
@@ -974,7 +974,7 @@ with the series."
           (denote-rename-file-and-buffer file new-name)
           (denote-update-dired-buffers))))))
 
-(defun org-hugo-simple-footnote-reference (footnote-reference _contents info)
+(defun org-takeonrules-footnote-reference (footnote-reference _contents info)
   "Transcode FOOTNOTE-REFERENCE element to Hugo sidenote shortcode.
 CONTENTS is nil.  INFO is a plist holding contextual information."
   (let* ((element
@@ -1000,7 +1000,7 @@ CONTENTS is nil.  INFO is a plist holding contextual information."
                     'md t '(:with-toc nil)))))))
     (format "{{< sidenote >}}%s{{< /sidenote >}}" content)))
 
-(defun org-hugo-simple-body-filter (body _backend info)
+(defun org-takeonrules-body-filter (body _backend info)
   "Add front-matter to the BODY of the document.
 
 BODY is the result of the export.
@@ -1017,10 +1017,10 @@ INFO is a plist holding export options."
               (widen)
               (ignore-errors ;If the point is at beginning of buffer even after widening
                 (backward-char))
-              (org-hugo-simple--front-matter info)))))
+              (org-takeonrules--front-matter info)))))
     (format "---\n%s\n---\n%s" front-matter body)))
 
-(defun org-hugo-simple--front-matter (info)
+(defun org-takeonrules--front-matter (info)
   "Generate the corresponding YAML Front-Matter from INFO.
 
 We also rely on the org-element at point."
@@ -1065,7 +1065,7 @@ We also rely on the org-element at point."
       (add-to-list 'metadata '("draft" . "true")))
     (yaml-encode metadata)))
 
-(defun org-hugo-simple-timestamp (timestamp _contents info)
+(defun org-takeonrules-timestamp (timestamp _contents info)
   "Transcode a TIMESTAMP object from Org to HTML time element.
 CONTENTS is ignored.  INFO is a plist holding contextual
 information."
@@ -1107,7 +1107,8 @@ When none found return `nil'."
   "Create a toot from the current blog post AT-POINT."
   (interactive)
   (if-let ((blogPost
-             (jf/org-mode/get-blog-post at-point)))
+             (jf/org-mode/get-blog-post
+               (or at-point (org-element-at-point)))))
     (progn
       (call-interactively #'mastodon-toot)
       (delete-rectangle (point-min) (point-max))
@@ -1115,18 +1116,36 @@ When none found return `nil'."
         (s-join "\n\n"
           (flatten-list
             (list
-              (when-let ((title
-                           (org-element-property :title blogPost))))
+              (format "«%s»"
+                (org-element-property :title blogPost))
               (org-entry-get blogPost "DESCRIPTION")
               (when-let ((roam_refs
                            (org-entry-get blogPost "ROAM_REFS")))
                 (car (s-split " " roam_refs)))
-              (mapcar
-                (lambda (e) (format "#%s"))
-                (org-get-tags blogPost t)))))))
+              (s-join " "
+                (mapcar
+                (lambda (e) (format "#%s" e))
+                (org-get-tags blogPost t))))))))
     (progn
       (user-error "Unable to find blogPost at point.")
       (pulsar-pulse-line-red))))
+
+(advice-add 'org-html-special-block
+  :around #'jf/org-html-special-block)
+
+(defun jf/org-html-special-block (adviced-function func &rest args)
+  (let* ((special-block
+           (car args))
+          (contents
+            (cadr args))
+          (info
+            (caddr args))
+          (block-type
+            (org-element-property :type special-block)))
+    (message "%S" block-type)))
+    ;; ;; CUSTOM LOGIC
+    ;; (progn)
+    ;; (apply advised-function func args)))
 
 (provide 'ox-takeonrules)
 ;;; ox-takeonrules.el ends here

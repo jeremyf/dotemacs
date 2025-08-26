@@ -525,20 +525,6 @@ Related to `jf/linux:radio-silence'."
   :bind ("H-i" . 'denote-link-or-create)
   :hook (dired-mode . denote-dired-mode)
   (org-mode . denote-rename-buffer-mode)
-  :init
-  (setopt denote-known-keywords
-    (with-current-buffer (find-file-noselect jf/filename/glossary)
-      (save-restriction
-        (widen)
-        (org-map-entries
-          (lambda ()
-            (or
-              (org-entry-get (org-element-at-point) "TAG")
-              (user-error
-                "Glossary entry %S missing TAG property"
-                (org-element-property :title (org-element-at-point)))))
-          "+tags+LEVEL=2"
-          'file))))
   :preface
   (defconst jf/denote/keywords/blogPosts
     "blogPosts"
@@ -703,55 +689,6 @@ PARG is part of the method signature for `org-link-parameters'."
       ;; This leverages a post v1.0.0 parameter of Denote
       ;; See https://git.sr.ht/~protesilaos/denote/commit/c6c3fc95c66ba093a266c775f411c0c8615c14c7
       (concat scheme ":" (denote-retrieve-filename-identifier file))))
-
-  (cl-defun jf/denote/link-ol-abbr-with-property (link
-                                                   description
-                                                   format
-                                                   info
-                                                   &key
-                                                   keyword
-                                                   additional-hugo-parameters)
-    "Export a LINK with DESCRIPTION for the given FORMAT.
-
-    FORMAT is an Org export backend.  We will discard the given
-    DESCRIPTION.  We use the INFO to track which abbreviations we've
-    encountered; later using `jf/ox/filter-body/latex' to add an
-    abbreviations section."
-    (let* ((keyword-alist
-             (jf/denote/org-keywords-from-id
-               :identifier link
-               :keywords (list "TITLE"
-                           keyword
-                           "CUSTOM_ID")))
-            (title
-              (car (alist-get "TITLE" keyword-alist nil nil #'string=)))
-            (keyword-value
-              (car (alist-get keyword keyword-alist nil nil #'string=)))
-            (key
-              (car (alist-get
-                     "CUSTOM_ID" keyword-alist nil nil #'string=))))
-      ;; When we encounter an abbreviation, add that to the list.  We'll
-      ;; later use that list to build a localized abbreviation element.
-      (let ((abbr-links
-              (plist-get info :abbr-links)))
-        (unless (alist-get keyword-value abbr-links nil nil #'string=)
-          (progn
-            (add-to-list 'abbr-links (cons keyword-value title))
-            (plist-put info :abbr-links abbr-links))))
-      (cond
-        ((or (eq format 'html) (eq format 'md))
-          (if jf/exporting-org-to-tor
-            (format "{{< glossary key=\"%s\" %s >}}"
-              key
-              additional-hugo-parameters)
-            (format "<abbr title=\"%s\">%s</abbr>"
-              title
-              keyword-value)))
-        ((or (eq format 'latex) (eq format 'beamer))
-          (format "\\ac{%s}" keyword-value))
-        (t (format "%s (%s)"
-             title
-             keyword-value)))))
 
   (org-link-set-parameters "abbr"
     :complete (lambda (&optional parg)
@@ -1304,6 +1241,62 @@ The DOM could be as sanitized by `org-web-tools--sanitized-dom'."
         (f-join (denote-directory) domain)
         nil
         (concat "#+ROAM_REFS: " url "\n\n" article)))))
+
+(cl-defun jf/denote/link-ol-abbr-with-property (link
+                                                 description
+                                                 format
+                                                 info
+                                                 &key
+                                                 keyword
+                                                 additional-hugo-parameters)
+  "Export a LINK with DESCRIPTION for the given FORMAT.
+
+    FORMAT is an Org export backend.  We will discard the given
+    DESCRIPTION.  We use the INFO to track which abbreviations we've
+    encountered; later using `jf/ox/filter-body/latex' to add an
+    abbreviations section."
+  (let* ((entry
+           (if (s-contains? "::#" link)
+             (let ((custom_id
+                     (car (last (s-split "::#" link)))))
+               (with-current-buffer (find-file-noselect jf/filename/glossary)
+                 (seq-first
+                   (org-map-entries
+                     #'org-element-at-point
+                     (format
+                       "CUSTOM_ID=\"%s\""
+                       custom_id)
+                     'file))))
+             (user-error "Attempting to process non-conformant ABBR link %S" link)))
+          (jf/glossary/entry-by-link link))
+          (title
+            (org-element-property :title entry))
+          (keyword-value
+            (org-entry-get entry keyword))
+          (key
+            (org-entry-get entry "CUSTOM_ID")))
+    ;; When we encounter an abbreviation, add that to the list.  We'll
+    ;; later use that list to build a localized abbreviation element.
+    (let ((abbr-links
+            (plist-get info :abbr-links)))
+      (unless (alist-get keyword-value abbr-links nil nil #'string=)
+        (progn
+          (add-to-list 'abbr-links (cons keyword-value title))
+          (plist-put info :abbr-links abbr-links))))
+    (cond
+      ((or (eq format 'html) (eq format 'md))
+        (if jf/exporting-org-to-tor
+          (format "{{< glossary key=\"%s\" %s >}}"
+            key
+            additional-hugo-parameters)
+          (format "<abbr title=\"%s\">%s</abbr>"
+            title
+            keyword-value)))
+      ((or (eq format 'latex) (eq format 'beamer))
+        (format "\\ac{%s}" keyword-value))
+      (t (format "%s (%s)"
+           title
+           keyword-value))))
 (require 'denote)
 
 (defvar jf/denote-base-dir
@@ -2456,12 +2449,9 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
 
 (use-package bm
   :straight t
-
   :init
   ;; restore on load (even before you require bm)
   (setq bm-restore-repository-on-load t)
-
-
   :config
   (setopt bm-in-lifo-order t)
   (setopt bm-highlight-style 'bm-highlight-line-and-fringe)
@@ -2509,11 +2499,9 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   ;; Then new bookmarks can be saved before the buffer is reverted.
   ;; Make sure bookmarks is saved before check-in (and revert-buffer)
   (add-hook 'vc-before-checkin-hook #'bm-buffer-save)
-
-
   :bind (("H-b H-n" . bm-common-next)
           ("H-b H-p" . bm-common-previous)
-          ("H-b H-a" . bm-annotate)
+          ("H-b H-a" . bm-bookmark-annotate)
           ("H-b H-s" . bm-show-all)
           ("H-b H-t" . bm-toggle)
           ("H-b H-b" . bm-toggle)))
@@ -4900,6 +4888,20 @@ literal then add a fuzzy search)."
 (defvar jf/filename/glossary
   (denote-get-path-by-id "20250101T000000")
   "Dude, you can put your concepts here.")
+
+(setopt denote-known-keywords
+  (with-current-buffer (find-file-noselect jf/filename/glossary)
+    (save-restriction
+      (widen)
+      (org-map-entries
+        (lambda ()
+          (or
+            (org-entry-get (org-element-at-point) "TAG")
+            (user-error
+              "Glossary entry %S missing TAG property"
+              (org-element-property :title (org-element-at-point)))))
+        "+tags+LEVEL=2"
+        'file))))
 
 (defvar jf/filename/bibliography
   (denote-get-path-by-id "20241124T080648")
