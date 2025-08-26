@@ -1140,22 +1140,32 @@ Otherwise, use pre-existing handling."
   (let* ((block-type
            (org-element-property :type special-block))
           (params
-            (car (mapcar (lambda (h)
-                           (org-babel-parse-header-arguments h t))
-                   (cons (org-element-property :parameters special-block)
-                     (org-element-property :header special-block))))))
+            (flatten-list
+              (mapcar (lambda (cell)
+                        (list (car cell) (cdr cell)))
+                (car (mapcar (lambda (h)
+                               (org-babel-parse-header-arguments h t))
+                       (cons (org-element-property :parameters special-block)
+                         (org-element-property :header special-block))))))))
     (pcase block-type
       ("details"
         (format "<details%s>%s%s</details>"
-          (if (alist-get :open params) " open" "")
+          (if (plist-get params :open) " open" "")
           (if-let ((summary
-                     (alist-get :summary params)))
+                     (plist-get params :summary)))
             (concat "<summary>" summary "</summary>\n")
             "")
           contents))
+      ("update"
+        (format
+          "{{< update %s >}}\n%s\n{{< /update >}}"
+          (org-html--make-attribute-string params)
+          contents))
       ("blockquote"
         ;; TODO: handle pre, post, etc
-        (format "{{< blockquote >}}\n%s{{< /blockquote >}}" contents))
+        (format "{{< blockquote %s >}}\n%s{{< /blockquote >}}"
+          (org-html--make-attribute-string params)
+          contents))
       ("marginnote"
         (concat "{{< marginnote >}}" contents "{{< /marginnote >}}"))
       (_ (apply func (list special-block contents info))))))
