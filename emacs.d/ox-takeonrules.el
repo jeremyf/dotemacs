@@ -1153,13 +1153,26 @@ Otherwise, use pre-existing handling."
             (concat "<summary>" summary "</summary>\n")
             "")
           contents))
-      ("quote"
-        ;; NOTE: There's already a handler for this `org-html-quote-block'
+      ("blockquote"
         ;; TODO: handle pre, post, etc
-        (format "<blockquote>%s</blockquote>" content))
+        (format "{{< blockquote >}}\n%s{{< /blockquote >}}" contents))
       ("marginnote"
         (concat "{{< marginnote >}}" contents "{{< /marginnote >}}"))
-      (t (apply func (list special-block contents info))))))
+      (_ (apply func (list special-block contents info))))))
+
+(defun jf/org-md-quote-block (func quote-block contents info)
+  "Render a QUOTE-BLOCK with CONTENTS and INFO.
+
+Either render via the standard markdown way or when exporting to
+Take on Rules using the \"blockquote\" special block."
+  (if jf/exporting-org-to-tor
+    (progn
+      (org-element-put-property quote-block :type "blockquote")
+      (jf/org-html-special-block func quote-block contents info))
+    (apply func (list quote-block contents info))))
+
+(advice-add #'org-html-quote-block :around #'jf/org-html-quote-block)
+(advice-add #'org-md-quote-block :around #'jf/org-md-quote-block)
 
 (provide 'ox-takeonrules)
 ;;; ox-takeonrules.el ends here

@@ -7562,22 +7562,6 @@ CONTENTS is nil.  INFO is a plist holding contextual information."
             (mapcar #'s-dashed-words (plist-get info field)))))
       info)
 
-    (defun jf/org-md-quote-block (quote-block contents info)
-      "Render a QUOTE-BLOCK with CONTENTS and INFO.
-
-Either render via the standard markdown way or when exporting to
-Take on Rules using the \"blockquote\" special block."
-      (if jf/exporting-org-to-tor
-        (progn
-          (org-element-put-property quote-block :type "blockquote")
-          (org-hugo-special-block quote-block contents info))
-        ;; The original md quote block method; probably a better way to
-        ;; do this.
-        (replace-regexp-in-string
-          "^" "> "
-          (replace-regexp-in-string "\n\\'" "" contents))))
-    (advice-add #'org-md-quote-block :override #'jf/org-md-quote-block)
-
     (setq org-hugo-base-dir "~/git/takeonrules.source")
 
     (defvar jf/org-macros-setup-filename
