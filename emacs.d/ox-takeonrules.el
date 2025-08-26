@@ -1133,19 +1133,33 @@ When none found return `nil'."
 (advice-add 'org-html-special-block
   :around #'jf/org-html-special-block)
 
-(defun jf/org-html-special-block (adviced-function func &rest args)
-  (let* ((special-block
-           (car args))
-          (contents
-            (cadr args))
-          (info
-            (caddr args))
-          (block-type
-            (org-element-property :type special-block)))
-    (message "%S" block-type)))
-    ;; ;; CUSTOM LOGIC
-    ;; (progn)
-    ;; (apply advised-function func args)))
+(defun jf/org-html-special-block (func special-block contents info)
+  "Handle SPECIAL-HANDLE when details, quote, or marginnote.
+
+Otherwise, use pre-existing handling."
+  (let* ((block-type
+           (org-element-property :type special-block))
+          (params
+            (car (mapcar (lambda (h)
+                           (org-babel-parse-header-arguments h t))
+                   (cons (org-element-property :parameters special-block)
+                     (org-element-property :header special-block))))))
+    (pcase block-type
+      ("details"
+        (format "<details%s>%s%s</details>"
+          (if (alist-get :open params) " open" "")
+          (if-let ((summary
+                     (alist-get :summary params)))
+            (concat "<summary>" summary "</summary>\n")
+            "")
+          contents))
+      ("quote"
+        ;; NOTE: There's already a handler for this `org-html-quote-block'
+        ;; TODO: handle pre, post, etc
+        (format "<blockquote>%s</blockquote>" content))
+      ("marginnote"
+        (concat "{{< marginnote >}}" contents "{{< /marginnote >}}"))
+      (t (apply func (list special-block contents info))))))
 
 (provide 'ox-takeonrules)
 ;;; ox-takeonrules.el ends here
