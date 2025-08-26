@@ -3296,7 +3296,6 @@ Each member's `car' is title and `cdr' is `org-mode' element."
 
   (add-to-list 'org-structure-template-alist '("m" . "marginnote"))
   (add-to-list 'org-structure-template-alist '("D" . "details"))
-  (add-to-list 'org-structure-template-alist '("S" . "summary"))
   (add-to-list 'org-structure-template-alist '("U" . "update"))
   (add-to-list 'org-structure-template-alist '("i" . "inlinecomment"))
   ;; I grabbed from the following LaTeX class from
