@@ -1277,7 +1277,6 @@ The DOM could be as sanitized by `org-web-tools--sanitized-dom'."
                        custom_id)
                      'file))))
              (user-error "Attempting to process non-conformant ABBR link %S" link)))
-          (jf/glossary/entry-by-link link))
           (title
             (org-element-property :title entry))
           (keyword-value
@@ -1306,7 +1305,7 @@ The DOM could be as sanitized by `org-web-tools--sanitized-dom'."
         (format "\\ac{%s}" keyword-value))
       (t (format "%s (%s)"
            title
-           keyword-value))))
+           keyword-value)))))
 (require 'denote)
 
 (defvar jf/denote-base-dir
