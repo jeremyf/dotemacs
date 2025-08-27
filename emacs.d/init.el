@@ -3521,6 +3521,46 @@ function is ever added to that hook."
        ("\\paragraph{%s}" . "\\paragraph{%s}")
        ("\\subparagraph{%s}" . "\\subparagraph{%s}")))
   (add-to-list 'org-latex-classes
+    '("jf/two-column-landscape"
+       "\\documentclass[11pt,letter,landscape]{article}
+\\usepackage[letter]{anysize}
+\\usepackage{minted}
+\\usepackage{array, booktabs, caption}
+\\usemintedstyle{emacs}
+\\usepackage[linktocpage=true]{hyperref}
+\\usepackage[french,english]{babel}
+\\usepackage[a4paper,top=3cm,bottom=3cm]{geometry}
+\\usepackage{minimalist}
+\\usepackage{fontspec}
+\\usepackage{caption} \\captionsetup{labelfont=bf,font={sf,small}}
+\\setmainfont{TeX Gyre Pagella}
+\\usepackage{enumitem} \\setlist{nosep}
+\\usepackage{longtable}
+\\usepackage{microtype}
+\\AtBeginEnvironment{longtable}{\\footnotesize}
+\\usepackage[marginal,hang]{footmisc}
+\\usepackage{relsize,etoolbox}
+\\AtBeginEnvironment{quote}{\\smaller}
+\\AtBeginEnvironment{tabular}{\\smaller}
+\\usepackage[printonlyused,nohyperlinks]{acronym}
+\\usepackage[marginal,hang]{footmisc}
+\\usepackage{mathabx}
+\\usepackage{multicol}
+\\setlength\\columnsep{20pt}
+\\hypersetup{colorlinks=true, linkcolor=blue, filecolor=magenta, urlcolor=cyan}
+\\tolerance=1000
+\\usepackage{float}
+\\usepackage{rotating}
+\\usepackage{sectsty}
+\\usepackage{titlesec}
+\\titleformat{\\section}{\\normalfont\\fontsize{12}{18}\\bfseries}{\\thesection}{1em}{}
+\\setcounter{secnumdepth}{1}"
+       ("\\section{%s}" . "\\section{%s}")
+       ("\\subsection{%s}" . "\\subsection{%s}")
+       ("\\subsubsection{%s}" . "\\subsubsection{%s}")
+       ("\\paragraph{%s}" . "\\paragraph{%s}")
+       ("\\subparagraph{%s}" . "\\subparagraph{%s}")))
+  (add-to-list 'org-latex-classes
     '("tuftebook"
        "\\documentclass[notoc,sfsidenotes]{tufte-book}
 \\usepackage{array, booktabs, caption}
