@@ -22,6 +22,9 @@
   :options-alist
   '((:with-toc nil "toc" nil)))
 
+(defvar jf/exporting-org-to-tor nil
+  "When non-nil, I'm in the middle of exporting the document to takeonrules.")
+
 (defun export-blog-post-to-takeonrules ()
   "Conditionally export to TakeOnRules the blog post at point.
 

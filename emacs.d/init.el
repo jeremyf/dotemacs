@@ -4989,7 +4989,7 @@ literal then add a fuzzy search)."
               (shell-command-to-string
                 "fd --version | rg \"fd (\\d+)\" -r '\$1' --only-matching"))))
       #'consult-fd
-    #'consult-find)))
+      #'consult-find)))
 
 (use-package emojify
   ;; All the people using emojiis; why not
@@ -5129,7 +5129,7 @@ See `jf/treesit-language-available-p' for usage.")
     :around #'jf/treesit-language-available-p)
 
   (add-to-list 'treesit-language-source-alist
-             '(gitcommit . ("https://github.com/gbprod/tree-sitter-gitcommit")))
+    '(gitcommit . ("https://github.com/gbprod/tree-sitter-gitcommit")))
   :preface
   (defun jf/treesit/func-signature/dwim ()
     "Kill current function signature at point."
@@ -6455,7 +6455,7 @@ Useful for Eglot."
 
   ;; https://github.com/emacs-lsp/lsp-mode/wiki/Install-Angular-Language-server
   ;; with modifications for homebrew
-    (add-to-list 'eglot-server-programs
+  (add-to-list 'eglot-server-programs
     '(angular-mode
        "node /opt/homebrew/lib/node_modules/@angular/language-server --ngProbeLocations /opt/homebrew/lib/node_modules --tsProbeLocations /opt/homebrew/lib/node_modules --stdio"))
   (add-to-list 'eglot-server-programs
@@ -6834,10 +6834,10 @@ Useful for Eglot."
     (display-fill-column-indicator-mode
       original-display-fill-column-indicator-mode)
     (display-line-numbers-mode
-     original-display-line-numbers-mode)
+      original-display-line-numbers-mode)
     (when (fboundp 'git-gutter-mode)
       (git-gutter-mode
-       original-git-gutter-mode))
+        original-git-gutter-mode))
     (setq-local org-modern-block-fringe
       original-org-modern-block-fringe))
   (defun jf/olivetti-mode (&rest args)
@@ -6951,10 +6951,10 @@ Useful for Eglot."
     "Select a default filter and update elfeed."
     (interactive)
     (let* ((filters
-            '(("First (1st)" . "+1st +unread")
-               ("Second (2nd)" . "@7-days-ago +2nd +unread")
-               ("Third (3rd)" . "@7-days-ago +3rd +unread")
-               ("Outlets" . "@2-days-ago +outlet")))
+             '(("First (1st)" . "+1st +unread")
+                ("Second (2nd)" . "@7-days-ago +2nd +unread")
+                ("Third (3rd)" . "@7-days-ago +3rd +unread")
+                ("Outlets" . "@2-days-ago +outlet")))
             (filter
               (completing-read "Elfeed Filter: " filters nil t)))
       (setq elfeed-search-filter
@@ -6965,7 +6965,7 @@ Useful for Eglot."
     (interactive)
     (elfeed-search-tag-all
       (intern (completing-read "Tag: "
-                  (elfeed-db-get-all-tags)))))
+                (elfeed-db-get-all-tags)))))
   (defun jf/elfeed-show-tag ()
     "Add TAGS to the displayed entry."
     (interactive)
@@ -7206,17 +7206,17 @@ See https://developer.mozilla.org/en-US/docs/Glossary/Block-level_content"
     (let ((face
             (intern (concat "shr-" tag)))
            (docstring-face
-            (format "Face for <%s> elements." tag)))
-    `(progn
-       (defface ,face
-         '((default :inherit shr-text))
-         ,docstring-face)
-       (advice-add (intern (concat "shr-tag-" ,tag))
-         :around
-         (lambda (advised-function func &rest args)
-           (let ((start (point)))
-             (apply advised-function func args)
-             (shr-add-font start (point) (intern (concat "shr-" ,tag)))))))))
+             (format "Face for <%s> elements." tag)))
+      `(progn
+         (defface ,face
+           '((default :inherit shr-text))
+           ,docstring-face)
+         (advice-add (intern (concat "shr-tag-" ,tag))
+           :around
+           (lambda (advised-function func &rest args)
+             (let ((start (point)))
+               (apply advised-function func args)
+               (shr-add-font start (point) (intern (concat "shr-" ,tag)))))))))
 
   (jf/shr-facify "blockquote")
   (jf/shr-facify "aside")
