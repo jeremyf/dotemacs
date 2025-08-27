@@ -451,7 +451,7 @@ Related to `jf/linux:radio-silence'."
                    (read-string
                      (concat "URL: " url "\nTitle: ")
                      (cdr url-and-title))))
-               (jf/bookmark-url url title)))
+           (jf/bookmark-url url title)))
        (defun ,ref-fn ()
          ,ref-doc
          (interactive)
@@ -967,11 +967,11 @@ Wires into `org-insert-link'."
   (defun jf/book-make-label (title subtitle author)
     "From the given TITLE, SUBTITLE and AUTHOR return it's formatted label."
     (format "«%s»%s"
-                              (if (s-present? subtitle)
-                                (concat title ": " subtitle)
-                                title)
-                              (if (s-present? author)
-                                (concat " by " author) "")))
+      (if (s-present? subtitle)
+        (concat title ": " subtitle)
+        title)
+      (if (s-present? author)
+        (concat " by " author) "")))
 
   (defun jf/org-link-ol-complete/work ()
     "Prompt for a work from my bibliography"
@@ -1294,7 +1294,8 @@ The DOM could be as sanitized by `org-web-tools--sanitized-dom'."
           (plist-put info :abbr-links abbr-links))))
     (cond
       ((or (eq format 'html) (eq format 'md))
-        (if jf/exporting-org-to-tor
+        (if (and (boundp 'jf/exporting-org-to-tor)
+              jf/exporting-org-to-tor)
           (format "{{< glossary key=\"%s\" %s >}}"
             key
             additional-hugo-parameters)
@@ -1358,7 +1359,7 @@ work computers.")
   ;; more.
   :straight (:type built-in)
   :custom (recentf-max-menu-items 50
-    recentf-max-saved-items 256)
+            recentf-max-saved-items 256)
   ;; Track recent
   (recentf-mode 1)
   :config
@@ -1576,9 +1577,9 @@ work computers.")
   :straight t
   :custom
   (keycast-mode-line-insert-after 'jf/mode-line-format/buffer-name-and-status
-  keycast-mode-line-remove-tail-elements nil
-  keycast-mode-line-window-predicate 'mode-line-window-selected-p
-  keycast-mode-line-format "%2s%k%2s(%c%R)"))
+    keycast-mode-line-remove-tail-elements nil
+    keycast-mode-line-window-predicate 'mode-line-window-selected-p
+    keycast-mode-line-format "%2s%k%2s(%c%R)"))
 
 (use-package emacs
   :straight (:type built-in)
@@ -1615,11 +1616,11 @@ work computers.")
     (let ((indicator
             (if (fboundp 'nerd-icons-icon-for-mode)
               (nerd-icons-icon-for-mode major-mode)
-            (cond
-              ((derived-mode-p 'text-mode) "¶")
-              ((derived-mode-p 'prog-mode) "λ")
-              ((derived-mode-p 'comint-mode) ">_")
-              (t "◦")))))
+              (cond
+                ((derived-mode-p 'text-mode) "¶")
+                ((derived-mode-p 'prog-mode) "λ")
+                ((derived-mode-p 'comint-mode) ">_")
+                (t "◦")))))
       (propertize indicator
         'face
         (if (mode-line-window-selected-p)
@@ -3295,7 +3296,7 @@ Each member's `car' is title and `cdr' is `org-mode' element."
     ;; https://baty.net/posts/2025/05/set-point-at-first-heading-when-opening-org-mode-file/
     (goto-char (point-min))
     (when (re-search-forward "^\\*+ " nil t)
-        (goto-char (match-beginning 0))))
+      (goto-char (match-beginning 0))))
 
   ;; https://stackoverflow.com/questions/13340616/assign-ids-to-every-entry-in-org-mode
   (defun jf/org-add-ids-to-headlines-in-file ()
