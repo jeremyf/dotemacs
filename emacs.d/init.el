@@ -314,6 +314,15 @@ Else, evaluate the whole buffer."
           "Copied buffer file name '%s' to the clipboard."
           filename)))))
 
+(defun indent-whole-buffer ()
+  "Indent the entire buffer without affecting point or mark."
+  (interactive)
+  (save-excursion
+    (save-restriction
+      (indent-region (point-min) (point-max)))))
+(global-set-key (kbd "C-c i") 'indent-whole-buffer)
+
+
 (when (eq system-type 'gnu/linux)
   (use-package grab-x-link
     :straight (:host github :repo "jeremyf/dotemacs" :files ("emacs.d/grab-x-link")))
