@@ -8541,6 +8541,8 @@ This encodes the logic for creating a project."
          "-H -0 -tf --strip-cwd-prefix -c never -E vendor/ -E pkg/ -E docs/ -E .git")
         (projectile-git-command .
           "git ls-files -zco --exclude-from=.projectile.gitignore")
+        (org-latex-toc-command .
+          "\\tableofcontents\n\\begin{multicols}{2}\\\let\\oldhref\\href\n\\renewcommand{\\href}[2]{\\oldhref{#1}{#2}\\footnote{\\url{#1}}}")
         )))
 
 (provide 'init)
