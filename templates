@@ -97,9 +97,16 @@ org-mode
   ":ALIGNMENT: " p n
   ":END:" n q)
 
-(update_block "#+attr_shortcode: :date " (format-time-string "%Y-%m-%d")
+(details_block
+  "#+begin_details"
+  " :summary " (p (read-string "Summary: ") nil t)
+    n q
+  n "#+end_details" n)
+
+(update_block
+  "#+begin_update"
+  " :date " (format-time-string "%Y-%m-%d")
   " :mode " (p (completing-read "Mode: " '(inline paragraph marginnote sidenote section fallback) nil t) mode)
-    n "#+begin_update"
     n q
   n "#+end_update" n)
 

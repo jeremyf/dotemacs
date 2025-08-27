@@ -35,7 +35,7 @@
 (defvar dig-my-grave/templates-alist/org-mode
   '(("Bash" . "#+begin_src bash :results scalar replace :exports both :tangle yes\n#+end_src")
      ("Blockquote" . jf/org-mode/insert-block/quote_block)
-     ("Details and Summary" . "#+begin_details\n#+begin_summary\n\n#+end_summary\n#+end_details")
+     ("Details" . tempel-insert-details_block)
      ("Emacs Lisp" . "#+begin_src emacs-lisp\n#+end_src")
      ("Gherkin" . "#+begin_src gherkin\n#+end_src")
      ("Go Lang" . "#+begin_src go-ts\n#+end_src")
@@ -54,12 +54,12 @@ The `car' as the label and `cdr' as the value that we'll insert.")
   (interactive (list (read-string "Author: ")
                  (read-string "Cite: ")
                  (read-string "Cite URL: ")))
-  ;; TODO Extract the attr_shortcode functionality to be able to insert this.
-  (insert (when (or (s-present? author) (s-present? cite) (s-present? cite_url)) "#+attr_shortcode:")
+  (insert
+    "\n#+begin_quote"
     (if (s-present? author) (concat " :pre " author) "")
     (if (s-present? cite) (concat " :cite " cite) "")
     (if (s-present? cite_url) (concat " :cite_url " cite_url) "")
-    "\n#+begin_quote\n\n#+end_quote")
+    "\n\n#+end_quote")
   (re-search-backward "^$"))
 
 (define-key org-mode-map (kbd "`") #'dig-my-grave)
