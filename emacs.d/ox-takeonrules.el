@@ -337,6 +337,9 @@ We ignore the DESCRIPTION and probably the CHANNEL."
                                  (org-element-property :name el)
                                  link)
                            el)))))
+                  (_
+                    (unless epigraph
+                      (user-error "Unable to find %s epigraph in file %s" link jf/filename/bibliography)))
                   (id
                     (org-element-property :name epigraph))
                   (class

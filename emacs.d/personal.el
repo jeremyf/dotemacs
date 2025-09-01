@@ -267,6 +267,10 @@ Useful for narrowing regions.")
   (denote-get-path-by-id "20241114T075414")
   "Where I put my journal.")
 
+(defvar jf/personal/filename-for-library
+  (denote-get-path-by-id "20250828T165328")
+  "Where I put my library checkouts.")
+
 (add-to-list 'org-capture-templates
   '("b" "Blog Post"
      entry (file+olp+datetree
@@ -556,6 +560,7 @@ Useful for narrowing regions.")
 (defvar jf/filename/bibliography-takeonrules
   (file-truename "~/git/takeonrules.source/content/site-map/bibliography/_index.md"))
 
+
 (defun jf/bibliography/export-to-takeonrules (&optional file)
   "Export completed bibliography reading to FILE."
   (interactive)
@@ -671,6 +676,10 @@ this variable reads.")
   "owns"
   "The tag used to indicate ownership of a work.")
 
+(defconst jf/bibliography/tag-from-libraries
+  "fromLibraries"
+  "The tag used to indicate borrowing a work.")
+
 (defconst jf/bibliography/tag-books
   "books"
   "The tag used to indicate that a work is book.")
@@ -762,6 +771,19 @@ operates on the book.  There would need to be an inversion of behavior."
     book))
 
 ;;; Entry points
+(defun jf/checkout-library-book-by-isbn (isbn)
+  "Add a book by ISBN to my checked out library list."
+  (interactive "nEnter an ISBN (as number): ")
+  (let ((isbnAsString (format "%s" isbn)))
+    (jf/bibliography/update-with-book
+      isbnAsString
+      (lambda ()
+        "Fetch and assemcble the book from the ISBN."
+        (jf/book-from-isbn isbnAsString))
+      :tags `(,jf/bibliography/tag-from-libraries)
+      :headline (format-time-string "%Y-%m-%d %A")
+      :file jf/personal/filename-for-library)))
+
 (defun jf/add-to-bibliography-from-isbn (isbn &optional prefix)
   "Append or amend to my bibliography the book associated with the ISBN.
 
@@ -771,12 +793,13 @@ When PREFIX is non-nil clobber and rebuild `my-cache-of-books' and
 ignore any guards against performing work on an already existing ISBN."
   (interactive "nEnter an ISBN (as number): \nP")
   (my-cache-of-books/populate prefix)
-  (jf/bibliography/update-with-book
-    isbn
-    (lambda ()
-      "Fetch and assemble the book from the ISBN."
-      (jf/book-from-isbn isbn))
-    prefix))
+  (let ((isbnAsString (format "%s" isbn)))
+    (jf/bibliography/update-with-book
+      isbnAsString
+      (lambda ()
+        "Fetch and assemble the book from the ISBN."
+        (jf/book-from-isbn isbnAsString))
+      :force prefix)))
 
 (defun jf/add-to-bibliography-from-bookaccio-file (filename &optional prefix)
   "Process books from FILENAME exported by Bookaccio app.
@@ -816,11 +839,16 @@ ignore any guards against performing work on an already existing ISBN."
                       :subtitle subtitle
                       :author author
                       :isbn isbn)))
-                prefix)))
+                :force prefix)))
           nodes)))))
 
 ;;; Bibliography Interaction
-(defun jf/bibliography/update-with-book (isbn book-builder &optional force)
+(cl-defun jf/bibliography/update-with-book
+  (isbn book-builder
+    &key force
+    (tags `(,jf/bibliography/tag-owns))
+    (headline "Works")
+    (file jf/filename/bibliography))
   "Append or amend to my bibliography the book associated with the ISBN.
 
 The BOOK-BUILDER is a function with arity 0; responsible for assembling
@@ -838,7 +866,10 @@ entry."
   (when (or force
           (not (my-cache-of-books/contains-isbn-p isbn)))
     (let* ((tags-for-bibliography
-             `(,jf/bibliography/tag-owns ,jf/bibliography/tag-books))
+             (seq-union
+               `(,jf/bibliography/tag-books)
+               tags
+               #'string=))
             (book-from-builder
               (funcall book-builder))
             (completed-value
@@ -864,7 +895,7 @@ entry."
             (widen)
             (save-excursion
               (with-current-buffer
-                (find-file-noselect jf/filename/bibliography)
+                (find-file-noselect file)
                 (org-map-entries
                   (lambda ()
                     (let ((hl (org-element-at-point)))
@@ -901,8 +932,8 @@ entry."
                      " :" (s-join ":" tags-for-bibliography) ":\n"
                      ":PROPERTIES:\n"
                      ":CUSTOM_ID: "
-                     (jf/denote-sluggify-title
-                       (jf/book-label book-from-builder)) "\n"
+                     (format "ISBN-%s" isbn)
+                     "\n"
                      (when (s-present?
                              (jf/book-subtitle book-from-builder))
                        (concat ":SUBTITLE: "
@@ -914,9 +945,9 @@ entry."
                      ":ISBN: " (jf/book-isbn book-from-builder) "\n"
                      ":END:\n")))
                 (org-capture-entry
-                  '("B" "Book from ISBN Lookup"
+                  `("B" "Book from ISBN Lookup"
                      entry
-                     (file+headline jf/filename/bibliography "Works")
+                     (file+headline ,file ,headline)
                      "%c"
                      :immediate-finish t)))
           (org-capture)
