@@ -686,25 +686,51 @@ This function is the plural version of
           (org-collect-keywords keywords)))))
 
   (cl-defun jf/org-link-complete-link-for (parg &key
-                                            scheme filter)
-    "Prompt for `denote' with filename FILTER.
+                                            property
+                                            scheme
+                                            (file jf/filename/glossary))
+    "Prompt for glossary entry in FILE with PROPERTY
 
     Returns a string of format: \"SCHEME:<id>\" where <id> is
-    an `denote' identifier.
+    an `denote' identifier linking to a custom header.
 
 PARG is part of the method signature for `org-link-parameters'."
-    (let* ((file
-             (denote-file-prompt (concat ".*" filter ".*"))))
-      ;; This leverages a post v1.0.0 parameter of Denote
-      ;; See https://git.sr.ht/~protesilaos/denote/commit/c6c3fc95c66ba093a266c775f411c0c8615c14c7
-      (concat scheme ":" (denote-retrieve-filename-identifier file))))
+    (let* ((buffer
+             (find-file-noselect file))
+            (property (or property (upcase scheme)))
+            (entries
+              (with-current-buffer buffer
+                (save-restriction
+                  (widen)
+                  (org-map-entries
+                    (lambda()
+                      (let* ((entry
+                               (org-element-at-point))
+                              (value
+                                (org-entry-get
+                                  entry (upcase property))))
+                        (cons
+                          (format "%s [%s]"
+                            (org-element-property :title entry)
+                            value)
+                          (org-entry-get entry "CUSTOM_ID"))))
+                    (format "+glossary+%s={.+}" (upcase property))
+                    'file))))
+            (selection
+              (completing-read (format "Link to %s:" property)
+                entries))
+            (custom_id
+              (alist-get selection entries nil nil #'string=)))
+      (format "%s:%s::#%s" scheme
+        (denote-retrieve-filename-identifier file)
+        custom_id)))
 
   (org-link-set-parameters "abbr"
     :complete (lambda (&optional parg)
                 (jf/org-link-complete-link-for
                   parg
                   :scheme "abbr"
-                  :filter "_abbr"))
+                  :property "ABBR"))
     :export (lambda (link description format channel)
               (jf/denote/link-ol-abbr-with-property
                 link description format channel
@@ -719,7 +745,7 @@ PARG is part of the method signature for `org-link-parameters'."
                 (jf/org-link-complete-link-for
                   parg
                   :scheme "abbr-plural"
-                  :filter "_abbr"))
+                  :property "PLURAL_ABBR"))
     :export (lambda (link description format channel)
               (jf/denote/link-ol-abbr-with-property
                 link description format channel
