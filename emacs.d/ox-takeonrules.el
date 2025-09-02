@@ -40,6 +40,7 @@ org-export backend derived from the 'md backend."
     (user-error "Current buffer not 'org-mode"))
   (org-set-regexps-and-options)
   (jf/bibliography/export-to-takeonrules)
+  (export-glossary-to-takeonrules)
   (let ((blogPost
           (jf/org-mode/get-blog-post)))
     (unless blogPost
