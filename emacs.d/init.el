@@ -725,6 +725,13 @@ PARG is part of the method signature for `org-link-parameters'."
         (denote-retrieve-filename-identifier file)
         custom_id)))
 
+  (org-link-set-parameters "glossary"
+    :complete (lambda (&optional parg)
+                (jf/org-link-complete-link-for
+                  parg
+                  :scheme "denote"
+                  :property "GLOSSARY_KEY")))
+
   (org-link-set-parameters "abbr"
     :complete (lambda (&optional parg)
                 (jf/org-link-complete-link-for

@@ -792,16 +792,15 @@ operates on the book.  There would need to be an inversion of behavior."
 ;;; Entry points
 (defun jf/checkout-library-book-by-isbn (isbn)
   "Add a book by ISBN to my checked out library list."
-  (interactive "nEnter an ISBN (as number): ")
-  (let ((isbnAsString (format "%s" isbn)))
-    (jf/bibliography/update-with-book
-      isbnAsString
-      (lambda ()
-        "Fetch and assemcble the book from the ISBN."
-        (jf/book-from-isbn isbnAsString))
-      :tags `(,jf/bibliography/tag-from-libraries)
-      :headline (format-time-string "%Y-%m-%d %A")
-      :file jf/personal/filename-for-library)))
+  (interactive "sEnter an ISBN (as number): ")
+  (jf/bibliography/update-with-book
+    isbn
+    (lambda ()
+      "Fetch and assemcble the book from the ISBN."
+      (jf/book-from-isbn isbn))
+    :tags `(,jf/bibliography/tag-from-libraries)
+    :headline (format-time-string "%Y-%m-%d %A")
+    :file jf/personal/filename-for-library))
 
 (defun jf/add-to-bibliography-from-isbn (isbn &optional prefix)
   "Append or amend to my bibliography the book associated with the ISBN.
@@ -810,15 +809,14 @@ See `jf/bibliography/update-with-book' for further details.
 
 When PREFIX is non-nil clobber and rebuild `my-cache-of-books' and
 ignore any guards against performing work on an already existing ISBN."
-  (interactive "nEnter an ISBN (as number): \nP")
+  (interactive "sEnter an ISBN (as number): \nP")
   (my-cache-of-books/populate prefix)
-  (let ((isbnAsString (format "%s" isbn)))
-    (jf/bibliography/update-with-book
-      isbnAsString
-      (lambda ()
-        "Fetch and assemble the book from the ISBN."
-        (jf/book-from-isbn isbnAsString))
-      :force prefix)))
+  (jf/bibliography/update-with-book
+    isbn
+    (lambda ()
+      "Fetch and assemble the book from the ISBN."
+      (jf/book-from-isbn isbn))
+    :force prefix))
 
 (defun jf/add-to-bibliography-from-bookaccio-file (filename &optional prefix)
   "Process books from FILENAME exported by Bookaccio app.
