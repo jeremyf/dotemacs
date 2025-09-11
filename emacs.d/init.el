@@ -4994,18 +4994,20 @@ literal then add a fuzzy search)."
   "Dude, you can put your concepts here.")
 
 (setopt denote-known-keywords
-  (with-current-buffer (find-file-noselect jf/filename/glossary)
-    (save-restriction
-      (widen)
-      (org-map-entries
-        (lambda ()
-          (or
-            (org-entry-get (org-element-at-point) "TAG")
-            (user-error
-              "Glossary entry %S missing TAG property"
-              (org-element-property :title (org-element-at-point)))))
-        "+tags+LEVEL=2"
-        'file))))
+        (if jf/filename/glossary
+            (with-current-buffer (find-file-noselect jf/filename/glossary)
+              (save-restriction
+                (widen)
+                (org-map-entries
+                 (lambda ()
+                   (or
+                    (org-entry-get (org-element-at-point) "TAG")
+                    (user-error
+                     "Glossary entry %S missing TAG property"
+                     (org-element-property :title (org-element-at-point)))))
+                 "+tags+LEVEL=2"
+                 'file)))
+          denote-known-keywords))
 
 (defvar jf/filename/bibliography
   (denote-get-path-by-id "20241124T080648")
