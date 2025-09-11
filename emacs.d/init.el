@@ -6721,64 +6721,6 @@ Useful for Eglot."
   ;; captured by `jf/bookmark-url'
   (put 'jf/browse-url-bookmark-jump 'bookmark-handler-type "BROWSE"))
 
-;; (use-package activities
-;;   ;; https://takeonrules.com/2024/05/18/a-quiet-morning-of-practice-to-address-an-observed-personal-computering-workflow-snag/
-;;   ;;
-;;   ;; https://github.com/alphapapa/activities.el
-;;   ;;
-;;   ;; On <2024-05-17 Fri> while working to orient to a code-base, I was
-;;   ;; reviewing several different files.  I found it helpful to have
-;;   ;; those files open in a specific window configuration.
-;;   ;;
-;;   ;; I did this exploration in between a pairing session in which a
-;;   ;; colleague stepped away to work on something and then came back.
-;;   ;; When she came back, I needed to set down my windwo configuration
-;;   ;; and work on the same code from a different perspective.
-;;   ;;
-;;   ;; It turns out "saving" that activity would have been useful; as I
-;;   ;; could then come back to that window state and resume that work.
-;;   ;;
-;;   ;; The `activities' package provides that capability.
-;;   :straight t
-;;   :init
-;;   (activities-mode)
-;;   (activities-tabs-mode)
-;;   :bind
-;;   (("H-a n" . activities-new)
-;;     ("H-a d" . activities-define)
-;;     ("H-a D" . activities-discard)
-;;     ("H-a a" . activities-resume)
-;;     ("H-a z" . activities-suspend)
-;;     ("H-a k" . activities-kill)
-;;     ("H-a RET" . #'tab-bar-switch-to-tab)
-;;     ("H-a S" . activities-save-all)
-;;     ("H-a s" . activities-switch)
-;;     ("H-a b" . activities-switch-buffer)
-;;     ("H-a g" . activities-revert)
-;;     ("H-a l" . activities-list)))
-
-;; (use-package intuitive-tab-line
-;;   :straight (:host github :repo "thread314/intuitive-tab-line-mode")
-;;   :custom
-;;   (tab-line-tabs-function 'intuitive-tab-line-buffers-list)
-;;   (tab-line-switch-cycling t)
-;;   :config
-;;   (global-tab-line-mode 1)
-;;   (recentf-mode 1)
-;;   (setq
-;;     tab-line-new-button-show nil  ;; do not show add-new button
-;;     tab-line-close-button-show nil  ;; do not show close button
-;;     tab-line-separator " "  ;; delimitation between tabs
-;;     )
-
-
-;;   ;; (global-set-key (kbd "C-<prior>") 'tab-line-switch-to-prev-tab)
-;;   (global-set-key (kbd "s-{") 'tab-line-switch-to-prev-tab)
-;;   ;; (global-set-key (kbd "C-<next>") 'tab-line-switch-to-next-tab)
-;;   (global-set-key (kbd "s-}") 'tab-line-switch-to-next-tab)
-;;   ;; (global-set-key (kbd "C-S-<prior>") 'intuitive-tab-line-shift-tab-left)
-;;   ;; (global-set-key (kbd "C-S-<next>") 'intuitive-tab-line-shift-tab-right)
-;;   (global-set-key (kbd "C-S-t") 'recentf-open-most-recent-file))
 
 (use-package org-bookmark-heading
   ;; Emacs bookmark support for Org-mode.
