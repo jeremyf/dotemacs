@@ -13,8 +13,25 @@ URL is assumed to be either of an RSS feed or Atom feed."
           (call-interactively #'eww-copy-alternate-url)
           (car kill-ring))
         (user-error "current buffer is not 'eww-mode'"))))
+  ;; Check if we've already subscribed (or archived) to this feed.
+  (let ((found
+          nil))
+    (with-current-buffer
+      (find-file-noselect jf/filename/rss-feed)
+      (org-map-entries
+        (lambda ()
+          (when
+            (string= (org-element-property :title (org-element-at-point)) url)
+            (setq found t)))
+        nil
+        'file-with-archives)
+      found)
+    (when found
+      (user-error "already subscribed to %S" url)))
   (let ((tags
           (or tags jf/subscribe-me/default-tags)))
+    ;; TODO: Consider prompting for "why" I've added this.  Which might
+    ;; mean better leverage the capture process.
     (save-excursion
       (save-restriction
         (require 'org)
@@ -312,6 +329,8 @@ Useful for narrowing regions.")
       (org-entry-put entry "CUSTOM_ID"
         (format "GLOSSARY-%s" (s-upcase
                                 (denote-sluggify 'title title)))))))
+(defvar jf/filename/rss-feed
+  (denote-get-path-by-id "20110202T000001"))
 
 (add-to-list 'org-capture-templates
   '("j" "Journal Entry"
@@ -326,7 +345,7 @@ Useful for narrowing regions.")
 (add-to-list 'org-capture-templates
   `("r" "Add to RSS Feed"
      entry (file+headline
-             ,(denote-get-path-by-id "20110202T000001")
+             jf/filename/rss-feed
              "RSS Feed")
      "%^{URL} %^g\n%?"
      :empty-lines-before 1
