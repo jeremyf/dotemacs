@@ -1606,6 +1606,16 @@ work computers.")
     keycast-mode-line-window-predicate 'mode-line-window-selected-p
     keycast-mode-line-format "%2s%k%2s(%c%R)"))
 
+(use-package timeclock
+  :straight (:host github :repo "bunnylushington/timeclock")
+  :init
+  (setq timeclock/db-file
+    (expand-file-name "timeclock.db" user-emacs-directory)))
+
+(defun jf/timeclock/punch-in (fn)
+  (apply (list fn nil 0 "")))
+(advice-add #'timeclock/punch-in :around #'jf/timeclock/punch-in)
+
 (use-package emacs
   :straight (:type built-in)
   :after (projectile)
@@ -1692,13 +1702,14 @@ active nature."
          " "
          (jf/mode-line-format/major-mode-name))))
 
-  (defun jf/mode-line-indicator (nerd-fn nerd-icon fallback face)
+  (defun jf/mode-line-indicator (nerd-fn nerd-icon fallback face &optional text)
     (concat
       (propertize
-        (format " %s "
+        (format " %s%s "
           (if (fboundp nerd-fn)
             (funcall nerd-fn nerd-icon)
-            fallback))
+            fallback)
+          (or text ""))
         'face face) " "))
 
   (defvar-local jf/mode-line-format/narrow
@@ -1712,6 +1723,23 @@ active nature."
                       'message-mode)))
          (jf/mode-line-indicator
            'nerd-icons-mdicon "nf-md-filter" "⊆" 'mode-line-highlight))))
+
+  (defvar-local jf/mode-line-format/timeclock
+    '(:eval
+       (when
+         (and
+           (fboundp #'timeclock/active-task-name)
+           (mode-line-window-selected-p)
+           (not (derived-mode-p
+                  'Info-mode
+                  'help-mode
+                  'special-mode
+                  'message-mode)))
+         (when-let ((task
+                      (timeclock/active-task-name)))
+           (jf/mode-line-indicator
+               'nerd-icons-mdicon "nf-md-book_clock"
+             "↻" 'mode-line-highlight (format "[%s]" task))))))
 
   (defvar-local jf/mode-line-format/org-clock
     '(:eval
@@ -1862,6 +1890,7 @@ active nature."
                         jf/mode-line-format/misc-info
                         jf/mode-line-format/narrow
                         jf/mode-line-format/org-clock
+                        jf/mode-line-format/timeclock
                         jf/mode-line-format/project
                         jf/mode-line-format/vc-branch
                         jf/mode-line-format/vterm
@@ -1871,6 +1900,7 @@ active nature."
 
   (setq-default mode-line-format
     '("%e" " "
+       jf/mode-line-format/timeclock
        jf/mode-line-format/org-clock
        jf/mode-line-format/vterm
        jf/mode-line-format/kbd-macro
