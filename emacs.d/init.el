@@ -5112,7 +5112,7 @@ literal then add a fuzzy search)."
   ;; The rules of “titlecase” are confounding.  The ~titlecase.el~
   ;; package provides numerous ways to cast a string to “titlecase.”  I
   ;; chose wikipedia style as a quasi-opinionated compromise.
-  :straight (titlecase :host github :repo "duckwork/titlecase.el")
+  :straight t
   :custom (titlecase-style 'wikipedia))
 
 (use-package multiple-cursors
