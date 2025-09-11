@@ -5841,21 +5841,6 @@ See https://github.com/chmouel/gotest-ts.el"
   :config (global-hl-todo-mode))
 
 
-(use-package magit-todos
-  ;; Package that adds a `magit' section highlighting todos in the
-  ;; current repository; and even highlighting what todos were added in
-  ;; the branch but not in main.
-  :config (magit-todos-mode)
-  :commands (magit-todos-list)
-  :bind (("H-t H-t" . magit-todos-list))
-  :custom (magit-todos-exclude-globs '(".git/" "public/" "vendor/"))
-  ;; (magit-todos-keywords-list
-  ;;   '("TODO" "HACK" "QUESTION" "BLOCKED" "WAITING" "FIXME"))
-  (magit-todos-insert-after
-    '(bottom) nil nil
-    "Changed by setter of obsolete option `magit-todos-insert-at'")
-  :straight (:host github :repo "alphapapa/magit-todos"))
-
 (use-package lua-mode
   ;; For working with https://www.hammerspoon.org/
   :straight t)
@@ -7291,6 +7276,9 @@ A page is marked `last' if rel=\"last\" appears in a <link> or <a> tag."
 (use-package emacsql
   :straight (:host github :repo "magit/emacsql"))
 
+(use-package cond-let
+  :straight (cond-let :host github :repo "tarsius/cond-let"))
+
 (use-package magit
   ;; A fantastic UI for git commands; the interactive rebase is an
   ;; absolute wonder tool (see
@@ -7300,6 +7288,7 @@ A page is marked `last' if rel=\"last\" appears in a <link> or <a> tag."
   :commands (magit-process-git)
   ;; My "~/bin/editor" script was causing problems in that it was asking
   ;; to wait.
+  :after cond-let
   :init (use-package with-editor
           :straight t
           :custom (with-editor-emacsclient-executable
@@ -7338,6 +7327,22 @@ A page is marked `last' if rel=\"last\" appears in a <link> or <a> tag."
           ("C-x g m" . magit-status)
           ("C-x g f" . magit-file-dispatch)
           ("C-x g d" . magit-dispatch)))
+
+(use-package magit-todos
+  ;; Package that adds a `magit' section highlighting todos in the
+  ;; current repository; and even highlighting what todos were added in
+  ;; the branch but not in main.
+  :config (magit-todos-mode)
+  :commands (magit-todos-list)
+  :bind (("H-t H-t" . magit-todos-list))
+  :custom (magit-todos-exclude-globs '(".git/" "public/" "vendor/"))
+  ;; (magit-todos-keywords-list
+  ;;   '("TODO" "HACK" "QUESTION" "BLOCKED" "WAITING" "FIXME"))
+  (magit-todos-insert-after
+    '(bottom) nil nil
+    "Changed by setter of obsolete option `magit-todos-insert-at'")
+  :straight (:host github :repo "alphapapa/magit-todos")
+  :after (magit cond-let))
 
 (use-package auth-source
   :straight (:type built-in)
