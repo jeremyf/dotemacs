@@ -531,7 +531,6 @@ Related to `jf/linux:radio-silence'."
               denote-file-prompt
               denote--title-prompt
               denote-get-path-by-id)
-  :bind ("H-i" . 'denote-link-or-create)
   :hook (dired-mode . denote-dired-mode)
   (org-mode . denote-rename-buffer-mode)
   :preface
@@ -721,6 +720,8 @@ PARG is part of the method signature for `org-link-parameters'."
                 entries))
             (custom_id
               (alist-get selection entries nil nil #'string=)))
+      ;; TODO: kill the correct value so it can be applied to the
+      ;; description.
       (format "%s:%s::#%s" scheme
         (denote-retrieve-filename-identifier file)
         custom_id)))
@@ -2975,6 +2976,7 @@ future copy)."
   :bind (("C-c C-j" . jf/project/jump-to-task)
           ("C-c C-x C-j" . org-clock-goto)
           ("s-5" . jf/org-insert-immediate-active-timestamp)
+          ("H-i" . org-insert-link)
           )
   :bind (:map org-mode-map (("C-c j" . org-goto)
                              ("C-c C-j" . jf/project/jump-to-task)
@@ -5374,16 +5376,28 @@ method, get the containing class."
   ;; Show the scope info of methods, blocks, if/case statements.  This
   ;; is done via an overlay for "blocks" that are more than 5 (default)
   ;; lines
-  :straight (:host github :repo "jeremyf/scopeline.el")
+  :straight (:host github :repo "meain/scopeline.el")
   ;; The original `scopeline' prefix was creating line height issues for
   ;; my font of choice.  Namely adding just a bit more spacing for the
   ;; `scopeline' overlay, thus making line heights inconsistent.
   :config (setq scopeline-overlay-prefix "  ~ ")
 
   (add-to-list 'scopeline-targets
-    '(go-mode "function_declaration" "func_literal" "method_declaration" "if_statement" "for_statement" "type_declaration" "call_expression"))
+    '(go-mode "function_declaration"
+       "func_literal"
+       "method_declaration"
+       "if_statement"
+       "for_statement"
+       "type_declaration"
+       "call_expression"))
   (add-to-list 'scopeline-targets
-    '(go-ts-mode "function_declaration" "func_literal" "method_declaration" "if_statement" "for_statement" "type_declaration" "call_expression"))
+    '(go-ts-mode "function_declaration"
+       "func_literal"
+       "method_declaration"
+       "if_statement"
+       "for_statement"
+       "type_declaration"
+       "call_expression"))
   :hook ((go-ts-mode go-mode) . scopeline-mode))
 
 (use-package bundler
