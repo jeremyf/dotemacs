@@ -1604,6 +1604,10 @@ work computers.")
   :straight t
   :config (whole-line-or-region-global-mode))
 
+(use-package paragraphs
+  :straight (:type built-in)
+  :config (setopt sentence-end-double-space t))
+
 (use-package keycast
   ;; It can be helpful when pairing or presenting to have a log of your
   ;; key cominations.
@@ -2882,14 +2886,6 @@ the light option.")
   ;; Keep white space tidy.
   :straight t
   :hook (prog-mode . ws-butler-mode))
-
-(use-package fill-sentences-correctly
-  ;; `fill-sentences-correctly-mode' ensures that `fill-paragraph'
-  ;; (e.g. M-q) preserves two spaces.
-  :straight (fill-sentences-correctly
-              :host github
-              :repo "duckwork/fill-sentences-correctly.el")
-  :config (fill-sentences-correctly-mode))
 
 (use-package tomelr
   ;; Emacs-Lisp Library for converting S-expressions to TOML.  I'll
