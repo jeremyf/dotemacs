@@ -764,7 +764,7 @@ Each type will have the following keys:
   (if (string= (file-name-extension path) "org")
     (cond
       ((eq nil slug)
-        '(:title "doc-title" :link "doc-link" :key "doc-key" :url "doc-url"))
+        '(:title "doc-title"))
       ((or (s-starts-with? "#" slug) (s-starts-with? "*" slug))
         (let* ((normalized_slug
                  (substring slug 1)))
@@ -778,7 +778,6 @@ Each type will have the following keys:
                              normalized_slug
                              normalized_slug)
                            'file)))))
-            ;; (org-entry-get headline "ROAM_REFS")
             (let ((data
                     (list :title (org-element-property :title headline))))
               (if-let* ((urls
