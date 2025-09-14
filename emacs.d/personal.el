@@ -1155,50 +1155,60 @@ This dynamic block assumes it placed within the month section of a
 capture template 'file+olp+datetree'; where the headling is \"2025-09
 September\"."
   (let* ((month-entry
-        (car
-         (seq-filter
-          (lambda (el)
-            (and
-             (eq (org-element-type el) 'headline)
-             (= (org-element-property :level el) 2)))
-          (org-element-lineage (org-element-at-point)))))
-       (begin-year-month
-        (apply #'cons
-               (mapcar
+           ;; The month headline in which this block was placed
+           (car
+             (seq-filter
+               (lambda (el)
+                 (and
+                   (eq (org-element-type el) 'headline)
+                   (= (org-element-property :level el) 2)))
+               (org-element-lineage (org-element-at-point)))))
+          (begin-year-month
+            ;; A cons cell of the block's year and month (as integer)
+            (apply #'cons
+              (mapcar
                 #'string-to-number
                 (s-split "-"
-                         (car (s-split " "
-                                       (org-element-property
-                                        :title month-entry)))))))
-       (end-year-month
-        (if (= (cdr begin-year-month) 12)
-            (cons (+ 1 (car begin-year-month)) 1)
-          (cons (car begin-year-month) (+ 1 (cdr begin-year-month)))))
-       (books
-        (with-current-buffer
-            (find-file-noselect jf/filename/bibliography)
-          (org-map-entries
-            #'jf/build-label-and-book-from-epom
-           (format
-            "+LEVEL=2+books+TODO=\"DONE\"+CLOSED>=\"<%d-%02d-01>\"+CLOSED<\"<%d-%02d-01>\""
-            (car begin-year-month)
-            (cdr begin-year-month)
-            (car end-year-month)
-            (cdr end-year-month))
-           'file))))
-    (insert (mapconcat (lambda (label-book)
-                         (let ((label
-                                 (car label-book))
-                                (book
-                                  (cdr label-book)))
-                         (format "- [[work:%s%s%s][%s]]\n"
-                           (jf/book-custom_id book)
-                           (if (s-present? (jf/book-author book))
-                             "::author" "")
-                           (if (s-present? (jf/book-subtitle book))
-                             "::subtitle" "")
-                           label)))
-              books))))
+                  (car (s-split " "
+                         (org-element-property
+                           :title month-entry)))))))
+          (end-year-month
+            ;; A cons cell of the block's ending year and month
+            ;; (exclusive)
+            (if (= (cdr begin-year-month) 12)
+              (cons (+ 1 (car begin-year-month)) 1)
+              (cons (car begin-year-month) (+ 1 (cdr begin-year-month)))))
+          (books
+            ;; An alist of book labels and book data.  We use the
+            ;; beginning and ending dates to limit our query and only
+            ;; look for books that closed within those dates.
+            (with-current-buffer
+              (find-file-noselect jf/filename/bibliography)
+              (org-map-entries
+                #'jf/build-label-and-book-from-epom
+                (format
+                  "+LEVEL=2+books+TODO=\"DONE\"+CLOSED>=\"<%d-%02d-01>\"+CLOSED<\"<%d-%02d-01>\""
+                  (car begin-year-month)
+                  (cdr begin-year-month)
+                  (car end-year-month)
+                  (cdr end-year-month))
+                'file))))
+    (insert
+      ;; With the list of books insert my `work' links to those books.
+      ;; These `work' links will then export as per that logic.
+      (mapconcat (lambda (label-book)
+                   (let ((label
+                           (car label-book))
+                          (book
+                            (cdr label-book)))
+                     (format "- [[work:%s%s%s][%s]]\n"
+                       (jf/book-custom_id book)
+                       (if (s-present? (jf/book-author book))
+                         "::author" "")
+                       (if (s-present? (jf/book-subtitle book))
+                         "::subtitle" "")
+                       label)))
+        books))))
 
 
 (require 'ox-takeonrules)
