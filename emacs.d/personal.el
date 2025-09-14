@@ -717,41 +717,50 @@ When CLEAR-CACHE is non-nil, clobber the cache and rebuild."
           (message "Rebuilding `my-cache-of-books'...")
           (org-map-entries
             (lambda ()
-              ;; For some reason the org-map-entries is not filtering
-              ;; on only items tagged as books.  Hence the
-              ;; conditional.
-              (when-let* ((tags
-                            (org-element-property
-                              :tags (org-element-at-point)))
-                           (_
-                             (member jf/bibliography/tag-books tags)))
-                (let* ((title
-                         (org-element-property
-                           :title (org-element-at-point)))
-                        (author
-                          (org-entry-get
-                            (org-element-at-point) "AUTHOR"))
-                        (subtitle
-                          (org-entry-get
-                            (org-element-at-point) "SUBTITLE"))
-                        (label (jf/book-make-label
-                                 title subtitle author)))
-                  (puthash label
-                    (make-jf/book
-                      :label label
-                      :tags tags
-                      :title title
-                      :subtitle subtitle
-                      :author author
-                      :custom_id (org-entry-get
-                                   (org-element-at-point)
-                                   "CUSTOM_ID")
-                      :isbn (org-entry-get
-                              (org-element-at-point)
-                              "ISBN"))
-                    my-cache-of-books))))
+              (when-let* ((label-book
+                            (jf/build-label-and-book-from-epom)))
+                (put-hash (car label-book)
+                  (cdr label-book)
+                  my-cache-of-books)))
             (concat "+level=2+" jf/bibliography/tag-books) 'file)))))
   my-cache-of-books)
+
+(defun jf/build-label-and-book-from-epom (&optional epom)
+  ;; For some reason the org-map-entries is not filtering
+  ;; on only items tagged as books.  Hence the
+  ;; conditional.
+  (let ((epom
+          (or epom (org-element-at-point))))
+    (when-let* ((tags
+                  (org-element-property
+                    :tags epom))
+                 (_
+                   (member jf/bibliography/tag-books tags)))
+      (let* ((title
+               (org-element-property
+                 :title epom))
+              (author
+                (org-entry-get
+                  epom "AUTHOR"))
+              (subtitle
+                (org-entry-get
+                  epom "SUBTITLE"))
+              (label (jf/book-make-label
+                       title subtitle author)))
+        (cons label
+          (make-jf/book
+            :label label
+            :tags tags
+            :title title
+            :subtitle subtitle
+            :author author
+            :custom_id (org-entry-get
+                         epom
+                         "CUSTOM_ID")
+            :isbn (org-entry-get
+                    epom
+                    "ISBN")))))))
+
 
 (defun jf/book-from-isbn (isbn)
   "Fetch the associated ISBN from Google API and return a `jf/book'.
@@ -1138,5 +1147,58 @@ entry."
                 glossary_key custom_id)))))
       "LEVEL=2+glossary"
       'file)))
+
+(defun org-dblock-write:books-finished (_params)
+  "Generate a list of books finished.
+
+This dynamic block assumes it placed within the month section of a
+capture template 'file+olp+datetree'; where the headling is \"2025-09
+September\"."
+  (let* ((month-entry
+        (car
+         (seq-filter
+          (lambda (el)
+            (and
+             (eq (org-element-type el) 'headline)
+             (= (org-element-property :level el) 2)))
+          (org-element-lineage (org-element-at-point)))))
+       (begin-year-month
+        (apply #'cons
+               (mapcar
+                #'string-to-number
+                (s-split "-"
+                         (car (s-split " "
+                                       (org-element-property
+                                        :title month-entry)))))))
+       (end-year-month
+        (if (= (cdr begin-year-month) 12)
+            (cons (+ 1 (car begin-year-month)) 1)
+          (cons (car begin-year-month) (+ 1 (cdr begin-year-month)))))
+       (books
+        (with-current-buffer
+            (find-file-noselect jf/filename/bibliography)
+          (org-map-entries
+            #'jf/build-label-and-book-from-epom
+           (format
+            "+LEVEL=2+books+TODO=\"DONE\"+CLOSED>=\"<%d-%02d-01>\"+CLOSED<\"<%d-%02d-01>\""
+            (car begin-year-month)
+            (cdr begin-year-month)
+            (car end-year-month)
+            (cdr end-year-month))
+           'file))))
+    (insert (mapconcat (lambda (label-book)
+                         (let ((label
+                                 (car label-book))
+                                (book
+                                  (cdr label-book)))
+                         (format "- [[work:%s%s%s][%s]]\n"
+                           (jf/book-custom_id book)
+                           (if (s-present? (jf/book-author book))
+                             "::author" "")
+                           (if (s-present? (jf/book-subtitle book))
+                             "::subtitle" "")
+                           label)))
+              books))))
+
 
 (require 'ox-takeonrules)
