@@ -727,6 +727,7 @@ PARG is part of the method signature for `org-link-parameters'."
         custom_id)))
 
   (org-link-set-parameters "glossary"
+    :insert-description #'jf/org/insert-description/glossary
     :complete (lambda (&optional parg)
                 (jf/org-link-complete-link-for
                   parg
@@ -1285,6 +1286,13 @@ The DOM could be as sanitized by `org-web-tools--sanitized-dom'."
         nil
         (concat "#+ROAM_REFS: " url "\n\n" article)))))
 
+(defun jf/org/insert-description/glossary (location description)
+  (message "🐂 %S" description)
+    (if description
+      description
+      (progn
+        (message location)
+        nil)))
 (cl-defun jf/denote/link-ol-abbr-with-property (link
                                                  description
                                                  format
@@ -1603,10 +1611,6 @@ work computers.")
   ;; I navigate Emacs.
   :straight t
   :config (whole-line-or-region-global-mode))
-
-(use-package paragraphs
-  :straight (:type built-in)
-  :config (setopt sentence-end-double-space t))
 
 (use-package keycast
   ;; It can be helpful when pairing or presenting to have a log of your
@@ -4230,6 +4234,7 @@ sort accordingly.")
   (delete-selection-mode t)
   (auto-save-file-name-transforms
     '((".*" "~/.emacs.d/autosaves/\\1" t)))
+  (sentence-end-double-space t)
   :init
   ;; Emacs 28: Hide commands in M-x which do not apply to the current
   ;; mode.  Corfu commands are hidden, since they are not supposed to be
