@@ -727,7 +727,6 @@ PARG is part of the method signature for `org-link-parameters'."
         custom_id)))
 
   (org-link-set-parameters "glossary"
-    :insert-description #'jf/org/insert-description/glossary
     :complete (lambda (&optional parg)
                 (jf/org-link-complete-link-for
                   parg
@@ -975,11 +974,39 @@ Wires into `org-insert-link'."
       (pulsar--pulse)))
 
   (org-link-set-parameters "work"
-    ;; TODO: Allow link to specify to include author.
+    :insert-description #'jf/org-link-description/work
     :follow #'jf/org-link-ol-follow/work
     :complete #'jf/org-link-ol-complete/work
     :export #'jf/org-link-ol-export/work
     :face #'jf/org-faces-work)
+
+  (defun jf/org-link-description/work (link desc)
+    "Provide default DESC for a work LINK."
+    (if desc
+      desc
+      (let* ((slugs
+               (s-split "::" link))
+              (custom-id
+                (cadr (s-split ":" (car slugs))))
+              (include-author
+                (member "author" slugs))
+              (include-subtitle
+                (member "subtitle" slugs))
+              (book-label
+                (car (org-map-entries
+                       (lambda ()
+                         (jf/book-make-label
+                           (org-element-property
+                             :title (org-element-at-point))
+                           (when include-subtitle
+                             (org-entry-get
+                               (org-element-at-point) "SUBTITLE"))
+                           (when include-author
+                             (org-entry-get
+                               (org-element-at-point) "AUTHOR"))))
+                       (format "CUSTOM_ID=\"%s\"" custom-id)
+                       `(,jf/filename/bibliography)))))
+        book-label)))
 
   (defun jf/org-link-ol-follow/work (name)
     "Follow the NAME to the work."
@@ -1047,14 +1074,7 @@ Wires into `org-insert-link'."
                    (yes-or-no-p "Include Author: ")))
                 (include-subtitle
                   (and (plist-get work-data :subtitle)
-                    (yes-or-no-p "Include Subtitle: ")))
-                (desc
-                  (jf/book-make-label
-                    (plist-get work-data :title)
-                    (when include-subtitle (plist-get work-data :subtitle))
-                    (when include-author (plist-get work-data :author)))))
-          (message "Added %S to the kill ring" desc)
-          (kill-new desc)
+                    (yes-or-no-p "Include Subtitle: "))))
           (format "work:%s%s%s"
             (plist-get work-data :id)
             (if include-author "::author" "")
@@ -1286,13 +1306,6 @@ The DOM could be as sanitized by `org-web-tools--sanitized-dom'."
         nil
         (concat "#+ROAM_REFS: " url "\n\n" article)))))
 
-(defun jf/org/insert-description/glossary (location description)
-  (message "🐂 %S" description)
-    (if description
-      description
-      (progn
-        (message location)
-        nil)))
 (cl-defun jf/denote/link-ol-abbr-with-property (link
                                                  description
                                                  format
