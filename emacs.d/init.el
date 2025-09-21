@@ -734,6 +734,7 @@ PARG is part of the method signature for `org-link-parameters'."
                   :property "GLOSSARY_KEY")))
 
   (org-link-set-parameters "abbr"
+    :insert-description #'jf/org-link-description/glossary
     :complete (lambda (&optional parg)
                 (jf/org-link-complete-link-for
                   parg
@@ -748,7 +749,40 @@ PARG is part of the method signature for `org-link-parameters'."
     :follow #'denote-link-ol-follow
     )
 
+  (defun jf/org-link-description/glossary (link desc)
+  "Provide default DESC for a glossary LINK.
+
+Types can be: abbr, abbr-plural, and denote"
+  (if desc
+      desc
+    (let* ((_match
+            (string-match "^\\([^:]+\\):\\([^:]+\\)\\(::#\\(.*\\)\\)?"
+                          link))
+           (type
+            (match-string 1 link))
+           (denote-identifier
+            (match-string 2 link))
+           (custom_id
+            (match-string 4 link))
+           (entry
+            (car (org-map-entries
+                  #'org-element-at-point
+                  (format "CUSTOM_ID=\"%s\"" custom_id)
+                  (list (denote-get-path-by-id denote-identifier))))))
+      (if entry
+          (pcase type
+            ("abbr"
+             (or (org-entry-get entry "ABBR")
+                 (org-element-property :title entry)))
+            ("abbr-plural"
+             (or (org-entry-get entry "PLURAL_ABBR")
+                 (org-element-property :title entry)))
+            ("denote"
+             (org-element-property :title entry)))
+        nil))))
+
   (org-link-set-parameters "abbr-plural"
+    :insert-description #'jf/org-link-description/glossary
     :complete (lambda (&optional parg)
                 (jf/org-link-complete-link-for
                   parg
@@ -1305,6 +1339,13 @@ The DOM could be as sanitized by `org-web-tools--sanitized-dom'."
         (f-join (denote-directory) domain)
         nil
         (concat "#+ROAM_REFS: " url "\n\n" article)))))
+
+(with-eval-after-load 'denote-org
+  (let ((config
+          (alist-get "denote" org-link-parameters nil nil #'string=)))
+    (plist-put config :insert-description
+      #'jf/org-link-description/glossary)
+    (org-link-set-parameters "denote" config)))
 
 (cl-defun jf/denote/link-ol-abbr-with-property (link
                                                  description
