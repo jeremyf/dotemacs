@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t; -*-
 (defun jf/default-browser (&optional name)
   "Set the default browser based on the given NAME."
   ;; brew install defaultbrowser

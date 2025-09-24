@@ -778,7 +778,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
   :filter (lambda (&rest dice) "We have a pool of dice to determine if there are dupes."
             (car (list-utils-dupes (-list dice))))
   :fetcher (lambda (data &rest rest)
-             (when-let ((index (car rest)))
+             (when-let* ((index (car rest)))
                (concat " with unexpected “"
                  (nth (- (if (listp index) (car index) index) 1) data)
                  "” event")))

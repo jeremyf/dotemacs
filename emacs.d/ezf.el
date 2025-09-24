@@ -98,7 +98,7 @@ columns like \"1-\" or \"1-6\", otherwise it is specified as a string
 representing an integer e.g. \"1\".
 
 If COMPLETING-FN is nil default to `ezf-default'."
-  (when-let ((candidates (funcall (or completing-fn 'ezf-helm) filename)))
+  (when-let* ((candidates (funcall (or completing-fn 'ezf-helm) filename)))
     (ezf-1 candidates field)))
 
 (provide 'ezf)

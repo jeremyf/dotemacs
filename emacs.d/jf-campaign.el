@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t; -*-
 (defvar jf/campaign/file-name
   "~/git/org/denote/indices/20231127T184806--the-shadows-of-mont-brun-status-document__campaigns_projects_rpgs_StatusDocuments.org"
   "The current campaign file.")

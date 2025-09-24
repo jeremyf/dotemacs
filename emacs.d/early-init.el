@@ -1,4 +1,10 @@
+;; -*- lexical-binding: t; -*-
 ;; A startup optimization with regard to startup speed optimisation.
+
+;; From straight.el, "Users of Emacs versions >= 27 will want to add
+;; the following:"
+(setq package-enable-at-startup nil)
+
 ;; Here I am storing the default value with the intent of restoring it
 ;; via the `emacs-startup-hook'.
 (defvar jf-emacs--file-name-handler-alist file-name-handler-alist)
@@ -22,7 +28,3 @@
     (setq
       file-name-handler-alist jf-emacs--file-name-handler-alist
       vc-handled-backends jf-emacs--vc-handled-backends)))
-
-;; From straight.el, "Users of Emacs versions >= 27 will want to add
-;; the following:"
-(setq package-enable-at-startup nil)

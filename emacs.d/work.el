@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t; -*-
 (dir-locals-set-class-variables
   'pcloud-cli
   '((nil . ((eglot-workspace-configuration .

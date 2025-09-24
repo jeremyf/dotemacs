@@ -211,7 +211,7 @@ A massive function for helping make the preliminaries of a blog post.
     "Return a \"link\" text based on the given NODE and DESC.
 
     This relates to my glossary.html Hugo short-code."
-    (when-let (url (jf/org-roam-external-url-for :node node))
+    (when-let* (url (jf/org-roam-external-url-for :node node))
       (let ((key (jf/org-roam-node-get-org-mode-property :node node :property "GLOSSARY_KEY")))
         (cond
          ((jf/org-roam-node-get-org-mode-property :node node :property "OFFER")

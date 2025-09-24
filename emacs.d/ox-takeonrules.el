@@ -120,27 +120,27 @@ INFO is a plist holding contextual information."
                           (entry
                             (list
                               (cons "key" (upcase (org-entry-get epom "CUSTOM_ID"))))))
-                    (when-let ((value (org-entry-get epom "DESCRIPTION")))
+                    (when-let* ((value (org-entry-get epom "DESCRIPTION")))
                       (add-to-list 'entry (cons "description" value)))
-                    (when-let ((value (org-entry-get epom "ABBR")))
+                    (when-let* ((value (org-entry-get epom "ABBR")))
                       (add-to-list 'entry (cons "abbr" value)))
-                    (when-let ((value (org-entry-get epom "PLURAL_ABBR")))
+                    (when-let* ((value (org-entry-get epom "PLURAL_ABBR")))
                       (add-to-list 'entry (cons "plural_abbr" value)))
-                    (when-let ((value (org-entry-get epom "PLURAL_TITLE")))
+                    (when-let* ((value (org-entry-get epom "PLURAL_TITLE")))
                       (add-to-list 'entry (cons "plural_title" value)))
-                    (when-let ((value (org-entry-get epom "SAME_AS")))
+                    (when-let* ((value (org-entry-get epom "SAME_AS")))
                       (add-to-list 'entry (cons "same_as" value)))
-                    (when-let ((value (org-entry-get epom "OFFER")))
+                    (when-let* ((value (org-entry-get epom "OFFER")))
                       (add-to-list 'entry (cons "offer" value)))
-                    (when-let ((value (org-entry-get epom "ITEMID")))
+                    (when-let* ((value (org-entry-get epom "ITEMID")))
                       (add-to-list 'entry (cons "itemid" value)))
-                    ;; (when-let ((value (org-entry-get epom "GAME")))
+                    ;; (when-let* ((value (org-entry-get epom "GAME")))
                     ;;   (add-to-list 'entry (cons "game" value)))
-                    (when-let ((value (org-entry-get epom "ROAM_REFS")))
+                    (when-let* ((value (org-entry-get epom "ROAM_REFS")))
                       (add-to-list 'entry (cons "url" value)))
-                    (when-let ((value (org-element-property :title epom)))
+                    (when-let* ((value (org-element-property :title epom)))
                       (add-to-list 'entry (cons "title" value)))
-                    (when-let ((value (org-entry-get epom "TAG")))
+                    (when-let* ((value (org-entry-get epom "TAG")))
                       (add-to-list 'entry (cons "tag" value)))
                     entry))
                 "+LEVEL=2+glossary-noexport" 'file)))))
@@ -545,7 +545,7 @@ Wires into `org-insert-link'."
                     "+LEVEL=2+!people" 'file)))))
           (work
             (completing-read "Citable: " works nil t)))
-    (when-let ((work-data
+    (when-let* ((work-data
                  (alist-get work works nil nil #'string=)))
       (let* ((include-author
                (and (plist-get work-data :author)
@@ -588,7 +588,7 @@ When CLEAR-CACHE is non-nil, clobber the cache and rebuild."
               (let ((el (org-element-at-point)))
                 ;; Skip un-named blocks as we can’t link to
                 ;; them.
-                (when-let ((id
+                (when-let* ((id
                              (org-entry-get el "CUSTOM_ID")))
                   (puthash id
                     (list
@@ -618,7 +618,7 @@ We ignore the DESCRIPTION and probably the CHANNEL."
             (member "subtitle" link-with-properties))
           (works
             (jf/works/populate)))
-    (when-let ((work
+    (when-let* ((work
                  (gethash link works)))
       (let ((author-suffix
               (if (and
@@ -631,7 +631,7 @@ We ignore the DESCRIPTION and probably the CHANNEL."
           ((or (eq format 'html) (eq format 'md))
             (format "<cite data-id=\"%s\">%s</cite>%s"
               link
-              (if-let ((url
+              (if-let* ((url
                          (plist-get work :url)))
                 (format "<a href=\"%s\">%s</a>"
                   url (plist-get work :title))
@@ -639,7 +639,7 @@ We ignore the DESCRIPTION and probably the CHANNEL."
               author-suffix))
           ((eq format 'latex)
             (format "\\textit{%s}%s"
-              (if-let ((url
+              (if-let* ((url
                          (plist-get work :url)))
                 (format "\\href{%s}{%s}"
                   url (plist-get work :title))
@@ -649,7 +649,7 @@ We ignore the DESCRIPTION and probably the CHANNEL."
             (format
               "<text:span text:style-name=\"%s\">%s</text:span>%s"
               "Emphasis"
-              (if-let ((url
+              (if-let* ((url
                          (plist-get work :url)))
                 (format "<text:a xlink:type=\"simple\" xlink:href=\"%s\">%s</text:a>"
                   url (plist-get work :title))
@@ -719,7 +719,7 @@ We ignore the DESCRIPTION and probably the CHANNEL."
 
     - is not a denote file
     - IDENTIFIER leads to a non `org-mode' file"
-  (when-let ((filename (denote-get-path-by-id identifier)))
+  (when-let* ((filename (denote-get-path-by-id identifier)))
     (when (string= (file-name-extension filename) "org")
       (with-current-buffer (find-file-noselect filename)
         (let ((kw-plist
@@ -732,7 +732,7 @@ We ignore the DESCRIPTION and probably the CHANNEL."
             :key (lax-plist-get kw-plist "CUSTOM_ID")
             :url (or
                    (lax-plist-get kw-plist "OFFER")
-                   (when-let ((refs
+                   (when-let* ((refs
                                 (lax-plist-get kw-plist "ROAM_REFS")))
                      (if (listp refs)
                        (first (s-split " " refs t))
@@ -768,7 +768,7 @@ Each type will have the following keys:
       ((or (s-starts-with? "#" slug) (s-starts-with? "*" slug))
         (let* ((normalized_slug
                  (substring slug 1)))
-          (if-let ((headline
+          (if-let* ((headline
                      (with-current-buffer (find-file-noselect path)
                        (seq-first
                          (org-map-entries
@@ -797,11 +797,11 @@ Each type will have the following keys:
                   (plist-put data :path 'normalized-slug)))
               (when (member "glossary"
                       (org-get-tags headline))
-                (when-let ((key
+                (when-let* ((key
                              (org-entry-get headline "CUSTOM_ID")))
                   (plist-put data :type 'glossary)
                   (plist-put data :key key)))
-              (when-let ((key
+              (when-let* ((key
                            (org-entry-get headline "SERIES_KEY")))
                 (plist-put data :type 'series)
                 (plist-put data :key key))
@@ -864,7 +864,7 @@ When USE_HUGO_SHORTCODE is given use glossary based exporting."
 This might be either the `denote' IDENTIFIER or the ID of an `org-mode'
 node in one of my agenda files."
   (message "Associating URL: %s with IDENTIFIER: %s." identifier url)
-  (if-let ((filename
+  (if-let* ((filename
              (denote-get-path-by-id identifier)))
     (let ((buffer
             (find-file-noselect filename)))
@@ -874,7 +874,7 @@ node in one of my agenda files."
           :plist (jf/org-keywords-as-plist :keywords-regexp "ROAM_REFS")
           :default url)
         (save-buffer)))
-    (if-let ((filename-and-pos
+    (if-let* ((filename-and-pos
                (org-id-find identifier)))
       (let ((buffer
               (find-file-noselect (car filename-and-pos))))
@@ -1063,7 +1063,7 @@ We also rely on the org-element at point."
                        ("layout" . "post")
                        ("type" . "post")
                        ("licenses" . ("by-nc-nd-4_0")))))
-    (if-let ((lastmod
+    (if-let* ((lastmod
                (org-entry-get (point) "LAST_MODIFIED_AT")))
       (add-to-list 'metadata `("lastmod" . ,lastmod))
       ;; Assume that the first time we publish, this is in a draft
@@ -1112,7 +1112,7 @@ When none found return `nil'."
 (defun jf/blog-post/tootify (&optional at-point)
   "Create a toot from the current blog post AT-POINT."
   (interactive)
-  (if-let ((blogPost
+  (if-let* ((blogPost
              (jf/org-mode/get-blog-post
                (or at-point (org-element-at-point)))))
     (progn
@@ -1125,7 +1125,7 @@ When none found return `nil'."
               (format "«%s»"
                 (org-element-property :title blogPost))
               (org-entry-get blogPost "DESCRIPTION")
-              (when-let ((roam_refs
+              (when-let* ((roam_refs
                            (org-entry-get blogPost "ROAM_REFS")))
                 (car (s-split " " roam_refs)))
               (s-join " "
@@ -1157,7 +1157,7 @@ Otherwise, use pre-existing handling."
       ("details"
         (format "<details%s>%s%s</details>"
           (if (plist-get params :open) " open" "")
-          (if-let ((summary
+          (if-let* ((summary
                      (plist-get params :summary)))
             (concat "<summary>" summary "</summary>\n")
             "")

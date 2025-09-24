@@ -94,7 +94,7 @@
   "Return files in GRAPH that are similar to FILENAME."
   (unless (git-related--graph-p graph)
     (user-error "You need to index this project first"))
-  (when-let ((file (gethash filename (git-related--graph-files graph))))
+  (when-let* ((file (gethash filename (git-related--graph-files graph))))
 
     (let ((file-sqrt (sqrt (length (git-related--file-commits file))))
            (neighbor-sqrts (make-hash-table :test 'equal :size 100))
@@ -150,7 +150,7 @@
   (if (buffer-file-name)
     (let ((default-directory (project-root (project-current))))
       (find-file
-        (when-let ((selection (consult-git-related--read)))
+        (when-let* ((selection (consult-git-related--read)))
           (format "%s"  selection))))
     (user-error "Current buffer has no file")))
 

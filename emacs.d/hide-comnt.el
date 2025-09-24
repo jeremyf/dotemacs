@@ -1,4 +1,4 @@
-;;; hide-comnt.el --- Hide/show comments in code.
+;;; hide-comnt.el --- Hide/show comments in code. -*- lexical-binding: t; -*-
 ;;
 ;; Filename: hide-comnt.el
 ;; Description: Hide/show comments in code.

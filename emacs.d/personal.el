@@ -73,12 +73,12 @@ URL is assumed to be either of an RSS feed or Atom feed."
             (sorted-works
               (sort works
                 :key (lambda (work)
-                       (if-let ((author
+                       (if-let* ((author
                                   (plist-get work :author)))
                          (car (last
                                 (s-split " "
                                   (car (s-split " and " author))) 1))
-                         (if-let ((editor
+                         (if-let* ((editor
                                     (plist-get work :editor)))
                            (car (last
                                   (s-split " "
@@ -92,10 +92,10 @@ URL is assumed to be either of an RSS feed or Atom feed."
           (dolist (work sorted-works)
             (insert (format "- “%s”%s%s\n"
                       (plist-get work :title)
-                      (if-let ((author (plist-get work :author)))
+                      (if-let* ((author (plist-get work :author)))
                         (concat " by " author)
                         "")
-                      (if-let ((editor (plist-get work :editor)))
+                      (if-let* ((editor (plist-get work :editor)))
                         (concat " edited by " editor)
                         ""))))
           (save-buffer)))))
@@ -365,7 +365,7 @@ Useful for narrowing regions.")
 (defun jf/personal/position-in-private-thoughts ()
   "Position to the end of today's private thoughts."
   (let ((entry-date (format-time-string "%Y-%m-%d %A")))
-    (if-let ((position
+    (if-let* ((position
                (car (org-element-map
                       (org-element-parse-buffer 'headline)
                       'headline
@@ -638,12 +638,12 @@ Useful for narrowing regions.")
             (mapcar (lambda (work)
 	                    (format "<tr><td><cite>%s%s</cite></td><td>%s%s</td></tr>"
                         (lax-plist-get work :title)
-                        (if-let ((subtitle
+                        (if-let* ((subtitle
                                    (lax-plist-get work :subtitle)))
                           (concat ": " subtitle)
                           "")
                         (lax-plist-get work :author)
-                        (if-let ((editor
+                        (if-let* ((editor
                                    (lax-plist-get work :editor)))
                           (concat "Editor: " editor)
                           "")))
@@ -844,7 +844,7 @@ ignore any guards against performing work on an already existing ISBN."
               (json-parse-buffer :object-type 'plist)))
         (seq-each
           (lambda (node)
-            (when-let ((isbn
+            (when-let* ((isbn
                          (plist-get node :isbn)))
               (jf/bibliography/update-with-book
                 isbn
@@ -904,7 +904,7 @@ entry."
                 my-cache-of-books nil nil
                 ;; Maybe we'll get a direct hit?
                 (jf/book-label book-from-builder))))
-      (if-let ((from-bibliography
+      (if-let* ((from-bibliography
                  (gethash completed-value my-cache-of-books)))
         ;; When book **is** found in bibliography, update a book entry
         ;; with one already in my bibliography.

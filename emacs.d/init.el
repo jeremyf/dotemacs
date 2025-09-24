@@ -655,7 +655,7 @@ Related to `jf/linux:radio-silence'."
     - is not a `denote' file
     - IDENTIFIER leads to a non `org-mode' file
     - PROPERTY does not exist on the file"
-    (when-let ((filename (denote-get-path-by-id identifier)))
+    (when-let* ((filename (denote-get-path-by-id identifier)))
       (when (string= (file-name-extension filename) "org")
         (with-current-buffer (find-file-noselect filename)
           (cadar (org-collect-keywords (list property)))))))
@@ -679,7 +679,7 @@ This function is the plural version of
     ;; (message "%s" (jf/denote/org-keywords-from-id
     ;;     :identifier "20220930T215235"
     ;;     :properties '("TITLE" "ABBR")))
-    (when-let ((filename (denote-get-path-by-id identifier)))
+    (when-let* ((filename (denote-get-path-by-id identifier)))
       (when (string= (file-name-extension filename) "org")
         (with-current-buffer (find-file-noselect filename)
           (org-collect-keywords keywords)))))
@@ -1101,7 +1101,7 @@ Wires into `org-insert-link'."
                       "+LEVEL=2+!people" 'file)))))
             (work
               (completing-read "Citable: " works nil t)))
-      (when-let ((work-data
+      (when-let* ((work-data
                    (alist-get work works nil nil #'string=)))
         (let* ((include-author
                  (and (plist-get work-data :author)
@@ -1137,7 +1137,7 @@ When CLEAR-CACHE is non-nil, clobber the cache and rebuild."
                 (let ((el (org-element-at-point)))
                   ;; Skip un-named blocks as we can’t link to
                   ;; them.
-                  (when-let ((id
+                  (when-let* ((id
                                (org-entry-get el "CUSTOM_ID")))
                     (puthash id
                       (list
@@ -1167,7 +1167,7 @@ We ignore the DESCRIPTION and probably the CHANNEL."
               (member "subtitle" link-with-properties))
             (works
               (jf/works/populate)))
-      (when-let ((work
+      (when-let* ((work
                    (gethash link works)))
         (let ((author-suffix
                 (if (and
@@ -1180,7 +1180,7 @@ We ignore the DESCRIPTION and probably the CHANNEL."
             ((or (eq format 'html) (eq format 'md))
               (format "<cite data-id=\"%s\">%s</cite>%s"
                 link
-                (if-let ((url
+                (if-let* ((url
                            (plist-get work :url)))
                   (format "<a href=\"%s\">%s</a>"
                     url (plist-get work :title))
@@ -1188,7 +1188,7 @@ We ignore the DESCRIPTION and probably the CHANNEL."
                 author-suffix))
             ((eq format 'latex)
               (format "\\textit{%s}%s"
-                (if-let ((url
+                (if-let* ((url
                            (plist-get work :url)))
                   (format "\\href{%s}{%s}"
                     url (plist-get work :title))
@@ -1198,7 +1198,7 @@ We ignore the DESCRIPTION and probably the CHANNEL."
               (format
                 "<text:span text:style-name=\"%s\">%s</text:span>%s"
                 "Emphasis"
-                (if-let ((url
+                (if-let* ((url
                            (plist-get work :url)))
                   (format "<text:a xlink:type=\"simple\" xlink:href=\"%s\">%s</text:a>"
                     url (plist-get work :title))
@@ -1270,10 +1270,10 @@ We ignore the DESCRIPTION and probably the CHANNEL."
                (denote-id
                  (plist-get (cadr element) :path)))
           (if (member type types)
-            (when-let ((new-type
+            (when-let* ((new-type
                          (completing-read "New link type: "
                            types nil t)))
-              (if-let ((new-text
+              (if-let* ((new-text
                          (jf/denote/org-property-from-id
                            :identifier denote-id
                            :property
@@ -1809,7 +1809,7 @@ active nature."
                   'help-mode
                   'special-mode
                   'message-mode)))
-         (when-let ((task
+         (when-let* ((task
                       (timeclock/active-task-name)))
            (jf/mode-line-indicator
                'nerd-icons-mdicon "nf-md-book_clock"
@@ -1859,7 +1859,7 @@ active nature."
   (defvar-local jf/mode-line-format/which-function
     '(:eval
        (when (and which-function-mode (mode-line-window-selected-p))
-         (when-let ((func (which-function)))
+         (when-let* ((func (which-function)))
            (propertize
              (concat " ⨍ := " func)
              'face
@@ -1931,7 +1931,7 @@ active nature."
 
   (defun jf/mode-line-format/vc-branch-name (file backend)
     "Return VC branch name for FILE with BACKEND."
-    (when-let ((rev (vc-working-revision file backend))
+    (when-let* ((rev (vc-working-revision file backend))
                 (branch (or (vc-git--symbolic-ref file)
                           (substring rev 0 7))))
       branch))
@@ -3337,11 +3337,11 @@ We want files to have the 'projects' `denote' keyword."
       ;; Defer finding this file as long as possible.
       (find-file filename)
 
-      (if-let ((task (cdr name-and-task)))
+      (if-let* ((task (cdr name-and-task)))
         ;; I like having the most recent writing close to the headline;
         ;; showing a reverse order.  This also allows me to have
         ;; sub-headings within a task and not insert content and clocks
-        ;; there.  (if-let ((drawer (car (org-element-map task 'drawer
+        ;; there.  (if-let* ((drawer (car (org-element-map task 'drawer
         ;; #'identity)))) (goto-char (org-element-property :contents-end
         ;; drawer)) (goto-char (org-element-property :contents-begin
         ;; task)))
@@ -3351,7 +3351,7 @@ We want files to have the 'projects' `denote' keyword."
                    (jf/org-mode/existing-sub-tasks :task task)))
                 (subtask-name
                   (car name-and-subtask)))
-          (if-let ((subtask (cdr name-and-subtask)))
+          (if-let* ((subtask (cdr name-and-subtask)))
             (goto-char (org-element-property :contents-end subtask))
             (if current-prefix-arg
               ;; We don't want to edit this thing
@@ -3722,13 +3722,13 @@ function is ever added to that hook."
     "Conditinally add filter functions to our org-export."
     (cond
       ((equal backend 'latex)
-        (if-let ((filter-body
+        (if-let* ((filter-body
                    (plist-get plist :filter-body)))
           (progn
             (add-to-list 'filter-body jf/ox/filter-body/latex)
             (plist-put plist :filter-body filter-body))
           (plist-put plist :filter-body '(jf/ox/filter-body/latex)))
-        (if-let ((filter-final-output
+        (if-let* ((filter-final-output
                    (plist-get plist :filter-final-output)))
           (progn
             (add-to-list 'filter-final-output jf/ox/filter-final-output/latex)
@@ -3741,7 +3741,7 @@ function is ever added to that hook."
 
   (defun jf/ox/filter-final-output/latex (body backend info)
   "Conditionally add an acronym package to exported LaTeX document."
-  (if-let ((abbr-links (plist-get info :abbr-links)))
+  (if-let* ((abbr-links (plist-get info :abbr-links)))
     (replace-regexp-in-string
       "^\\\\documentclass\\(.*\\)"
       (lambda (md)
@@ -3757,7 +3757,7 @@ function is ever added to that hook."
 To have a meaningful render, this requires using the acronym LaTeX
 package.  The `jf/ox/filter-final-output/latex' handles injecting that
 LaTeX package."
-  (if-let ((abbr-links (plist-get info :abbr-links)))
+  (if-let* ((abbr-links (plist-get info :abbr-links)))
     ;; We encountered some links, let's add a section.
     (progn
       (concat
@@ -4868,10 +4868,10 @@ Useful if you want a more robust view into the recommend candidates."
       ;; Ignore single !
       ((string= "!" pattern) `(orderless-literal . ""))
       ;; Prefix and suffix
-      ((if-let (x (assq (aref pattern 0) +orderless-dispatch-alist))
+      ((if-let* ((x (assq (aref pattern 0) +orderless-dispatch-alist)))
          (cons (cdr x) (substring pattern 1))
-         (when-let (x (assq (aref pattern (1- (length pattern)))
-                        +orderless-dispatch-alist))
+         (when-let* ((x (assq (aref pattern (1- (length pattern)))
+                        +orderless-dispatch-alist)))
            (cons (cdr x) (substring pattern 0 -1)))))))
   ;; Define orderless style with initialism by default
   (orderless-define-completion-style +orderless-with-initialism
@@ -5260,7 +5260,7 @@ See `jf/treesit-language-available-p' for usage.")
   (defun jf/treesit/func-signature/dwim ()
     "Kill current function signature at point."
     (interactive)
-    (when-let ((node
+    (when-let* ((node
                  (treesit-parent-until
                    (treesit-node-at (point))
                    (lambda (n)
@@ -5307,7 +5307,7 @@ This function is to \"copy\" the implementation details of the node."
   (defun jf/treesit/function-select ()
     "Select the current function at point."
     (interactive)
-    (if-let ((func (treesit-defun-at-point)))
+    (if-let* ((func (treesit-defun-at-point)))
       (progn
         (goto-char (treesit-node-start func))
         (call-interactively #'set-mark-command)
@@ -5318,7 +5318,7 @@ This function is to \"copy\" the implementation details of the node."
     "Wrap the current ruby region by disabling/enabling the GIVEN-COPS."
     (interactive)
     (if (derived-mode-p 'ruby-ts-mode 'ruby-mode)
-      (if-let ((region
+      (if-let* ((region
                  (jf/treesit/derive-region-for-rubocop)))
         (let ((cops
                 (or given-cops
@@ -5361,7 +5361,7 @@ This function is to \"copy\" the implementation details of the node."
       ;; Then fallback to attempting to find the containing
       ;; class/module.
       (t
-        (when-let ((node
+        (when-let* ((node
                      (treesit-parent-until
                        (treesit-node-at (point))
                        (lambda (n) (member (treesit-node-type n)
@@ -5373,7 +5373,7 @@ This function is to \"copy\" the implementation details of the node."
   (defun jf/treesit/yank-qualified-method-fname ()
     "Return the fully qualified name of method at point.  If not on a
 method, get the containing class."
-    (if-let ((func (treesit-defun-at-point)))
+    (if-let* ((func (treesit-defun-at-point)))
       ;; Instance method or class method?
       (let* ((method_type
                (if (string= "method"
@@ -5407,7 +5407,7 @@ method, get the containing class."
   ;;   end
   ;; Special thanks to https://eshelyaron.com/posts/2023-04-01-take-on-recursion.html
   (defun jf/treesit/module_space (node &optional acc)
-    (if-let ((parent
+    (if-let* ((parent
                (treesit-parent-until
                  node
                  (lambda (n) (member (treesit-node-type n)
@@ -6208,7 +6208,7 @@ The generated and indented TOC will be inserted at point."
 
 See `add-log-current-defun-function'."
     (interactive)
-    (if-let ((text
+    (if-let* ((text
                (funcall add-log-current-defun-function)))
       (progn
         (message "%s" text)
@@ -6217,7 +6217,7 @@ See `add-log-current-defun-function'."
   (defun jf/yank-current-scoped-function-as-org-mode-link ()
     "Yank the current function and region as an `org-mode' link."
     (interactive)
-    (if-let ((text
+    (if-let* ((text
                (funcall add-log-current-defun-function)))
       (let ((link
               (format "[[%s][%s]]"
@@ -7772,7 +7772,7 @@ CONTENTS is nil.  INFO is a plist holding contextual information."
                     (seq-intersection
                       (org-get-tags)
                       denote-known-keywords #'string=)))))
-      (when-let ((kw-plist (jf/org-keywords-as-plist
+      (when-let* ((kw-plist (jf/org-keywords-as-plist
                              :keywords-regexp "\\(SESSION_REPORT_DATE\\|SESSION_REPORT_LOCATION\\|SESSION_REPORT_GAME\\)")))
         (insert
           (format
@@ -8231,13 +8231,18 @@ If `consult--read' is defined, use that.  Otherwise fallback to
     "A counter for assisting with opening multiple files via a single
     client call.")
 
-  (defadvice server-visit-files
-    (around server-visit-files-custom-find
-      activate compile)
-    "Maintain a counter of visited files from a single client call."
+  ;; (defadvice server-visit-files
+  ;;   (around server-visit-files-custom-find
+  ;;     activate compile)
+  ;;   "Maintain a counter of visited files from a single client call."
+  ;;   (let ((server-visit-files-custom-find:buffer-count
+  ;;           0))
+  ;;     ad-do-it))
+  (defun jf/server-visit-files (&rest app)
     (let ((server-visit-files-custom-find:buffer-count
             0))
-      ad-do-it))
+    (apply app)))
+  (advice-add #'server-visit-files :around #'jf/server-visit-files)
 
   (defun server-visit-hook-custom-find ()
     "Arrange to visit the files from client call in separate windows."
@@ -8286,7 +8291,7 @@ With one PREFIX go to place where we would jump on capture."
     (require 'pulsar)
     (cond
       ;; ((>= prefix 16)
-      ;;   (if-let ((filename (f-join denote-journal-extras-directory "20240131T000000--time-reporting.org")))
+      ;;   (if-let* ((filename (f-join denote-journal-extras-directory "20240131T000000--time-reporting.org")))
       ;;     (progn
       ;;       (org-link-open-as-file (concat filename "::*Timeblock") nil)
       ;;       (org-next-visible-heading 1)
@@ -8388,7 +8393,7 @@ otherwise."
 Return nil if the current buffer is not part of a noted project.
 
 Noted projects would be found within the given DIRECTORY."
-    (when-let ((project_path_to_code_truename (cdr (project-current))))
+    (when-let* ((project_path_to_code_truename (cdr (project-current))))
       (let ((project_path_to_code
               (jf/filename/tilde-based
                 project_path_to_code_truename)))
@@ -8409,7 +8414,7 @@ Noted projects would be found within the given DIRECTORY."
     "Return the current clocked project's name or nil."
     ;; This is a naive implementation that assumes a :task: has the
     ;; clock.  A :task:'s immediate ancestor is a :projects:.
-    (when-let ((m (and
+    (when-let* ((m (and
                     ;; If this isn't set, we ain't clocking.
                     (fboundp 'org-clocking-p)
                     (org-clocking-p)
@@ -8631,3 +8636,4 @@ This encodes the logic for creating a project."
 
 (provide 'init)
 ;;; init.el ends here
+(put 'upcase-region 'disabled nil)
