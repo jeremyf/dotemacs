@@ -5159,13 +5159,15 @@ literal then add a fuzzy search)."
   :straight t
   :config (unicode-fonts-setup))
 
-(use-package unfill
-  ;; Provides the reverse of ~fill-paragraph~, and a toggle fill and
-  ;; unfill.  In fact, the unfill/fill function of Emacs was the first
-  ;; editor function I saw (shown to me by a friend in 2005) that had me
-  ;; strongly consider Emacs. Alas I was not prepared for Emacs.
-  :bind ("M-q" . unfill-toggle)
-  :straight t)
+(if (fboundp 'fill-paragraph-semlf)
+  (require 'fill-paragraph)
+  (use-package unfill
+    ;; Provides the reverse of ~fill-paragraph~, and a toggle fill and
+    ;; unfill.  In fact, the unfill/fill function of Emacs was the first
+    ;; editor function I saw (shown to me by a friend in 2005) that had me
+    ;; strongly consider Emacs. Alas I was not prepared for Emacs.
+    :bind ("M-q" . unfill-toggle)
+    :straight t))
 
 (use-package hungry-delete
   ;; Delete multiple spaces in one delete stroke.
