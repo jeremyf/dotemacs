@@ -2472,22 +2472,22 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
         `(
            ;; The first five are from Github:
            ;; https://github.com/orgs/community/discussions/16925
-           ("NOTE" . ,fg-blue)
-           ("TIP" . ,fg-green)
-           ("IMPORTANT" . ,fg-magenta)
-           ("WARNING" . ,fg-yellow)
-           ("CAUTION" .,fg-red)
+           ("NOTE" . ,blue-faint)
+           ("TIP" . ,green-faint)
+           ("IMPORTANT" . ,magenta-faint)
+           ("WARNING" . ,yellow-faint)
+           ("CAUTION" .,red-faint)
            ;; Other keywords that I'm using
-           ("HACK" . ,fg-blue)
-           ("TODO" . ,fg-red)
-           ("DRAFT" . ,fg-red)
-           ("FIXME" . ,fg-red)
-           ("DONE" . ,fg-green)
-           ("PUBLISHED" . ,fg-green)
-           ("ASSUMPTION" .,fg-yellow)
-           ("QUESTION" .,fg-yellow)
-           ("BLOCKED" . ,fg-yellow)
-           ("WAITING" . ,fg-yellow)))
+           ("HACK" . ,blue-faint)
+           ("TODO" . ,red-faint)
+           ("DRAFT" . ,red-faint)
+           ("FIXME" . ,red-faint)
+           ("DONE" . ,green-faint)
+           ("PUBLISHED" . ,green-faint)
+           ("ASSUMPTION" .,yellow-faint)
+           ("QUESTION" .,yellow-faint)
+           ("BLOCKED" . ,yellow-faint)
+           ("WAITING" . ,yellow-faint)))
       (custom-set-faces
         `(bm-fringe-persistent-face
            ((,c :background ,bg-main :foreground ,fg-added)))
