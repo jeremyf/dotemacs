@@ -5699,6 +5699,12 @@ method, get the containing class."
       :override t
       '((ERROR) @font-lock-warning-face))))
 
+(use-package ob-go
+  :straight t)
+
+(use-package go-playground
+  :straight t)
+
 (use-package go-tag
   ;; go install github.com/fatih/gomodifytags@latest
   :straight t
