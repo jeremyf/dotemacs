@@ -111,6 +111,7 @@ The DWIM behaviour of this command is as follows:
           ("s-[" . #'backward-paragraph)
           ("M-]" . #'forward-paragraph)
           ("s-]" . #'forward-paragraph)
+          ("s-t" . #'transpose-sentences)
           ("C-k" . #'jf/kill-line-or-region)
           ("C-c n" . #'jf/yank-file-name-to-clipboard) ;; Deprecated
           ("C-c y n" . #'jf/yank-file-name-to-clipboard)
@@ -120,7 +121,8 @@ The DWIM behaviour of this command is as follows:
           ("s-q" . #'save-buffers-kill-terminal)
           ("s-w" . #'kill-current-buffer)
           ("s-i" . #'ibuffer)
-          ("M-RET" . #'newline-and-indent))
+          ("M-RET" . #'newline-and-indent)
+          ("<f12>" . scratch-buffer))
   :bind (:map emacs-lisp-mode-map
           ("H-e m" . 'symbol-overlay-rename)
           ("C-c C-c" . 'jf/eval-region-dwim))
@@ -1072,33 +1074,28 @@ Wires into `org-insert-link'."
   (defun jf/org-link-ol-complete/work ()
     "Prompt for a work from my bibliography"
     (interactive)
-    (let* ((buffer
-             (find-file-noselect jf/filename/bibliography))
-            (works
-              (save-restriction
-                (widen)
-                (save-excursion
-                  (with-current-buffer buffer
-                    ;; With the given tag, find all associated headlines
-                    ;; that match that tag.
-                    (org-map-entries
-                      (lambda ()
-                        (let* ((headline
-                                 (org-element-at-point))
-                                (title
-                                  (org-element-property :title headline))
-                                (subtitle
-                                  (org-entry-get headline "SUBTITLE"))
-                                (author
-                                  (org-entry-get headline "AUTHOR")))
-                          (cons
-                            (jf/book-make-label title subtitle author)
-                            (list
-                              :id (org-entry-get headline "CUSTOM_ID")
-                              :title title
-                              :subtitle subtitle
-                              :author author))))
-                      "+LEVEL=2+!people" 'file)))))
+    (let* ((works
+             ;; With the given tag, find all associated headlines
+             ;; that match that tag.
+             (org-map-entries
+               (lambda ()
+                 (let* ((headline
+                          (org-element-at-point))
+                         (title
+                           (org-element-property :title headline))
+                         (subtitle
+                           (org-entry-get headline "SUBTITLE"))
+                         (author
+                           (org-entry-get headline "AUTHOR")))
+                   (cons
+                     (jf/book-make-label title subtitle author)
+                     (list
+                       :id (org-entry-get headline "CUSTOM_ID")
+                       :title title
+                       :subtitle subtitle
+                       :author author))))
+               "+LEVEL=2+!people"
+               (list jf/filename/bibliography)))
             (work
               (completing-read "Citable: " works nil t)))
       (when-let* ((work-data
@@ -2879,21 +2876,8 @@ the light option.")
           ("C-s-k" . crux-kill-line-backwards)
           ("<s-backspace>" . crux-kill-line-backwards)
           ("C-M-d" . jf/duplicate-current-line-or-lines-of-region)
-          ("C-c d" . jf/duplicate-current-line-or-lines-of-region)
-          ("<f12>" . jf/create-scratch-buffer))
+          ("C-c d" . jf/duplicate-current-line-or-lines-of-region))
   :config
-  (cl-defun jf/create-scratch-buffer (&optional arg)
-    "Create `scratch' buffer; create `denote' scratch when ARG given."
-    ;; A simple wrapper around scratch, that helps name it and sets the
-    ;; major mode to `org-mode'.
-    (interactive "P")
-    (if (car arg)
-      (jf/denote/create-scratch (format-time-string "%Y-%m-%d Scratch"))
-      (progn
-        (crux-create-scratch-buffer)
-        (rename-buffer (concat "*scratch* at "
-                         (format-time-string "%Y-%m-%d %H:%M")))
-        (org-mode))))
   (defun jf/duplicate-current-line-or-lines-of-region (arg)
     "Duplicate current line region ARG times."
     ;; Sometimes I just want to duplicate an area without copy and
@@ -8645,7 +8629,7 @@ This encodes the logic for creating a project."
         (projectile-git-command .
           "git ls-files -zco --exclude-from=.projectile.gitignore")
         (org-latex-toc-command .
-          "\\tableofcontents\n\\begin{multicols}{2}\\\let\\oldhref\\href\n\\renewcommand{\\href}[2]{\\oldhref{#1}{#2}\\footnote{\\url{#1}}}")
+          "\\tableofcontents\n\\begin{multicols}{2}\\\let\\oldhref\\href\n\\renewcommand{\\href}[2]{\\oldhref{#1}{#2}\\footnote{\\url{#1}}}\n")
         )))
 
 (provide 'init)
