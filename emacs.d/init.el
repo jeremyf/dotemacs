@@ -2585,6 +2585,15 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
     (let ((palette
             (symbol-value
               (intern (format "%s-palette" (doric-themes--current-theme))))))
+      ;; Apply a map for some baseline consistency with ef-themes
+      (dolist (to-from '((red-faint fg-faint-red)
+                          (green-faint fg-faint-green)
+                          (yellow-faint fg-faint-yellow)
+                          (blue-faint fg-faint-blue)
+                          (magenta-faint fg-faint-magenta)
+                          (cyan-faint fg-faint-cyan)))
+        (add-to-list 'palette
+          (list (car to-from) (car (alist-get (cadr to-from) palette)))))
       `(let* (,@palette)
          ,@body))))
 
