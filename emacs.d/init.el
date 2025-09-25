@@ -2479,22 +2479,22 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
         `(
            ;; The first five are from Github:
            ;; https://github.com/orgs/community/discussions/16925
-           ("NOTE" . ,blue-warmer)
-           ("TIP" . ,green)
-           ("IMPORTANT" . ,magenta-cooler)
-           ("WARNING" . ,yellow)
-           ("CAUTION" .,red-warmer)
+           ("NOTE" . ,fg-blue)
+           ("TIP" . ,fg-green)
+           ("IMPORTANT" . ,fg-magenta)
+           ("WARNING" . ,fg-yellow)
+           ("CAUTION" .,fg-red)
            ;; Other keywords that I'm using
-           ("HACK" . ,blue-warmer)
-           ("TODO" . ,red-warmer)
-           ("DRAFT" . ,red-warmer)
-           ("FIXME" . ,red-warmer)
-           ("DONE" . ,green)
-           ("PUBLISHED" . ,green)
-           ("ASSUMPTION" .,yellow)
-           ("QUESTION" .,yellow)
-           ("BLOCKED" . ,yellow)
-           ("WAITING" . ,yellow)))
+           ("HACK" . ,fg-blue)
+           ("TODO" . ,fg-red)
+           ("DRAFT" . ,fg-red)
+           ("FIXME" . ,fg-red)
+           ("DONE" . ,fg-green)
+           ("PUBLISHED" . ,fg-green)
+           ("ASSUMPTION" .,fg-yellow)
+           ("QUESTION" .,fg-yellow)
+           ("BLOCKED" . ,fg-yellow)
+           ("WAITING" . ,fg-yellow)))
       (custom-set-faces
         `(bm-fringe-persistent-face
            ((,c :background ,bg-main :foreground ,fg-added)))
@@ -2576,14 +2576,24 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
            ((,c :foreground ,fg-term-red-bright
               :box (:color ,fg-term-red-bright :line-width (-1 . -1)))))
         `(font-lock-regexp-face
-           ((,c :foreground ,red))))))
+           ((,c :foreground ,red)))))
+    )
   ;; I had '(:light ef-cyprus) but the differentiation between function
   ;; and comment was not adequate
   ;; (setq jf/themes-plist '(:dark ef-bio :light ef-elea-light))
   (setq jf/themes-plist '(:dark ef-symbiosis :light ef-elea-light)))
 
 (use-package doric-themes
-  :straight (:host github :repo "protesilaos/doric-themes"))
+  :straight (:host github :repo "protesilaos/doric-themes")
+  :config
+  (defmacro doric-themes-with-colors (&rest body)
+    "Evaluate BODY with colors from current doric-themes palette."
+    (declare (indent 0))
+    (let ((palette
+            (symbol-value
+              (intern (format "%s-palette" (doric-themes--current-theme))))))
+      `(let* (,@palette)
+         ,@body))))
 
 
 (use-package bm
