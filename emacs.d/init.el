@@ -1629,10 +1629,6 @@ work computers.")
 ;; Silence that bell by pulsing the line instead
 (setopt ring-bell-function 'jf/pulse)
 
-(use-package hideshow
-  :straight (hideshow :type built-in)
-  :hook (prog-mode . hs-minor-mode))
-
 (use-package rainbow-mode
   ;; When I toggle on Rainbow mode, it colorizes the text that is color
   ;; names and hex declarations (e.g. "#0000ff" ).  Most useful when
