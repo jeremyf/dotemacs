@@ -2465,6 +2465,30 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   (setopt ef-themes-mixed-fonts t
     ef-themes-variable-pitch-ui t)
 
+  (defmacro jf-with-colors (&rest body)
+    (if (ef-themes--list-enabled-themes)
+      (message "YO")
+      (let ((palette
+              (symbol-value
+                (intern (format "%s-palette" (doric-themes--current-theme))))))
+        ;; Apply a map for some baseline consistency with ef-themes
+        (dolist (to-from '((red-faint fg-faint-red)
+                            (green-faint fg-faint-green)
+                            (yellow-faint fg-faint-yellow)
+                            (blue-faint fg-faint-blue)
+                            (magenta-faint fg-faint-magenta)
+                            (cyan-faint fg-faint-cyan)
+                            (bg-alt bg-neutral)
+                            (fg-alt fg-neutral)
+                            (bg-dim bg-shadow-subtle)
+                            (fg-dim fg-shadow-subtle)
+                            ))
+          (add-to-list 'palette
+            (list (car to-from) (car (alist-get (cadr to-from) palette)))))
+        `(let* ((c '((class color (min-colors 256))))
+                 ,@palette)
+           ,@body))))
+
   (defun jf/theme-custom-faces ()
     "Set the various custom faces for both `treesit' and `tree-sitter'."
     (ef-themes-with-colors
@@ -2476,7 +2500,7 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
            ("TIP" . ,green-faint)
            ("IMPORTANT" . ,magenta-faint)
            ("WARNING" . ,yellow-faint)
-           ("CAUTION" .,red-faint)
+           ("CAUTION" . ,red-faint)
            ;; Other keywords that I'm using
            ("HACK" . ,blue-faint)
            ("TODO" . ,red-faint)
@@ -2484,8 +2508,8 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
            ("FIXME" . ,red-faint)
            ("DONE" . ,green-faint)
            ("PUBLISHED" . ,green-faint)
-           ("ASSUMPTION" .,yellow-faint)
-           ("QUESTION" .,yellow-faint)
+           ("ASSUMPTION" . ,yellow-faint)
+           ("QUESTION" . ,yellow-faint)
            ("BLOCKED" . ,yellow-faint)
            ("WAITING" . ,yellow-faint)))
       (custom-set-faces
