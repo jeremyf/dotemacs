@@ -1123,31 +1123,28 @@ See `jf/works/populate'.")
 When CLEAR-CACHE is non-nil, clobber the cache and rebuild."
     (when clear-cache (clrhash jf/works/cache))
     (when (hash-table-empty-p jf/works/cache)
-      (save-excursion
-        (with-current-buffer
-          (find-file-noselect jf/filename/bibliography)
-          (save-restriction
-            (widen)
-            (message "Rebuilding `jf/works/cache'...")
-            (org-map-entries
-              (lambda ()
-                (let ((el (org-element-at-point)))
-                  ;; Skip un-named blocks as we can’t link to
-                  ;; them.
-                  (when-let* ((id
-                               (org-entry-get el "CUSTOM_ID")))
-                    (puthash id
-                      (list
-                        :title
-                        (org-element-property :title el)
-                        :subtitle
-                        (org-entry-get el "SUBTITLE")
-                        :author
-                        (org-entry-get el "AUTHOR")
-                        :url
-                        (org-entry-get el "ROAM_REFS"))
-                      jf/works/cache))))
-              (concat "+level=2+works") 'file)))))
+      (message "Rebuilding `jf/works/cache'...")
+      (org-map-entries
+        (lambda ()
+          (when-let* ((el
+                        (org-element-at-point))
+                       ;; Skip un-named blocks as we can’t link to
+                       ;; them.
+                       (id
+                          (org-entry-get el "CUSTOM_ID")))
+              (puthash id
+                (list
+                  :title
+                  (org-element-property :title el)
+                  :subtitle
+                  (org-entry-get el "SUBTITLE")
+                  :author
+                  (org-entry-get el "AUTHOR")
+                  :url
+                  (org-entry-get el "ROAM_REFS"))
+                jf/works/cache)))
+        (concat "+level=2+works")
+        `(,jf/filename/bibliography)))
     jf/works/cache)
 
   (defun jf/org-link-ol-export/work (link description format channel)
