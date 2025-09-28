@@ -22,6 +22,9 @@
   :options-alist
   '((:with-toc nil "toc" nil)))
 
+(defvar ox-takeonrules/license
+  "by-nc-nd-4_0"
+  "The applicable license for this blog post.")
 (defvar jf/exporting-org-to-tor nil
   "When non-nil, I'm in the middle of exporting the document to takeonrules.")
 
@@ -107,43 +110,40 @@ INFO is a plist holding contextual information."
   "Export GLOSSARY to DATA file and BLOG file."
   (interactive)
   (let ((entries
-          (with-current-buffer (find-file-noselect
-                                 (or glossary jf/filename/glossary))
-            (save-restriction
-              (widen)
-              ;; With the given tag, find all associated headlines
-              ;; that match that tag.
-              (org-map-entries
-                (lambda ()
-                  (let* ((epom
-                           (org-element-at-point))
-                          (entry
-                            (list
-                              (cons "key" (upcase (org-entry-get epom "CUSTOM_ID"))))))
-                    (when-let* ((value (org-entry-get epom "DESCRIPTION")))
-                      (add-to-list 'entry (cons "description" value)))
-                    (when-let* ((value (org-entry-get epom "ABBR")))
-                      (add-to-list 'entry (cons "abbr" value)))
-                    (when-let* ((value (org-entry-get epom "PLURAL_ABBR")))
-                      (add-to-list 'entry (cons "plural_abbr" value)))
-                    (when-let* ((value (org-entry-get epom "PLURAL_TITLE")))
-                      (add-to-list 'entry (cons "plural_title" value)))
-                    (when-let* ((value (org-entry-get epom "SAME_AS")))
-                      (add-to-list 'entry (cons "same_as" value)))
-                    (when-let* ((value (org-entry-get epom "OFFER")))
-                      (add-to-list 'entry (cons "offer" value)))
-                    (when-let* ((value (org-entry-get epom "ITEMID")))
-                      (add-to-list 'entry (cons "itemid" value)))
-                    ;; (when-let* ((value (org-entry-get epom "GAME")))
-                    ;;   (add-to-list 'entry (cons "game" value)))
-                    (when-let* ((value (org-entry-get epom "ROAM_REFS")))
-                      (add-to-list 'entry (cons "url" value)))
-                    (when-let* ((value (org-element-property :title epom)))
-                      (add-to-list 'entry (cons "title" value)))
-                    (when-let* ((value (org-entry-get epom "TAG")))
-                      (add-to-list 'entry (cons "tag" value)))
-                    entry))
-                "+LEVEL=2+glossary-noexport" 'file)))))
+          ;; With the given tag, find all associated headlines
+          ;; that match that tag.
+          (org-map-entries
+            (lambda ()
+              (let* ((epom
+                       (org-element-at-point))
+                      (entry
+                        (list
+                          (cons "key" (upcase (org-entry-get epom "CUSTOM_ID"))))))
+                (when-let* ((value (org-entry-get epom "DESCRIPTION")))
+                  (add-to-list 'entry (cons "description" value)))
+                (when-let* ((value (org-entry-get epom "ABBR")))
+                  (add-to-list 'entry (cons "abbr" value)))
+                (when-let* ((value (org-entry-get epom "PLURAL_ABBR")))
+                  (add-to-list 'entry (cons "plural_abbr" value)))
+                (when-let* ((value (org-entry-get epom "PLURAL_TITLE")))
+                  (add-to-list 'entry (cons "plural_title" value)))
+                (when-let* ((value (org-entry-get epom "SAME_AS")))
+                  (add-to-list 'entry (cons "same_as" value)))
+                (when-let* ((value (org-entry-get epom "OFFER")))
+                  (add-to-list 'entry (cons "offer" value)))
+                (when-let* ((value (org-entry-get epom "ITEMID")))
+                  (add-to-list 'entry (cons "itemid" value)))
+                ;; (when-let* ((value (org-entry-get epom "GAME")))
+                ;;   (add-to-list 'entry (cons "game" value)))
+                (when-let* ((value (org-entry-get epom "ROAM_REFS")))
+                  (add-to-list 'entry (cons "url" value)))
+                (when-let* ((value (org-element-property :title epom)))
+                  (add-to-list 'entry (cons "title" value)))
+                (when-let* ((value (org-entry-get epom "TAG")))
+                  (add-to-list 'entry (cons "tag" value)))
+                entry))
+            "+LEVEL=2+glossary-noexport"
+            (list (or glossary jf/filename/glossary)))))
     (with-current-buffer (find-file-noselect
                            (or data jf/filename/glossary-data-takeonrules))
       (widen)
@@ -1046,6 +1046,11 @@ We also rely on the org-element at point."
             (car (plist-get info :title)))
           (slug
             (org-entry-get (point) "SLUG"))
+          (licenses
+            (-list
+              (or
+                (org-entry-get (point) "LICENSE")
+                ox-takeonrules/license)))
           (org_id
             (org-entry-get (point) "ID"))
           (metadata `(("title" . ,title)
@@ -1059,7 +1064,7 @@ We also rely on the org-element at point."
                        ("author" . ("Jeremy Friesen"))
                        ("layout" . "post")
                        ("type" . "post")
-                       ("licenses" . ("by-nc-nd-4_0")))))
+                       ("licenses" . ,licenses))))
     (if-let* ((lastmod
                (org-entry-get (point) "LAST_MODIFIED_AT")))
       (add-to-list 'metadata `("lastmod" . ,lastmod))
@@ -1174,6 +1179,17 @@ Otherwise, use pre-existing handling."
       (_ (apply func (list special-block contents info))))))
 
 (defun jf/org-md-quote-block (func quote-block contents info)
+  "Render a QUOTE-BLOCK with CONTENTS and INFO.
+
+Either render via the standard markdown way or when exporting to
+Take on Rules using the \"blockquote\" special block."
+  (if jf/exporting-org-to-tor
+    (progn
+      (org-element-put-property quote-block :type "blockquote")
+      (jf/org-html-special-block func quote-block contents info))
+    (apply func (list quote-block contents info))))
+
+(defun jf/org-html-quote-block (func quote-block contents info)
   "Render a QUOTE-BLOCK with CONTENTS and INFO.
 
 Either render via the standard markdown way or when exporting to

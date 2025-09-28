@@ -839,172 +839,6 @@ PARG is for a conformant method signature."
     (jf/bibliography/export-shopping-list)
     (jf/works/populate t))
 
-  (org-link-set-parameters "epigraph"
-    :complete #'jf/org-link-ol-complete/epigraph
-    :export #'jf/org-link-ol-export/epigraph
-    :face #'jf/org-faces-epigraph
-    :follow #'jf/org-link-ol-follow/epigraph)
-
-  (defun jf/org-link-ol-export/epigraph (link description format channel)
-    "Export the text of the LINK epigraph in the corresponding FORMAT.
-
-We ignore the DESCRIPTION and probably the CHANNEL."
-    (let ((buffer
-            (find-file-noselect jf/filename/bibliography)))
-      (save-restriction
-        (widen)
-        (save-excursion
-          (with-current-buffer buffer
-            (let* ((epigraph
-                     (car
-                       (org-element-map
-                         (org-element-parse-buffer)
-                         '(quote-block verse-block)
-                         (lambda (el)
-                           ;; Skip un-named blocks as we can’t link to
-                           ;; them.
-                           (when (string=
-                                   (org-element-property :name el)
-                                   link)
-                             el)))))
-                    (id
-                      (org-element-property :name epigraph))
-                    (class
-                      (if (eq 'verse-block (org-element-type epigraph))
-                        "verse"
-                        "quote"))
-                    (lineage
-                      (org-element-lineage epigraph))
-                    (context
-                      (car
-                        (seq-filter
-                          (lambda (el)
-                            (and
-                              (eq (org-element-type el) 'headline)
-                              (= (org-element-property :level el) 2)))
-                          lineage)))
-                    (people?
-                      (member "people"
-                        (org-element-property :tags context)))
-                    (work
-                      (if people?
-                        ""
-                        (car (org-element-property :title context))))
-                    (author
-                      (if people?
-                        (car (org-element-property :title context))
-                        (org-entry-get context "AUTHOR")))
-                    (text
-                      (buffer-substring-no-properties
-                        (org-element-property
-                          :contents-begin epigraph)
-                        (org-element-property
-                          :contents-end epigraph))))
-              (cond
-                ((or (eq format 'html) (eq format 'md))
-                  (format "<blockquote class=\"%s epigraph\" data-id=\"%s\">\n%s%s</blockquote>\n"
-                    class
-                    id
-                    (if (string= class "verse")
-                      (s-replace "\n" "<br />\n" text)
-                      (org-export-string-as text 'html t))
-                    (cond
-                      ((and (s-present? work) (s-present? author))
-                        (format "\n<footer>&#8213;%s, <cite>%s</cite></footer>"
-                          author work))
-                      ((s-present? work)
-                        (format "\n<footer>&#8213; <cite>%s</cite></footer>"
-                          work))
-                      ((s-present? author)
-                        (format "\n<footer>&#8213; %s</footer>"
-                          author))
-                      (t ""))))
-                ((eq format 'latex)
-                  (format "\\begin{%s}\n%s%s\n\\end{%s}\n"
-                    class
-                    (if (string= "verse" class)
-                      (s-replace "\n" "\\\\\n" text)
-                      text)
-                    (cond
-                      ((and (s-present? work) (s-present? author))
-                        (format "---%s, \\textit{%s}" author work))
-                      ((s-present? work)
-                        (format "---\\textit{%s}" work))
-                      ((s-present? author)
-                        (format "---%s" author))
-                      (t ""))
-                    class))
-                (t
-                  (let* ((use-hard-newlines t))
-                    (s-replace
-                      "\n" hard-newline
-                      (format "%s%s"
-                        text
-                        (cond
-                          ((and (s-present? work) (s-present? author))
-                            (format "\n\n—%s, “%s”" author work))
-                          ((s-present? work)
-                            (format "\n\n—“%s”" work))
-                          ((s-present? author)
-                            (format "\n\n—%s" author))
-                          (t "")))))))))))))
-
-  (defun jf/org-link-ol-complete/epigraph ()
-    "Find and insert an epigraph for export.
-
-Wires into `org-insert-link'."
-    (let* ((buffer
-             (find-file-noselect jf/filename/bibliography))
-            (candidates
-              (save-restriction
-                (widen)
-                (save-excursion
-                  (with-current-buffer buffer
-                    (org-element-map
-                      (org-element-parse-buffer)
-                      '(quote-block verse-block)
-                      (lambda (el)
-                        ;; Skip un-named blocks as we can’t link to them.
-                        (when-let* ((id
-                                      (org-element-property :name el))
-                                     (left
-                                       (org-element-property
-                                         :contents-begin el))
-                                     (right
-                                       (org-element-property
-                                         :contents-end el))
-                                     (text
-                                       ;; Compress the result into a
-                                       ;; single line.
-                                       (s-replace "\n" "⮒"
-                                         (s-trim
-                                           (buffer-substring-no-properties
-                                             left
-                                             right)))))
-                          (cons text id))))))))
-            (candidate
-              (completing-read "Epigraph: " candidates nil t))
-            (id
-              (alist-get candidate candidates nil nil #'string=)))
-      (when id
-        (progn
-          (message "Added %S to the kill ring" candidate)
-          ;; Expand the result into a single line.
-          (kill-new (s-replace "⮒" "\n" candidate))
-          (format "epigraph:%s" id)))))
-
-  (defun jf/org-link-ol-follow/epigraph (name)
-    "Follow the NAME to the epigraph."
-    (let* ((file
-             jf/filename/bibliography)
-            (case-fold-search
-              t))
-      (find-file file)
-      (goto-char (point-min))
-      (let ((case-fold-search t))
-        (search-forward-regexp (format "^#\\+name: +%s$" name)))
-      (pulsar--pulse)))
-
   (org-link-set-parameters "work"
     :insert-description #'jf/org-link-description/work
     :follow #'jf/org-link-ol-follow/work
@@ -3676,7 +3510,7 @@ function is ever added to that hook."
        ("\\subparagraph{%s}" . "\\subparagraph{%s}")))
   (add-to-list 'org-latex-classes
     '("jf/two-column-landscape"
-       "\\documentclass[11pt,letter,landscape]{article}
+       "\\documentclass[10pt,letter,landscape]{article}
 \\usepackage[letter]{anysize}
 \\usepackage{minted}
 \\usepackage{array, booktabs, caption}
@@ -8488,6 +8322,8 @@ When the `current-prefix-arg' is set always prompt for the project."
           (jf/project/get-project/project-source-code)))
       (completing-read "Project: " (jf/project/list-projects)))))
 
+(use-package org-count-words
+  :straight (org-count-words :host github :repo "Elilif/org-count-words"))
 
 (use-package uniline
   :straight t)
