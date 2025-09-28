@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t; -*-
 (defvar jf/subscribe-me/default-tags
   '("1st" "provisional")
   "Default tags to apply when subscribing to an RSS feed.")
@@ -499,7 +500,7 @@ Useful for narrowing regions.")
                       :contents-end el)))))))))))
 
 ;; (use-package notmuch
-;;   ;; Consider the NotMuch Mail Emacs tips and tricks: https://notmuchmail.org/emacstips/
+;;   ;; Consider the NotmuMuch Mail Emacs tips and tricks: https://notmuchmail.org/emacstips/
 ;;   ;;
 ;;   ;; https://blog.tomecek.net/post/removing-messages-with-notmuch/
 ;;   :load-path  "/opt/homebrew/share/emacs/site-lisp/notmuch"
@@ -719,7 +720,7 @@ When CLEAR-CACHE is non-nil, clobber the cache and rebuild."
             (lambda ()
               (when-let* ((label-book
                             (jf/build-label-and-book-from-epom)))
-                (put-hash (car label-book)
+                (puthash (car label-book)
                   (cdr label-book)
                   my-cache-of-books)))
             (concat "+level=2+" jf/bibliography/tag-books) 'file)))))
@@ -983,69 +984,69 @@ entry."
             (jf/book-label book-from-builder)))))))
 
 (defvar jf/site-lisp:mu4e
-  (if (f-exists? "/usr/local/share/emacs/site-lisp/mu4e")
-    "/usr/local/share/emacs/site-lisp/mu4e"
+  (if (f-exists? "/home/linuxbrew/.linuxbrew/share/emacs/site-lisp/mu4e")
+    "/home/linuxbrew/.linuxbrew/emacs/site-lisp/mu4e"
     "/opt/homebrew/share/emacs/site-lisp/mu/mu4e"))
-;; (add-to-list 'load-path jf/site-lisp:mu4e)
-;; (require 'mu4e)
-;; (use-package mu4e
-;;   :load-path jf/site-lisp:mu4e
-;;   ;; This follows the build from https://vhbelvadi.com/emacs-mu4e-on-macos.
-;;   ;;
-;;   ;; One variation: the tls_trust_file in ~/.msmtprc did not need to
-;;   ;; come from the Apple Keychain.  But was from "Export TLS
-;;   ;; Certificates from the Proton Bridge > Settings > Advanced Settings
-;;   ;; :load-path "/usr/share/emacs/site-lisp/mu4e" ;; jf/site-lisp
-;;   :init (require 'smtpmail)
-;;   :config
-;;   ;; BINARIES
-;;   (setq mu4e-mu-binary (executable-find "mu")
-;;     mu4e-get-mail-command (concat (executable-find "mbsync") " -a")
-;;     sendmail-program (executable-find "msmtp"))
-;;   (setq mu4e-user-mail-address-list '("jeremy@jeremyfriesen.com"))
-;;   (setq mu4e-change-filenames-when-moving t ; avoid sync conflicts
-;;     mu4e-update-interval (* 10 60) ; check mail 10 minutes
-;;     mu4e-compose-format-flowed t ; re-flow mail so it's not hard wrapped
-;;     mu4e-maildir "~/Maildir/proton")
-;;   (setq mu4e-drafts-folder "/Drafts"
-;;     mu4e-sent-folder   "/Sent"
-;;     mu4e-refile-folder "/All Mail"
-;;     mu4e-trash-folder  "/Trash")
-;;   (setq mu4e-completing-read-function 'completing-read)
-;;   (setq mu4e-maildir-shortcuts
-;;     '(("/inbox"     . ?i)
-;;        ("/Sent"      . ?s)
-;;        ("/Archive" . ?a)
-;;        ("/Trash"     . ?t)
-;;        ("/Drafts"    . ?d)))
-;;   (setq mu4e-use-fancy-chars t)
+(add-to-list 'load-path jf/site-lisp:mu4e)
+(require 'mu4e)
+(use-package mu4e
+  :load-path jf/site-lisp:mu4e
+  ;; This follows the build from https://vhbelvadi.com/emacs-mu4e-on-macos.
+  ;;
+  ;; One variation: the tls_trust_file in ~/.msmtprc did not need to
+  ;; come from the Apple Keychain.  But was from "Export TLS
+  ;; Certificates from the Proton Bridge > Settings > Advanced Settings
+  ;; :load-path "/usr/share/emacs/site-lisp/mu4e" ;; jf/site-lisp
+  :init (require 'smtpmail)
+  :config
+  ;; BINARIES
+  (setq mu4e-mu-binary (executable-find "mu")
+    mu4e-get-mail-command (concat (executable-find "mbsync") " -a")
+    sendmail-program (executable-find "msmtp"))
+  (setq mu4e-user-mail-address-list '("jeremy@jeremyfriesen.com"))
+  (setq mu4e-change-filenames-when-moving t ; avoid sync conflicts
+    mu4e-update-interval (* 10 60) ; check mail 10 minutes
+    mu4e-compose-format-flowed t ; re-flow mail so it's not hard wrapped
+    mu4e-maildir "~/Maildir/proton")
+  (setq mu4e-drafts-folder "/Drafts"
+    mu4e-sent-folder   "/Sent"
+    mu4e-refile-folder "/All Mail"
+    mu4e-trash-folder  "/Trash")
+  (setq mu4e-completing-read-function 'completing-read)
+  (setq mu4e-maildir-shortcuts
+    '(("/inbox"     . ?i)
+       ("/Sent"      . ?s)
+       ("/Archive" . ?a)
+       ("/Trash"     . ?t)
+       ("/Drafts"    . ?d)))
+  (setq mu4e-use-fancy-chars t)
 
-;;   ;; SENDING
-;;   (setq send-mail-function 'message-send-mail-with-sendmail
-;;     message-send-mail-function 'message-send-mail-with-sendmail)
-;;   (setq message-sendmail-envelope-from 'header)
-;;   (add-hook 'mu4e-compose-mode-hook (lambda () (setq-local fill-column 80)))
-;;   ;; POLICIES
-;;   (setq mu4e-context-policy 'pick-first)
-;;   (setq mu4e-compose-context-policy 'ask)
-;;   (setq message-kill-buffer-on-exit t)
-;;   (setq mu4e-hide-index-messages t)
-;;   (setq org-mu4e-link-query-in-headers-mode nil)
-;;   (setq mu4e-headers-visible-lines 25)
-;;   (setq mu4e-view-show-addresses t)
+  ;; SENDING
+  (setq send-mail-function 'message-send-mail-with-sendmail
+    message-send-mail-function 'message-send-mail-with-sendmail)
+  (setq message-sendmail-envelope-from 'header)
+  (add-hook 'mu4e-compose-mode-hook (lambda () (setq-local fill-column 80)))
+  ;; POLICIES
+  (setq mu4e-context-policy 'pick-first)
+  (setq mu4e-compose-context-policy 'ask)
+  (setq message-kill-buffer-on-exit t)
+  (setq mu4e-hide-index-messages t)
+  (setq org-mu4e-link-query-in-headers-mode nil)
+  (setq mu4e-headers-visible-lines 25)
+  (setq mu4e-view-show-addresses t)
 
-;;   (setq mu4e-headers-include-related t)
-;;   (setq mu4e-headers-show-threads t)
-;;   (setq message-citation-line-function 'message-insert-formatted-citation-line)
-;;   (setq message-citation-line-format "%N @ %Y-%m-%d %H:%M :\n")
+  (setq mu4e-headers-include-related t)
+  (setq mu4e-headers-show-threads t)
+  (setq message-citation-line-function 'message-insert-formatted-citation-line)
+  (setq message-citation-line-format "%N @ %Y-%m-%d %H:%M :\n")
 
 
-;;   ;; (setq message-send-mail-function 'smtpmail-send-it
-;;   ;;     auth-sources '("~/.authinfo") ;need to use gpg version but only local smtp stored for now
-;;   ;;     smtpmail-smtp-server "127.0.0.1"
-;;   ;;     smtpmail-smtp-service 1025
-;;   ;;     smtpmail-stream-type  'ssl)
-;;   )
+  ;; (setq message-send-mail-function 'smtpmail-send-it
+  ;;     auth-sources '("~/.authinfo") ;need to use gpg version but only local smtp stored for now
+  ;;     smtpmail-smtp-server "127.0.0.1"
+  ;;     smtpmail-smtp-service 1025
+  ;;     smtpmail-stream-type  'ssl)
+  )
 
 (use-package libmpdel
   :straight t)
@@ -1148,36 +1149,24 @@ entry."
       "LEVEL=2+glossary"
       'file)))
 
-(defun org-dblock-write:books-finished (_params)
+(defun org-dblock-write:books (params)
   "Generate a list of books finished.
 
-This dynamic block assumes it placed within the month section of a
-capture template 'file+olp+datetree'; where the headling is \"2025-09
-September\"."
-  (let* ((month-entry
-           ;; The month headline in which this block was placed
-           (car
-             (seq-filter
-               (lambda (el)
-                 (and
-                   (eq (org-element-type el) 'headline)
-                   (= (org-element-property :level el) 2)))
-               (org-element-lineage (org-element-at-point)))))
-          (begin-year-month
-            ;; A cons cell of the block's year and month (as integer)
-            (apply #'cons
-              (mapcar
-                #'string-to-number
-                (s-split "-"
-                  (car (s-split " "
-                         (org-element-property
-                           :title month-entry)))))))
-          (end-year-month
-            ;; A cons cell of the block's ending year and month
-            ;; (exclusive)
-            (if (= (cdr begin-year-month) 12)
-              (cons (+ 1 (car begin-year-month)) 1)
-              (cons (car begin-year-month) (+ 1 (cdr begin-year-month)))))
+I'm expecting two PARAM keys:
+- :begin
+- :end
+
+Both dates should be of \"CCYY-MM-DD\" format, with 0s for padding.
+This creates an range with an open begin date and and closed end
+date (that is omit that date)."
+  (let* ((begin
+           (or
+             (plist-get params :begin)
+             (user-error "missing :begin param")))
+          (end
+            (or
+              (plist-get params :end)
+              (user-error "missing :end param")))
           (books
             ;; An alist of book labels and book data.  We use the
             ;; beginning and ending dates to limit our query and only
@@ -1187,11 +1176,11 @@ September\"."
               (org-map-entries
                 #'jf/build-label-and-book-from-epom
                 (format
-                  "+LEVEL=2+books+TODO=\"DONE\"+CLOSED>=\"<%d-%02d-01>\"+CLOSED<\"<%d-%02d-01>\""
-                  (car begin-year-month)
-                  (cdr begin-year-month)
-                  (car end-year-month)
-                  (cdr end-year-month))
+                  (concat
+                    "+LEVEL=2+books+TODO=\"DONE\""
+                    "+CLOSED>=\"<%s>\"+CLOSED<\"<%s>\"")
+                  begin
+                  end)
                 'file))))
     (insert
       ;; With the list of books insert my `work' links to those books.

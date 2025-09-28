@@ -1,3 +1,4 @@
+;; -*- lexical-binding: t; -*-
 (setq random-table/reporter #'random-table/reporter/as-insert)
 
 (keymap-global-set "H-r" #'random-table/roll)

@@ -837,11 +837,7 @@ PARG is for a conformant method signature."
   (defun jf/org/capture/finalize-work ()
     "Finalize works after capture."
     (jf/bibliography/export-shopping-list)
-    (save-restriction
-      (widen)
-      (save-excursion
-        (call-interactively #'org-up-heading nil)
-        (jf/org-sort-entries/ignoring-stop-words))))
+    (jf/works/populate t))
 
   (org-link-set-parameters "epigraph"
     :complete #'jf/org-link-ol-complete/epigraph
@@ -2248,8 +2244,24 @@ bit differently.")
   :straight t
   :commands (typo-mode)
   :hook ((org-mode markdown-mode) . typo-mode)
-  :config (typo-global-mode 1)
+  :config
+  (define-typo-cycle typo-cycle-dashes
+    "Cycle through various dashes."
+    ("-" ; HYPHEN-MINUS
+      "–" ; EN DASH
+      "—" ; EM DASH
+      "―" ; QUOTE-Dash
+      "−" ; MINUS SIGN
+      "‐" ; HYPHEN
+      "‑" ; NON-BREAKING HYPHEN
+      ))
+  (define-typo-cycle typo-cycle-multiplication-signs
+  "Cycle through the asterisk and various multiplication signs"
+  ("*" "×" "·"))
   ;; I definitely don’t want my ‘ key to serve double duty
+  (bind-key "*" #'typo-cycle-multiplication-signs typo-mode-map)
+  (bind-key "?" #'typo-cycle-question-mark typo-mode-map)
+  (bind-key "!" #'typo-cycle-exclamation-mark typo-mode-map)
   (unbind-key "`" typo-mode-map))
 
 (defun jf/toggle-typo-mode ()
@@ -3426,8 +3438,8 @@ Each member's `car' is title and `cdr' is `org-mode' element."
     "Configure `org-mode' to my particulars."
     (setq-local tab-width 8)
     (jinx-mode 1)
-    (add-hook 'before-save-hook
-      #'jf/org-mode/recalculate-buffer-tables nil :local)
+    ;; (add-hook 'before-save-hook
+    ;;   #'jf/org-mode/recalculate-buffer-tables nil :local)
     ;; (add-hook 'before-save-hook
     ;;   #'jf/org-add-ids-to-headlines-in-file nil 'local)
     (add-hook 'focus-out-hook
@@ -6874,6 +6886,14 @@ Useful for Eglot."
     ("C-r" . isearch-backward))
   :config (global-so-long-mode 1))
 
+(use-package writeroom-mode
+  ;; Where olivetti is great for reading...I find writeroom great for
+  ;; writing.
+  :straight t)
+
+(advice-add 'text-scale-adjust :after
+  #'visual-fill-column-adjust)
+
 (use-package olivetti
   ;; A package to "narrow" focus; providing a visually appealing
   ;; interface
@@ -7616,7 +7636,7 @@ The `magit-gitdir' is the project's .git directory."
     (add-to-list 'org-agenda-custom-commands
       `("d" "Done this year"
          ((tags ,query))))
-    (let ((query (concat "books+" query)))
+    (let ((query (concat "level=2+books+" query)))
       (add-to-list 'org-agenda-custom-commands
         `("b" "Books read this year"
            ((tags ,query))))))
@@ -8659,7 +8679,7 @@ This encodes the logic for creating a project."
         (projectile-git-command .
           "git ls-files -zco --exclude-from=.projectile.gitignore")
         (org-latex-toc-command .
-          "\\tableofcontents\n\\begin{multicols}{2}\\\let\\oldhref\\href\n\\renewcommand{\\href}[2]{\\oldhref{#1}{#2}\\footnote{\\url{#1}}}\n")
+          "\\begin{multicols}{2}\n\\tableofcontents\n\\end{multicols}\\newpage\\begin{multicols}{2}\\\let\\oldhref\\href\n\\renewcommand{\\href}[2]{\\oldhref{#1}{#2}\\footnote{\\url{#1}}}\n")
         )))
 
 (provide 'init)
