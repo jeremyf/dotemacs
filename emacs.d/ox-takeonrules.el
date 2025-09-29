@@ -1203,5 +1203,16 @@ Take on Rules using the \"blockquote\" special block."
 (advice-add #'org-html-quote-block :around #'jf/org-html-quote-block)
 (advice-add #'org-md-quote-block :around #'jf/org-md-quote-block)
 
+(defvar-local jf/org-latex-src-block-skip nil
+  "When non-nil skip exporting src and example blocks for LaTeX.")
+
+(defun jf/org-latex-src-block (&rest args)
+  (if jf/org-latex-src-block-skip
+    "\\vspace{5mm}\\fbox{Code omitted for brevity}\\vspace{5mm}\n"
+    (apply args)))
+
+(advice-add #'org-latex-example-block :around #'jf/org-latex-src-block)
+(advice-add #'org-latex-src-block :around #'jf/org-latex-src-block)
+
 (provide 'ox-takeonrules)
 ;;; ox-takeonrules.el ends here
