@@ -67,7 +67,13 @@
               nil))
           (published-p
             (s-present?
-              (lax-plist-get properties "ROAM_REFS"))))
+              (lax-plist-get properties "ROAM_REFS")))
+          (closed-at
+            (when published-p
+              (format-time-string "[%F %a %H:%M]"
+                (date-to-time
+                  (lax-plist-get properties "HUGO_PUBLISHDATE")))))
+          )
     ;; DO WE HAVE FOOTNOTES?
     (with-current-buffer (find-file-noselect
                            jf/personal/filename-for-journal)
@@ -75,17 +81,29 @@
         (save-restriction
           (widen)
           (goto-char (point-min))
-          ;; Position to the parent headline.  This will error if one
-          ;; does not exist
-          (search-forward-regexp
-            (concat "^\\*\\*\\* +" parent-headline-title))
+          ;; Position to the parent headline.
+          (unless (search-forward-regexp
+                    (concat "^\\*\\*\\* +" parent-headline-title) nil t)
+            (progn
+              (search-forward-regexp
+                (concat "^\\*\\* +"
+                  (format-time-string "%Y-%m %B" time)))
+              (org-insert-subheading '(4))
+              (insert parent-headline-title)
+              ;; (goto-char (point-min))
+              ;; (search-forward-regexp
+              ;;   (concat "^\\*\\*\\* +" parent-headline-title))
+              ))
           (org-insert-subheading '(4))
           (insert (if published-p "PUBLISHED " "DRAFT ")
             (lax-plist-get properties "TITLE")
             " "
             (lax-plist-get properties "FILETAGS")
-            "\nCLOSED: "
-            (format-time-string "[%F %a %H:%M]" time)
+            (if closed-at
+              (concat
+                "\nCLOSED: "
+                closed-at)
+                "")
             "\n:PROPERTIES:"
             "\n:CUSTOM_ID: "
             identifier
@@ -100,7 +118,9 @@
                 "\n:DESCRIPTION: "
                 (lax-plist-get properties "DESCRIPTION")
                 "\n:EXPORT_FILE_NAME: "
-                (f-base file))
+                (f-base file)
+                "\n:PUBLISHED_AT: "
+                (lax-plist-get properties "HUGO_PUBLISHDATE"))
               "")
             "\n:END:"
             "\n"
@@ -115,79 +135,90 @@
       (f-delete file)
       )))
 
-(with-current-buffer (find-file-noselect jf/personal/filename-for-journal)
-  (save-excursion
-    (save-restriction
-      (widen)
-      (dolist (before-after '(("[dentoe:20250101T085001]" . "[denote:20241114T075414::#20250101T085001]")
-                               ("[dentoe:20250104T093754]" . "[denote:20241114T075414::#20250104T093754]")
-                               ("[denote:20250105T075810]" . "[denote:20241114T075414::#20250105T075810]")
-                               ("[denote:20250106T113811]" . "[denote:20241114T075414::#20250106T113811]")
-                               ("[denote:20250107T082446]" . "[denote:20241114T075414::#20250107T082446]")
-                               ("[denote:20250107T183243]" . "[denote:20241114T075414::#20250107T183243]")
-                               ("[denote:20250110T171802]" . "[denote:20241114T075414::#20250110T171802]")
-                               ("[denote:20250111T063043]" . "[denote:20241114T075414::#20250111T063043]")
-                               ("[denote:20250112T205723]" . "[denote:20241114T075414::#20250112T205723]")
-                               ("[denote:20250113T063713]" . "[denote:20241114T075414::#20250113T063713]")
-                               ("[denote:20250113T183357]" . "[denote:20241114T075414::#20250113T183357]")
-                               ("[denote:20250114T104916]" . "[denote:20241114T075414::#20250114T104916]")
-                               ("[denote:20250115T083225]" . "[denote:20241114T075414::#20250115T083225]")
-                               ("[denote:20250116T082654]" . "[denote:20241114T075414::#20250116T082654]")
-                               ("[denote:20250117T162430]" . "[denote:20241114T075414::#20250117T162430]")
-                               ("[denote:20250118T061015]" . "[denote:20241114T075414::#20250118T061015]")
-                               ("[denote:20250120T053808]" . "[denote:20241114T075414::#20250120T053808]")
-                               ("[denote:20250120T202237]" . "[denote:20241114T075414::#20250120T202237]")
-                               ("[denote:20250122T105133]" . "[denote:20241114T075414::#20250122T105133]")
-                               ("[denote:20250122T194932]" . "[denote:20241114T075414::#20250122T194932]")
-                               ("[denote:20250123T094551]" . "[denote:20241114T075414::#20250123T094551]")
-                               ("[denote:20250127T172223]" . "[denote:20241114T075414::#20250127T172223]")
-                               ("[denote:20250129T071405]" . "[denote:20241114T075414::#20250129T071405]")
-                               ("[denote:20250129T175338]" . "[denote:20241114T075414::#20250129T175338]")
-                               ("[denote:20250204T183116]" . "[denote:20241114T075414::#20250204T183116]")
-                               ("[denote:20250205T201043]" . "[denote:20241114T075414::#20250205T201043]")
-                               ("[denote:20250207T194529]" . "[denote:20241114T075414::#20250207T194529]")
-                               ("[denote:20250208T124907]" . "[denote:20241114T075414::#20250208T124907]")
-                               ("[denote:20250301T143446]" . "[denote:20241114T075414::#20250301T143446]")
-                               ("[denote:20250309T210928]" . "[denote:20241114T075414::#20250309T210928]")
-                               ("[denote:20250310T140745]" . "[denote:20241114T075414::#20250310T140745]")
-                               ("[denote:20250314T142830]" . "[denote:20241114T075414::#20250314T142830]")
-                               ("[denote:20250319T133918]" . "[denote:20241114T075414::#20250319T133918]")
-                               ("[denote:20250320T225456]" . "[denote:20241114T075414::#20250320T225456]")
-                               ("[denote:20250325T095903]" . "[denote:20241114T075414::#20250325T095903]")
-                               ("[denote:20250327T074541]" . "[denote:20241114T075414::#20250327T074541]")
-                               ("[denote:20250327T082356]" . "[denote:20241114T075414::#20250327T082356]")
-                               ("[denote:20250402T184910]" . "[denote:20241114T075414::#20250402T184910]")
-                               ("[denote:20250408T093243]" . "[denote:20241114T075414::#20250408T093243]")
-                               ("[denote:20250409T122434]" . "[denote:20241114T075414::#20250409T122434]")
-                               ("[denote:20250410T104847]" . "[denote:20241114T075414::#20250410T104847]")
-                               ("[denote:20250411T112545]" . "[denote:20241114T075414::#20250411T112545]")
-                               ("[denote:20250414T093730]" . "[denote:20241114T075414::#20250414T093730]")
-                               ("[denote:20250415T113302]" . "[denote:20241114T075414::#20250415T113302]")
-                               ("[denote:20250415T140348]" . "[denote:20241114T075414::#20250415T140348]")
-                               ("[denote:20250417T120140]" . "[denote:20241114T075414::#20250417T120140]")
-                               ("[denote:20250502T112002]" . "[denote:20241114T075414::#20250502T112002]")
-                               ("[denote:20250502T164508]" . "[denote:20241114T075414::#20250502T164508]")
-                               ("[denote:20250503T083457]" . "[denote:20241114T075414::#20250503T083457]")
-                               ("[denote:20250504T090346]" . "[denote:20241114T075414::#20250504T090346]")
-                               ("[denote:20250505T081314]" . "[denote:20241114T075414::#20250505T081314]")
-                               ("[denote:20250506T164359]" . "[denote:20241114T075414::#20250506T164359]")
-                               ("[denote:20250510T183456]" . "[denote:20241114T075414::#20250510T183456]")
-                               ("[denote:20250523T133027]" . "[denote:20241114T075414::#20250523T133027]")
-                               ("[denote:20250524T121747]" . "[denote:20241114T075414::#20250524T121747]")
-                               ("[denote:20250528T140108]" . "[denote:20241114T075414::#20250528T140108]")
-                               ("[denote:20250530T085004]" . "[denote:20241114T075414::#20250530T085004]")
-                               ("[denote:20250605T072051]" . "[denote:20241114T075414::#20250605T072051]")
-                               ("[denote:20250608T081003]" . "[denote:20241114T075414::#20250608T081003]")
-                               ("[denote:20250609T084513]" . "[denote:20241114T075414::#20250609T084513]")
-                               ("[denote:20250612T081424]" . "[denote:20241114T075414::#20250612T081424]")
-                               ("[denote:20250613T075044]" . "[denote:20241114T075414::#20250613T075044]")
-                               ("[denote:20250616T120103]" . "[denote:20241114T075414::#20250616T120103]")
-                               ("[denote:20250617T075329]" . "[denote:20241114T075414::#20250617T075329]")
-                               ("[denote:20250623T200252]" . "[denote:20241114T075414::#20250623T200252]")
-                               ("[denote:20250627T125456]" . "[denote:20241114T075414::#20250627T125456]")
-                               ("[denote:20250628T080426]" . "[denote:20241114T075414::#20250628T080426]")
-                               ("[denote:20250709T215652]" . "[denote:20241114T075414::#20250709T215652]")
-                               ("[denote:20250728T173103]" . "[denote:20241114T075414::#20250728T173103]")))
+(setq identifiers '(
+"20250101T085001"
+"20250104T093754"
+"20250105T075810"
+"20250106T113811"
+"20250107T082446"
+"20250107T183243"
+"20250110T171802"
+"20250111T063043"
+"20250112T205723"
+"20250113T063713"
+"20250113T183357"
+"20250114T104916"
+"20250115T083225"
+"20250116T082654"
+"20250117T162430"
+"20250118T061015"
+"20250120T053808"
+"20250120T202237"
+"20250122T105133"
+"20250122T194932"
+"20250123T094551"
+"20250127T172223"
+"20250129T071405"
+"20250129T175338"
+"20250204T183116"
+"20250205T201043"
+"20250207T194529"
+"20250208T124907"
+"20250301T143446"
+"20250309T210928"
+"20250310T140745"
+"20250314T142830"
+"20250319T133918"
+"20250325T095903"
+"20250327T074541"
+"20250327T082356"
+"20250402T184910"
+"20250408T093243"
+"20250409T122434"
+"20250410T104847"
+"20250411T112545"
+"20250414T093730"
+"20250415T113302"
+"20250415T140348"
+"20250417T120140"
+"20250502T112002"
+"20250502T164508"
+"20250503T083457"
+"20250504T090346"
+"20250505T081314"
+"20250506T164359"
+"20250510T183456"
+"20250523T133027"
+"20250524T121747"
+"20250528T140108"
+"20250530T085004"
+"20250605T072051"
+"20250608T081003"
+"20250609T084513"
+"20250612T081424"
+"20250616T120103"
+"20250617T075329"
+"20250623T200252"
+"20250627T125456"
+"20250628T080426"
+"20250709T215652"
+"20250728T173103"
+                    ))
+
+(dolist (identifier identifiers)
+  (ingest-blog-post identifier)
+  (save-buffer))
+
+(dolist (identifier identifiers)
+  (with-current-buffer (find-file-noselect jf/personal/filename-for-journal)
+    (save-excursion
+      (save-restriction
+        (widen)
         (goto-char (point-min))
-        (replace-string (car before-after) (cdr before-after)))
-      (save-buffer))))
+        (replace-string
+          (format "[denote:%s]" identifier)
+          (format "[denote:20241114T075414::#%s]" identifier))
+        (save-buffer)))))
+
+;; Ran query-replace-regexp with the following:
+;; ::GLOSSARY-\([^]]+\) --> \,(upcase \&)
