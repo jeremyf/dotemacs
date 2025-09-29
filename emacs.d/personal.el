@@ -657,22 +657,34 @@ Useful for narrowing regions.")
 (require 'request)
 (require 's)
 
+(cl-defun jf/book-make-label (&key title subtitle author translator)
+  "From given TITLE, SUBTITLE, AUTHOR, TRANSLATOR return its label."
+  (format "«%s»%s%s"
+    (if (s-present? subtitle)
+      (concat title ": " subtitle)
+      title)
+    (if (s-present? author)
+      (concat " by " author) "")
+    (if (s-present? translator)
+      (concat " translated by " translator) "")))
+
 (cl-defstruct jf/book
   "A basic representation of a book as it relates to my personal
 bibliography.
 
 Slots:
-- label:     Used for comparing to labels from my bibliography; expected
-             to conform to `jf/book-make-label' function.
-- title:     The ubiquitous human readable identifier of a work.
-- author:    The author(s) of the book; separated by \" and \".
-- subtitle:  Usually the words after the colon of a title.
-- tags:      A list of tags for the book; these are internal values.
-- isbn:      The ISBN for the given book.  One of the unique
-             identifiers.
-- custom_id: The `org-mode' headline CUSTOM_ID property, used for
-             helping find the headline."
-  label title author subtitle tags isbn custom_id)
+- label:       Used for comparing to labels from my bibliography;
+               expected to conform to `jf/book-make-label' function.
+- title:       The ubiquitous human readable identifier of a work.
+- author:      The author(s) of the book; separated by \" and \".
+- translator:  The author(s) of the book; separated by \" and \".
+- subtitle:    Usually the words after the colon of a title.
+- tags:        A list of tags for the book; these are internal values.
+- isbn:        The ISBN for the given book.  One of the unique
+               identifiers.
+- custom_id:   The `org-mode' headline CUSTOM_ID property, used for
+               helping find the headline."
+  label title author translator subtitle tags isbn custom_id)
 
 (defvar my-cache-of-books
   (make-hash-table :test 'equal)
@@ -751,8 +763,12 @@ When CLEAR-CACHE is non-nil, clobber the cache and rebuild."
               (subtitle
                 (org-entry-get
                   epom "SUBTITLE"))
+              (translator
+                (org-entry-get
+                  epom "TRANSLATOR"))
               (label (jf/book-make-label
-                       title subtitle author)))
+                       :title title :subtitle subtitle
+                       :author author :translator translator)))
         (cons label
           (make-jf/book
             :label label
@@ -760,6 +776,7 @@ When CLEAR-CACHE is non-nil, clobber the cache and rebuild."
             :title title
             :subtitle subtitle
             :author author
+            :translator translator
             :custom_id (org-entry-get
                          epom
                          "CUSTOM_ID")
@@ -798,7 +815,8 @@ operates on the book.  There would need to be an inversion of behavior."
                             (make-jf/book
                              :isbn isbn
                              :label (jf/book-make-label
-                                     title subtitle author)
+                                      :title title :subtitle subtitle
+                                      :author author)
                              :subtitle subtitle
                              :author author
                              :title title)))))))
@@ -864,7 +882,10 @@ ignore any guards against performing work on an already existing ISBN."
                             (s-join " and "
                               (plist-get node :authors)))
                           (label
-                            (jf/book-make-label title subtitle author)))
+                            (jf/book-make-label
+                              :title title
+                              :subtitle subtitle
+                              :author author)))
                     (make-jf/book
                       :label label
                       :title title

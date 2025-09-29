@@ -752,36 +752,36 @@ PARG is part of the method signature for `org-link-parameters'."
     )
 
   (defun jf/org-link-description/glossary (link desc)
-  "Provide default DESC for a glossary LINK.
+    "Provide default DESC for a glossary LINK.
 
 Types can be: abbr, abbr-plural, and denote"
-  (if desc
+    (if desc
       desc
-    (let* ((_match
-            (string-match "^\\([^:]+\\):\\([^:]+\\)\\(::#\\(.*\\)\\)?"
-                          link))
-           (type
-            (match-string 1 link))
-           (denote-identifier
-            (match-string 2 link))
-           (custom_id
-            (match-string 4 link))
-           (entry
-            (car (org-map-entries
-                  #'org-element-at-point
-                  (format "CUSTOM_ID=\"%s\"" custom_id)
-                  (list (denote-get-path-by-id denote-identifier))))))
-      (if entry
+      (let* ((_match
+               (string-match "^\\([^:]+\\):\\([^:]+\\)\\(::#\\(.*\\)\\)?"
+                 link))
+              (type
+                (match-string 1 link))
+              (denote-identifier
+                (match-string 2 link))
+              (custom_id
+                (match-string 4 link))
+              (entry
+                (car (org-map-entries
+                       #'org-element-at-point
+                       (format "CUSTOM_ID=\"%s\"" custom_id)
+                       (list (denote-get-path-by-id denote-identifier))))))
+        (if entry
           (pcase type
             ("abbr"
-             (or (org-entry-get entry "ABBR")
-                 (org-element-property :title entry)))
+              (or (org-entry-get entry "ABBR")
+                (org-element-property :title entry)))
             ("abbr-plural"
-             (or (org-entry-get entry "PLURAL_ABBR")
-                 (org-element-property :title entry)))
+              (or (org-entry-get entry "PLURAL_ABBR")
+                (org-element-property :title entry)))
             ("denote"
-             (org-element-property :title entry)))
-        nil))))
+              (org-element-property :title entry)))
+          nil))))
 
   (org-link-set-parameters "abbr-plural"
     :insert-description #'jf/org-link-description/glossary
@@ -858,18 +858,23 @@ PARG is for a conformant method signature."
                 (member "author" slugs))
               (include-subtitle
                 (member "subtitle" slugs))
+              (include-translator
+                (member "translator" slugs))
               (book-label
                 (car (org-map-entries
                        (lambda ()
                          (jf/book-make-label
-                           (org-element-property
-                             :title (org-element-at-point))
-                           (when include-subtitle
-                             (org-entry-get
-                               (org-element-at-point) "SUBTITLE"))
-                           (when include-author
-                             (org-entry-get
-                               (org-element-at-point) "AUTHOR"))))
+                           :title (org-element-property
+                                    :title (org-element-at-point))
+                           :subtitle (when include-subtitle
+                                       (org-entry-get
+                                         (org-element-at-point) "SUBTITLE"))
+                           :author (when include-author
+                                     (org-entry-get
+                                       (org-element-at-point) "AUTHOR"))
+                           :translator (when include-translator
+                                         (org-entry-get
+                                           (org-element-at-point) "TRANSLATOR"))))
                        (format "CUSTOM_ID=\"%s\"" custom-id)
                        `(,jf/filename/bibliography)))))
         book-label)))
@@ -892,15 +897,6 @@ PARG is for a conformant method signature."
         (call-interactively #'org-previous-visible-heading))
       (pulsar--pulse)))
 
-  (defun jf/book-make-label (title subtitle author)
-    "From the given TITLE, SUBTITLE and AUTHOR return it's formatted label."
-    (format "«%s»%s"
-      (if (s-present? subtitle)
-        (concat title ": " subtitle)
-        title)
-      (if (s-present? author)
-        (concat " by " author) "")))
-
   (defun jf/org-link-ol-complete/work ()
     "Prompt for a work from my bibliography"
     (interactive)
@@ -916,36 +912,113 @@ PARG is for a conformant method signature."
                          (subtitle
                            (org-entry-get headline "SUBTITLE"))
                          (author
-                           (org-entry-get headline "AUTHOR")))
+                           (org-entry-get headline "AUTHOR"))
+                         (translator
+                           (org-entry-get headline "TRANSLATOR")))
                    (cons
-                     (jf/book-make-label title subtitle author)
+                     (jf/book-make-label
+                       :title title :subtitle subtitle
+                       :author author :translator translator)
                      (list
                        :id (org-entry-get headline "CUSTOM_ID")
                        :title title
                        :subtitle subtitle
-                       :author author))))
+                       :author author
+                       :translator translator))))
                "+LEVEL=2+!people"
                (list jf/filename/bibliography)))
             (work
               (completing-read "Citable: " works nil t)))
       (when-let* ((work-data
-                   (alist-get work works nil nil #'string=)))
+                    (alist-get work works nil nil #'string=)))
         (let* ((include-author
                  (and (plist-get work-data :author)
                    (yes-or-no-p "Include Author: ")))
                 (include-subtitle
                   (and (plist-get work-data :subtitle)
-                    (yes-or-no-p "Include Subtitle: "))))
-          (format "work:%s%s%s"
+                    (yes-or-no-p "Include Subtitle: ")))
+                (include-translator
+                  (and (plist-get work-data :translator)
+                    (yes-or-no-p "Include translator: "))))
+          (format "work:%s%s%s%s"
             (plist-get work-data :id)
             (if include-author "::author" "")
-            (if include-subtitle "::subtitle" ""))))))
+            (if include-subtitle "::subtitle" "")
+            (if include-translator "::translator" ""))))))
 
   (defvar jf/works/cache
     (make-hash-table :test 'equal)
     "A cache of all works ready for exporting.
 
 See `jf/works/populate'.")
+
+  (defun jf/org-link-ol-export/work (link description format channel)
+    "Export the text of the LINK work in the corresponding FORMAT.
+
+We ignore the DESCRIPTION and probably the CHANNEL."
+    (let* ((link-with-properties
+             (s-split "::" link))
+            (link
+              (car link-with-properties))
+            (with-author
+              (member "author" link-with-properties))
+            (with-subtitle
+              (member "subtitle" link-with-properties))
+            (with-translator
+              (member "translator" link-with-properties))
+            (works
+              (jf/works/populate)))
+      (when-let* ((work
+                    (gethash link works)))
+        (let ((author-suffix
+                (if (and
+                      with-author
+                      (s-present? (plist-get work :author)))
+                  (format " by %s" (plist-get work :author))
+                  ""))
+               (translator-suffix
+                 (if (and
+                       with-translator
+                       (s-present? (plist-get work :translator)))
+                   (format " translated by %s" (plist-get work :translator))
+                   "")))
+          ;; Then we create the corresponding format.
+          (cond
+            ((or (eq format 'html) (eq format 'md))
+              (format "<cite data-id=\"%s\">%s</cite>%s%s"
+                link
+                (if-let* ((url
+                            (plist-get work :url)))
+                  (format "<a href=\"%s\">%s</a>"
+                    url (plist-get work :title))
+                  (plist-get work :title))
+                author-suffix
+                translator-suffix))
+            ((eq format 'latex)
+              (format "\\textit{%s}%s%s"
+                (if-let* ((url
+                            (plist-get work :url)))
+                  (format "\\href{%s}{%s}"
+                    url (plist-get work :title))
+                  (plist-get work :title))
+                author-suffix
+                translator-suffix))
+            ((eq format 'odt)
+              (format
+                "<text:span text:style-name=\"%s\">%s</text:span>%s%s"
+                "Emphasis"
+                (if-let* ((url
+                            (plist-get work :url)))
+                  (format "<text:a xlink:type=\"simple\" xlink:href=\"%s\">%s</text:a>"
+                    url (plist-get work :title))
+                  (plist-get work :title))
+                author-suffix
+                translator-suffix))
+            (t
+              (format "“%s”%s%s"
+                (plist-get work :title)
+                author-suffix
+                translator-suffixq)))))))
 
   (defun jf/works/populate (&optional clear-cache)
     "Populates and returns the `jf/works/cache'.
@@ -961,77 +1034,23 @@ When CLEAR-CACHE is non-nil, clobber the cache and rebuild."
                        ;; Skip un-named blocks as we can’t link to
                        ;; them.
                        (id
-                          (org-entry-get el "CUSTOM_ID")))
-              (puthash id
-                (list
-                  :title
-                  (org-element-property :title el)
-                  :subtitle
-                  (org-entry-get el "SUBTITLE")
-                  :author
-                  (org-entry-get el "AUTHOR")
-                  :url
-                  (org-entry-get el "ROAM_REFS"))
-                jf/works/cache)))
+                         (org-entry-get el "CUSTOM_ID")))
+            (puthash id
+              (list
+                :title
+                (org-element-property :title el)
+                :subtitle
+                (org-entry-get el "SUBTITLE")
+                :author
+                (org-entry-get el "AUTHOR")
+                :translator
+                (org-entry-get el "TRANSLATOR")
+                :url
+                (org-entry-get el "ROAM_REFS"))
+              jf/works/cache)))
         (concat "+level=2+works")
         `(,jf/filename/bibliography)))
     jf/works/cache)
-
-  (defun jf/org-link-ol-export/work (link description format channel)
-    "Export the text of the LINK work in the corresponding FORMAT.
-
-We ignore the DESCRIPTION and probably the CHANNEL."
-    (let* ((link-with-properties
-             (s-split "::" link))
-            (link
-              (car link-with-properties))
-            (with-author
-              (member "author" link-with-properties))
-            (with-subtitle
-              (member "subtitle" link-with-properties))
-            (works
-              (jf/works/populate)))
-      (when-let* ((work
-                   (gethash link works)))
-        (let ((author-suffix
-                (if (and
-                      with-author
-                      (s-present? (plist-get work :author)))
-                  (format " by %s" (plist-get work :author))
-                  "")))
-          ;; Then we create the corresponding format.
-          (cond
-            ((or (eq format 'html) (eq format 'md))
-              (format "<cite data-id=\"%s\">%s</cite>%s"
-                link
-                (if-let* ((url
-                           (plist-get work :url)))
-                  (format "<a href=\"%s\">%s</a>"
-                    url (plist-get work :title))
-                  (plist-get work :title))
-                author-suffix))
-            ((eq format 'latex)
-              (format "\\textit{%s}%s"
-                (if-let* ((url
-                           (plist-get work :url)))
-                  (format "\\href{%s}{%s}"
-                    url (plist-get work :title))
-                  (plist-get work :title))
-                author-suffix))
-            ((eq format 'odt)
-              (format
-                "<text:span text:style-name=\"%s\">%s</text:span>%s"
-                "Emphasis"
-                (if-let* ((url
-                           (plist-get work :url)))
-                  (format "<text:a xlink:type=\"simple\" xlink:href=\"%s\">%s</text:a>"
-                    url (plist-get work :title))
-                  (plist-get work :title))
-                author-suffix))
-            (t
-              (format "“%s”%s"
-                (plist-get work :title)
-                author-suffix)))))))
 
   (org-link-set-parameters "elfeed"
     :follow #'elfeed-link-open
@@ -1095,19 +1114,19 @@ We ignore the DESCRIPTION and probably the CHANNEL."
                  (plist-get (cadr element) :path)))
           (if (member type types)
             (when-let* ((new-type
-                         (completing-read "New link type: "
-                           types nil t)))
+                          (completing-read "New link type: "
+                            types nil t)))
               (if-let* ((new-text
-                         (jf/denote/org-property-from-id
-                           :identifier denote-id
-                           :property
-                           (cond
-                             ((string= "abbr" new-type)
-                               "ABBR")
-                             ((string= "abbr-plural" new-type)
-                               "PLURAL_ABBR")
-                             ((string= "denote" new-type)
-                               "TITLE")))))
+                          (jf/denote/org-property-from-id
+                            :identifier denote-id
+                            :property
+                            (cond
+                              ((string= "abbr" new-type)
+                                "ABBR")
+                              ((string= "abbr-plural" new-type)
+                                "PLURAL_ABBR")
+                              ((string= "denote" new-type)
+                                "TITLE")))))
                 (replace-regexp-in-region
                   (concat "\\[\\[\\([^:]+\\):\\([0-9A-Z]+\\)"
                     "\\]\\[\\([^]]+\\)\\]\\]")
@@ -1630,9 +1649,9 @@ active nature."
                   'special-mode
                   'message-mode)))
          (when-let* ((task
-                      (timeclock/active-task-name)))
+                       (timeclock/active-task-name)))
            (jf/mode-line-indicator
-               'nerd-icons-mdicon "nf-md-book_clock"
+             'nerd-icons-mdicon "nf-md-book_clock"
              "↻" 'mode-line-highlight (format "[%s]" task))))))
 
   (defvar-local jf/mode-line-format/org-clock
@@ -1752,8 +1771,8 @@ active nature."
   (defun jf/mode-line-format/vc-branch-name (file backend)
     "Return VC branch name for FILE with BACKEND."
     (when-let* ((rev (vc-working-revision file backend))
-                (branch (or (vc-git--symbolic-ref file)
-                          (substring rev 0 7))))
+                 (branch (or (vc-git--symbolic-ref file)
+                           (substring rev 0 7))))
       branch))
 
   (defvar-local jf/mode-line-format/flymake
@@ -2090,8 +2109,8 @@ bit differently.")
       "‑" ; NON-BREAKING HYPHEN
       ))
   (define-typo-cycle typo-cycle-multiplication-signs
-  "Cycle through the asterisk and various multiplication signs"
-  ("*" "×" "·"))
+    "Cycle through the asterisk and various multiplication signs"
+    ("*" "×" "·"))
   ;; I definitely don’t want my ‘ key to serve double duty
   (bind-key "*" #'typo-cycle-multiplication-signs typo-mode-map)
   (bind-key "?" #'typo-cycle-question-mark typo-mode-map)
@@ -3508,16 +3527,57 @@ function is ever added to that hook."
        ("\\subsubsection{%s}" . "\\subsubsection{%s}")
        ("\\paragraph{%s}" . "\\paragraph{%s}")
        ("\\subparagraph{%s}" . "\\subparagraph{%s}")))
-  (add-to-list 'org-latex-classes
-    '("jf/two-column-landscape"
-       "\\documentclass[10pt,letter,landscape]{article}
+  (progn
+    ;; (setq org-latex-classes nil)
+    (add-to-list 'org-latex-classes
+      '("jf/memoir"
+         "\\documentclass[10pt,letter,landscape,twoside]{book}
 \\usepackage[letter]{anysize}
 \\usepackage{minted}
 \\usepackage{array, booktabs, caption}
 \\usemintedstyle{emacs}
 \\usepackage[linktocpage=true]{hyperref}
 \\usepackage[french,english]{babel}
-\\usepackage[a4paper,top=3cm,bottom=3cm]{geometry}
+\\usepackage[letter]{geometry}
+\\usepackage{minimalist}
+\\usepackage{fontspec}
+\\usepackage{caption} \\captionsetup{labelfont=bf,font={sf,small}}
+\\setmainfont{TeX Gyre Pagella}
+\\usepackage{enumitem} \\setlist{nosep}
+\\usepackage{longtable}
+\\usepackage{microtype}
+\\AtBeginEnvironment{longtable}{\\footnotesize}
+\\usepackage[marginal,hang]{footmisc}
+\\usepackage{relsize,etoolbox}
+\\AtBeginEnvironment{quote}{\\smaller}
+\\AtBeginEnvironment{tabular}{\\smaller}
+\\usepackage[printonlyused,nohyperlinks]{acronym}
+\\usepackage{mathabx}
+\\usepackage{multicol}
+\\setlength\\columnsep{20pt}
+\\hypersetup{colorlinks=true, linkcolor=blue, filecolor=magenta, urlcolor=cyan}
+\\tolerance=1000
+\\usepackage{float}
+\\usepackage{rotating}
+\\usepackage{sectsty}
+\\usepackage{titlesec}
+\\titleformat{\\section}{\\normalfont\\fontsize{12}{18}\\bfseries}{\\thesection}{1em}{}
+\\setcounter{secnumdepth}{1}"
+         ("\\section{%s}" . "\\section{%s}")
+         ("\\subsection{%s}" . "\\subsection{%s}")
+         ("\\subsubsection{%s}" . "\\subsubsection{%s}")
+         ("\\paragraph{%s}" . "\\paragraph{%s}")
+         ("\\subparagraph{%s}" . "\\subparagraph{%s}"))))
+  (add-to-list 'org-latex-classes
+    '("jf/two-column-landscape"
+       "\\documentclass[10pt,letter,landscape,twoside]{article}
+\\usepackage[letter]{anysize}
+\\usepackage{minted}
+\\usepackage{array, booktabs, caption}
+\\usemintedstyle{emacs}
+\\usepackage[linktocpage=true]{hyperref}
+\\usepackage[french,english]{babel}
+\\usepackage[letter,top=1in,bottom=1in,left=1in,right=1in]{geometry}
 \\usepackage{minimalist}
 \\usepackage{fontspec}
 \\usepackage{caption} \\captionsetup{labelfont=bf,font={sf,small}}
@@ -3629,13 +3689,13 @@ function is ever added to that hook."
     (cond
       ((equal backend 'latex)
         (if-let* ((filter-body
-                   (plist-get plist :filter-body)))
+                    (plist-get plist :filter-body)))
           (progn
             (add-to-list 'filter-body jf/ox/filter-body/latex)
             (plist-put plist :filter-body filter-body))
           (plist-put plist :filter-body '(jf/ox/filter-body/latex)))
         (if-let* ((filter-final-output
-                   (plist-get plist :filter-final-output)))
+                    (plist-get plist :filter-final-output)))
           (progn
             (add-to-list 'filter-final-output jf/ox/filter-final-output/latex)
             (plist-put plist :filter-final-output filter-final-output))
@@ -3646,40 +3706,40 @@ function is ever added to that hook."
     'jf/org-export-change-options)
 
   (defun jf/ox/filter-final-output/latex (body backend info)
-  "Conditionally add an acronym package to exported LaTeX document."
-  (if-let* ((abbr-links (plist-get info :abbr-links)))
-    (replace-regexp-in-string
-      "^\\\\documentclass\\(.*\\)"
-      (lambda (md)
-        "Acronym package to matching line."
-        (concat "\\\\documentclass" (match-string 1 md)
-          "\n\\\\usepackage[printonlyused,withpage]{acronym}"))
-      body)
-    body))
+    "Conditionally add an acronym package to exported LaTeX document."
+    (if-let* ((abbr-links (plist-get info :abbr-links)))
+      (replace-regexp-in-string
+        "^\\\\documentclass\\(.*\\)"
+        (lambda (md)
+          "Acronym package to matching line."
+          (concat "\\\\documentclass" (match-string 1 md)
+            "\n\\\\usepackage[printonlyused,withpage]{acronym}"))
+        body)
+      body))
 
-(defun jf/ox/filter-body/latex (body backend info)
-  "Conditionally add a list of acronyms to the exported LaTeX document.
+  (defun jf/ox/filter-body/latex (body backend info)
+    "Conditionally add a list of acronyms to the exported LaTeX document.
 
 To have a meaningful render, this requires using the acronym LaTeX
 package.  The `jf/ox/filter-final-output/latex' handles injecting that
 LaTeX package."
-  (if-let* ((abbr-links (plist-get info :abbr-links)))
-    ;; We encountered some links, let's add a section.
-    (progn
-      (concat
-        body
-        "\n\\section{List of Acronyms}\n"
-        "\\begin{acronym}\n"
-        (mapconcat
-          (lambda (cell)
-            "Create an acro for link."
-            (format "\\acro{%s}{%s}" (car cell) (cdr cell)))
-          ;; Sort the keys alphabetically.  Otherwise they are rendered
-          ;; in the reverse order in which they are encountered.
-          (sort abbr-links :key #'car)
-          "\n")
-        "\n\\end{acronym}\n"))
-    body))
+    (if-let* ((abbr-links (plist-get info :abbr-links)))
+      ;; We encountered some links, let's add a section.
+      (progn
+        (concat
+          body
+          "\n\\section{List of Acronyms}\n"
+          "\\begin{acronym}\n"
+          (mapconcat
+            (lambda (cell)
+              "Create an acro for link."
+              (format "\\acro{%s}{%s}" (car cell) (cdr cell)))
+            ;; Sort the keys alphabetically.  Otherwise they are rendered
+            ;; in the reverse order in which they are encountered.
+            (sort abbr-links :key #'car)
+            "\n")
+          "\n\\end{acronym}\n"))
+      body))
 
   (use-package ox-gfm
     :straight t
@@ -4065,9 +4125,14 @@ Narrow focus to a tag, then a named element."
                          (subtitle
                            (org-entry-get headline "SUBTITLE"))
                          (author
-                           (org-entry-get headline "AUTHOR")))
+                           (org-entry-get headline "AUTHOR"))
+                         (translator
+                           (org-entry-get headline "TRANSLATOR"))
+                         )
                     (cons
-                      (jf/book-make-label title subtitle author)
+                      (jf/book-make-label
+                        :title title :subtitle subtitle
+                        :author author :translator translator)
                       (org-element-property :contents-begin headline)))))))
           ;; Prompt me to pick one of those headlines.
           (headline
@@ -4777,7 +4842,7 @@ Useful if you want a more robust view into the recommend candidates."
       ((if-let* ((x (assq (aref pattern 0) +orderless-dispatch-alist)))
          (cons (cdr x) (substring pattern 1))
          (when-let* ((x (assq (aref pattern (1- (length pattern)))
-                        +orderless-dispatch-alist)))
+                          +orderless-dispatch-alist)))
            (cons (cdr x) (substring pattern 0 -1)))))))
   ;; Define orderless style with initialism by default
   (orderless-define-completion-style +orderless-with-initialism
@@ -4968,20 +5033,20 @@ literal then add a fuzzy search)."
   "Dude, you can put your concepts here.")
 
 (setopt denote-known-keywords
-        (if jf/filename/glossary
-            (with-current-buffer (find-file-noselect jf/filename/glossary)
-              (save-restriction
-                (widen)
-                (org-map-entries
-                 (lambda ()
-                   (or
-                    (org-entry-get (org-element-at-point) "TAG")
-                    (user-error
-                     "Glossary entry %S missing TAG property"
-                     (org-element-property :title (org-element-at-point)))))
-                 "+tags+LEVEL=2"
-                 'file)))
-          denote-known-keywords))
+  (if jf/filename/glossary
+    (with-current-buffer (find-file-noselect jf/filename/glossary)
+      (save-restriction
+        (widen)
+        (org-map-entries
+          (lambda ()
+            (or
+              (org-entry-get (org-element-at-point) "TAG")
+              (user-error
+                "Glossary entry %S missing TAG property"
+                (org-element-property :title (org-element-at-point)))))
+          "+tags+LEVEL=2"
+          'file)))
+    denote-known-keywords))
 
 (defvar jf/filename/bibliography
   (denote-get-path-by-id "20241124T080648")
@@ -5169,13 +5234,13 @@ See `jf/treesit-language-available-p' for usage.")
     "Kill current function signature at point."
     (interactive)
     (when-let* ((node
-                 (treesit-parent-until
-                   (treesit-node-at (point))
-                   (lambda (n)
-                     (or
-                       (string= "function_declaration" (treesit-node-type n))
-                       (string= "call_expression" (treesit-node-type n))))
-                   t)))
+                  (treesit-parent-until
+                    (treesit-node-at (point))
+                    (lambda (n)
+                      (or
+                        (string= "function_declaration" (treesit-node-type n))
+                        (string= "call_expression" (treesit-node-type n))))
+                    t)))
       (pcase (treesit-node-type node)
         ("function_declaration"
           (jf/treesit/get-signature/function node))
@@ -5227,7 +5292,7 @@ This function is to \"copy\" the implementation details of the node."
     (interactive)
     (if (derived-mode-p 'ruby-ts-mode 'ruby-mode)
       (if-let* ((region
-                 (jf/treesit/derive-region-for-rubocop)))
+                  (jf/treesit/derive-region-for-rubocop)))
         (let ((cops
                 (or given-cops
                   (completing-read-multiple "Cops to Disable: "
@@ -5270,10 +5335,10 @@ This function is to \"copy\" the implementation details of the node."
       ;; class/module.
       (t
         (when-let* ((node
-                     (treesit-parent-until
-                       (treesit-node-at (point))
-                       (lambda (n) (member (treesit-node-type n)
-                                     '("class" "module"))))))
+                      (treesit-parent-until
+                        (treesit-node-at (point))
+                        (lambda (n) (member (treesit-node-type n)
+                                      '("class" "module"))))))
           (cons (treesit-node-start node) (treesit-node-end node))))))
 
   ;; This function, tested against Ruby, will return the module space
@@ -5316,18 +5381,18 @@ method, get the containing class."
   ;; Special thanks to https://eshelyaron.com/posts/2023-04-01-take-on-recursion.html
   (defun jf/treesit/module_space (node &optional acc)
     (if-let* ((parent
-               (treesit-parent-until
-                 node
-                 (lambda (n) (member (treesit-node-type n)
-                               '("class" "module" "assignment")))))
-              (parent_name
-                (treesit-node-text
-                  (car
-                    (treesit-filter-child
-                      parent
-                      (lambda (n)
-                        (member (treesit-node-type n)
-                          '("constant" "scope_resolution"))))))))
+                (treesit-parent-until
+                  node
+                  (lambda (n) (member (treesit-node-type n)
+                                '("class" "module" "assignment")))))
+               (parent_name
+                 (treesit-node-text
+                   (car
+                     (treesit-filter-child
+                       parent
+                       (lambda (n)
+                         (member (treesit-node-type n)
+                           '("constant" "scope_resolution"))))))))
       (jf/treesit/module_space parent (cons parent_name acc))
       acc)))
 
@@ -6123,7 +6188,7 @@ The generated and indented TOC will be inserted at point."
 See `add-log-current-defun-function'."
     (interactive)
     (if-let* ((text
-               (funcall add-log-current-defun-function)))
+                (funcall add-log-current-defun-function)))
       (progn
         (message "%s" text)
         (kill-new (substring-no-properties text)))
@@ -6132,7 +6197,7 @@ See `add-log-current-defun-function'."
     "Yank the current function and region as an `org-mode' link."
     (interactive)
     (if-let* ((text
-               (funcall add-log-current-defun-function)))
+                (funcall add-log-current-defun-function)))
       (let ((link
               (format "[[%s][%s]]"
                 (call-interactively #'git-link)
@@ -7639,7 +7704,7 @@ CONTENTS is nil.  INFO is a plist holding contextual information."
           (let* ((jf/exporting-org-to-tor
                    t)
                   (org-export-exclude-tags
-                   '("noexport" "private"))
+                    '("noexport" "private"))
                   (export-global-plist
                     (jf/org-keywords-as-plist))
                   (section
@@ -7695,7 +7760,7 @@ CONTENTS is nil.  INFO is a plist holding contextual information."
                       (org-get-tags)
                       denote-known-keywords #'string=)))))
       (when-let* ((kw-plist (jf/org-keywords-as-plist
-                             :keywords-regexp "\\(SESSION_REPORT_DATE\\|SESSION_REPORT_LOCATION\\|SESSION_REPORT_GAME\\)")))
+                              :keywords-regexp "\\(SESSION_REPORT_DATE\\|SESSION_REPORT_LOCATION\\|SESSION_REPORT_GAME\\)")))
         (insert
           (format
             (concat "\n#+HUGO_CUSTOM_FRONT_MATTER: :sessionReport "
@@ -8163,7 +8228,7 @@ If `consult--read' is defined, use that.  Otherwise fallback to
   (defun jf/server-visit-files (&rest app)
     (let ((server-visit-files-custom-find:buffer-count
             0))
-    (apply app)))
+      (apply app)))
   (advice-add #'server-visit-files :around #'jf/server-visit-files)
 
   (defun server-visit-hook-custom-find ()
@@ -8337,10 +8402,10 @@ Noted projects would be found within the given DIRECTORY."
     ;; This is a naive implementation that assumes a :task: has the
     ;; clock.  A :task:'s immediate ancestor is a :projects:.
     (when-let* ((m (and
-                    ;; If this isn't set, we ain't clocking.
-                    (fboundp 'org-clocking-p)
-                    (org-clocking-p)
-                    org-clock-marker)))
+                     ;; If this isn't set, we ain't clocking.
+                     (fboundp 'org-clocking-p)
+                     (org-clocking-p)
+                     org-clock-marker)))
       (with-current-buffer (marker-buffer m)
         (goto-char m)
         (jf/project/get-project/current-buffer))))
@@ -8552,6 +8617,7 @@ This encodes the logic for creating a project."
   '(safe-local-variable-values
      '((projectile-git-fd-args .
          "-H -0 -tf --strip-cwd-prefix -c never -E vendor/ -E pkg/ -E docs/ -E .git")
+        (jf/org-latex-src-block-skip . t)
         (projectile-git-command .
           "git ls-files -zco --exclude-from=.projectile.gitignore")
         (org-latex-toc-command .
@@ -8560,4 +8626,4 @@ This encodes the logic for creating a project."
 
 (provide 'init)
 ;;; init.el ends here
-(put 'upcase-region 'disabled nil)
+(put 'narrow-to-region 'disabled nil)
