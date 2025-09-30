@@ -282,6 +282,7 @@ Useful for narrowing regions.")
 ;; org-mode file and I export it to markdown, that markdown file will be
 ;; what we pick-up.
 (defvar jf/personal/filename-for-journal
+  ;; TODO: make this dynamic by year, and establish a convention.
   (denote-get-path-by-id "20241114T075414")
   "Where I put my journal.")
 
@@ -696,6 +697,10 @@ this variable reads.")
   "owns"
   "The tag used to indicate ownership of a work.")
 
+(defconst jf/bibliography/tag-shopping-list
+  "shoppingList"
+  "The tag used to indicate a desire to get this work.")
+
 (defconst jf/bibliography/tag-from-libraries
   "fromLibraries"
   "The tag used to indicate borrowing a work.")
@@ -870,6 +875,142 @@ ignore any guards against performing work on an already existing ISBN."
           nodes)))))
 
 ;;; Bibliography Interaction
+(cl-defun jf/capture-book (isbn &optional where force)
+  "Append or amend to my bibliography the book associated with the ISBN.
+
+When WHERE is nil, prompt for one of the allowed locations.  When WHERE
+is non-nil, use the named location.
+
+When FORCE is non-nil, we ignore looking up whether or not the
+`my-cache-of-books' contains the given ISBN.
+
+When FORCE is nil, we check if the given ISBN is in our
+`my-cache-of-books', and bail on the process when it is.
+
+Put another way, when we are FORCE-ing the update or the ISBN is not in
+`my-cache-of-books', we build the book and either append or amend our
+entry."
+  (interactive "sEnter an ISBN (as number): ")
+  (let* ((strategies
+           (list
+             (cons "Own"
+               (list :tags `(,jf/bibliography/tag-owns)
+                 :headline "Works"
+                 :file jf/filename/bibliography))
+             (cons "Shopping List"
+               (list :tags `(,jf/bibliography/tag-shopping-list)
+                 :headline "Works"
+                 :file jf/personal/filename-for-library))
+             (cons "Checked out from Library"
+               (list :tags `(,jf/bibliography/tag-from-libraries)
+                 :headline (format-time-string "%Y-%m-%d %A")
+                 :file jf/personal/filename-for-library))))
+          (strategy
+            (alist-get
+              (or where
+                (completing-read "Where to file: " strategies nil t))
+              strategies
+              (alist-get "Own" strategies nil nil #'string=)
+              nil #'string=))
+          (tags
+            (plist-get strategy :tags))
+          (headline
+            (plist-get strategy :headline))
+          (file
+            (plist-get strategy :file)))
+    (when (or force
+            (not (my-cache-of-books/contains-isbn-p isbn)))
+      (let* ((tags-for-bibliography
+               (seq-union
+                 `(,jf/bibliography/tag-books)
+                 tags
+                 #'string=))
+              (book-from-builder
+                (jf/book-from-isbn isbn))
+              (completed-value
+                (completing-read
+                  (format "Match %s: " (jf/book-label book-from-builder))
+                  my-cache-of-books nil nil
+                  ;; Maybe we'll get a direct hit?
+                  (jf/book-label book-from-builder))))
+        (if-let* ((from-bibliography
+                    (gethash completed-value my-cache-of-books)))
+          ;; When book **is** found in bibliography, update a book entry
+          ;; with one already in my bibliography.
+          (progn
+            (setf
+              (jf/book-isbn from-bibliography)
+              (jf/book-isbn book-from-builder)
+              (jf/book-tags from-bibliography)
+              (sort (seq-union
+                      (jf/book-tags from-bibliography)
+                      tags-for-bibliography
+                      #'string=)))
+            (save-restriction
+              (widen)
+              (save-excursion
+                (with-current-buffer
+                  (find-file-noselect file)
+                  (org-map-entries
+                    (lambda ()
+                      (let ((hl (org-element-at-point)))
+                        (when (string=
+                                (org-entry-get hl "CUSTOM_ID")
+                                (jf/book-custom_id from-bibliography))
+                          (progn
+                            (org-set-property "ISBN"
+                              (jf/book-isbn from-bibliography))
+                            (org-set-tags
+                              (jf/book-tags from-bibliography))
+                            (save-buffer)))))
+                    (concat "+" jf/bibliography/tag-books) 'file)
+                  (message "Updated %s with ISBN %s"
+                    (jf/book-label from-bibliography)
+                    (jf/book-isbn from-bibliography))))))
+          ;; When book **is not** found in bibliography, insert a new book
+          ;; entry into my bibliography.
+          ;;
+          ;; NOTE: My first incarnation was to use `org-capture-string'
+          ;; which meant adding to `org-capture-templates' a conceptually
+          ;; \"private\" capture template.  That incarnation used \"?\" as
+          ;; the template body.  However, when I'd test the behavior, I
+          ;; was getting an empty entry.
+          ;;
+          ;; Instead I deconstructed the concise `org-capture-string' and
+          ;; shifted towards binding `kill-ring' and using the \"%c\"
+          ;; capture variable.  I like this approach as it eschews adding
+          ;; a useless capture template while leveraging the power of the
+          ;; `org-capture' ecosystem.
+          (let* ((kill-ring
+                   (list
+                     (concat (jf/book-title book-from-builder)
+                       " :" (s-join ":" tags-for-bibliography) ":\n"
+                       ":PROPERTIES:\n"
+                       ":CUSTOM_ID: "
+                       (format "ISBN-%s" isbn)
+                       "\n"
+                       (when (s-present?
+                               (jf/book-subtitle book-from-builder))
+                         (concat ":SUBTITLE: "
+                           (jf/book-subtitle book-from-builder) "\n"))
+                       (when (s-present?
+                               (jf/book-author book-from-builder))
+                         (concat ":AUTHOR: "
+                           (jf/book-author book-from-builder) "\n"))
+                       ":ISBN: " (jf/book-isbn book-from-builder) "\n"
+                       ":END:\n")))
+                  (org-capture-entry
+                    `("B" "Book from ISBN Lookup"
+                       entry
+                       (file+headline ,file ,headline)
+                       "%c"
+                       :immediate-finish t)))
+            (org-capture)
+            (puthash (jf/book-label book-from-builder)
+              book-from-builder my-cache-of-books)
+            (message "Appended %s to bibliography"
+              (jf/book-label book-from-builder))))))))
+
 (cl-defun jf/bibliography/update-with-book
   (isbn book-builder
     &key force
