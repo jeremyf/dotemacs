@@ -874,6 +874,36 @@ ignore any guards against performing work on an already existing ISBN."
                 :force prefix)))
           nodes)))))
 
+(defvar jf/capture-book/strategies-function
+  "A function that returns an alist.
+
+Where each `cons' cell is structured:
+
+- `car' is a string (e.g., \"Own\")
+- `cdr' is a plist with keys:
+  - :tags :: a list of strings
+  - :headline :: a string
+  - :files :: a string
+
+The first element of the alist should be considered the defaul."
+  #'jf/capture-book/strategies)
+
+(defun jf/capture-book/strategies ()
+  "Conforms to `jf/capture-book/strategies-function' expectations"
+  (list
+             (cons "Owned"
+               (list :tags `(,jf/bibliography/tag-owns)
+                 :headline "Works"
+                 :file jf/filename/bibliography))
+             (cons "Shopping List"
+               (list :tags `(,jf/bibliography/tag-shopping-list)
+                 :headline "Works"
+                 :file jf/personal/filename-for-library))
+             (cons "Checked out from Library"
+               (list :tags `(,jf/bibliography/tag-from-libraries)
+                 :headline (format-time-string "%Y-%m-%d %A")
+                 :file jf/personal/filename-for-library))))
+
 ;;; Bibliography Interaction
 (cl-defun jf/capture-book (isbn &optional where force)
   "Append or amend to my bibliography the book associated with the ISBN.
@@ -892,25 +922,16 @@ Put another way, when we are FORCE-ing the update or the ISBN is not in
 entry."
   (interactive "sEnter an ISBN (as number): ")
   (let* ((strategies
-           (list
-             (cons "Own"
-               (list :tags `(,jf/bibliography/tag-owns)
-                 :headline "Works"
-                 :file jf/filename/bibliography))
-             (cons "Shopping List"
-               (list :tags `(,jf/bibliography/tag-shopping-list)
-                 :headline "Works"
-                 :file jf/personal/filename-for-library))
-             (cons "Checked out from Library"
-               (list :tags `(,jf/bibliography/tag-from-libraries)
-                 :headline (format-time-string "%Y-%m-%d %A")
-                 :file jf/personal/filename-for-library))))
+           (funcall jf/capture-book/strategies-function))
+          (default-strategy
+            (cdar
+              (funcall jf/capture-book/strategies-function)))
           (strategy
             (alist-get
               (or where
-                (completing-read "Where to file: " strategies nil t))
+                (completing-read "File as: " strategies nil t))
               strategies
-              (alist-get "Own" strategies nil nil #'string=)
+              default-strategy
               nil #'string=))
           (tags
             (plist-get strategy :tags))
