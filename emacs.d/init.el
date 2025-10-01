@@ -1220,6 +1220,8 @@ The DOM could be as sanitized by `org-web-tools--sanitized-dom'."
             (org-element-property :title entry))
           (keyword-value
             (org-entry-get entry keyword))
+          (description
+            (org-entry-get entry "DESCRIPTION"))
           (key
             (org-entry-get entry "CUSTOM_ID")))
     ;; When we encounter an abbreviation, add that to the list.  We'll
@@ -1228,7 +1230,11 @@ The DOM could be as sanitized by `org-web-tools--sanitized-dom'."
             (plist-get info :abbr-links)))
       (unless (alist-get keyword-value abbr-links nil nil #'string=)
         (progn
-          (add-to-list 'abbr-links (cons keyword-value title))
+          ;; TODO Also add description.
+          (add-to-list 'abbr-links
+            `(:abbr ,keyword-value
+               :title ,title
+               :description ,description))
           (plist-put info :abbr-links abbr-links))))
     (cond
       ((or (eq format 'html) (eq format 'md))
@@ -2460,7 +2466,7 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   ;; I had '(:light ef-cyprus) but the differentiation between function
   ;; and comment was not adequate
   ;; (setq jf/themes-plist '(:dark ef-bio :light ef-elea-light))
-  (setq jf/themes-plist '(:dark ef-symbiosis :light ef-elea-light)))
+  (setq jf/themes-plist '(:dark ef-owl :light ef-elea-light)))
 
 (use-package doric-themes
   :straight (:host github :repo "protesilaos/doric-themes")
@@ -3551,7 +3557,6 @@ function is ever added to that hook."
 \\usepackage{relsize,etoolbox}
 \\AtBeginEnvironment{quote}{\\smaller}
 \\AtBeginEnvironment{tabular}{\\smaller}
-\\usepackage[printonlyused,nohyperlinks]{acronym}
 \\usepackage{mathabx}
 \\usepackage{multicol}
 \\setlength\\columnsep{20pt}
@@ -3590,7 +3595,6 @@ function is ever added to that hook."
 \\usepackage{relsize,etoolbox}
 \\AtBeginEnvironment{quote}{\\smaller}
 \\AtBeginEnvironment{tabular}{\\smaller}
-\\usepackage[printonlyused,nohyperlinks]{acronym}
 \\usepackage[marginal,hang]{footmisc}
 \\usepackage{mathabx}
 \\usepackage{multicol}
@@ -3630,7 +3634,7 @@ function is ever added to that hook."
 \\usepackage{relsize,etoolbox}
 \\AtBeginEnvironment{quote}{\\smaller}
 \\AtBeginEnvironment{tabular}{\\smaller}
-\\usepackage[printonlyused,nohyperlinks]{acronym}
+
 \\usepackage[marginal,hang]{footmisc}
 \\usepackage{mathabx}
 \\usepackage{multicol}
@@ -3713,7 +3717,7 @@ function is ever added to that hook."
         (lambda (md)
           "Acronym package to matching line."
           (concat "\\\\documentclass" (match-string 1 md)
-            "\n\\\\usepackage[printonlyused,withpage]{acronym}"))
+            "\n\\\\usepackage[printonlyused,footnote]{acronym}"))
         body)
       body))
 
@@ -3731,9 +3735,17 @@ LaTeX package."
           "\n\\section{List of Acronyms}\n"
           "\\begin{acronym}\n"
           (mapconcat
-            (lambda (cell)
+            (lambda (data)
               "Create an acro for link."
-              (format "\\acro{%s}{%s}" (car cell) (cdr cell)))
+              ;; TODO add \\acroextra for additional description
+              (format "\\acro{%s}{%s}"
+                (plist-get data :abbr)
+                (format "{%s%s}"
+                  (plist-get data :title)
+                  (if-let ((desc
+                             (plist-get data :description)))
+                    (format "\\acroextra{: %s}" desc)
+                    ""))))
             ;; Sort the keys alphabetically.  Otherwise they are rendered
             ;; in the reverse order in which they are encountered.
             (sort abbr-links :key #'car)
