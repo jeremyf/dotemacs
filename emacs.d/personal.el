@@ -896,6 +896,7 @@ ignore any guards against performing work on an already existing ISBN."
           nodes)))))
 
 (defvar jf/capture-book/strategies-function
+  #'jf/capture-book/strategies
   "A function that returns an alist.
 
 Where each `cons' cell is structured:
@@ -906,8 +907,7 @@ Where each `cons' cell is structured:
   - :headline :: a string
   - :files :: a string
 
-The first element of the alist should be considered the defaul."
-  #'jf/capture-book/strategies)
+The first element of the alist should be considered the default.")
 
 (defun jf/capture-book/strategies ()
   "Conforms to `jf/capture-book/strategies-function' expectations"
