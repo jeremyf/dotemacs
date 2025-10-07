@@ -6790,14 +6790,6 @@ Useful for Eglot."
     ("C-r" . isearch-backward))
   :config (global-so-long-mode 1))
 
-(use-package writeroom-mode
-  ;; Where olivetti is great for reading...I find writeroom great for
-  ;; writing.
-  :straight t)
-
-(advice-add 'text-scale-adjust :after
-  #'visual-fill-column-adjust)
-
 (use-package olivetti
   ;; A package to "narrow" focus; providing a visually appealing
   ;; interface
@@ -8571,7 +8563,16 @@ This encodes the logic for creating a project."
        (ruby . t))))
 
 (if (file-exists-p (expand-file-name "~/.my-computer"))
-  (load "personal.el")
+  (progn
+    (use-package writeroom-mode
+      ;; Where olivetti is great for reading...I find writeroom great for
+      ;; writing.
+      :straight t)
+
+    (advice-add 'text-scale-adjust :after
+      #'visual-fill-column-adjust)
+
+    (load "personal.el"))
   (load "work.el"))
 
 (custom-set-variables
