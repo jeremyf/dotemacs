@@ -2317,10 +2317,7 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   (defvar jf/themes-plist '()
     "The named themes by pallette.")
   :config
-  (setopt ef-themes-common-palette-overrides
-    '((bg-region bg-green-intense)
-       (fg-region fg-main)))
-  (setq ef-themes-headings ; read the manual's entry or the doc string
+  (setq modus-themes-headings ; read the manual's entry or the doc string
     '((0 . (bold 1.4))
        (1 . (variable-pitch bold 1.7))
        (2 . (overline semibold 1.5))
@@ -2330,36 +2327,12 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
        (6 . (rainbow 1.15))
        (t . (rainbow 1.1))))
   ;; When these are non-nil, the mode line uses the proportional font
-  (setopt ef-themes-mixed-fonts t
-    ef-themes-variable-pitch-ui t)
-
-  (defmacro jf-with-colors (&rest body)
-    (if (ef-themes--list-enabled-themes)
-      (message "YO")
-      (let ((palette
-              (symbol-value
-                (intern (format "%s-palette" (doric-themes--current-theme))))))
-        ;; Apply a map for some baseline consistency with ef-themes
-        (dolist (to-from '((red-faint fg-faint-red)
-                            (green-faint fg-faint-green)
-                            (yellow-faint fg-faint-yellow)
-                            (blue-faint fg-faint-blue)
-                            (magenta-faint fg-faint-magenta)
-                            (cyan-faint fg-faint-cyan)
-                            (bg-alt bg-neutral)
-                            (fg-alt fg-neutral)
-                            (bg-dim bg-shadow-subtle)
-                            (fg-dim fg-shadow-subtle)
-                            ))
-          (add-to-list 'palette
-            (list (car to-from) (car (alist-get (cadr to-from) palette)))))
-        `(let* ((c '((class color (min-colors 256))))
-                 ,@palette)
-           ,@body))))
+  (setopt modus-themes-mixed-fonts t
+    modus-themes-variable-pitch-ui t)
 
   (defun jf/theme-custom-faces ()
     "Set the various custom faces for both `treesit' and `tree-sitter'."
-    (ef-themes-with-colors
+    (modus-themes-with-colors
       (setq hl-todo-keyword-faces
         `(
            ;; The first five are from Github:
@@ -2424,9 +2397,9 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
         `(go-test--error-face
            ((,c :foreground ,err)))
         `(jf/mode-line-format/face-shadow
-           ((,c :foreground ,fg-mode-line)))
+           ((,c :foreground ,fg-mode-line-active)))
         `(jf/mode-line-format/face-shadow-highlight
-           ((,c :foreground ,fg-mode-line :background ,bg-hover)))
+           ((,c :foreground ,fg-mode-line-active :background ,bg-hover)))
         `(jf/tabs-face
            ((,c :underline (:style wave :color ,bg-blue-intense))))
         `(jf/org-faces-date
@@ -2461,34 +2434,14 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
            ((,c :foreground ,fg-term-red-bright
               :box (:color ,fg-term-red-bright :line-width (-1 . -1)))))
         `(font-lock-regexp-face
-           ((,c :foreground ,red)))))
-    )
+             ((,c :foreground ,red))))
+      ))
   ;; I had '(:light ef-cyprus) but the differentiation between function
   ;; and comment was not adequate
   ;; (setq jf/themes-plist '(:dark ef-bio :light ef-elea-light))
-  (setq jf/themes-plist '(:dark ef-owl :light ef-elea-light)))
-
-(use-package doric-themes
-  :straight (:host github :repo "protesilaos/doric-themes")
-  :config
-  (defmacro doric-themes-with-colors (&rest body)
-    "Evaluate BODY with colors from current doric-themes palette."
-    (declare (indent 0))
-    (let ((palette
-            (symbol-value
-              (intern (format "%s-palette" (doric-themes--current-theme))))))
-      ;; Apply a map for some baseline consistency with ef-themes
-      (dolist (to-from '((red-faint fg-faint-red)
-                          (green-faint fg-faint-green)
-                          (yellow-faint fg-faint-yellow)
-                          (blue-faint fg-faint-blue)
-                          (magenta-faint fg-faint-magenta)
-                          (cyan-faint fg-faint-cyan)))
-        (add-to-list 'palette
-          (list (car to-from) (car (alist-get (cadr to-from) palette)))))
-      `(let* (,@palette)
-         ,@body))))
-
+  (setq jf/themes-plist '(:dark ef-owl :light ef-elea-light))
+  :init
+  (modus-themes-include-derivatives-mode 1))
 
 (use-package bm
   :straight t
@@ -2557,7 +2510,7 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
     "Function to load named theme."
     (let ((scheme
             (or given-scheme (funcall jf/color-scheme-func))))
-      (ef-themes-select (plist-get jf/themes-plist scheme))))
+      (modus-themes-select (plist-get jf/themes-plist scheme))))
 
   ;; Theming hooks to further customize colors
   (defvar after-enable-theme-hook nil
@@ -2632,7 +2585,7 @@ the light option.")
 
   (defun jf/color-scheme:emacs-theme (lightp)
     "Set the emacs theme based on LIGHTP (e.g. light/dark)."
-    (ef-themes-select
+    (modus-themes-select
       (plist-get jf/themes-plist
         (if lightp :light :dark))))
 
@@ -3742,7 +3695,7 @@ LaTeX package."
                 (plist-get data :abbr)
                 (format "{%s%s}"
                   (plist-get data :title)
-                  (if-let ((desc
+                  (if-let* ((desc
                              (plist-get data :description)))
                     (format "\\acroextra{: %s}" desc)
                     ""))))
