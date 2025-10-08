@@ -970,13 +970,19 @@ Otherwise, use pre-existing handling."
   (let* ((block-type
            (org-element-property :type special-block))
           (params
-            (flatten-list
-              (mapcar (lambda (cell)
-                        (list (car cell) (cdr cell)))
-                (car (mapcar (lambda (h)
-                               (org-babel-parse-header-arguments h t))
-                       (cons (org-element-property :parameters special-block)
-                         (org-element-property :header special-block))))))))
+            (cl-reduce (lambda (plist cell)
+                      (plist-put plist (car cell) (cdr cell)))
+              (org-babel-parse-header-arguments
+                (org-element-property :attr_params special-block))
+              :initial-value '()))
+          ;; (flatten-list
+          ;;     (mapcar (lambda (cell)
+          ;;               (list (car cell) (cdr cell)))
+          ;;       (car (mapcar (lambda (h)
+          ;;                      (org-babel-parse-header-arguments h t))
+          ;;              (cons (org-element-property :parameters special-block)
+          ;;                (org-element-property :header special-block))))))
+          )
     (pcase block-type
       ("details"
         (format "<details%s>%s%s</details>"
