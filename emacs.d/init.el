@@ -5086,11 +5086,6 @@ literal then add a fuzzy search)."
   :bind ("C-c C-'" . sdcv-search-input)
   :straight t)
 
-(use-package synosaurus
-  ;; brew install wordnet
-  :straight (synosaurus :type git :host github :repo "hpdeifel/synosaurus")
-  :custom (synosaurus-choose-method 'default))
-
 (use-package unicode-fonts
   ;; Before the emojii...
   :straight t
