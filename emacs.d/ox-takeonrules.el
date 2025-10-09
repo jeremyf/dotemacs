@@ -970,19 +970,7 @@ Otherwise, use pre-existing handling."
   (let* ((block-type
            (org-element-property :type special-block))
           (params
-            (cl-reduce (lambda (plist cell)
-                      (plist-put plist (car cell) (cdr cell)))
-              (org-babel-parse-header-arguments
-                (org-element-property :attr_params special-block))
-              :initial-value '()))
-          ;; (flatten-list
-          ;;     (mapcar (lambda (cell)
-          ;;               (list (car cell) (cdr cell)))
-          ;;       (car (mapcar (lambda (h)
-          ;;                      (org-babel-parse-header-arguments h t))
-          ;;              (cons (org-element-property :parameters special-block)
-          ;;                (org-element-property :header special-block))))))
-          )
+            (jf/block-params-from special-block)))
     (pcase block-type
       ("details"
         (format "<details%s>%s%s</details>"
@@ -1006,16 +994,16 @@ Otherwise, use pre-existing handling."
         (concat "{{< marginnote >}}" contents "{{< /marginnote >}}"))
       (_ (apply func (list special-block contents info))))))
 
-(defun jf/org-md-quote-block (func quote-block contents info)
-  "Render a QUOTE-BLOCK with CONTENTS and INFO.
-
-Either render via the standard markdown way or when exporting to
-Take on Rules using the \"blockquote\" special block."
-  (if jf/exporting-org-to-tor
-    (progn
-      (org-element-put-property quote-block :type "blockquote")
-      (jf/org-html-special-block func quote-block contents info))
-    (apply func (list quote-block contents info))))
+(defun jf/block-params-from (element)
+  "Extract plist params from ELEMENT."
+  (cl-reduce (lambda (plist cell)
+                      (plist-put plist (car cell) (cdr cell)))
+              (org-babel-parse-header-arguments
+                ;; Allow for one or more lines of attr_shortcode
+                (s-join " "
+                  (org-element-property :attr_shortcode element))
+                t)
+              :initial-value '()))
 
 (defun jf/org-html-quote-block (func quote-block contents info)
   "Render a QUOTE-BLOCK with CONTENTS and INFO.
@@ -1029,7 +1017,35 @@ Take on Rules using the \"blockquote\" special block."
     (apply func (list quote-block contents info))))
 
 (advice-add #'org-html-quote-block :around #'jf/org-html-quote-block)
-(advice-add #'org-md-quote-block :around #'jf/org-md-quote-block)
+(advice-add #'org-md-quote-block :around #'jf/org-html-quote-block)
+
+(defun jf/org-latex-quote-block (func quote-block contents info)
+  "Inject citation information then call FUNC.
+
+QUOTE-BLOCK, CONTENTS, and INFO are used to extract information"
+  (let* ((params
+           (jf/block-params-from quote-block))
+          (cite
+            (plist-get params :cite))
+          (cite_url
+            (plist-get params :cite_url))
+          (pre
+            (plist-get params :pre))
+          (contents
+            (format "%s%s%s%s"
+              contents
+              (if (< 0 (length params)) "\n\n--- " "")
+              (if pre
+                (concat pre
+                  (if (or cite cite_url) ", " ""))
+                "")
+              (if (or cite cite_url)
+                (if cite_url
+                  (format "\\textit{\\href{%s}{%s}}" cite_url cite)
+                  (format "\\textit{%s}" cite))
+                ""))))
+    (apply func (list quote-block contents info))))
+(advice-add #'org-latex-quote-block :around #'jf/org-latex-quote-block)
 
 (defvar jf/org-latex-src-block-skip nil
   "When non-nil skip exporting src and example blocks for LaTeX.")
