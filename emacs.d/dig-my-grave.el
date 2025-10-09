@@ -55,10 +55,10 @@ The `car' as the label and `cdr' as the value that we'll insert.")
                  (read-string "Cite: ")
                  (read-string "Cite URL: ")))
   (insert
-    "\n#+begin_quote"
-    (if (s-present? author) (concat " :pre " author) "")
-    (if (s-present? cite) (concat " :cite " cite) "")
-    (if (s-present? cite_url) (concat " :cite_url " cite_url) "")
+    (if (s-present? author) (concat "#+attr_shortcode: :pre " author "\n") "")
+    (if (s-present? cite) (concat "#+attr_shortcode: :cite " cite "\n") "")
+    (if (s-present? cite_url) (concat "#+attr_shortcode: :cite_url " cite_url "\n") "")
+    "#+begin_quote"
     "\n\n#+end_quote")
   (re-search-backward "^$"))
 

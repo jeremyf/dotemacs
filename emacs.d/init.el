@@ -1783,7 +1783,8 @@ active nature."
 
   (defvar-local jf/mode-line-format/flymake
     '(:eval
-       (when (and flymake--state
+      (when (and (boundp 'flymake--state)
+                 flymake--state
                (mode-line-window-selected-p))
          flymake-mode-line-format)))
 
