@@ -5836,6 +5836,7 @@ See https://github.com/chmouel/gotest-ts.el"
     ;; the the environment variable `WORKON_HOME` points to the right
     ;; place
     (venv-initialize-eshell)
+    (setq venv-location '("/Users/jfriesen/git/pvc-2.3.0/pvc_venv"))
     (setopt projectile-switch-project-action
       '(lambda ()
          (venv-projectile-auto-workon)
@@ -6332,6 +6333,8 @@ See `jf/comment-header-regexp/major-modes-alis'."
            )
           . eglot-ensure)
   :config
+  (add-to-list 'eglot-server-programs
+    `((python-ts-mode python-mode) . ("pyrefly" "lsp")))
   (defun jf/treesit/jump-to-declaration-identifier ()
     "Within a defun context, jump to the identifier.
 
