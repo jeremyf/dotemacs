@@ -1994,6 +1994,32 @@ The ARGS are the rest of the ARGS passed to the ADVISED-FUNCTION."
   (advice-add 'link-hint--apply
     :around #'jf/link-hint--apply))
 
+;; Drawing inspiration from
+;; https://github.com/bunnylushington/ace-kill/blob/main/ace-kill.el
+(link-hint-define-type 'coding-identifiers
+  :next #'link-hint--next-coding-identifiers
+  :at-point-p #'link-hint--coding-identifiers-at-point-p
+  :copy #'kill-new)
+
+(push 'link-hint-coding-identifiers link-hint-types)
+
+(defun link-hint--next-coding-identifiers (bound)
+  "Find a coding identifier within the given BOUND."
+  (link-hint--next-regexp thing-at-point-uuid-regexp bound))
+
+(defun link-hint--coding-identifiers-at-point-p ()
+  "Return the coding identifier at point.
+
+Returns nil when point is not on a coding identifier."
+  (save-excursion
+    (when-let* ((begin
+                  (point))
+                 (end
+                   (re-search-forward
+                     thing-at-point-uuid-regexp
+                     (point-max) t)))
+      (buffer-substring-no-properties begin end))))
+
 ;; Allow for opening the URLs provided in eldoc.  This is rough and
 ;; minimal error handling.
 (link-hint-define-type 'eldoc-url
