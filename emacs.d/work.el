@@ -26,6 +26,8 @@
 (dir-locals-set-directory-class
   "~/git/converge-cloud/morpho-service-broker" 'go-lang)
 
+(setopt magit-repository-directories
+  '(("~/git/converge-cloud" . 1)))
 
 ;; At my current employer, I have quarterly managed business objectives
 ;; (MBOs).  These focal activities involve: initiation, tracking work,

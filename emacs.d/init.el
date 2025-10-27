@@ -5389,7 +5389,10 @@ method, get the containing class."
 (use-package treesit-auto
   :straight (:host github :repo "renzmann/treesit-auto")
   :config (setq treesit-auto-install 'prompt)
-  (global-treesit-auto-mode))
+  (global-treesit-auto-mode)
+  ;; I'm finding that treesitter surprisingly hangs on many Python
+  ;; files.  I'm not excited to debug this so I'm disabling it.
+  (setf treesit-auto-langs (delete 'python treesit-auto-langs)))
 
 (use-package scopeline
   ;; Show the scope info of methods, blocks, if/case statements.  This
@@ -6352,7 +6355,7 @@ See `jf/comment-header-regexp/major-modes-alis'."
            html-mode html-ts-mode
            js-mode js-ts-mode
            json-mode json-ts-mode ;; npm i -g vscode-langservers-extracted
-           python-mode python-ts-mode ;; brew install python-lsp-server
+           python-mode ;; python-ts-mode ;; brew install python-lsp-server
            ruby-mode ruby-ts-mode
            scss-mode scss-ts-mode
            typescript-ts-mode typescript-mode ;; https://github.com/typescript-language-server/typescript-language-server
@@ -8609,6 +8612,7 @@ This encodes the logic for creating a project."
      '((projectile-git-fd-args .
          "-H -0 -tf --strip-cwd-prefix -c never -E vendor/ -E pkg/ -E docs/ -E .git")
         (jf/org-latex-src-block-skip . t)
+        (elixir-test-command . "mix testall")
         (projectile-git-command .
           "git ls-files -zco --exclude-from=.projectile.gitignore")
         (org-latex-toc-command .
