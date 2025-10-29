@@ -2665,6 +2665,9 @@ the light option.")
   :straight (:host github :type git
               :repo "protesilaos/tmr"))
 
+(use-package cond-let
+  :straight (cond-let :host github :repo "tarsius/cond-let"))
+
 (use-package transient
   ;; A package for creating turbo-charged menus.  It is the backbone for
   ;; the menu-like dispatch of `magit' functionality.
@@ -7317,9 +7320,6 @@ A page is marked `last' if rel=\"last\" appears in a <link> or <a> tag."
 
 (use-package emacsql
   :straight (:host github :repo "magit/emacsql"))
-
-(use-package cond-let
-  :straight (cond-let :host github :repo "tarsius/cond-let"))
 
 (use-package magit
   ;; A fantastic UI for git commands; the interactive rebase is an
