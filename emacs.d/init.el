@@ -2577,7 +2577,6 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   (defvar jf/color-scheme-system-toggle-functions
     '(jf/color-scheme:gnome-color-scheme
        jf/color-scheme:gnome-gtk-theme
-       jf/color-scheme:copyq-theme
        jf/color-scheme:emacs-theme)
     "A list of arity one functions that set component schemes based on the
 input parameter.
@@ -2600,15 +2599,6 @@ the light option.")
         (format
           "gsettings set org.gnome.desktop.interface gtk-theme %s"
           theme))))
-
-  (defun jf/color-scheme:copyq-theme (lightp)
-    "Set the copyq theme based on LIGHTP (e.g. light/dark)."
-    (shell-command
-      (format
-        "copyq loadTheme %s/solarized-%s.ini"
-        (s-trim
-          (shell-command-to-string "copyq info themes"))
-        (if lightp "light" "dark"))))
 
   (defun jf/color-scheme:emacs-theme (lightp)
     "Set the emacs theme based on LIGHTP (e.g. light/dark)."
