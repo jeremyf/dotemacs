@@ -104,11 +104,11 @@ org-mode
   n "#+end_details" n)
 
 (update_block
-  "#+begin_update"
-  " :date " (format-time-string "%Y-%m-%d")
-  " :mode " (p (completing-read "Mode: " '(inline paragraph marginnote sidenote section fallback) nil t) mode)
-    n q
-  n "#+end_update" n)
+  "#+attr_shortcode: :date " (format-time-string "%Y-%m-%d") n
+  "#+attr_shortcode: :mode " (p (completing-read "Mode: " '(inline paragraph marginnote sidenote section fallback) nil t) mode) n
+  "#+begin_update" n
+  q n
+  "#+end_update" n)
 
 (verb_block
   (p (completing-read "Method: " '("get" "post" "put") nil t) method t)
