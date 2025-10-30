@@ -1167,9 +1167,9 @@ entry."
             (jf/book-label book-from-builder)))))))
 
 (defvar jf/site-lisp:mu4e
-  (if (f-exists? "/home/linuxbrew/.linuxbrew/share/emacs/site-lisp/mu4e")
-    "/home/linuxbrew/.linuxbrew/emacs/site-lisp/mu4e"
-    "/opt/homebrew/share/emacs/site-lisp/mu/mu4e"))
+  (if (f-exists? "/usr/local/share/emacs/site-lisp/mu4e")
+    "/usr/local/share/emacs/site-lisp/mu4e"
+    (user-error "Missing mu4e directory")))
 (add-to-list 'load-path jf/site-lisp:mu4e)
 (require 'mu4e)
 (use-package mu4e
