@@ -2569,11 +2569,11 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   (defun jf/current-color-scheme-gnome ()
     "Determine Gnome preferred theme."
     (if (equal
-          "'prefer-light'"
+          "'prefer-dark'"
           (s-trim
             (shell-command-to-string
               "gsettings get org.gnome.desktop.interface color-scheme")))
-      :light :dark))
+      :dark :light))
 
   (defun jf/current-macos-interface-style ()
     "Determine MacOS preferred theme."
@@ -2597,17 +2597,15 @@ the light option.")
     "Set the gnome color scheme based on LIGHTP (e.g. light/dark)."
     (shell-command
       (format
-        "gsettings set org.gnome.desktop.interface color-scheme prefer-%s"
-        (if lightp "light" "dark"))))
+        "gsettings set org.gnome.desktop.interface color-scheme %s"
+        (if lightp "default" "prefer-dark"))))
 
   (defun  jf/color-scheme:gnome-gtk-theme (lightp)
     "Set the gnome gtk theme based on LIGHTP (e.g. light/dark)."
-    (let ((theme
-            (if lightp "Adwaita" "Adwaita-dark")))
-      (shell-command
-        (format
-          "gsettings set org.gnome.desktop.interface gtk-theme %s"
-          theme))))
+    (shell-command
+      (format
+        "gsettings set org.gnome.desktop.interface gtk-theme %s"
+        (if lightp "Adwaita" "Adwaita-dark"))))
 
   (defun jf/color-scheme:emacs-theme (lightp)
     "Set the emacs theme based on LIGHTP (e.g. light/dark)."
