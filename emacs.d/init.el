@@ -426,10 +426,12 @@ Related to `jf/linux:radio-silence'."
     ;; afield.
     (setopt
       ns-function-modifier 'hyper
+      ns-control-modifier 'control
+      ns-right-modifier 'control
       ns-command-modifier 'meta
       ns-right-command-modifier 'meta
-      ns-right-alternate-modifier 'hyper
-      ns-alternate-modifier 'super)))
+      ns-alternate-modifier 'super
+      ns-right-alternate-modifier 'super)))
 
 (defmacro jf/grab-browser-links (browser)
   (let* ((browser (downcase browser))
