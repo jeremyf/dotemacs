@@ -2375,6 +2375,7 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
            ("NOTE" . ,blue-faint)
            ("TIP" . ,green-faint)
            ("IMPORTANT" . ,magenta-faint)
+           ("SEE" . ,magenta-faint)
            ("WARNING" . ,yellow-faint)
            ("CAUTION" . ,red-faint)
            ;; Other keywords that I'm using
