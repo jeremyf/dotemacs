@@ -408,20 +408,28 @@ Related to `jf/linux:radio-silence'."
 
     See `ns-alternate-modifier'."
       (interactive)
-      (if (eq ns-right-alternate-modifier 'meta)
+      (if (eq ns-right-alternate-modifier 'hyper)
         (progn (setopt ns-right-alternate-modifier nil)
           (message "Enabling OS X native Option modifier"))
-        (progn (setopt ns-right-alternate-modifier 'meta)
+        (progn (setopt ns-right-alternate-modifier 'hyper)
           (message "Disabling OX X native Option modifier")))
       (force-mode-line-update))
 
-    ;; Exposing one additional modifier key.  This opens up a significant
-    ;; set of keys and no one (by default) binds to 'H-' while many bind
-    ;; to 'C-c' or other 'C-' keys, leaving conflicts.
+    ;; For awhile, I had Cmd and Alt at the MacOS level (via
+    ;; Karabiner-Elements).  However, I was finding that outside of
+    ;; Emacs, my left thumb was doing a lot of work.  So I have adjusted
+    ;; to use default MacOS outside of Emacs.
+    ;;
+    ;; And as I'm on that pattern, I'm contemplating further shifts.
+    ;; But I need to let this settle.  Namely moving Ctrl as the
+    ;; neighbor of Spacebar, Meta its neighbor, and Super as the further
+    ;; afield.
     (setopt
-      ns-function-modifier 'alt
-      ns-right-command-modifier 'hyper
-      ns-right-alternate-modifier 'meta)))
+      ns-function-modifier 'hyper
+      ns-command-modifier 'meta
+      ns-right-command-modifier 'meta
+      ns-right-alternate-modifier 'hyper
+      ns-alternate-modifier 'super)))
 
 (defmacro jf/grab-browser-links (browser)
   (let* ((browser (downcase browser))
