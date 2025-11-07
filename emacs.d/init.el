@@ -7378,6 +7378,19 @@ A page is marked `last' if rel=\"last\" appears in a <link> or <a> tag."
           ("C-x g f" . magit-file-dispatch)
           ("C-x g d" . magit-dispatch)))
 
+(defun jf/magit-purge-index-locks ()
+  "Delete associated index locks for project."
+  (interactive)
+  (if-let* ((dir
+              (magit-gitdir))
+             (lock-file
+               (f-join dir "index.lock")))
+    (when (f-exists? lock-file)
+      (progn
+        (delete-file lock-file)
+        (message "Purged those pesky git locks.")))
+    (user-error "Not in Git project")))
+
 (use-package magit-todos
   ;; Package that adds a `magit' section highlighting todos in the
   ;; current repository; and even highlighting what todos were added in
