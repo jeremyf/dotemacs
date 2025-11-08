@@ -229,7 +229,18 @@ URL is assumed to be either of an RSS feed or Atom feed."
           (file-truename "~/SyncThings/queue/elfeed.tar.gz")
           " " elfeed-db-directory " && mv -f ~/SyncThings/queue/elfeed.tar.gz ~/SyncThings/source&")
         "*syncthing-aling*"
-        "*syncthing-aling*"))
+        "*syncthing-aling*")
+      (message "Caching apt packages...")
+      (shell-command
+        (concat "apt list --installed"
+          " > ~/SyncThings/sources/debian-trixie-apt-packages.txt")
+        "*synchthing-aling*"
+        "*synchthing-aling*")
+      (message "Caching apt sources...")
+      (shell-command
+        (concat "fd . '/etc/apt/sources.list.d/' -e sources | "
+          "xargs cat | sed -E 's/^Types:/|Types:/' | tr '|' '\n'"
+          " > ~/SyncThings/sources/debian-trixie-apt-sources.txt")))
     (message "I'll get you next time Gadget")))
 
 ;; Based on the idea of habit stacking, whenever I pull down my RSS
