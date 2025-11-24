@@ -408,10 +408,10 @@ Related to `jf/linux:radio-silence'."
 
     See `ns-alternate-modifier'."
       (interactive)
-      (if (eq ns-right-alternate-modifier 'hyper)
+      (if (eq ns-right-alternate-modifier 'meta)
         (progn (setopt ns-right-alternate-modifier nil)
           (message "Enabling OS X native Option modifier"))
-        (progn (setopt ns-right-alternate-modifier 'hyper)
+        (progn (setopt ns-right-alternate-modifier 'meta)
           (message "Disabling OX X native Option modifier")))
       (force-mode-line-update))
 
@@ -426,12 +426,12 @@ Related to `jf/linux:radio-silence'."
     ;; afield.
     (setopt
       ns-function-modifier 'hyper
-      ns-control-modifier 'control
-      ns-right-modifier 'control
-      ns-command-modifier 'meta
-      ns-right-command-modifier 'meta
-      ns-alternate-modifier 'super
-      ns-right-alternate-modifier 'super)))
+      ns-control-modifier 'super
+      ns-right-control-modifier 'control
+      ns-command-modifier 'control
+      ns-right-command-modifier 'control
+      ns-alternate-modifier 'meta
+      ns-right-alternate-modifier 'meta)))
 
 (defmacro jf/grab-browser-links (browser)
   (let* ((browser (downcase browser))
@@ -5888,8 +5888,8 @@ See https://github.com/chmouel/gotest-ts.el"
   ;; A simple package to highlight todos identify by the
   ;; `hl-todo-keyword-faces'.
   :straight t
-  :bind (("H-t n" . hl-todo-next)
-          ("H-t p" . hl-todo-previous))
+  :bind (("H-t H-n" . hl-todo-next)
+          ("H-t H-p" . hl-todo-previous))
   :config (global-hl-todo-mode))
 
 
