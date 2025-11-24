@@ -4231,10 +4231,15 @@ sort accordingly.")
   (setopt org-web-tools-pandoc-sleep-time 1.5))
 
 (defun jf/md-to-org-region (start end)
-  "Convert region from markdown to org."
+  "Convert region from markdown to org or vice versa."
   ;; From http://yummymelon.com/devnull/converting-a-markdown-region-to-org-revisited.html
   (interactive "r")
-  (shell-command-on-region start end "pandoc -f markdown -t org" t t))
+  (let* ((from-to (if (derived-mode-p 'org-mode)
+                   (cons "org" "markdown")
+                   (cons "markdown" "org"))))
+    (shell-command-on-region start end
+      (format "pandoc -f %s -t %s" (car from-to) (cdr from-to))
+      t t)))
 
 (use-package abbrev
   ;; The =abbrev= package is simple and powerful, providing an
