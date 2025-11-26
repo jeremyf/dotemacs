@@ -6993,16 +6993,16 @@ Useful for Eglot."
               ("-" . elfeed-show-untag))))
   :config
   (defun elfeed-show-fetch-full-text ()
-  "Fetch the full text of the current Elfeed entry using eww-readable."
-  ;; https://plrj.org/2025/06/14/my-emacs-elfeed-configuration/
-  (interactive)
-  (let* ((entry elfeed-show-entry)
-         (url (elfeed-entry-link entry)))
-    (eww url)  ;; Open the URL in eww
-    (run-at-time "0.5 sec" nil
-                 (lambda ()
-                   (with-current-buffer "*eww*"
-                     (eww-readable))))))
+    "Fetch the full text of the current Elfeed entry using eww-readable."
+    ;; https://plrj.org/2025/06/14/my-emacs-elfeed-configuration/
+    (interactive)
+    (let* ((entry elfeed-show-entry)
+            (url (elfeed-entry-link entry)))
+      (eww url)  ;; Open the URL in eww
+      (run-at-time "0.5 sec" nil
+        (lambda ()
+          (with-current-buffer "*eww*"
+            (eww-readable))))))
   (defun jf/elfeed-filter-by-ordinality ()
     "Select a default filter and update elfeed."
     (interactive)
@@ -7046,7 +7046,7 @@ Useful for Eglot."
     (interactive)
     (elfeed-db-save)
     (quit-window))
-  (defun jf/elfeed-load-db-and-open ()
+  (defun jf/elfeed-load-db-and-open (&rest args)
     "Load the elfeed db from disk before opening."
     (interactive)
     (elfeed)
