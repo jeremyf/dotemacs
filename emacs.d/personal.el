@@ -208,51 +208,41 @@ URL is assumed to be either of an RSS feed or Atom feed."
           (save-buffer))
         (message "Done exporting epigraphs to blog"))))
 
-(defun jf/syncthing-aling (number)
+(defvar jf/syncthings
+  (list
+    (cons "syncing elfeed"
+      (concat "tar -czf "
+      (file-truename "~/SyncThings/queue/elfeed.tar.gz")
+      " " elfeed-db-directory
+      " && mv -f ~/SyncThings/queue/elfeed.tar.gz ~/SyncThings/source&"))
+    (cons "syncing apt packages"
+      (concat "apt list --installed"
+      " > ~/SyncThings/source/debian-trixie-apt-packages.txt"))
+    (cons "syncing apt sources"
+      (concat "fd . '/etc/apt/sources.list.d/' -e sources | "
+          "xargs cat | sed -E 's/^Types:/|Types:/' | tr '|' '\n'"
+      " > ~/SyncThings/source/debian-trixie-apt-sources.txt"))
+    (cons "syncing gnome-extensions"
+      (concat "gnome-extensions list --active --details"
+        " > ~/SyncThings/source/gnome-extensions-active.txt"))
+    (cons "cleaning mail.log"
+      "cat /dev/null > ~/.msmtp.log"))
+  "The things that we sync.")
+
+(defun jf/syncthing-aling (&optional number)
   "Synchronize files into SyncThing bucket.
 
-There is a 1 in NUMBER chance we'll run the synchronizations."
+There is a 1 in NUMBER chance we'll run the synchronizations; with a
+default of 6 (ye ol' 1d6)."
   (interactive "P")
   ;; Ensure we have our queue and our ready location
   (mkdir (file-truename "~/SyncThings/queue") t)
   (mkdir (file-truename "~/SyncThings/source") t)
   ;; There's a 1 in NUMBER chance that we'll perform the sync.
-  (if (= 0 (random (or number 10)))
-    (let ((message-buffer
-            "*syncthing-aling*"))
-      (message "Clearing mail log...")
-      (shell-command
-        "cat /dev/null > ~/.msmtp.log")
-      (message "Syncing elfeed database...")
-      ;; We tar zip into one directory (our queue) and then move that
-      ;; file in its complete state into the ready directory.  As move
-      ;; is instantaneous and we don't need to worry about syncthing
-      ;; picking up a partially completed file.
-      (shell-command
-        (concat "tar -cvzf "
-          (file-truename "~/SyncThings/queue/elfeed.tar.gz")
-          " " elfeed-db-directory " && mv -f ~/SyncThings/queue/elfeed.tar.gz ~/SyncThings/source&")
-        message-buffer
-        message-buffer)
-      (message "Caching apt packages...")
-      (shell-command
-        (concat "apt list --installed"
-          " > ~/SyncThings/source/debian-trixie-apt-packages.txt")
-        message-buffer
-        message-buffer)
-      (message "Caching apt sources...")
-      (shell-command
-        (concat "fd . '/etc/apt/sources.list.d/' -e sources | "
-          "xargs cat | sed -E 's/^Types:/|Types:/' | tr '|' '\n'"
-          " > ~/SyncThings/source/debian-trixie-apt-sources.txt")
-        message-buffer
-        message-buffer)
-      (message "Caching gnome-extensions...")
-      (shell-command
-        (concat "gnome-extensions list --active --details"
-          " > ~/SyncThings/source/gnome-extensions-active.txt")
-        message-buffer
-        message-buffer))
+  (if (= 0 (random (or number 6)))
+    (dolist (cell jf/syncthings)
+        (message (car cell))
+        (shell-command (cdr cell)))
     (message "I'll get you next time Gadget")))
 
 ;; Based on the idea of habit stacking, whenever I pull down my RSS
@@ -1115,70 +1105,70 @@ entry."
           (message "Appended %s to bibliography"
             (jf/book-label book-from-builder)))))))
 
-;; (defvar jf/site-lisp:mu4e
-;;   (if (f-exists? "/usr/local/share/emacs/site-lisp/mu4e")
-;;     "/usr/local/share/emacs/site-lisp/mu4e"
-;;     (user-error "Missing mu4e directory")))
-;; (add-to-list 'load-path jf/site-lisp:mu4e)
-;; (require 'mu4e)
-;; (use-package mu4e
-;;   :load-path jf/site-lisp:mu4e
-;;   ;; This follows the build from https://vhbelvadi.com/emacs-mu4e-on-macos.
-;;   ;;
-;;   ;; One variation: the tls_trust_file in ~/.msmtprc did not need to
-;;   ;; come from the Apple Keychain.  But was from "Export TLS
-;;   ;; Certificates from the Proton Bridge > Settings > Advanced Settings
-;;   ;; :load-path "/usr/share/emacs/site-lisp/mu4e" ;; jf/site-lisp
-;;   :init (require 'smtpmail)
-;;   :config
-;;   ;; BINARIES
-;;   (setq mu4e-mu-binary (executable-find "mu")
-;;     mu4e-get-mail-command (concat (executable-find "mbsync") " -a")
-;;     sendmail-program (executable-find "msmtp"))
-;;   (setq mu4e-user-mail-address-list '("jeremy@jeremyfriesen.com"))
-;;   (setq mu4e-change-filenames-when-moving t ; avoid sync conflicts
-;;     mu4e-update-interval (* 10 60) ; check mail 10 minutes
-;;     mu4e-compose-format-flowed t ; re-flow mail so it's not hard wrapped
-;;     mu4e-maildir "~/Maildir/proton")
-;;   (setq mu4e-drafts-folder "/Drafts"
-;;     mu4e-sent-folder   "/Sent"
-;;     mu4e-refile-folder "/All Mail"
-;;     mu4e-trash-folder  "/Trash")
-;;   (setq mu4e-completing-read-function 'completing-read)
-;;   (setq mu4e-maildir-shortcuts
-;;     '(("/inbox"     . ?i)
-;;        ("/Sent"      . ?s)
-;;        ("/Archive" . ?a)
-;;        ("/Trash"     . ?t)
-;;        ("/Drafts"    . ?d)))
-;;   (setq mu4e-use-fancy-chars t)
+(defvar jf/site-lisp:mu4e
+  (if (f-exists? "/usr/local/share/emacs/site-lisp/mu4e")
+    "/usr/local/share/emacs/site-lisp/mu4e"
+    (user-error "Missing mu4e directory")))
+(add-to-list 'load-path jf/site-lisp:mu4e)
+(require 'mu4e)
+(use-package mu4e
+  :load-path jf/site-lisp:mu4e
+  ;; This follows the build from https://vhbelvadi.com/emacs-mu4e-on-macos.
+  ;;
+  ;; One variation: the tls_trust_file in ~/.msmtprc did not need to
+  ;; come from the Apple Keychain.  But was from "Export TLS
+  ;; Certificates from the Proton Bridge > Settings > Advanced Settings
+  ;; :load-path "/usr/share/emacs/site-lisp/mu4e" ;; jf/site-lisp
+  :init (require 'smtpmail)
+  :config
+  ;; BINARIES
+  (setq mu4e-mu-binary (executable-find "mu")
+    mu4e-get-mail-command (concat (executable-find "mbsync") " -a")
+    sendmail-program (executable-find "msmtp"))
+  (setq mu4e-user-mail-address-list '("jeremy@jeremyfriesen.com"))
+  (setq mu4e-change-filenames-when-moving t ; avoid sync conflicts
+    mu4e-update-interval (* 10 60) ; check mail 10 minutes
+    mu4e-compose-format-flowed t ; re-flow mail so it's not hard wrapped
+    mu4e-maildir "~/Maildir/proton")
+  (setq mu4e-drafts-folder "/Drafts"
+    mu4e-sent-folder   "/Sent"
+    mu4e-refile-folder "/All Mail"
+    mu4e-trash-folder  "/Trash")
+  (setq mu4e-completing-read-function 'completing-read)
+  (setq mu4e-maildir-shortcuts
+    '(("/inbox"     . ?i)
+       ("/Sent"      . ?s)
+       ("/Archive" . ?a)
+       ("/Trash"     . ?t)
+       ("/Drafts"    . ?d)))
+  (setq mu4e-use-fancy-chars t)
 
-;;   ;; SENDING
-;;   (setq send-mail-function 'message-send-mail-with-sendmail
-;;     message-send-mail-function 'message-send-mail-with-sendmail)
-;;   (setq message-sendmail-envelope-from 'header)
-;;   (add-hook 'mu4e-compose-mode-hook (lambda () (setq-local fill-column 80)))
-;;   ;; POLICIES
-;;   (setq mu4e-context-policy 'pick-first)
-;;   (setq mu4e-compose-context-policy 'ask)
-;;   (setq message-kill-buffer-on-exit t)
-;;   (setq mu4e-hide-index-messages t)
-;;   (setq org-mu4e-link-query-in-headers-mode nil)
-;;   (setq mu4e-headers-visible-lines 25)
-;;   (setq mu4e-view-show-addresses t)
+  ;; SENDING
+  (setq send-mail-function 'message-send-mail-with-sendmail
+    message-send-mail-function 'message-send-mail-with-sendmail)
+  (setq message-sendmail-envelope-from 'header)
+  (add-hook 'mu4e-compose-mode-hook (lambda () (setq-local fill-column 80)))
+  ;; POLICIES
+  (setq mu4e-context-policy 'pick-first)
+  (setq mu4e-compose-context-policy 'ask)
+  (setq message-kill-buffer-on-exit t)
+  (setq mu4e-hide-index-messages t)
+  (setq org-mu4e-link-query-in-headers-mode nil)
+  (setq mu4e-headers-visible-lines 25)
+  (setq mu4e-view-show-addresses t)
 
-;;   (setq mu4e-headers-include-related t)
-;;   (setq mu4e-headers-show-threads t)
-;;   (setq message-citation-line-function 'message-insert-formatted-citation-line)
-;;   (setq message-citation-line-format "%N @ %Y-%m-%d %H:%M :\n")
+  (setq mu4e-headers-include-related t)
+  (setq mu4e-headers-show-threads t)
+  (setq message-citation-line-function 'message-insert-formatted-citation-line)
+  (setq message-citation-line-format "%N @ %Y-%m-%d %H:%M :\n")
 
 
-;;   ;; (setq message-send-mail-function 'smtpmail-send-it
-;;   ;;     auth-sources '("~/.authinfo") ;need to use gpg version but only local smtp stored for now
-;;   ;;     smtpmail-smtp-server "127.0.0.1"
-;;   ;;     smtpmail-smtp-service 1025
-;;   ;;     smtpmail-stream-type  'ssl)
-;;   )
+  ;; (setq message-send-mail-function 'smtpmail-send-it
+  ;;     auth-sources '("~/.authinfo") ;need to use gpg version but only local smtp stored for now
+  ;;     smtpmail-smtp-server "127.0.0.1"
+  ;;     smtpmail-smtp-service 1025
+  ;;     smtpmail-stream-type  'ssl)
+  )
 
 (use-package libmpdel
   :straight t)
