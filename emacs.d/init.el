@@ -129,7 +129,6 @@ The DWIM behaviour of this command is as follows:
   :config
   ;; Allow "y" or "n" to stand in for yes/no prompts
   (defalias 'yes-or-no-p 'y-or-n-p)
-
   (prefer-coding-system 'utf-8)
   (set-default-coding-systems 'utf-8)
   (set-terminal-coding-system 'utf-8)
@@ -1870,6 +1869,7 @@ active nature."
        (?t . avy-action-teleport)
        (?T . jf/avy-action-teleport-whole-line)))
   :config
+  (setopt avy-timeout-seconds 1.25)
   ;; https://karthinks.com/software/avy-can-do-anything/#remembering-to-avy
   (defun jf/avy-action-kill-whole-line (pt)
     (save-excursion
@@ -6988,9 +6988,21 @@ Useful for Eglot."
              ("+" . jf/elfeed-search-tag-all)
              ("q" . jf/elfeed-save-db-and-bury)))
           (:map elfeed-show-mode-map
-            (("+" . jf/elfeed-show-tag)
+            (("f" . elfeed-show-fetch-full-text)
+              ("+" . jf/elfeed-show-tag)
               ("-" . elfeed-show-untag))))
   :config
+  (defun elfeed-show-fetch-full-text ()
+  "Fetch the full text of the current Elfeed entry using eww-readable."
+  ;; https://plrj.org/2025/06/14/my-emacs-elfeed-configuration/
+  (interactive)
+  (let* ((entry elfeed-show-entry)
+         (url (elfeed-entry-link entry)))
+    (eww url)  ;; Open the URL in eww
+    (run-at-time "0.5 sec" nil
+                 (lambda ()
+                   (with-current-buffer "*eww*"
+                     (eww-readable))))))
   (defun jf/elfeed-filter-by-ordinality ()
     "Select a default filter and update elfeed."
     (interactive)

@@ -207,15 +207,19 @@ URL is assumed to be either of an RSS feed or Atom feed."
                     (t ""))))))
           (save-buffer))
         (message "Done exporting epigraphs to blog"))))
-(defun jf/syncthing-aling ()
-  "Synchronize files into SyncThing bucket."
-  (interactive)
+
+(defun jf/syncthing-aling (number)
+  "Synchronize files into SyncThing bucket.
+
+There is a 1 in NUMBER chance we'll run the synchronizations."
+  (interactive "P")
   ;; Ensure we have our queue and our ready location
   (mkdir (file-truename "~/SyncThings/queue") t)
   (mkdir (file-truename "~/SyncThings/source") t)
-  ;; There's a 1 in 10 chance that we'll perform the sync.  Toss that d10.
-  (if (= 0 (random 10))
-    (progn
+  ;; There's a 1 in NUMBER chance that we'll perform the sync.
+  (if (= 0 (random (or number 10)))
+    (let ((message-buffer
+            "*syncthing-aling*"))
       (message "Clearing mail log...")
       (shell-command
         "cat /dev/null > ~/.msmtp.log")
@@ -228,19 +232,27 @@ URL is assumed to be either of an RSS feed or Atom feed."
         (concat "tar -cvzf "
           (file-truename "~/SyncThings/queue/elfeed.tar.gz")
           " " elfeed-db-directory " && mv -f ~/SyncThings/queue/elfeed.tar.gz ~/SyncThings/source&")
-        "*syncthing-aling*"
-        "*syncthing-aling*")
+        message-buffer
+        message-buffer)
       (message "Caching apt packages...")
       (shell-command
         (concat "apt list --installed"
-          " > ~/SyncThings/sources/debian-trixie-apt-packages.txt")
-        "*synchthing-aling*"
-        "*synchthing-aling*")
+          " > ~/SyncThings/source/debian-trixie-apt-packages.txt")
+        message-buffer
+        message-buffer)
       (message "Caching apt sources...")
       (shell-command
         (concat "fd . '/etc/apt/sources.list.d/' -e sources | "
           "xargs cat | sed -E 's/^Types:/|Types:/' | tr '|' '\n'"
-          " > ~/SyncThings/sources/debian-trixie-apt-sources.txt")))
+          " > ~/SyncThings/source/debian-trixie-apt-sources.txt")
+        message-buffer
+        message-buffer)
+      (message "Caching gnome-extensions...")
+      (shell-command
+        (concat "gnome-extensions list --active --details"
+          " > ~/SyncThings/source/gnome-extensions-active.txt")
+        message-buffer
+        message-buffer))
     (message "I'll get you next time Gadget")))
 
 ;; Based on the idea of habit stacking, whenever I pull down my RSS
@@ -510,80 +522,6 @@ Useful for narrowing regions.")
                       :contents-begin el)
                     (org-element-property
                       :contents-end el)))))))))))
-
-;; (use-package notmuch
-;;   ;; Consider the NotmuMuch Mail Emacs tips and tricks: https://notmuchmail.org/emacstips/
-;;   ;;
-;;   ;; https://blog.tomecek.net/post/removing-messages-with-notmuch/
-;;   :load-path  "/opt/homebrew/share/emacs/site-lisp/notmuch"
-;;   :custom
-;;   ((notmuch-saved-searches
-;;      '((:name "inbox" :query "tag:inbox" :key "i" :sort-order newest-first)
-;;         (:name "unread" :query "tag:unread" :key "u" :sort-order newest-first)
-;;         (:name "correspondence" :query "tag:correspondence" :key "c" :sort-order newest-first)
-;;         (:name "flagged" :query "tag:flagged" :key "f" :sort-order newest-first)
-;;         (:name "sent" :query "tag:sent" :key "t" :sort-order newest-first)
-;;         (:name "drafts" :query "tag:draft" :key "d" :sort-order newest-first)
-;;         (:name "all mail" :query "*" :key "a" :sort-order newest-first)))
-;;     (notmuch-init-file "~/.notmuch-config"))
-;;   :config
-;;   /(setq notmuch-fcc-dirs "sent")
-;;   (setq mail-specify-envelope-from t)
-;;   (define-key notmuch-search-mode-map (kbd "C-k")
-;;     (lambda ()
-;;       "Delete message."
-;;       (interactive)
-;;       (notmuch-search-tag (list "+deleted" "-inbox"))
-;;       (notmuch-search-next-thread)))
-;;   (define-key notmuch-tree-mode-map (kbd "C-k")
-;;     (lambda ()
-;;       "Delete message."
-;;       (interactive)
-;;       (notmuch-tree-tag (list "+deleted" "-inbox"))
-;;       (notmuch-tree-next-matching-message)))
-
-  (defun jf/notmuch/expunge-deleted ()
-    "Expunge deleted emails."
-    (interactive)
-    (shell-command
-      "for x in $(notmuch search --output=files tag:deleted | rg \":2(,.*[^T])?$\" | sed -E \"s/:2(,.+)?$/:2/g\" ) ; do mv $x ${x}T ; done"))
-
-;;   (defun jf/notmuch-unthreaded-show-recipient-if-sent (format-string result)
-;;     (let* ((headers (plist-get result :headers))
-;;             (to (plist-get headers :To))
-;;             (author (plist-get headers :From))
-;;             (face (if (plist-get result :match)
-;;                     'notmuch-tree-match-author-face
-;;                     'notmuch-tree-no-match-author-face)))
-;;       (propertize
-;;         (format format-string
-;;           (if (string-match "jeremy@jeremyfriesen.com" author)
-;;             (concat "↦ " (notmuch-tree-clean-address to))
-;;             (notmuch-tree-clean-address to)
-;;             author))
-;;         'face face)))
-
-;;   (setq notmuch-unthreaded-result-format
-;;     '(("date" . "%12s  ")
-;;        (jf/notmuch-unthreaded-show-recipient-if-sent . "%-20.20s")
-;;        ((("subject" . "%s"))
-;;          . " %-54s ")
-;;        ("tags" . "(%s)"))))
-
-;; (use-package ol-notmuch
-;;   :straight t
-;;   :after notmuch)
-;; (use-package notmuch-transient
-;;   :straight t
-;;   :after notmuch)
-
-;; (use-package notmuch-addr
-;;   ;; Relies on Emacs 27.1 updated completion framework.
-;;   :straight t
-;;   :config
-;;   (with-eval-after-load 'notmuch-address
-;;     (notmuch-addr-setup)))
-
 
 (defvar jf/filename/glossary-takeonrules
   (file-truename "~/git/takeonrules.source/content/site-map/glossary/index.md"))
@@ -1177,70 +1115,70 @@ entry."
           (message "Appended %s to bibliography"
             (jf/book-label book-from-builder)))))))
 
-(defvar jf/site-lisp:mu4e
-  (if (f-exists? "/usr/local/share/emacs/site-lisp/mu4e")
-    "/usr/local/share/emacs/site-lisp/mu4e"
-    (user-error "Missing mu4e directory")))
-(add-to-list 'load-path jf/site-lisp:mu4e)
-(require 'mu4e)
-(use-package mu4e
-  :load-path jf/site-lisp:mu4e
-  ;; This follows the build from https://vhbelvadi.com/emacs-mu4e-on-macos.
-  ;;
-  ;; One variation: the tls_trust_file in ~/.msmtprc did not need to
-  ;; come from the Apple Keychain.  But was from "Export TLS
-  ;; Certificates from the Proton Bridge > Settings > Advanced Settings
-  ;; :load-path "/usr/share/emacs/site-lisp/mu4e" ;; jf/site-lisp
-  :init (require 'smtpmail)
-  :config
-  ;; BINARIES
-  (setq mu4e-mu-binary (executable-find "mu")
-    mu4e-get-mail-command (concat (executable-find "mbsync") " -a")
-    sendmail-program (executable-find "msmtp"))
-  (setq mu4e-user-mail-address-list '("jeremy@jeremyfriesen.com"))
-  (setq mu4e-change-filenames-when-moving t ; avoid sync conflicts
-    mu4e-update-interval (* 10 60) ; check mail 10 minutes
-    mu4e-compose-format-flowed t ; re-flow mail so it's not hard wrapped
-    mu4e-maildir "~/Maildir/proton")
-  (setq mu4e-drafts-folder "/Drafts"
-    mu4e-sent-folder   "/Sent"
-    mu4e-refile-folder "/All Mail"
-    mu4e-trash-folder  "/Trash")
-  (setq mu4e-completing-read-function 'completing-read)
-  (setq mu4e-maildir-shortcuts
-    '(("/inbox"     . ?i)
-       ("/Sent"      . ?s)
-       ("/Archive" . ?a)
-       ("/Trash"     . ?t)
-       ("/Drafts"    . ?d)))
-  (setq mu4e-use-fancy-chars t)
+;; (defvar jf/site-lisp:mu4e
+;;   (if (f-exists? "/usr/local/share/emacs/site-lisp/mu4e")
+;;     "/usr/local/share/emacs/site-lisp/mu4e"
+;;     (user-error "Missing mu4e directory")))
+;; (add-to-list 'load-path jf/site-lisp:mu4e)
+;; (require 'mu4e)
+;; (use-package mu4e
+;;   :load-path jf/site-lisp:mu4e
+;;   ;; This follows the build from https://vhbelvadi.com/emacs-mu4e-on-macos.
+;;   ;;
+;;   ;; One variation: the tls_trust_file in ~/.msmtprc did not need to
+;;   ;; come from the Apple Keychain.  But was from "Export TLS
+;;   ;; Certificates from the Proton Bridge > Settings > Advanced Settings
+;;   ;; :load-path "/usr/share/emacs/site-lisp/mu4e" ;; jf/site-lisp
+;;   :init (require 'smtpmail)
+;;   :config
+;;   ;; BINARIES
+;;   (setq mu4e-mu-binary (executable-find "mu")
+;;     mu4e-get-mail-command (concat (executable-find "mbsync") " -a")
+;;     sendmail-program (executable-find "msmtp"))
+;;   (setq mu4e-user-mail-address-list '("jeremy@jeremyfriesen.com"))
+;;   (setq mu4e-change-filenames-when-moving t ; avoid sync conflicts
+;;     mu4e-update-interval (* 10 60) ; check mail 10 minutes
+;;     mu4e-compose-format-flowed t ; re-flow mail so it's not hard wrapped
+;;     mu4e-maildir "~/Maildir/proton")
+;;   (setq mu4e-drafts-folder "/Drafts"
+;;     mu4e-sent-folder   "/Sent"
+;;     mu4e-refile-folder "/All Mail"
+;;     mu4e-trash-folder  "/Trash")
+;;   (setq mu4e-completing-read-function 'completing-read)
+;;   (setq mu4e-maildir-shortcuts
+;;     '(("/inbox"     . ?i)
+;;        ("/Sent"      . ?s)
+;;        ("/Archive" . ?a)
+;;        ("/Trash"     . ?t)
+;;        ("/Drafts"    . ?d)))
+;;   (setq mu4e-use-fancy-chars t)
 
-  ;; SENDING
-  (setq send-mail-function 'message-send-mail-with-sendmail
-    message-send-mail-function 'message-send-mail-with-sendmail)
-  (setq message-sendmail-envelope-from 'header)
-  (add-hook 'mu4e-compose-mode-hook (lambda () (setq-local fill-column 80)))
-  ;; POLICIES
-  (setq mu4e-context-policy 'pick-first)
-  (setq mu4e-compose-context-policy 'ask)
-  (setq message-kill-buffer-on-exit t)
-  (setq mu4e-hide-index-messages t)
-  (setq org-mu4e-link-query-in-headers-mode nil)
-  (setq mu4e-headers-visible-lines 25)
-  (setq mu4e-view-show-addresses t)
+;;   ;; SENDING
+;;   (setq send-mail-function 'message-send-mail-with-sendmail
+;;     message-send-mail-function 'message-send-mail-with-sendmail)
+;;   (setq message-sendmail-envelope-from 'header)
+;;   (add-hook 'mu4e-compose-mode-hook (lambda () (setq-local fill-column 80)))
+;;   ;; POLICIES
+;;   (setq mu4e-context-policy 'pick-first)
+;;   (setq mu4e-compose-context-policy 'ask)
+;;   (setq message-kill-buffer-on-exit t)
+;;   (setq mu4e-hide-index-messages t)
+;;   (setq org-mu4e-link-query-in-headers-mode nil)
+;;   (setq mu4e-headers-visible-lines 25)
+;;   (setq mu4e-view-show-addresses t)
 
-  (setq mu4e-headers-include-related t)
-  (setq mu4e-headers-show-threads t)
-  (setq message-citation-line-function 'message-insert-formatted-citation-line)
-  (setq message-citation-line-format "%N @ %Y-%m-%d %H:%M :\n")
+;;   (setq mu4e-headers-include-related t)
+;;   (setq mu4e-headers-show-threads t)
+;;   (setq message-citation-line-function 'message-insert-formatted-citation-line)
+;;   (setq message-citation-line-format "%N @ %Y-%m-%d %H:%M :\n")
 
 
-  ;; (setq message-send-mail-function 'smtpmail-send-it
-  ;;     auth-sources '("~/.authinfo") ;need to use gpg version but only local smtp stored for now
-  ;;     smtpmail-smtp-server "127.0.0.1"
-  ;;     smtpmail-smtp-service 1025
-  ;;     smtpmail-stream-type  'ssl)
-  )
+;;   ;; (setq message-send-mail-function 'smtpmail-send-it
+;;   ;;     auth-sources '("~/.authinfo") ;need to use gpg version but only local smtp stored for now
+;;   ;;     smtpmail-smtp-server "127.0.0.1"
+;;   ;;     smtpmail-smtp-service 1025
+;;   ;;     smtpmail-stream-type  'ssl)
+;;   )
 
 (use-package libmpdel
   :straight t)
@@ -1250,18 +1188,6 @@ entry."
   :straight t
   :custom (mpdel-prefix-key (kbd "H-m"))
   :config (mpdel-mode))
-
-(use-package bongo
-  :straight t)
-
-(use-package vlc
-  :straight t)
-
-(use-package p-search
-  :straight (:host github :repo "zkry/p-search"))
-
-(use-package doric-themes
-  :straight (:host github :repo "protesilaos/doric-themes"))
 
 ;;; One Off Scripts
 ;; Goal: to migrate all [[denote:identifier]] references to each
@@ -1393,5 +1319,17 @@ date (that is omit that date)."
                        label)))
         books))))
 
+(use-package request :straight t)
+(use-package emojify :straight t)
+
+(use-package org-social
+  :straight (org-social :host github :repo "tanrax/org-social.el"
+              :rev :newest
+              :files (:defaults "ui/*.el" "ui/buffers/*.el"))
+  :custom
+  (org-social-file (denote-get-path-by-id "20251028T052834"))
+  (org-social-default-lang "en")
+  (org-social-relay "https://org-social-relay.andros.dev/")
+  (org-social-my-public-url "https://takeonrules.com/social.org"))
 
 (require 'ox-takeonrules)
