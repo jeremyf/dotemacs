@@ -248,7 +248,7 @@ default of 6 (ye ol' 1d6)."
 ;; Based on the idea of habit stacking, whenever I pull down my RSS
 ;; feed, I'll go ahead and sync my notes.
 (advice-add #'jf/elfeed-load-db-and-open :before #'jf/syncthing-aling)
-(add-hook 'after-init-hook #'jf/syncthing-aling)
+(add-hook 'after-init-hook (lambda (jf/syncthing-aling 1)))
 
 (use-package mastodon
   ;; :straight (:host codeberg :repo "martianh/mastodon.el")
