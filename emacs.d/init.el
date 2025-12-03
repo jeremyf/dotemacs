@@ -6333,6 +6333,7 @@ See `jf/comment-header-regexp/major-modes-alis'."
   ("H-e h" . flymake-show-buffer-diagnostics)
   ("H-e n" . flymake-goto-next-error)
   ("H-e p" . flymake-goto-prev-error)
+  ("H-e r" . eglot)
   (:map eglot-mode-map
     ("H-e s" . consult-eglot-symbols)
     ("H-e r" . eglot-reconnect)
