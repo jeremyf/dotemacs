@@ -407,28 +407,19 @@ Related to `jf/linux:radio-silence'."
 
     See `ns-alternate-modifier'."
       (interactive)
-      (if (eq ns-right-alternate-modifier 'meta)
+      (if (eq ns-right-alternate-modifier 'hyper)
         (progn (setopt ns-right-alternate-modifier nil)
           (message "Enabling OS X native Option modifier"))
-        (progn (setopt ns-right-alternate-modifier 'meta)
+        (progn (setopt ns-right-alternate-modifier 'hyper)
           (message "Disabling OX X native Option modifier")))
       (force-mode-line-update))
 
-    ;; For awhile, I had Cmd and Alt at the MacOS level (via
-    ;; Karabiner-Elements).  However, I was finding that outside of
-    ;; Emacs, my left thumb was doing a lot of work.  So I have adjusted
-    ;; to use default MacOS outside of Emacs.
-    ;;
-    ;; And as I'm on that pattern, I'm contemplating further shifts.
-    ;; But I need to let this settle.  Namely moving Ctrl as the
-    ;; neighbor of Spacebar, Meta its neighbor, and Super as the further
-    ;; afield.
     (setopt
       ns-function-modifier 'hyper
-      ns-control-modifier 'super
+      ns-control-modifier 'control
       ns-right-control-modifier 'control
-      ns-command-modifier 'control
-      ns-right-command-modifier 'control
+      ns-command-modifier 'super
+      ns-right-command-modifier 'hyper
       ns-alternate-modifier 'meta
       ns-right-alternate-modifier 'meta)))
 
