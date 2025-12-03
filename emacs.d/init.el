@@ -2370,7 +2370,7 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   (defun jf/theme-custom-faces ()
     "Set the various custom faces for both `treesit' and `tree-sitter'."
     (modus-themes-with-colors
-      (setq hl-todo-keyword-faces
+      (setopt hl-todo-keyword-faces
         `(
            ;; The first five are from Github:
            ;; https://github.com/orgs/community/discussions/16925
@@ -2561,6 +2561,7 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   (advice-add 'enable-theme :after #'run-after-enable-theme-hook)
 
   (add-hook 'after-enable-theme-hook #'jf/theme-custom-faces)
+  (add-hook 'modus-themes-after-load-theme-hook #'jf/theme-custom-faces)
 
   (defvar jf/color-scheme-func
     (if (eq system-type 'darwin)
