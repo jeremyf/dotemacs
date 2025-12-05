@@ -2577,60 +2577,49 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
               "defaults read -g AppleInterfaceStyle") 0 4))
       :dark :light))
 
-  (defvar jf/color-scheme-system-toggle-functions
-    '(jf/color-scheme:gnome-color-scheme
-       jf/color-scheme:gnome-gtk-theme
-       jf/color-scheme:emacs-theme
-       jf/color-scheme:gnome-night-light)
-    "A list of arity one functions that set component schemes based on the
-input parameter.
+  (defvar jf/color-scheme-system-toggle/gnome-settings
+    '((:template "gsettings set org.gnome.settings-daemon.plugins.color night-light-enabled %s"
+        :light "false" :dark "true")
+       (:template "gsettings set org.gnome.desktop.interface color-scheme %s"
+         :light "default" :dark "prefer-dark")
+       (:template "gsettings set org.gnome.desktop.interface gtk-theme %s"
+         :light "default" :dark "prefer-dark"))
+    "A list of plists with three parts:
 
-When the parameter is non-nil, favor the dark option.  Otherwise favor
-the light option.")
+- :template :: command to run.
+- :dark :: what the setting should be to be in \"dark\" mode.
+- :light :: what the setting should be to be in \"light\" mode.")
 
-  (defun jf/color-scheme:gnome-night-light (lightp)
-    "Set the nightlight color scheme base on LIGHTP (e.g. light/dark)."
+  (defun jf/color-scheme-system-toggle:gnu/linux ()
+    "Toggle the gnu/linux system scheme."
+    (let* ((target_scheme
+              (plist-get '(:dark :light :light :dark)
+                (jf/current-color-scheme-gnome))))
+      ;; Instead of all of the shelling out, we could assemble the shell
+      ;; commands into a singular command and issue that.
+      (dolist (setting jf/color-scheme-system-toggle/gnome-settings)
+        ;; In essence pipe the output to /dev/null
+        (shell-command-to-string
+          (format (plist-get setting :template)
+            (plist-get setting target_scheme))))
+      (modus-themes-select
+        (plist-get jf/themes-plist target_scheme))))
+
+  (defun jf/color-scheme-system-toggle:darwin ()
+    "Toggle the darwin system scheme."
     (shell-command
-      (concat
-        "gsettings set org.gnome.settings-daemon.plugins.color "
-        "night-light-enabled " (if lightp "false" "true"))))
-
-  (defun jf/color-scheme:gnome-color-scheme (lightp)
-    "Set the gnome color scheme based on LIGHTP (e.g. light/dark)."
-    (shell-command
-      (format
-        "gsettings set org.gnome.desktop.interface color-scheme %s"
-        (if lightp "default" "prefer-dark"))))
-
-  (defun  jf/color-scheme:gnome-gtk-theme (lightp)
-    "Set the gnome gtk theme based on LIGHTP (e.g. light/dark)."
-    (shell-command
-      (format
-        "gsettings set org.gnome.desktop.interface gtk-theme %s"
-        (if lightp "Adwaita" "Adwaita-dark"))))
-
-  (defun jf/color-scheme:emacs-theme (lightp)
-    "Set the emacs theme based on LIGHTP (e.g. light/dark)."
-    (modus-themes-select
-      (plist-get jf/themes-plist
-        (if lightp :light :dark))))
+      (concat "osascript -e 'tell application \"System Events\" "
+        "to tell appearance preferences "
+        "to set dark mode to not dark mode'"))
+    (jf/color-scheme-set-for-emacs))
 
   (defun jf/color-scheme-system-toggle ()
     "Toggle system-wide Dark or Light setting."
     (interactive)
-    (pcase system-type
-      ('darwin
-        (progn
-          (shell-command
-            (concat "osascript -e 'tell application \"System Events\" "
-              "to tell appearance preferences "
-              "to set dark mode to not dark mode'"))
-          (jf/color-scheme-set-for-emacs)))
-      (_
-        (let ((lightp
-                (eq :dark (jf/current-color-scheme-gnome))))
-          (dolist (fn jf/color-scheme-system-toggle-functions)
-            (funcall fn lightp))))))
+    (funcall
+      (intern
+        (format "jf/color-scheme-system-toggle:%s" system-type))))
+
   (defalias 'jf/dark 'jf/color-scheme-system-toggle)
 
   ;; Set the color scheme of emacs based on existing system function.
