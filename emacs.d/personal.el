@@ -248,7 +248,7 @@ default of 6 (ye ol' 1d6)."
 ;; Based on the idea of habit stacking, whenever I pull down my RSS
 ;; feed, I'll go ahead and sync my notes.
 (advice-add #'jf/elfeed-load-db-and-open :before #'jf/syncthing-aling)
-(add-hook 'after-init-hook (lambda (jf/syncthing-aling 1)))
+(add-hook 'after-init-hook (lambda () (jf/syncthing-aling 1)))
 
 (use-package mastodon
   ;; :straight (:host codeberg :repo "martianh/mastodon.el")
@@ -622,8 +622,9 @@ Slots:
 - isbn:        The ISBN for the given book.  One of the unique
                identifiers.
 - custom_id:   The `org-mode' headline CUSTOM_ID property, used for
-               helping find the headline."
-  label title author translator subtitle tags isbn custom_id)
+               helping find the headline.
+- rating:      A representation of my love of the book."
+  label title author translator subtitle tags isbn custom_id rating)
 
 (defvar my-cache-of-books
   (make-hash-table :test 'equal)
@@ -705,6 +706,9 @@ When CLEAR-CACHE is non-nil, clobber the cache and rebuild."
               (translator
                 (org-entry-get
                   epom "TRANSLATOR"))
+              (rating
+                (org-entry-get
+                  epom "RATING"))
               (label (jf/book-make-label
                        :title title :subtitle subtitle
                        :author author :translator translator)))
@@ -716,6 +720,7 @@ When CLEAR-CACHE is non-nil, clobber the cache and rebuild."
             :subtitle subtitle
             :author author
             :translator translator
+            :rating rating
             :custom_id (org-entry-get
                          epom
                          "CUSTOM_ID")
@@ -1300,13 +1305,16 @@ date (that is omit that date)."
                            (car label-book))
                           (book
                             (cdr label-book)))
-                     (format "- [[work:%s%s%s][%s]]\n"
+                     (format "- [[work:%s%s%s][%s]]%s\n"
                        (jf/book-custom_id book)
                        (if (s-present? (jf/book-author book))
                          "::author" "")
                        (if (s-present? (jf/book-subtitle book))
                          "::subtitle" "")
-                       label)))
+                       label
+                       (if (s-present? (jf/book-rating book))
+                         (concat " (" (jf/book-rating book) ")")
+                         ""))))
         books))))
 
 (use-package request :straight t)
