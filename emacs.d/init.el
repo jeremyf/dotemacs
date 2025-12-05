@@ -2535,10 +2535,13 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   :config
   ;; In organizing the packages, I discovred that themes is part of the
   ;; `custom' package.
-  (defun jf/color-scheme-set-for-emacs (&optional given-scheme)
+  (defun jf/color-scheme:emacs (&optional given-scheme)
     "Function to load named theme."
     (let ((scheme
-            (or given-scheme (funcall jf/color-scheme-func))))
+            (or given-scheme
+              (funcall
+                (intern
+                  (format "jf/color-scheme-func:%s" system-type))))))
       (modus-themes-select (plist-get jf/themes-plist scheme))))
 
   ;; Theming hooks to further customize colors
@@ -2554,13 +2557,7 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   (add-hook 'after-enable-theme-hook #'jf/theme-custom-faces)
   (add-hook 'modus-themes-after-load-theme-hook #'jf/theme-custom-faces)
 
-  (defvar jf/color-scheme-func
-    (if (eq system-type 'darwin)
-      #'jf/current-macos-interface-style
-      #'jf/current-color-scheme-gnome)
-    "Function that returns :dark or :light, depending on current color scheme.")
-
-  (defun jf/current-color-scheme-gnome ()
+  (defun jf/color-scheme-func:gnu/linux ()
     "Determine Gnome preferred theme."
     (if (equal
           "'prefer-dark'"
@@ -2569,7 +2566,7 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
               "gsettings get org.gnome.desktop.interface color-scheme")))
       :dark :light))
 
-  (defun jf/current-macos-interface-style ()
+  (defun jf/color-scheme-func:darwin ()
     "Determine MacOS preferred theme."
     (if (equal "Dark"
           (substring
@@ -2594,7 +2591,7 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
     "Toggle the gnu/linux system scheme."
     (let* ((target_scheme
               (plist-get '(:dark :light :light :dark)
-                (jf/current-color-scheme-gnome))))
+                (jf/color-scheme-func:gnu/linux))))
       ;; Instead of all of the shelling out, we could assemble the shell
       ;; commands into a singular command and issue that.
       (dolist (setting jf/color-scheme-system-toggle/gnome-settings)
@@ -2611,7 +2608,7 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
       (concat "osascript -e 'tell application \"System Events\" "
         "to tell appearance preferences "
         "to set dark mode to not dark mode'"))
-    (jf/color-scheme-set-for-emacs))
+    (jf/color-scheme:emacs))
 
   (defun jf/color-scheme-system-toggle ()
     "Toggle system-wide Dark or Light setting."
@@ -2623,7 +2620,7 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   (defalias 'jf/dark 'jf/color-scheme-system-toggle)
 
   ;; Set the color scheme of emacs based on existing system function.
-  (jf/color-scheme-set-for-emacs))
+  (jf/color-scheme:emacs))
 
 (use-package xref
   ;; Cross-referencing commands.  I suspect there's a lot more that I
