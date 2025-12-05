@@ -2580,12 +2580,20 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   (defvar jf/color-scheme-system-toggle-functions
     '(jf/color-scheme:gnome-color-scheme
        jf/color-scheme:gnome-gtk-theme
-       jf/color-scheme:emacs-theme)
+       jf/color-scheme:emacs-theme
+       jf/color-scheme:gnome-night-light)
     "A list of arity one functions that set component schemes based on the
 input parameter.
 
 When the parameter is non-nil, favor the dark option.  Otherwise favor
 the light option.")
+
+  (defun jf/color-scheme:gnome-night-light (lightp)
+    "Set the nightlight color scheme base on LIGHTP (e.g. light/dark)."
+    (shell-command
+      (concat
+        "gsettings set org.gnome.settings-daemon.plugins.color "
+        "night-light-enabled " (if lightp "false" "true"))))
 
   (defun jf/color-scheme:gnome-color-scheme (lightp)
     "Set the gnome color scheme based on LIGHTP (e.g. light/dark)."
