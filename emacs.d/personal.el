@@ -596,15 +596,21 @@ Useful for narrowing regions.")
 (require 'request)
 (require 's)
 
-(cl-defun jf/book-make-label (&key title subtitle author translator)
+(cl-defun jf/book-make-label (&key title subtitle author translator omit)
   "From given TITLE, SUBTITLE, AUTHOR, TRANSLATOR return its label."
   (format "«%s»%s%s"
-    (if (s-present? subtitle)
+    (if (and
+          (not (member 'rating omit))
+          (s-present? subtitle))
       (concat title ": " subtitle)
       title)
-    (if (s-present? author)
+    (if (and
+          (not (member 'author omit))
+          (s-present? author))
       (concat " by " author) "")
-    (if (s-present? translator)
+    (if (and
+          (not (member 'translator omit))
+          (s-present? translator))
       (concat " translated by " translator) "")))
 
 (cl-defstruct jf/book
@@ -623,8 +629,10 @@ Slots:
                identifiers.
 - custom_id:   The `org-mode' headline CUSTOM_ID property, used for
                helping find the headline.
-- rating:      A representation of my love of the book."
-  label title author translator subtitle tags isbn custom_id rating)
+- rating:      A representation of my love of the book.
+- closed:      The org-mode timestamp in which the object was closed."
+  label title author translator subtitle tags isbn
+  custom_id rating closed)
 
 (defvar my-cache-of-books
   (make-hash-table :test 'equal)
@@ -683,7 +691,8 @@ When CLEAR-CACHE is non-nil, clobber the cache and rebuild."
             (concat "+level=2+" jf/bibliography/tag-books) 'file)))))
   my-cache-of-books)
 
-(defun jf/build-label-and-book-from-epom (&optional epom)
+(defun jf/build-label-and-book-from-epom (&optional epom omit)
+  "Build a book object from EPOM and OMIT from label given properties."
   ;; For some reason the org-map-entries is not filtering
   ;; on only items tagged as books.  Hence the
   ;; conditional.
@@ -711,7 +720,8 @@ When CLEAR-CACHE is non-nil, clobber the cache and rebuild."
                   epom "RATING"))
               (label (jf/book-make-label
                        :title title :subtitle subtitle
-                       :author author :translator translator)))
+                       :author author :translator translator
+                       :omit omit)))
         (cons label
           (make-jf/book
             :label label
@@ -721,12 +731,9 @@ When CLEAR-CACHE is non-nil, clobber the cache and rebuild."
             :author author
             :translator translator
             :rating rating
-            :custom_id (org-entry-get
-                         epom
-                         "CUSTOM_ID")
-            :isbn (org-entry-get
-                    epom
-                    "ISBN")))))))
+            :closed (org-entry-get epom "CLOSED")
+            :custom_id (org-entry-get epom "CUSTOM_ID")
+            :isbn (org-entry-get epom "ISBN")))))))
 
 
 (defun jf/book-from-isbn (isbn)
@@ -1271,6 +1278,11 @@ I'm expecting two PARAM keys:
 - :begin
 - :end
 
+You may also provide an :omit param, which allows you to specify what
+properties to :omit (e.g. authors, subtitles, ratings).
+
+The :closed param can specify the closed date format.
+
 Both dates should be of \"CCYY-MM-DD\" format, with 0s for padding.
 This creates an range with an open begin date and and closed end
 date (that is omit that date)."
@@ -1282,6 +1294,16 @@ date (that is omit that date)."
             (or
               (plist-get params :end)
               (user-error "missing :end param")))
+          (closed
+            (or
+              (plist-get params :closed)
+              "%Y-%m-%d"))
+          (rating
+            (or
+              (plist-get params :rating)
+              "(%s)"))
+          (omit
+            (flatten-list (list (plist-get params :omit))))
           (books
             ;; An alist of book labels and book data.  We use the
             ;; beginning and ending dates to limit our query and only
@@ -1289,7 +1311,8 @@ date (that is omit that date)."
             (with-current-buffer
               (find-file-noselect jf/filename/bibliography)
               (org-map-entries
-                #'jf/build-label-and-book-from-epom
+                (lambda ()
+                  (jf/build-label-and-book-from-epom nil omit))
                 (format
                   (concat
                     "+LEVEL=2+books+TODO=\"DONE\""
@@ -1305,15 +1328,30 @@ date (that is omit that date)."
                            (car label-book))
                           (book
                             (cdr label-book)))
-                     (format "- [[work:%s%s%s][%s]]%s\n"
+                     (format "- [[work:%s%s%s][%s]]%s%s\n"
                        (jf/book-custom_id book)
-                       (if (s-present? (jf/book-author book))
+                       (if (and
+                             (not (member 'author omit))
+                             (s-present? (jf/book-author book)))
                          "::author" "")
-                       (if (s-present? (jf/book-subtitle book))
+                       (if (and
+                             (not (member 'subtitle omit))
+                             (s-present? (jf/book-subtitle book)))
                          "::subtitle" "")
                        label
-                       (if (s-present? (jf/book-rating book))
-                         (concat " (" (jf/book-rating book) ")")
+                       (if (and
+                             (not (member 'rating omit))
+                             (s-present? (jf/book-rating book)))
+                         (concat " "
+                           (format rating (jf/book-rating book)))
+                         "")
+                       (if (and
+                             (not (member 'closed omit))
+                             (s-present? (jf/book-closed book)))
+                         (concat " "
+                           (format-time-string
+                             closed (org-read-date t t
+                                     (jf/book-closed book))))
                          ""))))
         books))))
 
