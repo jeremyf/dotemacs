@@ -2548,6 +2548,16 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   (defvar after-enable-theme-hook nil
     "Normal hook run after enabling a theme.")
 
+  ;; (defvar jf/window-manager
+  ;;   (pcase system-type
+  ;;     ('gnu/linux
+  ;;       (s-downcase
+  ;;         (shell-command-to-string
+  ;;           "wmctrl -m | rg \"^Name:\\s*(.*)\" -r '$1' | sed 's/\\s\\+/-/g'")))
+  ;;     ('darwin
+  ;;       "not-applicable"))
+  ;;   "Assign the active window manager.")
+
   (defun run-after-enable-theme-hook (&rest _args)
     "Run `after-enable-theme-hook'."
     (run-hooks 'after-enable-theme-hook))
@@ -2558,7 +2568,7 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   (add-hook 'modus-themes-after-load-theme-hook #'jf/theme-custom-faces)
 
   (defun jf/color-scheme-func:gnu/linux ()
-    "Determine Gnome preferred theme."
+    "Determine Gnome preferred/current theme."
     (if (equal
           "'prefer-dark'"
           (s-trim
@@ -2567,14 +2577,14 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
       :dark :light))
 
   (defun jf/color-scheme-func:darwin ()
-    "Determine MacOS preferred theme."
+    "Determine MacOS preferred/current theme."
     (if (equal "Dark"
           (substring
             (shell-command-to-string
               "defaults read -g AppleInterfaceStyle") 0 4))
       :dark :light))
 
-  (defvar jf/color-scheme-system-toggle/gnome-settings
+  (defvar jf/color-scheme-commands:gnu/linux
     '((:template "gsettings set org.gnome.settings-daemon.plugins.color night-light-enabled %s"
         :light "false" :dark "true")
        (:template "gsettings set org.gnome.desktop.interface color-scheme %s"
@@ -2594,13 +2604,12 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
                 (jf/color-scheme-func:gnu/linux))))
       ;; Instead of all of the shelling out, we could assemble the shell
       ;; commands into a singular command and issue that.
-      (dolist (setting jf/color-scheme-system-toggle/gnome-settings)
+      (dolist (setting jf/color-scheme-commands:gnu/linux)
         ;; In essence pipe the output to /dev/null
         (shell-command-to-string
           (format (plist-get setting :template)
             (plist-get setting target_scheme))))
-      (modus-themes-select
-        (plist-get jf/themes-plist target_scheme))))
+      (jf/color-scheme:emacs target_scheme)))
 
   (defun jf/color-scheme-system-toggle:darwin ()
     "Toggle the darwin system scheme."
