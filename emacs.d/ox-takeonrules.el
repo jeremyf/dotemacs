@@ -990,6 +990,8 @@ Otherwise, use pre-existing handling."
         (format "{{< blockquote %s >}}\n%s{{< /blockquote >}}"
           (org-html--make-attribute-string params)
           contents))
+      ("inlinecomment"
+        (concat "{{< inlinecomment >}}" contents "{{< /inlinecomment >}}"))
       ("marginnote"
         (concat "{{< marginnote >}}" contents "{{< /marginnote >}}"))
       (_ (apply func (list special-block contents info))))))
