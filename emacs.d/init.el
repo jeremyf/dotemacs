@@ -4890,7 +4890,7 @@ Useful if you want a more robust view into the recommend candidates."
   ;; adequate and has a narrower implementation foot-print, cleaving
   ;; closer to emacs-lisp; thus likely easing it's maintenance burden.
   :straight (tempel :host github :repo "minad/tempel")
-  :custom (tempel-path "~/git/dotemacs/templates")
+  :custom (tempel-path "~/git/dotemacs/tempels/*.eld")
   :config (global-tempel-abbrev-mode)
   :bind (("M-+" . tempel-complete) ;; Alternative tempel-expand
           ("M-*" . tempel-insert))
