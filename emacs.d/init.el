@@ -8186,6 +8186,7 @@ If `consult--read' is defined, use that.  Otherwise fallback to
 (use-package pdf-tools
   ;; I appreciate having a good PDF reading experience within Emacs.
   :straight t
+  :bind (:map pdf-view-mode-map ("g" . #'pdf-view-goto-page))
   :config
   ;; For some reason when I call `embark-dwim' on `pdf-loader-install'
   ;; It resets my theme and puts me at the beginning of this file.
