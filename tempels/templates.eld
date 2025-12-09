@@ -70,10 +70,6 @@ org-mode
   n "#+STARTUP: beamer"
   n "#+latex_header: \\AtBeginSection[]{\\begin{frame}<beamer>\\frametitle{Topic}\\tableofcontents[currentsection]\\end{frame}}" n)
 
-(eg "([[abbr:20230824T082549][e.g.]], " q ")")
-(aka "([[abbr:20221009T115519][a.k.a.]] " q ")")
-(dnd "[[abbr:20221009T115753][D&D]] " q )
-(ie "[[abbr:20230825T130802][i.e.]] " q "")
 (clocktable "#+BEGIN: clocktable :scope file :tcolumns 1 :block untilnow :narrow 80! :step year :stepskip0 t :fileskip0 t :filetitle t\n#+END:")
 ;; (lore24-transclude "#+TRANSCLUDE: [[id:" p "]] :only-contents :exclude-elements \"drawer keyword headline\"")
 
@@ -85,17 +81,17 @@ org-mode
 (macro-keyboard "{{{kbd(" (p (completing-read "Keyboard: " (jf/org-macro-value-list "kbd"))) ")}}}")
 (macro-emphatic "{{{em(" (p (completing-read "Emphasis: " (jf/org-macro-value-list "em"))) ")}}}")
 (macro-mechanic "{{{m(" (p (completing-read "Mechanic: " (jf/org-macro-value-list "m(?:echanic)?"))) ")}}}")
-(errant-monster "** " (p "Monster Name") n
-  ":PROPERTIES:" n
-  ":ID: " (org-id-new) n
-  ":SOURCE:" p n
-  ":THREAT: " p n
-  ":HP: " p n
-  ":ATTACKS: " p n
-  ":MD: " p n
-  ":MORALE: " p n
-  ":ALIGNMENT: " p n
-  ":END:" n q)
+;; (errant-monster "** " (p "Monster Name") n
+;;   ":PROPERTIES:" n
+;;   ":ID: " (org-id-new) n
+;;   ":SOURCE:" p n
+;;   ":THREAT: " p n
+;;   ":HP: " p n
+;;   ":ATTACKS: " p n
+;;   ":MD: " p n
+;;   ":MORALE: " p n
+;;   ":ALIGNMENT: " p n
+;;   ":END:" n q)
 
 (details_block
   "#+begin_details"
@@ -153,8 +149,8 @@ go-ts-mode go-mode
 
 ;;;; web-mode
 web-mode
-(bb "<% byebug %>" n)
-(db "<% require \"debug\"; binding.break %>" n)
+;; (bb "<% byebug %>" n)
+;; (db "<% require \"debug\"; binding.break %>" n)
 (tor "<cite><a href=\"https://takeonrules.com\">Take on Rules</a></cite>")
 (today "<time datetime=\"" (format-time-string "%Y-%m-%d") "\">today</time>")
 
