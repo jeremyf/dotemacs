@@ -369,6 +369,11 @@ Related to `jf/linux:radio-broadcast'."
     (interactive)
     (shell-command "rfkill block all"))
 
+  (defun jf/linux:xmodmap ()
+    "Rebind xmodmap."
+    (interactive)
+    (shell-command "xmodmap ~/.Xmodmap"))
+
   (defun jf/linux:radio-broadcast (&optional all identifiers)
     "Soft unblock laptop radios (e.g. bluetooth and wlan)
 
