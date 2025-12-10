@@ -98,7 +98,11 @@ org-export backend derived from the 'md backend."
                  (f-join jf/tor-home-directory "content" "posts"
                    (format-time-string "%Y")))))
         (and (org-export-to-file 'takeonrules file nil t t t)
-          (find-file-other-window file))))))
+          (find-file-other-window file)
+          ;; Quick and dirty demote headings one level.
+          (save-excursion
+            (goto-char (point-min))
+            (replace-regexp "^#" "##")))))))
 
 (defun org-takeonrules-inner-template (contents info)
   "Transcode CONTENTS to markdown body.
@@ -893,6 +897,9 @@ We also rely on the org-element at point."
       ;; Assume that the first time we publish, this is in a draft
       ;; state.  That is what picks up what I am to publish.
       (add-to-list 'metadata '("draft" . "true")))
+    (when-let ((series
+                 (org-entry-get (point) "SERIES")))
+      (add-to-list 'metadata `("series" . ,series)))
     (yaml-encode metadata)))
 
 (defun org-takeonrules-timestamp (timestamp _contents info)
@@ -977,7 +984,7 @@ Otherwise, use pre-existing handling."
           (if (plist-get params :open) " open" "")
           (if-let* ((summary
                      (plist-get params :summary)))
-            (concat "<summary>" summary "</summary>\n")
+            (format "<summary>%s</summary>\n" summary)
             "")
           contents))
       ("update"
@@ -991,9 +998,9 @@ Otherwise, use pre-existing handling."
           (org-html--make-attribute-string params)
           contents))
       ("inlinecomment"
-        (concat "{{< inlinecomment >}}" contents "{{< /inlinecomment >}}"))
+        (format "{{< inlinecomment >}}%s{{< /inlinecomment >}}" contents))
       ("marginnote"
-        (concat "{{< marginnote >}}" contents "{{< /marginnote >}}"))
+        (format "{{< marginnote >}}%s{{< /marginnote >}}" contents))
       (_ (apply func (list special-block contents info))))))
 
 (defun jf/block-params-from (element)
