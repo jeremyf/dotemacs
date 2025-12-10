@@ -1544,6 +1544,13 @@ work computers.")
   :straight (:type built-in)
   :after (projectile)
   :preface
+  (defvar-local jf/mode-line-format/playing-fftw
+    '(:eval
+       (when (and (boundp playing-forged-from-the-worst)
+               playing-forged-from-the-worst
+               (mode-line-window-selected-p))
+         (concat
+           (propertize " 🎲 " 'face 'mode-line-highlight) " "))))
   (defvar-local jf/mode-line-format/kbd-macro
     '(:eval
        (when (and (mode-line-window-selected-p) defining-kbd-macro)
@@ -1811,6 +1818,7 @@ active nature."
                         jf/mode-line-format/eglot
                         jf/mode-line-format/flymake
                         jf/mode-line-format/kbd-macro
+                        jf/mode-line-format/playing-fftw
                         jf/mode-line-format/major-mode
                         jf/mode-line-format/misc-info
                         jf/mode-line-format/narrow
@@ -1830,6 +1838,7 @@ active nature."
        jf/mode-line-format/vterm
        jf/mode-line-format/kbd-macro
        jf/mode-line-format/narrow
+       jf/mode-line-format/playing-fftw
        jf/mode-line-format/buffer-name-and-status " "
        jf/mode-line-format/major-mode " "
        jf/mode-line-format/project " "
@@ -6731,7 +6740,7 @@ Useful for Eglot."
   :config
   ;; On each machine I use, I have different bookmarks, yet they all
   ;; point to the same location.
-  (setq bookmark-default-file "~/emacs-bookmarks.el")
+  (setopt bookmark-default-file "~/emacs-bookmarks.el")
 
   ;; Save the `bookmark-file' each time I modify a bookmark.
   (setq bookmark-save-flag 1)
