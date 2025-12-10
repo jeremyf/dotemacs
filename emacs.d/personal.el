@@ -229,6 +229,9 @@ URL is assumed to be either of an RSS feed or Atom feed."
       "cat /dev/null > ~/.msmtp.log"))
   "The things that we sync.")
 
+(use-package elpher
+  :straight t)
+
 (defun jf/syncthing-aling (&optional number)
   "Synchronize files into SyncThing bucket.
 
