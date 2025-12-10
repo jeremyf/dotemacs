@@ -1546,7 +1546,7 @@ work computers.")
   :preface
   (defvar-local jf/mode-line-format/playing-fftw
     '(:eval
-       (when (and (boundp playing-forged-from-the-worst)
+       (when (and (boundp 'playing-forged-from-the-worst)
                playing-forged-from-the-worst
                (mode-line-window-selected-p))
          (concat
