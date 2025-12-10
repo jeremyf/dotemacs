@@ -1368,4 +1368,91 @@ date (that is omit that date)."
   (org-social-relay "https://org-social-relay.andros.dev/")
   (org-social-my-public-url "https://takeonrules.com/social.org"))
 
+(defvar playing-forged-from-the-worst nil
+  "When non-nil, indicates that I'm playing Forged from the Worst.")
+
+(defun toggle-forged-from-the-worst ()
+  "Begin or end playing Forged from the Worst."
+  (interactive)
+  (load "jf-mythic-bastionland.el")
+  (setq playing-forged-from-the-worst
+    (not playing-forged-from-the-worst))
+  (bookmark-load
+    (if playing-forged-from-the-worst
+      "~/SyncThings/source/forged-from-the-worst/forged=from=the=worst--bookmarks.el"
+      "~/emacs-bookmarks.el")
+    t nil t))
+
+(defvar random-pages
+  '(("Knights/Seers" .
+      (:file "~/Documents/RPGs/Mythic Bastionland/mythic=bastionland--core-rules__rules_systems.pdf"
+        :callback (lambda () (pdf-view-goto-page (+ 28 (* (random 72) 2))))))
+     ("Myths" .
+       (:file "~/Documents/RPGs/Mythic Bastionland/mythic=bastionland--core-rules__rules_systems.pdf"
+         :callback (lambda () (pdf-view-goto-page (+ 29 (* (random 72) 2)))))))
+  "An alist where `car' is the label and `cdr' is a plist with :file and
+optional :callback.
+
+We'll open the :file, then if a :callback is present, we'll run that
+callback on the newly opened file.")
+
+(defun random-page (&optional label set)
+  "Open the file from SET with given LABEL.
+
+SET is assumed to be an alist with `car' as the label and `cdr' a plist
+with :file and :callback.  See `random-pages' for more information."
+  (interactive)
+  (let* ((set
+           (or set random-pages))
+          (label
+           (or label
+             (completing-read "Source: " set nil t)))
+          (source
+            (alist-get label set nil nil #'string=))
+          (file
+            (plist-get source :file))
+          (display-buffer-mark-dedicated
+            t)
+          (buffer (or
+                    (find-buffer-visiting file)
+                    (find-file-noselect file))))
+    ;; We'll pop open a dedicated side window with ample space for
+    ;; viewing a new file.
+    (pop-to-buffer buffer '((display-buffer-in-side-window)
+                             (side . right)
+                             (window-width 72)
+                             (window-parameters
+                               (tab-line-format . none)
+                               (mode-line-format . none)
+                               (no-delete-other-windows . t))))
+    (with-current-buffer buffer
+      (local-set-key (kbd "g")
+        (lambda () (interactive)
+          (random-page label)))
+      (when-let ((callback
+                   (plist-get source :callback)))
+        (funcall callback)))))
+
+(use-package consult-mu
+  :straight (consult-mu :type git :host github
+              :repo "armindarvish/consult-mu"
+              :files (:defaults "extras/*.el"))
+        :after consult)
+
+(use-package consult-omni
+  :straight (consult-omni :type git :host github
+              :repo "armindarvish/consult-omni"
+              :files (:defaults "sources/*.el"))
+  :after consult
+  :config
+
+  (require 'consult-omni-sources)
+  (require 'consult-omni-apps)
+  (require 'consult-omni-mu4e)
+  (require 'consult-omni-elfeed)
+  (require 'consult-omni-org-agenda)
+  (setopt consult-omni-multi-sources '("Apps" "elfeed" "mu4e" "Org Agenda"))
+
+  (setopt consult-omni-default-interactive-command #'consult-omni-multi))
+
 (require 'ox-takeonrules)
