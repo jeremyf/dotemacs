@@ -1383,34 +1383,41 @@ date (that is omit that date)."
       "~/emacs-bookmarks.el")
     t nil t))
 
-(defvar random-pages
-  '(("Knights/Seers" .
-      (:file "~/Documents/RPGs/Mythic Bastionland/mythic=bastionland--core-rules__rules_systems.pdf"
-        :callback (lambda () (pdf-view-goto-page (+ 28 (* (random 72) 2))))))
-     ("Myths" .
-       (:file "~/Documents/RPGs/Mythic Bastionland/mythic=bastionland--core-rules__rules_systems.pdf"
-         :callback (lambda () (pdf-view-goto-page (+ 29 (* (random 72) 2)))))))
-  "An alist where `car' is the label and `cdr' is a plist with :file and
-optional :callback.
+;; As I work through this, I can envision amending the bookmarks to
+;; allow for a function instead of page number.
+(defvar pdf-pages
+  (let ((file
+          "~/Documents/RPGs/Mythic Bastionland/mythic=bastionland--core-rules__rules_systems.pdf"))
+    `(("Basic Rules" . (,file 8))
+       ("Harm & Scars" . (,file 9))
+       ("Specifics of Combat" . (,file 10))
+       ("Warfare" . (,file 11))
+       ("Arms & Goods" . (,file 12))
+       ("People & Realms" . (,file 13))
+       ("Time" . (,file 17))
+       ("Travel" . (,file 18))
+       ("Dominion" . (,file 20))
+       ("Authority" . (,file 21))
+       ("Knights/Seers" . (,file (lambda () (+ 28 (* (random 72) 2)))))
+       ("Myths" . (,file (lambda () (+ 29 (* (random 72) 2)))))))
+  "An alist where 'car' is the label and 'cdr' is a list with 'car' of
+ the filename and 'cadr' an integer or a function.")
 
-We'll open the :file, then if a :callback is present, we'll run that
-callback on the newly opened file.")
+(defun open-pdf-page-in-sidecar (&optional label set)
+  "Open the PDF from SET with given LABEL.
 
-(defun random-page (&optional label set)
-  "Open the file from SET with given LABEL.
-
-SET is assumed to be an alist with `car' as the label and `cdr' a plist
-with :file and :callback.  See `random-pages' for more information."
+SET is assumed to be an alist with `car' as the label and `cdr' a list
+that conforms to 'pdf-pages' documentation."
   (interactive)
   (let* ((set
-           (or set random-pages))
+           (or set pdf-pages))
           (label
-           (or label
-             (completing-read "Source: " set nil t)))
-          (source
+            (or label
+              (completing-read "Source: " set nil t)))
+          (pdf-page
             (alist-get label set nil nil #'string=))
           (file
-            (plist-get source :file))
+            (car pdf-page))
           (display-buffer-mark-dedicated
             t)
           (buffer (or
@@ -1426,12 +1433,17 @@ with :file and :callback.  See `random-pages' for more information."
                                (mode-line-format . none)
                                (no-delete-other-windows . t))))
     (with-current-buffer buffer
-      (local-set-key (kbd "g")
-        (lambda () (interactive)
-          (random-page label)))
-      (when-let ((callback
-                   (plist-get source :callback)))
-        (funcall callback)))))
+      (let ((pager
+              (cadr pdf-page)))
+        (if (integerp pager)
+          (pdf-view-goto-page pager)
+          (progn
+            ;; Assume that if we have a function there's something more
+            ;; dynamic, so lets provide a "refresh" option.
+            (pdf-view-goto-page (funcall pager))
+            (local-set-key (kbd "g")
+              (lambda () (interactive)
+                (open-pdf-page-in-sidecar label)))))))))
 
 (use-package consult-mu
   :straight (consult-mu :type git :host github
