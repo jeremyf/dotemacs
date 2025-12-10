@@ -50,14 +50,16 @@
   "A list of `cons' cells used for `dig-my-grave' `completing-read'.
 The `car' as the label and `cdr' as the value that we'll insert.")
 
-(defun jf/org-mode/insert-block/quote_block (author cite cite_url)
+(defun jf/org-mode/insert-block/quote_block (&optional author cite cite_url page)
   (interactive (list (read-string "Author: ")
                  (read-string "Cite: ")
-                 (read-string "Cite URL: ")))
+                 (read-string "Cite URL: ")
+                 (read-string "Page: "))
   (insert
     (if (s-present? author) (concat "#+attr_shortcode: :pre " author "\n") "")
     (if (s-present? cite) (concat "#+attr_shortcode: :cite " cite "\n") "")
     (if (s-present? cite_url) (concat "#+attr_shortcode: :cite_url " cite_url "\n") "")
+    (if (s-present? page) (concat "#+attr_shortcode: :post " page "\n") "")
     "#+begin_quote"
     "\n\n#+end_quote")
   (re-search-backward "^$"))
