@@ -1544,10 +1544,10 @@ work computers.")
   :straight (:type built-in)
   :after (projectile)
   :preface
-  (defvar-local jf/mode-line-format/playing-fftw
+  (defvar-local jf/mode-line-format/playing
     '(:eval
-       (when (and (boundp 'playing-forged-from-the-worst)
-               playing-forged-from-the-worst
+       (when (and (boundp 'playing-a-game)
+               playing-a-game
                (mode-line-window-selected-p))
          (concat
            (propertize " ⚅ " 'face 'mode-line-highlight) " "))))
@@ -1818,7 +1818,7 @@ active nature."
                         jf/mode-line-format/eglot
                         jf/mode-line-format/flymake
                         jf/mode-line-format/kbd-macro
-                        jf/mode-line-format/playing-fftw
+                        jf/mode-line-format/playing
                         jf/mode-line-format/major-mode
                         jf/mode-line-format/misc-info
                         jf/mode-line-format/narrow
@@ -1838,7 +1838,7 @@ active nature."
        jf/mode-line-format/vterm
        jf/mode-line-format/kbd-macro
        jf/mode-line-format/narrow
-       jf/mode-line-format/playing-fftw
+       jf/mode-line-format/playing
        jf/mode-line-format/buffer-name-and-status " "
        jf/mode-line-format/major-mode " "
        jf/mode-line-format/project " "

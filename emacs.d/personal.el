@@ -49,179 +49,179 @@ URL is assumed to be either of an RSS feed or Atom feed."
         (bury-buffer)))))
 
 (defun jf/bibliography/export-shopping-list (&optional file)
-    "Export my book shopping list to the given FILE."
-    (interactive)
-    (let* ((works
-             (save-restriction
-               (widen)
-               (save-excursion
-                 (with-current-buffer
-                   (find-file-noselect jf/filename/bibliography)
-                   (org-map-entries
-                     (lambda ()
-                       (list
-                         :title
-                         (org-element-property
-                           :title (org-element-at-point))
-                         :author
-                         (org-entry-get
-                           (org-element-at-point) "AUTHOR")
-                         :editor
-                         (org-entry-get
-                           (org-element-at-point) "EDITOR")
-                         ))
-                     "+LEVEL=2+books+shoppingList" 'file)))))
-            (sorted-works
-              (sort works
-                :key (lambda (work)
-                       (if-let* ((author
-                                  (plist-get work :author)))
+  "Export my book shopping list to the given FILE."
+  (interactive)
+  (let* ((works
+           (save-restriction
+             (widen)
+             (save-excursion
+               (with-current-buffer
+                 (find-file-noselect jf/filename/bibliography)
+                 (org-map-entries
+                   (lambda ()
+                     (list
+                       :title
+                       (org-element-property
+                         :title (org-element-at-point))
+                       :author
+                       (org-entry-get
+                         (org-element-at-point) "AUTHOR")
+                       :editor
+                       (org-entry-get
+                         (org-element-at-point) "EDITOR")
+                       ))
+                   "+LEVEL=2+books+shoppingList" 'file)))))
+          (sorted-works
+            (sort works
+              :key (lambda (work)
+                     (if-let* ((author
+                                 (plist-get work :author)))
+                       (car (last
+                              (s-split " "
+                                (car (s-split " and " author))) 1))
+                       (if-let* ((editor
+                                   (plist-get work :editor)))
                          (car (last
                                 (s-split " "
-                                  (car (s-split " and " author))) 1))
-                         (if-let* ((editor
-                                    (plist-get work :editor)))
-                           (car (last
-                                  (s-split " "
-                                    (car (s-split " and " editor))) 1))
-                           ""))))))
-      (let ((buffer
-              (find-file-noselect (or file jf/filename/shopping-list))))
-        (with-current-buffer buffer
-          (delete-region (point-min) (point-max))
-          (insert "Books from Jeremy's “shopping list” that he’s considering:\n\n")
-          (dolist (work sorted-works)
-            (insert (format "- “%s”%s%s\n"
-                      (plist-get work :title)
-                      (if-let* ((author (plist-get work :author)))
-                        (concat " by " author)
-                        "")
-                      (if-let* ((editor (plist-get work :editor)))
-                        (concat " edited by " editor)
-                        ""))))
-          (save-buffer)))))
+                                  (car (s-split " and " editor))) 1))
+                         ""))))))
+    (let ((buffer
+            (find-file-noselect (or file jf/filename/shopping-list))))
+      (with-current-buffer buffer
+        (delete-region (point-min) (point-max))
+        (insert "Books from Jeremy's “shopping list” that he’s considering:\n\n")
+        (dolist (work sorted-works)
+          (insert (format "- “%s”%s%s\n"
+                    (plist-get work :title)
+                    (if-let* ((author (plist-get work :author)))
+                      (concat " by " author)
+                      "")
+                    (if-let* ((editor (plist-get work :editor)))
+                      (concat " edited by " editor)
+                      ""))))
+        (save-buffer)))))
 
 (defun jf/bibliography/export-epigraphs (&optional file)
-    "Export epigraphs to my blog."
-    (interactive)
-    (let* ((epigraphs
-             (save-restriction
-               (widen)
-               (save-excursion
-                 (with-current-buffer
-                   (find-file-noselect jf/filename/bibliography)
-                   (elfeed--shuffle
-                     (org-element-map
-                       (org-element-parse-buffer)
-                       '(quote-block verse-block)
-                       (lambda (el)
-                         ;; Skip un-named blocks as we can’t link to them.
-                         (when-let* ((id
-                                       (org-element-property :name el)))
-                           (let* ((lineage
-                                    (org-element-lineage el))
-                                   ;; Loop
-                                   (citable-work
+  "Export epigraphs to my blog."
+  (interactive)
+  (let* ((epigraphs
+           (save-restriction
+             (widen)
+             (save-excursion
+               (with-current-buffer
+                 (find-file-noselect jf/filename/bibliography)
+                 (elfeed--shuffle
+                   (org-element-map
+                     (org-element-parse-buffer)
+                     '(quote-block verse-block)
+                     (lambda (el)
+                       ;; Skip un-named blocks as we can’t link to them.
+                       (when-let* ((id
+                                     (org-element-property :name el)))
+                         (let* ((lineage
+                                  (org-element-lineage el))
+                                 ;; Loop
+                                 (citable-work
+                                   (car
+                                     (seq-filter
+                                       (lambda (el)
+                                         (and
+                                           (eq (org-element-type el) 'headline)
+                                           (or (member "citables"
+                                                 (org-element-property :tags el))
+                                             (= (org-element-property :level el) 2))))
+                                       lineage)))
+                                 (h-node
+                                   (car
+                                     (seq-filter
+                                       (lambda (el)
+                                         (and
+                                           (eq (org-element-type el) 'headline)
+                                           (= (org-element-property :level el) 2)))
+                                       lineage)))
+                                 (people?
+                                   (member "people"
+                                     (org-element-property :tags h-node))))
+                           (list
+                             :id id
+                             :type (org-element-type el)
+                             :work (if people?
+                                     ""
                                      (car
-                                       (seq-filter
-                                         (lambda (el)
-                                           (and
-                                             (eq (org-element-type el) 'headline)
-                                             (or (member "citables"
-                                                   (org-element-property :tags el))
-                                               (= (org-element-property :level el) 2))))
-                                         lineage)))
-                                   (h-node
-                                     (car
-                                       (seq-filter
-                                         (lambda (el)
-                                           (and
-                                             (eq (org-element-type el) 'headline)
-                                             (= (org-element-property :level el) 2)))
-                                         lineage)))
-                                   (people?
-                                     (member "people"
-                                       (org-element-property :tags h-node))))
-                             (list
-                               :id id
-                               :type (org-element-type el)
-                               :work (if people?
-                                       ""
-                                       (car
-                                         (org-element-property
-                                           :title citable-work)))
-                               :author
-                               (if people?
-                                 (car
-                                   (org-element-property :title h-node))
-                                 (org-entry-get h-node "AUTHOR"))
-                               :text
-                               (buffer-substring-no-properties
-                                 (org-element-property
-                                   :contents-begin el)
-                                 (org-element-property
-                                   :contents-end el)))))))))))))
-      (let* ((buffer
-               (find-file-noselect
-                 (or file jf/filename/epigraphy-takeonrules))))
-        (with-current-buffer buffer
-          (delete-region (point-min) (point-max))
-          (insert
-            "---\n"
-            "date: 2021-07-22 19:23:43.883686000 -04:00 \n"
-            "full_width: true\n"
-            "images: []\n"
-            "lastmod: " (format-time-string "%Y-%m-%d %H:%M:%S.%N %z") "\n"
-            "layout: page\n"
-            "permalink: \"/site-map/epigraphs/\"\n"
-            "title: Epigraphs\n"
-            "type: page\n"
-            "---\n"
-            "\n"
-            "Ever since reading {{< glossary key=\"DUNE-NOVEL\" >}} by {{< glossary key=\"FRANK-HERBERT\" >}} I've loved epigraphs.  "
-            "In that novel, the epigraphs are quotes from fictional works written within the Dune universe.  "
-            "Below are quotes that I've gathered, and in some cases, I've used as epigraphs throughout <cite>Take on Rules</cite>.\n")
-          (dolist (epigraph epigraphs)
-            (let ((work
-                    (plist-get epigraph :work))
-                   (author
-                     (plist-get epigraph :author))
-                   (text
-                     (plist-get epigraph :text)))
-              (insert
-                (format "<section class=\"epigraphs\"><blockquote data-id=\"%s\">%s%s\n</blockquote></section>\n"
-                  (plist-get epigraph :id)
-                  (if (eq (plist-get epigraph :type) 'verse-block)
-                    (concat "<pre class=\"verse\">"  text "</pre>")
-                    (org-export-string-as (s-trim text) 'html t))
-                  (cond
-                    ((and (s-present? work) (s-present? author))
-                      (format "\n<footer>&#8213;%s, <cite>%s</cite></footer>"
-                        author work))
-                    ((s-present? work)
-                      (format "\n<footer>&#8213; <cite>%s</cite></footer>"
-                        work))
-                    ((s-present? author)
-                      (format "\n<footer>&#8213; %s</footer>"
-                        author))
-                    (t ""))))))
-          (save-buffer))
-        (message "Done exporting epigraphs to blog"))))
+                                       (org-element-property
+                                         :title citable-work)))
+                             :author
+                             (if people?
+                               (car
+                                 (org-element-property :title h-node))
+                               (org-entry-get h-node "AUTHOR"))
+                             :text
+                             (buffer-substring-no-properties
+                               (org-element-property
+                                 :contents-begin el)
+                               (org-element-property
+                                 :contents-end el)))))))))))))
+    (let* ((buffer
+             (find-file-noselect
+               (or file jf/filename/epigraphy-takeonrules))))
+      (with-current-buffer buffer
+        (delete-region (point-min) (point-max))
+        (insert
+          "---\n"
+          "date: 2021-07-22 19:23:43.883686000 -04:00 \n"
+          "full_width: true\n"
+          "images: []\n"
+          "lastmod: " (format-time-string "%Y-%m-%d %H:%M:%S.%N %z") "\n"
+          "layout: page\n"
+          "permalink: \"/site-map/epigraphs/\"\n"
+          "title: Epigraphs\n"
+          "type: page\n"
+          "---\n"
+          "\n"
+          "Ever since reading {{< glossary key=\"DUNE-NOVEL\" >}} by {{< glossary key=\"FRANK-HERBERT\" >}} I've loved epigraphs.  "
+          "In that novel, the epigraphs are quotes from fictional works written within the Dune universe.  "
+          "Below are quotes that I've gathered, and in some cases, I've used as epigraphs throughout <cite>Take on Rules</cite>.\n")
+        (dolist (epigraph epigraphs)
+          (let ((work
+                  (plist-get epigraph :work))
+                 (author
+                   (plist-get epigraph :author))
+                 (text
+                   (plist-get epigraph :text)))
+            (insert
+              (format "<section class=\"epigraphs\"><blockquote data-id=\"%s\">%s%s\n</blockquote></section>\n"
+                (plist-get epigraph :id)
+                (if (eq (plist-get epigraph :type) 'verse-block)
+                  (concat "<pre class=\"verse\">"  text "</pre>")
+                  (org-export-string-as (s-trim text) 'html t))
+                (cond
+                  ((and (s-present? work) (s-present? author))
+                    (format "\n<footer>&#8213;%s, <cite>%s</cite></footer>"
+                      author work))
+                  ((s-present? work)
+                    (format "\n<footer>&#8213; <cite>%s</cite></footer>"
+                      work))
+                  ((s-present? author)
+                    (format "\n<footer>&#8213; %s</footer>"
+                      author))
+                  (t ""))))))
+        (save-buffer))
+      (message "Done exporting epigraphs to blog"))))
 
 (defvar jf/syncthings
   (list
     (cons "syncing elfeed"
       (concat "tar -czf "
-      (file-truename "~/SyncThings/queue/elfeed.tar.gz")
-      " " elfeed-db-directory
-      " && mv -f ~/SyncThings/queue/elfeed.tar.gz ~/SyncThings/source&"))
+        (file-truename "~/SyncThings/queue/elfeed.tar.gz")
+        " " elfeed-db-directory
+        " && mv -f ~/SyncThings/queue/elfeed.tar.gz ~/SyncThings/source&"))
     (cons "syncing apt packages"
       (concat "apt list --installed"
-      " > ~/SyncThings/source/debian-trixie-apt-packages.txt"))
+        " > ~/SyncThings/source/debian-trixie-apt-packages.txt"))
     (cons "syncing apt sources"
       (concat "fd . '/etc/apt/sources.list.d/' -e sources | "
-          "xargs cat | sed -E 's/^Types:/|Types:/' | tr '|' '\n'"
-      " > ~/SyncThings/source/debian-trixie-apt-sources.txt"))
+        "xargs cat | sed -E 's/^Types:/|Types:/' | tr '|' '\n'"
+        " > ~/SyncThings/source/debian-trixie-apt-sources.txt"))
     (cons "syncing gnome-extensions"
       (concat "gnome-extensions list --active --details"
         " > ~/SyncThings/source/gnome-extensions-active.txt"))
@@ -244,8 +244,8 @@ default of 6 (ye ol' 1d6)."
   ;; There's a 1 in NUMBER chance that we'll perform the sync.
   (if (= 0 (random (or number 6)))
     (dolist (cell jf/syncthings)
-        (message (car cell))
-        (shell-command (cdr cell)))
+      (message (car cell))
+      (shell-command (cdr cell)))
     (message "I'll get you next time Gadget")))
 
 ;; Based on the idea of habit stacking, whenever I pull down my RSS
@@ -384,22 +384,22 @@ Useful for narrowing regions.")
   "Position to the end of today's private thoughts."
   (let ((entry-date (format-time-string "%Y-%m-%d %A")))
     (if-let* ((position
-               (car (org-element-map
-                      (org-element-parse-buffer 'headline)
-                      'headline
-                      (lambda (hl)
-                        (and
-                          (=
-                            (org-element-property :level hl) 4)
-                          (member "private"
-                            (org-element-property :tags hl))
-                          (string=
-                            (format-time-string "%Y-%m-%d %A")
-                            (format "%s"
-                              (org-element-property
-	                                   :title
-	                                   (car (org-element-lineage hl)))))
-                          (org-element-property :contents-end hl)))))))
+                (car (org-element-map
+                       (org-element-parse-buffer 'headline)
+                       'headline
+                       (lambda (hl)
+                         (and
+                           (=
+                             (org-element-property :level hl) 4)
+                           (member "private"
+                             (org-element-property :tags hl))
+                           (string=
+                             (format-time-string "%Y-%m-%d %A")
+                             (format "%s"
+                               (org-element-property
+	                               :title
+	                               (car (org-element-lineage hl)))))
+                           (org-element-property :contents-end hl)))))))
       (goto-char (1- position))
       (user-error "Missing :private: entry for date %S" entry-date))))
 
@@ -583,12 +583,12 @@ Useful for narrowing regions.")
 	                    (format "<tr><td><cite>%s%s</cite></td><td>%s%s</td></tr>"
                         (lax-plist-get work :title)
                         (if-let* ((subtitle
-                                   (lax-plist-get work :subtitle)))
+                                    (lax-plist-get work :subtitle)))
                           (concat ": " subtitle)
                           "")
                         (lax-plist-get work :author)
                         (if-let* ((editor
-                                   (lax-plist-get work :editor)))
+                                    (lax-plist-get work :editor)))
                           (concat "Editor: " editor)
                           "")))
               works))
@@ -654,7 +654,7 @@ this variable reads.")
   "Return non-nil when `my-cache-of-books' has ISBN."
   (seq-find (lambda (book)
               (equal isbn (jf/book-isbn book)))
-            (hash-table-values my-cache-of-books)))
+    (hash-table-values my-cache-of-books)))
 
 (defconst jf/bibliography/tag-owns
   "owns"
@@ -752,28 +752,28 @@ operates on the book.  There would need to be an inversion of behavior."
                   (json-read)))
       :sync t
       :success (cl-function
-                (lambda (&key data &allow-other-keys)
-                  (let* ((item
-                          (aref (plist-get data :items) 0))
-                         (volumeInfo
-                          (plist-get item :volumeInfo)))
-                    (setq book
-                          (let ((title
-                                 (plist-get volumeInfo :title))
-                                (subtitle
-                                 (plist-get volumeInfo :subtitle))
-                                (author
-                                 (s-join " and "
-                                         (plist-get
-                                          volumeInfo :authors))))
-                            (make-jf/book
-                             :isbn isbn
-                             :label (jf/book-make-label
-                                      :title title :subtitle subtitle
-                                      :author author)
-                             :subtitle subtitle
-                             :author author
-                             :title title)))))))
+                 (lambda (&key data &allow-other-keys)
+                   (let* ((item
+                            (aref (plist-get data :items) 0))
+                           (volumeInfo
+                             (plist-get item :volumeInfo)))
+                     (setq book
+                       (let ((title
+                               (plist-get volumeInfo :title))
+                              (subtitle
+                                (plist-get volumeInfo :subtitle))
+                              (author
+                                (s-join " and "
+                                  (plist-get
+                                    volumeInfo :authors))))
+                         (make-jf/book
+                           :isbn isbn
+                           :label (jf/book-make-label
+                                    :title title :subtitle subtitle
+                                    :author author)
+                           :subtitle subtitle
+                           :author author
+                           :title title)))))))
     book))
 
 ;;; Entry points
@@ -823,7 +823,7 @@ ignore any guards against performing work on an already existing ISBN."
         (seq-each
           (lambda (node)
             (when-let* ((isbn
-                         (plist-get node :isbn)))
+                          (plist-get node :isbn)))
               (jf/bibliography/update-with-book
                 isbn
                 (lambda ()
@@ -866,18 +866,18 @@ The first element of the alist should be considered the default.")
 (defun jf/capture-book/strategies ()
   "Conforms to `jf/capture-book/strategies-function' expectations"
   (list
-             (cons "Owned"
-               (list :tags `(,jf/bibliography/tag-owns)
-                 :headline "Works"
-                 :file jf/filename/bibliography))
-             (cons "Shopping List"
-               (list :tags `(,jf/bibliography/tag-shopping-list)
-                 :headline "Works"
-                 :file jf/personal/filename-for-library))
-             (cons "Checked out from Library"
-               (list :tags `(,jf/bibliography/tag-from-libraries)
-                 :headline (format-time-string "%Y-%m-%d %A")
-                 :file jf/personal/filename-for-library))))
+    (cons "Owned"
+      (list :tags `(,jf/bibliography/tag-owns)
+        :headline "Works"
+        :file jf/filename/bibliography))
+    (cons "Shopping List"
+      (list :tags `(,jf/bibliography/tag-shopping-list)
+        :headline "Works"
+        :file jf/personal/filename-for-library))
+    (cons "Checked out from Library"
+      (list :tags `(,jf/bibliography/tag-from-libraries)
+        :headline (format-time-string "%Y-%m-%d %A")
+        :file jf/personal/filename-for-library))))
 
 ;;; Bibliography Interaction
 (cl-defun jf/capture-book (isbn &optional where force)
@@ -1043,7 +1043,7 @@ entry."
                 ;; Maybe we'll get a direct hit?
                 (jf/book-label book-from-builder))))
       (if-let* ((from-bibliography
-                 (gethash completed-value my-cache-of-books)))
+                  (gethash completed-value my-cache-of-books)))
         ;; When book **is** found in bibliography, update a book entry
         ;; with one already in my bibliography.
         (progn
@@ -1354,7 +1354,7 @@ date (that is omit that date)."
                          (concat " "
                            (format-time-string
                              closed (org-read-date t t
-                                     (jf/book-closed book))))
+                                      (jf/book-closed book))))
                          ""))))
         books))))
 
@@ -1371,88 +1371,57 @@ date (that is omit that date)."
   (org-social-relay "https://org-social-relay.andros.dev/")
   (org-social-my-public-url "https://takeonrules.com/social.org"))
 
-(defvar playing-forged-from-the-worst nil
-  "When non-nil, indicates that I'm playing Forged from the Worst.")
+(defvar playing-a-game nil
+  "When non-nil, indicates that I'm playing a game.
 
-(defun toggle-forged-from-the-worst ()
-  "Begin or end playing Forged from the Worst."
+See `playing-a-game-candidates' and `start-playing'.")
+
+(defvar playing-a-game-candidates
+  '(
+     ("Forged from the Worst (Mythic Bastionland)" .
+       ((start .
+          ((bookmark-display-function . #'switch-to-buffer-side-window)
+            (bookmark-file . "~/SyncThings/source/forged-from-the-worst/forged=from=the=worst--bookmarks.el")))
+         (stop .
+           ((bookmark-display-function . nil)
+             (bookmark-file . "~/emacs-bookmarks.el")))))
+     )
+  "Possible games I might be playing via Emacs.")
+
+(defun stop-playing ()
+  "Stop playing a game."
   (interactive)
-  (load "jf-mythic-bastionland.el")
-  (setq playing-forged-from-the-worst
-    (not playing-forged-from-the-worst))
-  (bookmark-load
-    (if playing-forged-from-the-worst
-      "~/SyncThings/source/forged-from-the-worst/forged=from=the=worst--bookmarks.el"
-      "~/emacs-bookmarks.el")
-    t nil t))
+  (start-playing '("Nothing" . nil)))
 
-;; As I work through this, I can envision amending the bookmarks to
-;; allow for a function instead of page number.
-(defvar pdf-pages
-  (let ((file
-          "~/Documents/RPGs/Mythic Bastionland/mythic=bastionland--core-rules__rules_systems.pdf"))
-    `(("Basic Rules" . (,file 8))
-       ("Harm & Scars" . (,file 9))
-       ("Specifics of Combat" . (,file 10))
-       ("Warfare" . (,file 11))
-       ("Arms & Goods" . (,file 12))
-       ("People & Realms" . (,file 13))
-       ("Time" . (,file 17))
-       ("Travel" . (,file 18))
-       ("Dominion" . (,file 20))
-       ("Authority" . (,file 21))
-       ("Knights/Seers" . (,file (lambda () (+ 28 (* (random 72) 2)))))
-       ("Myths" . (,file (lambda () (+ 29 (* (random 72) 2)))))))
-  "An alist where 'car' is the label and 'cdr' is a list with 'car' of
- the filename and 'cadr' an integer or a function.")
-
-(defun open-pdf-page-in-sidecar (&optional label set)
-  "Open the PDF from SET with given LABEL.
-
-SET is assumed to be an alist with `car' as the label and `cdr' a list
-that conforms to 'pdf-pages' documentation."
-  (interactive)
-  (let* ((set
-           (or set pdf-pages))
-          (label
-            (or label
-              (completing-read "Source: " set nil t)))
-          (pdf-page
-            (alist-get label set nil nil #'string=))
-          (file
-            (car pdf-page))
-          (display-buffer-mark-dedicated
-            t)
-          (buffer (or
-                    (find-buffer-visiting file)
-                    (find-file-noselect file))))
-    ;; We'll pop open a dedicated side window with ample space for
-    ;; viewing a new file.
-    (pop-to-buffer buffer '((display-buffer-in-side-window)
-                             (side . right)
-                             (window-width 72)
-                             (window-parameters
-                               (tab-line-format . none)
-                               (mode-line-format . none)
-                               (no-delete-other-windows . t))))
-    (with-current-buffer buffer
-      (let ((pager
-              (cadr pdf-page)))
-        (if (integerp pager)
-          (pdf-view-goto-page pager)
-          (progn
-            ;; Assume that if we have a function there's something more
-            ;; dynamic, so lets provide a "refresh" option.
-            (pdf-view-goto-page (funcall pager))
-            (local-set-key (kbd "g")
-              (lambda () (interactive)
-                (open-pdf-page-in-sidecar label)))))))))
+(defun start-playing (game)
+  "Start playing the game with given HANDLE; stopping any currently played game."
+  (interactive
+    (list
+      (let ((handle
+              (completing-read "Start Playing: "
+                playing-a-game-candidates nil t)))
+        (alist-get handle playing-a-game-candidates nil nil #'string=))))
+  ;; Stop playing what we were playing...if anything
+  ;; Then start playing what we are playing.
+  (dolist (config (list playing-a-game (alist-get 'start game)))
+    (when config
+      (let ((file
+              (or
+                (alist-get 'bookmark-file config)
+                "~/emacs-bookmarks.el")))
+        (setq default-bookmark-display-function
+          (alist-get 'bookmark-display-function config))
+        (bookmark-save)
+        (setopt bookmark-default-file file)
+        (bookmark-load file t nil t))))
+  ;; Last register how to stop playing.
+  (setq playing-a-game (alist-get 'stop game)))
 
 (use-package consult-mu
   :straight (consult-mu :type git :host github
               :repo "armindarvish/consult-mu"
               :files (:defaults "extras/*.el"))
-        :after consult)
+  :after consult)
 
 (use-package consult-omni
   :straight (consult-omni :type git :host github
