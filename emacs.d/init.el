@@ -1677,6 +1677,7 @@ active nature."
        (when
          (and
            (mode-line-window-selected-p)
+           (boundp 'org-clock-current-task)
            org-clock-current-task
            (not (derived-mode-p
                   'Info-mode
