@@ -6754,9 +6754,10 @@ Useful for Eglot."
 (use-package bookmark
   :straight (:type built-in)
   :config
+  (defconst fallback-bookmark-file "~/emacs-bookmarks.el")
   ;; On each machine I use, I have different bookmarks, yet they all
   ;; point to the same location.
-  (setopt bookmark-default-file "~/emacs-bookmarks.el")
+  (setopt bookmark-default-file fallback-bookmark-file)
 
   ;; Save the `bookmark-file' each time I modify a bookmark.
   (setq bookmark-save-flag 1)

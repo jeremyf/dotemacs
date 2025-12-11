@@ -1377,14 +1377,13 @@ date (that is omit that date)."
 See `playing-a-game-candidates' and `start-playing'.")
 
 (defvar playing-a-game-candidates
-  '(
+  `(
      ("Forged from the Worst (Mythic Bastionland)" .
        ((start .
           ((bookmark-display-function . #'switch-to-buffer-side-window)
             (bookmark-file . "~/SyncThings/source/forged-from-the-worst/forged=from=the=worst--bookmarks.el")))
          (stop .
-           ((bookmark-display-function . nil)
-             (bookmark-file . "~/emacs-bookmarks.el")))))
+           ((bookmark-display-function . nil)))))
      )
   "Possible games I might be playing via Emacs.")
 
@@ -1408,7 +1407,7 @@ See `playing-a-game-candidates' and `start-playing'.")
       (let ((file
               (or
                 (alist-get 'bookmark-file config)
-                "~/emacs-bookmarks.el")))
+                fallback-bookmark-file)))
         (setq default-bookmark-display-function
           (alist-get 'bookmark-display-function config))
         (bookmark-save)
