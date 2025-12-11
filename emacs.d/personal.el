@@ -1380,12 +1380,14 @@ See `playing-a-game-candidates' and `start-playing'.")
   `(
      ("Forged from the Worst (Mythic Bastionland)" .
        ((start .
-          ((bookmark-display-function . #'switch-to-buffer-side-window)
-            (bookmark-file . "~/SyncThings/source/forged-from-the-worst/forged=from=the=worst--bookmarks.el")))
+          ((bmk-display-func . switch-to-buffer-side-window)
+            (bmk-prompt-for-random . t)
+            (bmk-file . "~/SyncThings/source/forged-from-the-worst/forged=from=the=worst--bookmarks.el")))
          (stop .
            ((bookmark-display-function . nil)))))
      )
-  "Possible games I might be playing via Emacs.")
+  "Possible games I might be playing via Emacs.  A game you are playing
+should have both a 'start' and 'stop' property.")
 
 (defun stop-playing ()
   "Stop playing a game."
@@ -1393,7 +1395,17 @@ See `playing-a-game-candidates' and `start-playing'.")
   (start-playing '("Nothing" . nil)))
 
 (defun start-playing (game)
-  "Start playing the game with given HANDLE; stopping any currently played game."
+  "Start playing the GAME; stopping any currently played game.
+
+A GAME has a 'start' and 'stop' property, that is an alist.  That alist
+has the following properties:
+
+- 'bmk-file' :: what file we'll find our working bookmarks.
+- 'bmk-display-func' :: the function we use to display bookmarks.
+- 'bmk-prompt-for-random' :: if we'll prompt for possible random pages
+  in PDF bookmarks.
+
+When a property is not provided, \"suitable\" defaults are assigned."
   (interactive
     (list
       (let ((handle
@@ -1401,20 +1413,23 @@ See `playing-a-game-candidates' and `start-playing'.")
                 playing-a-game-candidates nil t)))
         (alist-get handle playing-a-game-candidates nil nil #'string=))))
   ;; Stop playing what we were playing...if anything
-  ;; Then start playing what we are playing.
+  ;; Then start playing what we are playing...if anything
   (dolist (config (list playing-a-game (alist-get 'start game)))
     (when config
       (let ((file
               (or
-                (alist-get 'bookmark-file config)
+                (alist-get 'bmk-file config)
                 fallback-bookmark-file)))
         (setq default-bookmark-display-function
-          (alist-get 'bookmark-display-function config))
+          (alist-get 'bmk-display-func config))
+        (setq pdf-view-bookmark-make-record:prompt-for-random
+          (alist-get 'bmk-prompt-for-random config))
         (bookmark-save)
         (setopt bookmark-default-file file)
         (bookmark-load file t nil t))))
   ;; Last register how to stop playing.
   (setq playing-a-game (alist-get 'stop game)))
+
 
 (use-package consult-mu
   :straight (consult-mu :type git :host github

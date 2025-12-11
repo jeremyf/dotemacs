@@ -6792,76 +6792,75 @@ Useful for Eglot."
 
   ;; In the bookmark list page, identify the type as BROWSE for those
   ;; captured by `jf/bookmark-url'
-  (put 'jf/browse-url-bookmark-jump 'bookmark-handler-type "BROWSE")
+  (put 'jf/browse-url-bookmark-jump 'bookmark-handler-type "BROWSE"))
 
-  ;;;; BEGIN: Random Page in PDF Functionality
-  (defun pdf-view-bookmark-jump-handler:random (bmk)
-    "A handler-function implementing interface for bookmark PDF BMK.
+;;;; BEGIN: Random Page in PDF Functionality
+(defun pdf-view-bookmark-jump-handler:random (bmk)
+  "A handler-function implementing interface for bookmark PDF BMK.
 
 When the handler has a 'pages property, which is assumed to be a list,
 pick one from that.  Otherwise fallack to the 'page property.
 
 See also `pdf-view-bookmark-jump-handler' and
 `pdf-view-bookmark-make-record'."
-    (let ((pages
-            (bookmark-prop-get bmk 'pages)))
-      (bookmark-prop-set bmk 'page
-        (or (seq-random-elt pages) (bookmark-prop-get bmk 'page)))
-      (pdf-view-bookmark-jump-handler bmk)))
+  (let ((pages
+          (bookmark-prop-get bmk 'pages)))
+    (bookmark-prop-set bmk 'page
+      (or (seq-random-elt pages) (bookmark-prop-get bmk 'page)))
+    (pdf-view-bookmark-jump-handler bmk)))
 
-  (defvar pdf-view-bookmark-make-record:prompt-for-random
-    nil
-    "When non-nil, prompt as to whether or not to create a bookmark
+(defvar pdf-view-bookmark-make-record:prompt-for-random
+  nil
+  "When non-nil, prompt as to whether or not to create a bookmark
 that is randomization.")
 
-  (defun pdf-view-bookmark-make-record:with-randomizer (&rest app)
-    "Conditionally randomize which page we'll open in a PDF.
+(defun pdf-view-bookmark-make-record:with-randomizer (&rest app)
+  "Conditionally randomize which page we'll open in a PDF.
 
 See `pdf-view-bookmark-make-record:prompt-for-random'."
-    (let ((bmk
-            (apply app)))
-      (message "%S" (cdr bmk))
-      (if (and
-            pdf-view-bookmark-make-record:prompt-for-random
-            (yes-or-no-p "Specify Random Pages?"))
-        (let* ((attributes
-                (cdr bmk))
-               (integers-as-string
-                 (split-string
-                   (read-string "Enter pages (comma-separated): "
-                     (format "%s," (alist-get 'page attributes)))
-                   "[,; ]+" t "[[:space:]]+")))
-          ;; We clobber the existing handler replacing it with one of
-          ;; our own devising.
-          (setcdr (assoc 'handler attributes)
-            'pdf-view-bookmark-jump-handler:random)
-          (add-to-list 'attributes
-            (cons 'pages
-              (mapcar #'string-to-number integers-as-string)))
-          ;; We need to return an object of the same form (e.g. a `cons'
-          ;; cell).
-          (cons (car bmk) attributes))
-        bmk)))
+  (let ((bmk
+          (apply app)))
+    (if (and
+          pdf-view-bookmark-make-record:prompt-for-random
+          (yes-or-no-p "Specify Random Pages?"))
+      (let* ((attributes
+               (cdr bmk))
+              (integers-as-string
+                (split-string
+                  (read-string "Enter pages (comma-separated): "
+                    (format "%s," (alist-get 'page attributes)))
+                  "[,; ]+" t "[[:space:]]+")))
+        ;; We clobber the existing handler replacing it with one of
+        ;; our own devising.
+        (setcdr (assoc 'handler attributes)
+          'pdf-view-bookmark-jump-handler:random)
+        (add-to-list 'attributes
+          (cons 'pages
+            (mapcar #'string-to-number integers-as-string)))
+        ;; We need to return an object of the same form (e.g. a `cons'
+        ;; cell).
+        (cons (car bmk) attributes))
+      bmk)))
 
-  (advice-add #'pdf-view-bookmark-make-record
-    :around #'pdf-view-bookmark-make-record:with-randomizer)
+(advice-add #'pdf-view-bookmark-make-record
+  :around #'pdf-view-bookmark-make-record:with-randomizer)
 
-  (defvar default-bookmark-display-function
-    nil
-    "When non-nil, favor opening bookmarks with this function.")
+(defvar default-bookmark-display-function
+  nil
+  "When non-nil, favor opening bookmarks with this function.")
 
-  (defun bookmark-jump-with-display (fn bookmark &optional display-func)
-    (let ((display-func
-            (or display-func
-              default-bookmark-display-function
-              (when current-prefix-arg #'switch-to-buffer-side-window))))
-      (funcall fn bookmark display-func)))
-  (advice-add #'bookmark-jump :around #'bookmark-jump-with-display)
+(defun bookmark-jump-with-display (fn bookmark &optional display-func)
+  (funcall fn
+    bookmark
+    (or display-func
+      default-bookmark-display-function
+      (when current-prefix-arg 'switch-to-buffer-side-window))))
+(advice-add #'bookmark-jump :around #'bookmark-jump-with-display)
 
-  ;; Show that I'll be opening this PDF to a random page.
-  (put 'pdf-view-bookmark-jump-handler:random 'bookmark-handler-type "⚅PDF")
+;; Show that I'll be opening this PDF to a random page.
+(put 'pdf-view-bookmark-jump-handler:random 'bookmark-handler-type "⚅PDF")
   ;;;; END: Random Page in PDF Functionality
-  )
+
 
 
 (use-package org-bookmark-heading
