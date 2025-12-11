@@ -54,7 +54,7 @@ The `car' as the label and `cdr' as the value that we'll insert.")
   (interactive (list (read-string "Author: ")
                  (read-string "Cite: ")
                  (read-string "Cite URL: ")
-                 (read-string "Page: "))
+                 (read-string "Page: ")))
   (insert
     (if (s-present? author) (concat "#+attr_shortcode: :pre " author "\n") "")
     (if (s-present? cite) (concat "#+attr_shortcode: :cite " cite "\n") "")
