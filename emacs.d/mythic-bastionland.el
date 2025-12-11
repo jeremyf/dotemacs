@@ -173,16 +173,7 @@ See `mythic-bastionland--prompt-for-coord'."
 See `mythic-bastionland--prompt-for-coord'."
   (interactive
     (list (mythic-bastionland--prompt-for-coord)))
-  (let* ((distances
-           (mythic-bastionland--myth-distances coord))
-          (shortest-distance
-            (caar distances)))
-    (message "%s"
-      (cdr
-        (seq-random-elt
-          (seq-filter (lambda (cell)
-                        (= shortest-distance (car cell)))
-            distances))))))
+  (mythic-bastionland--myth-by-strategy coord 'nearest))
 
 (defun mythic-bastionland-not-nearest-myth (coord)
   "Echo the nearest myth to COORD.
@@ -190,6 +181,14 @@ See `mythic-bastionland--prompt-for-coord'."
 See `mythic-bastionland--prompt-for-coord'."
   (interactive
     (list (mythic-bastionland--prompt-for-coord)))
+  (mythic-bastionland--myth-by-strategy coord 'not-nearest))
+
+(defun mythic-bastionland--myth-by-strategy (coord strategy)
+  "Determine the myth that matches the STRATEGY relative to COORD.
+
+Expected strategies are:
+- nearest
+- not-nearest."
   (let* ((distances
            (mythic-bastionland--myth-distances coord))
           (shortest-distance
@@ -197,8 +196,14 @@ See `mythic-bastionland--prompt-for-coord'."
     (message "%s"
       (cdr
         (seq-random-elt
-          (seq-filter (lambda (cell)
-                        (not (= shortest-distance (car cell))))
+          (seq-filter
+            (lambda (cell)
+              (pcase strategy
+                ('nearest (= shortest-distance (car cell)))
+                ('not-nearest
+                  (not (= shortest-distance (car cell))))
+                (_
+                  (user-error "Unknown stratgegy %s" strategy))))
             distances))))))
 
 (defun mythic-bastionland--myth-distances (from)
