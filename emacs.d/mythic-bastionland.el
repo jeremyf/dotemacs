@@ -368,7 +368,8 @@ We return the closest first.
 The `car' is the integer distance and the `cdr' is the name of the
 myth.`
 
-Note the FROM is conformant to the `mythic-bastionland--col-row-to-coord'."
+Note the FROM is conformant to the
+`mythic-bastionland--col-row-to-coord'."
   (seq-sort (lambda (l r) (< (car l) (car r)))
     (mapcar (lambda (myth)
               (cons (mythic-bastionland--hex-distance (cdr myth) from)
@@ -426,17 +427,21 @@ See `mythic-bastionland--col-row-to-coord' for details of FROM."
                           (float (- (cdr to) (cdr from)))
                           (float (- (car to) (car from))))))
              (cond
-               ;; TODO: Determine which direction.
+               ;; After compass, protractor, marker, and spreadsheet
+               ;; work, I'm happy with the direction calculations.
+               ;; Remember, hex maps starting from top-left instead
+               ;; of bottom right like Geometry means things get a
+               ;; mind bending (at least for this old guy).
                ((or (> slope 4) (< slope -4))
                  (if (> (cdr from) (cdr to))
                    "North" "South"))
-               ((and (< 0.67 slope) (<= slope 4))
+               ((<= 0.8 slope) (<= slope 4)
                  (if (> (cdr from) (cdr to))
                    "Northwest" "Southeast"))
-               ((<= -0.65 slope 0.67)
+               ((< -0.8 slope 0.8)
                  (if (> (car from) (car to))
                    "West" "East"))
-               ((and (<= -4 slope) (< slope -0.65))
+               ((<= -4 slope -0.8)
                  (if (> (cdr from) (cdr to))
                    "Northeast" "Southwest"))))))))
 
