@@ -16,31 +16,77 @@
 ;;   square).
 ;; - What, if any, Landmark is present?
 ;; - What is the nearest Myth?
-;; - What is the direction towards a Myth?
-;; - Get a Myth that is not the closest.
-;; - Moving from Hex A to Hex B, do I encounter a Barrier?
+;; - What is the direction towards a Myth (or other features perhaps)?
+;; - What is a Myth that is not the closest?
+;; - Do I encounter a Barrier moving from Hex A to Hex B (or B to A)?
 ;;
 ;; And I realized that I could randomly generate a map, encode it in an
-;; illegible manner, and query it throughout game play.  Now, how to
-;; encode that map?
+;; illegible manner, and query it throughout game play.  I considered
+;; using a sqlite database, but opted for an in-memory structure that I
+;; could read and write to the file system.  That does mean, while
+;; playing, that I could "M-x describe-variable".  But I'll just not do
+;; that.  While building out these features in the REPL having
+;; a view of the variable proved valuable.
 ;;
-;; I begin my research: https://www.redblobgames.com/grids/parts/; which
-;; leads me to https://www.redblobgames.com/grids/hexagons/.
+;; Many thanks to https://www.redblobgames.com/grids/hexagons/ for a
+;; useful crash course in the mathematics of hex mapping.
 ;;
-;; For this implementation, I making hard and fast assumptions:
+;; For this implementation, I am making the following assumptions:
 ;;
 ;; - The map is 12 x 12.
-;; - The map orientation is jagged side on the from and to; which
-;;   means I'm using double height coordinates.
-;; - I'm not randomly placing holdings, instead relying on other maps.
+
+;; - The map orientation is jagged side on the left and right; which
+;;   means double height coordinates (using redbloggames.com's
+;;   nomenclature)
+;; - I'm not randomly placing holdings, instead relying
+;;   on another visual map.
 ;; - Coordinates start at 0,0, which is the top-most left-most hex.
-;;
-;;; Future considerations
-;;
-;; - Replace the label at a given coordinate.  You'll need to specify
-;;   type and coordinate (or perhaps current string).
+;; - Any prompts for coordinates use single height coordinates starting
+;;   at 0,0.  That means 1,0 is the hex one to the right and half a hex
+;;   down from the 0,0 coordinate.  The 1,0 coord will be translated to
+;;   1,1 for storage and interactions.
 ;;
 ;; Further I want to make it hard to read the map.
+
+;;; Examples of `mythic-bastionland-map' data:
+;;
+;; ((locations ((10 . 14) . "Myth 1") ((1 . 15) . "Myth 2") ((9 . 21) . "Myth 3")
+;;             ((5 . 9) . "The Wall") ((3 . 5) . "Myth 5") ((1 . 13) . "Myth 6")
+;;             ((4 . 0) . "Sanctum 1") ((8 . 22) . "Sanctum 2")
+;;             ((4 . 2) . "Sanctum 3") ((10 . 6) . "Sanctum 4")
+;;             ((0 . 10) . "Dwelling 1") ((2 . 14) . "Dwelling 2")
+;;             ((0 . 2) . "Dwelling 3") ((11 . 5) . "Dwelling 4")
+;;             ((5 . 19) . "Monument 1") ((0 . 20) . "Monument 2")
+;;             ((1 . 11) . "Monument 3") ((2 . 22) . "Monument 4")
+;;             ((8 . 10) . "Hazard 1") ((5 . 21) . "Hazard 2")
+;;             ((7 . 13) . "Hazard 3") ((7 . 7) . "Curse 1") ((8 . 18) . "Curse 2")
+;;             ((4 . 20) . "Curse 3") ((9 . 9) . "Ruin 1") ((10 . 8) . "Ruin 2")
+;;             ((1 . 5) . "Ruin 3") ((11 . 17) . "Ruin 4") ((9 . 3) . "Tower")
+;;             ((5 . 7) . "Castle") ((1 . 19) . "Fortress") ((8 . 16) . "Town"))
+;;  (myths ("Myth 1" 10 . 14) ("Myth 2" 1 . 15) ("Myth 3" 9 . 21)
+;;         ("The Wall" 5 . 9) ("Myth 5" 3 . 5) ("Myth 6" 1 . 13))
+;;  (sanctums ("Sanctum 1" 4 . 0) ("Sanctum 2" 8 . 22) ("Sanctum 3" 4 . 2)
+;;            ("Sanctum 4" 10 . 6))
+;;  (dwellings ("Dwelling 1" 0 . 10) ("Dwelling 2" 2 . 14) ("Dwelling 3" 0 . 2)
+;;             ("Dwelling 4" 11 . 5))
+;;  (monuments ("Monument 1" 5 . 19) ("Monument 2" 0 . 20) ("Monument 3" 1 . 11)
+;;             ("Monument 4" 2 . 22))
+;;  (hazards ("Hazard 1" 8 . 10) ("Hazard 2" 5 . 21) ("Hazard 3" 7 . 13))
+;;  (curses ("Curse 1" 7 . 7) ("Curse 2" 8 . 18) ("Curse 3" 4 . 20))
+;;  (ruins ("Ruin 1" 9 . 9) ("Ruin 2" 10 . 8) ("Ruin 3" 1 . 5) ("Ruin 4" 11 . 17))
+;;  (barriers (left (10 . 22) right (9 . 21)) (left (6 . 22) right (6 . 20))
+;;            (left (5 . 1) right (6 . 0)) (left (10 . 16) right (10 . 14))
+;;            (left (6 . 8) right (6 . 6)) (left (4 . 8) right (4 . 6))
+;;            (left (7 . 11) right (6 . 12)) (left (5 . 7) right (5 . 5))
+;;            (left (5 . 19) right (5 . 17)) (left (7 . 5) right (7 . 3))
+;;            (left (4 . 16) right (3 . 17)) (left (8 . 4) right (7 . 5))
+;;            (left (9 . 17) right (8 . 16)) (left (9 . 1) right (8 . 0))
+;;            (left (1 . 19) right (1 . 17)) (left (6 . 22) right (5 . 21))
+;;            (left (11 . 9) right (10 . 8)) (left (8 . 4) right (9 . 3))
+;;            (left (7 . 9) right (6 . 8)) (left (8 . 12) right (8 . 10))
+;;            (left (9 . 11) right (8 . 12)) (left (7 . 7) right (6 . 6))
+;;            (left (11 . 5) right (10 . 6)) (left (9 . 1) right (10 . 0)))
+;;  (holdings ("Tower" 9 . 3) ("Castle" 5 . 7) ("Fortress" 1 . 19) ("Town" 8 . 16)))
 
 ;;; Code:
 (defun mythic-bastionland-map-generate (holdings)
@@ -77,7 +123,7 @@ coordinates, as expressed in `mythic-bastionland--col-row-to-coord'."
     ;; each place, then generate a random coordinate, and test if its
     ;; occupied.
     ;;
-    ;; When occupied, get a new random coordinate and try again.
+    ;; When occupied, get a new-label random coordinate and try again.
     ;; When unoccupied, add to the list and move to the next feature.
     (dolist (to-place locations-to-place)
       (let ((keep-trying t))
