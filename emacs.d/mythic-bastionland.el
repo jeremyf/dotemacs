@@ -108,6 +108,35 @@ coordinates, as expressed in `mythic-bastionland--col-row-to-coord'."
       (cons 'barriers (mythic-bastionland--generate-barriers))
       (cons 'holdings holdings))))
 
+(defvar mythic-bastionland-labeled-feature-types
+  '(myths sanctums monuments dwellings hazards curses ruins holding)
+  "Feature types that are labeled, and thus renameable.")
+
+(defun mythic-bastionland-feature-rename ()
+  "Re-label a feature."
+  (interactive)
+  (let* ((feature-type
+           (intern
+             (completing-read "Feature Type: "
+               mythic-bastionland-labeled-feature-types
+               nil t)))
+          (features
+            (alist-get feature-type (mythic-bastionland-map)))
+          (current-label
+            (completing-read "Current Label: " features nil t))
+          (new-label
+            (read-string "New Label: " current-label)))
+    (let ((feature
+            (assoc current-label features))
+           (locations
+             (alist-get 'locations (mythic-bastionland-map))))
+      ;; Update the feature's label
+      (setf (car feature) new-label)
+      ;; Update the corresponding location.
+      (setf (cdr (assoc (cdr feature) locations)) new-label)
+      ;; And persist that information.
+      (mythic-bastionland-map-write))))
+
 (defun mythic-bastionland-map-write ()
   "Write a base64 encoded version of the map."
   (f-write
