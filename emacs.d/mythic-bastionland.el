@@ -135,7 +135,6 @@ coordinates, as expressed in `mythic-bastionland--col-row-to-coord'."
         ))
     (error "We have an unexpected bastionland.base64 file")))
 
-
 (defvar mythic-bastionland-map
   nil
   "DO NOT SEEK THE TREASURE!
@@ -193,7 +192,8 @@ See `mythic-bastionland--col-row-to-coord'."
 See `mythic-bastionland--col-row-to-coord'."
   (interactive
     (list (mythic-bastionland--col-row-to-coord)))
-  (mythic-bastionland--myth-by-strategy coord 'nearest))
+  (message "%s"
+    (mythic-bastionland--myth-by-strategy coord 'nearest)))
 
 (defun mythic-bastionland-not-nearest-myth (coord)
   "Echo the nearest myth to COORD.
@@ -201,7 +201,8 @@ See `mythic-bastionland--col-row-to-coord'."
 See `mythic-bastionland--col-row-to-coord'."
   (interactive
     (list (mythic-bastionland--col-row-to-coord)))
-  (mythic-bastionland--myth-by-strategy coord 'not-nearest))
+  (message "%s"
+    (mythic-bastionland--myth-by-strategy coord 'not-nearest)))
 
 (defun mythic-bastionland--myth-by-strategy (coord strategy)
   "Determine the myth that matches the STRATEGY relative to COORD.
@@ -213,18 +214,17 @@ Expected strategies are:
            (mythic-bastionland--myth-distances coord))
           (shortest-distance
             (caar distances)))
-    (message "%s"
-      (cdr
-        (seq-random-elt
-          (seq-filter
-            (lambda (cell)
-              (pcase strategy
-                ('nearest (= shortest-distance (car cell)))
-                ('not-nearest
-                  (not (= shortest-distance (car cell))))
-                (_
-                  (user-error "Unknown stratgegy %s" strategy))))
-            distances))))))
+    (cdr
+      (seq-random-elt
+        (seq-filter
+          (lambda (cell)
+            (pcase strategy
+              ('nearest (= shortest-distance (car cell)))
+              ('not-nearest
+                (not (= shortest-distance (car cell))))
+              (_
+                (user-error "Unknown stratgegy %s" strategy))))
+          distances)))))
 
 (defun mythic-bastionland--generate-barriers ()
   "Generate barriers placing them between two neighboring hexes.
@@ -329,36 +329,41 @@ See `mythic-bastionland--col-row-to-coord' for details of FROM."
       (mythic-bastionland--col-row-to-coord)
       (let ((myths (cdr (assoc 'myths (mythic-bastionland-map)))))
         (assoc (completing-read "Myth: " myths nil t) myths))))
-  (mythic-bastionland--direction from (cdr myth)))
+  (message "%s is %s"
+    (car myth)
+    (mythic-bastionland--direction from (cdr myth))))
 
-(defun mythic-bastionland--direction (from to)
+(defun mythic-bastionland--direction (&optional from to)
   "Get human-readable direction FROM TO."
-  ;; TODO: split the north/south
   (let ((from
           (or from
             (mythic-bastionland--col-row-to-coord nil nil "From ")))
          (to
            (or to
              (mythic-bastionland--col-row-to-coord nil nil "To "))))
-    (message "%s"
       (cond
         ((equal to from)
           "Under your nose")
         ((= (car from) (car to))
-          "North/South")
+          (if (> (cdr from) (cdr to))
+            "North" "South"))
         (t (let ((slope (/
                           (float (- (cdr to) (cdr from)))
                           (float (- (car to) (car from))))))
              (cond
                ;; TODO: Determine which direction.
-               ((or (> slope 3) (< slope -3))
-                 "North/South")
-               ((and (< 0.67 slope) (<= slope 3))
-                 "Northeast/Southwest")
+               ((or (> slope 4) (< slope -4))
+                 (if (> (cdr from) (cdr to))
+                   "North" "South"))
+               ((and (< 0.67 slope) (<= slope 4))
+                 (if (> (cdr from) (cdr to))
+                   "Northwest" "Southeast"))
                ((<= -0.65 slope 0.67)
-                 "East/West")
-               ((and (<= -3 slope) (< slope -0.65))
-                 "Northwest/Southeast"))))))))
+                 (if (> (car from) (car to))
+                   "West" "East"))
+               ((and (<= -4 slope) (< slope -0.65))
+                 (if (> (cdr from) (cdr to))
+                   "Northeast" "Southwest"))))))))
 
 (defun mythic-bastionland--make-ordered-pair (from to)
   "Provide a consistent sort order FROM and TO coordinates."
