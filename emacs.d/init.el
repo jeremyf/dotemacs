@@ -1875,7 +1875,7 @@ active nature."
        (?t . avy-action-teleport)
        (?T . jf/avy-action-teleport-whole-line)))
   :config
-  (setopt avy-timeout-seconds 1.25)
+  (setopt avy-timeout-seconds 1.0)
   ;; https://karthinks.com/software/avy-can-do-anything/#remembering-to-avy
   (defun jf/avy-action-kill-whole-line (pt)
     (save-excursion
