@@ -128,7 +128,7 @@
 ;;                           (omit . 2)))
 ;;           (,(mbc 9 5) . ((myth . (,(mbc 8 5)))
 ;;                          (omit . 3)))))
-;;        ;; Now pick a random scenario
+;;        ;; We'll pick a random scenario
 ;;        (scenario
 ;;         (seq-random-elt scenarios)))
 ;;   (mythic-bastionland-map-generate
@@ -139,12 +139,10 @@
 ;;       (("The Mountain" . ,(car scenario))
 ;;        ("The Beast" . ,(seq-random-elt
 ;;                         (alist-get 'myth (cdr scenario))))))
-;;      ;; The random map player facing map I started with, had these
-;;      ;; locations.
 ;;      (holdings .
 ;;       (("Tower" . (9 . 3)) ("Castle" . (5 . 7))
 ;;        ("Fortress" . (1 . 19)) ("Town" . (8 . 16))))
-;;      (omit . (
+;;      (omit (
 ;;             ;; Sir Wedylyn crossed between these two potential
 ;;             ;; barriers.
 ;;             (barriers .
@@ -154,7 +152,6 @@
 ;;             (myths . ,(alist-get
 ;;                        (alist-get 'omit (cdr scenario))
 ;;                        myth-omits)))))))
-
 
 ;;
 ;;; Code:
@@ -171,17 +168,17 @@ the Base64 encoding of it and having the function return the reified
 object.")
 
 (defvar mythic-bastionland-features
-  '((myths . ((how-many . (6)))
-      (holdings . ((how-many . (4)) (min-distance . 5)))
-      (sanctums . ((how-many . (3 4))))
-      (monuments . ((how-many . (3 4))))
-      (dwellings . ((how-many . (3 4))))
-      (hazards . ((how-many . (3 4))))
-      (curses . ((how-many . (3 4))))
-      (ruins . ((how-many . (3 4))))))
+  '((myths . ((how-many . (6))))
+     (holdings . ((how-many . (4)) (min-distance . 5)))
+     (sanctums . ((how-many . (3 4))))
+     (monuments . ((how-many . (3 4))))
+     (dwellings . ((how-many . (3 4))))
+     (hazards . ((how-many . (3 4))))
+     (curses . ((how-many . (3 4))))
+     (ruins . ((how-many . (3 4)))))
   "Feature types that are labeled, and thus renameable.  Also we want
 to consider how many of these we might place as well as the minimum
-distance (if any).  TODO: Implement minimum distance.")
+distance (if any).")
 
 (defun mythic-bastionland-map-generate (config)
   "Generate and store `mythic-bastionland-map' via CONFIG.
@@ -194,15 +191,15 @@ itself an alist, with the same `car' values as those in CONFIG (except
          (locations nil)
          (locations-to-place nil)
          (the-map nil))
-
     ;; First put the locations on the map...no effort is taken to avoid
     ;; location collisions.  Also, queue up further locations to place.
     (cl-loop for (feature . fconfig) in mythic-bastionland-features do
-      (let ((feat-locations
-              (alist-get feature config))
-             (how-many
-               (alist-get 'count fconfig))
-        ;; When we are given locations for this feature type, add it
+      (let* ((feat-locations
+               (alist-get feature config))
+              (how-many
+                (alist-get 'how-many fconfig)))
+        (message "feat-locations: %S" feat-locations)
+        ;; When we are given location qs for this feature type, add it
         ;; to the placed list.
         (when feat-locations
           (cl-loop for (label . coord) in feat-locations do
@@ -210,7 +207,8 @@ itself an alist, with the same `car' values as those in CONFIG (except
 
         ;; Next queue up placing the remainder of locations for the
         ;; feature type (accounting for what was already given).
-        (dotimes (i (- (seq-random-elt how-many) (length feat-locations)))
+        (dotimes (i (- (seq-random-elt how-many)
+                      (length feat-locations)))
           (cl-pushnew (cons feature
                         (format "%s %s" feature (+ i 1)))
             locations-to-place))
@@ -224,21 +222,37 @@ itself an alist, with the same `car' values as those in CONFIG (except
     ;; feature.
     (cl-loop for (feature . label) in locations-to-place do
       (let ((keep-trying t)
+             (min-distance
+               (alist-get 'min-distance
+                 (alist-get feature mythic-bastionland-features)))
              (omitted-feature-coordinates
                (alist-get feature (alist-get 'omit the-map))))
         (while keep-trying
-          (let ((coord
+          (let* ((coord
                   (mythic-bastionland--col-row-to-coord
                     (random 12) (random 12))))
-            (when (not (or
+            (when (and
+                    ;; Verify that what we're placing is place at the
+                    ;; minimum distance.
+                    (if min-distance
+                      (<= min-distance
+                        (min
+                          (mapcar
+                            (lambda (label-coord)
+                              (mythic-bastionland--hex-distance
+                                coord (cdr label-coord)))
+                               (alist-get feature the-map))))
+                      t)
+                    (not (or
                          (assoc coord locations)
-                         (member coord omitted-feature-coordinates)
-                         ))
+                         (member coord omitted-feature-coordinates))))
               (progn
                 (setq keep-trying nil)
                 ;; For locations we favor storing the (coord . label)
+                ;; This makes later comparisons easier.n
                 (cl-pushnew (cons coord label) locations)
-                ;; TODO add to list
+                ;; For a named feature favor storing (label . coord)
+                ;; as this makes prompts easier.
                 (cl-pushnew (cons label coord)
                   (alist-get feature the-map))))))))
 
