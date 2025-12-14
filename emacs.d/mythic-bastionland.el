@@ -159,12 +159,29 @@
 ;;
 ;;; Code:
 
+(defvar mythic-bastionland-map
+  nil
+  "DO NOT SEEK THE TREASURE!
+
+Here lies your working copy of the map.  Glancing at it could provide
+a hint as to the secrets of your game.
+
+NOTE: We could implement a more opaque handling of the map, by storing
+the Base64 encoding of it and having the function return the reified
+object.")
+
 (defvar mythic-bastionland-features
-  '((myths . (6)) (holdings . (4))
-     (sanctums . (3 4)) (monuments . (3 4)) (dwellings . (3 4))
-     (hazards . (3 4)) (curses . (3 4)) (ruins . (3 4)))
-  "Feature types that are labeled, and thus renameable.  We also encode
-how many of these, in total, are to be placed.")
+  '((myths . ((how-many . (6)))
+      (holdings . ((how-many . (4)) (min-distance . 5)))
+      (sanctums . ((how-many . (3 4))))
+      (monuments . ((how-many . (3 4))))
+      (dwellings . ((how-many . (3 4))))
+      (hazards . ((how-many . (3 4))))
+      (curses . ((how-many . (3 4))))
+      (ruins . ((how-many . (3 4))))))
+  "Feature types that are labeled, and thus renameable.  Also we want
+to consider how many of these we might place as well as the minimum
+distance (if any).  TODO: Implement minimum distance.")
 
 (defun mythic-bastionland-map-generate (config)
   "Generate and store `mythic-bastionland-map' via CONFIG.
@@ -172,10 +189,7 @@ how many of these, in total, are to be placed.")
 See `mythic-bastionland-features' for some of the `car' values of
 CONFIG.  Another is `barriers' (which are unamed).  Another is `omit',
 itself an alist, with the same `car' values as those in CONFIG (except
-`omit').
-
-As of <2025-12-12 Fri> adding `barriers' is not handled.  It is a
-feature I'd like to implement."
+`omit')."
   (let ((barriers nil)
          (locations nil)
          (locations-to-place nil)
@@ -183,9 +197,11 @@ feature I'd like to implement."
 
     ;; First put the locations on the map...no effort is taken to avoid
     ;; location collisions.  Also, queue up further locations to place.
-    (cl-loop for (feature . count) in mythic-bastionland-features do
+    (cl-loop for (feature . fconfig) in mythic-bastionland-features do
       (let ((feat-locations
-              (alist-get feature config)))
+              (alist-get feature config))
+             (how-many
+               (alist-get 'count fconfig))
         ;; When we are given locations for this feature type, add it
         ;; to the placed list.
         (when feat-locations
@@ -194,7 +210,7 @@ feature I'd like to implement."
 
         ;; Next queue up placing the remainder of locations for the
         ;; feature type (accounting for what was already given).
-        (dotimes (i (- (seq-random-elt count) (length feat-locations)))
+        (dotimes (i (- (seq-random-elt how-many) (length feat-locations)))
           (cl-pushnew (cons feature
                         (format "%s %s" feature (+ i 1)))
             locations-to-place))
@@ -340,13 +356,6 @@ feature I'd like to implement."
           'utf-8-unix)
         ))
     (error "We have an unexpected bastionland.base64 file")))
-
-(defvar mythic-bastionland-map
-  nil
-  "DO NOT SEEK THE TREASURE!
-
-Here lies your working copy of the map.  Glancing at it could provide
-a hint as to the secrets of your game.")
 
 (defun mythic-bastionland--col-row-to-coord (&optional column row prefix)
   "Prompt for COLUMN and ROW returning a `cons' cell.
