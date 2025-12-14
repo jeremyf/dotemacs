@@ -386,6 +386,17 @@ PREFIX is the prompt prefix."
       (cons c (* 2 r))
       (cons c (+ 1 (* 2 r))))))
 
+(defun mythic-bastionland-myth-hex? (coord)
+  "Is the given COORD a myth hex?"
+  (interactive
+    (list
+      (mythic-bastionland--col-row-to-coord)))
+  (if-let ((label-coord
+             (rassoc coord
+               (alist-get 'myths (mythic-bastionland-map)))))
+    (message "%S at %S" (car label-coord) (cdr label-coord))
+    "No myth here...but there could still be a landmark."))
+
 (defun mythic-bastionland-hex-feature (coord)
   "Echo the feature, if any, at the given COORD.
 
