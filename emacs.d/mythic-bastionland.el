@@ -90,7 +90,8 @@
 
 ;;; Generating Map with Example Config:
 
-;; (defalias 'mbc 'mythic-bastionland--col-row-to-coord)
+;; (defun mbc (col row)
+;;   (mythic-bastionland--text-to-coord (format "%s,%s" col row)))
 ;; ;; Based on the presented game logic and reviewing the map, there are 6
 ;; ;; places where the Mountain could be and still allow for the Beast to
 ;; ;; also be along the shores of the lake.
@@ -229,8 +230,7 @@ itself an alist, with the same `car' values as those in CONFIG (except
                (alist-get feature (alist-get 'omit the-map))))
         (while keep-trying
           (let* ((coord
-                  (mythic-bastionland--col-row-to-coord
-                    (random 12) (random 12))))
+                   (mythic-bastionland--random-coord)))
             (when (and
                     ;; Verify that what we're placing is place at the
                     ;; minimum distance.
@@ -241,11 +241,11 @@ itself an alist, with the same `car' values as those in CONFIG (except
                             (lambda (label-coord)
                               (mythic-bastionland--hex-distance
                                 coord (cdr label-coord)))
-                               (alist-get feature the-map))))
+                            (alist-get feature the-map))))
                       t)
                     (not (or
-                         (assoc coord locations)
-                         (member coord omitted-feature-coordinates))))
+                           (assoc coord locations)
+                           (member coord omitted-feature-coordinates))))
               (progn
                 (setq keep-trying nil)
                 ;; For locations we favor storing the (coord . label)
@@ -270,13 +270,12 @@ itself an alist, with the same `car' values as those in CONFIG (except
               (lambda (b)
                 (mythic-bastionland--make-ordered-pair
                   (car b) (cdr b)))
-                (alist-get 'barriers (alist-get 'omit config)))))
+              (alist-get 'barriers (alist-get 'omit config)))))
       (dotimes (i (+ 23 (random 3)))
         (let ((keep-trying t))
           (while keep-trying
             (let* ((coord
-                     (mythic-bastionland--col-row-to-coord
-                       (random 12) (random 12)))
+                     (mythic-bastionland--random-coord))
                     (in-6-chance
                       (cond
                         ((member coord '((0 . 0) (11 . 22)))
@@ -371,39 +370,52 @@ itself an alist, with the same `car' values as those in CONFIG (except
         ))
     (error "We have an unexpected bastionland.base64 file")))
 
-(defun mythic-bastionland--col-row-to-coord (&optional column row prefix)
-  "Prompt for COLUMN and ROW returning a `cons' cell.
+(defun mythic-bastionland--random-coord (&optional column row)
+  "Return a random coordinate, though you can seed COLUMN or ROW."
+  (let ((c (or column (random 12)))
+         (r (or row (random 12))))
+    (cons col
+      (if (= 0 (mod c 2)) (* 2 r) (* 2 r)))))
 
-The coordinates are coerced using the \"double-height\" encoding.
-Where `car' is the column and `cdr' is the row.
+(defun mythic-bastionland--text-to-coord (&optional text prefix)
+  "Convert TEXT to \"double-height\" coordinate.
+
+The column will be the first integer provided and the row will be the
+second integer provided in the given TEXT.
+
+The resulting coordinate will be a `cons' cell where `car' is the column
+and `cdr' is the row.
 
 PREFIX is the prompt prefix."
-  (let ((c (or column
-             (read-number (concat prefix "Column: "))))
-         (r (or row
-              (read-number (concat prefix "Row: ")))))
-    (if (= 0 (mod c 2))
-      (cons c (* 2 r))
-      (cons c (+ 1 (* 2 r))))))
+  (let* ((coord
+           (mapcar #'string-to-number
+             (split-string
+               (or text
+                 (read-string (concat prefix "Coordinate: ")))
+               "[^[:digit:]+]" t))))
+    (if (<= 2 (length coord))
+      (mythic-bastionland--random-coord (car coord) (cadr coord))
+      (user-error "Invalid coordinate %S given" text))))
 
 (defun mythic-bastionland-myth-hex? (coord)
   "Is the given COORD a myth hex?"
   (interactive
     (list
-      (mythic-bastionland--col-row-to-coord)))
-  (if-let ((label-coord
-             (rassoc coord
-               (alist-get 'myths (mythic-bastionland-map)))))
-    (message "%S at %S" (car label-coord) (cdr label-coord))
-    "No myth here...but there could still be a landmark."))
+      (mythic-bastionland--text-to-coord)))
+  (message "%s"
+    (if-let ((label-coord
+               (rassoc coord
+                 (alist-get 'myths (mythic-bastionland-map)))))
+      (format "%S at %S" (car label-coord) (cdr label-coord))
+      "No myth here...but there could still be a landmark.")))
 
 (defun mythic-bastionland-hex-feature (coord)
   "Echo the feature, if any, at the given COORD.
 
-See `mythic-bastionland--col-row-to-coord'."
+See `mythic-bastionland--text-to-coord'."
   (interactive
     (list
-      (mythic-bastionland--col-row-to-coord)))
+      (mythic-bastionland--text-to-coord)))
   (message "%s"
     (or
       (cdr (assoc coord (assoc 'locations (mythic-bastionland-map))))
@@ -412,7 +424,7 @@ See `mythic-bastionland--col-row-to-coord'."
 ;; https://www.redblobgames.com/grids/hexagons/#distances-doubled
 (defun mythic-bastionland--hex-distance (to from)
   "Both TO and FROM are `cons' as per
-`mythic-bastionland--col-row-to-coord'."
+`mythic-bastionland--text-to-coord'."
   ;; We're assuming double height that is left/right side is saw-blade.
   (let ((dcol
           (abs (- (car to) (car from))))
@@ -423,18 +435,18 @@ See `mythic-bastionland--col-row-to-coord'."
 (defun mythic-bastionland-nearest-myth (coord)
   "Echo the nearest myth to COORD.
 
-See `mythic-bastionland--col-row-to-coord'."
+See `mythic-bastionland--text-to-coord'."
   (interactive
-    (list (mythic-bastionland--col-row-to-coord)))
+    (list (mythic-bastionland--text-to-coord)))
   (message "%s"
     (mythic-bastionland--myth-by-strategy coord 'nearest)))
 
 (defun mythic-bastionland-not-nearest-myth (coord)
   "Echo the nearest myth to COORD.
 
-See `mythic-bastionland--col-row-to-coord'."
+See `mythic-bastionland--text-to-coord'."
   (interactive
-    (list (mythic-bastionland--col-row-to-coord)))
+    (list (mythic-bastionland--text-to-coord)))
   (message "%s"
     (mythic-bastionland--myth-by-strategy coord 'not-nearest)))
 
@@ -463,8 +475,8 @@ Expected strategies are:
 (defun mythic-bastionland-barrier-between (from to)
   "Answer if there is a barrier goint FROM hex TO hex."
   (interactive
-    (list (mythic-bastionland--col-row-to-coord nil nil "From ")
-      (mythic-bastionland--col-row-to-coord nil nil "To ")))
+    (list (mythic-bastionland--text-to-coord nil "From ")
+      (mythic-bastionland--text-to-coord nil "To ")))
   (if (member
         (mythic-bastionland--make-ordered-pair from to)
         (alist-get 'barriers (mythic-bastionland-map)))
@@ -480,7 +492,7 @@ The `car' is the integer distance and the `cdr' is the name of the
 myth.`
 
 Note the FROM is conformant to the
-`mythic-bastionland--col-row-to-coord'."
+`mythic-bastionland--text-to-coord'."
   (seq-sort (lambda (l r) (< (car l) (car r)))
     (mapcar (lambda (myth)
               (cons (mythic-bastionland--hex-distance (cdr myth) from)
@@ -494,7 +506,7 @@ Neighboring coordinates that are not on the map are omitted."
   ;; See https://www.redblobgames.com/grids/hexagons/#neighbors-doubled
   (let ((coord
           (or coord
-            (mythic-bastionland--col-row-to-coord)))
+            (mythic-bastionland--text-to-coord)))
          (neighbors nil))
     (dolist (delta '((0 . -2) (1 . -1)
                       (1 . 1) (0 . 2)
@@ -510,10 +522,10 @@ Neighboring coordinates that are not on the map are omitted."
 (defun mythic-bastionland-direction (from myth)
   "Provide the direction FROM coordinate to the MYTH.
 
-See `mythic-bastionland--col-row-to-coord' for details of FROM."
+See `mythic-bastionland--text-to-coord' for details of FROM."
   (interactive
     (list
-      (mythic-bastionland--col-row-to-coord)
+      (mythic-bastionland--text-to-coord)
       (let ((myths (cdr (assoc 'myths (mythic-bastionland-map)))))
         (assoc (completing-read "Myth: " myths nil t) myths))))
   (message "%s is %s"
@@ -524,10 +536,10 @@ See `mythic-bastionland--col-row-to-coord' for details of FROM."
   "Get human-readable direction FROM TO."
   (let ((from
           (or from
-            (mythic-bastionland--col-row-to-coord nil nil "From ")))
+            (mythic-bastionland--text-to-coord nil "From ")))
          (to
            (or to
-             (mythic-bastionland--col-row-to-coord nil nil "To "))))
+             (mythic-bastionland--text-to-coord nil "To "))))
       (cond
         ((equal to from)
           "Under your nose")
@@ -560,10 +572,10 @@ See `mythic-bastionland--col-row-to-coord' for details of FROM."
   "Provide a consistent sort order FROM and TO coordinates."
   (let ((from
           (or from
-            (mythic-bastionland--col-row-to-coord nil nil "Left ")))
+            (mythic-bastionland--text-to-coord nil "Left ")))
          (to
            (or to
-             (mythic-bastionland--col-row-to-coord nil nil "Right "))))
+             (mythic-bastionland--text-to-coord nil "Right "))))
     (if (> (car from) (car to))
       `(from ,from to ,to)
       (if (> (cdr from) (cdr to))
