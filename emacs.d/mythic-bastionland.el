@@ -315,8 +315,9 @@ itself an alist, with the same `car' values as those in CONFIG (except
     ;; PS...make sure we add the locations and barriers to the map.
     (cl-pushnew `(locations . ,locations) the-map)
     (cl-pushnew `(barriers . ,barriers) the-map)
-    (setq mythic-bastionland-map the-map)
-    (mythic-bastionland-map-write)))
+    ;; (setq mythic-bastionland-map the-map)
+    ;; (mythic-bastionland-map-write)
+    ))
 
 (defun mythic-bastionland-feature-rename ()
   "Re-label `mythic-bastionland' feature."
