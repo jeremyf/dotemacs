@@ -87,67 +87,44 @@
 ;;; Generating Map with Example Config:
 
 ;; (alias 'mbc 'mythic-bastionland--random-coord)
-;; ;; Based on the presented game logic and reviewing the map, there are 6
-;; ;; places where the Mountain could be and still allow for the Beast to
-;; ;; also be along the shores of the lake.
-;; (let* (
-;;        ;; This is where Sir Weydlyn encountered Seer Tompot.
-;;        (sanctums
-;;         `(("Tompot (Tangled Seer)" . ,(mbc 8 1))))
-;;        ;; Based on Sir Weydlyn's encountered a "nearest myth" event,
-;;        ;; These are the coordinates in which no myth can occur.  The
-;;        ;; `car' (e.g. 1) means that The Beast myth is within one hex of
-;;        ;; the place where Sir Weydlyn encountered that first sign.
-;;        (myth-omits `((1 . (,(mbc 9 2) ,(mbc 10 1) ,(mbc 8 1)
-;;                            ,(mbc 10 2) ,(mbc 9 0) ,(mbc 8 2)))
-;;                      (2 . (,(mbc 8 0) ,(mbc 10 0) ,(mbc 11 0)
-;;                            ,(mbc 11 1) ,(mbc 11 2) ,(mbc 10 3)
-;;                            ,(mbc 9 3) ,(mbc 8 3) ,(mbc 7 2)
-;;                            ,(mbc 7 1) ,(mbc 7 0)))
-;;                      (3 . (,(mbc 6 0) ,(mbc 6 1) ,(mbc 6 2)
-;;                            ,(mbc 6 3) ,(mbc 7 3) ,(mbc 8 4)
-;;                            ,(mbc 9 4) ,(mbc 10 4) ,(mbc 11 3)))))
-;;        ;; a list of lists; each element's `car' is where the Mountain is
-;;        ;; and each elements `cdr' is a list of where the Beast could be,
-;;        ;; based on the two points of information.
-;;        (scenarios
-;;         `((,(mbc 10 4) . ((myth . (,(mbc 9 4) ,(mbc 8 5)))
-;;                           (omit . 2)))
-;;           (,(mbc 8 4) . ((myth . (,(mbc 9 5) ,(mbc 8 5)))
-;;                          (omit . 2)))
-;;           (,(mbc 9 2) . ((myth . (,(mbc 8 3) ,(mbc 8 4) ,(mbc 8 5)
-;;                                   ,(mbc 9 3) ,(mbc 9 4), (mbc 9 5)))
-;;                          (omit . nil)))
-;;           (,(mbc 9 3) . ((myth . (,(mbc 8 4) ,(mbc 8 5) ,(mbc 9 4)))
-;;                          (omit . 1)))
-;;           (,(mbc 9 4) .  ((myth . (,(mbc 8 4)))
-;;                           (omit . 2)))
-;;           (,(mbc 9 5) . ((myth . (,(mbc 8 5)))
-;;                          (omit . 3)))))
-;;        ;; We'll pick a random scenario
-;;        (scenario
-;;         (seq-random-elt scenarios)))
-;;   (mythic-bastionland-map-generate
-;;    `(
+;;
+;; (mythic-bastionland-map-generate
+;;   `((constraints
+;;       ((nearest . ((label . "The Mountain")
+;;                     (feature . 'myth)
+;;                     (coord . ,(mbc 9 1))))
+;;         (nearest . ((label . "The Judge")
+;;                      (feature . 'myth)
+;;                      (coord . ,(mbc 7 2))))
+;;         ;; (direction . ((label . "The Mountain")
+;;         ;;               (feature . 'myth)
+;;         ;;               (pointing . "South")
+;;         ;;               (coord . ,(mbc 9 1))))
+;;         ))
+;;      ;; This is where Sir Weydlyn encountered Seer Tompot.
+;;      (sanctums
+;;        (("Tompot (Tangled Seer)" . ,(mbc 8 1))))
 ;;      ;; With the chosen random scenario, we assign the Moutain, then
 ;;      ;; pick a random one for the Beast
-;;      (myths .
-;;       (("The Mountain" . ,(car scenario))
-;;        ("The Beast" . ,(seq-random-elt
-;;                         (alist-get 'myth (cdr scenario))))))
-;;      (holdings .
-;;       (("Tower" . (9 . 3)) ("Castle" . (5 . 7))
-;;        ("Fortress" . (1 . 19)) ("Town" . (8 . 16))))
+;;      (myths . (("The Mountain" .
+;;                  (,(mbc 10 4) ,(mbc 8 4) ,(mbc 9 2)
+;;                    ,(mbc 9 3) ,(mbc 9 4) ,(mbc 9 5)))
+;;                 ("The Beast" .
+;;                   (,(mbc 8 3) ,(mbc 9 3) ,(mbc 8 4)
+;;                     ,(mbc 9 4) ,(mbc 8 5)))
+;;                 ("The Judge" .
+;;                   ,(mythic-bastionland-hexes-within-range
+;;                      (mbc 7 2) 3))))
+;;      ;; These have been converted to double height coordinates.
+;;      (holdings .                      (("Tower" . (9 . 3)) ("Castle" . (5 . 7))
+;;                                         ("Fortress" . (1 . 19)) ("Town" . (8 . 16))))
 ;;      (omit (
-;;             ;; Sir Wedylyn crossed between these two potential
-;;             ;; barriers.
-;;             (barriers .
-;;                       ((,(mbc 8 1) . ,(mbc 9 1))
-;;                        (,(mbc 9 1) . ,(mbc 8 2))))
-;;             ;; With myths chosen, now assign where myths cannot be.
-;;             (myths . ,(alist-get
-;;                        (alist-get 'omit (cdr scenario))
-;;                        myth-omits)))))))
+;;              ;; Sir Wedylyn crossed between these two potential
+;;              ;; barriers.
+;;              (barriers .
+;;                ((,(mbc 8 1) . ,(mbc 9 1))
+;;                  (,(mbc 9 1) . ,(mbc 8 2))
+;;                  (,(mbc 8 2) . ,(mbc 7 2))))))))
 
 ;;
 ;;; Code:
@@ -182,7 +159,15 @@ distance (if any).")
 See `mythic-bastionland-features' for some of the `car' values of
 CONFIG.  Another is `barriers' (which are unamed).  Another is `omit',
 itself an alist, with the same `car' values as those in CONFIG (except
-`omit')."
+`omit').
+
+When providing existing locations to place, you may provide either a
+single coordinate or a list of coordinates (from which the function will
+randomly pick a candidate of coordinates not already placed).  The logic
+enforces that only one feature may be placed in each hex.
+
+Given this placement logic, ensure that the config places features with
+less candidate spaces earlier."
   (let ((barriers nil)
          (locations nil)
          (locations-to-place nil)
@@ -193,13 +178,37 @@ itself an alist, with the same `car' values as those in CONFIG (except
       (let* ((feat-locations
                (alist-get feature config))
               (how-many
-                (alist-get 'how-many fconfig)))
-        (message "feat-locations: %S" feat-locations)
+                (alist-get 'how-many fconfig))
+              ;; TODO: allow for multiple feature entries.
+              (placed-features '()))
+
         ;; When we are given location qs for this feature type, add it
         ;; to the placed list.
         (when feat-locations
-          (cl-loop for (label . coord) in feat-locations do
-            (cl-pushnew (cons coord label) locations)))
+          (cl-loop for (label . list-of-or-one-coord) in feat-locations do
+            (let ((placed-coordinates
+                    (mapcar #'car locations)))
+              (if (consp (car list-of-or-one-coord))
+                ;; We have a list of coordinates
+                (let ((coord
+                        (seq-random-elt
+                          (seq-filter
+                            (lambda (c)
+                              (not (member c placed-coordinates)))
+                            list-of-or-one-coord))))
+                  (unless coord
+                    (user-error "Location %s with coordinate options %s cannot be placed due to collisoin with all other placed locations."
+                      (label list-of-or-one-coord)))
+                  (cl-pushnew (cons coord label) locations)
+                  (cl-pushnew (cons label coord) placed-features))
+                ;; We have one coordinate
+                (let ((coord list-of-or-one-coord))
+                  (when (member coord placed-coordinates)
+                    (user-error "Location %s with coord %s cannot be placed due to existing placed location"
+                      label coord))
+                  (cl-pushnew (cons coord label) locations)
+                  (cl-pushnew (cons label coord) placed-features))))))
+        (cl-pushnew (cons feature placed-features) the-map)
 
         ;; Next queue up placing the remainder of locations for the
         ;; feature type (accounting for what was already given).
@@ -207,9 +216,7 @@ itself an alist, with the same `car' values as those in CONFIG (except
                       (length feat-locations)))
           (cl-pushnew (cons feature
                         (format "%s %s" feature (+ i 1)))
-            locations-to-place))
-
-        (cl-pushnew (cons feature feat-locations) the-map)))
+            locations-to-place))))
 
     ;; Now that we have our task list of what all needs adding.
     ;;
