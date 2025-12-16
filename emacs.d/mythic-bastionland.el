@@ -86,46 +86,44 @@
 
 ;;; Generating Map with Example Config:
 
-;; (alias 'mbc 'mythic-bastionland--random-coord)
-;;
-;; (mythic-bastionland-map-generate
-;;   `((constraints
-;;       ((nearest . ((label . "The Mountain")
-;;                     (feature . 'myth)
-;;                     (coord . ,(mbc 9 1))))
-;;         (nearest . ((label . "The Judge")
-;;                      (feature . 'myth)
-;;                      (coord . ,(mbc 7 2))))
-;;         ;; (direction . ((label . "The Mountain")
-;;         ;;               (feature . 'myth)
-;;         ;;               (pointing . "South")
-;;         ;;               (coord . ,(mbc 9 1))))
-;;         ))
-;;      ;; This is where Sir Weydlyn encountered Seer Tompot.
-;;      (sanctums
-;;        (("Tompot (Tangled Seer)" . ,(mbc 8 1))))
-;;      ;; With the chosen random scenario, we assign the Moutain, then
-;;      ;; pick a random one for the Beast
-;;      (myths . (("The Mountain" .
-;;                  (,(mbc 10 4) ,(mbc 8 4) ,(mbc 9 2)
-;;                    ,(mbc 9 3) ,(mbc 9 4) ,(mbc 9 5)))
-;;                 ("The Beast" .
-;;                   (,(mbc 8 3) ,(mbc 9 3) ,(mbc 8 4)
-;;                     ,(mbc 9 4) ,(mbc 8 5)))
-;;                 ("The Judge" .
-;;                   ,(mythic-bastionland-hexes-within-range
-;;                      (mbc 7 2) 3))))
-;;      ;; These have been converted to double height coordinates.
-;;      (holdings .                      (("Tower" . (9 . 3)) ("Castle" . (5 . 7))
-;;                                         ("Fortress" . (1 . 19)) ("Town" . (8 . 16))))
-;;      (omit (
-;;              ;; Sir Wedylyn crossed between these two potential
-;;              ;; barriers.
-;;              (barriers .
-;;                ((,(mbc 8 1) . ,(mbc 9 1))
-;;                  (,(mbc 9 1) . ,(mbc 8 2))
-;;                  (,(mbc 8 2) . ,(mbc 7 2))))))))
-
+;; (defalias 'mbc 'mythic-bastionland--random-coord)
+;; (setq working-map
+;;       (mythic-bastionland-map-generate
+;;        `((constraints
+;;           ((nearest . ((label . "The Mountain")
+;;                        (feature . 'myth)
+;;                        (coord . ,(mbc 9 1))))
+;;            (nearest . ((label . "The Judge")
+;;                        (feature . 'myth)
+;;                        (coord . ,(mbc 7 2))))
+;;            ;; (direction . ((label . "The Mountain")
+;;            ;;               (feature . 'myth)
+;;            ;;               (pointing . "South")
+;;            ;;               (coord . ,(mbc 9 1))))
+;;            ))
+;;          ;; This is where Sir Weydlyn encountered Seer Tompot.
+;;          (sanctums . (("Tompot (Tangled Seer)" . ,(mbc 8 1))))
+;;          ;; With the chosen random scenario, we assign the Moutain, then
+;;          ;; pick a random one for the Beast
+;;          (myths . (("The Mountain" .
+;;                     (,(mbc 10 4) ,(mbc 8 4) ,(mbc 9 2)
+;;                      ,(mbc 9 3) ,(mbc 9 4) ,(mbc 9 5)))
+;;                    ("The Beast" .
+;;                     (,(mbc 8 3) ,(mbc 9 3) ,(mbc 8 4)
+;;                      ,(mbc 9 4) ,(mbc 8 5)))
+;;                    ("The Judge" .
+;;                     ,(mythic-bastionland-hexes-within-range
+;;                       (mbc 7 2) 3))))
+;;          ;; These have been converted to double height coordinates.
+;;          (holdings . (("Tower" . (9 . 3)) ("Castle" . (5 . 7))
+;;                       ("Fortress" . (1 . 19)) ("Town" . (8 . 16))))
+;;          (omit (
+;;                 ;; Sir Wedylyn crossed between these two potential
+;;                 ;; barriers.
+;;                 (barriers .
+;;                           ((,(mbc 8 1) . ,(mbc 9 1))
+;;                            (,(mbc 9 1) . ,(mbc 8 2))
+;;                            (,(mbc 8 2) . ,(mbc 7 2)))))))))
 ;;
 ;;; Code:
 
@@ -168,158 +166,170 @@ enforces that only one feature may be placed in each hex.
 
 Given this placement logic, ensure that the config places features with
 less candidate spaces earlier."
-  (let ((barriers nil)
-         (locations nil)
-         (locations-to-place nil)
+  (let ((max-retries
+          (or (alist-get 'max-retries config) 10))
+         (keep-mapping t)
          (the-map nil))
-    ;; First put the locations on the map...no effort is taken to avoid
-    ;; location collisions.  Also, queue up further locations to place.
-    (cl-loop for (feature . fconfig) in mythic-bastionland-features do
-      (let* ((feat-locations
-               (alist-get feature config))
-              (how-many
-                (alist-get 'how-many fconfig))
-              ;; TODO: allow for multiple feature entries.
-              (placed-features '()))
+    (while (and keep-mapping (> max-retries 0))
+      ;; Assume that we don't need to keep trying to build the map
+      (setq keep-mapping nil)
+      (setq the-map nil)
+      (setq max-retries (- max-retries 1))
 
-        ;; When we are given location qs for this feature type, add it
-        ;; to the placed list.
-        (when feat-locations
-          (cl-loop for (label . list-of-or-one-coord) in feat-locations do
-            (let ((placed-coordinates
-                    (mapcar #'car locations)))
-              (if (consp (car list-of-or-one-coord))
-                ;; We have a list of coordinates
-                (let ((coord
-                        (seq-random-elt
-                          (seq-filter
-                            (lambda (c)
-                              (not (member c placed-coordinates)))
-                            list-of-or-one-coord))))
-                  (unless coord
-                    (user-error "Location %s with coordinate options %s cannot be placed due to collisoin with all other placed locations."
-                      (label list-of-or-one-coord)))
-                  (cl-pushnew (cons coord label) locations)
-                  (cl-pushnew (cons label coord) placed-features))
-                ;; We have one coordinate
-                (let ((coord list-of-or-one-coord))
-                  (when (member coord placed-coordinates)
-                    (user-error "Location %s with coord %s cannot be placed due to existing placed location"
-                      label coord))
-                  (cl-pushnew (cons coord label) locations)
-                  (cl-pushnew (cons label coord) placed-features))))))
-        (cl-pushnew (cons feature placed-features) the-map)
+      ;; Now, let's see if our assumption is correct.
+      (let ((barriers nil)
+             (locations nil)
+             (locations-to-place nil))
+        ;; First put the locations on the map...no effort is taken to
+        ;; avoid location collisions.  Also, queue up further locations
+        ;; to place.
+        (cl-loop for (feature . fconfig) in mythic-bastionland-features do
+          (let* ((feat-locations
+                   (alist-get feature config))
+                  (how-many
+                    (alist-get 'how-many fconfig))
+                  ;; TODO: allow for multiple feature entries.
+                  (placed-features '()))
 
-        ;; Next queue up placing the remainder of locations for the
-        ;; feature type (accounting for what was already given).
-        (dotimes (i (- (seq-random-elt how-many)
-                      (length feat-locations)))
-          (cl-pushnew (cons feature
-                        (format "%s %s" feature (+ i 1)))
-            locations-to-place))))
+            ;; When we are given location qs for this feature type, add
+            ;; it to the placed list.
+            (when feat-locations
+              (cl-loop for (label . list-or-one-coord) in feat-locations do
+                (let ((placed-coordinates
+                        (mapcar #'car locations)))
+                  (if (consp (car list-or-one-coord))
+                    ;; We have a list of coordinates
+                    (let ((coord
+                            (seq-random-elt
+                              (seq-filter
+                                (lambda (c)
+                                  (not (member c placed-coordinates)))
+                                list-or-one-coord))))
+                      (unless coord
+                        (user-error "Location %s with coordinate options %s cannot be placed due to collisoin with all other placed locations."
+                          (label list-or-one-coord)))
+                      (cl-pushnew (cons coord label) locations)
+                      (cl-pushnew (cons label coord) placed-features))
+                    ;; We have one coordinate
+                    (let ((coord list-or-one-coord))
+                      (when (member coord placed-coordinates)
+                        (user-error "Location %s with coord %s cannot be placed due to existing placed location"
+                          label coord))
+                      (cl-pushnew (cons coord label) locations)
+                      (cl-pushnew (cons label coord) placed-features))))))
+            (cl-pushnew (cons feature placed-features) the-map)
 
-    ;; Now that we have our task list of what all needs adding.
-    ;;
-    ;; This involves avoiding collisions with other placed features as
-    ;; well as heading the guidance of an omit coordinates for the given
-    ;; feature.
-    (cl-loop for (feature . label) in locations-to-place do
-      (let ((keep-trying t)
-             (min-distance
-               (alist-get 'min-distance
-                 (alist-get feature mythic-bastionland-features)))
-             (omitted-feature-coordinates
-               (alist-get feature (alist-get 'omit the-map))))
-        (while keep-trying
-          (let* ((coord
-                   (mythic-bastionland--random-coord)))
-            (when (and
-                    ;; Verify that what we're placing is place at the
-                    ;; minimum distance.
-                    (if min-distance
-                      (<= min-distance
-                        (min
-                          (mapcar
-                            (lambda (label-coord)
-                              (mythic-bastionland--hex-distance
-                                coord (cdr label-coord)))
-                            (alist-get feature the-map))))
-                      t)
-                    (not (or
-                           (assoc coord locations)
-                           (member coord omitted-feature-coordinates))))
-              (progn
-                (setq keep-trying nil)
-                ;; For locations we favor storing the (coord . label)
-                ;; This makes later comparisons easier.n
-                (cl-pushnew (cons coord label) locations)
-                ;; For a named feature favor storing (label . coord)
-                ;; as this makes prompts easier.
-                (cl-pushnew (cons label coord)
-                  (alist-get feature the-map))))))))
+            ;; Next queue up placing the remainder of locations for the
+            ;; feature type (accounting for what was already given).
+            (dotimes (i (- (seq-random-elt how-many)
+                          (length feat-locations)))
+              (cl-pushnew (cons feature
+                            (format "%s %s" feature (+ i 1)))
+                locations-to-place))))
 
-    ;; And last, we handle the barriers as they are a bit of a different
-    ;; creature.  We generate them by placing them between two
-    ;; neighboring hexes.
-    ;;
-    ;; I have given special consideration for hexes on the edge of the
-    ;; map; Namely don't create barriers on the edges.  And
-    ;; proportionally reduce the chance of adding a barrier on those
-    ;; edges proportional to the number sides that the hex has on-map
-    ;; neighbors."
-    (let ((omitted-barriers
-            (mapcar
-              (lambda (b)
-                (mythic-bastionland--make-ordered-pair
-                  (car b) (cdr b)))
-              (alist-get 'barriers (alist-get 'omit config)))))
-      (dotimes (i (+ 23 (random 3)))
-        (let ((keep-trying t))
-          (while keep-trying
-            (let* ((coord
-                     (mythic-bastionland--random-coord))
-                    (in-6-chance
-                      (cond
-                        ((member coord '((0 . 0) (11 . 22)))
-                          ;; top-left, bottom-right
-                          2)
-                        ((member coord '((11 . 0) (0 . 22)))
-                          ;; top-right, bottom-right
-                          3)
-                        ((member (car coord) '(0 11))
-                          ;; from or to
-                          4)
-                        ((member (cdr coord) '(0 23))
-                          ;; top of col that is taller; bottom of col
-                          ;; that is shorter
-                          3)
-                        ((member (cdr coord) '(1 22))
-                          ;; top of col that is shorter; bottom of col
-                          ;; that is taller
-                          5)
-                        (t 6))))
-              (when (<= (+ 1 (random 6)) in-6-chance)
-                (progn
-                  (let* ((neighbor
-                           (seq-random-elt
-                             (mythic-bastionland--neighbors coord)))
-                          (pair
-                            (mythic-bastionland--make-ordered-pair
-                              coord neighbor)))
-                    ;; Don't repeat barriers
-                    (when
-                      (not (or (member pair barriers)
-                             (member pair omitted-barriers)))
-                      (progn
-                        (cl-pushnew pair barriers)
-                        (setq keep-trying nil)))))))))))
+        ;; Now that we have our task list of what all needs adding.
+        ;;
+        ;; This involves avoiding collisions with other placed features
+        ;; as well as heading the guidance of an omit coordinates for
+        ;; the given feature.
+        (cl-loop for (feature . label) in locations-to-place do
+          (let ((keep-trying t)
+                 (min-distance
+                   (alist-get 'min-distance
+                     (alist-get feature mythic-bastionland-features)))
+                 (omitted-feature-coordinates
+                   (alist-get feature (alist-get 'omit the-map))))
+            (while keep-trying
+              (let* ((coord
+                       (mythic-bastionland--random-coord)))
+                (when (and
+                        ;; Verify that what we're placing is place at
+                        ;; the minimum distance.
+                        (if min-distance
+                          (<= min-distance
+                            (min
+                              (mapcar
+                                (lambda (label-coord)
+                                  (mythic-bastionland--hex-distance
+                                    coord (cdr label-coord)))
+                                (alist-get feature the-map))))
+                          t)
+                        (not (or
+                               (assoc coord locations)
+                               (member coord
+                                 omitted-feature-coordinates))))
+                  (progn
+                    (setq keep-trying nil)
+                    ;; For locations we favor storing the (coord . label)
+                    ;; This makes later comparisons easier.n
+                    (cl-pushnew (cons coord label) locations)
+                    ;; For a named feature favor storing (label . coord)
+                    ;; as this makes prompts easier.
+                    (cl-pushnew (cons label coord)
+                      (alist-get feature the-map))))))))
 
-    ;; PS...make sure we add the locations and barriers to the map.
-    (cl-pushnew `(locations . ,locations) the-map)
-    (cl-pushnew `(barriers . ,barriers) the-map)
-    ;; (setq mythic-bastionland-map the-map)
-    ;; (mythic-bastionland-map-write)
-    ))
+        ;; Next consider placing constraints
+
+        ;; And last, we handle the barriers as they are a bit of a
+        ;; different creature.  We generate them by placing them between
+        ;; two neighboring hexes.
+        ;;
+        ;; I have given special consideration for hexes on the edge of
+        ;; the map; Namely don't create barriers on the edges.  And
+        ;; proportionally reduce the chance of adding a barrier on those
+        ;; edges proportional to the number sides that the hex has
+        ;; on-map neighbors."
+        (let ((omitted-barriers
+                (mapcar
+                  (lambda (b)
+                    (mythic-bastionland--make-ordered-pair
+                      (car b) (cdr b)))
+                  (alist-get 'barriers (alist-get 'omit config)))))
+          (dotimes (i (+ 23 (random 3)))
+            (let ((keep-trying t))
+              (while keep-trying
+                (let* ((coord
+                         (mythic-bastionland--random-coord))
+                        (in-6-chance
+                          (cond
+                            ((member coord '((0 . 0) (11 . 22)))
+                              ;; top-left, bottom-right
+                              2)
+                            ((member coord '((11 . 0) (0 . 22)))
+                              ;; top-right, bottom-right
+                              3)
+                            ((member (car coord) '(0 11))
+                              ;; from or to
+                              4)
+                            ((member (cdr coord) '(0 23))
+                              ;; top of col that is taller; bottom of
+                              ;; col that is shorter
+                              3)
+                            ((member (cdr coord) '(1 22))
+                              ;; top of col that is shorter; bottom of
+                              ;; col that is taller
+                              5)
+                            (t 6))))
+                  (when (<= (+ 1 (random 6)) in-6-chance)
+                    (progn
+                      (let* ((neighbor
+                               (seq-random-elt
+                                 (mythic-bastionland--neighbors coord)))
+                              (pair
+                                (mythic-bastionland--make-ordered-pair
+                                  coord neighbor)))
+                        ;; Don't repeat barriers
+                        (when
+                          (not (or (member pair barriers)
+                                 (member pair omitted-barriers)))
+                          (progn
+                            (cl-pushnew pair barriers)
+                            (setq keep-trying nil)))))))))))
+
+        ;; PS...make sure we add the locations and barriers to the map.
+        (cl-pushnew `(locations . ,locations) the-map)
+        (cl-pushnew `(barriers . ,barriers) the-map)))
+    the-map))
 
 (defun mythic-bastionland-feature-rename ()
   "Re-label `mythic-bastionland' feature."
