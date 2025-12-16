@@ -498,6 +498,63 @@ Note the FROM is conformant to the
               (cons (mythic-bastionland--hex-distance (cdr myth) from)
                 (car myth)))
       (cdr (assoc 'myths (mythic-bastionland-map))))))
+(defun mythic-bastionland-hexes-within-range (&optional coord distance include-given)
+  "Return list of coordinates on the map within DISTANCE of COORD.
+
+When INCLUDE-GIVEN is non-nil, also include the given COORD; otherwise
+omit it."
+  (let* ((coord
+           (or coord (mythic-bastionland--text-to-coord)))
+          (returning nil)
+          (dist
+            (or distance (read-number "Distance: "))))
+    ;; This logic loops through each of the colums that make up the area
+    ;; within range.  For each column, we start at the top and walk down
+    ;; to the bottom.
+    ;;
+    ;; Assuming double-height coordinates, Consider collecting all hexes
+    ;; distance 2 from the middle hex of the diagram.  We can couunt the
+    ;; hexes of each column: 3, 4, 5, 4, 3 (were we including the center
+    ;; hex).  The coordinate delta of the top left most column is (-2,2)
+    ;; the coordinate delta of the top most center column is (0,4).  And
+    ;; the coordinate delta of the right top most column is (2,2).  From
+    ;; that we can gather each column's hexes.
+    ;;
+    ;;           ___
+    ;;       ___/   \___
+    ;;   ___/   \___/   \___
+    ;;  /   \___/   \___/   \
+    ;;  \___/   \___/   \___/
+    ;;  /   \___/   \___/   \
+    ;;  \___/   \___/   \___/
+    ;;  /   \___/   \___/   \
+    ;;  \___/   \___/   \___/
+    ;;      \___/   \___/
+    ;;          \___/
+    ;;
+    (dotimes (i (+ 1 (* 2 dist)))
+      (let ((top (cons (+ (- (car coord) dist) i)
+                   (+ (- (cdr coord) (* 2 dist)) (abs (- dist i))))))
+        (dotimes (j (- (* (+ 1 dist) 2) 1 (abs (- dist i))))
+          (let ((cand
+                  (cons (car top) (+ (cdr top) (* 2 j)))))
+            (when (and (mythic-bastionland--in-map cand)
+                    (or (not include-given)
+                      (and include-given (equal coord cand))))
+              (push cand returning))))))
+    returning))
+
+
+(defconst mythic-bastionland--directional-delta
+  '((0 . -2) (1 . -1)
+     (1 . 1) (0 . 2)
+     (-1 . 1) (-1 . -1)))
+
+(defun mythic-bastionland--in-map (&optional coord)
+  (let ((coord
+          (or coord
+            (mythic-bastionland--text-to-coord))))
+    (and (<= 0 (car coord) 11) (<= 0 (cdr coord) 23))))
 
 (defun mythic-bastionland--neighbors (&optional coord)
   "Calculate the neighbors of the given COORD.
@@ -508,15 +565,12 @@ Neighboring coordinates that are not on the map are omitted."
           (or coord
             (mythic-bastionland--text-to-coord)))
          (neighbors nil))
-    (dolist (delta '((0 . -2) (1 . -1)
-                      (1 . 1) (0 . 2)
-                      (-1 . 1) (-1 . -1)))
-      (let ((col
-              (+ (car coord) (car delta)))
-             (row
-               (+ (cdr coord) (cdr delta))))
-        (when (and (<= 0 col 11) (<= 0 row 23))
-          (cl-pushnew (cons col row) neighbors))))
+    (dolist (delta mythic-bastionland--directional-delta)
+      (let ((cand
+              (cons (+ (car coord) (car delta))
+               (+ (cdr coord) (cdr delta)))))
+        (when (mythic-bastionland--in-map cand)
+          (cl-pushnew cand neighbors))))
     neighbors))
 
 (defun mythic-bastionland-direction (from myth)
