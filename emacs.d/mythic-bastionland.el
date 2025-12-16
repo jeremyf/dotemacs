@@ -375,7 +375,7 @@ itself an alist, with the same `car' values as those in CONFIG (except
   "Return a random coordinate, though you can seed COLUMN or ROW."
   (let ((c (or column (random 12)))
          (r (or row (random 12))))
-    (cons col
+    (cons c
       (if (= 0 (mod c 2)) (* 2 r) (* 2 r)))))
 
 (defun mythic-bastionland--text-to-coord (&optional text prefix)
