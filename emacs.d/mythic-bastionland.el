@@ -612,33 +612,33 @@ See `mythic-bastionland--text-to-coord' for details of FROM."
          (to
            (or to
              (mythic-bastionland--text-to-coord nil "To "))))
-      (cond
-        ((equal to from)
-          "Under your nose")
-        ((= (car from) (car to))
-          (if (> (cdr from) (cdr to))
-            "North" "South"))
-        (t (let ((slope (/
-                          (float (- (cdr to) (cdr from)))
-                          (float (- (car to) (car from))))))
-             (cond
-               ;; After compass, protractor, marker, and spreadsheet
-               ;; work, I'm happy with the direction calculations.
-               ;; Remember, hex maps starting from top-left instead
-               ;; of bottom right like Geometry means things get a
-               ;; mind bending (at least for this old guy).
-               ((or (> slope 4) (< slope -4))
-                 (if (> (cdr from) (cdr to))
-                   "North" "South"))
-               ((<= 0.8 slope) (<= slope 4)
-                 (if (> (cdr from) (cdr to))
-                   "Northwest" "Southeast"))
-               ((< -0.8 slope 0.8)
-                 (if (> (car from) (car to))
-                   "West" "East"))
-               ((<= -4 slope -0.8)
-                 (if (> (cdr from) (cdr to))
-                   "Northeast" "Southwest"))))))))
+    (cond
+      ((equal to from)
+        "Under your nose")
+      ((= (car from) (car to))
+        (if (> (cdr from) (cdr to))
+          "North" "South"))
+      (t (let ((slope (/
+                        (float (- (cdr to) (cdr from)))
+                        (float (- (car to) (car from))))))
+           (cond
+             ;; After compass, protractor, marker, and spreadsheet
+             ;; work, I'm happy with the direction calculations.
+             ;; Remember, hex maps starting from top-left instead
+             ;; of bottom right like Geometry means things get a
+             ;; mind bending (at least for this old guy).
+             ((or (> slope 4) (< slope -4))
+               (if (> (cdr from) (cdr to))
+                 "North" "South"))
+             ((<= 0.8 slope) (<= slope 4)
+               (if (> (cdr from) (cdr to))
+                 "Northwest" "Southeast"))
+             ((< -0.8 slope 0.8)
+               (if (> (car from) (car to))
+                 "West" "East"))
+             ((<= -4 slope -0.8)
+               (if (> (cdr from) (cdr to))
+                 "Northeast" "Southwest"))))))))
 
 (defun mythic-bastionland--make-ordered-pair (from to)
   "Provide a consistent sort order FROM and TO coordinates."
