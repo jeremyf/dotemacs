@@ -74,24 +74,19 @@
 ;;  (hazards ("Hazard 1" 8 . 10) ("Hazard 2" 5 . 21) ("Hazard 3" 7 . 13))
 ;;  (curses ("Curse 1" 7 . 7) ("Curse 2" 8 . 18) ("Curse 3" 4 . 20))
 ;;  (ruins ("Ruin 1" 9 . 9) ("Ruin 2" 10 . 8) ("Ruin 3" 1 . 5) ("Ruin 4" 11 . 17))
-;;  (barriers (left (10 . 22) right (9 . 21)) (left (6 . 22) right (6 . 20))
-;;            (left (5 . 1) right (6 . 0)) (left (10 . 16) right (10 . 14))
-;;            (left (6 . 8) right (6 . 6)) (left (4 . 8) right (4 . 6))
-;;            (left (7 . 11) right (6 . 12)) (left (5 . 7) right (5 . 5))
-;;            (left (5 . 19) right (5 . 17)) (left (7 . 5) right (7 . 3))
-;;            (left (4 . 16) right (3 . 17)) (left (8 . 4) right (7 . 5))
-;;            (left (9 . 17) right (8 . 16)) (left (9 . 1) right (8 . 0))
-;;            (left (1 . 19) right (1 . 17)) (left (6 . 22) right (5 . 21))
-;;            (left (11 . 9) right (10 . 8)) (left (8 . 4) right (9 . 3))
-;;            (left (7 . 9) right (6 . 8)) (left (8 . 12) right (8 . 10))
-;;            (left (9 . 11) right (8 . 12)) (left (7 . 7) right (6 . 6))
-;;            (left (11 . 5) right (10 . 6)) (left (9 . 1) right (10 . 0)))
+;;  (barriers ((10 . 22) 9 . 21) ((6 . 22) 6 . 20) ((5 . 1) 6 . 0)
+;;            ((10 . 16) 10 . 14) ((6 . 8) 6 . 6) ((4 . 8) 4 . 6)
+;;            ((7 . 11) 6 . 12) ((5 . 7) 5 . 5) ((5 . 19) 5 . 17)
+;;            ((7 . 5) 7 . 3) ((4 . 16) 3 . 17) ((8 . 4) 7 . 5)
+;;            ((9 . 17) 8 . 16) ((9 . 1) 8 . 0) ((1 . 19) 1 . 17)
+;;            ((6 . 22) 5 . 21) ((11 . 9) 10 . 8) ((8 . 4) 9 . 3)
+;;            ((7 . 9) 6 . 8) ((8 . 12) 8 . 10) ((9 . 11) 8 . 12)
+;;            ((7 . 7) 6 . 6) ((11 . 5) 10 . 6) ((9 . 1) 10 . 0))
 ;;  (holdings ("Tower" 9 . 3) ("Castle" 5 . 7) ("Fortress" 1 . 19) ("Town" 8 . 16)))
 
 ;;; Generating Map with Example Config:
 
-;; (defun mbc (col row)
-;;   (mythic-bastionland--text-to-coord (format "%s,%s" col row)))
+;; (alias 'mbc 'mythic-bastionland--random-coord)
 ;; ;; Based on the presented game logic and reviewing the map, there are 6
 ;; ;; places where the Mountain could be and still allow for the Beast to
 ;; ;; also be along the shores of the lake.
@@ -457,21 +452,13 @@ See `mythic-bastionland--text-to-coord'."
 Expected strategies are:
 - nearest
 - not-nearest."
-  (let* ((distances
-           (mythic-bastionland--myth-distances coord))
-          (shortest-distance
-            (caar distances)))
-    (cdr
-      (seq-random-elt
-        (seq-filter
-          (lambda (cell)
-            (pcase strategy
-              ('nearest (= shortest-distance (car cell)))
-              ('not-nearest
-                (not (= shortest-distance (car cell))))
-              (_
-                (user-error "Unknown stratgegy %s" strategy))))
-          distances)))))
+  (let* ((labels
+           (mythic-bastionland--sorted-by-closest-distance
+             coord 'myths)))
+    (pcase strategy
+      ('nearest (car labels))
+      ('not-nearest (seq-random-elt (cdr labels)))
+      (_ (user-error "Unknown stratgegy %s" strategy)))))
 
 (defun mythic-bastionland-barrier-between (from to)
   "Answer if there is a barrier goint FROM hex TO hex."
@@ -484,21 +471,51 @@ Expected strategies are:
     (user-error "You Shall Not Pass!")
     (message "Passthrough on through")))
 
-(defun mythic-bastionland--myth-distances (from)
-  "Sort distance FROM each myth into a list of `cons' cells.
+(defun mythic-bastionland--sorted-by-closest-distance (from feature &optional map)
+  "List of FEATURE names sorted in distance FROM.
 
-We return the closest first.
+When MAP is given use that, else `mythic-bastionland-map'.
 
-The `car' is the integer distance and the `cdr' is the name of the
-myth.`
+We make a concession for consistency.  Our highest sorting priority is
+on distance.  And then based on the normalized order pair produced by
+`mythic-bastionland--make-ordered-pair'.  In this way we neither favor
+the order in which they were stored nor have a random response as to
+which is closest based on those that have the same distances."
+  (let ((feature-distance-ordered-pair
+          (mapcar
+            (lambda (f)
+              (let ((to (cdr f)))
+                `((label .
+                    ,(car f))
+                   (distance .
+                     ,(mythic-bastionland--hex-distance
+                        to from))
+                   (pair .
+                     ,(mythic-bastionland--make-ordered-pair
+                        to from)))))
+            (alist-get feature (or map (mythic-bastionland-map))))))
+    (mapcar (lambda (data)
+              (alist-get 'label data))
+      (seq-sort
+        (lambda (left right)
+          (let ((pair-left (alist-get 'pair left))
+                 (pair-right (alist-get 'pair right)))
+            (< (string-to-number
+                 (format "%02d%02d%02d%02d%02d"
+                   (alist-get 'distance left)
+                   (caar pair-left)
+                   (cdar pair-left)
+                   (cadr pair-left)
+                   (cddr pair-left)))
+              (string-to-number
+                (format "%02d%02d%02d%02d%02d"
+                  (alist-get 'distance right)
+                  (caar pair-right)
+                  (cdar pair-right)
+                  (cadr pair-right)
+                  (cddr pair-right))))))
+feature-distance-ordered-pair))))
 
-Note the FROM is conformant to the
-`mythic-bastionland--text-to-coord'."
-  (seq-sort (lambda (l r) (< (car l) (car r)))
-    (mapcar (lambda (myth)
-              (cons (mythic-bastionland--hex-distance (cdr myth) from)
-                (car myth)))
-      (cdr (assoc 'myths (mythic-bastionland-map))))))
 (defun mythic-bastionland-hexes-within-range (&optional coord distance include-given)
   "Return list of coordinates on the map within DISTANCE of COORD.
 
@@ -632,10 +649,10 @@ See `mythic-bastionland--text-to-coord' for details of FROM."
            (or to
              (mythic-bastionland--text-to-coord nil "Right "))))
     (if (> (car from) (car to))
-      `(from ,from to ,to)
+      `(,from . ,to)
       (if (> (cdr from) (cdr to))
-        `(from ,from to ,to)
-        `(from ,to to ,from)))))
+        `(,from . ,to)
+        `(,to . ,from)))))
 
 (provide 'mythic-bastionland)
 ;;; mythic-bastionland.el ends here
