@@ -1382,12 +1382,18 @@ See `playing-a-game-candidates' and `start-playing'.")
        ((start .
           ((bmk-display-func . switch-to-buffer-side-window)
             (bmk-prompt-for-random . t)
+            (callback . #'start-playing-mythic-bastionaland)
             (bmk-file . "~/SyncThings/source/forged-from-the-worst/forged=from=the=worst--bookmarks.el")))
          (stop .
            ((bookmark-display-function . nil)))))
      )
   "Possible games I might be playing via Emacs.  A game you are playing
 should have both a 'start' and 'stop' property.")
+
+(defun start-playing-mythic-bastionaland ()
+  (load "jf-mythic-bastionland.el")
+  (when (f-file?  "~/git/mythic-bastionland.el/mythic-bastionland.el")
+    (require 'mythic-bastionland "~/git/mythic-bastionland.el/mythic-bastionland.el")))
 
 (defun stop-playing ()
   "Stop playing a game."
@@ -1426,7 +1432,9 @@ When a property is not provided, \"suitable\" defaults are assigned."
           (alist-get 'bmk-prompt-for-random config))
         (bookmark-save)
         (setopt bookmark-default-file file)
-        (bookmark-load file t nil t))))
+        (bookmark-load file t nil t)
+        (when (fn (alist-get 'callback config))
+          (funcall fn)))))
   ;; Last register how to stop playing.
   (setq playing-a-game (alist-get 'stop game)))
 
