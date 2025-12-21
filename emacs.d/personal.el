@@ -1185,14 +1185,15 @@ entry."
   ;;     smtpmail-stream-type  'ssl)
   )
 
-(use-package libmpdel
+(use-package listen
+  ;; A music management package which can leverage mpd.  Eventually I
+  ;; want expose music from my machine.
+  ;;
+  ;; `sudo apt install mpd`
+  ;; update `/etc/mpd.conf` library path to Music directory
+  ;; `systemctl --user enable mpd`
+  ;; `systemctl --user start mpd`
   :straight t)
-
-(use-package mpdel
-  :after libmpdel
-  :straight t
-  :custom (mpdel-prefix-key (kbd "H-m"))
-  :config (mpdel-mode))
 
 ;;; One Off Scripts
 ;; Goal: to migrate all [[denote:identifier]] references to each
@@ -1382,7 +1383,7 @@ See `playing-a-game-candidates' and `start-playing'.")
        ((start .
           ((bmk-display-func . switch-to-buffer-side-window)
             (bmk-prompt-for-random . t)
-            (callback . #'start-playing-mythic-bastionaland)
+            (callback . start-playing-mythic-bastionaland)
             (bmk-file . "~/SyncThings/source/forged-from-the-worst/forged=from=the=worst--bookmarks.el")))
          (stop .
            ((bookmark-display-function . nil)))))
@@ -1391,6 +1392,7 @@ See `playing-a-game-candidates' and `start-playing'.")
 should have both a 'start' and 'stop' property.")
 
 (defun start-playing-mythic-bastionaland ()
+  (setq random-table/reporter #'random-table/reporter/as-child-window)
   (load "jf-mythic-bastionland.el")
   (when (f-file?  "~/git/mythic-bastionland.el/mythic-bastionland.el")
     (require 'mythic-bastionland "~/git/mythic-bastionland.el/mythic-bastionland.el")))
@@ -1433,7 +1435,7 @@ When a property is not provided, \"suitable\" defaults are assigned."
         (bookmark-save)
         (setopt bookmark-default-file file)
         (bookmark-load file t nil t)
-        (when (fn (alist-get 'callback config))
+        (when-let ((fn (alist-get 'callback config)))
           (funcall fn)))))
   ;; Last register how to stop playing.
   (setq playing-a-game (alist-get 'stop game)))
@@ -1460,5 +1462,8 @@ When a property is not provided, \"suitable\" defaults are assigned."
   (setopt consult-omni-multi-sources '("Apps" "elfeed" "mu4e" "Org Agenda"))
 
   (setopt consult-omni-default-interactive-command #'consult-omni-multi))
+
+(when (f-file?  "~/git/denote-bookmark.el/denote-bookmark.el")
+  (require 'denote-bookmark "~/git/denote-bookmark.el/denote-bookmark.el"))
 
 (require 'ox-takeonrules)

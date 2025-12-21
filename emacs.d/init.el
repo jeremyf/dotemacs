@@ -578,7 +578,7 @@ Related to `jf/linux:radio-silence'."
 
   (setopt denote-link-description-format "%t")
   (setopt denote-org-store-link-to-heading 'id)
-  (setopt denote-rename-buffer-format "⟄ %D%b")
+  (setopt denote-rename-buffer-format "%D%b")
   (setopt denote-rename-buffer-backlinks-indicator " ↜")
   (setopt denote-infer-keywords nil)
   (setopt denote-org-capture-specifiers
@@ -2235,13 +2235,15 @@ When pass NORECORD along to pop-to-buffer."
     (interactive
       (list (read-buffer-to-switch "Switch to buffer in other window: ")))
     (pop-to-buffer buffer-or-name
-      '((display-buffer-in-side-window)
+      '((display-buffer-in-direction)
+         (display-buffer-in-side-window)
          (side . right)
          (window-width 72)
          (window-parameters
            (tab-line-format . none)
            (no-delete-other-windows . t)))
-      norecord))
+      norecord)
+    (recenter 0 t))
 
   (setq display-buffer-alist
     `(;; no window
@@ -2503,7 +2505,9 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
            ((,c :foreground ,fg-term-red-bright
               :box (:color ,fg-term-red-bright :line-width (-1 . -1)))))
         `(font-lock-regexp-face
-             ((,c :foreground ,red))))
+           ((,c :foreground ,red)))
+        `(symbol-overlay-default-face
+           ((,c :background ,bg-search-lazy))))
       ))
   ;; I had '(:light ef-cyprus) but the differentiation between function
   ;; and comment was not adequate
@@ -3031,11 +3035,7 @@ File.open('%s', 'w') { |f| $stdout = f; pp results }")
     org-fontify-quote-and-verse-blocks t
     ;; I'd prefer to use the executable, but that doe not appear to be
     ;; the implementation of org-babel.
-    org-plantuml-jar-path (concat
-                            (string-trim
-                              (shell-command-to-string
-                                "brew-path plantuml"))
-                            "/libexec/plantuml.jar")
+    org-plantuml-jar-path "/usr/share/plantuml/plantuml.jar"
     org-insert-heading-respect-content t
     org-catch-invisible-edits 'show-and-error
     org-use-fast-todo-selection 'expert
@@ -3615,7 +3615,8 @@ function is ever added to that hook."
 \\usepackage[marginal,hang]{footmisc}
 \\usepackage{mathabx}
 \\usepackage{multicol}
-\\setlength\\columnsep{20pt}
+\\usepackage[skip=10pt plus1pt, indent=40pt]{parskip}
+\\setlength\\columnsep{15pt}
 \\hypersetup{colorlinks=true, linkcolor=blue, filecolor=magenta, urlcolor=cyan}
 \\tolerance=1000
 \\usepackage{float}
@@ -3651,6 +3652,7 @@ function is ever added to that hook."
 \\usepackage{relsize,etoolbox}
 \\AtBeginEnvironment{quote}{\\smaller}
 \\AtBeginEnvironment{tabular}{\\smaller}
+\\usepackage[skip=10pt plus1pt, indent=40pt]{parskip}
 
 \\usepackage[marginal,hang]{footmisc}
 \\usepackage{mathabx}
@@ -6023,7 +6025,7 @@ The generated and indented TOC will be inserted at point."
   ;; I write most of my Ruby tests using rspec.  This tool helps manage
   ;; that process.
   :straight t
-  ;; Ensure that we’re loading ruby-mode before we do any rspec loading.
+  ;; ensure that we’re loading ruby-mode before we do any rspec loading.
   :after ruby-mode
   :custom
   (rspec-docker-container "web")
@@ -6330,7 +6332,8 @@ See `jf/comment-header-regexp/major-modes-alis'."
 
 (use-package symbol-overlay
   ;; Very useful when refactoring elisp
-  :straight t)
+  :straight t
+  :hook (emacs-lisp-mode . symbol-overlay-mode))
 
 (use-package text-mode
   :straight (:type built-in)
@@ -6862,33 +6865,17 @@ See `pdf-view-bookmark-make-record:prompt-for-random'."
   nil
   "When non-nil, favor opening bookmarks with this function.")
 
-(defun bookmark-jump-with-display (fn bookmark &optional display-func)
-  (funcall fn
-    bookmark
-    (or display-func
+(defun bookmark-jump-with-display (args)
+  (list
+    (car args)
+    (or (cdr args)
       default-bookmark-display-function
       (when current-prefix-arg 'switch-to-buffer-side-window))))
-(advice-add #'bookmark-jump :around #'bookmark-jump-with-display)
+(advice-add #'bookmark-jump :filter-args #'bookmark-jump-with-display)
 
 ;; Show that I'll be opening this PDF to a random page.
 (put 'pdf-view-bookmark-jump-handler:random 'bookmark-handler-type "⚅PDF")
   ;;;; END: Random Page in PDF Functionality
-
-
-
-(use-package org-bookmark-heading
-  ;; Emacs bookmark support for Org-mode.
-  ;;
-  ;; Without this package, the default bookmarking for an `org-mode'
-  ;; file is to use a regular expression (which might include things
-  ;; like TODO state).  This approach is precarious.  With this package
-  ;; we now store a bookmark to an `org-mode' file as the filename and
-  ;; the UUID.  This does not quite solve the precarity in regards to
-  ;; `denote' and it's filename convention.
-  ;;
-  ;; As indicated in the configuration, this is a drop-in no additional
-  ;; configuration package.  Super sweet!
-  :straight t)
 
 (use-package logos
   ;; A `narrow-region' extension that moves towards providing a
@@ -8761,6 +8748,10 @@ This encodes the logic for creating a project."
           "git ls-files -zco --exclude-from=.projectile.gitignore")
         (org-latex-toc-command .
           "\\begin{multicols}{2}\n\\tableofcontents\n\\end{multicols}\\newpage\\begin{multicols}{2}\\\let\\oldhref\\href\n\\renewcommand{\\href}[2]{\\oldhref{#1}{#2}\\footnote{\\url{#1}}}\n")
+        (org-latex-toc-command .
+          "\\begin{multicols}{1}\n\\tableofcontents\n\\end{multicols}\\newpage\\begin{multicols}{2}\\\let\\oldhref\\href\n\\renewcommand{\\href}[2]{\\oldhref{#1}{#2}\\footnote{\\url{#1}}}\n")
+        (org-latex-toc-command .
+          "\\begin{multicols}{2}\n\\tableofcontents\n\\end{multicols}\\newpage\\begin{multicols}{3}\\\let\\oldhref\\href\n\\renewcommand{\\href}[2]{\\oldhref{#1}{#2}\\footnote{\\url{#1}}}\n")
         )))
 
 (provide 'init)

@@ -825,6 +825,18 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            ((99 . 100) .  "{OSE > Secondary Skill} and {OSE > Secondary Skill} ")))
 
 ;;; Random Names (from Stars without Number)
+
+(random-table/register :name "Forged From the Worst > Name"
+  :exclude-from-prompt t
+  :data '(           "{English Name > Masculine Given Name} {English Name > Surname} (English)"
+           "{English Name > Feminine Given Name} {English Name > Surname} (English)"
+           "{Russian Name > Masculine Given Name} {Russian Name > Surname} (Russian)"
+           "{Russian Name > Feminine Given Name} {Russian Name > Surname} (Russian)"
+           "{Norse Given Name} {Norse Surname} (Norse)"
+           "{Norse Given Name} {Norse Surname} (Norse)"
+           "{Breggle Name > Masculine Given Name} {Breggle Name > Surname} (Breggle)"
+           "{Breggle Name > Feminine Given Name} {Breggle Name > Surname} (Breggle)"))
+
 (random-table/register :name "Name"
   :exclude-from-prompt t
   :data '("{Arabic Name > Masculine Given Name} {Arabic Name > Surname} (Arabic)"
