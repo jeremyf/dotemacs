@@ -1002,10 +1002,10 @@ entry."
                        "%c"
                        :immediate-finish t)))
             (org-capture)
-            (puthash (jf/book-label book-from-builder)
-              book-from-builder my-cache-of-books)
-            (message "Appended %s to bibliography"
-              (jf/book-label book-from-builder))))))))
+            (let ((label (jf/book-label book-from-builder)))
+              (puthash label book-from-builder my-cache-of-books)
+              (message "Appended %s to bibliography"
+                label))))))))
 
 (cl-defun jf/bibliography/update-with-book
   (isbn book-builder
