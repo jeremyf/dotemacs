@@ -464,11 +464,20 @@ Related to `jf/linux:radio-silence'."
          (interactive)
          (jf/denote/capture-reference :url (car (,grabber-fn)))))))
 
-(jf/grab-browser-links "safari")
-(jf/grab-browser-links "firefox")
-(jf/grab-browser-links "librewolf")
-(jf/grab-browser-links "mullvad")
-(jf/grab-browser-links "chrome")
+(if (eq system-type 'gnu/linux)
+  (progn
+    (when (executable-find "mullvad-browser")
+      (jf/grab-browser-links "mullvad"))
+    (when (executable-find "vivaldi")
+      (jf/grab-browser-links "vivaldi"))
+    (when (executable-find "librewolf")
+      (jf/grab-browser-links "librewolf")))
+  (progn
+    (jf/grab-browser-links "safari")
+    (jf/grab-browser-links "firefox")
+    (jf/grab-browser-links "librewolf")
+    (jf/grab-browser-links "mullvad")
+    (jf/grab-browser-links "chrome")))
 
 (use-package denote
   ;; Preamble
@@ -8680,7 +8689,10 @@ This encodes the logic for creating a project."
           :if-derived elfeed-show-mode)
         ("g c" "Chrome" jf/menu--org-capture-chrome)
         ("g f" "Firefox" jf/menu--org-capture-firefox)
+        ("g l" "Librewolf" jf/menu--org-capture-librewolf)
+        ("g m" "Mullvad" jf/menu--org-capture-mullvad)
         ("g s" "Safari" jf/menu--org-capture-safari)
+        ("g v" "Vivaldi" jf/menu--org-capture-vivaldi)
         ("g w" "Eww" jf/capture/denote/from/eww-data
           :if-derived eww-mode)
         ]
@@ -8691,6 +8703,7 @@ This encodes the logic for creating a project."
         ("b l" "Librewolf" jf/menu--bookmark-librewolf)
         ("b m" "Mullvad" jf/menu--bookmark-mullvad)
         ("b s" "Safari" jf/menu--bookmark-safari)
+        ("b v" "Vivaldi" jf/menu--bookmark-vivaldi)
         ]])
   :bind ("s-1" . #'jf/menu))
 

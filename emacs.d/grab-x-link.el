@@ -173,8 +173,12 @@ SUFFIX: The suffix to strip from the returned title.
                  "xdotool getactivewindow"))
               (app-window
                 (or
-                  (grab-x-link--shell-command-to-string
-                    (format "comm -12 <(xdotool search --name \"%s\" | sort) <(xdotool search --classname \"%s\" | sort)" ,name ,classname))
+                  ;; Vivaldi was reporting a multi-line string.  With
+                  ;; the first one being the id I want.
+                  (car
+                    (s-split "\n"
+                      (grab-x-link--shell-command-to-string
+                        (format "comm -12 <(xdotool search --name \"%s\" | sort) <(xdotool search --classname \"%s\" | sort)" ,name ,classname))))
                   (error "Can't find %s Window -- is it running?" ,name))))
          (shell-command
            (format "xdotool windowactivate --sync %s key %s" app-window ,key))
@@ -188,15 +192,6 @@ SUFFIX: The suffix to strip from the returned title.
                          ,suffix)))
            (cons url title))))))
 
-(when (executable-find "firefox")
-  (grab-x-link:register-app
-    :menu-key ?f
-    :menu-label "[f]irefox"
-    :name "Firefox"
-    :classname "Navigator"
-    :key "ctrl+l Escape ctrl+l ctrl+c Escape"
-    :suffix " - Mozilla Firefox"))
-
 (when (executable-find "librewolf")
   (grab-x-link:register-app
     :menu-key ?l
@@ -205,6 +200,15 @@ SUFFIX: The suffix to strip from the returned title.
     :classname "Navigator"
     :key "ctrl+l Escape ctrl+l ctrl+c Escape"
     :suffix " — LibreWolf"))
+
+(when (executable-find "vivaldi")
+  (grab-x-link:register-app
+    :menu-key ?v
+    :menu-label "[v]ivaldi"
+    :name "Vivaldi"
+    :classname "Vivaldi-stable"
+    :key "ctrl+l Escape ctrl+l ctrl+c Escape"
+    :suffix " - Vivaldi"))
 
 (when (executable-find "mullvad-browser")
   (grab-x-link:register-app
