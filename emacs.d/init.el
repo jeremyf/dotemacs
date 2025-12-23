@@ -6332,8 +6332,7 @@ See `jf/comment-header-regexp/major-modes-alis'."
 
 (use-package symbol-overlay
   ;; Very useful when refactoring elisp
-  :straight t
-  :hook (emacs-lisp-mode . symbol-overlay-mode))
+  :straight t)
 
 (use-package text-mode
   :straight (:type built-in)

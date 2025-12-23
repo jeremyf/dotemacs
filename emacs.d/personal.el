@@ -1395,7 +1395,11 @@ should have both a 'start' and 'stop' property.")
   (setq random-table/reporter #'random-table/reporter/as-child-window)
   (load "jf-mythic-bastionland.el")
   (when (f-file?  "~/git/mythic-bastionland.el/mythic-bastionland.el")
-    (require 'mythic-bastionland "~/git/mythic-bastionland.el/mythic-bastionland.el")))
+    (progn
+      (require 'mythic-bastionland "~/git/mythic-bastionland.el/mythic-bastionland.el")
+      (setq mythic-bastionland-map-as-html-path
+        "~/SyncThings/source/forged-from-the-worst/forged=from=the=worst--revealed-map.html")
+      (mythic-bastionland-map-read))))
 
 (defun stop-playing ()
   "Stop playing a game."
