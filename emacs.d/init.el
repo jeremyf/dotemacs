@@ -2426,9 +2426,9 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
            ("WAITING" . ,yellow-faint)))
       (custom-set-faces
         `(bm-fringe-persistent-face
-           ((,c :background ,bg-main :foreground ,fg-added)))
+           ((,c :background ,bg-added :foreground ,fg-added)))
         `(bm-persistent-face
-           ((,c :background ,bg-alt)))
+           ((,c :background ,bg-added-faint)))
         `(shr-blockquote
            ((,c :foreground ,docstring)))
         `(shr-dfn
@@ -2462,9 +2462,9 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
                          :color ,underline-err
                          :style released-button)))))
         `(go-test--standard-face
-           ((,c :foreground ,info :background ,bg-info)))
+           ((,c :foreground ,fg-prominent-note :background ,bg-prominent-note)))
         `(go-test--ok-face
-           ((,c :foreground ,info)))
+           ((,c :foreground ,fg-prominent-note)))
         `(go-test--error-face
            ((,c :foreground ,err)))
         `(jf/mode-line-format/face-shadow

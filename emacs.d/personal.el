@@ -1384,9 +1384,7 @@ See `playing-a-game-candidates' and `start-playing'.")
           ((bmk-display-func . switch-to-buffer-side-window)
             (bmk-prompt-for-random . t)
             (callback . start-playing-mythic-bastionaland)
-            (bmk-file . "~/SyncThings/source/forged-from-the-worst/forged=from=the=worst--bookmarks.el")))
-         (stop .
-           ((bookmark-display-function . nil)))))
+            (bmk-file . "~/SyncThings/source/forged-from-the-worst/forged=from=the=worst--bookmarks.el")))))
      )
   "Possible games I might be playing via Emacs.  A game you are playing
 should have both a 'start' and 'stop' property.")
