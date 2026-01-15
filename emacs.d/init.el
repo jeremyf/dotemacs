@@ -5226,10 +5226,6 @@ The misspelled word is taken from OVERLAY.  WORD is the corrected word."
   (advice-add 'jinx--correct-replace :before #'jinx--add-to-abbrev))
 
 
-(use-package crdt
-  ;; For remote code sharing/pairing
-  :straight t)
-
 (use-package treesit
   :straight (:type built-in)
   :init
@@ -5726,6 +5722,22 @@ method, get the containing class."
   (setq-default go-run-go-command "LOGGING_LEVEL=22 go")
   (setq-default go-test-go-command "LOGGING_LEVEL=22 go")
   (setq-default go-test-args (concat "-count 1 -v  --failfast -coverprofile=test.coverage")))
+
+(defun flymake-go-vet (orig-fun)
+  "A flymake backend to run `go vet` on a Go source file."
+  (when (eq major-mode 'go-mode)
+    (let* ((filename (buffer-file-name))
+           (dir (file-name-directory filename))
+           (cmd (executable-find "go")))
+      (when (and cmd filename dir)
+        ;; The command to run go vet
+        (list cmd (list "vet" "-json=true" filename))))))
+
+;; Add the custom backend function to the hook
+(add-hook 'go-ts-mode-hook
+          (lambda ()
+            (add-to-list 'flymake-diagnostic-functions
+                         #'flymake-go-vet)))
 
 (use-package dape
   :straight t)

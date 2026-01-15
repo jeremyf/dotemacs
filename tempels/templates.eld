@@ -134,7 +134,16 @@ go-ts-mode go-mode
 (thelper "func helper" p "(t *testing.T) {" n > "t.Helper()" n > q n "}")
 (tfunc "func Test" p "(t *testing.T) {" n > q n "}")
 (trun  "t.Run(\"" p "\", func(t *testing.T) {" n > q n "})")
-(ttable "test_cases := struct {" n > p n "}{" n > "{" p "}" n "}" n n "for _, test_case := range test_cases {" n > q n "}")
+(tscenario "var scenarios = []struct {" n
+  > p
+  n "}{" n
+  > "{" p "}" n
+  "}" n n
+  "for _, s := range scenarios {" n
+  > > "t.Run(fmt.Sprintf(\"scenario %d: %v\", i, v), func(t *testing.T) {" n
+  > > > q n
+	> > "})" n
+  "}")
 (options "type " (p "Options for: " optInterface) "Option interface {"
   n> "apply(*" optInterface ")" n
   "}"
