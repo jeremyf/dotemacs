@@ -428,7 +428,7 @@ Related to `jf/linux:radio-silence'."
       ns-alternate-modifier 'meta
       ns-right-alternate-modifier 'meta)))
 
-(defmacro jf/grab-browser-links (browser)
+(defmacro jf/grab-browser-links (browser predicate-alist)
   (let* ((browser (downcase browser))
           (bmk-fn
             (intern (format "jf/menu--bookmark-%s" browser)))
@@ -438,6 +438,16 @@ Related to `jf/linux:radio-silence'."
             (intern (format "jf/menu--org-capture-%s" browser)))
           (ref-doc
             (format "Create an `denote' entry from %s page." browser))
+          (predicate-fn
+            (intern (format "jf/browser-%s?" browser)))
+          (predicate-var
+            (intern (format "jf/browser-%s?" browser)))
+          (predicate-var-doc
+            (format "Non-nil when %s browser is installed." browser))
+          (predicate-fn-doc
+            (format "When %s browser is installed 1, else -1." browser))
+          (browser-finder-fn
+            (alist-get system-type predicate-alist))
           (grabber-fn
             (if (eq system-type 'darwin)
               (progn
@@ -459,25 +469,42 @@ Related to `jf/linux:radio-silence'."
                      (concat "URL: " url "\nTitle: ")
                      (cdr url-and-title))))
            (jf/bookmark-url url title)))
+       (defvar ,predicate-var nil ,predicate-var-doc)
+       (defun ,predicate-fn ()
+         ,predicate-fn-doc
+         (if ,predicate-var
+           (= predicate-var 1)
+           (if-let* ((installed ,browser-finder-fn))
+             (progn
+               (setf predicate-var 1)
+               t)
+             (progn
+               (setf predicate-var -1)
+               nil))))
        (defun ,ref-fn ()
          ,ref-doc
          (interactive)
          (jf/denote/capture-reference :url (car (,grabber-fn)))))))
 
-(if (eq system-type 'gnu/linux)
-  (progn
-    (when (executable-find "mullvad-browser")
-      (jf/grab-browser-links "mullvad"))
-    (when (executable-find "vivaldi")
-      (jf/grab-browser-links "vivaldi"))
-    (when (executable-find "librewolf")
-      (jf/grab-browser-links "librewolf")))
-  (progn
-    (jf/grab-browser-links "safari")
-    (jf/grab-browser-links "firefox")
-    (jf/grab-browser-links "librewolf")
-    (jf/grab-browser-links "mullvad")
-    (jf/grab-browser-links "chrome")))
+
+(jf/grab-browser-links "vivaldi"
+  '((gnu/linux . (find-executable "mullvad-browser"))
+     (darwin . (f-dir? "/Applications/Vivaldi.app"))))
+(jf/grab-browser-links "safari"
+  ((gnu/linux . (find-executable "safari"))
+    (darwin . (f-dir? "/Applications/Safari.app"))))
+(jf/grab-browser-links "firefox"
+  ((gnu/linux . (find-executable "firefox"))
+    (darwin . (f-dir? "/Applications/Firefox.app"))))
+(jf/grab-browser-links "librewolf"
+  ((gnu/linux . (find-executable "librewolf"))
+    (darwin . (f-dir? "/Applications/Librewolf.app"))))
+(jf/grab-browser-links "mullvad"
+  ((gnu/linux . (find-executable "mullvad-browser"))
+    (darwin . (f-dir? "/Applications/Mullvad Browser.app"))))
+(jf/grab-browser-links "chrome"
+  ((gnu/linux . (find-executable "chrome"))
+    (darwin . (f-dir? "/Applications/Google Chrome.app"))))
 
 (use-package denote
   ;; Preamble
@@ -8685,23 +8712,23 @@ This encodes the logic for creating a project."
       ["Grab Refs"
         ("g e" "Elfeed" jf/capture/denote/from/elfeed-show-entry
           :if-derived elfeed-show-mode)
-        ("g c" "Chrome" jf/menu--org-capture-chrome)
-        ("g f" "Firefox" jf/menu--org-capture-firefox)
-        ("g l" "Librewolf" jf/menu--org-capture-librewolf)
-        ("g m" "Mullvad" jf/menu--org-capture-mullvad)
-        ("g s" "Safari" jf/menu--org-capture-safari)
-        ("g v" "Vivaldi" jf/menu--org-capture-vivaldi)
+        ("g c" "Chrome" jf/menu--org-capture-chrome :if jf/browser-chrome?)
+        ("g f" "Firefox" jf/menu--org-capture-firefox :if jf/browser-firefox?)
+        ("g l" "Librewolf" jf/menu--org-capture-librewolf :if jf/browser-librewolf?)
+        ("g m" "Mullvad" jf/menu--org-capture-mullvad :if jf/browser-mullvad?)
+        ("g s" "Safari" jf/menu--org-capture-safari :if jf/browser-safari?)
+        ("g v" "Vivaldi" jf/menu--org-capture-vivaldi :if jf/browser-vivaldi?)
         ("g w" "Eww" jf/capture/denote/from/eww-data
           :if-derived eww-mode)
         ]
       ["Bookmark"
         ("b b" "Bookmarks" bookmark-bmenu-list)
-        ("b c" "Chrome" jf/menu--bookmark-chrome)
-        ("b f" "Firefox" jf/menu--bookmark-firefox)
-        ("b l" "Librewolf" jf/menu--bookmark-librewolf)
-        ("b m" "Mullvad" jf/menu--bookmark-mullvad)
-        ("b s" "Safari" jf/menu--bookmark-safari)
-        ("b v" "Vivaldi" jf/menu--bookmark-vivaldi)
+        ("b c" "Chrome" jf/menu--bookmark-chrome :if jf/browser-chrome?)
+        ("b f" "Firefox" jf/menu--bookmark-firefox :if jf/browser-firefox?)
+        ("b l" "Librewolf" jf/menu--bookmark-librewolf :if jf/browser-librewolf?)
+        ("b m" "Mullvad" jf/menu--bookmark-mullvad :if jf/browser-mullvad?)
+        ("b s" "Safari" jf/menu--bookmark-safari :if jf/browser-safari?)
+        ("b v" "Vivaldi" jf/menu--bookmark-vivaldi :if jf/browser-vivaldi?)
         ]])
   :bind ("s-1" . #'jf/menu))
 
