@@ -192,33 +192,6 @@ SUFFIX: The suffix to strip from the returned title.
                          ,suffix)))
            (cons url title))))))
 
-(when (executable-find "librewolf")
-  (grab-x-link:register-app
-    :menu-key ?l
-    :menu-label "[l]ibrewolf"
-    :name "Librewolf"
-    :classname "Navigator"
-    :key "ctrl+l Escape ctrl+l ctrl+c Escape"
-    :suffix " — LibreWolf"))
-
-(when (executable-find "vivaldi")
-  (grab-x-link:register-app
-    :menu-key ?v
-    :menu-label "[v]ivaldi"
-    :name "Vivaldi"
-    :classname "Vivaldi-stable"
-    :key "ctrl+l Escape ctrl+l ctrl+c Escape"
-    :suffix " - Vivaldi"))
-
-(when (executable-find "mullvad-browser")
-  (grab-x-link:register-app
-    :menu-key ?m
-    :menu-label "[m]ullvad"
-    :name "Mullvad"
-    :classname "Navigator"
-    :key "ctrl+l Escape ctrl+l ctrl+c Escape"
-    :suffix " - Mullvad Browser"))
-
 (bind-key "C-c g" 'grab-x-link)
 
 (provide 'grab-x-link)

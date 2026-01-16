@@ -428,82 +428,122 @@ Related to `jf/linux:radio-silence'."
       ns-alternate-modifier 'meta
       ns-right-alternate-modifier 'meta)))
 
-(defmacro jf/grab-browser-links (browser predicate-alist)
-  (let* ((browser (downcase browser))
-          (bmk-fn
-            (intern (format "jf/menu--bookmark-%s" browser)))
-          (bmk-doc
-            (format "Create `bookmark' for current %s page." browser))
-          (ref-fn
-            (intern (format "jf/menu--org-capture-%s" browser)))
-          (ref-doc
-            (format "Create an `denote' entry from %s page." browser))
-          (predicate-fn
-            (intern (format "jf/browser-%s?" browser)))
-          (predicate-var
-            (intern (format "jf/browser-%s-p" browser)))
-          (predicate-var-doc
-            (format "Non-nil when %s browser is installed." browser))
-          (predicate-fn-doc
-            (format "When %s browser is installed 1, else -1." browser))
-          (browser-finder-fn
-            (alist-get system-type predicate-alist))
-          (grabber-fn
-            (if (eq system-type 'darwin)
-              (progn
-                (require 'grab-mac-link)
-                (intern (format "grab-mac-link-%s-1" browser)))
-              (progn
-                (require 'grab-x-link)
-                (intern (format "grab-x-link-%s" browser))))))
-    `(progn
-       (defun ,bmk-fn ()
-         ,bmk-doc
-         (interactive)
-         (let* ((url-and-title
-                  (,grabber-fn))
-                 (url
-                   (car url-and-title))
-                 (title
-                   (read-string
-                     (concat "URL: " url "\nTitle: ")
-                     (cdr url-and-title))))
-           (jf/bookmark-url url title)))
-       (defvar ,predicate-var nil ,predicate-var-doc)
-       (defun ,predicate-fn ()
-         ,predicate-fn-doc
-         (if ,predicate-var
-           (= ,predicate-var 1)
-           (if-let* ((installed ,browser-finder-fn))
-             (progn
-               (setf ,predicate-var 1)
-               t)
-             (progn
-               (setf ,predicate-var -1)
-               nil))))
-       (defun ,ref-fn ()
-         ,ref-doc
-         (interactive)
-         (jf/denote/capture-reference :url (car (,grabber-fn)))))))
+(defmacro jf/grab-browser-links (browser config)
+  "For the given BROWSER and CONFIG define helper commands.
+
+Interacting with the current tab/page of the BROWSER we can:
+- grab the URL and page title as a link
+- bookmark the URL with page title for description
+- download a copy of the contents for the URL."
+  (when-let* ((os-config (alist-get system-type config)))
+    (when-let ((grabber (plist-get os-config :grabber)))
+      ;; As the grabber is a macro, we need to `eval' it instead of
+      ;; `apply'.
+      (eval grabber))
+    (let* ((browser (downcase browser))
+            (bmk-fn
+              (intern (format "jf/menu--bookmark-%s" browser)))
+            (bmk-doc
+              (format "Create `bookmark' for current %s page." browser))
+            (ref-fn
+              (intern (format "jf/menu--org-capture-%s" browser)))
+            (ref-doc
+              (format "Create an `denote' entry from %s page." browser))
+            (predicate-fn
+              (intern (format "jf/browser-%s?" browser)))
+            (predicate-var
+              (intern (format "jf/browser-%s-p" browser)))
+            (predicate-var-doc
+              (format "Non-nil when %s browser is installed." browser))
+            (predicate-fn-doc
+              (format "When %s browser is installed 1, else -1." browser))
+            (browser-finder-fn
+              (plist-get os-config :when))
+            (grabber-fn
+              (if (eq system-type 'darwin)
+                (progn
+                  (require 'grab-mac-link)
+                  (intern (format "grab-mac-link-%s-1" browser)))
+                (progn
+                  (require 'grab-x-link)
+                  (intern (format "grab-x-link-%s" browser))))))
+      `(progn
+         (defun ,bmk-fn ()
+           ,bmk-doc
+           (interactive)
+           (let* ((url-and-title
+                    (,grabber-fn))
+                   (url
+                     (car url-and-title))
+                   (title
+                     (read-string
+                       (concat "URL: " url "\nTitle: ")
+                       (cdr url-and-title))))
+             (jf/bookmark-url url title)))
+         (defvar ,predicate-var nil ,predicate-var-doc)
+         (defun ,predicate-fn ()
+           ,predicate-fn-doc
+           (if ,predicate-var
+             (= ,predicate-var 1)
+             (if-let* ((installed ,browser-finder-fn))
+               (progn
+                 (setf ,predicate-var 1)
+                 t)
+               (progn
+                 (setf ,predicate-var -1)
+                 nil))))
+         (defun ,ref-fn ()
+           ,ref-doc
+           (interactive)
+           (jf/denote/capture-reference :url (car (,grabber-fn))))))))
 
 (jf/grab-browser-links "vivaldi"
-  ((gnu/linux . (executable-find "vivaldi"))
-     (darwin . (f-dir? "/Applications/Vivaldi.app"))))
+  ((gnu/linux .
+     (:when (executable-find "vivaldi")
+       :grabber (grab-x-link:register-app
+                  :menu-key ?v
+                  :menu-label "[v]ivaldi"
+                  :name "Vivaldi"
+                  :classname "Vivaldi-stable"
+                  :key "ctrl+l Escape ctrl+l ctrl+c Escape"
+                  :suffix " - Vivaldi")))
+     (darwin . (:when (f-dir? "/Applications/Vivaldi.app")))))
 (jf/grab-browser-links "safari"
-  ((gnu/linux . (executable-find "safari"))
-    (darwin . (f-dir? "/Applications/Safari.app"))))
+  ((gnu/linux . (:when (executable-find "safari")))
+    (darwin . (:when (f-dir? "/Applications/Safari.app")))))
 (jf/grab-browser-links "firefox"
-  ((gnu/linux . (executable-find "firefox"))
-    (darwin . (f-dir? "/Applications/Firefox.app"))))
+  ((gnu/linux . (:when (executable-find "firefox")
+                  :grabber (grab-x-link:register-app
+                             :menu-key ?f
+                             :menu-label "[f]irefox"
+                             :name "Firefox"
+                             :classname "Navigator"
+                             :key "ctrl+l Escape ctrl+l ctrl+c Escape"
+                             :suffix " - Firefox")))
+    (darwin . (:when (f-dir? "/Applications/Firefox.app")))))
 (jf/grab-browser-links "librewolf"
-  ((gnu/linux . (executable-find "librewolf"))
+  ((gnu/linux . (:when (executable-find "librewolf")
+                  :grabber (grab-x-link:register-app
+                             :menu-key ?l
+                             :menu-label "[l]ibrewolf"
+                             :name "Librewolf"
+                             :classname "Navigator"
+                             :key "ctrl+l Escape ctrl+l ctrl+c Escape"
+                             :suffix " — LibreWolf")))
     (darwin . (f-dir? "/Applications/Librewolf.app"))))
 (jf/grab-browser-links "mullvad"
-  ((gnu/linux . (executable-find "mullvad-browser"))
-    (darwin . (f-dir? "/Applications/Mullvad Browser.app"))))
+  ((gnu/linux . (:when (executable-find "mullvad-browser")
+                  :grabber (grab-x-link:register-app
+                             :menu-key ?m
+                             :menu-label "[m]ullvad"
+                             :name "Mullvad"
+                             :classname "Navigator"
+                             :key "ctrl+l Escape ctrl+l ctrl+c Escape"
+                             :suffix " - Mullvad Browser")))
+    (darwin . (:when (f-dir? "/Applications/Mullvad Browser.app")))))
 (jf/grab-browser-links "chrome"
-  ((gnu/linux . (executable-find "chrome"))
-    (darwin . (f-dir? "/Applications/Google Chrome.app"))))
+  ((gnu/linux . (:when (executable-find "chrome")))
+    (darwin . (:when (f-dir? "/Applications/Google Chrome.app")))))
 
 (use-package denote
   ;; Preamble
