@@ -441,7 +441,7 @@ Related to `jf/linux:radio-silence'."
           (predicate-fn
             (intern (format "jf/browser-%s?" browser)))
           (predicate-var
-            (intern (format "jf/browser-%s?" browser)))
+            (intern (format "jf/browser-%s-p" browser)))
           (predicate-var-doc
             (format "Non-nil when %s browser is installed." browser))
           (predicate-fn-doc
@@ -473,37 +473,36 @@ Related to `jf/linux:radio-silence'."
        (defun ,predicate-fn ()
          ,predicate-fn-doc
          (if ,predicate-var
-           (= predicate-var 1)
+           (= ,predicate-var 1)
            (if-let* ((installed ,browser-finder-fn))
              (progn
-               (setf predicate-var 1)
+               (setf ,predicate-var 1)
                t)
              (progn
-               (setf predicate-var -1)
+               (setf ,predicate-var -1)
                nil))))
        (defun ,ref-fn ()
          ,ref-doc
          (interactive)
          (jf/denote/capture-reference :url (car (,grabber-fn)))))))
 
-
 (jf/grab-browser-links "vivaldi"
-  '((gnu/linux . (find-executable "mullvad-browser"))
+  ((gnu/linux . (executable-find "vivaldi"))
      (darwin . (f-dir? "/Applications/Vivaldi.app"))))
 (jf/grab-browser-links "safari"
-  ((gnu/linux . (find-executable "safari"))
+  ((gnu/linux . (executable-find "safari"))
     (darwin . (f-dir? "/Applications/Safari.app"))))
 (jf/grab-browser-links "firefox"
-  ((gnu/linux . (find-executable "firefox"))
+  ((gnu/linux . (executable-find "firefox"))
     (darwin . (f-dir? "/Applications/Firefox.app"))))
 (jf/grab-browser-links "librewolf"
-  ((gnu/linux . (find-executable "librewolf"))
+  ((gnu/linux . (executable-find "librewolf"))
     (darwin . (f-dir? "/Applications/Librewolf.app"))))
 (jf/grab-browser-links "mullvad"
-  ((gnu/linux . (find-executable "mullvad-browser"))
+  ((gnu/linux . (executable-find "mullvad-browser"))
     (darwin . (f-dir? "/Applications/Mullvad Browser.app"))))
 (jf/grab-browser-links "chrome"
-  ((gnu/linux . (find-executable "chrome"))
+  ((gnu/linux . (executable-find "chrome"))
     (darwin . (f-dir? "/Applications/Google Chrome.app"))))
 
 (use-package denote
