@@ -299,7 +299,7 @@ Useful for narrowing regions.")
 ;; what we pick-up.
 (defvar jf/personal/filename-for-journal
   ;; TODO: make this dynamic by year, and establish a convention.
-  (denote-get-path-by-id "20241114T075414")
+  (denote-get-path-by-id "20260101T093750")
   "Where I put my journal.")
 
 (defvar jf/personal/filename-for-library
@@ -1001,7 +1001,7 @@ entry."
                        (file+headline ,file ,headline)
                        "%c"
                        :immediate-finish t)))
-            (org-capture)
+            (org-capture nil "B")
             (let ((label (jf/book-label book-from-builder)))
               (puthash label book-from-builder my-cache-of-books)
               (message "Appended %s to bibliography"
@@ -1402,7 +1402,7 @@ should have both a 'start' and 'stop' property.")
 (defun stop-playing ()
   "Stop playing a game."
   (interactive)
-  (start-playing '("Nothing" . nil)))
+  (start-playing `("Nothing" . nil)))
 
 (defun start-playing (game)
   "Start playing the GAME; stopping any currently played game.
@@ -1422,7 +1422,7 @@ When a property is not provided, \"suitable\" defaults are assigned."
               (completing-read "Start Playing: "
                 playing-a-game-candidates nil t)))
         (alist-get handle playing-a-game-candidates nil nil #'string=))))
-  ;; Stop playing what we were playing...if anything
+  ;; Stop playing what we were playing...unwinding that.
   ;; Then start playing what we are playing...if anything
   (dolist (config (list playing-a-game (alist-get 'start game)))
     (when config
@@ -1439,8 +1439,12 @@ When a property is not provided, \"suitable\" defaults are assigned."
         (bookmark-load file t nil t)
         (when-let ((fn (alist-get 'callback config)))
           (funcall fn)))))
-  ;; Last register how to stop playing.
-  (setq playing-a-game (alist-get 'stop game)))
+  ;; Last register how to stop playing.  NOTE: We need a non-nil value
+  ;; for playing-a-game, so we can have a proper modeline indicator.
+  (setq playing-a-game
+    (or
+      (alist-get 'stop game)
+      `((bmk-file . ,fallback-bookmark-file)))))
 
 
 (use-package consult-mu
@@ -1467,5 +1471,10 @@ When a property is not provided, \"suitable\" defaults are assigned."
 
 (when (f-file?  "~/git/denote-bookmark.el/denote-bookmark.el")
   (require 'denote-bookmark "~/git/denote-bookmark.el/denote-bookmark.el"))
-
+(require 'org-crypt)
+(org-crypt-use-before-save-magic)
+(setq org-tags-exclude-from-inheritance (quote ("crypt")))
+;; GPG key to use for encryption
+;; Either the Key ID or set to nil to use symmetric encryption.
+(setq org-crypt-key nil)
 (require 'ox-takeonrules)

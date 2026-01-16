@@ -2414,7 +2414,9 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   (defvar jf/themes-plist '()
     "The named themes by pallette.")
   :config
-  (setq modus-themes-headings ; read the manual's entry or the doc string
+  (setopt modus-themes-common-palette-overrides
+    '((fg-heading-1 cyan-faint)))
+  (setopt modus-themes-headings ; read the manual's entry or the doc string
     '((0 . (bold 1.4))
        (1 . (variable-pitch bold 1.7))
        (2 . (overline semibold 1.5))
@@ -2434,23 +2436,23 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
         `(
            ;; The first five are from Github:
            ;; https://github.com/orgs/community/discussions/16925
-           ("NOTE" . ,blue-faint)
-           ("TIP" . ,green-faint)
-           ("IMPORTANT" . ,magenta-faint)
-           ("SEE" . ,magenta-faint)
-           ("WARNING" . ,yellow-faint)
-           ("CAUTION" . ,red-faint)
+           ("NOTE" . ,blue-intense)
+           ("TIP" . ,green-intense)
+           ("IMPORTANT" . ,magenta-intense)
+           ("SEE" . ,magenta-intense)
+           ("WARNING" . ,yellow-intense)
+           ("CAUTION" . ,red-intense)
            ;; Other keywords that I'm using
-           ("HACK" . ,blue-faint)
-           ("TODO" . ,red-faint)
-           ("DRAFT" . ,red-faint)
-           ("FIXME" . ,red-faint)
-           ("DONE" . ,green-faint)
-           ("PUBLISHED" . ,green-faint)
-           ("ASSUMPTION" . ,yellow-faint)
-           ("QUESTION" . ,yellow-faint)
-           ("BLOCKED" . ,yellow-faint)
-           ("WAITING" . ,yellow-faint)))
+           ("HACK" . ,blue-intense)
+           ("TODO" . ,red-intense)
+           ("DRAFT" . ,red-intense)
+           ("FIXME" . ,red-intense)
+           ("DONE" . ,green-intense)
+           ("PUBLISHED" . ,green-intense)
+           ("ASSUMPTION" . ,yellow-intense)
+           ("QUESTION" . ,yellow-intense)
+           ("BLOCKED" . ,yellow-intense)
+           ("WAITING" . ,yellow-intense)))
       (custom-set-faces
         `(bm-fringe-persistent-face
            ((,c :background ,bg-added :foreground ,fg-added)))
@@ -2524,6 +2526,9 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
         `(org-block
            ;; ((,c :background ,bg-yellow-subtle)))
            ((,c :background ,bg-added-faint)))
+        `(org-verse
+           ;; ((,c :background ,bg-yellow-subtle)))
+           ((,c :background ,bg-added-faint)))
         `(org-block-begin-line
            ((,c :background ,bg-added-refine)))
         `(org-block-end-line
@@ -2539,68 +2544,14 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   ;; I had '(:light ef-cyprus) but the differentiation between function
   ;; and comment was not adequate
   ;; (setq jf/themes-plist '(:dark ef-bio :light ef-elea-light))
-  (setq jf/themes-plist '(:dark ef-owl :light ef-elea-light))
+  (setq jf/themes-plist '(:dark
+                           modus-vivendi-deuteranopia
+                           ;; ef-owl
+                           :light
+                           ef-elea-light))y
   :init
   (modus-themes-include-derivatives-mode 1))
 
-(use-package bm
-  :straight t
-  :init
-  ;; restore on load (even before you require bm)
-  (setq bm-restore-repository-on-load t)
-  :config
-  (setopt bm-in-lifo-order t)
-  (setopt bm-highlight-style 'bm-highlight-line-and-fringe)
-  (setopt bm-marker 'bm-marker-left)
-  ;; Allow cross-buffer 'next'
-  (setopt bm-cycle-all-buffers t)
-  (setopt bm-annotation-width 32)
-
-  ;; where to store persistant files
-  (setopt bm-repository-file "~/.emacs.d/bm-repository")
-
-  ;; save bookmarks
-  (setopt bm-buffer-persistence t)
-
-  ;; Loading the repository from file when on start up.
-  (add-hook 'after-init-hook 'bm-repository-load)
-
-  ;; Saving bookmarks
-  (add-hook 'kill-buffer-hook #'bm-buffer-save)
-
-  (add-hook 'bm-after-goto-hook 'org-bookmark-jump-unhide)
-
-  ;; Saving the repository to file when on exit.
-  ;; kill-buffer-hook is not called when Emacs is killed, so we
-  ;; must save all bookmarks first.
-  (add-hook 'kill-emacs-hook #'(lambda nil
-                                 (bm-buffer-save-all)
-                                 (bm-repository-save)))
-
-  ;; The `after-save-hook' is not necessary to use to achieve persistence,
-  ;; but it makes the bookmark data in repository more in sync with the file
-  ;; state.
-  (add-hook 'after-save-hook #'bm-buffer-save)
-
-  ;; Restoring bookmarks
-  (add-hook 'find-file-hooks   #'bm-buffer-restore)
-  (add-hook 'after-revert-hook #'bm-buffer-restore)
-
-  ;; The `after-revert-hook' is not necessary to use to achieve persistence,
-  ;; but it makes the bookmark data in repository more in sync with the file
-  ;; state. This hook might cause trouble when using packages
-  ;; that automatically reverts the buffer (like vc after a check-in).
-  ;; This can easily be avoided if the package provides a hook that is
-  ;; called before the buffer is reverted (like `vc-before-checkin-hook').
-  ;; Then new bookmarks can be saved before the buffer is reverted.
-  ;; Make sure bookmarks is saved before check-in (and revert-buffer)
-  (add-hook 'vc-before-checkin-hook #'bm-buffer-save)
-  :bind (("H-b H-n" . bm-common-next)
-          ("H-b H-p" . bm-common-previous)
-          ("H-b H-a" . bm-bookmark-annotate)
-          ("H-b H-s" . bm-show-all)
-          ("H-b H-t" . bm-toggle)
-          ("H-b H-b" . bm-toggle)))
 (use-package custom
   :straight (:type built-in)
   :config
@@ -4324,6 +4275,7 @@ sort accordingly.")
   (column-number-mode t)
   (global-display-fill-column-indicator-mode t)
   (delete-selection-mode t)
+  (auto-save-no-message t)
   (auto-save-file-name-transforms
     '((".*" "~/.emacs.d/autosaves/\\1" t)))
   (sentence-end-double-space t)
@@ -8781,6 +8733,7 @@ This encodes the logic for creating a project."
      '((projectile-git-fd-args .
          "-H -0 -tf --strip-cwd-prefix -c never -E vendor/ -E pkg/ -E docs/ -E .git")
         (jf/org-latex-src-block-skip . t)
+        (auto-save-default . nil)
         (elixir-test-command . "mix testall")
         (projectile-git-command .
           "git ls-files -zco --exclude-from=.projectile.gitignore")
