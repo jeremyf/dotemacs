@@ -7210,6 +7210,35 @@ It will display entries without switching to them."
        (elfeed-search-show-entry-pre))))
 ;; End https://karthinks.com/blog/lazy-elfeed/
 
+;; https://punchagan.muse-amuse.in/blog/elfeed-db-back-up-hooks/
+(defvar jf/elfeed-db-save-timer nil
+  "Timer for debounced elfeed database saves.")
+
+(defun jf/elfeed-db-save-and-backup ()
+  "Save the elfeed database and commit to git."
+  (when (and (boundp 'elfeed-db) elfeed-db)
+    (elfeed-db-save)
+    (let ((default-directory elfeed-db-directory))
+      (when (file-exists-p ".git")
+        (call-process "git" nil "*elfeed-db-backup*" nil "add" "-A")
+        (call-process "git" nil "*elfeed-db-backup*" nil "commit" "-m" "auto-backup")
+        (call-process "git" nil "*elfeed-db-backup*" nil "push" "origin" "main")))))
+
+(defun jf/elfeed-db-save-soon ()
+  "Schedule a database save after 10 seconds of idle."
+  (interactive)
+  (when jf/elfeed-db-save-timer
+    (cancel-timer jf/elfeed-db-save-timer))
+  (setq jf/elfeed-db-save-timer
+        (run-with-idle-timer 10 nil #'jf/elfeed-db-save-and-backup)))
+
+;; Save and backup when tags change (elfeed-web usage)
+(add-hook 'elfeed-tag-hooks   (lambda (&rest _) (jf/elfeed-db-save-soon)))
+(add-hook 'elfeed-untag-hooks (lambda (&rest _) (jf/elfeed-db-save-soon)))
+
+;; Save and backup when new entries are added
+(add-hook 'elfeed-db-update-hook #'jf/elfeed-db-save-soon)
+
 (use-package elfeed-org
   ;; Maintaining my RSS subscriptions in `org-mode' format.
   :straight t
