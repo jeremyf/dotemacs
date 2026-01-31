@@ -7462,14 +7462,66 @@ A page is marked `last' if rel=\"last\" appears in a <link> or <a> tag."
   :straight t
   :custom (stem-reading-overlay t))
 
-(use-package amread-mode
-  ;; A speadreading package.
-  :straight t
-  :custom
-  (amread-word-speed 9.5)
-  (amread-scroll-style 'word)
-  (amread-voice-reader-language 'english)
-  :commands (amread-mode))
+;; From
+;; https://www.emacs.dyerdwelling.family/emacs/20260116182841-emacs--speed-reading-in-emacs-building-an-rsvp-reader/
+(defun speedread-in-minibuffer ()
+  "Display words from point (or mark to point) in minibuffer using RSVP.
+Use f/s for speed, [/] for size, b/n to skip, SPC to pause, q to quit."
+  (interactive)
+  (let* ((start (if (region-active-p) (region-beginning) (point)))
+          (end (if (region-active-p) (region-end) (point-max)))
+          (text (buffer-substring-no-properties start end))
+          (wpm 350) (font-size 500) (orp-column 20)
+          (word-positions '()) (pos 0) (i 0)
+          (message-log-max nil)) ; Disable message logging
+    ;; Build word positions list
+    (dolist (word (split-string text))
+      (unless (string-blank-p word)
+        (when-let ((word-start
+                     (string-match (regexp-quote word) text pos)))
+          (push (cons word (+ start word-start)) word-positions)
+          (setq pos (+ word-start (length word))))))
+    (setq word-positions (nreverse word-positions))
+    ;; Display loop
+    (while (< i (length word-positions))
+      (let* ((word (car (nth i word-positions)))
+              (word-pos (cdr (nth i word-positions)))
+              (word-len (length word))
+              (delay (* (/ 60.0 wpm)
+                       (cond
+                         ((< word-len 3) 0.8)
+                         ((> word-len 8) 1.3)
+                         (t 1.0))
+                       (if (string-match-p "[.!?;:]$" word) 1.5 1.0)))
+              (orp-pos (/ word-len 3))
+              (face-mono
+                `(:height ,font-size :family "monospace"))
+              (face-orp
+                `(:foreground "red" :weight normal ,@face-mono))
+              (padded-word
+                (concat
+                  (propertize
+                    (make-string (max 0 (- orp-column orp-pos)) ?\s)
+                    'face face-mono)
+                  (propertize (substring word 0 orp-pos)
+                    'face face-mono)
+                  (propertize (substring word orp-pos (1+ orp-pos))
+                    'face face-orp)
+                  (propertize (substring word (1+ orp-pos))
+                    'face face-mono))))
+        (goto-char (+ word-pos word-len))
+        (message "%s" padded-word)
+        (pcase (read-event nil nil delay)
+          (?f (setq wpm (min 1000 (+ wpm 50))))
+          (?s (setq wpm (max 50 (- wpm 50))))
+          (?\[ (setq font-size (max 100 (- font-size 20))))
+          (?\] (setq font-size (min 500 (+ font-size 20))))
+          (?b (setq i (max 0 (- i 10))))
+          (?n (setq i (min (1- (length word-positions)) (+ i 10))))
+          (?\s (read-event
+                 (format "%s [PAUSED - WPM: %d]" padded-word wpm)))
+          (?q (setq i (length word-positions)))
+          (_ (setq i (1+ i))))))))
 
 (use-package git-modes
   ;; A mode for editing gitconfig files.
