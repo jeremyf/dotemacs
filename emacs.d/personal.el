@@ -751,6 +751,9 @@ operates on the book.  There would need to be an inversion of behavior."
                 (let ((json-object-type 'plist))
                   (json-read)))
       :sync t
+      :error (cl-function
+                 (lambda (&rest args)
+                   (error "Error looking up book: %S" args)))
       :success (cl-function
                  (lambda (&key data &allow-other-keys)
                    (let* ((item
@@ -774,7 +777,7 @@ operates on the book.  There would need to be an inversion of behavior."
                            :subtitle subtitle
                            :author author
                            :title title)))))))
-    book))
+    (or book (error "Unable to assemble book"))))
 
 ;;; Entry points
 (defun jf/checkout-library-book-by-isbn (isbn)
