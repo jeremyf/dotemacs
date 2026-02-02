@@ -139,8 +139,8 @@ go-ts-mode go-mode
   n "}{" n
   > "{" p "}" n
   "}" n n
-  "for _, s := range scenarios {" n
-  > > "t.Run(fmt.Sprintf(\"scenario %d: %v\", i, v), func(t *testing.T) {" n
+  "for i, s := range scenarios {" n
+  > > "t.Run(fmt.Sprintf(\"scenario %d: %v\", i, s), func(t *testing.T) {" n
   > > > q n
 	> > "})" n
   "}")
