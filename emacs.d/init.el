@@ -2584,10 +2584,11 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   ;; and comment was not adequate
   ;; (setq jf/themes-plist '(:dark ef-bio :light ef-elea-light))
   (setq jf/themes-plist '(:dark
-                           modus-vivendi-deuteranopia
+                           ef-themes-fig
+                           ;; modus-vivendi-deuteranopia
                            ;; ef-owl
                            :light
-                           ef-elea-light))y
+                           ef-elea-light))
   :init
   (modus-themes-include-derivatives-mode 1))
 
@@ -8410,6 +8411,15 @@ If `consult--read' is defined, use that.  Otherwise fallback to
   (setq pdf-annot-activate-created-annotations t)
   ;; use normal isearch
   (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward))
+
+;; For improving the readability of images later to be OCR-ed.
+(use-package unpaper
+  :straight (unpaper :host github :repo "unpaper/unpaper"))
+;; For scanning text from images and PDFs.  Probably will need to
+;; install tesseract.
+(use-package scanner
+  :straight (scanner :host github :repo "emacsmirror/scanner")
+  :custom (scanner-use-unpaper t))
 
 (use-package org-noter
   :straight t
