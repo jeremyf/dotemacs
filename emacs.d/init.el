@@ -2584,7 +2584,7 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   ;; and comment was not adequate
   ;; (setq jf/themes-plist '(:dark ef-bio :light ef-elea-light))
   (setq jf/themes-plist '(:dark
-                           ef-themes-fig
+                           ef-fig
                            ;; modus-vivendi-deuteranopia
                            ;; ef-owl
                            :light
