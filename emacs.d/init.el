@@ -4307,7 +4307,7 @@ sort accordingly.")
               ((f-file? "~/SyncThings/source/emacs.d/abbrev_defs")
                 (file-truename "~/SyncThings/source/emacs.d/abbrev_defs"))
               (t (user-error "Unable to find suitable abbrev_defs"))))
-  :hook (text-mode . abbrev-mode))
+  :hook ((prog-mode text-mode) . abbrev-mode))
 
 (use-package emacs
   :bind (("C-M-i" . completion-at-point)
