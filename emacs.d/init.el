@@ -4302,12 +4302,13 @@ sort accordingly.")
   :straight (:type built-in)
   :custom (abbrev-file-name
             (cond
-              ((f-file? "~/.emacs.d/abbrev_defs")
-                (file-truename  "~/.emacs.d/abbrev_defs"))
               ((f-file? "~/SyncThings/source/emacs.d/abbrev_defs")
                 (file-truename "~/SyncThings/source/emacs.d/abbrev_defs"))
+              ((f-file? "~/.emacs.d/abbrev_defs")
+                (file-truename  "~/.emacs.d/abbrev_defs"))
               (t (user-error "Unable to find suitable abbrev_defs"))))
-  :hook ((prog-mode text-mode) . abbrev-mode))
+  :hook (prog-mode . abbrev-mode)
+  (text-mode . abbrev-mode))
 
 (use-package emacs
   :bind (("C-M-i" . completion-at-point)
