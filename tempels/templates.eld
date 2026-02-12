@@ -129,7 +129,7 @@ text-mode
 
 go-ts-mode go-mode
 (regex "rx := regexp.MustCompile(`" p "`)")
-(db "runtime.Breakpoint()" n)
+(rdb "runtime.Breakpoint()" n)
 (tnew  "package " p "_test" n n "import(" n "  \"testing\"" n "  \"github.com/stretchr/testify/assert\"" n ")" n n "func Test" p "(t *testing.T) {" n q n "  assert.Nil(t, nil)" n "}")
 (thelper "func helper" p "(t *testing.T) {" n > "t.Helper()" n > q n "}")
 (tfunc "func Test" p "(t *testing.T) {" n > q n "}")
@@ -197,3 +197,9 @@ enh-ruby-mode ruby-mode rspec-mode ruby-ts-mode
       "attr_reader " (s-join ", " symbols) "\n")))
 
 (it_is "it { is_expected.to " q " }")
+
+git-commit-ts-mode
+(rmc "Closes: https://github.com/converge-cloud/morpho-roadmap/issues/" (s number) n)
+(rmr "[Roadmap #" (s number) "][" number "]" n
+  n
+  "[" number "]: https://github.com/converge-cloud/morpho-roadmap/issues/" number n)
