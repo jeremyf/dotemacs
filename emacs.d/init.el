@@ -1794,7 +1794,7 @@ active nature."
        (when (and which-function-mode (mode-line-window-selected-p))
          (when-let* ((func (which-function)))
            (propertize
-             (concat " ⨍ := " func)
+             (concat "𝆑:" func)
              'face
              'mode-line-emphasis
              'local-map
@@ -3339,6 +3339,7 @@ Each member's `car' is title and `cdr' is `org-mode' element."
     (add-hook 'focus-out-hook
       #'org-save-all-org-buffers nil :local)
     (jf/org-capf)
+    (org-lint-remove-checker 'invalid-fuzzy-link)
     (turn-on-visual-line-mode)
     (electric-pair-mode -1)
     ;; https://baty.net/posts/2025/05/set-point-at-first-heading-when-opening-org-mode-file/
