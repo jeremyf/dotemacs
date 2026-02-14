@@ -3258,3 +3258,61 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "Pungent aged cheese" "Barley porridge" "Thick river-fish steak"
            "Baked apple" "Fried, crumbed insect legs" "Fresh buttered bread"
            "Scavenged candy" "Honey-roasted seeds" "Mushroom stew"))
+
+(random-table/register :name "Reaction Roll > Overloaded"
+  :roller (lambda (table)
+            (list :love (random 12) :hate (random 12)))
+  :filter (lambda (&rest dice)
+            (message "%S" dice))
+  ;; '(("Meh" "Meh" "Notice" "Dislike" "Dislike" "Dislike"
+  ;;     "Clear Hostility" "Clear Hostility" "Clear Hostility"
+  ;;     "Planning Attack" "Attack" "Attack")
+  ;;    ("Meh" "Meh" "Notice" "Dislike" "Dislike" "Dislike"
+  ;;      "Clear Hostility" "Clear Hostility" "Clear Hostility"
+  ;;      "Planning Attack" "Attack" "Attack")
+  ;;    ("Notice" "Notice""Notice"
+  ;;      "Dislike" "Dislike" "Dislike"
+  ;;      "Clear Hostility" "Clear Hostility" "Clear Hostility"
+  ;;      "Planning Attack" "Planning Attack" "Planning Attack")
+  ;;    ("Curious Interest" "Curious Interest" "Curious Interest"
+  ;;      "Guarded Caution" "Guarded Caution" "Guarded Caution"
+  ;;      "Distruct" "Distruct" "Distruct"
+  ;;      "Mistrusting Hostility" "Mistrusting Hostility" "Mistrusting Hostility")
+  ;;    ("Curious Interest" "Curious Interest" "Curious Interest"
+  ;;      "Guarded Caution" "Guarded Caution" "Guarded Caution"
+  ;;      "Distruct" "Distruct" "Distruct"
+  ;;      "Mistrusting Hostility" "Mistrusting Hostility" "Mistrusting Hostility")
+  ;;    ("Curious Interest" "Curious Interest" "Curious Interest"
+  ;;      "Guarded Caution" "Guarded Caution" "Guarded Caution"
+  ;;      "Distruct" "Distruct" "Distruct"
+  ;;      "Mistrusting Hostility" "Mistrusting Hostility" "Mistrusting Hostility")
+  ;;    ("Open interest" "Open interest" "Open interest"
+  ;;      "Guarded Interest" "Guarded Interest" "Guarded Interest"
+  ;;      "Confused Uncertain" "Confused Uncertain" "Confused Uncertain"
+  ;;      "Unfriendly fearfulness" "Unfriendly fearfulness" "Unfriendly fearfulness")
+  ;;    ("Open interest" "Open interest" "Open interest"
+  ;;      "Guarded Interest" "Guarded Interest" "Guarded Interest"
+  ;;      "Confused Uncertain" "Confused Uncertain" "Confused Uncertain"
+  ;;      "Unfriendly fearfulness" "Unfriendly fearfulness" "Unfriendly fearfulness")
+  ;;    ("Open interest" "Open interest" "Open interest"
+  ;;      "Guarded Interest" "Guarded Interest" "Guarded Interest"
+  ;;      "Confused Uncertain" "Confused Uncertain" "Confused Uncertain"
+  ;;      "Unfriendly fearfulness" "Unfriendly fearfulness" "Unfriendly fearfulness")
+  ;;    ("Trust" "Trust" "Trust"
+  ;;      "Respectful Interest" "Respectful Interest" "Respectful Interest"
+  ;;      "Fearful Respect" "Fearful Respect" "Fearful Respect"
+  ;;      "Fear (Flee?)" "Fear (Flee?)" "Fear (Flee?)")
+  ;;    ("Friend" "Friend" "Trust"
+  ;;      "Respectful Interest" "Respectful Interest" "Respectful Interest"
+  ;;      "Fearful Respect" "Fearful Respect" "Fearful Respect"
+  ;;      "Fear (Flee?)" "Flee/Erratic" "Flee/Erratic")
+  ;;    ("Friend" "Friend" "Trust"
+  ;;      "Respectful Interest" "Respectful Interest" "Respectful Interest"
+  ;;      "Fearful Respect" "Fearful Respect" "Fearful Respect"
+  ;;      "Fear (Flee?)" "Flee/Erratic" "Flee/Erratic"))
+  :fetcher (lambda (data &rest result)
+             (message "🐂 data: %S; result: %S" data result))
+  :data '(("Physique" . "Violent")
+           ("Skill" . "Deviant")
+           ("Mind" . "Occult")
+           ("Presence" . "Zealot")))
