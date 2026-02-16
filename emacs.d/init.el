@@ -412,10 +412,10 @@ Related to `jf/linux:radio-silence'."
 
     See `ns-alternate-modifier'."
       (interactive)
-      (if (eq ns-right-alternate-modifier 'hyper)
+      (if (eq ns-right-alternate-modifier 'meta)
         (progn (setopt ns-right-alternate-modifier nil)
           (message "Enabling OS X native Option modifier"))
-        (progn (setopt ns-right-alternate-modifier 'hyper)
+        (progn (setopt ns-right-alternate-modifier 'meta)
           (message "Disabling OX X native Option modifier")))
       (force-mode-line-update))
 
@@ -5250,7 +5250,6 @@ The misspelled word is taken from OVERLAY.  WORD is the corrected word."
       (message "Abbrev: %s -> %s" abbrev word)
       (define-abbrev global-abbrev-table abbrev word)))
   (advice-add 'jinx--correct-replace :before #'jinx--add-to-abbrev))
-
 
 (use-package treesit
   :straight (:type built-in)

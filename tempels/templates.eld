@@ -37,7 +37,7 @@ emacs-lisp-mode
 (command "(defun " p " (" p ")\n  \"" p "\"" n> "(interactive" p ")" n> r> ")")
 (advice "(defun " (p "adv" name) " (&rest app)" n> p n> "(apply app))" n>
   "(advice-add #'" (p "fun") " " (p ":around") " #'" (s name) ")")
-(package ";;; " (file-name-base (or (buffer-file-name) (buffer-name))) " --- " p " -*- lexical-binding: t -*-"
+(npackage ";;; " (file-name-base (or (buffer-file-name) (buffer-name))) " --- " p " -*- lexical-binding: t -*-"
    n n
    ";; Copyright (C) " (format-time-string "%Y") " Jeremy Friesen" n
    ";; Author: Jeremy Friesen <jeremy@jeremyfriesen.com>" n n
