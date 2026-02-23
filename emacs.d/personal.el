@@ -251,7 +251,7 @@ default of 6 (ye ol' 1d6)."
 ;; Based on the idea of habit stacking, whenever I pull down my RSS
 ;; feed, I'll go ahead and sync my notes.
 (advice-add #'jf/elfeed-load-db-and-open :before #'jf/syncthing-aling)
-(add-hook 'after-init-hook (lambda () (jf/syncthing-aling 1)))
+(add-hook 'after-init-hook #'jf/syncthing-aling)
 
 (use-package mastodon
   ;; :straight (:host codeberg :repo "martianh/mastodon.el")
@@ -1389,8 +1389,7 @@ See `playing-a-game-candidates' and `start-playing'.")
             (callback . start-playing-mythic-bastionaland)
             (bmk-file . "~/SyncThings/source/forged-from-the-worst/forged=from=the=worst--bookmarks.el")))))
      )
-  "Possible games I might be playing via Emacs.  A game you are playing
-should have both a 'start' and 'stop' property.")
+  "Possible games I might be playing via Emacs.")
 
 (defun start-playing-mythic-bastionaland ()
   (setq random-table/reporter #'random-table/reporter/as-child-window)
@@ -1405,13 +1404,27 @@ should have both a 'start' and 'stop' property.")
 (defun stop-playing ()
   "Stop playing a game."
   (interactive)
-  (start-playing `("Nothing" . nil)))
+  (when playing-a-game
+    (progn
+      (keymap-global-set "H-r" #'start-playing)
+      (keymap-global-set "C-H-r" #'start-playing)
+      (setq playing-a-game nil)
+      (setopt bookmark-default-file fallback-bookmark-file)
+      (bookmark-load fallback-bookmark-file t nil t)
+      (unload-feature 'random-tables-data)
+      (unload-feature 'random-table))))
+
+(when (f-file-p "~/git/random-table.el/random-table.el")
+  (add-to-list 'load-path "~/git/random-table.el"))
+
+(keymap-global-set "H-r" #'start-playing)
+(keymap-global-set "C-H-r" #'start-playing)
 
 (defun start-playing (game)
   "Start playing the GAME; stopping any currently played game.
 
-A GAME has a 'start' and 'stop' property, that is an alist.  That alist
-has the following properties:
+A GAME has a 'start' that is an alist.  That alist has the followingrandom-table/storage/tables
+properties:
 
 - 'bmk-file' :: what file we'll find our working bookmarks.
 - 'bmk-display-func' :: the function we use to display bookmarks.
@@ -1425,14 +1438,16 @@ When a property is not provided, \"suitable\" defaults are assigned."
               (completing-read "Start Playing: "
                 playing-a-game-candidates nil t)))
         (alist-get handle playing-a-game-candidates nil nil #'string=))))
-  ;; Stop playing what we were playing...unwinding that.
-  ;; Then start playing what we are playing...if anything
-  (dolist (config (list playing-a-game (alist-get 'start game)))
-    (when config
-      (let ((file
-              (or
-                (alist-get 'bmk-file config)
-                fallback-bookmark-file)))
+  (let* ((config
+           (alist-get 'start game))
+          (file
+            (or
+              (alist-get 'bmk-file config)
+              fallback-bookmark-file)))
+        (require 'random-tables-data)
+        (keymap-global-set "H-r" #'random-table/roll)
+        (keymap-global-set "C-H-r" #'random-table/roll-region)
+        (setq random-table/reporter #'random-table/reporter/as-insert)
         (setq default-bookmark-display-function
           (alist-get 'bmk-display-func config))
         (setq pdf-view-bookmark-make-record:prompt-for-random
@@ -1441,36 +1456,8 @@ When a property is not provided, \"suitable\" defaults are assigned."
         (setopt bookmark-default-file file)
         (bookmark-load file t nil t)
         (when-let ((fn (alist-get 'callback config)))
-          (funcall fn)))))
-  ;; Last register how to stop playing.  NOTE: We need a non-nil value
-  ;; for playing-a-game, so we can have a proper modeline indicator.
-  (setq playing-a-game
-    (or
-      (alist-get 'stop game)
-      `((bmk-file . ,fallback-bookmark-file)))))
-
-
-(use-package consult-mu
-  :straight (consult-mu :type git :host github
-              :repo "armindarvish/consult-mu"
-              :files (:defaults "extras/*.el"))
-  :after consult)
-
-(use-package consult-omni
-  :straight (consult-omni :type git :host github
-              :repo "armindarvish/consult-omni"
-              :files (:defaults "sources/*.el"))
-  :after consult
-  :config
-
-  (require 'consult-omni-sources)
-  (require 'consult-omni-apps)
-  (require 'consult-omni-mu4e)
-  (require 'consult-omni-elfeed)
-  (require 'consult-omni-org-agenda)
-  (setopt consult-omni-multi-sources '("Apps" "elfeed" "mu4e" "Org Agenda"))
-
-  (setopt consult-omni-default-interactive-command #'consult-omni-multi))
+          (funcall fn)))
+  (setq playing-a-game game))
 
 (when (f-file?  "~/git/denote-bookmark.el/denote-bookmark.el")
   (require 'denote-bookmark "~/git/denote-bookmark.el/denote-bookmark.el"))

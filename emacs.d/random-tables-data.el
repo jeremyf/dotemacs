@@ -1,8 +1,13 @@
-;; -*- lexical-binding: t; -*-
-(setq random-table/reporter #'random-table/reporter/as-insert)
+;;; random-tables-data --- Tables for random-table -*- lexical-binding: t -*-
 
-(keymap-global-set "H-r" #'random-table/roll)
-(keymap-global-set "C-H-r" #'random-table/roll-region)
+;; Copyright (C) 2026 Jeremy Friesen
+;; Author: Jeremy Friesen <jeremy@jeremyfriesen.com>
+
+;; This file is NOT part of GNU Emacs.
+;;; Commentary:
+
+;;; Code:
+(require 'random-table)
 
 (defun random-table/roll/ironsworn (modifier)
   "Roll for an Ironsworn action with the given MODIFIER."
@@ -3262,57 +3267,57 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
 (random-table/register :name "Reaction Roll > Overloaded"
   :roller (lambda (table)
             (list :love (random 12) :hate (random 12)))
-  :filter (lambda (&rest dice)
-            (message "%S" dice))
-  ;; '(("Meh" "Meh" "Notice" "Dislike" "Dislike" "Dislike"
-  ;;     "Clear Hostility" "Clear Hostility" "Clear Hostility"
-  ;;     "Planning Attack" "Attack" "Attack")
-  ;;    ("Meh" "Meh" "Notice" "Dislike" "Dislike" "Dislike"
-  ;;      "Clear Hostility" "Clear Hostility" "Clear Hostility"
-  ;;      "Planning Attack" "Attack" "Attack")
-  ;;    ("Notice" "Notice""Notice"
-  ;;      "Dislike" "Dislike" "Dislike"
-  ;;      "Clear Hostility" "Clear Hostility" "Clear Hostility"
-  ;;      "Planning Attack" "Planning Attack" "Planning Attack")
-  ;;    ("Curious Interest" "Curious Interest" "Curious Interest"
-  ;;      "Guarded Caution" "Guarded Caution" "Guarded Caution"
-  ;;      "Distruct" "Distruct" "Distruct"
-  ;;      "Mistrusting Hostility" "Mistrusting Hostility" "Mistrusting Hostility")
-  ;;    ("Curious Interest" "Curious Interest" "Curious Interest"
-  ;;      "Guarded Caution" "Guarded Caution" "Guarded Caution"
-  ;;      "Distruct" "Distruct" "Distruct"
-  ;;      "Mistrusting Hostility" "Mistrusting Hostility" "Mistrusting Hostility")
-  ;;    ("Curious Interest" "Curious Interest" "Curious Interest"
-  ;;      "Guarded Caution" "Guarded Caution" "Guarded Caution"
-  ;;      "Distruct" "Distruct" "Distruct"
-  ;;      "Mistrusting Hostility" "Mistrusting Hostility" "Mistrusting Hostility")
-  ;;    ("Open interest" "Open interest" "Open interest"
-  ;;      "Guarded Interest" "Guarded Interest" "Guarded Interest"
-  ;;      "Confused Uncertain" "Confused Uncertain" "Confused Uncertain"
-  ;;      "Unfriendly fearfulness" "Unfriendly fearfulness" "Unfriendly fearfulness")
-  ;;    ("Open interest" "Open interest" "Open interest"
-  ;;      "Guarded Interest" "Guarded Interest" "Guarded Interest"
-  ;;      "Confused Uncertain" "Confused Uncertain" "Confused Uncertain"
-  ;;      "Unfriendly fearfulness" "Unfriendly fearfulness" "Unfriendly fearfulness")
-  ;;    ("Open interest" "Open interest" "Open interest"
-  ;;      "Guarded Interest" "Guarded Interest" "Guarded Interest"
-  ;;      "Confused Uncertain" "Confused Uncertain" "Confused Uncertain"
-  ;;      "Unfriendly fearfulness" "Unfriendly fearfulness" "Unfriendly fearfulness")
-  ;;    ("Trust" "Trust" "Trust"
-  ;;      "Respectful Interest" "Respectful Interest" "Respectful Interest"
-  ;;      "Fearful Respect" "Fearful Respect" "Fearful Respect"
-  ;;      "Fear (Flee?)" "Fear (Flee?)" "Fear (Flee?)")
-  ;;    ("Friend" "Friend" "Trust"
-  ;;      "Respectful Interest" "Respectful Interest" "Respectful Interest"
-  ;;      "Fearful Respect" "Fearful Respect" "Fearful Respect"
-  ;;      "Fear (Flee?)" "Flee/Erratic" "Flee/Erratic")
-  ;;    ("Friend" "Friend" "Trust"
-  ;;      "Respectful Interest" "Respectful Interest" "Respectful Interest"
-  ;;      "Fearful Respect" "Fearful Respect" "Fearful Respect"
-  ;;      "Fear (Flee?)" "Flee/Erratic" "Flee/Erratic"))
-  :fetcher (lambda (data &rest result)
-             (message "🐂 data: %S; result: %S" data result))
-  :data '(("Physique" . "Violent")
-           ("Skill" . "Deviant")
-           ("Mind" . "Occult")
-           ("Presence" . "Zealot")))
+  :fetcher (lambda (data roll)
+             (nth (plist-get roll :hate)
+               (nth (plist-get roll :love) data)))
+  :filter (lambda (&rest dice) dice)
+  :data
+  '(("Meh" "Meh" "Notice" "Dislike" "Dislike" "Dislike"
+      "Clear Hostility" "Clear Hostility" "Clear Hostility"
+      "Planning Attack" "Attack" "Attack")
+     ("Meh" "Meh" "Notice" "Dislike" "Dislike" "Dislike"
+       "Clear Hostility" "Clear Hostility" "Clear Hostility"
+       "Planning Attack" "Attack" "Attack")
+     ("Notice" "Notice""Notice"
+       "Dislike" "Dislike" "Dislike"
+       "Clear Hostility" "Clear Hostility" "Clear Hostility"
+       "Planning Attack" "Planning Attack" "Planning Attack")
+     ("Curious Interest" "Curious Interest" "Curious Interest"
+       "Guarded Caution" "Guarded Caution" "Guarded Caution"
+       "Distruct" "Distruct" "Distruct"
+       "Mistrusting Hostility" "Mistrusting Hostility" "Mistrusting Hostility")
+     ("Curious Interest" "Curious Interest" "Curious Interest"
+       "Guarded Caution" "Guarded Caution" "Guarded Caution"
+       "Distruct" "Distruct" "Distruct"
+       "Mistrusting Hostility" "Mistrusting Hostility" "Mistrusting Hostility")
+     ("Curious Interest" "Curious Interest" "Curious Interest"
+       "Guarded Caution" "Guarded Caution" "Guarded Caution"
+       "Distruct" "Distruct" "Distruct"
+       "Mistrusting Hostility" "Mistrusting Hostility" "Mistrusting Hostility")
+     ("Open interest" "Open interest" "Open interest"
+       "Guarded Interest" "Guarded Interest" "Guarded Interest"
+       "Confused Uncertain" "Confused Uncertain" "Confused Uncertain"
+       "Unfriendly fearfulness" "Unfriendly fearfulness" "Unfriendly fearfulness")
+     ("Open interest" "Open interest" "Open interest"
+       "Guarded Interest" "Guarded Interest" "Guarded Interest"
+       "Confused Uncertain" "Confused Uncertain" "Confused Uncertain"
+       "Unfriendly fearfulness" "Unfriendly fearfulness" "Unfriendly fearfulness")
+     ("Open interest" "Open interest" "Open interest"
+       "Guarded Interest" "Guarded Interest" "Guarded Interest"
+       "Confused Uncertain" "Confused Uncertain" "Confused Uncertain"
+       "Unfriendly fearfulness" "Unfriendly fearfulness" "Unfriendly fearfulness")
+     ("Trust" "Trust" "Trust"
+       "Respectful Interest" "Respectful Interest" "Respectful Interest"
+       "Fearful Respect" "Fearful Respect" "Fearful Respect"
+       "Fear (Flee?)" "Fear (Flee?)" "Fear (Flee?)")
+     ("Friend" "Friend" "Trust"
+       "Respectful Interest" "Respectful Interest" "Respectful Interest"
+       "Fearful Respect" "Fearful Respect" "Fearful Respect"
+       "Fear (Flee?)" "Flee/Erratic" "Flee/Erratic")
+     ("Friend" "Friend" "Trust"
+       "Respectful Interest" "Respectful Interest" "Respectful Interest"
+       "Fearful Respect" "Fearful Respect" "Fearful Respect"
+       "Fear (Flee?)" "Flee/Erratic" "Flee/Erratic")))
+
+(provide 'random-tables-data)
+;;; random-tables-data.el ends here

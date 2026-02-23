@@ -6367,6 +6367,9 @@ See `jf/comment-header-regexp/major-modes-alis'."
     ;; (which-function-mode)
     ))
 
+(use-package i3wm-config-mode
+  :straight t)
+
 (use-package symbol-overlay
   ;; Very useful when refactoring elisp
   :straight t)
@@ -8819,11 +8822,6 @@ This encodes the logic for creating a project."
         ("b v" "Vivaldi" jf/menu--bookmark-vivaldi :if jf/browser-vivaldi?)
         ]])
   :bind ("s-1" . #'jf/menu))
-
-(when (f-file-p "~/git/random-table.el/random-table.el")
-  (progn
-    (load "~/git/random-table.el/random-table.el")
-    (load "~/git/dotemacs/emacs.d/random-tables-data.el")))
 
 (with-eval-after-load 'org
   (use-package edraw-org
