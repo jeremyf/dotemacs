@@ -1,4 +1,14 @@
 ;; -*- lexical-binding: t; -*-
+
+;; For improving the readability of images later to be OCR-ed.
+(use-package unpaper
+  :straight (unpaper :host github :repo "unpaper/unpaper"))
+;; For scanning text from images and PDFs.  Probably will need to
+;; install tesseract.
+(use-package scanner
+  :straight (scanner :host github :repo "emacsmirror/scanner")
+  :custom (scanner-use-unpaper t))
+
 (defvar jf/subscribe-me/default-tags
   '("1st" "provisional")
   "Default tags to apply when subscribing to an RSS feed.")

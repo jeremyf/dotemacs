@@ -1794,7 +1794,7 @@ active nature."
        (when (and which-function-mode (mode-line-window-selected-p))
          (when-let* ((func (which-function)))
            (propertize
-             (concat "𝆑:" func)
+             (concat "f(): " func)
              'face
              'mode-line-emphasis
              'local-map
@@ -6173,7 +6173,7 @@ The generated and indented TOC will be inserted at point."
           ("C-c y f" . yaml-pro-copy-node-path-at-point))
   :config
   (defun jf/yaml-mode-configurator ()
-    ;; (which-function-mode)
+    (which-function-mode -1)
     (setq-local add-log-current-defun-function
       #'jf/yaml-node-path-at-point))
   (defun jf/yaml-node-path-at-point ()
@@ -6277,9 +6277,9 @@ See `add-log-current-defun-function'."
         (message link)
         (kill-new (substring-no-properties link)))
       (user-error "Warning: Point not on function")))
-  (bind-key "C-M-e"
+  (bind-key "M-<down>"
     #'end-of-defun prog-mode-map)
-  (bind-key "C-M-a"
+  (bind-key "M-<up>"
     #'beginning-of-defun prog-mode-map)
   (bind-key "C-c y f"
     #'jf/yank-current-scoped-function-name prog-mode-map)
@@ -6364,11 +6364,21 @@ See `jf/comment-header-regexp/major-modes-alis'."
     (hl-todo-mode t)
     (setq show-trailing-whitespace t)
     (setq truncate-lines t)
-    ;; (which-function-mode)
+    (which-function-mode)
     ))
+
 
 (use-package i3wm-config-mode
   :straight t)
+
+(use-package flyspell
+  :straight (:type built-in)
+  :custom
+  ;; The default binding is C-; which clobbers iedit; something I find
+  ;; unacceptable.
+  (flyspell-auto-correct-binding [(hyper ?\;)])
+  :config
+  (setq flyspell-mode-map nil))
 
 (use-package symbol-overlay
   ;; Very useful when refactoring elisp
@@ -6402,10 +6412,10 @@ See `jf/comment-header-regexp/major-modes-alis'."
       (kbd "C-c y f") #'jf/yank-current-scoped-function-name)
     (define-key ruby-ts-mode-map
       (kbd "C-c y y") #'jf/ruby-mode/yank-yardoc)
-    (define-key ruby-ts-mode-map
-      (kbd "s-ESC") #'jf/comment-header-backward)
-    (define-key ruby-ts-mode-map
-      (kbd "C-s-]") #'jf/comment-header-forward)
+    ;; (define-key ruby-ts-mode-map
+    ;;   (kbd "s-ESC") #'jf/comment-header-backward)
+    ;; (define-key ruby-ts-mode-map
+    ;;   (kbd "C-s-]") #'jf/comment-header-forward)
     (define-key ruby-ts-mode-map
       (kbd "C-c w r") #'jf/treesit/wrap-rubocop)
     (define-key ruby-ts-mode-map
@@ -8415,15 +8425,6 @@ If `consult--read' is defined, use that.  Otherwise fallback to
   (setq pdf-annot-activate-created-annotations t)
   ;; use normal isearch
   (define-key pdf-view-mode-map (kbd "C-s") 'isearch-forward))
-
-;; For improving the readability of images later to be OCR-ed.
-(use-package unpaper
-  :straight (unpaper :host github :repo "unpaper/unpaper"))
-;; For scanning text from images and PDFs.  Probably will need to
-;; install tesseract.
-(use-package scanner
-  :straight (scanner :host github :repo "emacsmirror/scanner")
-  :custom (scanner-use-unpaper t))
 
 (use-package org-noter
   :straight t
