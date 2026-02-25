@@ -144,7 +144,7 @@ go-ts-mode go-mode
   > > > q n
 	> > "})" n
   "}")
-(options "type " (p "Options for: " optInterface) "Option interface {"
+(noptions "type " (p "Options for: " optInterface) "Option interface {"
   n> "apply(*" optInterface ")" n
   "}"
   n n"type " (string-inflection-camelcase-function optInterface) "Option_" (p "Option Name: " withOpt) " struct {}"
