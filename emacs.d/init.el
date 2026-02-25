@@ -108,19 +108,19 @@ The DWIM behaviour of this command is as follows:
   ;; this has saved me from lost "work".
   (make-directory "~/.emacs.d/autosaves/" t)
   :bind (("M-[" . #'backward-paragraph)
-          ("s-[" . #'backward-paragraph)
           ("M-]" . #'forward-paragraph)
-          ("s-]" . #'forward-paragraph)
-          ("s-t" . #'transpose-sentences)
+          ("M-<up>" . #'beginning-of-defun)
+          ("M-<down>" . #'end-of-defun)
+          ("M-C-t" . #'transpose-sentences)
           ("C-k" . #'jf/kill-line-or-region)
           ("C-c n" . #'jf/yank-file-name-to-clipboard) ;; Deprecated
           ("C-c y n" . #'jf/yank-file-name-to-clipboard)
           ("M-<delete>" . #'kill-word)
-          ("s-<down>" . #'end-of-buffer)
-          ("s-<up>" . #'beginning-of-buffer)
-          ("s-q" . #'save-buffers-kill-terminal)
-          ("s-w" . #'kill-current-buffer)
-          ("s-i" . #'ibuffer)
+          ;; ("s-<down>" . #'end-of-buffer)
+          ;; ("s-<up>" . #'beginning-of-buffer)
+          ;; ("s-q" . #'save-buffers-kill-terminal)
+          ;; ("s-w" . #'kill-current-buffer)
+          ;; ("s-i" . #'ibuffer)
           ("M-RET" . #'newline-and-indent)
           ("<f12>" . scratch-buffer))
   :bind (:map emacs-lisp-mode-map
@@ -391,9 +391,8 @@ Related to `jf/linux:radio-silence'."
           (if all "all" identifiers)))))
 
   ;; Favoring this over `cua-mode'
-  (bind-key "s-c" 'copy-region-as-kill)
-  (bind-key "s-a" 'mark-whole-buffer)
-  (bind-key "s-s" 'save-buffer))
+  (bind-key "C-c C-w" 'copy-region-as-kill)
+  (bind-key "C-c C-a" 'mark-whole-buffer))
 
 (when (eq system-type 'darwin)
   (progn
@@ -1928,8 +1927,7 @@ active nature."
   ;; Quick navigation from window to window.
   :straight t
   :custom (aw-keys '(?a ?s ?d ?f ?g ?j ?h ?k ?l))
-  :bind (("M-o" . ace-window) ;; deprecated
-          ("s-o" . ace-window)))
+  :bind (("M-o" . ace-window)))
 
 (use-package avy
   ;; Pick a letter, avy finds all words with that at the beginning of
@@ -1995,7 +1993,6 @@ active nature."
   :custom (imenu-list-focus-after-activation t)
   (imenu-list-size 0.4)
   (imenu-list-position 'right)
-  :bind ("s-i" . 'imenu-list-smart-toggle)
   :bind (:map imenu-list-major-mode-map ("o" . 'imenu-list-goto-entry))
   :straight t)
 
@@ -2254,10 +2251,10 @@ bit differently.")
   :preface (require 'prot-window)
   ;; Wrangle up how windows and buffers display.
   :straight (:type built-in)
-  :bind (("s-q" . #'jf/bury-or-unbury-buffer)
+  :bind (("H-q" . #'jf/bury-or-unbury-buffer)
           ("C-x 2" . #'jf/window/split-and-follow-below)
           ("C-x 3" . #'jf/window/split-and-follow-right)
-          ("s-\\" . #'jf/nav-toggle-split-direction))
+          ("H-\\" . #'jf/nav-toggle-split-direction))
   :config
   (advice-add #'kill-buffer-and-window :after #'balance-windows)
   (defun jf/nav-toggle-split-direction ()
@@ -2812,10 +2809,7 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   ;; A mix of a few odd and useful functions.
   :straight t
   :bind (("C-a" . crux-move-beginning-of-line)
-          ("<C-s-return>" . crux-smart-open-line-above)
-          ("C-s-k" . crux-kill-line-backwards)
-          ("<s-backspace>" . crux-kill-line-backwards)
-          ("C-M-d" . jf/duplicate-current-line-or-lines-of-region)
+          ("<H-backspace>" . crux-kill-line-backwards)
           ("C-c d" . jf/duplicate-current-line-or-lines-of-region))
   :config
   (defun jf/duplicate-current-line-or-lines-of-region (arg)
@@ -2963,7 +2957,7 @@ future copy)."
   :hook (org-mode . jf/org-mode/configurator)
   :bind (("C-c C-j" . jf/project/jump-to-task)
           ("C-c C-x C-j" . org-clock-goto)
-          ("s-5" . jf/org-insert-immediate-active-timestamp)
+          ("H-5" . jf/org-insert-immediate-active-timestamp)
           ("H-i" . org-insert-link)
           )
   :bind (:map org-mode-map (("C-c j" . org-goto)
@@ -3376,8 +3370,7 @@ Each member's `car' is title and `cdr' is `org-mode' element."
           ("M-g o" . consult-org-heading))
   :bind (("C-c l s" . org-store-link)
           ("C-c a" . org-agenda)
-          ("C-c c" . org-capture)
-          ("C-s-t" . org-toggle-link-display))
+          ("C-c c" . org-capture))
 
   :config
   (defvar jf/org-mode/capture/filename
@@ -4394,7 +4387,7 @@ sort accordingly.")
   :bind
   (("C-." . embark-act)       ;; pick some comfortable binding
     ("M-." . embark-dwim)
-    ("C-s-e" . embark-export)
+    ("C-M-e" . embark-export)
     ("C-h b" . embark-bindings))
   :init
   ;; Optionally replace the key help with a completing-read interface
@@ -4418,7 +4411,6 @@ sort accordingly.")
           ;; C-x bindings (ctl-x-map)
           ("C-x M-:" . consult-complex-command)
           ("C-x b" . consult-bookmark)
-          ("s-b" . consult-buffer)
           ("C-x 4 b" . consult-buffer-other-window)
           ;; Custom M-# bindings for fast register access
           ("M-#" . consult-register-load)
@@ -4436,7 +4428,7 @@ sort accordingly.")
           ("H-o" . consult-org-agenda)
           ("M-g s-o" . consult-org-agenda)
           ("M-g M-g" . consult-goto-line)
-          ("s-l" . consult-goto-line)
+          ("H-l" . consult-goto-line)
           ;; ("C-l" . consult-goto-line)
           ("M-g o" . consult-outline)
           ("M-g m" . consult-mark)
@@ -4696,7 +4688,6 @@ possible.")
        ;; consult--source-modified-buffer
        ))
   :bind
-  ("s-p" . consult-projectile)
   ("H-p" . consult-projectile))
 
 (use-package corfu
@@ -4711,7 +4702,7 @@ possible.")
           ("M-l" . 'corfu-show-location)
           ("TAB" . corfu-next)
           ([tab] . corfu-next)
-          ("S-TAB" . corfu-previous)
+          ("H-TAB" . corfu-previous)
           ([backtab] . corfu-previous))
   :custom
   ;; Works with `indent-for-tab-command'. Make sure tab doesn't indent
@@ -4807,8 +4798,7 @@ Useful if you want a more robust view into the recommend candidates."
       ("." "Thing at point" helpful-at-point)
       ("t" "Text properties" describe-text-properties)
       ("v" "Variable" helpful-variable)])
-  :bind ("H-h" . jf/helpful-menu)
-  ("C-s-h" . jf/helpful-menu))
+  :bind ("H-h" . jf/helpful-menu))
 
 (use-package hippie-exp
   ;; A composable expansion tool that I find compliments `corfu' in that
@@ -5130,8 +5120,8 @@ literal then add a fuzzy search)."
   :after (consult denote)
   :straight t
   :bind
-  ("H-f" . #'consult-denote-find)
-  ("H-s" . #'consult-denote-grep)
+  ("H-d f" . #'consult-denote-find)
+  ("H-d s" . #'consult-denote-grep)
   :custom
   (consult-denote-grep-command #'consult-ripgrep)
   :config
@@ -5221,7 +5211,6 @@ literal then add a fuzzy search)."
   :bind (("C-M-SPC" . set-rectangular-region-anchor)
           ("C->" . mc/mark-next-like-this)
           ("C-<" . mc/mark-previous-like-this)
-          ("C-s-<mouse-1>" . mc/add-cursor-on-click)
           ("C-c C->" . mc/mark-all-like-this)
           ("C-c C-SPC" . mc/edit-lines)) ;; CTRL+CMD+c
   :straight t)
@@ -5559,7 +5548,7 @@ method, get the containing class."
   :straight (:type built-in)
   :hook (go-ts-mode . jf/go-ts-mode-configurator)
   :bind (:map go-ts-mode-map
-          (("s-." . 'jf/go/toggle-test-impl)
+          (("H-e ." . 'jf/go/toggle-test-impl)
             ("H-e c" . 'jf/go/show-coverage)))
   :config
   (defun jf/go/show-coverage (&optional coverage-file)
@@ -6078,11 +6067,11 @@ The generated and indented TOC will be inserted at point."
   ;; app/models/my_file.rb, the spec should be in
   ;; spec/models/my_file_spec.rb
   :bind (:map rspec-mode-map
-          (("s-." .
+          (("H-e ." .
              'rspec-toggle-spec-and-target)
             ("C-c y r" .
               'jf/yank-bundle-exec-rspec-to-clipboard)))
-  :bind (:map ruby-mode-map (("s-." . 'rspec-toggle-spec-and-target)))
+  :bind (:map ruby-mode-map (("H-e ." . 'rspec-toggle-spec-and-target)))
   :preface
   (defun jf/rspec-mode-hook ()
     (setq imenu-generic-expression
@@ -6348,9 +6337,9 @@ See `jf/comment-header-regexp/major-modes-alis'."
       (unless (s-contains? "-ts-" (format "%s" (car el)))
         (progn
           (define-key (symbol-value jf-map)
-            (kbd "s-ESC") #'jf/comment-header-backward)
+            (kbd "H-[") #'jf/comment-header-backward)
           (define-key (symbol-value jf-map)
-            (kbd "C-s-]") #'jf/comment-header-forward)))))
+            (kbd "H-]") #'jf/comment-header-forward)))))
 
   (defun jf/prog-mode-configurator ()
     "Do the configuration of all the things."
@@ -6406,7 +6395,7 @@ See `jf/comment-header-regexp/major-modes-alis'."
       #'jf/treesit/function-select)
     (define-key ruby-ts-mode-map (kbd "M-.")
       #'xref-find-definitions)
-    (define-key ruby-ts-mode-map (kbd "s-.")
+    (define-key ruby-ts-mode-map (kbd "H-.")
       #'rspec-toggle-spec-and-target)
     (define-key ruby-ts-mode-map
       (kbd "C-c y f") #'jf/yank-current-scoped-function-name)
@@ -6766,7 +6755,7 @@ Useful for Eglot."
   (projectile-enable-caching t)
   (projectile-project-search-path
     '("~/git/" "~/git/converge-cloud"))
-  :bind ("s-." . projectile-toggle-between-implementation-and-test)
+  :bind ("H-e ." . projectile-toggle-between-implementation-and-test)
   :config
   (setopt projectile-create-missing-test-files t)
   (setopt projectile-git-command
@@ -6797,25 +6786,25 @@ Useful for Eglot."
   (:host github :repo "larsmagne/eplot"))
 
 
-(use-package casual-suite
-  :straight t
-  :config
-  (use-package casual-avy
-    :straight t)
-  (keymap-set calc-mode-map "H-c" #'casual-calc-tmenu)
-  (keymap-set dired-mode-map "H-c" #'casual-dired-tmenu)
-  (keymap-set isearch-mode-map "H-c" #'casual-isearch-tmenu)
-  (keymap-set ibuffer-mode-map "H-c" #'casual-ibuffer-tmenu)
-  (keymap-set ibuffer-mode-map "H-f" #'casual-ibuffer-filter-tmenu)
-  (keymap-set ibuffer-mode-map "H-s" #'casual-ibuffer-sortby-tmenu)
-  (keymap-set Info-mode-map "H-c" #'casual-info-tmenu)
-  (keymap-set reb-mode-map "H-c" #'casual-re-builder-tmenu)
-  (keymap-set reb-lisp-mode-map "H-c" #'casual-re-builder-tmenu)
-  (keymap-set bookmark-bmenu-mode-map "H-c" #'casual-bookmarks-tmenu)
-  (keymap-set org-agenda-mode-map "H-c" #'casual-agenda-tmenu)
-  (keymap-set symbol-overlay-map "H-c" #'casual-symbol-overlay-tmenu)
-  (keymap-global-set "H-c a" #'casual-avy-tmenu)
-  (keymap-global-set "H-c e" #'casual-editkit-main-tmenu))
+;; (use-package casual-suite
+;;   :straight t
+;;   :config
+;;   (use-package casual-avy
+;;     :straight t)
+;;   (keymap-set calc-mode-map "H-c" #'casual-calc-tmenu)
+;;   (keymap-set dired-mode-map "H-c" #'casual-dired-tmenu)
+;;   (keymap-set isearch-mode-map "H-c" #'casual-isearch-tmenu)
+;;   (keymap-set ibuffer-mode-map "H-c" #'casual-ibuffer-tmenu)
+;;   (keymap-set ibuffer-mode-map "H-f" #'casual-ibuffer-filter-tmenu)
+;;   (keymap-set ibuffer-mode-map "H-s" #'casual-ibuffer-sortby-tmenu)
+;;   (keymap-set Info-mode-map "H-c" #'casual-info-tmenu)
+;;   (keymap-set reb-mode-map "H-c" #'casual-re-builder-tmenu)
+;;   (keymap-set reb-lisp-mode-map "H-c" #'casual-re-builder-tmenu)
+;;   (keymap-set bookmark-bmenu-mode-map "H-c" #'casual-bookmarks-tmenu)
+;;   (keymap-set org-agenda-mode-map "H-c" #'casual-agenda-tmenu)
+;;   (keymap-set symbol-overlay-map "H-c" #'casual-symbol-overlay-tmenu)
+;;   (keymap-global-set "H-c a" #'casual-avy-tmenu)
+;;   (keymap-global-set "H-c e" #'casual-editkit-main-tmenu))
 
 (use-package bookmark
   :straight (:type built-in)
@@ -6932,9 +6921,7 @@ See `pdf-view-bookmark-make-record:prompt-for-random'."
   :straight t
   :bind (:map logos-focus-mode-map
           ("M-]" . #'logos-forward-page-dwim)
-          ("s-]" . #'logos-forward-page-dwim)
-          ("M-[" . #'logos-backward-page-dwim)
-          ("s-[" . #'logos-backward-page-dwim))
+          ("M-[" . #'logos-backward-page-dwim))
   :config
   (let ((map
           global-map))
@@ -7049,10 +7036,8 @@ See `pdf-view-bookmark-make-record:prompt-for-random'."
             (make-sparse-keymap)))
       (define-key map (kbd "C-n") #'next-line)
       (define-key map (kbd "C-p") #'previous-line)
-      (dolist (key `("M-]" "s-]"))
-        (define-key map (kbd key) 'logos-forward-page-dwim))
-      (dolist (key `("M-[" "s-["))
-        (define-key map (kbd key) 'logos-backward-page-dwim))
+      (define-key map (kbd "M-]") 'logos-forward-page-dwim)
+      (define-key map (kbd "M-[") 'logos-backward-page-dwim)
       map))
 
   (define-minor-mode jf/minor-mode/presenter
@@ -7493,7 +7478,6 @@ A page is marked `last' if rel=\"last\" appears in a <link> or <a> tag."
           ("M-<left>" . eww-first-url)
           ("M-<right>" . eww-last-url)
           ("h" . eww-home-url))
-  :bind (("C-s-o" . browse-url-at-point))
   :hook ((eww-mode . jf/reader-visual)))
 
 ;; Given that I have tools to grab results from the browser; it makes
@@ -7704,7 +7688,6 @@ Use f/s for speed, [/] for size, b/n to skip, SPC to pause, q to quit."
   :hook ((git-commit-ts-mode . jf/git-commit-mode-configurator))
   :bind (:map git-commit-ts-mode-map
           (("TAB" .  #'completion-at-point)))
-  :bind ("s-7" . #'structured-commit/write-message)
   :config
   (defun jf/git-commit-mode-configurator ()
     "Prepare all of the commit buffer structure"
@@ -7784,7 +7767,7 @@ The `magit-gitdir' is the project's .git directory."
   :custom
   (git-messenger:use-magit-popup t)
   :bind (:map git-messenger-map (("l" . 'git-link)))
-  :bind (("s-6" . jf/git-messenger-popup)
+  :bind (("H-6" . jf/git-messenger-popup)
           ("C-x g b" . jf/git-messenger-popup))
   :straight t)
 
@@ -7800,7 +7783,7 @@ The `magit-gitdir' is the project's .git directory."
   ;; with this.
   :straight t
   :bind (("C-z" . undo)
-          ("C-s-z" . undo-tree-redo))
+          ("C-M-z" . undo-tree-redo))
   :custom (undo-tree-history-directory-alist
             ("." . "~/.emacs.d/undo-tree/"))
   :init
@@ -8541,7 +8524,7 @@ With one PREFIX go to place where we would jump on capture."
              (org-capture-goto-target "t")))))
     (pulsar-pulse-line))
 
-  (bind-key "s-2" 'jf/project/jump-to/project-work-space)
+  (bind-key "H-2" 'jf/project/jump-to/project-work-space)
   (defun jf/project/jump-to/project-work-space (project)
     "Prompt for PROJECT then workspace and open that workspace."
     (interactive (list (jf/project/find-dwim)))
@@ -8822,7 +8805,7 @@ This encodes the logic for creating a project."
         ("b s" "Safari" jf/menu--bookmark-safari :if jf/browser-safari?)
         ("b v" "Vivaldi" jf/menu--bookmark-vivaldi :if jf/browser-vivaldi?)
         ]])
-  :bind ("s-1" . #'jf/menu))
+  :bind ("H-1" . #'jf/menu))
 
 (with-eval-after-load 'org
   (use-package edraw-org
