@@ -4,53 +4,53 @@
     :straight (:host github :repo "jeremyf/random-table.el")))
 
 (random-table/register
- ;; From https://bit.ly/askthestars
- :name "Ask the Stars > Yes or No"
- :roller (lambda (&optional table)
-           (if (yes-or-no-p "Is the answer likely yes?")
-               (max (+ 1 (random 12)) (+ 1 (random 12)))
-             (min (+ 1 (random 12)) (+ 1 (random 12)))))
- :data '("No" "No" "No"
-         "No but" "No but" "No but"
-         "Yes but" "Yes but" "Yes but"
-         "Yes" "Yes" "Yes"))
+  ;; From https://bit.ly/askthestars
+  :name "Ask the Stars > Yes or No"
+  :roller (lambda (&optional table)
+            (if (yes-or-no-p "Is the answer likely yes?")
+              (max (+ 1 (random 12)) (+ 1 (random 12)))
+              (min (+ 1 (random 12)) (+ 1 (random 12)))))
+  :data '("No" "No" "No"
+           "No but" "No but" "No but"
+           "Yes but" "Yes but" "Yes but"
+           "Yes" "Yes" "Yes"))
 
 (random-table/register
- ;; From https://bit.ly/askthestars
- :name "Ask the Stars > Signs & Positions"
- :data '("- Sign :: {Ask the Stars > Sign}\n- Position :: {Ask the Stars > Position}"))
+  ;; From https://bit.ly/askthestars
+  :name "Ask the Stars > Signs & Positions"
+  :data '("- Sign :: {Ask the Stars > Sign}\n- Position :: {Ask the Stars > Position}"))
 
 (random-table/register
- :name "Ask the Stars > Sign"
- :private t
- :data '("The Fang (hostility - fear)"
-         "The Wings (freedom - nature)"
-         "The Cage (protection - obligation)"
-         "The Hand (creation - misdirection)"
-         "The Mask (persuasion - shame)"
-         "The Eye (judgement - secrets)"
-         "The Child (learning - greed)"
-         "The Traveller (wandering - chance)"
-         "The Elder (authority - tradition)"
-         "The Ship (direciton - struggle)"
-         "The Council (opposition - cycles)"
-         "The Legion (unification - identity)"))
+  :name "Ask the Stars > Sign"
+  :private t
+  :data '("The Fang (hostility - fear)"
+           "The Wings (freedom - nature)"
+           "The Cage (protection - obligation)"
+           "The Hand (creation - misdirection)"
+           "The Mask (persuasion - shame)"
+           "The Eye (judgement - secrets)"
+           "The Child (learning - greed)"
+           "The Traveller (wandering - chance)"
+           "The Elder (authority - tradition)"
+           "The Ship (direciton - struggle)"
+           "The Council (opposition - cycles)"
+           "The Legion (unification - identity)"))
 
 (random-table/register
- :name "Ask the Stars > Position"
- :private t
- :data '("Rising (growth - possibility)"
-         "Entombed (memory - death)"
-         "Twinned (intimacy - dependency)"
-         "Waning (desire - decay)"
-         "Rooted (stability - plenty)"
-         "Bowed (submission - mercy)"
-         "Colliding (change - violence)"
-         "Burning (honesty - pride)"
-         "Veiled (faith - deceit)"
-         "Exiled (guilt - autonomy)"
-         "Crowned (ambition - ruin)"
-         "Reflected (reversal - vanity)"))
+  :name "Ask the Stars > Position"
+  :private t
+  :data '("Rising (growth - possibility)"
+           "Entombed (memory - death)"
+           "Twinned (intimacy - dependency)"
+           "Waning (desire - decay)"
+           "Rooted (stability - plenty)"
+           "Bowed (submission - mercy)"
+           "Colliding (change - violence)"
+           "Burning (honesty - pride)"
+           "Veiled (faith - deceit)"
+           "Exiled (guilt - autonomy)"
+           "Crowned (ambition - ruin)"
+           "Reflected (reversal - vanity)"))
 
 (random-table/scope
   "Mythic Bastionland"
@@ -141,4 +141,15 @@
        "eavesdropping, ears like a bat." "judging character."
        "storytelling, with the ability to enchant any audience." "sensing direction."
        "scholarship; a fountain of facts." "horse-whispering, be it race, pack, cart, or war."
-       "herbalism, familiar with flora." "hunting and tracking.")))
+       "herbalism, familiar with flora." "hunting and tracking."))
+  (random-table/register :name "Sparks > Ceremony"
+    :data
+    "Mood: [Solemn/Celebratory/Poetci/Ostentatious/Charitable/Brutal/Nurturing/Vindictive/Humble/Formal/Despairing/Joyous]; Ritual: [Burial/Drinking/Oration/Music/Combat/Decoration/Breaking/Sacrifice/Pleading/Washing/Burning/Expedition]")
+
+  (random-table/register :name "Sparks > Spectacle"
+    :data
+    "Activity: [Performance/Joust/Pyre/Artwork/Games/Battle/Wrestling/Relics/Gifts/Athletics/Construction/Hunt]; With: [Costumes/Vastness/Smoke/Death/Duration/Flowers/Blood/Altitude/Gold/Jewels/Ships/Soil]")
+
+  (random-table/register :name "Sparks > Revelry"
+    :data
+    "Banquet: [Boozy/Imported/Sweet/Layered/Meaty/Sparkling/Sizzling/Aged/Fatty/Bubbling/Spiced/Fruited]; Amusement: [Stories/Dancing/Pranks/Masks/Gambling/Boasts/Excess/Ridicule/Stimulant/Bathing/Darkness/Destruction]"))
