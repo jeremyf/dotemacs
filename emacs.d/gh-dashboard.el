@@ -148,11 +148,13 @@
   (if workflows
       (mapconcat (lambda (run)
                    (let* ((status (plist-get run :status))
-                          (conclusion (plist-get run :conclusion)))
+                           (conclusion (plist-get run :conclusion)))
                      (cond ((string= status "completed")
-                            (if (string= conclusion "success")
-                                (propertize "●" 'face 'success)
-                              (propertize "●" 'face 'error)))
+                             (pcase conclusion
+                               ("success" (propertize "●" 'face 'success))
+                               ("error" (propertize "●" 'face 'error))
+                               ("skipped" (propertize "○" 'face 'success))
+                               (_ (propertize "◐" 'face 'warning))))
                            (t (propertize "○" 'face 'warning)))))
                  workflows " ")
     (propertize "No runs" 'face 'shadow)))
