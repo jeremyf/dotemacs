@@ -315,15 +315,6 @@ Else, evaluate the whole buffer."
           "Copied buffer file name '%s' to the clipboard."
           filename)))))
 
-(defun indent-whole-buffer ()
-  "Indent the entire buffer without affecting point or mark."
-  (interactive)
-  (save-excursion
-    (save-restriction
-      (indent-region (point-min) (point-max)))))
-(global-set-key (kbd "C-c i") 'indent-whole-buffer)
-
-
 (when (eq system-type 'gnu/linux)
   (use-package grab-x-link
     :straight (:host github :repo "jeremyf/dotemacs" :files ("emacs.d/grab-x-link")))
@@ -2251,7 +2242,7 @@ bit differently.")
   :preface (require 'prot-window)
   ;; Wrangle up how windows and buffers display.
   :straight (:type built-in)
-  :bind (("H-q" . #'jf/bury-or-unbury-buffer)
+  :bind (("H-w" . #'jf/bury-or-unbury-buffer)
           ("C-x 2" . #'jf/window/split-and-follow-below)
           ("C-x 3" . #'jf/window/split-and-follow-right)
           ("H-\\" . #'jf/nav-toggle-split-direction))
@@ -4304,10 +4295,23 @@ sort accordingly.")
   :hook (prog-mode . abbrev-mode)
   (text-mode . abbrev-mode))
 
+(defun C-w-dwim ()
+  "Copy region or delete backward.
+
+When `active-region-p' is non-nil, copy the region as kill.  When
+`active-region-p' is nil, delete backwards.
+
+This all is because long ago I mentally trained 'C-w' as backward delete
+word.  Probably form my days on the AS400 terminal."
+  (interactive)
+  (if (region-active-p)
+    (call-interactively #'copy-region-as-kill)
+    (jf/delete-region-or-backward-word)))
+
 (use-package emacs
   :bind (("C-M-i" . completion-at-point)
           ("TAB" . indent-for-tab-command)
-          ("C-w" . jf/delete-region-or-backward-word)
+          ("C-w" . C-w-dwim)
           ("M-DEL" . jf/delete-region-or-backward-word)
           ("C-M-<backspace>" . backward-kill-paragraph))
   :custom
