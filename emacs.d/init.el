@@ -381,12 +381,12 @@ Related to `jf/linux:radio-silence'."
         (concat "rfkill unblock "
           (if all "all" identifiers)))))
 
-  ;; Favoring this over `cua-mode'
-  (bind-key "C-c C-w" 'copy-region-as-kill)
   (bind-key "C-c C-a" 'mark-whole-buffer))
 
 (when (eq system-type 'darwin)
   (progn
+    (bind-key "s-w" 'jf/bury-or-unbury-buffer)
+    (bind-key "s-p" 'consult-projectile)
     (load "~/git/dotemacs/emacs.d/grab-mac-link-revised.el")
     ;; The following function facilitates a best of both worlds.  By
     ;; default, I want Option to be Meta (e.g. \"M-\") in Emacs.
@@ -3488,7 +3488,21 @@ function is ever added to that hook."
         (org-table-recalculate-buffer-tables)
         (org-dblock-update '(4))))))
 
+(defvar jf/personal/filename-for-journal
+  ""
+  "Where I put my journal.")
+
 (with-eval-after-load 'org
+  (add-to-list 'org-capture-templates
+  '("j" "Journal Entry"
+     entry (file+olp+datetree
+             jf/personal/filename-for-journal)
+     "At %(format-time-string \"%R\")\n:PROPERTIES:\n:CUSTOM_ID: journal-%(format-time-string \"%Y%m%d-%H%M\")\n:END:\n%?"
+     :empty-lines-before 1
+     :empty-lines-after 1
+     :clock-in t
+     :clock-resume t))
+
   (use-package ox
     :straight (ox :type built-in))
   (setq org-export-global-macros (list))
