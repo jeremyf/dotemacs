@@ -9,18 +9,6 @@
 ;;; Code:
 (use-package plantuml-mode
   ;; A mode for working with PlantUML.  See https://plantuml.com
-  :config (setq plantuml-executable-path
-            (f-join
-              (s-trim
-                (shell-command-to-string "brew --prefix plantuml"))
-              "bin/plantuml")
-            plantuml-default-exec-mode 'executable
-            org-plantuml-executable-path
-            (f-join
-              (s-trim
-                (shell-command-to-string "brew --prefix plantuml"))
-              "bin/plantuml")
-            org-plantuml-exec-mode 'executable)
   :mode (("\\.plantuml\\'" . plantuml-mode))
   :mode (("\\.puml\\'" . plantuml-mode))
   :straight t)
@@ -35,6 +23,11 @@
 
 (use-package eplot :straight
   (:host github :repo "larsmagne/eplot"))
+
+(if (eq system-type 'darwin)
+  (setq plantuml-executable-path (s-trim (shell-command-to-string "which plantuml"))
+    plantuml-default-exec-mode 'executable
+    org-plantuml-executable-path plantuml-executable-path))
 
 (provide 'setup-diagraming)
 ;;; setup-diagraming.el ends here
