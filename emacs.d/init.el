@@ -5210,6 +5210,10 @@ literal then add a fuzzy search)."
   :straight t
   :config (global-hungry-delete-mode))
 
+(use-package string-inflection
+  ;; A quick way to change case and separators for words.
+  :straight t)
+
 (use-package move-text
   ;; A simple package ability to move lines up and down.
   :straight t
@@ -6044,26 +6048,7 @@ The generated and indented TOC will be inserted at point."
           (concat markdown-toc (concat indentation line)))))
     (insert markdown-toc)))
 
-(use-package plantuml-mode
-  ;; A mode for working with PlantUML.  See https://plantuml.com
-  :config (setq plantuml-executable-path (concat
-                                           (getenv "HB_PATH")
-                                           "/bin/plantuml")
-            plantuml-default-exec-mode 'executable
-            org-plantuml-executable-path (concat
-                                           (getenv "HB_PATH")
-                                           "/bin/plantuml")
-            org-plantuml-exec-mode 'executable)
-  :mode (("\\.plantuml\\'" . plantuml-mode))
-  :mode (("\\.puml\\'" . plantuml-mode))
-  :straight t)
-
-(use-package mermaid-mode
-  :straight t)
-(use-package ob-mermaid
-  :after (org)
-  :straight t
-  :custom (ob-mermaid-cli-path (executable-find "mmdc")))
+(require 'setup-diagramming)
 
 (use-package rspec-mode
   ;; I write most of my Ruby tests using rspec.  This tool helps manage
@@ -6135,10 +6120,6 @@ The generated and indented TOC will be inserted at point."
   ;; SQL, oh how I love thee and wish I worked more with thee.
   :straight t
   :hook (sql-mode . sqlind-minor-mode))
-
-(use-package string-inflection
-  ;; A quick way to change case and separators for words.
-  :straight t)
 
 (use-package typescript-mode
   ;; I have this for the work I once did a few years ago.  I am happiest
@@ -6799,9 +6780,6 @@ Useful for Eglot."
       (if (s-ends-with? "_test.go" path)
         (list :impl (replace-regexp-in-string "_test\\.go$" ".go" path))
         (list :test (replace-regexp-in-string "\\.go$" "_test.go" path))))))
-
-(use-package eplot :straight
-  (:host github :repo "larsmagne/eplot"))
 
 
 ;; (use-package casual-suite
@@ -7502,11 +7480,6 @@ A page is marked `last' if rel=\"last\" appears in a <link> or <a> tag."
 ;; sense to have tools to launch a search in my browser.
 (use-package emacs-websearch
   :straight '(emacs-websearch :host github :repo "zhenhua-wang/emacs-websearch"))
-
-(use-package stem-reading-mode
-  ;; A package that emboldens word stems, helping read a bit faster.
-  :straight t
-  :custom (stem-reading-overlay t))
 
 ;; From
 ;; https://www.emacs.dyerdwelling.family/emacs/20260116182841-emacs--speed-reading-in-emacs-building-an-rsvp-reader/
