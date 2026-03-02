@@ -52,6 +52,9 @@
   (denote-get-path-by-id "20250117T101521")
   "Where I put my MBOs.")
 
+(setq jf/personal/filename-for-journal
+  (denote-get-path-by-id "20260101T000000"))
+
 (add-to-list 'org-capture-templates
   '("T" "Add to task for MBO"
      plain (file+function
@@ -75,7 +78,7 @@
      :clock-resume t))
 
 (add-to-list 'org-capture-templates
-  '("j" "Journal entry for MBO"
+  '("J" "Journal entry for MBO"
      plain (file+function
              jf/work/filename-for-mbos
              jf/work/position-in-mbo-journal-entry)
