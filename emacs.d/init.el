@@ -21,45 +21,11 @@
 ;;
 ;;; Code:
 (add-to-list 'load-path "~/git/dotemacs/emacs.d")
+(add-to-list 'load-path "~/git/dotemacs/emacs.d/modules")
 
 ;; Let's just shunt those custom files into oblivion.
 (setopt custom-file (make-temp-file "emacs-custom-"))
 (load custom-file :noerror)
-
-;; https://www.reddit.com/r/emacs/comments/mtb05k/emacs_init_time_decreased_65_after_i_realized_the/
-(setopt straight-check-for-modifications
-  '(check-on-save find-when-checking))
-
-;; This preamble is part of straight-use-package My understanding, in
-;; reading straight documentation is that it has better load
-;; times. However, the configuration options I often see leverage
-;; "use-package" which is why most of my package declarations look as
-;; they do.
-(defvar bootstrap-version nil)
-(let ((bootstrap-file
-        (expand-file-name "straight/repos/straight.el/bootstrap.el"
-          user-emacs-directory))
-       (bootstrap-version 6))
-  (unless (file-exists-p bootstrap-file)
-    (with-current-buffer
-      (url-retrieve-synchronously
-        "https://raw.githubusercontent.com/radian-software/straight.el/develop/install.el"
-        'silent 'inhibit-cookies)
-      (goto-char (point-max))
-      (eval-print-last-sexp)))
-  (load bootstrap-file nil 'nomessage))
-
-(setopt straight-repository-branch "develop")
-(straight-use-package 'use-package)
-(setopt use-package-always-ensure t)
-
-;; See https://github.com/radian-software/straight.el/issues/1146
-(use-package straight
-  :straight t
-  :custom
-  ;; add project and flymake to the pseudo-packages variable so straight.el doesn't download a separate version than what eglot downloads.
-  (straight-built-in-pseudo-packages '(emacs nadvice python image-mode project flymake))
-  (straight-use-package-by-default t))
 
 ;; When you open Emacs, grab all the space on the screen
 (add-to-list 'initial-frame-alist '(fullscreen . maximized))
@@ -4619,17 +4585,17 @@ The symbol at point is added to the future history."
   :hook
   (embark-collect-mode . consult-preview-at-point-mode))
 
-(use-package consult-dir
-  ;; This package helps ease traveling across directories by providing
-  ;; directory candidates related to current buffers, bookmarks, and
-  ;; projects.  Further, like other ~consult.el~ functions, you can use
-  ;; narrowing keys.  See https://github.com/karthink/consult-dir.
-  :straight t
-  :after (consult)
-  :bind (("C-x C-d" . consult-dir)
-          :map minibuffer-local-completion-map
-          ("C-x C-d" . consult-dir)
-          ("C-x C-j" . consult-dir-jump-file)))
+;; (use-package consult-dir
+;;   ;; This package helps ease traveling across directories by providing
+;;   ;; directory candidates related to current buffers, bookmarks, and
+;;   ;; projects.  Further, like other ~consult.el~ functions, you can use
+;;   ;; narrowing keys.  See https://github.com/karthink/consult-dir.
+;;   :straight t
+;;   :after (consult)
+;;   :bind (("C-x C-d" . consult-dir)
+;;           :map minibuffer-local-completion-map
+;;           ("C-x C-d" . consult-dir)
+;;           ("C-x C-j" . consult-dir-jump-file)))
 
 (use-package consult-projectile
   ;; This package provides a function I use everyday: ~M-x
@@ -6048,7 +6014,7 @@ The generated and indented TOC will be inserted at point."
           (concat markdown-toc (concat indentation line)))))
     (insert markdown-toc)))
 
-(require 'setup-diagramming)
+(require 'setup-diagraming)
 
 (use-package rspec-mode
   ;; I write most of my Ruby tests using rspec.  This tool helps manage
@@ -6229,6 +6195,9 @@ The generated and indented TOC will be inserted at point."
 
 ;; (use-packaqge consult-dash
 ;;   :straight t)
+
+(use-package project
+  :straight (:type built-in))
 
 (use-package flymake
   :straight t
