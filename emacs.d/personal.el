@@ -1,5 +1,8 @@
 ;; -*- lexical-binding: t; -*-
 
+(use-package i3wm-config-mode
+  :straight t)
+
 ;; For improving the readability of images later to be OCR-ed.
 (use-package unpaper
   :straight (unpaper :host github :repo "unpaper/unpaper"))

@@ -10,6 +10,211 @@
 
 ;;;; Language Server Integration (LSP)
 
+(use-package treesit
+  :straight (:type built-in)
+  :init
+  (setopt treesit-font-lock-level 4)
+  :config
+  (defvar jf/treesit-lang-cache
+    (make-hash-table :test 'equal)
+    "Cache the expensive computation of treelit language availability.
+
+See `jf/treesit-language-available-p' for usage.")
+
+  (defun jf/treesit-language-available-p (fn lang &rest rest)
+    "Caching around the CPU expensive `treesit-language-available-p'."
+    ;; I did some profiling of `treesit-language-available-p', and found
+    ;; that when moving around via consult (and therefore preview) this
+    ;; function was contributing to 75% of the CPU time.  And it was run
+    ;; each time.
+    (let ((cached-value
+            (gethash lang jf/treesit-lang-cache 'miss)))
+      (if (eq 'miss cached-value)
+        (let ((value
+                (apply fn lang rest)))
+          (puthash lang value jf/treesit-lang-cache)
+          value)
+        cached-value)))
+  (advice-add #'treesit-language-available-p
+    :around #'jf/treesit-language-available-p)
+
+  (add-to-list 'treesit-language-source-alist
+    '(gitcommit . ("https://github.com/gbprod/tree-sitter-gitcommit")))
+  :preface
+  (defun jf/treesit/func-signature/dwim ()
+    "Kill current function signature at point."
+    (interactive)
+    (when-let* ((node
+                  (treesit-parent-until
+                    (treesit-node-at (point))
+                    (lambda (n)
+                      (or
+                        (string= "function_declaration" (treesit-node-type n))
+                        (string= "call_expression" (treesit-node-type n))))
+                    t)))
+      (pcase (treesit-node-type node)
+        ("function_declaration"
+          (jf/treesit/get-signature/function node))
+        ("call_expression"
+          (save-excursion
+            (call-interactively #'xref-find-definitions)
+            (jf/treesit/get-signature/function
+              (treesit-parent-until
+                (treesit-node-at (point))
+                (lambda (n)
+                  (string= "function_declaration" (treesit-node-type n)))
+                t)))))))
+
+  (defun jf/treesit/get-signature/function (node)
+    "For the given NODE add its parameters and result to kill ring.
+
+This function is to \"copy\" the implementation details of the node."
+    (let ((node-type (treesit-node-type node)))
+      (if (string= "function_declaration" node-type)
+        (let* ((strings
+                 (list
+                   (treesit-node-text
+                     (treesit-node-child-by-field-name node "parameters"))
+                   (treesit-node-text
+                     (treesit-node-child-by-field-name node "result"))))
+                (msg
+                  (concat "func" (s-join " " (-non-nil strings)))))
+          (message
+            "%s func dsignature: %s"
+            (treesit-node-text
+              (treesit-node-child-by-field-name node "name"))
+            msg)
+          (kill-new msg))
+        (user-error "given node %s (type %s) not function_declaration"
+          node node-type))))
+
+  (defun jf/treesit/function-select ()
+    "Select the current function at point."
+    (interactive)
+    (if-let* ((func (treesit-defun-at-point)))
+      (progn
+        (goto-char (treesit-node-start func))
+        (call-interactively #'set-mark-command)
+        (goto-char (treesit-node-end func)))
+      (user-error "No function to select")))
+
+  (defun jf/treesit/wrap-rubocop (&optional given-cops)
+    "Wrap the current ruby region by disabling/enabling the GIVEN-COPS."
+    (interactive)
+    (if (derived-mode-p 'ruby-ts-mode 'ruby-mode)
+      (if-let* ((region
+                  (jf/treesit/derive-region-for-rubocop)))
+        (let ((cops
+                (or given-cops
+                  (completing-read-multiple "Cops to Disable: "
+                    jf/rubocop/list-all-cops nil t))))
+          (save-excursion
+            (goto-char (cdr region))
+            (call-interactively #'crux-move-beginning-of-line)
+            (let ((indentation
+                    (s-repeat (current-column) " ")))
+              (goto-char (cdr region))
+              (insert "\n"
+                (s-join "\n"
+                  (mapcar
+                    (lambda (cop)
+                      (concat indentation "# rubocop:enable " cop))
+                    cops)))
+              (goto-char (car region))
+              (beginning-of-line)
+              (insert
+                (s-join "\n"
+                  (mapcar
+                    (lambda (cop)
+                      (concat indentation "# rubocop:disable " cop))
+                    cops))
+                "\n"))))
+        (user-error "Not a region nor a function"))
+      (user-error "%s is not derived from a ruby mode" major-mode)))
+
+  (defun jf/treesit/derive-region-for-rubocop ()
+    "Return `cons' of begin and end positions of region."
+    (cond
+      ;; When given, first honor the explicit region
+      ((use-region-p)
+        (cons (region-beginning) (region-end)))
+      ;; Then honor the current function
+      ((treesit-defun-at-point)
+        (cons (treesit-node-start (treesit-defun-at-point))
+          (treesit-node-end (treesit-defun-at-point))))
+      ;; Then fallback to attempting to find the containing
+      ;; class/module.
+      (t
+        (when-let* ((node
+                      (treesit-parent-until
+                        (treesit-node-at (point))
+                        (lambda (n) (member (treesit-node-type n)
+                                      '("class" "module"))))))
+          (cons (treesit-node-start node) (treesit-node-end node))))))
+
+  ;; This function, tested against Ruby, will return the module space
+  ;; qualified method name (e.g. Hello::World#method_name).
+  (defun jf/treesit/yank-qualified-method-fname ()
+    "Return the fully qualified name of method at point.  If not on a
+method, get the containing class."
+    (if-let* ((func (treesit-defun-at-point)))
+      ;; Instance method or class method?
+      (let* ((method_type
+               (if (string= "method"
+                     (treesit-node-type func))
+                 "#" "."))
+              (method_name
+                (treesit-node-text
+                  (car (treesit-filter-child
+                         func
+                         (lambda (node)
+                           (string= "identifier"
+                             (treesit-node-type node)))))))
+              (module_space
+                (s-join "::" (jf/treesit/module_space func))))
+        (if current-prefix-arg
+          module_space
+          (concat module_space method_type method_name)))
+      (let ((current-node
+              (treesit-node-at (point))))
+        (s-join "::" (jf/treesit/module_space current-node)))))
+
+  ;; Handles the following Ruby code:
+  ;;
+  ;;   module A::B
+  ;;     module C
+  ;;     end
+  ;;     C::D = Struct.new do
+  ;;       def call
+  ;;       end
+  ;;     end
+  ;;   end
+  ;; Special thanks to https://eshelyaron.com/posts/2023-04-01-take-on-recursion.html
+  (defun jf/treesit/module_space (node &optional acc)
+    (if-let* ((parent
+                (treesit-parent-until
+                  node
+                  (lambda (n) (member (treesit-node-type n)
+                                '("class" "module" "assignment")))))
+               (parent_name
+                 (treesit-node-text
+                   (car
+                     (treesit-filter-child
+                       parent
+                       (lambda (n)
+                         (member (treesit-node-type n)
+                           '("constant" "scope_resolution"))))))))
+      (jf/treesit/module_space parent (cons parent_name acc))
+      acc)))
+
+(use-package treesit-auto
+  :straight (:host github :repo "renzmann/treesit-auto")
+  :config (setq treesit-auto-install 'prompt)
+  (global-treesit-auto-mode)
+  ;; I'm finding that treesitter surprisingly hangs on many Python
+  ;; files.  I'm not excited to debug this so I'm disabling it.
+  (setf treesit-auto-langs (delete 'python treesit-auto-langs)))
+
 (use-package dape
   :straight t)
 
@@ -275,10 +480,10 @@ Useful for Eglot."
   :after heex-ts-mode
   :straight t)
 
-(use-package flymake-elixir
-  :straight t
-  :config
-  (add-hook 'elixir-ts-mode-hook 'flymake-elixir-load))
+;; (use-package flymake-elixir
+;;   :straight t
+;;   :config
+;;   (add-hook 'elixir-ts-mode-hook 'flymake-elixir-load))
 
 (use-package flymake-go-staticcheck
   ;; Adding a linter to go files, leveraging the staticcheck binary.
@@ -449,7 +654,8 @@ Useful for Eglot."
       '((ERROR) @font-lock-warning-face))))
 
 (use-package ob-go
-  :straight t)
+  :straight t
+  :after (go org-mode))
 
 (use-package go-playground
   :straight t)
@@ -522,6 +728,9 @@ Useful for Eglot."
   :after (consult eglot)
   :straight t)
 
+(use-package project
+  :straight (:type built-in))
+
 (use-package consult-eglot-embark
   :straight t
   :config
@@ -531,126 +740,6 @@ Useful for Eglot."
       (consult-eglot-embark-mode))))
 
 ;;;; Programming Modes
-
-(use-package prog-mode
-  :straight (:type built-in)
-  :config
-  (add-hook 'prog-mode-hook #'jf/prog-mode-configurator)
-  ;; I didn't know about `add-log-current-defun-function' until a blog
-  ;; reader reached out.  Now, I'm making a general function for
-  ;; different modes.
-  (defun jf/yank-current-scoped-function-name ()
-    "Echo and kill the current scoped function name.
-
-See `add-log-current-defun-function'."
-    (interactive)
-    (if-let* ((text
-                (funcall add-log-current-defun-function)))
-      (progn
-        (message "%s" text)
-        (kill-new (substring-no-properties text)))
-      (user-error "Warning: Point not on function")))
-  (defun jf/yank-current-scoped-function-as-org-mode-link ()
-    "Yank the current function and region as an `org-mode' link."
-    (interactive)
-    (if-let* ((text
-                (funcall add-log-current-defun-function)))
-      (let ((link
-              (format "[[%s][%s]]"
-                (call-interactively #'git-link)
-                text)))
-        (message link)
-        (kill-new (substring-no-properties link)))
-      (user-error "Warning: Point not on function")))
-  (bind-key "M-<down>"
-    #'end-of-defun prog-mode-map)
-  (bind-key "M-<up>"
-    #'beginning-of-defun prog-mode-map)
-  (bind-key "C-c y f"
-    #'jf/yank-current-scoped-function-name prog-mode-map)
-  (bind-key "C-c y o"
-    #'jf/yank-current-scoped-function-as-org-mode-link prog-mode-map)
-  (bind-key "C-c y f"
-    #'jf/yank-current-scoped-function-name emacs-lisp-mode-map)
-  (bind-key "C-c y o"
-    #'jf/yank-current-scoped-function-as-org-mode-link emacs-lisp-mode-map)
-
-  (defvar jf/comment-header-regexp/major-modes-alist
-    '((emacs-lisp-mode . "^;;;+$")
-       (ruby-mode . "^[[:space:]]*##+$")
-       (ruby-ts-mode . "^[[:space:]]*##+$"))
-    "AList of major modes and their comment headers.")
-
-  (defun jf/comment-header-forward ()
-    "Move to previous line that starts a comment block.
-
-See `jf/comment-header-regexp/major-modes-alis'."
-    (interactive)
-    (let ((regexp
-            (alist-get major-mode
-              jf/comment-header-regexp/major-modes-alist)))
-      (when (string-match-p
-              regexp
-              (buffer-substring-no-properties
-                (line-beginning-position)
-                (line-end-position)))
-        (forward-line))
-      (condition-case err
-        (progn
-          (search-forward-regexp regexp)
-          (beginning-of-line)
-          (recenter scroll-margin t)
-          (pulsar-pulse-line))
-        (error (goto-char (point-max))))))
-
-  (defun jf/comment-header-backward ()
-    "Move to previous line that starts a comment block.
- See `jf/comment-header-regexp/major-modes-alis'."
-    (interactive)
-    (let ((regexp
-            (alist-get major-mode
-              jf/comment-header-regexp/major-modes-alist)))
-      (when (string-match-p
-              regexp
-              (buffer-substring-no-properties
-                (line-beginning-position)
-                (line-end-position)))
-        (previous-line)
-        (recenter scroll-margin t)
-        (pulsar-pulse-line))
-      (condition-case err
-        (progn
-          (search-backward-regexp regexp)
-          (beginning-of-line)
-          (recenter scroll-margin t)
-          (pulsar-pulse-line))
-        (error (goto-char (point-min))))))
-
-  (dolist (el jf/comment-header-regexp/major-modes-alist)
-    (let ((jf-map
-            (intern (format "%s-map" (car el)))))
-      ;; The treesitter mode maps don't seem to exist at this point
-      (unless (s-contains? "-ts-" (format "%s" (car el)))
-        (progn
-          (define-key (symbol-value jf-map)
-            (kbd "H-[") #'jf/comment-header-backward)
-          (define-key (symbol-value jf-map)
-            (kbd "H-]") #'jf/comment-header-forward)))))
-
-  (defun jf/prog-mode-configurator ()
-    "Do the configuration of all the things."
-    ;; I'll type my own parenthesis thank you very much.
-    ;; (electric-pair-mode)
-
-    ;; CVE-2024-53920
-    ;; https://eshelyaron.com/posts/2024-11-27-emacs-aritrary-code-execution-and-how-to-avoid-it.html
-    (unless (derived-mode-p 'emacs-lisp-mode)
-      (flymake-mode 1))
-    (hl-todo-mode t)
-    (setq show-trailing-whitespace t)
-    (setq truncate-lines t)
-    (which-function-mode)
-    ))
 
 (use-package devdocs
   ;; Download and install documents from https://devdocs.io/ Useful for
@@ -1019,6 +1108,126 @@ See https://github.com/chmouel/gotest-ts.el"
   ;; awareness.
   :straight t)
 
+(use-package prog-mode
+  :straight (:type built-in)
+  :config
+  (add-hook 'prog-mode-hook #'jf/prog-mode-configurator)
+  ;; I didn't know about `add-log-current-defun-function' until a blog
+  ;; reader reached out.  Now, I'm making a general function for
+  ;; different modes.
+  (defun jf/yank-current-scoped-function-name ()
+    "Echo and kill the current scoped function name.
+
+See `add-log-current-defun-function'."
+    (interactive)
+    (if-let* ((text
+                (funcall add-log-current-defun-function)))
+      (progn
+        (message "%s" text)
+        (kill-new (substring-no-properties text)))
+      (user-error "Warning: Point not on function")))
+  (defun jf/yank-current-scoped-function-as-org-mode-link ()
+    "Yank the current function and region as an `org-mode' link."
+    (interactive)
+    (if-let* ((text
+                (funcall add-log-current-defun-function)))
+      (let ((link
+              (format "[[%s][%s]]"
+                (call-interactively #'git-link)
+                text)))
+        (message link)
+        (kill-new (substring-no-properties link)))
+      (user-error "Warning: Point not on function")))
+  (bind-key "M-<down>"
+    #'end-of-defun prog-mode-map)
+  (bind-key "M-<up>"
+    #'beginning-of-defun prog-mode-map)
+  (bind-key "C-c y f"
+    #'jf/yank-current-scoped-function-name prog-mode-map)
+  (bind-key "C-c y o"
+    #'jf/yank-current-scoped-function-as-org-mode-link prog-mode-map)
+  (bind-key "C-c y f"
+    #'jf/yank-current-scoped-function-name emacs-lisp-mode-map)
+  (bind-key "C-c y o"
+    #'jf/yank-current-scoped-function-as-org-mode-link emacs-lisp-mode-map)
+
+  (defvar jf/comment-header-regexp/major-modes-alist
+    '((emacs-lisp-mode . "^;;;+$")
+       (ruby-mode . "^[[:space:]]*##+$")
+       (ruby-ts-mode . "^[[:space:]]*##+$"))
+    "AList of major modes and their comment headers.")
+
+  (defun jf/comment-header-forward ()
+    "Move to previous line that starts a comment block.
+
+See `jf/comment-header-regexp/major-modes-alis'."
+    (interactive)
+    (let ((regexp
+            (alist-get major-mode
+              jf/comment-header-regexp/major-modes-alist)))
+      (when (string-match-p
+              regexp
+              (buffer-substring-no-properties
+                (line-beginning-position)
+                (line-end-position)))
+        (forward-line))
+      (condition-case err
+        (progn
+          (search-forward-regexp regexp)
+          (beginning-of-line)
+          (recenter scroll-margin t)
+          (pulsar-pulse-line))
+        (error (goto-char (point-max))))))
+
+  (defun jf/comment-header-backward ()
+    "Move to previous line that starts a comment block.
+ See `jf/comment-header-regexp/major-modes-alis'."
+    (interactive)
+    (let ((regexp
+            (alist-get major-mode
+              jf/comment-header-regexp/major-modes-alist)))
+      (when (string-match-p
+              regexp
+              (buffer-substring-no-properties
+                (line-beginning-position)
+                (line-end-position)))
+        (previous-line)
+        (recenter scroll-margin t)
+        (pulsar-pulse-line))
+      (condition-case err
+        (progn
+          (search-backward-regexp regexp)
+          (beginning-of-line)
+          (recenter scroll-margin t)
+          (pulsar-pulse-line))
+        (error (goto-char (point-min))))))
+
+  (dolist (el jf/comment-header-regexp/major-modes-alist)
+    (let ((jf-map
+            (intern (format "%s-map" (car el)))))
+      ;; The treesitter mode maps don't seem to exist at this point
+      (unless (s-contains? "-ts-" (format "%s" (car el)))
+        (progn
+          (define-key (symbol-value jf-map)
+            (kbd "H-[") #'jf/comment-header-backward)
+          (define-key (symbol-value jf-map)
+            (kbd "H-]") #'jf/comment-header-forward)))))
+
+  (defun jf/prog-mode-configurator ()
+    "Do the configuration of all the things."
+    ;; I'll type my own parenthesis thank you very much.
+    ;; (electric-pair-mode)
+
+    ;; CVE-2024-53920
+    ;; https://eshelyaron.com/posts/2024-11-27-emacs-aritrary-code-execution-and-how-to-avoid-it.html
+    (unless (derived-mode-p 'emacs-lisp-mode)
+      (flymake-mode 1))
+    (hl-todo-mode t)
+    (setq show-trailing-whitespace t)
+    (setq truncate-lines t)
+    (which-function-mode)
+    ))
+
 ;;;; Supporting Functions
 
 (defun jf/go-ts-mode-configurator ()
@@ -1082,6 +1291,26 @@ See https://github.com/chmouel/gotest-ts.el"
   :init-value nil
   :global nil
   :keymap jf/minor-mode/go-ts-implementation-mode-map)
+
+(defun go-ts-mode--testing-run-node-p (node)
+  "Return t when NODE is a testing.T.Run declaration."
+  (and
+    (string-equal "call_expression" (treesit-node-type node))
+    (when-let* ((fnNode (treesit-node-child-by-field-name node "function"))
+                 (operand (treesit-node-child-by-field-name fnNode "operand"))
+                 (field (treesit-node-child-by-field-name fnNode "field")))
+      (and
+        (string= (treesit-node-type operand) "identifier")
+        (string= (treesit-node-text operand) "t")
+        (string= (treesit-node-type field) "field_identifier")
+        (string= (treesit-node-text field) "Run")))))
+
+(defun go-ts-mode--testing-run-name (node)
+  "Get imenu t.Run NODE name."
+  (let* ((args
+           (treesit-node-child-by-field-name node "arguments")))
+    (format "%s"
+      (treesit-node-text (car (treesit-node-children args "argument_list"))))))
 
 (provide 'setup-coding)
 ;;; setup-coding.el ends here
