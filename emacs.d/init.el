@@ -2414,15 +2414,15 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   :config
   (setopt modus-themes-common-palette-overrides
     '((fg-heading-1 cyan-faint)))
-  ;; (setopt modus-themes-headings ; read the manual's entry or the doc string
-  ;;   '((0 . (bold 1.4))
-  ;;      (1 . (variable-pitch bold 1.7))
-  ;;      (2 . (overline semibold 1.5))
-  ;;      (3 . (monochrome overline 1.4 background))
-  ;;      (4 . (overline 1.3))
-  ;;      (5 . (rainbow 1.2))
-  ;;      (6 . (rainbow 1.15))
-  ;;      (t . (rainbow 1.1))))
+  (setq modus-themes-headings ; read the manual's entry or the doc string
+    '((0 . (bold 1.4))
+       (1 . (variable-pitch bold 1.7))
+       (2 . (overline semibold 1.5))
+       (3 . (monochrome overline 1.4 background))
+       (4 . (overline 1.3))
+       (5 . (rainbow 1.2))
+       (6 . (rainbow 1.15))
+       (t . (rainbow 1.1))))
   ;; When these are non-nil, the mode line uses the proportional font
   (setopt modus-themes-mixed-fonts t
     modus-themes-variable-pitch-ui t)

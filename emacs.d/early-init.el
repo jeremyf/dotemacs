@@ -10,7 +10,7 @@
             (setq gc-cons-threshold (* 2 1024 1024))
             (setq file-name-handler-alist ii/file-name-handler-alist-old)))
 
-(add-to-list 'default-frame-alist '(undecorated-round . t))
+;; (add-to-list 'default-frame-alist '(undecorated-round . t))
 (setq package-enable-at-startup nil)
 
 ;; Bootstrap straight.el
