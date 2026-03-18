@@ -721,7 +721,7 @@ Useful for Eglot."
 
 (use-package eglot-hierarchy
   :straight (:host github :repo "dolmens/eglot-hierarchy")
-  :bind (:map eglot-mode-map ("H-e ." . eglot-hierarchy-call-hierarchy))
+  :bind (:map eglot-mode-map ("H-e @" . eglot-hierarchy-call-hierarchy))
   :after eglot)
 
 (use-package consult-eglot
@@ -841,11 +841,14 @@ Useful for Eglot."
     ;; the the environment variable `WORKON_HOME` points to the right
     ;; place
     (venv-initialize-eshell)
-    (setq venv-location '("/Users/jfriesen/git/pvc-2.3.0/pvc_venv"))
+    (setq venv-location '("~/git/converge-cloud/morpho-utils/pvc-utils/venv/"))
     (setopt projectile-switch-project-action
       '(lambda ()
          (venv-projectile-auto-workon)
-         (projectile-find-file)))))
+         (projectile-find-file))))
+  (use-package pylint
+    :straight t
+    :custom (pylint-command "PYTHONPATH=\"\" pylint")))
 
 (use-package rspec-mode
   ;; I write most of my Ruby tests using rspec.  This tool helps manage
