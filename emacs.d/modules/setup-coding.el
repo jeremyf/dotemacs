@@ -983,7 +983,6 @@ Useful for Eglot."
           ("C-c y f" . yaml-pro-copy-node-path-at-point))
   :config
   (defun jf/yaml-mode-configurator ()
-    (which-function-mode -1)
     (setq-local add-log-current-defun-function
       #'jf/yaml-node-path-at-point))
   (defun jf/yaml-node-path-at-point ()
@@ -1228,7 +1227,7 @@ See `jf/comment-header-regexp/major-modes-alis'."
     (hl-todo-mode t)
     (setq show-trailing-whitespace t)
     (setq truncate-lines t)
-    (which-function-mode)
+    ;; (which-function-mode)
     ))
 
 ;;;; Supporting Functions
@@ -1267,6 +1266,7 @@ See `jf/comment-header-regexp/major-modes-alis'."
 (defun jf/go-test-current (prefix)
   "Run current test.  When PREFIX given run using `dape`."
   (interactive "p")
+  (save-buffer)
   (cond
     ((>= prefix 16)
       (let ((current-prefix-arg nil))

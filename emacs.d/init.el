@@ -284,6 +284,28 @@ Else, evaluate the whole buffer."
 (use-package project
   :straight (:type built-in))
 
+(use-package ibuffer
+  :straight (:type built-in)
+  :custom (ibuffer-formats
+      '((mark modified read-only " "
+              (name 40 40 :left :elide) ; Change '30 30' to your preferred width
+              " "
+              (size 9 -1 :right)
+              " "
+              (mode 16 16 :left :elide)
+              " " filename-and-process)
+        (mark " " (name 16 -1) " " filename))))
+
+(use-package ibuffer-vc
+  :straight t
+  :after (ibuffer)
+  :config
+  (add-hook 'ibuffer-hook
+    (lambda ()
+      (ibuffer-vc-set-filter-groups-by-vc-root)
+      (unless (eq ibuffer-sorting-mode 'alphabetic)
+        (ibuffer-do-sort-by-alphabetic)))))
+
 (when (eq system-type 'gnu/linux)
   (use-package grab-x-link
     :straight (:host github :repo "jeremyf/dotemacs" :files ("emacs.d/grab-x-link")))
@@ -2381,8 +2403,26 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
       ((>= prefix 4)
         (unbury-buffer))
       (t
-        (if buffer-read-only (kill-current-buffer) (bury-buffer))))))
+        (if buffer-read-only (kill-current-buffer) (bury-use))))))
 
+(use-package tab-bar
+  :straight (:type built-in)
+  :custom (tab-bar-tab-name-function 'tab-bar-tab-name-all-with-projectile)
+  (tab-bar-auto-width-max '((330) 30))
+  :config
+  (defun tab-bar-tab-name-all-with-projectile ()
+    (mapconcat
+      (lambda (buffer)
+        (format "%s%s"
+        (alist-get (projectile-project-name)
+          tab-bar-project-alist "" nil #'string=)
+          (buffer-name buffer)))
+      (delete-dups (mapcar #'window-buffer
+                     (window-list-1 (frame-first-window)
+                       'nomini)))
+      ", "))
+  (defvar tab-bar-project-alist nil
+    "An alist of project names and their corresponding emoji prefix"))
 (use-package font-lock
   :straight (:type built-in)
   :config

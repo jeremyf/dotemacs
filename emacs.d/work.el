@@ -186,11 +186,27 @@ For inserting entity."
        :mode "remote"
        :request "attach")))
 
+(setq tab-bar-tab-name-all-with-projectile
+  '(
+     ("morpho-pcloud-cli" . "P ")
+     ("morpho-service-broker" . "B ")
+     ("aeris" . "A ")
+     ("factotum" . "F ")
+     ("morpho-swagger" . "🤠 ")))
+
 (require 'gh-dashboard)
-(setq ii/gh-dashboard-repos '("converge-cloud/aeris"
+(setq ii/gh-dashboard-repos '(
+                               "converge-cloud/aeris"
+                               "converge-cloud/concierge"
+                               "converge-cloud/emigrate"
                                "converge-cloud/factotum"
+                               "converge-cloud/gh-harness-elixir"
+                               "converge-cloud/gh-harness-go"
+                               "converge-cloud/gh-harness-npm"
                                "converge-cloud/morpho-pcloud-cli"
+                               "converge-cloud/morpho-pipeline-templates"
                                "converge-cloud/morpho-service-broker"
                                "converge-cloud/morpho-swagger"
                                "converge-cloud/tollbooth"
-                               "converge-cloud/vision"))
+                               "converge-cloud/vision"
+                               ))
