@@ -315,22 +315,14 @@ INFO is a plist holding contextual information."
       (message "Done exporting epigraphs to blog"))))
 
 (org-link-set-parameters "epigraph"
-  :complete #'jf/org-link-ol-complete/epigraph
-  :insert-description #'jf/org-link-ol-description/epigraph
+  :complete (lambda ()
+              (jf/org-link-ol-complete/named-content-block
+                "epigraph" jf/filename/bibliography))
+  :insert-description #'jf/org-link-ol-description/named-content-block
   :export #'jf/org-link-ol-export/epigraph
   :face #'jf/org-faces-epigraph
   :follow #'jf/org-link-ol-follow/epigraph)
 
-(defvar jf/org-link-ol-description/current-epigraph
-  nil
-  "The value of the last epigraph's body that we linked to.")
-
-(defun jf/org-link-ol-description/epigraph (link desc)
-  "Apply the DESC to the LINK.  Or use the `car' of `kill-ring'.
-
-This assumes that the completion function pushes a desc to the
-`kill-ring'."
-  (or desc jf/org-link-ol-description/current-epigraph))
 
 (defun jf/org-link-ol-export/epigraph (link description format channel)
   "Export the text of the LINK epigraph in the corresponding FORMAT.
@@ -390,54 +382,8 @@ We ignore the DESCRIPTION and probably the CHANNEL."
                         :contents-begin epigraph)
                       (org-element-property
                         :contents-end epigraph))))
-            (cond
-              ((or (eq format 'html) (eq format 'md))
-                (format "<blockquote class=\"%s epigraph\" data-id=\"%s\">\n%s%s</blockquote>\n"
-                  class
-                  id
-                  (if (string= class "verse")
-                    (s-replace "\n" "<br />\n" text)
-                    (org-export-string-as text 'html t))
-                  (cond
-                    ((and (s-present? work) (s-present? author))
-                      (format "\n<footer>&#8213;%s, <cite>%s</cite></footer>"
-                        author work))
-                    ((s-present? work)
-                      (format "\n<footer>&#8213; <cite>%s</cite></footer>"
-                        work))
-                    ((s-present? author)
-                      (format "\n<footer>&#8213; %s</footer>"
-                        author))
-                    (t ""))))
-              ((eq format 'latex)
-                (format "\\begin{%s}\n%s%s\n\\end{%s}\n"
-                  class
-                  (if (string= "verse" class)
-                    (s-replace "\n" "\\\\\n" text)
-                    text)
-                  (cond
-                    ((and (s-present? work) (s-present? author))
-                      (format "---%s, \\textit{%s}" author work))
-                    ((s-present? work)
-                      (format "---\\textit{%s}" work))
-                    ((s-present? author)
-                      (format "---%s" author))
-                    (t ""))
-                  class))
-              (t
-                (let* ((use-hard-newlines t))
-                  (s-replace
-                    "\n" hard-newline
-                    (format "%s%s"
-                      text
-                      (cond
-                        ((and (s-present? work) (s-present? author))
-                          (format "\n\n—%s, “%s”" author work))
-                        ((s-present? work)
-                          (format "\n\n—“%s”" work))
-                        ((s-present? author)
-                          (format "\n\n—%s" author))
-                        (t "")))))))))))))
+            (jf/org-link-ol-export/by-format
+              format `(,class "epigraph") id text work author)))))))
 
 (defun jf/org-link-ol-complete/epigraph ()
   "Find and insert an epigraph for export.
@@ -480,20 +426,13 @@ Wires into `org-insert-link'."
       (progn
         (message "Added %S to the kill ring" candidate)
         ;; Expand the result into a single line.
-        (setq jf/org-link-ol-description/epigraph (s-replace "⮒" "\n" candidate))
+        (setq jf/org-link-ol-description/named-content-block (s-replace "⮒" "\n" candidate))
         (format "epigraph:%s" id)))))
 
 (defun jf/org-link-ol-follow/epigraph (name)
   "Follow the NAME to the epigraph."
-  (let* ((file
-           jf/filename/bibliography)
-          (case-fold-search
-            t))
-    (find-file file)
-    (goto-char (point-min))
-    (let ((case-fold-search t))
-      (search-forward-regexp (format "^#\\+name: +%s$" name)))
-    (pulsar--pulse)))
+  (jf/org-link-ol-follow-named-content-block
+    name jf/filename/bibliography))
 
 (org-link-set-parameters "elfeed"
   :follow #'elfeed-link-open

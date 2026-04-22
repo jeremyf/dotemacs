@@ -2578,6 +2578,8 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
                            :style dots))))
         `(jf/org-faces-epigraph
            ((,c :underline nil :slant italic :foreground ,fg-alt)))
+        `(jf/org-faces-poem
+           ((,c :underline nil :slant italic :foreground ,fg-alt :background ,bg-alt)))
         `(jf/org-faces-work
            ((,c :underline nil :slant italic :bold t :foreground ,mail-cite-0)))
         `(jf/org-faces-abbr
@@ -4169,32 +4171,37 @@ The return value is a list of `cons' with the `car' values of:
       (forward-line)
       (org-sort-list nil ?a))))
 
-(defun jf/org/capture/quote/name-that-block ()
-  "Name a quote/verse block from capture block.
+(defun jf/org/capture/name-that-block (&optional nth-line prefix)
+  "Name a content block from capture.
 
-Use `denote-sluggify' as the naming function for the quote"
+Use `denote-sluggify' as the naming function for the block.
+
+Use the NTH-LINE of the block as the name; where 0 is the first line.
+Prepend any given PREFIX to the derived name."
   (let* (
           ;; The evaluated text thus far.  With prompts completed.
           (template
             (plist-get org-capture-current-plist :template))
-          ;; By convention the second line of the template is the
-          ;; first line of the content block
+          ;; By convention the second line of the template is the first
+          ;; line of the content block; however we can use a different
+          ;; line based on the provided input.
           (first-line-of-block-content
-            (nth 1 (s-split "\n" template)))
+            (nth (or nth-line 1) (s-split "\n" template)))
           ;; Derive the name of the block by leveraging
           ;; `denote-sluggify'.
           (name
+            (s-prepend (or prefix "")
             (s-join "-"
               (seq-take
                 (s-split "-"
                   (denote-sluggify 'title
                     first-line-of-block-content))
-                8))))
+                8)))))
     (save-excursion
       ;; Place the name of the quote just above the start of the
       ;; block.
       (goto-char (point-min))
-      (insert (format "#+NAME: %s\n" name)))))
+      (insert (format "#+name: %s\n" name)))))
 
 (defun jf/org/capture/quote-location ()
   "Position to a selected “quotable” element base on prompts.
@@ -4304,7 +4311,7 @@ sort accordingly.")
        (file+function jf/filename/bibliography
          jf/org/capture/quote-location)
        "#+begin_%^{Type|quote|quote|verse}\n%^{Text}\n#+end_%\\1"
-       :prepare-finalize jf/org/capture/quote/name-that-block
+       :prepare-finalize jf/org/capture/name-that-block
        :jump-to-captured t
        :empty-lines 1)
      ("w" "Work"

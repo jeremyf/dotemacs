@@ -1,8 +1,5 @@
 ;; -*- lexical-binding: t; -*-
 
-(use-package i3wm-config-mode
-  :straight t)
-
 ;; For improving the readability of images later to be OCR-ed.
 (use-package unpaper
   :straight (unpaper :host github :repo "unpaper/unpaper"))
@@ -378,6 +375,203 @@ Useful for narrowing regions.")
      :no-save t
      :immediate-finish nil
      :kill-buffer t
+     :jump-to-captured t))
+
+(defvar jf/org-link-ol-description/named-content-block/stack
+  nil
+  "The value of the last named content block's body that we linked to.")
+
+(defun jf/org-link-ol-description/named-content-block (link desc)
+  "Apply the DESC to the LINK.  Or use the `car' of `kill-ring'.
+
+This assumes that the completion function pushes a desc to the
+`kill-ring'."
+  (or desc (pop
+             jf/org-link-ol-description/named-content-block/stack)))
+
+(defun jf/org-link-ol-follow/named-content-block (name file)
+  "Follow the org link NAME to the FILE."
+  (let* ((case-fold-search
+            t))
+    (find-file file)
+    (goto-char (point-min))
+    (let ((case-fold-search t))
+      (search-forward-regexp (format "^#\\+name: +%s$" name)))
+    (pulsar--pulse)))
+
+(defun jf/org-link-ol-complete/named-content-block (type file)
+  "Find and insert an epigraph for export.
+
+Wires into `org-insert-link'."
+  (let* ((buffer
+           (find-file-noselect file))
+          (candidates
+            (save-restriction
+              (widen)
+              (save-excursion
+                (with-current-buffer buffer
+                  (org-element-map
+                    (org-element-parse-buffer)
+                    '(quote-block verse-block)
+                    (lambda (el)
+                      ;; Skip un-named blocks as we can’t link to them.
+                      (when-let* ((id
+                                    (org-element-property :name el))
+                                   (left
+                                     (org-element-property
+                                       :contents-begin el))
+                                   (right
+                                     (org-element-property
+                                       :contents-end el))
+                                   (text
+                                     ;; Compress the result into a
+                                     ;; single line.
+                                     (s-replace "\n" "⮒"
+                                       (s-trim
+                                         (buffer-substring-no-properties
+                                           left
+                                           right)))))
+                        (cons text id))))))))
+          (candidate
+            (completing-read (format "%s: "
+                               (s-titleize type))
+              candidates nil t))
+          (id
+            (alist-get candidate candidates nil nil #'string=)))
+    (when id
+      (progn
+        (message "Added %S to the named content ring" candidate)
+        ;; Expand the result into a single line.
+        (push (s-replace "⮒" "\n" candidate)
+          jf/org-link-ol-description/named-content-block/stack)
+        (format "%s:%s" type id)))))
+
+(defun jf/org-link-ol-export/by-format (format classes id text &optional work author)
+  "Generate the the link text for the given FORMAT, CLASS, ID, and TEXT.
+
+When WORK and/or AUTHOR is non-nil, the link will contain more
+information."
+  (let ((verse-p (member "verse" classes)))
+    (cond
+      ((or (eq format 'html) (eq format 'md))
+        (format "<blockquote class=\"%s\" data-id=\"%s\">\n%s%s</blockquote>\n"
+          (s-join " " classes)
+          id
+          (if verse-p
+            (s-replace "\n" "<br />\n" text)
+            (org-export-string-as text 'html t))
+          (cond
+            ((and (s-present? work) (s-present? author))
+              (format "\n<footer>&#8213;%s, <cite>%s</cite></footer>"
+                author work))
+            ((s-present? work)
+              (format "\n<footer>&#8213; <cite>%s</cite></footer>"
+                work))
+            ((s-present? author)
+              (format "\n<footer>&#8213; %s</footer>"
+                author))
+            (t ""))))
+      ((eq format 'latex)
+        (format "\\begin{%s}\n%s%s\n\\end{%s}\n"
+          (verse-p "verse" "quote")
+          (if verse-p
+            (s-replace "\n" "\\\\\n" text)
+            text)
+          (cond
+            ((and (s-present? work) (s-present? author))
+              (format "---%s, \\textit{%s}" author work))
+            ((s-present? work)
+              (format "---\\textit{%s}" work))
+            ((s-present? author)
+              (format "---%s" author))
+            (t ""))
+          class))
+      (t
+        (let* ((use-hard-newlines t))
+          (s-replace
+            "\n" hard-newline
+            (format "%s%s"
+              text
+              (cond
+                ((and (s-present? work) (s-present? author))
+                  (format "\n\n—%s, “%s”" author work))
+                ((s-present? work)
+                  (format "\n\n—“%s”" work))
+                ((s-present? author)
+                  (format "\n\n—%s" author))
+                (t "")))))))))
+
+(defvar jf/filename/poems
+  (denote-get-path-by-id "20260422T080153")
+  "The file where I'm gathering all of the poems I write.")
+
+(defface jf/org-faces-poem '((default :inherit link))
+  "Face used to style `org-mode' epigraph links in the buffer."
+  :group 'denote-faces
+  :package-version '(denote . "0.5.0"))
+
+(defun jf/org-link-ol-export/poem (link description format channel)
+  "Export the text of the LINK poem in the corresponding FORMAT.
+
+We ignore the DESCRIPTION and probably the CHANNEL."
+  (let ((buffer
+          (find-file-noselect jf/filename/poems)))
+    (save-restriction
+      (widen)
+      (save-excursion
+        (with-current-buffer buffer
+          (let* ((poem
+                   (car
+                     (org-element-map
+                       (org-element-parse-buffer)
+                       '(quote-block verse-block)
+                       (lambda (el)
+                         ;; Skip un-named blocks as we can’t link to
+                         ;; them.
+                         (when (string=
+                                 (org-element-property :name el)
+                                 link)
+                           el)))))
+                  (_
+                    (unless poem
+                      (user-error
+                        "Unable to find %s poem in file %s"
+                        link jf/filename/poems)))
+                  (id
+                    (org-element-property :name poem))
+                  (text
+                    (buffer-substring-no-properties
+                      (org-element-property
+                        :contents-begin poem)
+                      (org-element-property
+                        :contents-end poem))))
+            (jf/org-link-ol-export/by-format
+              format '("verse") id text)))))))
+
+(org-link-set-parameters "poem"
+  :complete (lambda ()
+              (jf/org-link-ol-complete/named-content-block
+                "poem" jf/filename/poems))
+  :insert-description #'jf/org-link-ol-description/named-content-block
+  :export #'jf/org-link-ol-export/poem
+  :face #'jf/org-faces-poem
+  :follow (lambda (name)
+            (jf/org-link-ol-follow/named-content-block
+              name jf/filename/poems)))
+
+(add-to-list 'org-capture-templates
+  '("h" "Haiku"
+     plain (file+headline
+             jf/filename/poems
+             "Haiku")
+     "#+attr_shortcode: :date %<%Y-%m-%d>\n#+begin_verse\n%^{Haiku}\n#+end_verse"
+     :prepare-finalize (lambda ()
+                   (jf/org/capture/quote/name-that-block
+                           2 "haiku-"))
+     :no-save t
+     :immediate-finish nil
+     :kill-buffer t
+     :empty-lines 1
      :jump-to-captured t))
 
 
