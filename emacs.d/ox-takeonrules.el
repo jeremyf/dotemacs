@@ -316,9 +316,21 @@ INFO is a plist holding contextual information."
 
 (org-link-set-parameters "epigraph"
   :complete #'jf/org-link-ol-complete/epigraph
+  :insert-description #'jf/org-link-ol-description/epigraph
   :export #'jf/org-link-ol-export/epigraph
   :face #'jf/org-faces-epigraph
   :follow #'jf/org-link-ol-follow/epigraph)
+
+(defvar jf/org-link-ol-description/current-epigraph
+  nil
+  "The value of the last epigraph's body that we linked to.")
+
+(defun jf/org-link-ol-description/epigraph (link desc)
+  "Apply the DESC to the LINK.  Or use the `car' of `kill-ring'.
+
+This assumes that the completion function pushes a desc to the
+`kill-ring'."
+  (or desc jf/org-link-ol-description/current-epigraph))
 
 (defun jf/org-link-ol-export/epigraph (link description format channel)
   "Export the text of the LINK epigraph in the corresponding FORMAT.
@@ -468,7 +480,7 @@ Wires into `org-insert-link'."
       (progn
         (message "Added %S to the kill ring" candidate)
         ;; Expand the result into a single line.
-        (kill-new (s-replace "⮒" "\n" candidate))
+        (setq jf/org-link-ol-description/epigraph (s-replace "⮒" "\n" candidate))
         (format "epigraph:%s" id)))))
 
 (defun jf/org-link-ol-follow/epigraph (name)

@@ -245,6 +245,44 @@ URL is assumed to be either of an RSS feed or Atom feed."
 (use-package elpher
   :straight t)
 
+(defun dired-do-load-movie (&optional arg)
+  "Load the dock for the current movie or all marked (or next ARG)."
+  (interactive "P" dired-mode)
+  (let ((files
+          (seq-filter (lambda (file)
+                      (s-ends-with? ".mp4" file))
+            (dired-get-marked-files nil arg))))
+    (dolist (file files)
+      (let* ((given
+               (f-base file))
+              (title
+                (read-string (format "Movie %s: " given)
+                  (s-titleize
+                    (s-replace-regexp "[-_]+" " "
+                      (string-replace ".mp4" "" given)))))
+              (_
+                (browse-url
+                  (format
+                    "https://www.themoviedb.org/search/movie?query=%s"
+                    (browse-url-encode-url title))))
+              (year
+                (read-number
+                  (format
+                    "«%s» Release Year: " title)))
+              (tmdbid
+                (read-number
+                  (format
+                    "«%s» Movie DB ID: " title)))
+              (dirname
+                (format "%s (%s) [tmdbid-%s]" title year tmdbid))
+              (filename
+                (format "%s.mp4" dirname))
+              (loading-dock-folder
+                (f-join "/home/movies/LoadingDock/Movies/" dirname)))
+        (mkdir loading-dock-folder t)
+        (f-move file (f-join loading-dock-folder filename)))))
+  (revert-buffer))
+
 (defun jf/syncthing-aling (&optional number)
   "Synchronize files into SyncThing bucket.
 

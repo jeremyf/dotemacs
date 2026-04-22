@@ -93,7 +93,25 @@ The DWIM behaviour of this command is as follows:
           ("H-e m" . 'symbol-overlay-rename)
           ("C-c C-c" . 'jf/eval-region-dwim))
   :config
-  ;; Allow "y" or "n" to stand in for yes/no prompts
+  ;; Recommendations from https://emacsredux.com/blog/2026/04/07/stealing-from-the-best-emacs-configs/
+  (setq-default bidi-display-reordering 'left-to-right
+              bidi-paragraph-direction 'left-to-right)
+  (setq bidi-inhibit-bpa t)
+  (setopt redisplay-skip-fontification-on-input t)
+  (setopt read-process-output-max (* 8 1024 1024))
+  (setq-default cursor-in-non-selected-windows nil)
+  (setq highlight-nonselected-windows nil)
+  (setopt use-short-answers t)
+  (setopt help-window-select t)
+  (setopt kill-do-not-save-duplicates t)
+  (setopt savehist-additional-variables
+    '(search-ring regexp-search-ring kill-ring))
+  (setopt save-interprogram-paste-before-kill t)
+  (setopt ffap-machine-p-known 'reject)
+  (setopt window-combination-resize t)
+  ;; https://irreal.org/blog/?p=13677 namely, `use-short-answers'
+  ;; supplants the defalias trick.
+  ;; ;; Allow "y" or "n" to stand in for yes/no prompts
   (defalias 'yes-or-no-p 'y-or-n-p)
   (prefer-coding-system 'utf-8)
   (set-default-coding-systems 'utf-8)
@@ -410,6 +428,19 @@ Related to `jf/linux:radio-silence'."
       ns-right-command-modifier 'hyper
       ns-alternate-modifier 'meta
       ns-right-alternate-modifier 'meta)))
+
+(winner-mode +1)
+
+(defun toggle-delete-other-windows ()
+  "Delete other windows in frame if any, or restore previous window config."
+  (interactive)
+  (if (and winner-mode
+           (equal (selected-window) (next-window)))
+      (winner-undo)
+    (delete-other-windows)))
+
+(global-set-key (kbd "C-x 1") #'toggle-delete-other-windows)
+
 
 (defmacro jf/grab-browser-links (browser config)
   "For the given BROWSER and CONFIG define helper commands.
@@ -5858,7 +5889,7 @@ Use f/s for speed, [/] for size, b/n to skip, SPC to pause, q to quit."
 (use-package auth-source
   :straight (:type built-in)
   :config
-  (setq auth-sources (list "~/.authinfo.pgp" "~/.authinfo")))
+  (setq auth-sources (list "~/.authinfo.gpg" "~/.authinfo")))
 
 (use-package forge
   :straight (:host github :repo "magit/forge"))

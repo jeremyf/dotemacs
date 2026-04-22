@@ -46,7 +46,9 @@
         typopunct-insert-quotation-mark
         typopunct-insert-times
         typopunct-insert-typographical-dashes
+        wdired--self-insert
         wdired-finish-edit
+        wdired-previous-line
         wgrep-finish-edit
         whole-line-or-region-comment-dwim-2
         yaml-electric-backspace
