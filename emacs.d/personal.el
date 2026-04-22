@@ -348,7 +348,10 @@ Useful for narrowing regions.")
 ;; A cautionary tale in regards to using this function.  If I have an
 ;; org-mode file and I export it to markdown, that markdown file will be
 ;; what we pick-up.
-(setq (denote-get-path-by-id "20260101T093750"))
+(defvar jf/personal/filename-for-journal
+  ;; TODO: make this dynamic by year, and establish a convention.
+  (denote-get-path-by-id "20260101T093750")
+  "Where I put my journal.")
 
 (defvar jf/personal/filename-for-library
   (denote-get-path-by-id "20250828T165328")
