@@ -431,7 +431,7 @@ Wires into `org-insert-link'."
 
 (defun jf/org-link-ol-follow/epigraph (name)
   "Follow the NAME to the epigraph."
-  (jf/org-link-ol-follow-named-content-block
+  (jf/org-link-ol-follow/named-content-block
     name jf/filename/bibliography))
 
 (org-link-set-parameters "elfeed"

@@ -325,6 +325,7 @@ Else, evaluate the whole buffer."
         (ibuffer-do-sort-by-alphabetic)))))
 
 (when (eq system-type 'gnu/linux)
+  (bind-key "s-s" #'save-buffer)
   (use-package grab-x-link
     :straight (:host github :repo "jeremyf/dotemacs" :files ("emacs.d/grab-x-link")))
 
@@ -2434,7 +2435,7 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
       ((>= prefix 4)
         (unbury-buffer))
       (t
-        (if buffer-read-only (kill-current-buffer) (bury-use))))))
+        (if buffer-read-only (kill-current-buffer) (bury-buffer))))))
 
 (use-package tab-bar
   :straight (:type built-in)
@@ -4171,7 +4172,7 @@ The return value is a list of `cons' with the `car' values of:
       (forward-line)
       (org-sort-list nil ?a))))
 
-(defun jf/org/capture/name-that-block (&optional nth-line prefix)
+(defun jf/org/capture/name-that-block (&optional nth-line prefix lines-to-name)
   "Name a content block from capture.
 
 Use `denote-sluggify' as the naming function for the block.
@@ -4201,6 +4202,8 @@ Prepend any given PREFIX to the derived name."
       ;; Place the name of the quote just above the start of the
       ;; block.
       (goto-char (point-min))
+      (when lines-to-name
+        (forward-line lines-to-name))
       (insert (format "#+name: %s\n" name)))))
 
 (defun jf/org/capture/quote-location ()
@@ -4458,7 +4461,6 @@ word.  Probably form my days on the AS400 terminal."
   :commands (consult-projectile)
   :bind (("M-s r r" . consult-ripgrep)
           ("M-s r n" . jf/consult-ripgrep-no-generated))
-  :after (consult projectile)
   :straight (consult-projectile
               :type git
               :host gitlab
@@ -4545,7 +4547,6 @@ possible.")
       ("b" "Bindings" embark-bindings)
       ("c" "Command" helpful-command)
       ("d" "Definition" sdcv-search)
-      ("D" "Docs" devdocs-lookup)
       ("f" "Function (interactive)" helpful-callable)
       ("F" "Function (all)" helpful-function)
       ("i" "Info" info)
@@ -5355,12 +5356,13 @@ See `pdf-view-bookmark-make-record:prompt-for-random'."
   (url-privacy-level '(email lastloc os emacs))
   (url-user-agent "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:128.0) Gecko/20100101 Firefox/128.0"))
 
+(require 'compat)
 (use-package elfeed
   ;; An Emacs RSS reader.  I’ve used Google Reader, Feedly, Inoreader,
   ;; and Newsboat.  I wrote about
   ;; https://takeonrules.com/2020/04/12/switching-from-inoreader-to-newsboat-for-rss-reader/,
   ;; and the principles apply for Elfeed.
-  :straight t
+  :straight (:host github :repo "emacs-elfeed/elfeed" :ref "3.4.2")
   ;; Without this, I was not seeing `rss' command.
   :demand 3
   :custom

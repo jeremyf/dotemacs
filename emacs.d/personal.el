@@ -302,7 +302,7 @@ default of 6 (ye ol' 1d6)."
 (add-hook 'after-init-hook #'jf/syncthing-aling)
 
 (use-package mastodon
-  ;; :straight (:host codeberg :repo "martianh/mastodon.el")
+  :straight (:host codeberg :repo "martianh/mastodon.el")
   :when (file-exists-p (expand-file-name "~/.my-computer"))
   :after (logos)
   :init
@@ -347,8 +347,7 @@ Useful for narrowing regions.")
 ;; what we pick-up.
 (defvar jf/personal/filename-for-journal
   ;; TODO: make this dynamic by year, and establish a convention.
-  (denote-get-path-by-id "20260101T093750")
-  "Where I put my journal.")
+  (denote-get-path-by-id "20260101T093750"))
 
 (defvar jf/personal/filename-for-library
   (denote-get-path-by-id "20250828T165328")
@@ -397,7 +396,7 @@ This assumes that the completion function pushes a desc to the
     (goto-char (point-min))
     (let ((case-fold-search t))
       (search-forward-regexp (format "^#\\+name: +%s$" name)))
-    (pulsar--pulse)))
+    (pulsar-pulse-line)))
 
 (defun jf/org-link-ol-complete/named-content-block (type file)
   "Find and insert an epigraph for export.
@@ -447,7 +446,7 @@ Wires into `org-insert-link'."
         (format "%s:%s" type id)))))
 
 (defun jf/org-link-ol-export/by-format (format classes id text &optional work author)
-  "Generate the the link text for the given FORMAT, CLASS, ID, and TEXT.
+  "Generate the the link text for the given FORMAT, CLASSES, ID, and TEXT.
 
 When WORK and/or AUTHOR is non-nil, the link will contain more
 information."
@@ -473,7 +472,7 @@ information."
             (t ""))))
       ((eq format 'latex)
         (format "\\begin{%s}\n%s%s\n\\end{%s}\n"
-          (verse-p "verse" "quote")
+          (if verse-p "verse" "quote")
           (if verse-p
             (s-replace "\n" "\\\\\n" text)
             text)
@@ -485,7 +484,7 @@ information."
             ((s-present? author)
               (format "---%s" author))
             (t ""))
-          class))
+          (if verse-p "verse" "quote")))
       (t
         (let* ((use-hard-newlines t))
           (s-replace
@@ -559,15 +558,33 @@ We ignore the DESCRIPTION and probably the CHANNEL."
             (jf/org-link-ol-follow/named-content-block
               name jf/filename/poems)))
 
+(defalias 'haiku-to-poem-link
+  (kmacro "C-s # + b e g i n _ v e r s e <return> C-n C-a C-SPC C-s # + e n d _ v e r s e <return> C-a C-p C-e C-k C-c c h C-y <return> C-c C-c H-w C-p C-3 C-k C-c l i p o e m <return> M-y <down> <down> <return> C-a C-k C-p <backspace> C-a C-k <backspace> <return> <return>")
+  "Find the next verse block and convert it to a haiku")
+
 (add-to-list 'org-capture-templates
   '("h" "Haiku"
      plain (file+headline
              jf/filename/poems
              "Haiku")
-     "#+attr_shortcode: :date %<%Y-%m-%d>\n#+begin_verse\n%^{Haiku}\n#+end_verse"
+     "#+latex: \\newpage\n#+latex: \\vspace*{\\fill}\n#+attr_shortcode: :date %<%Y-%m-%d>\n#+begin_verse\n%^{Haiku}\n#+end_verse\n#+latex: \\vspace*{\\fill}"
      :prepare-finalize (lambda ()
-                   (jf/org/capture/quote/name-that-block
-                           2 "haiku-"))
+                   (jf/org/capture/name-that-block
+                           2 "haiku-" 2))
+     :no-save t
+     :immediate-finish nil
+     :kill-buffer t
+     :empty-lines 1
+     :jump-to-captured t))
+(add-to-list 'org-capture-templates
+  '("P" "Poem"
+     plain (file+headline
+             jf/filename/poems
+             "Poems")
+     "#+latex: \\newpage\n** %^{Title}\n#+attr_shortcode: :date %<%Y-%m-%d>\n#+begin_verse\n%^{First Line}\n#+end_verse\n"
+     :prepare-finalize (lambda ()
+                   (jf/org/capture/name-that-block
+                           3 "poem-" 1))
      :no-save t
      :immediate-finish nil
      :kill-buffer t
