@@ -186,12 +186,13 @@ For inserting entity."
        :mode "remote"
        :request "attach")))
 
-(setq tab-bar-tab-name-all-with-projectile
+(setq tab-bar-project-alist
   '(
      ("morpho-pcloud-cli" . "P ")
      ("morpho-service-broker" . "B ")
      ("aeris" . "A ")
      ("factotum" . "F ")
+     ("dotemacs" . "E ")
      ("morpho-swagger" . "🤠 ")))
 
 (require 'gh-dashboard)

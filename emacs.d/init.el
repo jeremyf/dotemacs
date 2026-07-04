@@ -81,7 +81,8 @@ The DWIM behaviour of this command is as follows:
           ("C-k" . #'jf/kill-line-or-region)
           ("C-c n" . #'jf/yank-file-name-to-clipboard) ;; Deprecated
           ("C-c y n" . #'jf/yank-file-name-to-clipboard)
-          ("M-<delete>" . #'kill-word)
+          ("M-<delete>" . #'jf/delete-word)
+          ("M-d" . #'jf/delete-word)
           ;; ("s-<down>" . #'end-of-buffer)
           ;; ("s-<up>" . #'beginning-of-buffer)
           ;; ("s-q" . #'save-buffers-kill-terminal)
@@ -2441,6 +2442,9 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   :straight (:type built-in)
   :custom (tab-bar-tab-name-function 'tab-bar-tab-name-all-with-projectile)
   (tab-bar-auto-width-max '((330) 30))
+  :bind (:map tab-bar-mode-map
+          (("s-[" . tab-previous)
+            (("s-]" . tab-next))))
   :config
   (defun tab-bar-tab-name-all-with-projectile ()
     (mapconcat
