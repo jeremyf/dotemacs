@@ -60,6 +60,10 @@ markdown-mode markdown-ts-mode
 ;;;; org-mode
 org-mode
 
+(uyesterday "[[date:" (ts-format "%Y-%m-%d" (ts-adjust 'day -1 (ts-now))) "][Yesterday]]")
+(lyesterday "[[date:" (ts-format "%Y-%m-%d" (ts-adjust 'day -1 (ts-now))) "][yesterday]]")
+(ulastn "[[date:" (ts-format "%Y-%m-%d" (ts-adjust 'day -1 (ts-now))) "][Last night]]")
+(llastn "[[date:" (ts-format "%Y-%m-%d" (ts-adjust 'day -1 (ts-now))) "][last night]]")
 (utoday "[[date:" (format-time-string "%Y-%m-%d") "][Today]]")
 (ltoday "[[date:" (format-time-string "%Y-%m-%d") "][today]]")
 (beamer

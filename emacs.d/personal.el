@@ -345,7 +345,7 @@ Useful for narrowing regions.")
 ;; A cautionary tale in regards to using this function.  If I have an
 ;; org-mode file and I export it to markdown, that markdown file will be
 ;; what we pick-up.
-(defvar jf/personal/filename-for-journal
+(setq jf/personal/filename-for-journal
   ;; TODO: make this dynamic by year, and establish a convention.
   (denote-get-path-by-id "20260101T093750"))
 

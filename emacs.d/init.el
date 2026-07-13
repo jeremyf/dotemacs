@@ -5013,6 +5013,7 @@ The generated and indented TOC will be inserted at point."
 (use-package projectile
   ;; Convenient organization and commands for projects.
   :straight t
+  :commands (projectile-project-name)
   :custom
   (projectile-enable-caching t)
   (projectile-project-search-path
@@ -7104,6 +7105,23 @@ This encodes the logic for creating a project."
 
     (load "personal.el"))
   (load "work.el"))
+
+;; https://protesilaos.com/codelog/2026-07-08-emacs-global-keybinding-overrides/
+;; The purpose is to put all key commands that I want as global in the
+;; jf/overrides-mode-map
+(defvar jf/overrides-mode-map (make-sparse-keymap)
+  "Keymap for the `jf/overrides-mode'.")
+
+(define-minor-mode jf/overrides-mode
+  "Activate the `jf/overrides-mode-map'."
+  :global t
+  :init-value nil
+  :keymap jf/overrides-mode-map)
+
+(define-key jf/overrides-mode-map (kbd "M-o") 'ace-window)
+
+(jf/overrides-mode 1)
+
 
 (custom-set-variables
   ;; custom-set-variables was added by Custom.
