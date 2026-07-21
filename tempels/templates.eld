@@ -64,8 +64,12 @@ org-mode
 (lyesterday "[[date:" (ts-format "%Y-%m-%d" (ts-adjust 'day -1 (ts-now))) "][yesterday]]")
 (ulastn "[[date:" (ts-format "%Y-%m-%d" (ts-adjust 'day -1 (ts-now))) "][Last night]]")
 (llastn "[[date:" (ts-format "%Y-%m-%d" (ts-adjust 'day -1 (ts-now))) "][last night]]")
+(uthism "[[date:" (format-time-string "%Y-%m-%d") "][This morning]]")
+(lthism "[[date:" (format-time-string "%Y-%m-%d") "][this morning]]")
 (utoday "[[date:" (format-time-string "%Y-%m-%d") "][Today]]")
 (ltoday "[[date:" (format-time-string "%Y-%m-%d") "][today]]")
+(utomorrow "[[date:" (ts-format "%Y-%m-%d" (ts-adjust 'day 1 (ts-now))) "][Tomorrow]]")
+(ltomorrow "[[date:" (ts-format "%Y-%m-%d" (ts-adjust 'day 1 (ts-now))) "][tomorrow]]")
 (beamer
   n "#+OPTIONS: H:2 num:t"
   n "#+BEAMER_THEME: Madrid"

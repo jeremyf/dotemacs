@@ -120,7 +120,7 @@ URL is assumed to be either of an RSS feed or Atom feed."
              (save-excursion
                (with-current-buffer
                  (find-file-noselect jf/filename/bibliography)
-                 (elfeed--shuffle
+                 (elfeed-shuffle
                    (org-element-map
                      (org-element-parse-buffer)
                      '(quote-block verse-block)
@@ -727,7 +727,7 @@ We ignore the DESCRIPTION and probably the CHANNEL."
   (save-excursion
     (with-current-buffer
       (find-file-noselect jf/filename/bibliography)
-      (elfeed--shuffle
+      (elfeed-shuffle
         (org-element-map
           (org-element-parse-buffer)
           '(quote-block verse-block)
