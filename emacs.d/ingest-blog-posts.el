@@ -76,7 +76,7 @@
           )
     ;; DO WE HAVE FOOTNOTES?
     (with-current-buffer (find-file-noselect
-                           jf/personal/filename-for-journal)
+                           jf/filename-for-journal)
       (save-excursion
         (save-restriction
           (widen)
@@ -218,7 +218,7 @@
   (save-buffer))
 
 (dolist (identifier identifiers)
-  (with-current-buffer (find-file-noselect jf/personal/filename-for-journal)
+  (with-current-buffer (find-file-noselect jf/filename-for-journal)
     (save-excursion
       (save-restriction
         (widen)

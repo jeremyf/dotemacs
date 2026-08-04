@@ -53,7 +53,7 @@
   (denote-get-path-by-id "20250117T101521")
   "Where I put my MBOs.")
 
-(setq jf/personal/filename-for-journal
+(setq jf/filename-for-journal
   (denote-get-path-by-id "20260101T000000"))
 
 (add-to-list 'org-capture-templates

@@ -280,6 +280,9 @@ URL is assumed to be either of an RSS feed or Atom feed."
         (f-move file (f-join loading-dock-folder filename)))))
   (revert-buffer))
 
+(setq jf/filename-for-runbooks
+      (denote-get-path-by-id "20260307T075535"))
+
 (defun jf/syncthing-aling (&optional number)
   "Synchronize files into SyncThing bucket.
 
@@ -342,7 +345,7 @@ Useful for narrowing regions.")
   (advice-add 'mastodon-tl--insert-status
     :before #'jf/mastodon-tl--insert-status))
 
-;; A cautionary tale in regards to using this function.  If I have an
+;; A cauale in regards to using this function.  If I have an
 ;; org-mode file and I export it to markdown, that markdown file will be
 ;; what we pick-up.
 (setq jf/personal/filename-for-journal
@@ -353,7 +356,7 @@ Useful for narrowing regions.")
   (denote-get-path-by-id "20250828T165328")
   "Where I put my library checkouts.")
 
-(add-to-list 'org-capture-templates
+(add-to-list 'oe-templates
   '("b" "Blog Post"
      entry (file+olp+datetree
              jf/personal/filename-for-journal)
@@ -609,7 +612,7 @@ We ignore the DESCRIPTION and probably the CHANNEL."
       (org-entry-put entry "CUSTOM_ID"
         (format "GLOSSARY-%s" (s-upcase
                                 (denote-sluggify 'title title)))))))
-(defvar jf/filename/rss-feed
+(defvar jf/filefeed
   (denote-get-path-by-id "20110202T000001"))
 
 (add-to-list 'org-capture-templates

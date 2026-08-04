@@ -3537,12 +3537,15 @@ function is ever added to that hook."
         (org-table-recalculate-buffer-tables)
         (org-dblock-update '(4))))))
 
-(defvar jf/personal/filename-for-journal
+(defvar jf/filename-for-journal
   ""
   "Where I put my journal.")
+(defvar jf/filename-for-runbooks
+  ""
+  "Where I put my runbook notes.")
 
 (with-eval-after-load 'org
-  (add-to-list 'org-capture-templates
+  (add-to-list ure-templates
   '("j" "Journal Entry"
      entry (file+olp+datetree
              jf/personal/filename-for-journal)
@@ -4304,6 +4307,14 @@ sort accordingly.")
       plain (clock)
       "%(jf/denote/capture-wrap :link \"%L\" :content \"%i\")"
       :empty-lines 1)
+    ("u" "Runbook"
+     entry (file
+            jf/filename-for-runbooks)
+     "%^{Entry}\n%?"
+     :no-save t
+     :immediate-finish nil
+     :kill-buffer t
+     :jump-to-captured t)
      ("d" "Dictionary"
        plain (file jf/filename/dictionary)
        "- %^{Term} :: %^{Description}; %a"
@@ -4932,7 +4943,8 @@ The generated and indented TOC will be inserted at point."
 (use-package flymake
   :straight t
   ;; Don't be so hasty in syntax checking.
-  :custom (flymake-no-changes-timeout 2))
+  :custom (flymake-no-changes-timeout 2
+  flymake-show-diagnostics-at-end-of-line 'short))
 
 (use-package flyspell
   :straight (:type built-in)
@@ -5482,8 +5494,7 @@ It will display entries without switching to them."
     (let ((default-directory elfeed-db-directory))
       (when (file-exists-p ".git")
         (call-process "git" nil "*elfeed-db-backup*" nil "add" "-A")
-        (call-process "git" nil "*elfeed-db-backup*" nil "commit" "-m" "auto-backup")
-        (call-process "git" nil "*elfeed-db-backup*" nil "push" "origin" "main")))))
+        (call-process "git" nil "*elfeed-db-backup*" nil "commit" "-m" "auto-backup")))))
 
 (defun jf/elfeed-db-save-soon ()
   "Schedule a database save after 10 seconds of idle."
