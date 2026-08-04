@@ -188,6 +188,7 @@ For inserting entity."
 
 (setq tab-bar-project-alist
   '(
+     ("morpho-roadmap.wiki" . "📓")
      ("morpho-pcloud-cli" . "P ")
      ("morpho-service-broker" . "B ")
      ("aeris" . "A ")
