@@ -56,6 +56,9 @@
 (setq jf/filename-for-journal
   (denote-get-path-by-id "20260101T000000"))
 
+(setq jf/filename-for-runbooks
+  (denote-get-path-by-id "20260804T120428"))
+
 (add-to-list 'org-capture-templates
   '("T" "Add to task for MBO"
      plain (file+function
