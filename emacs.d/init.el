@@ -3545,7 +3545,7 @@ function is ever added to that hook."
   "Where I put my runbook notes.")
 
 (with-eval-after-load 'org
-  (add-to-list ure-templates
+  (add-to-list 'org-capture-templates
   '("j" "Journal Entry"
      entry (file+olp+datetree
              jf/personal/filename-for-journal)
