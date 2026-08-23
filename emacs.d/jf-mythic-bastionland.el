@@ -94,12 +94,6 @@
  :private t
  :data '(((2 . 18) . "{CURRENT_ROLL}")))
 (random-table/register
- :name "Mythic Bastionland > Guard > Young"
- :roller (lambda (table)
-           (max 2 (+ 1 (random 6))))
- :private t
- :data '(((1 . 6) . "{CURRENT_ROLL}")))
-(random-table/register
  :name "Mythic Bastionland > Virtues > Mature"
  :private t
  :roller (lambda (table)
@@ -107,13 +101,6 @@
                   (+ 2 (random 6) (random 12))
                   (+ 2 (random 6) (random 12))))
  :data '(((2 . 18) . "{CURRENT_ROLL}")))
-
-(random-table/register
- :name "Mythic Bastionland > Guard > Mature"
- :roller (lambda (table)
-           (max (+ 1 (random 6))
-                (+ 2 (random 6) (random 6))))
- :data '(((1 . 12) . "{CURRENT_ROLL}")))
 (random-table/register
  :name "Mythic Bastionland > Virtues > Old"
  :roller (lambda (table)
@@ -123,6 +110,18 @@
                  (+ 2 (random 6) (random 12)))
             (+2 (random 6) (random 12))))
  :data '(((2 . 18) . "{CURRENT_ROLL}")))
+(random-table/register
+ :name "Mythic Bastionland > Guard > Young"
+ :roller (lambda (table)
+           (max 2 (+ 1 (random 6))))
+ :private t
+ :data '(((1 . 6) . "{CURRENT_ROLL}")))
+(random-table/register
+ :name "Mythic Bastionland > Guard > Mature"
+ :roller (lambda (table)
+           (max (+ 1 (random 6))
+                (+ 2 (random 6) (random 6))))
+ :data '(((1 . 12) . "{CURRENT_ROLL}")))
 (random-table/register
  :name "Mythic Bastionland > Guard > Old"
  :roller (lambda (table)
