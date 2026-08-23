@@ -356,7 +356,7 @@ Useful for narrowing regions.")
   (denote-get-path-by-id "20250828T165328")
   "Where I put my library checkouts.")
 
-(add-to-list 'oe-templates
+(add-to-list 'org-capture-templates
   '("b" "Blog Post"
      entry (file+olp+datetree
              jf/personal/filename-for-journal)
@@ -612,7 +612,7 @@ We ignore the DESCRIPTION and probably the CHANNEL."
       (org-entry-put entry "CUSTOM_ID"
         (format "GLOSSARY-%s" (s-upcase
                                 (denote-sluggify 'title title)))))))
-(defvar jf/filefeed
+(defvar jf/filename/rss-feed
   (denote-get-path-by-id "20110202T000001"))
 
 (add-to-list 'org-capture-templates
@@ -1639,21 +1639,28 @@ See `playing-a-game-candidates' and `start-playing'.")
   `(
      ("Forged from the Worst (Mythic Bastionland)" .
        ((start .
-          ((bmk-display-func . switch-to-buffer-side-window)
-            (bmk-prompt-for-random . t)
-            (callback . start-playing-mythic-bastionaland)
+          ((default-bookmark-display-function . switch-to-buffer-side-window)
+            (pdf-view-bookmark-make-record:prompt-for-random . t)
+            (callback . start-playing-mythic-bastionland)
+            (mythic-bastionland-map-as-html-path . "~/SyncThings/source/forged-from-the-worst/forged=from=the=worst--revealed-map.html")
+            (mythic-bastionland-map-state-file . "~/SyncThings/source/forged-from-the-worst/forged=from=the=worst--map-state.eld")
             (bmk-file . "~/SyncThings/source/forged-from-the-worst/forged=from=the=worst--bookmarks.el")))))
-     )
+     ("Carrion's Call (Mythic Bastionland)" .
+       ((start .
+          ((default-bookmark-display-function . switch-to-buffer-side-window)
+           (pdf-view-bookmark-make-record:prompt-for-random . t)
+           (mythic-bastionland-map-as-html-path . "~/SyncThings/source/carrions-call/carrions=call--revealed-map.html")
+           (mythic-bastionland-map-state-file . "~/SyncThings/source/carrions-call/carrions=call--map-state.eld")
+           (callback . start-playing-mythic-bastionland)
+           (bmk-file . "~/SyncThings/source/carrions-call/carrions=call--bookmarks.el"))))))
   "Possible games I might be playing via Emacs.")
 
-(defun start-playing-mythic-bastionaland ()
+(defun start-playing-mythic-bastionland ()
   (setq random-table/reporter #'random-table/reporter/as-child-window)
   (load "jf-mythic-bastionland.el")
   (when (f-file?  "~/git/mythic-bastionland.el/mythic-bastionland.el")
     (progn
       (require 'mythic-bastionland "~/git/mythic-bastionland.el/mythic-bastionland.el")
-      (setq mythic-bastionland-map-as-html-path
-        "~/SyncThings/source/forged-from-the-worst/forged=from=the=worst--revealed-map.html")
       (mythic-bastionland-map-read))))
 
 (defun stop-playing ()
@@ -1682,9 +1689,9 @@ A GAME has a 'start' that is an alist.  That alist has the followingrandom-table
 properties:
 
 - 'bmk-file' :: what file we'll find our working bookmarks.
-- 'bmk-display-func' :: the function we use to display bookmarks.
-- 'bmk-prompt-for-random' :: if we'll prompt for possible random pages
-  in PDF bookmarks.
+- 'callback' :: the function we call to get us fully ready.
+
+All other key/value pairs will be sent to `setq'.
 
 When a property is not provided, \"suitable\" defaults are assigned."
   (interactive
@@ -1703,10 +1710,11 @@ When a property is not provided, \"suitable\" defaults are assigned."
         (keymap-global-set "H-r" #'random-table/roll)
         (keymap-global-set "C-H-r" #'random-table/roll-region)
         (setq random-table/reporter #'random-table/reporter/as-insert)
-        (setq default-bookmark-display-function
-          (alist-get 'bmk-display-func config))
-        (setq pdf-view-bookmark-make-record:prompt-for-random
-          (alist-get 'bmk-prompt-for-random config))
+        (cl-loop for (key . value) in config do
+                 (pcase key
+                   ('bmk-file t)
+                   ('callback t)
+                   (_ (set key value))))
         (bookmark-save)
         (setopt bookmark-default-file file)
         (bookmark-load file t nil t)
