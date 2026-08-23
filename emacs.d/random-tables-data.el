@@ -132,7 +132,7 @@
   :data (list
           (concat "\n- Archetype :: {Errant > Henchman > Archetype}"
             "\n- Renown :: {Errant > Henchman > Renown}"
-            "\n- Morale :: {(Errant :: Henchman :: Morale Base) + (Errant :: Henchman :: Morale Variable)}"
+            "\n- Morale :: {(Errant > Henchman > Morale Base) + (Errant > Henchman > Morale Variable)}"
             "\n{Errant > Character}")))
 
 (random-table/register :name "Errant > Henchman > Archetype"

@@ -433,17 +433,6 @@ Related to `jf/linux:radio-silence'."
 
 (winner-mode +1)
 
-(defun toggle-delete-other-windows ()
-  "Delete other windows in frame if any, or restore previous window config."
-  (interactive)
-  (if (and winner-mode
-           (equal (selected-window) (next-window)))
-      (winner-undo)
-    (delete-other-windows)))
-
-(global-set-key (kbd "C-x 1") #'toggle-delete-other-windows)
-
-
 (defmacro jf/grab-browser-links (browser config)
   "For the given BROWSER and CONFIG define helper commands.
 
@@ -2996,11 +2985,13 @@ future copy)."
   :straight (org :github "bzg/org-mode")
   :hook (org-mode . jf/org-mode/configurator)
   :bind (("C-c C-j" . jf/project/jump-to-task)
-          ("C-c C-x C-j" . org-clock-goto)
+         ("C-c C-x C-j" . org-clock-goto)
           ("H-5" . jf/org-insert-immediate-active-timestamp)
           ("H-i" . org-insert-link)
           )
   :bind (:map org-mode-map (("C-c j" . org-goto)
+                            ("M-n" . org-next-item)
+                            ("M-p" . org-previous-item)
                              ("C-c C-j" . jf/project/jump-to-task)
                              ("C-j" . avy-goto-char-timer)))
   :config
@@ -7148,11 +7139,11 @@ This encodes the logic for creating a project."
         (projectile-git-command .
           "git ls-files -zco --exclude-from=.projectile.gitignore")
         (org-latex-toc-command .
-          "\\begin{multicols}{2}\n\\tableofcontents\n\\end{multicols}\\newpage\\begin{multicols}{2}\\\let\\oldhref\\href\n\\renewcommand{\\href}[2]{\\oldhref{#1}{#2}\\footnote{\\url{#1}}}\n")
+          "\\begin{multicols}{2}\n\\tableofcontents\n\\end{multicols}\\newpage\\begin{multicols}{2}\\let\\oldhref\\href\n\\renewcommand{\\href}[2]{\\oldhref{#1}{#2}\\footnote{\\url{#1}}}\n")
         (org-latex-toc-command .
-          "\\begin{multicols}{1}\n\\tableofcontents\n\\end{multicols}\\newpage\\begin{multicols}{2}\\\let\\oldhref\\href\n\\renewcommand{\\href}[2]{\\oldhref{#1}{#2}\\footnote{\\url{#1}}}\n")
+          "\\begin{multicols}{1}\n\\tableofcontents\n\\end{multicols}\\newpage\\begin{multicols}{2}\\let\\oldhref\\href\n\\renewcommand{\\href}[2]{\\oldhref{#1}{#2}\\footnote{\\url{#1}}}\n")
         (org-latex-toc-command .
-          "\\begin{multicols}{2}\n\\tableofcontents\n\\end{multicols}\\newpage\\begin{multicols}{3}\\\let\\oldhref\\href\n\\renewcommand{\\href}[2]{\\oldhref{#1}{#2}\\footnote{\\url{#1}}}\n")
+          "\\begin{multicols}{2}\n\\tableofcontents\n\\end{multicols}\\newpage\\begin{multicols}{3}\\let\\oldhref\\href\n\\renewcommand{\\href}[2]{\\oldhref{#1}{#2}\\footnote{\\url{#1}}}\n")
         )))
 
 (provide 'init)

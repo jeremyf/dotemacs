@@ -1637,22 +1637,22 @@ See `playing-a-game-candidates' and `start-playing'.")
 
 (defvar playing-a-game-candidates
   `(
-     ("Forged from the Worst (Mythic Bastionland)" .
-       ((start .
-          ((default-bookmark-display-function . switch-to-buffer-side-window)
-            (pdf-view-bookmark-make-record:prompt-for-random . t)
-            (callback . start-playing-mythic-bastionland)
-            (mythic-bastionland-map-as-html-path . "~/SyncThings/source/forged-from-the-worst/forged=from=the=worst--revealed-map.html")
-            (mythic-bastionland-map-state-file . "~/SyncThings/source/forged-from-the-worst/forged=from=the=worst--map-state.eld")
-            (bmk-file . "~/SyncThings/source/forged-from-the-worst/forged=from=the=worst--bookmarks.el")))))
-     ("Carrion's Call (Mythic Bastionland)" .
-       ((start .
-          ((default-bookmark-display-function . switch-to-buffer-side-window)
-           (pdf-view-bookmark-make-record:prompt-for-random . t)
-           (mythic-bastionland-map-as-html-path . "~/SyncThings/source/carrions-call/carrions=call--revealed-map.html")
-           (mythic-bastionland-map-state-file . "~/SyncThings/source/carrions-call/carrions=call--map-state.eld")
-           (callback . start-playing-mythic-bastionland)
-           (bmk-file . "~/SyncThings/source/carrions-call/carrions=call--bookmarks.el"))))))
+    ("Forged from the Worst (Mythic Bastionland)" .
+     ((start .
+             ((default-bookmark-display-function . switch-to-buffer-side-window)
+              (pdf-view-bookmark-make-record:prompt-for-random . t)
+              (callback . start-playing-mythic-bastionland)
+              (mythic-bastionland-map-as-html-path . "~/SyncThings/source/forged-from-the-worst/forged=from=the=worst--revealed-map.html")
+              (mythic-bastionland-map-state-file . "~/SyncThings/source/forged-from-the-worst/forged=from=the=worst--map-state.eld")
+              (bmk-file . "~/SyncThings/source/forged-from-the-worst/forged=from=the=worst--bookmarks.el")))))
+    ("Carrion's Call (Mythic Bastionland)" .
+     ((start .
+             ((default-bookmark-display-function . switch-to-buffer-side-window)
+              (pdf-view-bookmark-make-record:prompt-for-random . t)
+              (mythic-bastionland-map-as-html-path . "~/SyncThings/source/carrions-call/carrions=call--revealed-map.html")
+              (mythic-bastionland-map-state-file . "~/SyncThings/source/carrions-call/carrions=call--map-state.eld")
+              (callback . start-playing-mythic-bastionland)
+              (bmk-file . "~/SyncThings/source/carrions-call/carrions=call--bookmarks.el"))))))
   "Possible games I might be playing via Emacs.")
 
 (defun start-playing-mythic-bastionland ()
