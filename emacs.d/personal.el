@@ -348,7 +348,7 @@ Useful for narrowing regions.")
 ;; A cauale in regards to using this function.  If I have an
 ;; org-mode file and I export it to markdown, that markdown file will be
 ;; what we pick-up.
-(setq jf/personal/filename-for-journal
+(setq jf/filename-for-journal
   ;; TODO: make this dynamic by year, and establish a convention.
   (denote-get-path-by-id "20260101T093750"))
 
@@ -359,7 +359,7 @@ Useful for narrowing regions.")
 (add-to-list 'org-capture-templates
   '("b" "Blog Post"
      entry (file+olp+datetree
-             jf/personal/filename-for-journal)
+             jf/filename-for-journal)
      "DRAFT At %(format-time-string \"%R\") :blogPosts:\n:PROPERTIES:\n:CUSTOM_ID: journal-%(format-time-string \"%Y%m%d-%H%M\")\n:END:\n%?"
      :empty-lines-before 1
      :empty-lines-after 1
@@ -627,7 +627,7 @@ We ignore the DESCRIPTION and probably the CHANNEL."
 (add-to-list 'org-capture-templates
   `("t" "Task"
      entry (file+headline
-             jf/personal/filename-for-journal
+             jf/filename-for-journal
              "Tasks")
      "TODO %^{Task}\n\n%T :: %(jf/denote/capture-wrap :link \"%L\" :content \"%i\")"
      :empty-lines-before 1

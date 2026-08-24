@@ -3539,7 +3539,7 @@ function is ever added to that hook."
   (add-to-list 'org-capture-templates
   '("j" "Journal Entry"
      entry (file+olp+datetree
-             jf/personal/filename-for-journal)
+             jf/filename-for-journal)
      "At %(format-time-string \"%R\")\n:PROPERTIES:\n:CUSTOM_ID: journal-%(format-time-string \"%Y%m%d-%H%M\")\n:END:\n%?"
      :empty-lines-before 1
      :empty-lines-after 1
