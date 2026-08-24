@@ -108,7 +108,7 @@
             (max (+ 2 (random 6) (random 6))
                  (+ 2 (random 6) (random 12))
                  (+ 2 (random 6) (random 12)))
-            (+2 (random 6) (random 12))))
+            (+ 2 (random 6) (random 12))))
  :data '(((2 . 18) . "{CURRENT_ROLL}")))
 (random-table/register
  :name "Mythic Bastionland > Guard > Young"
