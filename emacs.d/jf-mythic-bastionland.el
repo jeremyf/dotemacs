@@ -53,11 +53,17 @@
            "Reflected (reversal - vanity)"))
 
 (random-table/register
+ :name "Mythic Bastionland > Knight > Random NPC"
+ :data '("\n  - {Mythic Bastionland > Knight > Age and Glory}\n  - {Mythic Bastionland > Virtues > Random NPC}\n  - Wisdom Dice: {Mythic Bastionland > Clash of Tongues > Wisdom Dice}\n  - EA and EQ: {Mythic Bastionland > Clash of Tongues > Emotional Armour and Equipment}"))
+
+
+(random-table/register
  :name "Mythic Bastionland > Knight > Age and Glory"
  :roller "1d6"
  :store t
  :filter (lambda (&rest _) 0)
- :data "{Mythic Bastionland > Knight > Age} (Glory {({CURRENT_ROLL}) + ({Mythic Bastionland > Knight > Glory})})")
+ :data "Age: {Mythic Bastionland > Knight > Age}, Glory: {Mythic Bastionland > Knight > Glory}")
+
 (random-table/register
  :name "Mythic Bastionland > Knight > Age"
  :reuse "Mythic Bastionland > Knight > Age and Glory"
@@ -66,23 +72,43 @@
  :data '(((1 . 3)  . "Young")
          ((4 . 5) . "Mature")
          (6 . "Old")))
+
+(random-table/register
+ :name "Mythic Bastionland > Virtues > Random NPC"
+ :reuse "Mythic Bastionland > Knight > Age"
+ :private t
+ :data '(((1 . 3) . "VIG: {Mythic Bastionland > Virtues > Young}, CLA: {Mythic Bastionland > Virtues > Young}, SPI: {Mythic Bastionland > Virtues > Young}, GD: {Mythic Bastionland > Guard > Young}")
+         ((4 . 5) . "VIG: {Mythic Bastionland > Virtues > Mature}, CLA: {Mythic Bastionland > Virtues > Mature}, SPI: {Mythic Bastionland > Virtues > Mature}, GD: {Mythic Bastionland > Guard > Mature}")
+         (6 . "VIG: {Mythic Bastionland > Virtues > Old}, CLA: {Mythic Bastionland > Virtues > Old}, SPI: {Mythic Bastionland > Virtues > Old}, GD: {Mythic Bastionland > Guard > Old}")))
+
 (random-table/register
  :name "Mythic Bastionland > Knight > Glory"
- :roller "1d6"
+ :store t
  :private t
- :data '((1 . -2)
-         ((2 . 3) . -1)
-         ((4 . 5) . 0)
-         (6 . 3)))
+ :roller (lambda (table)
+           ;; Disallow negative glorry
+           (max 0
+                (+
+                 (random-table/storage/results/get-rolled-value
+                  "Mythic Bastionland > Knight > Age and Glory")
+                 (pcase (random 5) (0 -3) (1 -2) (2 -1) (3 0) (4 1)(5 3)))))
+ :filter (lambda (roll) 0)
+ :data '("{CURRENT_ROLL}"))
 
 (random-table/register
  :name "Mythic Bastionland > Virtues"
  :roller #'random-table/roller/prompt-from-table-data
- :data '(("Squire" . "Squire :: VIG: {Mythic Bastionland > Virtues > Squire}, CLA: {Mythic Bastionland > Virtues > Squire}, SPI: {Mythic Bastionland > Virtues > Squire}, GD: 2")
-         ("Young" . "Young Knight :: VIG: {Mythic Bastionland > Virtues > Young}, CLA: {Mythic Bastionland > Virtues > Young}, SPI: {Mythic Bastionland > Virtues > Young}, GD: {Mythic Bastionland > Guard > Young}")
-         ("Mature" . "Mature Knight :: VIG: {Mythic Bastionland > Virtues > Mature}, CLA: {Mythic Bastionland > Virtues > Mature}, SPI: {Mythic Bastionland > Virtues > Mature}, GD: {Mythic Bastionland > Guard > Mature}")
-         ("Old" . "Old Knight :: VIG: {Mythic Bastionland > Virtues > Old}, CLA: {Mythic Bastionland > Virtues > Old}, SPI: {Mythic Bastionland > Virtues > Old}, GD: {Mythic Bastionland > Guard > Old}")))
+ :data '(("Commoner" . "VIG: {Mythic Bastionland > Virtues > Commoner}, CLA: {Mythic Bastionland > Virtues > Commoner}, SPI: {Mythic Bastionland > Virtues > Commoner}, GD: {1d6}")
+         ("Squire" . "VIG: {Mythic Bastionland > Virtues > Squire}, CLA: {Mythic Bastionland > Virtues > Squire}, SPI: {Mythic Bastionland > Virtues > Squire}, GD: 2")
+         ("Young" . "VIG: {Mythic Bastionland > Virtues > Young}, CLA: {Mythic Bastionland > Virtues > Young}, SPI: {Mythic Bastionland > Virtues > Young}, GD: {Mythic Bastionland > Guard > Young}")
+         ("Mature" . "VIG: {Mythic Bastionland > Virtues > Mature}, CLA: {Mythic Bastionland > Virtues > Mature}, SPI: {Mythic Bastionland > Virtues > Mature}, GD: {Mythic Bastionland > Guard > Mature}")
+         ("Old" . "VIG: {Mythic Bastionland > Virtues > Old}, CLA: {Mythic Bastionland > Virtues > Old}, SPI: {Mythic Bastionland > Virtues > Old}, GD: {Mythic Bastionland > Guard > Old}")))
 
+(random-table/register
+ :name "Mythic Bastionland > Virtues > Commoner"
+ :roller '(+ "1d6" "1d12")
+ :private t
+ :data '(((2 . 18) . "{CURRENT_ROLL}")))
 (random-table/register
  :name "Mythic Bastionland > Virtues > Squire"
  :roller "2d6"
@@ -103,6 +129,7 @@
  :data '(((2 . 18) . "{CURRENT_ROLL}")))
 (random-table/register
  :name "Mythic Bastionland > Virtues > Old"
+ :private t
  :roller (lambda (table)
            (min
             (max (+ 2 (random 6) (random 6))
@@ -118,18 +145,47 @@
  :data '(((1 . 6) . "{CURRENT_ROLL}")))
 (random-table/register
  :name "Mythic Bastionland > Guard > Mature"
+ :private t
  :roller (lambda (table)
            (max (+ 1 (random 6))
                 (+ 2 (random 6) (random 6))))
  :data '(((1 . 12) . "{CURRENT_ROLL}")))
 (random-table/register
  :name "Mythic Bastionland > Guard > Old"
+ :private t
  :roller (lambda (table)
            (max (+ 1 (random 6))
                 (+ 2 (random 6) (random 6))
                 (+ 2 (random 6) (random 6))))
  :data '(((1 . 12) . "{CURRENT_ROLL}")))
 
+(random-table/register :name "Mythic Bastionland > Clash of Tongues > Emotional Armour and Equipment"
+                        :data
+                        '("Pride (EA1) - The grit that got me through the war. (d8, cannot be impaired)"
+                          "Loyalty (EA2) - The memory of an oath broken. (d6, when using the Rebuttal Feat, your opponent always takes the other half of the Emotional Damage)"
+                          "Honor (EA1) - The wise words of a mentor. (d6, you may perform an additional Flashback each encounter)"
+                          "Obligation (EA2) - An oath to a higher power. (d10, on a result of a 1 or 2, re-roll)"
+                          "Shame (EA1) - The burden of a secret I vowed never to share. (2d4, perform a Gambit on doubles, regardless of the result)"
+                          "Longing (EA2) - A face I hardly remember. (d8, when providing help, roll your Emotional Equipment and your Wisdom die, use the higher result)"
+                          "Faith (EA3) - The hope for a better tomorrow. (d4, exploding. On a result of 4, roll another d4)"
+                          "Devotion (EA2) - A mother’s love. (d6, when providing help, roll your Wisdom die twice and take the higher result)"
+                          "Contempt (EA1) - Contempt for a better rival. (d8, Strong Gambits may be performed upon a roll of 7 or higher)"
+                          "Jealousy (EA1) - The mercy I gave too freely. (2d6, when Fatigued, the Reinforce Gambit regains you an additional Spirit)"
+                          "Resolve (EA3) - The harsh winter I barely survived. (d6, when you would become Fatigued, roll a d6. On a 6, ignore it)"
+                          "Love (EA2) - The person I would die for. (d6, once per encounter, when an ally would take Emotional Damage, choose instead to take it yourself)"
+                          "Envy (EA3) - What ought to have been mine. (d8, once per encounter, when an opponent saves against a Gambit, you may immediately perform another Gambit)"
+                          "Ambition (EA2) - A hunger to rise above. (d8, when Fatigued, the Bolster Gambit does an additional Emotional Damage)"
+                          "Greed (EA2) - A deal I regret taking. (2d6, when winning Glory as a result of a Clash of Tongues, gain an additional Glory)"
+                          "Wonder (EA2) - A glimpse from beyond the veil. (d10, upon encountering something new and otherworldly, regain 2 SPI)"
+                          "Restraint (EA1) - A fury I mask as duty. (d10, when you use the Domineer Feat, perform both options)"
+                          "Compassion (EA2) - A burden I choose to carry. (d8, when an ally would become Fatigued, you may choose to become Fatigued instead)"
+                          "Justice (EA2) - A reckoning to come. (d8, when an opponent would use a Strong Gambit against you, save against VIG to ignore it)"
+                          "Scorn (EA2) - A betrayal that cut deeper than the sword. (d8, when you perform the Bait Feat, perform both options)"))
+
+ (random-table/register :name "Mythic Bastionland > Clash of Tongues > Wisdom Dice"
+                        :private t
+                        :reuse "Mythic Bastionland > Knight > Glory"
+                        :data '(((-3 . 2) . "d6") ((3 . 5) . "d8") ((6 . 8) . "d10") ((9 . 11) . "d12") ((12 . 30) . "2d8")))
 
 (random-table/scope
  "Mythic Bastionland"
