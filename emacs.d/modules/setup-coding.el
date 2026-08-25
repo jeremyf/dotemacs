@@ -452,7 +452,17 @@ Useful for Eglot."
   (add-to-list 'eglot-server-programs
     '(elixir-mode "~/elixir-ls/elixir-ls-v0.31.1/language_server.sh"))
   (add-to-list 'eglot-server-programs
-    '(elixir-ts-mode "~/elixir-ls/elixir-ls-v0.31.1/language_server.sh"))
+               '(elixir-ts-mode "~/elixir-ls/elixir-ls-v0.31.1/language_server.sh"))
+  ;; BEGIN CODE UPDATES FOUND From https://www.jamescherti.com/emacs-eglot-performance/
+  (setq eglot-autoshutdown t)
+  (setq eglot-sync-connect 0)
+  (setq eglot-events-buffer-config '(:size 0 :format short))
+  (setq jsonrpc-event-hook nil)
+  (setq eglot-report-progress nil)
+  (setq eglot-code-action-indications nil)
+  (add-to-list 'eglot-ignored-server-capabilities :colorProvider)
+  (add-to-list 'eglot-ignored-server-capabilities :foldingRangeProvider)
+  ;; END CODE UPDATES FOUND From https://www.jamescherti.com/emacs-eglot-performance/
   :hook ((eglot-managed-mode . jf/eglot-managed-mode)))
 
 (add-hook 'go-ts-mode-hook 'flymake-mode 8)
