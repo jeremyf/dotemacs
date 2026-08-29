@@ -2610,11 +2610,13 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   ;; and comment was not adequate
   ;; (setq jf/themes-plist '(:dark ef-bio :light ef-elea-light))
   (setq jf/themes-plist '(:dark
-                           ef-fig
+                           ef-symbiosis
                            ;; modus-vivendi-deuteranopia
                            ;; ef-owl
                            :light
-                           ef-elea-light))
+                           ef-cyprus
+                           ;; ef-elea-light
+                           ))
   :init
   (modus-themes-include-derivatives-mode 1))
 
@@ -2673,8 +2675,8 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
       :dark :light))
 
   (defvar jf/color-scheme-commands:gnu/linux
-    '((:template "gsettings set org.gnome.settings-daemon.plugins.color night-light-enabled %s"
-        :light "false" :dark "true")
+    '(;; (:template "gsettings set org.gnome.settings-daemon.plugins.color night-light-enabled %s"
+      ;;   :light "false" :dark "true")
        (:template "gsettings set org.gnome.desktop.interface color-scheme %s"
          :light "default" :dark "prefer-dark")
        (:template "gsettings set org.gnome.desktop.interface gtk-theme %s"
@@ -3536,16 +3538,6 @@ function is ever added to that hook."
   "Where I put my runbook notes.")
 
 (with-eval-after-load 'org
-  (add-to-list 'org-capture-templates
-  '("j" "Journal Entry"
-     entry (file+olp+datetree
-             jf/filename-for-journal)
-     "At %(format-time-string \"%R\")\n:PROPERTIES:\n:CUSTOM_ID: journal-%(format-time-string \"%Y%m%d-%H%M\")\n:END:\n%?"
-     :empty-lines-before 1
-     :empty-lines-after 1
-     :clock-in t
-     :clock-resume t))
-
   (use-package ox
     :straight (ox :type built-in))
   (setq org-export-global-macros (list))
@@ -4294,41 +4286,49 @@ sort accordingly.")
     #'string<))
 
 (setq org-capture-templates
-  `(("c" "Content to Clock"
-      plain (clock)
-      "%(jf/denote/capture-wrap :link \"%L\" :content \"%i\")"
-      :empty-lines 1)
-    ("u" "Runbook"
-     entry (file
-            jf/filename-for-runbooks)
-     "%^{Entry}\n%?"
-     :no-save t
-     :immediate-finish nil
-     :kill-buffer t
-     :jump-to-captured t)
-     ("d" "Dictionary"
-       plain (file jf/filename/dictionary)
-       "- %^{Term} :: %^{Description}; %a"
-       :after-finalize jf/org/capture/dictionary/sort)
-     ("p" "Person to Quote"
-       entry
-       (file+headline jf/filename/bibliography "People")
-       "%^{Name} :people:\n:PROPERTIES:\n:CUSTOM_ID: %(org-id-new)\n:END:\n%?"
-       :jump-to-captured t)
-     ("q" "Quote"
-       plain
-       (file+function jf/filename/bibliography
-         jf/org/capture/quote-location)
-       "#+begin_%^{Type|quote|quote|verse}\n%^{Text}\n#+end_%\\1"
-       :prepare-finalize jf/org/capture/name-that-block
-       :jump-to-captured t
-       :empty-lines 1)
-     ("w" "Work"
-       entry
-       (file+headline jf/filename/bibliography "Works")
-       "%^{Title} %^g\n:PROPERTIES:\n:CUSTOM_ID: %(org-id-new)\n:SUBTITLE: %^{Subtitle}\n:AUTHOR: %^{Author}\n:END:\n%?"
-       :jump-to-captured t
-       :after-finalize jf/org/capture/finalize-work)))
+      `(("j" "Journal Entry"
+         entry (file+olp+datetree
+                jf/filename-for-journal)
+         "At %(format-time-string \"%R\")\n:PROPERTIES:\n:CUSTOM_ID: journal-%(format-time-string \"%Y%m%d-%H%M\")\n:END:\n%?"
+         :empty-lines-before 1
+         :empty-lines-after 1
+         :clock-in t
+         :clock-resume t)
+        ("c" "Content to Clock"
+         plain (clock)
+         "%(jf/denote/capture-wrap :link \"%L\" :content \"%i\")"
+         :empty-lines 1)
+        ("u" "Runbook"
+         entry (file
+                jf/filename-for-runbooks)
+         "%^{Entry}\n%?"
+         :no-save t
+         :immediate-finish nil
+         :kill-buffer t
+         :jump-to-captured t)
+        ("d" "Dictionary"
+         plain (file jf/filename/dictionary)
+         "- %^{Term} :: %^{Description}; %a"
+         :after-finalize jf/org/capture/dictionary/sort)
+        ("p" "Person to Quote"
+         entry
+         (file+headline jf/filename/bibliography "People")
+         "%^{Name} :people:\n:PROPERTIES:\n:CUSTOM_ID: %(org-id-new)\n:END:\n%?"
+         :jump-to-captured t)
+        ("q" "Quote"
+         plain
+         (file+function jf/filename/bibliography
+                        jf/org/capture/quote-location)
+         "#+begin_%^{Type|quote|quote|verse}\n%^{Text}\n#+end_%\\1"
+         :prepare-finalize jf/org/capture/name-that-block
+         :jump-to-captured t
+         :empty-lines 1)
+        ("w" "Work"
+         entry
+         (file+headline jf/filename/bibliography "Works")
+         "%^{Title} %^g\n:PROPERTIES:\n:CUSTOM_ID: %(org-id-new)\n:SUBTITLE: %^{Subtitle}\n:AUTHOR: %^{Author}\n:END:\n%?"
+         :jump-to-captured t
+         :after-finalize jf/org/capture/finalize-work)))
 
 (use-package verb
   ;; https://github.com/federicotdn/verb
@@ -4367,7 +4367,7 @@ sort accordingly.")
   :hook (prog-mode . abbrev-mode)
   (text-mode . abbrev-mode))
 
-(defun C-w-dwim ()
+(defun C-w-dwim (parg)
   "Copy region or delete backward.
 
 When `active-region-p' is non-nil, copy the region as kill.  When
@@ -4375,10 +4375,10 @@ When `active-region-p' is non-nil, copy the region as kill.  When
 
 This all is because long ago I mentally trained 'C-w' as backward delete
 word.  Probably form my days on the AS400 terminal."
-  (interactive)
+  (interactive "p")
   (if (region-active-p)
     (call-interactively #'copy-region-as-kill)
-    (jf/delete-region-or-backward-word)))
+    (jf/delete-region-or-backward-word parg)))
 
 (use-package emacs
   :bind (("C-M-i" . completion-at-point)
