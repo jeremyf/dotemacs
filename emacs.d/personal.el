@@ -1730,4 +1730,5 @@ When a property is not provided, \"suitable\" defaults are assigned."
 ;; GPG key to use for encryption
 ;; Either the Key ID or set to nil to use symmetric encryption.
 (setq org-crypt-key nil)
+
 (require 'ox-takeonrules)

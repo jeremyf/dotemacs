@@ -7078,6 +7078,8 @@ This encodes the logic for creating a project."
     :straight (edraw-org :host github :repo "misohena/el-easydraw")
     :config (edraw-org-setup-default)))
 
+(require 'how-im-feeling)
+
 ;; When using the org-export-in-background option (when using the
 ;; asynchronous export function), the following settings are
 ;; required. This is because Emacs started in a separate process does
