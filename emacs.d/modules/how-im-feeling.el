@@ -16,11 +16,11 @@
     ("Stressed" . "Go for a walk")
     ("Procrastinating" . "Set a 10-minute timer")
     ("Sad" . "Get sunlight")
-    ("Can’t Focus" . "Clean your workspace")
+    ("Can't focus" . "Clean your workspace")
     ("Negative thoughts" . "Write 3 gratitudes")
     ("Stuck" . "Change your environment")
     ("Financial stress" . "Build an emergency fund")
-    ("Low Energy" . "Fix your sleep")
+    ("Low energy" . "Fix your sleep")
     ("Overthinking" . "Journal it out")
     ("Lonely" . "Call someone")
     ("No motivation" . "Start with 2 minutes")
@@ -36,15 +36,28 @@
   (let ((feels
          (completing-read-multiple "I'm Feeling: "
                                    how-im-feeling-responses
-                                   nil
+                                   #'completing-read-omit-p
                                    t))
         (concatter
          (lambda (feel)
            (format "- *%s:* %s"
                    feel
-                   (alist-get feel how-im-feeling-responses nil nil #'string=)))))
-    (insert (format "I'm feeling:\n\n%s\n" (mapconcat concatter feels "\n")))))
+                   (alist-get feel
+                              how-im-feeling-responses
+                              nil nil #'string=)))))
+    (insert
+     (format "I'm feeling:\n\n%s\n"
+             (mapconcat concatter feels "\n")))))
 
+(defun completing-read-omit-p (thusfar)
+  "Omit completions THUSFAR given."
+  (let ((input
+         (butlast (split-string
+                   (minibuffer-contents-no-properties)
+                   crm-separator)))
+        (test
+         (car (last (split-string thusfar crm-separator)))))
+    (not (member test input))))
 
 (provide 'how-im-feeling)
 ;;; how-im-feeling.el ends here
