@@ -4229,8 +4229,12 @@ Narrow focus to a tag, then a named element."
             (completing-read
               "Quotable: "  headline-alist nil t)))
     (goto-char (alist-get headline headline-alist nil nil #'string=))
-    (while (org-element-type-p (org-element-at-point) '(drawer property-drawer keyword planning))
-      (goto-char (org-element-property :end (org-element-at-point))))))
+    (while (org-element-type-p
+            (org-element-at-point)
+            '(drawer property-drawer keyword planning))
+      (goto-char (org-element-property :end (org-element-at-point))))
+    (when (org-element-type-p (org-element-at-point) '(headline))
+      (progn (insert "\n") (previous-line)))))
 
 (defvar jf/filename/shopping-list
   "~/SyncThings/source/books-to-get-from-bibliography.txt"
