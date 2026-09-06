@@ -1636,24 +1636,31 @@ date (that is omit that date)."
 See `playing-a-game-candidates' and `start-playing'.")
 
 (defvar playing-a-game-candidates
-  `(
-    ("Forged from the Worst (Mythic Bastionland)" .
-     ((start .
-             ((default-bookmark-display-function . switch-to-buffer-side-window)
-              (pdf-view-bookmark-make-record:prompt-for-random . t)
-              (callback . start-playing-mythic-bastionland)
-              (mythic-bastionland-map-as-html-path . "~/SyncThings/source/forged-from-the-worst/forged=from=the=worst--revealed-map.html")
-              (mythic-bastionland-map-state-file . "~/SyncThings/source/forged-from-the-worst/forged=from=the=worst--map-state.eld")
-              (bmk-file . "~/SyncThings/source/forged-from-the-worst/forged=from=the=worst--bookmarks.el")))))
-    ("Carrion's Call (Mythic Bastionland)" .
-     ((start .
-             ((default-bookmark-display-function . switch-to-buffer-side-window)
-              (pdf-view-bookmark-make-record:prompt-for-random . t)
-              (mythic-bastionland-map-as-html-path . "~/SyncThings/source/carrions-call/carrions=call--revealed-map.html")
-              (mythic-bastionland-map-state-file . "~/SyncThings/source/carrions-call/carrions=call--map-state.eld")
-              (callback . start-playing-mythic-bastionland)
-              (bmk-file . "~/SyncThings/source/carrions-call/carrions=call--bookmarks.el"))))))
-  "Possible games I might be playing via Emacs.")
+  nil
+  "Possible games I might be playing via Emacs.
+
+See 'start-playing' for structure of the alist.")
+
+(setq playing-a-game-candidates
+      `(("Forged from the Worst (Mythic Bastionland)" .
+         ((default-bookmark-display-function . switch-to-buffer-side-window)
+          (pdf-view-bookmark-make-record:prompt-for-random . t)
+          (callback . start-playing-mythic-bastionland)
+          (mythic-bastionland-map-as-html-path . "~/SyncThings/source/forged-from-the-worst/forged=from=the=worst--revealed-map.html")
+          (mythic-bastionland-map-state-file . "~/SyncThings/source/forged-from-the-worst/forged=from=the=worst--map-state.eld")
+          (bmk-file . "~/SyncThings/source/forged-from-the-worst/forged=from=the=worst--bookmarks.el")))
+        ("Sindralin (Mythic Bastionland)" .
+         ((default-bookmark-display-function . switch-to-buffer-side-window)
+          (pdf-view-bookmark-make-record:prompt-for-random . t)
+          (callback . start-playing-mythic-bastionland)
+          (bmk-file . "~/SyncThings/source/syndralin/20260905T000000==syndralin--bookmarks__campaigns.el")))
+        ("Carrion's Call (Mythic Bastionland)" .
+         ((default-bookmark-display-function . switch-to-buffer-side-window)
+          (pdf-view-bookmark-make-record:prompt-for-random . t)
+          (mythic-bastionland-map-as-html-path . "~/SyncThings/source/carrions-call/carrions=call--revealed-map.html")
+          (mythic-bastionland-map-state-file . "~/SyncThings/source/carrions-call/carrions=call--map-state.eld")
+          (callback . start-playing-mythic-bastionland)
+          (bmk-file . "~/SyncThings/source/carrions-call/carrions=call--bookmarks.el")))))
 
 (defun start-playing-mythic-bastionland ()
   (setq random-table/reporter #'random-table/reporter/as-child-window)
@@ -1682,11 +1689,18 @@ See `playing-a-game-candidates' and `start-playing'.")
 (keymap-global-set "H-r" #'start-playing)
 (keymap-global-set "C-H-r" #'start-playing)
 
+(defvar playing-a-game-mode-map
+  (let ((map
+         (make-sparse-keymap)))
+    (define-key map (kbd "H-r") #'random-table/roll)
+    (define-key map (kbd "C-H-r") #'random-table/roll-region)
+  map)
+  "Map for when playing 'playing-a-game'.")
+
 (defun start-playing (game)
   "Start playing the GAME; stopping any currently played game.
 
-A GAME has a 'start' that is an alist.  That alist has the followingrandom-table/storage/tables
-properties:
+A GAME is an alist has the properties:
 
 - 'bmk-file' :: what file we'll find our working bookmarks.
 - 'callback' :: the function we call to get us fully ready.
@@ -1695,31 +1709,29 @@ All other key/value pairs will be sent to `setq'.
 
 When a property is not provided, \"suitable\" defaults are assigned."
   (interactive
-    (list
-      (let ((handle
-              (completing-read "Start Playing: "
-                playing-a-game-candidates nil t)))
-        (alist-get handle playing-a-game-candidates nil nil #'string=))))
-  (let* ((config
-           (alist-get 'start game))
-          (file
-            (or
-              (alist-get 'bmk-file config)
-              fallback-bookmark-file)))
-        (require 'random-tables-data)
-        (keymap-global-set "H-r" #'random-table/roll)
-        (keymap-global-set "C-H-r" #'random-table/roll-region)
-        (setq random-table/reporter #'random-table/reporter/as-insert)
-        (cl-loop for (key . value) in config do
-                 (pcase key
-                   ('bmk-file t)
-                   ('callback t)
-                   (_ (set key value))))
-        (bookmark-save)
-        (setopt bookmark-default-file file)
-        (bookmark-load file t nil t)
-        (when-let ((fn (alist-get 'callback config)))
-          (funcall fn)))
+   (list
+    (let ((handle
+           (completing-read "Start Playing: "
+                            playing-a-game-candidates nil t)))
+      (alist-get handle playing-a-game-candidates nil nil #'string=))))
+  (let* ((file
+          (or
+           (alist-get 'bmk-file game)
+           fallback-bookmark-file)))
+    (require 'random-tables-data)
+    (keymap-global-set "H-r" #'random-table/roll)
+    (keymap-global-set "C-H-r" #'random-table/roll-region)
+    (setq random-table/reporter #'random-table/reporter/as-insert)
+    (cl-loop for (key . value) in game do
+             (pcase key
+               ('bmk-file t)
+               ('callback t)
+               (_ (set key value))))
+    (bookmark-save)
+    (setopt bookmark-default-file file)
+    (bookmark-load file t nil t)
+    (when-let ((fn (alist-get 'callback game)))
+      (funcall fn)))
   (setq playing-a-game game))
 
 (when (f-file?  "~/git/denote-bookmark.el/denote-bookmark.el")
