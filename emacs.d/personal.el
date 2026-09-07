@@ -1630,16 +1630,11 @@ date (that is omit that date)."
   (org-social-relay "https://org-social-relay.andros.dev/")
   (org-social-my-public-url "https://takeonrules.com/social.org"))
 
-(defvar playing-a-game nil
-  "When non-nil, indicates that I'm playing a game.
-
-See `playing-a-game-candidates' and `start-playing'.")
-
 (defvar playing-a-game-candidates
   nil
   "Possible games I might be playing via Emacs.
 
-See 'start-playing' for structure of the alist.")
+See 'playing-a-game-mode' for structure of the alist.")
 
 (setq playing-a-game-candidates
       `(("Forged from the Worst (Mythic Bastionland)" .
@@ -1670,24 +1665,12 @@ See 'start-playing' for structure of the alist.")
       (require 'mythic-bastionland "~/git/mythic-bastionland.el/mythic-bastionland.el")
       (mythic-bastionland-map-read))))
 
-(defun stop-playing ()
-  "Stop playing a game."
-  (interactive)
-  (when playing-a-game
-    (progn
-      (keymap-global-set "H-r" #'start-playing)
-      (keymap-global-set "C-H-r" #'start-playing)
-      (setq playing-a-game nil)
-      (setopt bookmark-default-file fallback-bookmark-file)
-      (bookmark-load fallback-bookmark-file t nil t)
-      (unload-feature 'random-tables-data)
-      (unload-feature 'random-table))))
-
 (when (f-file-p "~/git/random-table.el/random-table.el")
   (add-to-list 'load-path "~/git/random-table.el"))
 
-(keymap-global-set "H-r" #'start-playing)
-(keymap-global-set "C-H-r" #'start-playing)
+
+(keymap-global-set "H-r" #'playing-a-game-mode)
+(keymap-global-set "C-H-r" #'playing-a-game-mode)
 
 (defvar playing-a-game-mode-map
   (let ((map
@@ -1695,44 +1678,43 @@ See 'start-playing' for structure of the alist.")
     (define-key map (kbd "H-r") #'random-table/roll)
     (define-key map (kbd "C-H-r") #'random-table/roll-region)
   map)
-  "Map for when playing 'playing-a-game'.")
+  "Map for 'playing-a-game-map'.")
 
-(defun start-playing (game)
-  "Start playing the GAME; stopping any currently played game.
-
-A GAME is an alist has the properties:
-
-- 'bmk-file' :: what file we'll find our working bookmarks.
-- 'callback' :: the function we call to get us fully ready.
-
-All other key/value pairs will be sent to `setq'.
-
-When a property is not provided, \"suitable\" defaults are assigned."
-  (interactive
-   (list
-    (let ((handle
-           (completing-read "Start Playing: "
-                            playing-a-game-candidates nil t)))
-      (alist-get handle playing-a-game-candidates nil nil #'string=))))
-  (let* ((file
+(define-minor-mode playing-a-game-mode
+  "Minor mode indicating playing a game."
+  :global t
+  :init-value nil
+  :keymap playing-a-game-mode-map
+  :after-hook
+  (if playing-a-game-mode
+      ;; I have started with the intention of playing a game.  I now
+      ;; need to indicate what game I'm playing.
+      (let* ((game
+          (alist-get
+            (completing-read "Start Playing: "
+                             playing-a-game-candidates nil t)
+            playing-a-game-candidates nil nil #'string=))
+         (file
           (or
-           (alist-get 'bmk-file game)
-           fallback-bookmark-file)))
-    (require 'random-tables-data)
-    (keymap-global-set "H-r" #'random-table/roll)
-    (keymap-global-set "C-H-r" #'random-table/roll-region)
-    (setq random-table/reporter #'random-table/reporter/as-insert)
-    (cl-loop for (key . value) in game do
-             (pcase key
-               ('bmk-file t)
-               ('callback t)
-               (_ (set key value))))
-    (bookmark-save)
-    (setopt bookmark-default-file file)
-    (bookmark-load file t nil t)
-    (when-let ((fn (alist-get 'callback game)))
-      (funcall fn)))
-  (setq playing-a-game game))
+           (alist-get 'bmk-file game) fallback-bookmark-file)))
+        (require 'random-tables-data)
+        (setq random-table/reporter #'random-table/reporter/as-insert)
+        (cl-loop for (key . value) in game do
+                 (pcase key
+                   ('bmk-file t)
+                   ('callback t)
+                   (_ (set key value))))
+        (bookmark-save)
+        (setopt bookmark-default-file file)
+        (bookmark-load file t nil t)
+        (when-let ((fn (alist-get 'callback game)))
+          (funcall fn)))
+    (progn
+      ;; Stop playing a game
+      (setopt bookmark-default-file fallback-bookmark-file)
+      (bookmark-load fallback-bookmark-file t nil t)
+      (unload-feature 'random-tables-data)
+      (unload-feature 'random-table))))
 
 (when (f-file?  "~/git/denote-bookmark.el/denote-bookmark.el")
   (require 'denote-bookmark "~/git/denote-bookmark.el/denote-bookmark.el"))

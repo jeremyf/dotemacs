@@ -1626,8 +1626,8 @@ work computers.")
   :preface
   (defvar-local jf/mode-line-format/playing
     '(:eval
-       (when (and (boundp 'playing-a-game)
-               playing-a-game
+       (when (and (boundp 'playing-a-game-mode)
+               playing-a-game-mode
                (mode-line-window-selected-p))
          (concat
            (propertize " ⚅ " 'face 'mode-line-highlight) " "))))
