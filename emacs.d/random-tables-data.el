@@ -2174,15 +2174,15 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
 ;; https://welshpiper.com/random-noble-houses/
 (random-table/register :name "Noble House"
   :data (list (concat
-                "\n- Atriarch Pronouns :: {Noble House > Atriarch Pronouns}"
-                "\n- Atriarch Age :: {Noble House > Atriarch Age}"
-                "\n- Alignment :: {Noble House > Alignment}"
-                "\n- Influence :: {Noble House > Influence}"
-                "\n- Holdings :: {Noble House > Holdings}"
-                "\n- Relatives :: {Noble House > Relatives}"
-                "\n- Recent Activity :: {Noble House > Recent Activity}"
-                "\n- Current Ambition :: {Noble House > Current Ambition}"
-                "\n- Closet Skeleton :: {Noble House > Closet Skeleton}")))
+                "\n\t- Atriarch Pronouns :: {Noble House > Atriarch Pronouns}"
+                "\n\t- Atriarch Age :: {Noble House > Atriarch Age}"
+                "\n\t- Alignment :: {Noble House > Alignment}"
+                "\n\t- Influence :: {Noble House > Influence}"
+                "\n\t- Holdings :: {Noble House > Holdings}"
+                "\n\t- Relatives :: {Noble House > Relatives}"
+                "\n\t- Recent Activity :: {Noble House > Recent Activity}"
+                "\n\t- Current Ambition :: {Noble House > Current Ambition}"
+                "\n\t- Closet Skeleton :: {Noble House > Closet Skeleton}")))
 
 (random-table/register :name "Noble House > Atriarch Pronouns"
   :private t
@@ -2191,8 +2191,8 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
 (random-table/register :name "Noble House > Atriarch Age"
   :store t
   :data '((1 . "Young ({Noble House > Atriarch > Young Personality})")
-           ((2 . 4) . "Middle-aged ({Noble House > Atriarch > Middle-aged Personality}})")
-           ((5 . 6) . "Old ({Noble House > Atriarch > Old Personality}})")))
+           ((2 . 4) . "Middle-aged ({Noble House > Atriarch > Middle-aged Personality})")
+           ((5 . 6) . "Old ({Noble House > Atriarch > Old Personality})")))
 
 (random-table/register :name "Noble House > Atriarch > Young Personality"
   :private t
@@ -2219,8 +2219,8 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
 (random-table/register :name "Noble House > Holdings"
   :private t
   :data '(((1 . 2) . "Modest ({1d10} 5-mile hexes)")
-           ((3 . 5) . "Appreciable ({1d10 + 10} 5-mile hexes)")
-           (6 . "Extensive ({1d10 + 10} 5-mile hexes)")))
+           ((3 . 5) . "Appreciable ({1d10+10} 5-mile hexes)")
+           (6 . "Extensive ({1d10+10} 5-mile hexes)")))
 
 (random-table/register :name "Noble House > Relatives"
   :private t
@@ -2283,7 +2283,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "Addicted to [legal or widely available intoxicant/committing crimes/material possessions/exotic drug]"))
 
 (random-table/register :name "Mortal Site"
-  :data '("\n- What Is It :: {Mortal Site > What is it}\n- Who Is Here :: {Mortal Site > Who Is Here}"))
+  :data '("\n\t- What Is It :: {Mortal Site > What Is It}\n\t- Who Is Here :: {Mortal Site > Who Is Here}"))
 
 (random-table/register :name "Mortal Site > What Is It"
   :private t
@@ -2291,7 +2291,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "Workshop" "Farm" "Small fair" "Inn"
            "Forge" "Mill" "Woodcutter’s lodge" "Orphanage"
            "Pavilion" "Altar, statue, or shrine" "Road, path, or bridge" "Hamlet, village or towne"
-           "Manse" "Tower or small keep" "Castle" "Disguised as {Mortal Site > What is it} but actually {Mortal Site > What is it}"))
+           "Manse" "Tower or small keep" "Castle" "Disguised as {Mortal Site > What Is It} but actually {Mortal Site > What Is It}"))
 
 (random-table/register :name "Mortal Site > Who Is Here"
   :private t
@@ -2324,7 +2324,7 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "[poachers/outlaw loggers]"
            "[bandits/footpads/ne’er-do-wells]"
            "hermit"
-           "[monks/nuns/nuns and monks (gasp)"
+           "[monks/nuns/nuns and monks (gasp)]"
            "[runaways/lost children]"
            "[poets/musicians/artists]"
            "[adventurers/fortune seekers]"
@@ -2338,13 +2338,13 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "witchfinders"
            "monarchs and their retinues"))
 
-(random-table/register :name "Fey Site > What is it"
+(random-table/register :name "Fey Site > What Is It"
   :private t
   :data '("Maypole" "Bonfire" "Unicorn blind" "Tournament field"
            "Military outpost" "Market" "Fair" "Garden"
            "Mortal observation post" "Amphitheater" "Band shell" "Observatory"
            "Standing stones" "Circus" "Wildlife museum" "Mushroom library"
-           "Holiday home (timeshare)" "Manse" "Castle" "Disguised as {Fey Site > What is it} but actually {Fey Site > What is it}"))
+           "Holiday home (timeshare)" "Manse" "Castle" "Disguised as {Fey Site > What Is It} but actually {Fey Site > What Is It}"))
 
 (random-table/register :name "Fey Site > Who is here"
   :private t
@@ -2842,50 +2842,6 @@ From page 98 of /The Black Sword Hack: Ultimate Chaos Edition/.")
            "expose [skin/metal/leather/wood/blood/paper]"))
 
 ;;; Holy Roman Empire using Cepheus Engine
-(dolist (ability '("HRE > Ability > STR"
-                    "HRE > Ability > DEX"
-                    "HRE > Ability > END"
-                    "HRE > Ability > INT"))
-  (random-table/register :name ability
-    :store t
-    :private t
-    :reuse ability
-    :roller "2d6"
-    :data '(2 3 4 5 6 7 8 9 10 11 12)))
-
-(random-table/register :name "HRE > Ability > SOC"
-  :roller "2d6"
-  :reuse "HRE > SOC"
-  :store t
-  :data '((2 . "{CURRENT_ROLL}\tUnclean")
-           ((3 . 5) . "{CURRENT_ROLL}\tPeasant: Agriculture, Archery, Driving, Grappling, Watercraft, Survival.")
-           ((6 . 7) . "{CURRENT_ROLL}\tTownsman: Carousing, Driving, Grappling, Streetwise, Trade (select), Watercraft.")
-           ((8 . 9) . "{CURRENT_ROLL}\tBürgher: EDU + 1, Carousing, Fencing, Firearms, Streetwise, Statecraft, Trade (select).")
-           ((10 . 11) . "{CURRENT_ROLL}\tGentry: EDU +1, Agriculture, Etiquette, Fencing, Language (Latin), Survival, Statecraft, Riding.")
-           ((12 . 20) . "{CURRENT_ROLL}\tNobility: EDU +1, Art (any), Etiquette, Fencing, Language (Latin), Persuasion, Statecraft, Riding.")))
-
-(random-table/register :name "HRE > Ability > SOC > Modifier to EDU"
-  :reuse "HRE > SOC"
-  :private t
-  :exclude-from-prompt t
-  :filter (lambda (&rest dice) (if (>= (car dice) 8) 0 1))
-  :data '(0 1))
-
-(random-table/register :name "HRE > Ability > EDU"
-  :roller '(+ "2d6" "HRE > Ability > SOC > Modifier to EDU")
-  :reuse "HRE > Ability > EDU"
-  :store t
-  :private t
-  :data '(((2 . 7) . "{CURRENT_ROLL}\tSimple cultural knowledge.  Illiterate.")
-           (8 . "{CURRENT_ROLL}\tBasic Grammar, Arithmetic, and Literacy.  Attended civic, private, or religious primary school; literate in native language.")
-           (9 . "{CURRENT_ROLL}\tLatin, Grammar, Logic, Rhetoric.  University student to Bachelor of Arts (+2 Starting Age). Character is literate in any language known.")
-           (10 . "{CURRENT_ROLL}\tArithmetic, Geometry, Music, Astronomy, Metaphysics, Occult.  Master of Arts (+4 Starting Age) Completion of University. Can earn money tutoring.")
-           (11 . "{CURRENT_ROLL}\tLaw, Theology, Natural Sciences, Moral Philosophy, Philology.  Doctorate (+6 Starting Age). Begins specializing in a scholarly trade.")
-           ((12 . 20) . "{CURRENT_ROLL}\tSpecialization in previous subjects.  May indicate a Rector or Chair position and a University staff position (+8 Starting Age).")))
-
-(random-table/register :name "HRE"
-  :data '("\n- STR :: {HRE > Ability > STR}\n- DEX :: {HRE > Ability > DEX}\n- END :: {HRE > Ability > END}\n- INT :: {HRE > Ability > INT}\n- EDU :: {HRE > Ability > EDU}\n- SOC :: {HRE > Ability > SOC}"))
-
 (random-table/register :name "HRE > Contact"
   :data '("Kacker" "Thief" "Hanse merchange" "Barber-surgeon" "Musician" "Apothecary"
            "Executioner" "Cunning folk" "Beggar" "Ship's captain" "Scholar" "Military quartermaster"
