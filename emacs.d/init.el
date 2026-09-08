@@ -5837,7 +5837,7 @@ Use f/s for speed, [/] for size, b/n to skip, SPC to pause, q to quit."
   :init (use-package with-editor
           :straight t
           :custom (with-editor-emacsclient-executable
-                    (file-truename "~/bin/git_editor")))
+                    (with-editor-locate-emacsclient))
   :config
   ;; git-commit is a package shipped with transient.
   (require 'git-commit)
