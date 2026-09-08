@@ -2610,15 +2610,17 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   ;; I had '(:light ef-cyprus) but the differentiation between function
   ;; and comment was not adequate
   ;; (setq jf/themes-plist '(:dark ef-bio :light ef-elea-light))
-  (setq jf/themes-plist '((doric . (:dark doric-pine
-                                    :light doric-jade))
+  (setq jf/themes-plist '((doric . (:dark doric-walnut
+                                    :light doric-oak))
                           (ef . (:dark ef-symbiosis
                                  :light ef-cyprus))))
   :init
   (modus-themes-include-derivatives-mode 1))
 
-(setq jf/theme-source
-  '(doric . doric-themes-select))
+(defvar jf/theme-source
+  '(doric . doric-themes-select)
+  ;; '(ef . ef-themes-select)
+  "Theme package and corresponding function used to apply thetheme.")
 
 (use-package custom
   :straight (:type built-in)
