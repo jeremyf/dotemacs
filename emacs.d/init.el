@@ -1620,6 +1620,15 @@ work computers.")
   (apply (list fn nil 0 "")))
 (advice-add #'timeclock/punch-in :around #'jf/timeclock/punch-in)
 
+(use-package doric-themes :straight t
+  :config
+  (defface jf/mode-line-format/face-shadow
+    '((t :foreground fg-shadow-intense :backgroun bg-shadow-intense :inherit shadow))
+    "A face for symbols in the `mode-line'.")
+
+  (defface jf/mode-line-format/face-shadow-highlight
+    '((t :foreground fg-shadow-intense :backgroun bg-shadow-intense :inherit shadow))
+    "A face for highlighting symbols in the `mode-line'."))
 (use-package emacs
   :straight (:type built-in)
   :after (projectile)
@@ -1838,14 +1847,6 @@ active nature."
                       (jf/mode-line-format/vc-branch-name
                         file backend)))
          (jf/mode-line-format/vc-details file branch))))
-
-  (defface jf/mode-line-format/face-shadow
-    '((t :foreground "#d0ffe0" :inherit shadow))
-    "A face for symbols in the `mode-line'.")
-
-  (defface jf/mode-line-format/face-shadow-highlight
-    '((t :foreground "#d0ffe0" :inherit shadow))
-    "A face for highlighting symbols in the `mode-line'.")
 
   (defun jf/mode-line-format/vc-details (file branch)
     "Return the FILE and BRANCH."
@@ -2609,16 +2610,15 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   ;; I had '(:light ef-cyprus) but the differentiation between function
   ;; and comment was not adequate
   ;; (setq jf/themes-plist '(:dark ef-bio :light ef-elea-light))
-  (setq jf/themes-plist '(:dark
-                           ef-symbiosis
-                           ;; modus-vivendi-deuteranopia
-                           ;; ef-owl
-                           :light
-                           ef-cyprus
-                           ;; ef-elea-light
-                           ))
+  (setq jf/themes-plist '((doric . (:dark doric-pine
+                                    :light doric-jade))
+                          (ef . (:dark ef-symbiosis
+                                 :light ef-cyprus))))
   :init
   (modus-themes-include-derivatives-mode 1))
+
+(setq jf/theme-source
+  '(doric . doric-themes-select))
 
 (use-package custom
   :straight (:type built-in)
@@ -2627,12 +2627,16 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   ;; `custom' package.
   (defun jf/color-scheme:emacs (&optional given-scheme)
     "Function to load named theme."
-    (let ((scheme
+    (let* ((scheme
             (or given-scheme
               (funcall
                 (intern
-                  (format "jf/color-scheme-func:%s" system-type))))))
-      (modus-themes-select (plist-get jf/themes-plist scheme))))
+                 (format "jf/color-scheme-func:%s" system-type)))))
+          (theme
+           (plist-get
+            (alist-get (car jf/theme-source) jf/themes-plist) scheme)))
+      (funcall (cdr jf/theme-source) theme)))
+
 
   ;; Theming hooks to further customize colors
   (defvar after-enable-theme-hook nil
