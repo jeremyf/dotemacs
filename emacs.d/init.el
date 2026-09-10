@@ -1620,15 +1620,7 @@ work computers.")
   (apply (list fn nil 0 "")))
 (advice-add #'timeclock/punch-in :around #'jf/timeclock/punch-in)
 
-(use-package doric-themes :straight t
-  :config
-  (defface jf/mode-line-format/face-shadow
-    '((t :foreground fg-shadow-intense :backgroun bg-shadow-intense :inherit shadow))
-    "A face for symbols in the `mode-line'.")
-
-  (defface jf/mode-line-format/face-shadow-highlight
-    '((t :foreground fg-shadow-intense :backgroun bg-shadow-intense :inherit shadow))
-    "A face for highlighting symbols in the `mode-line'."))
+(use-package doric-themes :straight t)
 (use-package emacs
   :straight (:type built-in)
   :after (projectile)
@@ -1679,10 +1671,7 @@ work computers.")
       (propertize indicator
         'face
         (if (mode-line-window-selected-p)
-          (if (and (boundp 'ns-right-alternate-modifier)
-                (eq ns-right-alternate-modifier nil))
-            'jf/mode-line-format/face-shadow-highlight
-            'jf/mode-line-format/face-shadow)
+          'mode-line-active
           'mode-line-inactive)
         'local-map jf/mode-line-format/major-mode-indicator-map
         'help-echo
@@ -1855,7 +1844,7 @@ active nature."
         ;; 
         (propertize "" ;; (char-to-string #xE0A0)
           'face
-          'jf/mode-line-format/face-shadow)
+          'mode-line-active)
         " "
         branch)
       'local-map jf/mode-line-format/map-vc
@@ -1889,7 +1878,7 @@ active nature."
            (concat " " (project-name (project-current)))
            'face
            (if (mode-line-window-selected-p)
-             'jf/mode-line-format/face-shadow
+             'mode-line-active
              'mode-line-inactive)))))
 
   ;; We need to acknowledge and accept that these are risky variables.
@@ -2560,10 +2549,6 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
            ((,c :foreground ,fg-prominent-note)))
         `(go-test--error-face
            ((,c :foreground ,err)))
-        `(jf/mode-line-format/face-shadow
-           ((,c :foreground ,fg-mode-line-active)))
-        `(jf/mode-line-format/face-shadow-highlight
-           ((,c :foreground ,fg-mode-line-active :background ,bg-hover)))
         `(jf/tabs-face
            ((,c :underline (:style wave :color ,bg-blue-intense))))
         `(jf/org-faces-date
@@ -2609,7 +2594,6 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
       ))
   ;; I had '(:light ef-cyprus) but the differentiation between function
   ;; and comment was not adequate
-  ;; (setq jf/themes-plist '(:dark ef-bio :light ef-elea-light))
   (setq jf/themes-plist '((doric . (:dark doric-walnut
                                     :light doric-oak))
                           (ef . (:dark ef-symbiosis
@@ -2617,10 +2601,9 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   :init
   (modus-themes-include-derivatives-mode 1))
 
-(defvar jf/theme-source
-  '(doric . doric-themes-select)
-  ;; '(ef . ef-themes-select)
-  "Theme package and corresponding function used to apply thetheme.")
+(defvar jf/theme-source 'doric
+  "Theme package.")
+
 
 (use-package custom
   :straight (:type built-in)
@@ -2636,8 +2619,11 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
                  (format "jf/color-scheme-func:%s" system-type)))))
           (theme
            (plist-get
-            (alist-get (car jf/theme-source) jf/themes-plist) scheme)))
-      (funcall (cdr jf/theme-source) theme)))
+            (alist-get jf/theme-source jf/themes-plist) scheme)))
+      (funcall
+        (intern
+          (format "%s-themes-load-theme" jf/theme-source))
+        theme)))
 
 
   ;; Theming hooks to further customize colors
