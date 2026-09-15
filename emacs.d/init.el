@@ -5759,7 +5759,7 @@ Use f/s for speed, [/] for size, b/n to skip, SPC to pause, q to quit."
     ;; Build word positions list
     (dolist (word (split-string text))
       (unless (string-blank-p word)
-        (when-let ((word-start
+        (when-let* ((word-start
                      (string-match (regexp-quote word) text pos)))
           (push (cons word (+ start word-start)) word-positions)
           (setq pos (+ word-start (length word))))))
