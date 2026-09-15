@@ -4799,6 +4799,8 @@ possible.")
 (use-package iedit
   ;; Type \"C-;\" to select current symbol and all matches; Then edit at
   ;; multiple points.
+  :config
+  (set-face-attribute 'iedit-occurrence nil :inherit 'region)
   :straight t)
 
 (use-package jinx
