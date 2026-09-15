@@ -299,6 +299,10 @@ Else, evaluate the whole buffer."
         (message
           "Copied buffer file name '%s' to the clipboard."
           filename)))))
+(use-package whitespace
+  :straight (:type built-in)
+  :config
+  (setopt whitespace-line-column nil))
 
 (use-package project
   :straight (:type built-in))

@@ -1239,6 +1239,7 @@ See `jf/comment-header-regexp/major-modes-alis'."
     (unless (derived-mode-p 'emacs-lisp-mode)
       (flymake-mode 1))
     (hl-todo-mode t)
+    (whitespace-mode t)
     (setq show-trailing-whitespace t)
     (setq truncate-lines t)
     ;; (which-function-mode)
