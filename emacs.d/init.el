@@ -2428,10 +2428,17 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   (defun tab-bar-tab-name-all-with-projectile ()
     (mapconcat
       (lambda (buffer)
-        (format "%s%s"
-        (alist-get (projectile-project-name)
-          tab-bar-project-alist "" nil #'string=)
-          (buffer-name buffer)))
+        (with-current-buffer buffer
+          (format "%s%s"
+            ;; Without the current buffer, the 'projectile-project-name'
+            ;; will return the active buffer's project name.
+            (alist-get
+              (when-let* ((proj (project-current)))
+                (file-name-nondirectory
+                  (directory-file-name (project-root proj))))
+              ;; (projectile-project-name))
+              tab-bar-project-alist "" nil #'string=)
+          (buffer-name))))
       (delete-dups (mapcar #'window-buffer
                      (window-list-1 (frame-first-window)
                        'nomini)))

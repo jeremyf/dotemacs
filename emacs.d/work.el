@@ -191,12 +191,14 @@ For inserting entity."
 
 (setq tab-bar-project-alist
   '(
-     ("morpho-roadmap.wiki" . "📓")
-     ("morpho-pcloud-cli" . "P ")
-     ("morpho-service-broker" . "B ")
-     ("aeris" . "A ")
-     ("factotum" . "F ")
-     ("dotemacs" . "E ")
+     ("morpho-roadmap.wiki" . "📓 ")
+     ("morpho-pcloud-cli" . "🐍 ")
+     ("morpho-service-broker" . "🗑 ")
+     ("aeris" . "🖥 ")
+     ("factotum" . "🤹 ")
+     ("tollbooth" . "💰 ")
+     ("vision" . "👓 ")
+     ("dotemacs" . "🏡 ")
      ("morpho-swagger" . "🤠 ")))
 
 (require 'gh-dashboard)
