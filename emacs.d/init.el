@@ -1486,7 +1486,8 @@ work computers.")
   :straight (:type built-in)
   :config
   (info-initialize)
-  (push "/opt/homebrew/share/info" Info-directory-list))
+  (when (f-dir-p "/opt/homebrew/share/info")
+    (push "/opt/homebrew/share/info" Info-directory-list)))
 
 (use-package expand-region
   ;; A simple package that does two related things really well; expands
