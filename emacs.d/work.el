@@ -198,7 +198,8 @@ For inserting entity."
      ("factotum" . "🤹 ")
      ("tollbooth" . "💰 ")
      ("vision" . "👓 ")
-     ("dotemacs" . "🏡 ")
+     ("dotemacs" . "🧰 ")
+     ("dotzshr" . "🏡 ")
      ("morpho-swagger" . "🤠 ")))
 
 (require 'gh-dashboard)
