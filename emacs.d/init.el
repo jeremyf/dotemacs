@@ -4984,6 +4984,7 @@ The generated and indented TOC will be inserted at point."
   ;; Creating some outline modes.  Which has me thinking about an
   ;; outline mode for my agenda file.
   (defun jf/emacs-lisp-mode-configurator ()
+    (symbol-overlay-mode t)
     (setopt imenu-sort-function 'imenu--sort-by-name)
     (setq imenu-generic-expression
       '((nil "^;;[[:space:]]+-> \\(.*\\)$" 1)
