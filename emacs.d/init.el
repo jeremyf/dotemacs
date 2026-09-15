@@ -302,7 +302,9 @@ Else, evaluate the whole buffer."
 (use-package whitespace
   :straight (:type built-in)
   :config
-  (setopt whitespace-line-column nil))
+  ;; I don't want too much chatter on lines almost within the 80
+  ;; character traditional limit.  The 144 gives some breathing room.
+  (setopt whitespace-line-column 144))
 
 (use-package project
   :straight (:type built-in))
