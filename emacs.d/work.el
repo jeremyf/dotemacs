@@ -56,8 +56,23 @@
 (setq jf/filename-for-journal
   (denote-get-path-by-id "20260101T000000"))
 
+(defvar jf/filename-for-management
+  (denote-get-path-by-id "20260915T140237")
+  "Where I put my management tasks.")
+
 (setq jf/filename-for-runbooks
   (denote-get-path-by-id "20260804T120428"))
+
+(add-to-list 'org-capture-templates
+  '("m" "Add management task"
+     entry (file+headline
+             jf/filename-for-management
+             "Tasks")
+     "TODO %^{Task}\nSCHEDULED: %^{Start}t\nDEADLINE:%^{Deadline}t\n%?"
+     :empty-lines-before 1
+     :empty-lines-after 1
+     :clock-in t
+     :clock-resume t))
 
 (add-to-list 'org-capture-templates
   '("T" "Add to task for MBO"
