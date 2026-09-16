@@ -4689,7 +4689,7 @@ possible.")
                 (org-element-property :title (org-element-at-point)))))
           "+tags+LEVEL=2"
           'file)))
-    denote-known-keywords))
+    '("projects" "notes")))
 
 (defvar jf/filename/bibliography
   (denote-get-path-by-id "20241124T080648")
