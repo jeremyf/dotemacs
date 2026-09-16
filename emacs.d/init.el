@@ -3772,9 +3772,9 @@ function is ever added to that hook."
         (if-let* ((filter-body
                     (plist-get plist :filter-body)))
           (progn
-            (add-to-list 'filter-body jf/ox/filter-body/latex)
+            (add-to-list 'filter-body #'jf/ox/filter-body/latex)
             (plist-put plist :filter-body filter-body))
-          (plist-put plist :filter-body '(jf/ox/filter-body/latex)))
+          (plist-put plist :filter-body '(#'jf/ox/filter-body/latex)))
         (if-let* ((filter-final-output
                     (plist-get plist :filter-final-output)))
           (progn
