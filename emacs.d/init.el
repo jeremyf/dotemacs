@@ -2162,51 +2162,73 @@ Returns nil when point is not on a coding identifier."
     "Provide an inflection point for OS fonts.  Namely they are named just a
 bit differently.")
   (setopt fontaine-presets
-    ;; I'm naming the presets as "actions"; the mindset that I'm using
-    ;; when wanting that font.
-    `((smallest
-        :default-height 100)
-       (smaller
-         :default-height 110)
-       (default
-         :default-family "IntoneMono Nerd Font Mono"
-         :default-weight light
-         :bold-weight medium
-         :default-height 125)
-       (bigger
-         :default-height 160)
-       (coding
-         :default-family "IntoneMono Nerd Font Mono"
-         :default-weight light
-         :bold-weight medium
-         :default-height 125)
-       (biggest
-         :default-weight light
-         :default-height 220
-         :bold-weight medium)
-       (reading
-         :default-weight semilight
-         :default-family "ETBembo"
-         :default-height 220
-         :bold-weight medium)
-       (t
-         :default-family "IntoneMono Nerd Font Mono"
-         :default-weight light
-         :default-height 1
-         :fixed-pitch-family nil ; falls back to :default-family
-         :fixed-pitch-weight nil ; falls back to :default-weight
-         :fixed-pitch-height 1.0
-         :fixed-pitch-serif-family nil ; falls back to :default-family
-         :fixed-pitch-serif-weight nil ; falls back to :default-weight
-         :fixed-pitch-serif-height 1.0
-         :variable-pitch-family ,variable-pitch-name
-         :variable-pitch-weight light
-         :variable-pitch-height 1.0
-         :bold-family nil ; use whatever the underlying face has
-         :bold-weight medium
-         :italic-family nil
-         :italic-slant italic
-         :line-spacing nil)))
+          ;; I'm naming the presets as "actions"; the mindset that I'm using
+          ;; when wanting that font.
+          `((three-column
+             :inherit default
+             :default-height 80)
+            (smaller
+             :inherit default
+             :default-height 100)
+            (default
+             :default-family "IntoneMono Nerd Font Mono"
+             :default-weight light
+             :bold-weight medium
+             :default-height 120)
+            (bigger
+             :inherit default
+             :default-height 160)
+            (biggest
+             :inherit default
+             :default-height 220)
+            (t
+             :default-family "IntoneMono Nerd Font Mono"
+             :default-weight light
+             :default-height 100
+
+             :fixed-pitch-family nil ; falls back to :default-family
+             :fixed-pitch-weight nil ; falls back to :default-weight
+             :fixed-pitch-height 1.0
+
+             :fixed-pitch-serif-family nil ; falls back to :default-family
+             :fixed-pitch-serif-weight nil ; falls back to :default-weight
+             :fixed-pitch-serif-height 1.0
+
+             :variable-pitch-family "Times New Roman"
+             :variable-pitch-weight nil
+             :variable-pitch-height 1.0
+
+             :mode-line-active-family nil ; falls back to :default-family
+             :mode-line-active-weight nil ; falls back to :default-weight
+             :mode-line-active-height 0.9
+
+             :mode-line-inactive-family nil ; falls back to :default-family
+             :mode-line-inactive-weight nil ; falls back to :default-weight
+             :mode-line-inactive-height 0.9
+
+             :header-line-family nil ; falls back to :default-family
+             :header-line-weight nil ; falls back to :default-weight
+             :header-line-height 0.9
+
+             :line-number-family nil ; falls back to :default-family
+             :line-number-weight nil ; falls back to :default-weight
+             :line-number-height 1.0
+
+             :tab-bar-family nil ; falls back to :default-family
+             :tab-bar-weight nil ; falls back to :default-weight
+             :tab-bar-height 1.0
+
+             :tab-line-family nil ; falls back to :default-family
+             :tab-line-weight nil ; falls back to :default-weight
+             :tab-line-height 1.0
+
+             :bold-family nil ; use whatever the underlying face has
+             :bold-weight bold
+
+             :italic-family nil
+             :italic-slant italic
+
+             :line-spacing nil)))
   (fontaine-set-preset 'default))
 
 (use-package nerd-icons
