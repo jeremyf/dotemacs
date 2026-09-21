@@ -4951,6 +4951,24 @@ The generated and indented TOC will be inserted at point."
   :config
   (add-to-list 'auto-mode-alist '("\\.env\\..*\\'" . dotenv-mode)))
 
+(use-package ghostel
+  :straight t
+  :bind (:map ghostel-semi-char-mode-map
+              ("C-s"  . consult-line)
+              ("C-k"  . my/ghostel-send-C-k-and-kill))
+  :config
+  (defun my/ghostel-send-C-k-and-kill ()
+    "Send `C-k' to ghostel.
+Like normal Emacs `C-k'.  Kill to end of line and put content in
+kill-ring."
+    (interactive)
+    (kill-ring-save (point) (line-end-position))
+    (ghostel-send-key "k" "ctrl"))
+
+  (add-to-list 'ghostel-eval-cmds
+               '("magit-status-setup-buffer"
+                  magit-status-setup-buffer)))
+
 (use-package vterm
   ;; A terminal in Emacs.
   :straight t
