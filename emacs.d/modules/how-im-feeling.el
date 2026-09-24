@@ -11,6 +11,49 @@
 
 ;;; Code:
 
+(defvar how-im-processing-responses
+  '((
+     ;; Four response
+     "Why are you so emotional?" .
+     ("What are you hoping your partner understands that they may be missing?"
+      "What need is underneath this emotion?"
+      "When you increase the intensity, what are you hoping will happen?"
+      "What feels most painful when your partner becomes quiet?"
+      "What story do you tell yourself when they withdraw?"
+      "What helps you feel emotionally chosen?"))
+    ;; Nine response
+    ("Why didn't you say anything?" .
+     ("What happened inside you just before you became quiet?"
+      "What were you hoping would happen if you stayed silent?"
+      "What emotion feels hardest to bring into this relationship?"
+      "What do you worry would happen if you expressed your disagreement?"
+      "How do you know when you've disappeared in the relationship?"
+      "When you shut down, what are you protecting?"
+      "If conflict didn't threaten connection, what would you say")))
+  "Prompts to help me reformulate questions.")
+
+(defun how-im-processing ()
+  "Short-circuit questions I'm processing with appropriate questions.
+
+These are based on specific Enneagram types."
+  (interactive)
+  (let ((questions
+         (completing-read-multiple "Questions I'm asking myself: "
+                                   how-im-processing-responses
+                                   #'completing-read-omit-p
+                                   t))
+        (concatter
+         (lambda (question)
+           (format "- *%s*\n  - %s"
+                   question
+                   (s-join "\n  - "
+                   (alist-get question
+                              how-im-processing-responses
+                              nil nil #'string=))))))
+    (insert
+     (format "Questions I'm asking myself:\n\n%s\n"
+             (mapconcat concatter questions "\n")))))
+
 (defvar how-im-feeling-responses
   '(("Angry" . "Lift weights")
     ("Stressed" . "Go for a walk")
@@ -40,7 +83,7 @@
                                    t))
         (concatter
          (lambda (feel)
-           (format "- *%s:* %s"
+           (format "- *%s:%s"
                    feel
                    (alist-get feel
                               how-im-feeling-responses
