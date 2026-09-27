@@ -12,9 +12,16 @@
 ;;; Code:
 
 (defvar how-im-processing-responses
-  '((
+  '(
+    ("Why am I continuing to pursue?" .
+     ("What am I hoping will happen if I continue this conversation right now?"
+      "Have I communicated my need clearly, or am I repeating myself because I haven't received the response I'm hoping for?"
+      "Is my current approach creating more opportunity for connection, or is it increasing pressure on my partner?"
+      "Can I give my partner space without abandoning my own needs or allowing the issue to disappear?"
+      "What specific request could I make instead of continuing to explain or pursue?"
+      "If we need a pause, what would a mutually respectful plan for reconnecting look like?"))
      ;; Four response
-     "Why are you so emotional?" .
+    ("Why are you so emotional?" .
      ("What are you hoping your partner understands that they may be missing?"
       "What need is underneath this emotion?"
       "When you increase the intensity, what are you hoping will happen?"
