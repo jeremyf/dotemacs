@@ -959,13 +959,16 @@ PARG is for a conformant method signature."
                                     :title (org-element-at-point))
                            :subtitle (when include-subtitle
                                        (org-entry-get
-                                         (org-element-at-point) "SUBTITLE"))
+                                        (org-element-at-point)
+                                        "SUBTITLE"))
                            :author (when include-author
                                      (org-entry-get
-                                       (org-element-at-point) "AUTHOR"))
+                                       (org-element-at-point)
+                                        "AUTHOR"))
                            :translator (when include-translator
                                          (org-entry-get
-                                           (org-element-at-point) "TRANSLATOR"))))
+                                           (org-element-at-point)
+                                        "TRANSLATOR"))))
                        (format "CUSTOM_ID=\"%s\"" custom-id)
                        `(,jf/filename/bibliography)))))
         book-label)))
