@@ -2773,20 +2773,15 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
             "TMR May Ring (Emacs tmr package)")
            (description
              (tmr--timer-description timer)))
-      (if (eq system-type 'darwin)
+      (when (eq system-type 'darwin)
         (ns-do-applescript (concat "display notification \""
                              description
-                             "\" sound name \"Glass\""))
-        (user-error "Unable to send tmr notification for OS"))))
-  :custom (tmr-notify-function #'jf/notifications-notify)
-  (tmr-timer-completed-functions
-    (list #'tmr-print-message-for-completed-timer
-      #'tmr-sound-play
-      #'jf/tmr-notification-notify))
+                             "\" sound name \"Glass\"")))))
+  :custom
   (tmr-timer-finished-functions
-    (list #'tmr-print-message-for-completed-timer
-      #'tmr-sound-play #'jf/tmr-notification-notify)
-    nil nil "Customized with use-package tmr")
+   (list #'tmr-print-message-for-finished-timer
+         #'tmr-notification-notify
+      #'tmr-sound-play #'jf/tmr-notification-notify))
   :straight (:host github :type git
               :repo "protesilaos/tmr"))
 
