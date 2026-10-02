@@ -322,6 +322,7 @@ Else, evaluate the whole buffer."
         (mark " " (name 16 -1) " " filename))))
 
 (use-package ibuffer-vc
+  ;; Group ibuffer by project
   :straight t
   :after (ibuffer)
   :config
@@ -333,6 +334,7 @@ Else, evaluate the whole buffer."
 
 (when (eq system-type 'gnu/linux)
   (bind-key "s-s" #'save-buffer)
+  (bind-key "s-q" #'save-buffers-kill-emacs)
   (use-package grab-x-link
     :straight (:host github :repo "jeremyf/dotemacs" :files ("emacs.d/grab-x-link")))
 
@@ -1777,21 +1779,21 @@ active nature."
            'nerd-icons-mdicon "nf-md-clock_outline"
            "⨶" 'mode-line-highlight))))
 
-  (defvar jf/mode-line-format/vterm-map
-    (let ((map
-            (make-sparse-keymap)))
-      (define-key map [mode-line down-mouse-1] #'vterm-copy-mode)
-      map)
-    "Keymap to display on `vterm' copy indicator.")
+  ;; (defvar jf/mode-line-format/vterm-map
+  ;;   (let ((map
+  ;;           (make-sparse-keymap)))
+  ;;     (define-key map [mode-line down-mouse-1] #'vterm-copy-mode)
+  ;;     map)
+  ;;   "Keymap to display on `vterm' copy indicator.")
 
-  (defvar-local jf/mode-line-format/vterm
-    '(:eval
-       (when (derived-mode-p 'vterm-mode)
-         (propertize
-           (concat " " (if vterm-copy-mode "©" "O") " ")
-           'face 'mode-line-highlight
-           'local-map jf/mode-line-format/vterm-map
-           'help-echo "mouse-1:vterm-copy-mode"))))
+  ;; (defvar-local jf/mode-line-format/vterm
+  ;;   '(:eval
+  ;;      (when (derived-mode-p 'vterm-mode)
+  ;;        (propertize
+  ;;          (concat " " (if vterm-copy-mode "©" "O") " ")
+  ;;          'face 'mode-line-highlight
+  ;;          'local-map jf/mode-line-format/vterm-map
+  ;;          'help-echo "mouse-1:vterm-copy-mode"))))
 
   (defvar jf/mode-line-format/which-function-map
     (let ((map
@@ -1907,7 +1909,7 @@ active nature."
                         jf/mode-line-format/timeclock
                         jf/mode-line-format/project
                         jf/mode-line-format/vc-branch
-                        jf/mode-line-format/vterm
+                        ;; jf/mode-line-format/vterm
                         jf/mode-line-format/which-function
                         ))
     (put construct 'risky-local-variable t))
@@ -1916,7 +1918,7 @@ active nature."
     '("%e" " "
        jf/mode-line-format/timeclock
        jf/mode-line-format/org-clock
-       jf/mode-line-format/vterm
+       ;; jf/mode-line-format/vterm
        jf/mode-line-format/kbd-macro
        jf/mode-line-format/narrow
        jf/mode-line-format/playing
@@ -2634,7 +2636,7 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   ;; I had '(:light ef-cyprus) but the differentiation between function
   ;; and comment was not adequate
   (setq jf/themes-plist '((doric . (:dark doric-walnut
-                                    :light doric-oak))
+                                    :light doric-jade))
                           (ef . (:dark ef-symbiosis
                                  :light ef-cyprus))))
   :init
@@ -2903,27 +2905,27 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   :bind ("C-c =" . math-at-point))
 
 
-(use-package emacs-everywhere
-  ;; Favor this over the hammerspoon editWithEmacs command.  Why?  This
-  ;; command is more generalized and is getting more traction amongst
-  ;; folks in the #emacs fediverse.  Hence something that is more likely
-  ;; to see maintenance.
-  :straight t
-  :custom
-  (emacs-everywhere-major-mode-function #'emacs-everywhere-major-mode-org-or-markdown)
-  (emacs-everywhere-frame-parameters
-    '((name . "emacs-everywhere")
-       (width . 80)
-       (height . 12)
-       (user-position . t)
-       (top . 0)
-       (left . 0)))
-  :config
-  ;; Create a nice editing experience, in which we have a well maximized
-  ;; screen.  The position and fullscreen don't work.  So I'm relying on
-  ;; setting a small frame, then expanding it to maximum.
-  (add-hook 'emacs-everywhere-mode-hook #'olivetti-mode)
-  (add-hook 'emacs-everywhere-mode-hook #'toggle-frame-maximized))
+;; (use-package emacs-everywhere
+;;   ;; Favor this over the hammerspoon editWithEmacs command.  Why?  This
+;;   ;; command is more generalized and is getting more traction amongst
+;;   ;; folks in the #emacs fediverse.  Hence something that is more likely
+;;   ;; to see maintenance.
+;;   :straight t
+;;   :custom
+;;   (emacs-everywhere-major-mode-function #'emacs-everywhere-major-mode-org-or-markdown)
+;;   (emacs-everywhere-frame-parameters
+;;     '((name . "emacs-everywhere")
+;;        (width . 80)
+;;        (height . 12)
+;;        (user-position . t)
+;;        (top . 0)
+;;        (left . 0)))
+;;   :config
+;;   ;; Create a nice editing experience, in which we have a well maximized
+;;   ;; screen.  The position and fullscreen don't work.  So I'm relying on
+;;   ;; setting a small frame, then expanding it to maximum.
+;;   (add-hook 'emacs-everywhere-mode-hook #'olivetti-mode)
+;;   (add-hook 'emacs-everywhere-mode-hook #'toggle-frame-maximized))
 
 (use-package ws-butler
   ;; Keep white space tidy.
@@ -4955,6 +4957,7 @@ The generated and indented TOC will be inserted at point."
               ("C-s"  . consult-line)
               ("C-k"  . my/ghostel-send-C-k-and-kill))
   :config
+  (with-eval-after-load 'org (require 'ghostel-org))
   (defun my/ghostel-send-C-k-and-kill ()
     "Send `C-k' to ghostel.
 Like normal Emacs `C-k'.  Kill to end of line and put content in
@@ -4967,14 +4970,14 @@ kill-ring."
                '("magit-status-setup-buffer"
                   magit-status-setup-buffer)))
 
-(use-package vterm
-  ;; A terminal in Emacs.
-  :straight t
-  :config
-  (setopt vterm-always-compile-module t))
+;; (use-package vterm
+;;   ;; A terminal in Emacs.
+;;   :straight t
+;;   :config
+;;   (setopt vterm-always-compile-module t))
 
-(use-package multi-vterm
-  :straight t)
+;; (use-package multi-vterm
+;;   :straight t)
 
 (use-package dash-docs
   ;; An alternate to devdocs.  Facilitates downloading HTML files and
