@@ -2768,22 +2768,21 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   ;;
   ;; My dbus install is not behaving so I'm cheating with a bit of
   ;; AppleScript
+  :custom
+  (tmr-timer-finished-functions
+    '(tmr-print-message-for-finished-timer
+      jf/tmr-notification-notify))
   :preface
   (defun jf/tmr-notification-notify (timer)
     "Dispatch a notification for TIMER."
-    (let ((title
-            "TMR May Ring (Emacs tmr package)")
-           (description
-             (tmr--timer-description timer)))
-      (when (eq system-type 'darwin)
-        (ns-do-applescript (concat "display notification \""
-                             description
-                             "\" sound name \"Glass\"")))))
-  :custom
-  (tmr-timer-finished-functions
-   (list #'tmr-print-message-for-finished-timer
-         #'tmr-notification-notify
-      #'tmr-sound-play #'jf/tmr-notification-notify))
+    (if (eq system-type 'darwin)
+      (start-process "terminal-notifier" nil
+        "terminal-notifier"
+        "-title" "TMR"
+        "-message" (tmr--long-description-for-finished-timer timer))
+      (progn
+        (tmr-notification-notify timer)
+        (tmr-sound-play timer))))
   :straight (:host github :type git
               :repo "protesilaos/tmr"))
 
