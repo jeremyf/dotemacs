@@ -1632,7 +1632,10 @@ work computers.")
   (apply (list fn nil 0 "")))
 (advice-add #'timeclock/punch-in :around #'jf/timeclock/punch-in)
 
-(use-package doric-themes :straight t)
+(use-package doric-themes
+  :straight
+  (doric-themes :host github :repo "protesilaos/doric-themes"))
+
 (use-package emacs
   :straight (:type built-in)
   :after (projectile)
