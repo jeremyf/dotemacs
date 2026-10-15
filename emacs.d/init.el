@@ -654,7 +654,7 @@ Interacting with the current tab/page of the BROWSER we can:
     :straight (:host github :type git :repo "protesilaos/denote-org")
     :after (denote org))
   ;; (setq denote-journal-extras-title-format 'day-date-month-year)
-
+  (setopt denote-org-store-link-to-heading 'local)
   (setopt denote-link-description-format "%t")
   (setopt denote-org-store-link-to-heading 'id)
   (setopt denote-rename-buffer-format "%D%b")
@@ -2645,7 +2645,7 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
   :init
   (modus-themes-include-derivatives-mode 1))
 
-(defvar jf/theme-source 'doric
+(defvar jf/theme-source 'ef
   "Theme package.")
 
 
