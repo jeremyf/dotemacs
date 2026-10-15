@@ -2182,7 +2182,7 @@ bit differently.")
              :default-family "IntoneMono Nerd Font Mono"
              :default-weight light
              :bold-weight medium
-             :default-height 120)
+             :default-height 125)
             (bigger
              :inherit default
              :default-height 160)
@@ -2206,11 +2206,11 @@ bit differently.")
              :variable-pitch-weight nil
              :variable-pitch-height 1.0
 
-             :mode-line-active-family nil ; falls back to :default-family
+             :mode-line-active-family "IntoneMono Nerd Font Mono" ; falls back to :default-family
              :mode-line-active-weight nil ; falls back to :default-weight
              :mode-line-active-height 0.9
 
-             :mode-line-inactive-family nil ; falls back to :default-family
+             :mode-line-inactive-family "IntoneMono Nerd Font Mono" ; falls back to :default-family
              :mode-line-inactive-weight nil ; falls back to :default-weight
              :mode-line-inactive-height 0.9
 
@@ -2647,7 +2647,6 @@ With three or more universal PREFIX `save-buffers-kill-emacs'."
 
 (defvar jf/theme-source 'ef
   "Theme package.")
-
 
 (use-package custom
   :straight (:type built-in)
