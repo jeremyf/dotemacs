@@ -638,30 +638,22 @@ When USE_HUGO_SHORTCODE is given use glossary based exporting."
 This might be either the `denote' IDENTIFIER or the ID of an `org-mode'
 node in one of my agenda files."
   (message "Associating URL: %s with IDENTIFIER: %s." identifier url)
-  (if-let* ((filename
-             (denote-get-path-by-id identifier)))
-    (let ((buffer
-            (find-file-noselect filename)))
-      (with-current-buffer buffer
-        (jf/export-org-to-tor--global-buffer-prop-ensure
-          :key "ROAM_REFS"
-          :plist (jf/org-keywords-as-plist :keywords-regexp "ROAM_REFS")
-          :default url)
-        (save-buffer)))
-    (if-let* ((filename-and-pos
-               (org-id-find identifier)))
-      (let ((buffer
-              (find-file-noselect (car filename-and-pos))))
-        (with-current-buffer buffer
+  (let ((file-id-and-headline-id
+         (s-split "::#" identifier)))
+    (message "%S" file-id-and-headline-id)
+    (if-let* ((filename
+               (denote-get-path-by-id (car file-id-and-headline-id))))
+        (with-current-buffer (find-file-noselect filename)
           (save-excursion
             (save-restriction
               (widen)
-              (goto-char (cdr filename-and-pos))
+              (search-forward
+               (format ":CUSTOM_ID: %s" (cadr file-id-and-headline-id)))
               (org-todo "PUBLISHED")
               (org-clock-in)
               (org-clock-out)
               (org-entry-put (org-element-at-point) "ROAM_REFS" url)))))
-      (user-error "Unable to find org_id %s for url %s" identifier url))))
+    (user-error "Unable to find org_id %s for url %s" identifier url)))
 
 (defun jf/capture/denote/from/eww-data ()
   "Create an `denote' entry from `eww' data."
@@ -829,7 +821,10 @@ We also rely on the org-element at point."
                 (org-entry-get (point) "LICENSE")
                 ox-takeonrules/license)))
           (org_id
-            (org-entry-get (point) "ID"))
+           (format "%s::#%s"
+                   (denote-retrieve-filename-identifier
+                    (buffer-file-name (current-buffer)))
+                   (org-entry-get (point) "CUSTOM_ID")))
           (metadata `(("title" . ,title)
                        ("description" . ,description)
                        ("org_id" . ,org_id)
@@ -848,7 +843,7 @@ We also rely on the org-element at point."
       ;; Assume that the first time we publish, this is in a draft
       ;; state.  That is what picks up what I am to publish.
       (add-to-list 'metadata '("draft" . "true")))
-    (when-let ((series
+    (when-let* ((series
                  (org-entry-get (point) "SERIES")))
       (add-to-list 'metadata `("series" . ,series)))
     (yaml-encode metadata)))
