@@ -13,6 +13,17 @@
 
 (defvar how-im-processing-responses
   '(
+    ;; Moving towards a one response.
+    ("How can I ethically move towards my conscience?" .
+     ("What action would be consistent with my values, even if I feel emotionally activated?"
+      "What is my responsibility in this situation, and what belongs to my partner?"
+      "Can I respond with honesty and integrity without needing to control the outcome?"
+      "What would it look like to communicate clearly rather than reactively?"
+      "Am I acting in a way that reflects the partner I want to be?"
+      "What is the most constructive action available to me right now?"
+      "Can I hold both the validity of my feelings and the possibility that my interpretation may be incomplete?"
+      "What would intentionality look like here, rather than urgency?"))
+     ;; Creating a positive type 2 response.
     ("Why am I continuing to pursue?" .
      ("What am I hoping will happen if I continue this conversation right now?"
       "Have I communicated my need clearly, or am I repeating myself because I haven't received the response I'm hoping for?"
@@ -45,7 +56,7 @@
 These are based on specific Enneagram types."
   (interactive)
   (let ((questions
-         (completing-read-multiple "Questions I'm asking myself: "
+         (completing-read-multiple "How I’m processing: "
                                    how-im-processing-responses
                                    #'completing-read-omit-p
                                    t))
@@ -58,7 +69,7 @@ These are based on specific Enneagram types."
                               how-im-processing-responses
                               nil nil #'string=))))))
     (insert
-     (format "Questions I'm asking myself:\n\n%s\n"
+     (format "How I’m processing:\n\n%s\n"
              (mapconcat concatter questions "\n")))))
 
 (defvar how-im-feeling-responses
@@ -90,7 +101,7 @@ These are based on specific Enneagram types."
                                    t))
         (concatter
          (lambda (feel)
-           (format "- *%s:%s"
+           (format "- *%s:* %s"
                    feel
                    (alist-get feel
                               how-im-feeling-responses
