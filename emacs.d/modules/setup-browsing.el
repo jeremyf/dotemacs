@@ -148,6 +148,12 @@ A page is marked `last' if rel=\"last\" appears in a <link> or <a> tag."
           ("h" . eww-home-url))
   :hook ((eww-mode . jf/reader-visual)))
 
+(defun jf/kill-cookies ()
+  "Delete the cookies from Webkit"
+  (interactive)
+  (delete-file "~/.emacs.d/url/cookies")
+  (message "Cookies deleted."))
+
 (when (f-dir-p "~/git/kagi-search.el")
   ;; https://git.andros.dev/andros/kagi-search.el
   (use-package kagi-search
