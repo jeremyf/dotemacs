@@ -2194,7 +2194,7 @@ bit differently.")
              :default-weight light
              :default-height 100
 
-             :fixed-pitch-family nil ; falls back to :default-family
+             :fixed-pitch-family "IntoneMono Nerd Font Mono" ; falls back to :default-family
              :fixed-pitch-weight nil ; falls back to :default-weight
              :fixed-pitch-height 1.0
 
@@ -2214,19 +2214,19 @@ bit differently.")
              :mode-line-inactive-weight nil ; falls back to :default-weight
              :mode-line-inactive-height 0.9
 
-             :header-line-family nil ; falls back to :default-family
+             :header-line-family "IntoneMono Nerd Font Mono"nil ; falls back to :default-family
              :header-line-weight nil ; falls back to :default-weight
              :header-line-height 0.9
 
-             :line-number-family nil ; falls back to :default-family
+             :line-number-family "IntoneMono Nerd Font Mono" ; falls back to :default-family
              :line-number-weight nil ; falls back to :default-weight
              :line-number-height 1.0
 
-             :tab-bar-family nil ; falls back to :default-family
+             :tab-bar-family "IntoneMono Nerd Font Mono" ; falls back to :default-family
              :tab-bar-weight nil ; falls back to :default-weight
              :tab-bar-height 1.0
 
-             :tab-line-family nil ; falls back to :default-family
+             :tab-line-family "IntoneMono Nerd Font Mono" ; falls back to :default-family
              :tab-line-weight nil ; falls back to :default-weight
              :tab-line-height 1.0
 
