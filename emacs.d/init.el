@@ -3068,6 +3068,17 @@ future copy)."
       "File.open('%s', 'w') { |f| "
       " f.write((results.class == String) ? results : results.inspect) "
       "}"))
+  (setopt org-latex-toc-command
+          (s-join
+           "\n"
+           `("\\begin{multicols}{2}"
+             "\\tableofcontents"
+             ""
+             "\\end{multicols}"
+             "\\newpage\\begin{multicols}{2}"
+             ,(concat "\\\let\\oldhref\\href\\renewcommand{\\href}[2]"
+                      "{\\oldhref{#1}{#2}\\footnote{\\url{#1}}}")
+             "")))
 
   (setopt org-babel-ruby-pp-wrapper-method "require 'pp'
 results = self.instance_exec { %s }
