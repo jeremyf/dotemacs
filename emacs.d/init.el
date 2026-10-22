@@ -3674,7 +3674,7 @@ function is ever added to that hook."
   (add-to-list 'org-latex-classes
     '("jf/two-column-landscape"
        "\\documentclass[10pt,letter,landscape,twoside]{article}
-\\usepackage[letter]{anysize}
+\\usepackage[letterpaper]{anysize}
 \\usepackage{minted}
 \\usepackage{array, booktabs, caption}
 \\usemintedstyle{emacs}
@@ -3713,14 +3713,14 @@ function is ever added to that hook."
        ("\\subparagraph{%s}" . "\\subparagraph{%s}")))
   (add-to-list 'org-latex-classes
     '("jf/two-column-portrait"
-       "\\documentclass[10pt,letter,portrait]{article}
-\\usepackage[letter]{anysize}
+       "\\documentclass[10pt,letterpaper,portrait]{article}
+\\usepackage[letterpaper]{anysize}
 \\usepackage{minted}
 \\usepackage{array, booktabs, caption}
 \\usemintedstyle{emacs}
 \\usepackage[linktocpage=true]{hyperref}
 \\usepackage[french,english]{babel}
-\\usepackage[letter,top=1in,bottom=1in]{geometry}
+\\usepackage[letterpaper,top=1in,bottom=1in]{geometry}
 \\usepackage{minimalist}
 \\usepackage{fontspec}
 \\usepackage{caption} \\captionsetup{labelfont=bf,font={sf,small}}
