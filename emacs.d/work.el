@@ -63,6 +63,15 @@
 (setq jf/filename-for-runbooks
   (denote-get-path-by-id "20260804T120428"))
 
+(if-let* ((honoria-path
+            (getenv "HONORIA_REPO_PATH"))
+           (honoria-file
+             (format "%s/honoria.el" (getenv "HONORIA_REPO_PATH"))))
+  (if (f-file-p honoria-file)
+    (require 'honoria honoria-file)
+    (user-error "honoria.el not found in " honoria-file))
+  (user-error "expected HONORIA_REPO_PATH to exist"))
+
 (add-to-list 'org-capture-templates
   '("m" "Add management task"
      entry (file+headline
