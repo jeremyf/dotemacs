@@ -216,7 +216,7 @@ INFO is a plist holding contextual information."
              (save-excursion
                (with-current-buffer
                  (find-file-noselect jf/filename/bibliography)
-                 (elfeed--shuffle
+                 (elfeed-shuffle
                    (org-element-map
                      (org-element-parse-buffer)
                      '(quote-block verse-block)

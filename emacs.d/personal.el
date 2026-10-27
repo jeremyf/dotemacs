@@ -775,6 +775,8 @@ We ignore the DESCRIPTION and probably the CHANNEL."
   (file-truename "~/git/takeonrules.source/data/glossary.yml"))
 (defvar jf/filename/bibliography-takeonrules
   (file-truename "~/git/takeonrules.source/content/site-map/bibliography/_index.md"))
+(defvar jf/filename/epigraph-takeonrules
+  (file-truename "~/git/takeonrules.source/content/site-map/epigraphs/index.md"))
 
 
 (defun jf/bibliography/export-to-takeonrules (&optional file)
