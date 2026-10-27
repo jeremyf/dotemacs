@@ -3071,8 +3071,9 @@ future copy)."
       "File.open('%s', 'w') { |f| "
       " f.write((results.class == String) ? results : results.inspect) "
       "}"))
-  (setopt org-latex-toc-command
-          (s-join
+  (defvar org-latex-toc-commands
+    `((default . "\\tableofcontents\n\n")
+      (multicol . ,(s-join
            "\n"
            `("\\begin{multicols}{2}"
              "\\tableofcontents"
@@ -3081,7 +3082,23 @@ future copy)."
              "\\newpage\\begin{multicols}{2}"
              ,(concat "\\\let\\oldhref\\href\\renewcommand{\\href}[2]"
                       "{\\oldhref{#1}{#2}\\footnote{\\url{#1}}}")
-             "")))
+             ""))))
+    "Available values for 'org-latex-toc-command'.")
+  (defun org-latex-toc-command-set (name)
+    "Set 'org-latex-toc-command' to NAME.
+
+Lookup NAME in 'org-latex-toc-commands'."
+    (interactive (list
+                  (completing-read "Name: " org-latex-toc-commands)))
+    (if-let* ((command
+               (alist-get (intern name)
+                          org-latex-toc-commands 'default)))
+        (progn
+          (setopt org-latex-toc-command command)
+          (message "Set 'org-latex-toc-command' via name %s" name))
+      (user-error
+       "Unable to set 'org-latex-toc-command' via name %s" name)))
+
 
   (setopt org-babel-ruby-pp-wrapper-method "require 'pp'
 results = self.instance_exec { %s }
