@@ -4627,7 +4627,8 @@ possible.")
       ("." "Thing at point" helpful-at-point)
       ("t" "Text properties" describe-text-properties)
       ("v" "Variable" helpful-variable)])
-  :bind ("C-H-h" . jf/helpful-menu))
+  :bind (("C-H-h" . jf/helpful-menu)
+         ("H-h" . jf/helpful-menu)))
 
 (use-package tempel
   ;; For awhile, I'd used yasnippets; themselves inspired by my beloved
