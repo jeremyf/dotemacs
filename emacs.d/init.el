@@ -159,6 +159,7 @@ The DWIM behaviour of this command is as follows:
 
     ;; Show index and count of search results
     isearch-lazy-count t
+    isearch-allow-motion t
     lazy-count-prefix-format "(%s/%s) "
 
     ;; Slow down the UI being updated to improve performance
