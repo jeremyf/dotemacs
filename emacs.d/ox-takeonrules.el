@@ -23,7 +23,7 @@
   '((:with-toc nil "toc" nil)))
 
 (defvar ox-takeonrules/license
-  "by-nc-nd-4_0"
+  "all-rights-reserved"
   "The applicable license for this blog post.")
 (defvar jf/exporting-org-to-tor nil
   "When non-nil, I'm in the middle of exporting the document to takeonrules.")
@@ -652,8 +652,9 @@ node in one of my agenda files."
               (org-todo "PUBLISHED")
               (org-clock-in)
               (org-clock-out)
-              (org-entry-put (org-element-at-point) "ROAM_REFS" url)))))
-    (user-error "Unable to find org_id %s for url %s" identifier url)))
+              (org-entry-put (org-element-at-point) "ROAM_REFS" url)
+              (save-buffer))))
+    (user-error "Unable to find org_id %s for url %s" identifier url))))
 
 (defun jf/capture/denote/from/eww-data ()
   "Create an `denote' entry from `eww' data."
