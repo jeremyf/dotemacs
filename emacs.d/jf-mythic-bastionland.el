@@ -388,9 +388,10 @@
                           (2 . "They are adept at {Mythic Bastionland > Squires > They Are Adept At}")
                           (3 . "They come from {Mythic Bastionland > Squires > They Come From}")
                           (4 . "They are accompanied by {Mythic Bastionland > Squires > They Are Accompanied By}")
-                          (5 . "They possess an unusual {Mythic Bastionland > Squires > They Possess an Unusual}")
-                          (6 . "It is prophesied that they {Mythic Bastionland > Squires > It is Prophesied That They}")))
+                          (5 . "They possess an unusual {Mythic Bastionland > Squires > They Possess An Unusual}")
+                          (6 . "It is prophesied that they {Mythic Bastionland > Squires > It Is Prophesied That They}")))
  (random-table/register :name "Squires > They Have Brought"
+                        :private t
                         :data
                         '("a grand but ill-fitting helm (A1)." "A shrill flute played often."
                           "fine clothes & a pouch of coins." "A homemade shield (A1)."
@@ -399,6 +400,7 @@
                           "a tiny mirror of poor quality." "sustenance, loaded on by kin."
                           "forage stimulant, to share." "a Seer-given sacrament."))
  (random-table/register :name "Squires > They Are Adept At"
+                        :private t
                         :data
                         '("sprinting, swift as a hare." "climbing, sure as a squirrel."
                           "singing, sweet as a nightingale." "swimming, as a fish in water."
@@ -406,6 +408,64 @@
                           "storytelling, with the ability to enchant any audience." "sensing direction."
                           "scholarship; a fountain of facts." "horse-whispering, be it race, pack, cart, or war."
                           "herbalism, familiar with flora." "hunting and tracking."))
+ (random-table/register :name "Squires > They Come From"
+                        :private t
+                        :data '("far away, and can speak an unknown tongue."
+                                "co-native and distant kin to this Realm's Ruler."
+                                "a position as heir to a Holding."
+                                "a position as chosen successor to one of the Knights."
+                                "a Seer's adoptive family."
+                                "a clan sprawled throughout the Realm."
+                                "a hidden claim to the Seat of Power."
+                                "a family executed for treason, so lives under an assumed name."
+                                "the wilds; their guttural sounds are vaguely intelligible to beasts."
+                                "the frozen peaks, and are unfazed by Winter."
+                                "a realm of darkness, and are unfazed by night."
+                                "a body of water, needing no air to breathe."))
+
+ (random-table/register :name "Squires > They Are Accompanied By"
+                        :private t
+                        :data '("an old but loyal hound (VIG 5, CLA 7, SPI 6, 4 GD, d6 Bite)."
+                                "a pet rat that they believe understands them."
+                                "an overbearing parent (roll as a weaponless Squire)."
+                                "an identical twin."
+                                "a kestrel (VIG 4, CLA 15, SPI 5, 3 GD, d4 Talons)"
+                                "a violent pony (d6 Trample)"
+                                "a younger sibling—too young to be of use? (Roll as a squire)."
+                                "their mother's ashes in an urn."
+                                "an embarrassing rag doll."
+                                "their father's skull, kept and spoken to in secret."
+                                "an older sibling of renown who visits sometimes (roll Knight)."))
+
+ (random-table/register :name "Squires > They Possess An Unusual"
+                        :private t
+                        :data '("old age."
+                                "size (VIG 12)."
+                                "boldness (SPI 12)."
+                                "claim, insisting they are a Knigh reborn (add Smite)."
+                                "perserverance (add Focus)."
+                                "steadfastness in the face of death (add Deny)."
+                                "hatred toward Seers."
+                                "aversion to meat."
+                                "integrity, and cannot lie."
+                                "fear of horses."
+                                "disfigurement from battle (roll d12 no the Scar table)."))
+ (random-table/register :name "Squires > It Is Prophesied That They"
+                        :private t
+                        :data '("must not fight until Knighted."
+                                "must die so another may rise."
+                                "will find the City (or found it)."
+                                "must visit every Seer."
+                                "must slay a Knight to become one."
+                                "will become a Seer."
+                                "must slay a Seer."
+                                "will discover the next Ruler."
+                                "must never mount a steed."
+                                "must vow a life of poverty."
+                                "must not be Knighted."
+                                "will achieve nothing of note, at least, in their lifetime."))
+
+ 
  (random-table/register :name "Sparks > Ceremony"
                         :data
                         "Mood: [Solemn/Celebratory/Poetci/Ostentatious/Charitable/Brutal/Nurturing/Vindictive/Humble/Formal/Despairing/Joyous]; Ritual: [Burial/Drinking/Oration/Music/Combat/Decoration/Breaking/Sacrifice/Pleading/Washing/Burning/Expedition]")
