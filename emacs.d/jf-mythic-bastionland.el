@@ -99,7 +99,7 @@
  :name "Mythic Bastionland > Virtues"
  :roller #'random-table/roller/prompt-from-table-data
  :data '(("Commoner" . "VIG: {Mythic Bastionland > Virtues > Commoner}, CLA: {Mythic Bastionland > Virtues > Commoner}, SPI: {Mythic Bastionland > Virtues > Commoner}, GD: {1d6}")
-         ("Squire" . "VIG: {Mythic Bastionland > Virtues > Squire}, CLA: {Mythic Bastionland > Virtues > Squire}, SPI: {Mythic Bastionland > Virtues > Squire}, GD: 2")
+         ("Squire" . "VIG: {Mythic Bastionland > Virtues > Squire}, CLA: {Mythic Bastionland > Virtues > Squire}, SPI: {Mythic Bastionland > Virtues > Squire}, GD: 2. {Mythic Bastionland > Squires}")
          ("Young" . "VIG: {Mythic Bastionland > Virtues > Young}, CLA: {Mythic Bastionland > Virtues > Young}, SPI: {Mythic Bastionland > Virtues > Young}, GD: {Mythic Bastionland > Guard > Young}")
          ("Mature" . "VIG: {Mythic Bastionland > Virtues > Mature}, CLA: {Mythic Bastionland > Virtues > Mature}, SPI: {Mythic Bastionland > Virtues > Mature}, GD: {Mythic Bastionland > Guard > Mature}")
          ("Old" . "VIG: {Mythic Bastionland > Virtues > Old}, CLA: {Mythic Bastionland > Virtues > Old}, SPI: {Mythic Bastionland > Virtues > Old}, GD: {Mythic Bastionland > Guard > Old}")))
