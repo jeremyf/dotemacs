@@ -68,7 +68,12 @@
            (honoria-file
              (format "%s/honoria.el" (getenv "HONORIA_REPO_PATH"))))
   (if (f-file-p honoria-file)
-    (require 'honoria honoria-file)
+    (progn
+      (require 'honoria honoria-file)
+      (setopt honoria-cli-path
+        (if (f-file-p (format "%s/honoria" honoria-path))
+          (format "%s/honoria" honoria-path)
+          "~/bin/honoria")))
     (user-error "honoria.el not found in " honoria-file))
   (user-error "expected HONORIA_REPO_PATH to exist"))
 
@@ -79,6 +84,16 @@
              "Tasks")
      "TODO %^{Task}\nSCHEDULED: %^{Start}t\nDEADLINE:%^{Deadline}t\n%?"
      :empty-lines-before 1
+     :empty-lines-after 1
+     :clock-in t
+     :clock-resume t))
+(add-to-list 'org-capture-templates
+  '("r" "T[r]acking"
+     entry (file+headline
+             jf/filename-for-management
+             "Tracking")
+      "%<%Y-%M-%d>\n*👓 Tracking as of %<%Y-%M-%d>*\n\n%?"
+      :empty-lines-before 1
      :empty-lines-after 1
      :clock-in t
      :clock-resume t))
